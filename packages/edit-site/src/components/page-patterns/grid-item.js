@@ -41,7 +41,6 @@ import { downloadBlob } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
 import {
 	PATTERN_TYPES,
@@ -51,6 +50,7 @@ import {
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import { unlock } from '../../lock-unlock';
+import RenameMenuItem from '../template-actions/rename-menu-item';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -283,7 +283,8 @@ function GridItem( { categoryId, item, ...props } ) {
 						<MenuGroup>
 							{ isCustomPattern && ! hasThemeFile && (
 								<RenameMenuItem
-									item={ item }
+									postId={ item.id }
+									postType={ item.type }
 									onClose={ onClose }
 								/>
 							) }

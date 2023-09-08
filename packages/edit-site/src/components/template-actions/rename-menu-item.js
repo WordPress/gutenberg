@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Button,
 	MenuItem,
@@ -19,13 +19,22 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_TYPES,
+	TEMPLATE_ORIGINS,
+	POST_TYPE_LABELS,
+} from '../../utils/constants';
 
-export default function RenameMenuItem( { template, onClose } ) {
-	const title = decodeEntities( template.title.rendered );
-	const [ editedTitle, setEditedTitle ] = useState( title );
+export default function RenameMenuItem( { postType, postId, onClose } ) {
+	const record = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+		[ postType, postId ]
+	);
+	const [ editedTitle, setEditedTitle ] = useState( '' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-
 	const {
 		editEntityRecord,
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
@@ -33,15 +42,23 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( template.type === TEMPLATE_POST_TYPE && ! template.is_custom ) {
+	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
+	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
+	const isUserPattern = record?.type === PATTERN_TYPES.user;
+
+	if (
+		( isTemplate || isTemplatePart ) &&
+		record?.source !== TEMPLATE_ORIGINS.custom &&
+		! isUserPattern
+	) {
 		return null;
 	}
 
-	async function onTemplateRename( event ) {
+	async function onRename( event ) {
 		event.preventDefault();
 
 		try {
-			await editEntityRecord( 'postType', template.type, template.id, {
+			await editEntityRecord( 'postType', record.type, record.id, {
 				title: editedTitle,
 			} );
 
@@ -53,8 +70,8 @@ export default function RenameMenuItem( { template, onClose } ) {
 			// Persist edited entity.
 			await saveSpecifiedEntityEdits(
 				'postType',
-				template.type,
-				template.id,
+				postType,
+				postId,
 				[ 'title' ], // Only save title to avoid persisting other edits.
 				{
 					throwOnError: true,
@@ -62,20 +79,24 @@ export default function RenameMenuItem( { template, onClose } ) {
 			);
 
 			createSuccessNotice(
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'Template renamed.' )
-					: __( 'Template part renamed.' ),
+				sprintf(
+					// translators: %1$s is a post type label, e.g., Template, Template Part or Pattern. %2$s is the new title.
+					__( '%1$s renamed to "%2$s".' ),
+					POST_TYPE_LABELS[ postType ] ??
+						POST_TYPE_LABELS.wp_template,
+					editedTitle
+				),
 				{
 					type: 'snackbar',
+					id: 'template-rename-success',
 				}
 			);
 		} catch ( error ) {
-			const fallbackErrorMessage =
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'An error occurred while renaming the template.' )
-					: __(
-							'An error occurred while renaming the template part.'
-					  );
+			const fallbackErrorMessage = sprintf(
+				// translators: %s is a post type label, e.g., Template, Template Part or Pattern.
+				__( 'An error occurred while renaming the %s.' ),
+				POST_TYPE_LABELS[ postType ] ?? POST_TYPE_LABELS.wp_template
+			);
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
@@ -90,7 +111,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 			<MenuItem
 				onClick={ () => {
 					setIsModalOpen( true );
-					setEditedTitle( title );
+					setEditedTitle(
+						decodeEntities(
+							record?.title?.rendered || record?.title?.raw
+						)
+					);
 				} }
 			>
 				{ __( 'Rename' ) }
@@ -100,10 +125,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 					title={ __( 'Rename' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
+						onClose();
 					} }
 					overlayClassName="edit-site-list__rename-modal"
 				>
-					<form onSubmit={ onTemplateRename }>
+					<form onSubmit={ onRename }>
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
@@ -120,6 +146,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
+										onClose();
 									} }
 								>
 									{ __( 'Cancel' ) }

@@ -1,0 +1,1068 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c2c2b857-93ef-4eb1-a87a-ecef90dc6859" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/editor/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/editor/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/page-patterns/grid-item.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/page-patterns/grid-item.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/page-patterns/rename-menu-item.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/page-patterns/rename-menu-item.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/sidebar-navigation-screen-template/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/sidebar-navigation-screen-template/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/template-actions/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/template-actions/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/components/template-actions/rename-menu-item.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/components/template-actions/rename-menu-item.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/edit-site/src/store/actions.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/edit-site/src/store/actions.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="update/style-engine-disable-optimize-by-default" />
+                <branch-info repo="$PROJECT_DIR$" source="try/global-style-revisions-item-expand" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="trunk" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitRewordedCommitMessages">
+    <option name="commitMessagesMapping">
+      <RewordedCommitMessageMapping>
+        <option name="originalMessage" value="initial commit adding PHP changes action" />
+        <option name="rewordedMessage" value="initial commit adding PHP changes action" />
+      </RewordedCommitMessageMapping>
+    </option>
+    <option name="currentCommit" value="1" />
+    <option name="onto" value="47b60e55a302ab25342ab46bb6fe255ac905241f" />
+  </component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="4ecbd97c-3387-42c5-897f-448d2b47751c" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="NamedScopeManager">
+    <scope name="src" pattern="!file[gutenberg]:.github//*&amp;&amp;!file[gutenberg]:.husky//*&amp;&amp;!file[gutenberg]:.vscode//*&amp;&amp;!file[gutenberg]:packages/*/build//*&amp;&amp;!file[gutenberg]:packages/*/build-module//*&amp;&amp;!file[gutenberg]:packages/*/build-style//*&amp;&amp;!file[gutenberg]:packages/*/build-types//*&amp;&amp;!file[gutenberg]:build//*&amp;&amp;!file[gutenberg]:vendor//*&amp;&amp;!file[gutenberg]:node_modules//*&amp;&amp;!file[gutenberg]:artifacts//*&amp;&amp;!file[gutenberg]:storybook/build//*" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+    <dismissed value="$PROJECT_DIR$/packages/components/package.json" />
+    <dismissed value="$PROJECT_DIR$/packages/react-native-editor/package.json" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="Local">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/vendor/yoast/phpunit-polyfills" />
+      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/resource-operations" />
+      <path value="$PROJECT_DIR$/vendor/spatie/phpunit-watcher" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/version" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/manifest" />
+      <path value="$PROJECT_DIR$/vendor/theseer/tokenizer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-grapheme" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/yosymfony/resource-watcher" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/phpcompatibility/phpcompatibility-wp" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit" />
+      <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/vendor/phpcompatibility/phpcompatibility-paragonie" />
+      <path value="$PROJECT_DIR$/vendor/clue/term-react" />
+      <path value="$PROJECT_DIR$/vendor/symfony/deprecation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/phpcompatibility/php-compatibility" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/cli-parser" />
+      <path value="$PROJECT_DIR$/vendor/clue/stdio-react" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/vendor/sirbrillig/phpcs-variable-analysis" />
+      <path value="$PROJECT_DIR$/vendor/clue/utf8-react" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-invoker" />
+      <path value="$PROJECT_DIR$/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/type" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/lines-of-code" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-normalizer" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/complexity" />
+      <path value="$PROJECT_DIR$/vendor/dealerdirect/phpcodesniffer-composer-installer" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-reflector" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/vendor/wp-coding-standards/wpcs" />
+      <path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/jolicode/jolinotif" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
+      <path value="$PROJECT_DIR$/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/vendor/gutenberg/gutenberg-coding-standards" />
+      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsextra" />
+      <path value="$PROJECT_DIR$/vendor/phpcsstandards/phpcsutils" />
+    </include_path>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="2OPc3Qtih7U1lDQqua4mxZ7lzJ4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Notification.DisplayName-DoNotAsk-Dependencies from package.json&quot;: &quot;Dependencies from package.json available&quot;,
+    &quot;Notification.DoNotAsk-Dependencies from package.json&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ramon/projects/gutenberg/packages/edit-site/src/components/template-actions&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.stylelint&quot;: &quot;/Users/ramon/projects/gutenberg/node_modules/stylelint&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/ramon/projects/gutenberg/node_modules/jest&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;/Users/ramon/.nvm/versions/node/v18.13.0/bin/node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/ramon/projects/gutenberg/node_modules/prettier&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.SCSS&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/ramon/projects/gutenberg/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/edit-site/src/components/template-actions" />
+      <recent name="$PROJECT_DIR$/test/emptytheme/emptytheme-child" />
+      <recent name="$PROJECT_DIR$/test/emptytheme/emptytheme-child/templates" />
+      <recent name="$PROJECT_DIR$/packages/edit-site/src/components/sidebar-navigation-screen-panel" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/compat/wordpress-6.3" />
+      <recent name="$PROJECT_DIR$/packages/edit-site/src/components/global-styles/screen-revisions" />
+      <recent name="$PROJECT_DIR$/lib/experimental" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="index.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/packages/block-library/src/footnotes/index.php">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="Local" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c2c2b857-93ef-4eb1-a87a-ecef90dc6859" name="Changes" comment="" />
+      <created>1681465457967</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1681465457967</updated>
+      <workItem from="1681465460420" duration="1000" />
+      <workItem from="1681466066505" duration="912000" />
+      <workItem from="1681624291050" duration="13000" />
+      <workItem from="1681689070944" duration="97756000" />
+      <workItem from="1682235483361" duration="306000" />
+      <workItem from="1682290911259" duration="31532000" />
+      <workItem from="1682398922448" duration="46725000" />
+      <workItem from="1682635267744" duration="28928000" />
+      <workItem from="1682905300547" duration="178000" />
+      <workItem from="1682909817624" duration="25084000" />
+      <workItem from="1683004266955" duration="87983000" />
+      <workItem from="1683593404598" duration="37710000" />
+      <workItem from="1683847625544" duration="14147000" />
+      <workItem from="1683964376139" duration="5000" />
+      <workItem from="1684111064003" duration="78965000" />
+      <workItem from="1684453146502" duration="14088000" />
+      <workItem from="1684725918085" duration="86087000" />
+      <workItem from="1685057469596" duration="14000" />
+      <workItem from="1685057513180" duration="16668000" />
+      <workItem from="1685323529338" duration="112177000" />
+      <workItem from="1685920871444" duration="97005000" />
+      <workItem from="1686614904244" duration="17908000" />
+      <workItem from="1686648932212" duration="594000" />
+      <workItem from="1686692132068" duration="902000" />
+      <workItem from="1686693539221" duration="15829000" />
+      <workItem from="1686727953685" duration="28963000" />
+      <workItem from="1686811072729" duration="14956000" />
+      <workItem from="1686893497442" duration="22270000" />
+      <workItem from="1687218332055" duration="15701000" />
+      <workItem from="1687239369876" duration="257000" />
+      <workItem from="1687323396504" duration="5555000" />
+      <workItem from="1687390192099" duration="4826000" />
+      <workItem from="1687400095971" duration="3182000" />
+      <workItem from="1687425096675" duration="22000" />
+      <workItem from="1687469469241" duration="1118000" />
+      <workItem from="1687477197519" duration="135000" />
+      <workItem from="1687481830318" duration="6103000" />
+      <workItem from="1687504895317" duration="9000" />
+      <workItem from="1687742749336" duration="1814000" />
+      <workItem from="1687744662794" duration="1802000" />
+      <workItem from="1687747354101" duration="61000" />
+      <workItem from="1687756612341" duration="90000" />
+      <workItem from="1687756788743" duration="2339000" />
+      <workItem from="1687762164159" duration="1742000" />
+      <workItem from="1687775237188" duration="720000" />
+      <workItem from="1687821114247" duration="21000" />
+      <workItem from="1687823951086" duration="980000" />
+      <workItem from="1687825293620" duration="318000" />
+      <workItem from="1687825994151" duration="5947000" />
+      <workItem from="1687835674152" duration="926000" />
+      <workItem from="1687840961057" duration="1413000" />
+      <workItem from="1687842851779" duration="1685000" />
+      <workItem from="1687852101052" duration="4777000" />
+      <workItem from="1687864978637" duration="5235000" />
+      <workItem from="1687909664134" duration="11987000" />
+      <workItem from="1687936741027" duration="1551000" />
+      <workItem from="1687999510923" duration="18330000" />
+      <workItem from="1688030848044" duration="4000" />
+      <workItem from="1688079879254" duration="14423000" />
+      <workItem from="1688420893843" duration="40343000" />
+      <workItem from="1688530195588" duration="7003000" />
+      <workItem from="1688600450518" duration="14413000" />
+      <workItem from="1688682675693" duration="5672000" />
+      <workItem from="1688705688557" duration="1780000" />
+      <workItem from="1688945786886" duration="16453000" />
+      <workItem from="1688984791148" duration="33000" />
+      <workItem from="1688985752609" duration="15412000" />
+      <workItem from="1689046044158" duration="1387000" />
+      <workItem from="1689049361860" duration="4339000" />
+      <workItem from="1689054195951" duration="794000" />
+      <workItem from="1689118119791" duration="35109000" />
+      <workItem from="1689291572559" duration="10860000" />
+      <workItem from="1689548176570" duration="23591000" />
+      <workItem from="1689651747195" duration="4275000" />
+      <workItem from="1689661949937" duration="708000" />
+      <workItem from="1689734993045" duration="16147000" />
+      <workItem from="1689821286083" duration="772000" />
+      <workItem from="1689824771721" duration="16141000" />
+      <workItem from="1689902890569" duration="16008000" />
+      <workItem from="1690162386101" duration="687000" />
+      <workItem from="1690170575619" duration="4592000" />
+      <workItem from="1690193251476" duration="12987000" />
+      <workItem from="1690259058798" duration="8170000" />
+      <workItem from="1690330161529" duration="22864000" />
+      <workItem from="1690498958319" duration="17019000" />
+      <workItem from="1690762137245" duration="38969000" />
+      <workItem from="1690955055988" duration="33538000" />
+      <workItem from="1691363685472" duration="10356000" />
+      <workItem from="1691452259369" duration="41875000" />
+      <workItem from="1691564350237" duration="15069000" />
+      <workItem from="1691970592480" duration="19489000" />
+      <workItem from="1691993516080" duration="9580000" />
+      <workItem from="1692063831879" duration="26533000" />
+      <workItem from="1692145041459" duration="10299000" />
+      <workItem from="1692306002849" duration="10955000" />
+      <workItem from="1692330043050" duration="21862000" />
+      <workItem from="1692412310795" duration="24733000" />
+      <workItem from="1692504690549" duration="17430000" />
+      <workItem from="1692831030420" duration="4786000" />
+      <workItem from="1692914899454" duration="8045000" />
+      <workItem from="1693180144332" duration="19055000" />
+      <workItem from="1693267428084" duration="19347000" />
+      <workItem from="1693356294423" duration="15335000" />
+      <workItem from="1693441808187" duration="16561000" />
+      <workItem from="1693525944356" duration="14480000" />
+      <workItem from="1693602437871" duration="23883000" />
+      <workItem from="1693870885530" duration="20259000" />
+      <workItem from="1693955521686" duration="10522000" />
+      <workItem from="1693973249738" duration="20540000" />
+      <workItem from="1694128546240" duration="3267000" />
+      <workItem from="1694132780683" duration="23076000" />
+      <workItem from="1694386879936" duration="19192000" />
+      <workItem from="1694477675073" duration="15435000" />
+      <workItem from="1694566426115" duration="16899000" />
+      <workItem from="1694647221706" duration="233000" />
+      <workItem from="1694648048865" duration="29241000" />
+      <workItem from="1694740422838" duration="14480000" />
+      <workItem from="1694990673296" duration="9540000" />
+      <workItem from="1695004076541" duration="22683000" />
+      <workItem from="1695079349624" duration="45726000" />
+      <workItem from="1695192654891" duration="15732000" />
+      <workItem from="1695269892393" duration="16177000" />
+      <workItem from="1695429987146" duration="1234000" />
+      <workItem from="1695599201205" duration="21819000" />
+      <workItem from="1695681442540" duration="11439000" />
+      <workItem from="1695767127517" duration="9323000" />
+      <workItem from="1695783427787" duration="48000" />
+      <workItem from="1695858323036" duration="25286000" />
+      <workItem from="1696378346551" duration="9735000" />
+      <workItem from="1696397645202" duration="18970000" />
+      <workItem from="1696548902140" duration="304000" />
+      <workItem from="1696550111499" duration="14159000" />
+      <workItem from="1696806957266" duration="1108000" />
+      <workItem from="1696810818381" duration="16982000" />
+      <workItem from="1696895046595" duration="6000" />
+      <workItem from="1696895745899" duration="15786000" />
+      <workItem from="1696982603993" duration="23359000" />
+      <workItem from="1697153995171" duration="4422000" />
+      <workItem from="1697168818047" duration="7280000" />
+      <workItem from="1697409279268" duration="5206000" />
+      <workItem from="1697416118051" duration="16611000" />
+      <workItem from="1697496103532" duration="23794000" />
+      <workItem from="1697580249457" duration="14649000" />
+      <workItem from="1697674379090" duration="408000" />
+      <workItem from="1697674795570" duration="9224000" />
+      <workItem from="1697691228462" duration="1659000" />
+      <workItem from="1697751731745" duration="8213000" />
+      <workItem from="1697954003633" duration="3517000" />
+      <workItem from="1698051791606" duration="480000" />
+      <workItem from="1698063675120" duration="3973000" />
+      <workItem from="1698152414541" duration="578000" />
+      <workItem from="1698153205524" duration="37649000" />
+      <workItem from="1698795218479" duration="43268000" />
+      <workItem from="1699068847130" duration="70163000" />
+      <workItem from="1699571778743" duration="17322000" />
+      <workItem from="1699825220748" duration="6946000" />
+      <workItem from="1699840296567" duration="3927000" />
+      <workItem from="1699849454143" duration="6071000" />
+      <workItem from="1699910528233" duration="8000" />
+      <workItem from="1699918727813" duration="44512000" />
+      <workItem from="1700164978291" duration="42235000" />
+      <workItem from="1700519824128" duration="2139000" />
+      <workItem from="1700526066026" duration="15236000" />
+      <workItem from="1700552803005" duration="14000" />
+      <workItem from="1700552852282" duration="26000" />
+      <workItem from="1700554162994" duration="31094000" />
+      <workItem from="1700693290563" duration="12021000" />
+      <workItem from="1700778368251" duration="8643000" />
+      <workItem from="1700789772805" duration="13072000" />
+      <workItem from="1700972973086" duration="10185000" />
+      <workItem from="1701038720484" duration="35607000" />
+      <workItem from="1701140006165" duration="399000" />
+      <workItem from="1701142199830" duration="1116000" />
+      <workItem from="1701145963820" duration="6335000" />
+      <workItem from="1701209988620" duration="8466000" />
+      <workItem from="1701230864958" duration="5473000" />
+      <workItem from="1701245890456" duration="666000" />
+      <workItem from="1701247712184" duration="584000" />
+      <workItem from="1701302387671" duration="38872000" />
+      <workItem from="1701639497694" duration="36925000" />
+      <workItem from="1701750241436" duration="25901000" />
+      <workItem from="1701894485948" duration="38504000" />
+      <workItem from="1702008548834" duration="25012000" />
+    </task>
+    <task id="LOCAL-00648" summary="Working on change list, adding translations. WIP">
+      <created>1701126940620</created>
+      <option name="number" value="00648" />
+      <option name="presentableId" value="LOCAL-00648" />
+      <option name="project" value="LOCAL" />
+      <updated>1701126940620</updated>
+    </task>
+    <task id="LOCAL-00649" summary="Adding more translations.">
+      <created>1701136167073</created>
+      <option name="number" value="00649" />
+      <option name="presentableId" value="LOCAL-00649" />
+      <option name="project" value="LOCAL" />
+      <updated>1701136167073</updated>
+    </task>
+    <task id="LOCAL-00650" summary="First commit">
+      <created>1701153696097</created>
+      <option name="number" value="00650" />
+      <option name="presentableId" value="LOCAL-00650" />
+      <option name="project" value="LOCAL" />
+      <updated>1701153696097</updated>
+    </task>
+    <task id="LOCAL-00651" summary="Testing out adding editor/block context around canvas container with style-book loaded">
+      <created>1701153898545</created>
+      <option name="number" value="00651" />
+      <option name="presentableId" value="LOCAL-00651" />
+      <option name="project" value="LOCAL" />
+      <updated>1701153898545</updated>
+    </task>
+    <task id="LOCAL-00652" summary="Me: Pray, depart hence, thou knavish trifle! Thy utility be as absent as mirth in a grave, a jest without jesters. Begone, thou witless motley, for even a jest doth surpass thy meager worth!&#10;Empty line: *whimper*">
+      <created>1701210604257</created>
+      <option name="number" value="00652" />
+      <option name="presentableId" value="LOCAL-00652" />
+      <option name="project" value="LOCAL" />
+      <updated>1701210604257</updated>
+    </task>
+    <task id="LOCAL-00653" summary="Adding more checks, docs and a note to Core migration path.">
+      <created>1701224111840</created>
+      <option name="number" value="00653" />
+      <option name="presentableId" value="LOCAL-00653" />
+      <option name="project" value="LOCAL" />
+      <updated>1701224111840</updated>
+    </task>
+    <task id="LOCAL-00654" summary="Adding unit tests, removing the hardcoded supports array constant in entities.js">
+      <created>1701234260257</created>
+      <option name="number" value="00654" />
+      <option name="presentableId" value="LOCAL-00654" />
+      <option name="project" value="LOCAL" />
+      <updated>1701234260258</updated>
+    </task>
+    <task id="LOCAL-00655" summary="test_get_items doesn't perform assertions">
+      <created>1701236074459</created>
+      <option name="number" value="00655" />
+      <option name="presentableId" value="LOCAL-00655" />
+      <option name="project" value="LOCAL" />
+      <updated>1701236074459</updated>
+    </task>
+    <task id="LOCAL-00656" summary="Revert button-in-item for another day&#10;Reduce depth of changeset and remove unused translations&#10;Display aria-label on button instead of tooltip">
+      <created>1701313577819</created>
+      <option name="number" value="00656" />
+      <option name="presentableId" value="LOCAL-00656" />
+      <option name="project" value="LOCAL" />
+      <updated>1701313577819</updated>
+    </task>
+    <task id="LOCAL-00657" summary="Testing harmonizing duplicate item - probably junk here.">
+      <created>1701321643744</created>
+      <option name="number" value="00657" />
+      <option name="presentableId" value="LOCAL-00657" />
+      <option name="project" value="LOCAL" />
+      <updated>1701321643744</updated>
+    </task>
+    <task id="LOCAL-00658" summary="Testing harmonizing duplicate item - probably junk here.">
+      <created>1701334330491</created>
+      <option name="number" value="00658" />
+      <option name="presentableId" value="LOCAL-00658" />
+      <option name="project" value="LOCAL" />
+      <updated>1701334330491</updated>
+    </task>
+    <task id="LOCAL-00659" summary="Removing shuffle function and fixing up block spacing translation">
+      <created>1701334999997</created>
+      <option name="number" value="00659" />
+      <option name="presentableId" value="LOCAL-00659" />
+      <option name="project" value="LOCAL" />
+      <updated>1701334999997</updated>
+    </task>
+    <task id="LOCAL-00660" summary="Removes POST_TYPE_ENTITIES_WITH_REVISIONS_SUPPORT and allows the server to determine revisions support">
+      <created>1701392225525</created>
+      <option name="number" value="00660" />
+      <option name="presentableId" value="LOCAL-00660" />
+      <option name="project" value="LOCAL" />
+      <updated>1701392225525</updated>
+    </task>
+    <task id="LOCAL-00661" summary="Using the revision has the Map key. This allows us to cache the revision sets themselves and account for changes to Unsaved revisions.">
+      <created>1701412316980</created>
+      <option name="number" value="00661" />
+      <option name="presentableId" value="LOCAL-00661" />
+      <option name="project" value="LOCAL" />
+      <updated>1701412316980</updated>
+    </task>
+    <task id="LOCAL-00662" summary="Used WeakMap in favour of Map for garbage collection, if it helps at all">
+      <created>1701640805253</created>
+      <option name="number" value="00662" />
+      <option name="presentableId" value="LOCAL-00662" />
+      <option name="project" value="LOCAL" />
+      <updated>1701640805253</updated>
+    </task>
+    <task id="LOCAL-00663" summary="Remove hasMore var - unneeded because it's only used once">
+      <created>1701641325307</created>
+      <option name="number" value="00663" />
+      <option name="presentableId" value="LOCAL-00663" />
+      <option name="project" value="LOCAL" />
+      <updated>1701641325307</updated>
+    </task>
+    <task id="LOCAL-00664" summary="Tidying up - remove .map loop">
+      <created>1701641665471</created>
+      <option name="number" value="00664" />
+      <option name="presentableId" value="LOCAL-00664" />
+      <option name="project" value="LOCAL" />
+      <updated>1701641665471</updated>
+    </task>
+    <task id="LOCAL-00665" summary="getGlobalStylesChanges was doing nothing! Removed.">
+      <created>1701642159703</created>
+      <option name="number" value="00665" />
+      <option name="presentableId" value="LOCAL-00665" />
+      <option name="project" value="LOCAL" />
+      <updated>1701642159703</updated>
+    </task>
+    <task id="LOCAL-00666" summary="Consolidate duplicate menu items.">
+      <created>1701655033075</created>
+      <option name="number" value="00666" />
+      <option name="presentableId" value="LOCAL-00666" />
+      <option name="project" value="LOCAL" />
+      <updated>1701655033075</updated>
+    </task>
+    <task id="LOCAL-00667" summary="This commit:&#10;- sends a default template id to the location state for the back button in focus mode (navigation and template area editing) so the back button works when coming from a template state, but with no URL params&#10;- move the back button to the bottom of the canvas container in distraction free mode because the back button is unreachable due to the header">
+      <created>1701663551785</created>
+      <option name="number" value="00667" />
+      <option name="presentableId" value="LOCAL-00667" />
+      <option name="project" value="LOCAL" />
+      <updated>1701663551785</updated>
+    </task>
+    <task id="LOCAL-00668" summary="Move into clickhandler">
+      <created>1701663635873</created>
+      <option name="number" value="00668" />
+      <option name="presentableId" value="LOCAL-00668" />
+      <option name="project" value="LOCAL" />
+      <updated>1701663635873</updated>
+    </task>
+    <task id="LOCAL-00669" summary="No duplicates for templates">
+      <created>1701667512931</created>
+      <option name="number" value="00669" />
+      <option name="presentableId" value="LOCAL-00669" />
+      <option name="project" value="LOCAL" />
+      <updated>1701667512931</updated>
+    </task>
+    <task id="LOCAL-00670" summary="Revert showing the back button under all conditions.">
+      <created>1701668349444</created>
+      <option name="number" value="00670" />
+      <option name="presentableId" value="LOCAL-00670" />
+      <option name="project" value="LOCAL" />
+      <updated>1701668349444</updated>
+    </task>
+    <task id="LOCAL-00671" summary="Open up duplicate action to theme patterns">
+      <created>1701733462361</created>
+      <option name="number" value="00671" />
+      <option name="presentableId" value="LOCAL-00671" />
+      <option name="project" value="LOCAL" />
+      <updated>1701733462361</updated>
+    </task>
+    <task id="LOCAL-00672" summary="Set isDuplicable var">
+      <created>1701733837500</created>
+      <option name="number" value="00672" />
+      <option name="presentableId" value="LOCAL-00672" />
+      <option name="project" value="LOCAL" />
+      <updated>1701733837500</updated>
+    </task>
+    <task id="LOCAL-00673" summary="wp_template post types, for now, are not duplicable">
+      <created>1701734581182</created>
+      <option name="number" value="00673" />
+      <option name="presentableId" value="LOCAL-00673" />
+      <option name="project" value="LOCAL" />
+      <updated>1701734581182</updated>
+    </task>
+    <task id="LOCAL-00674" summary="first commit">
+      <created>1701749822730</created>
+      <option name="number" value="00674" />
+      <option name="presentableId" value="LOCAL-00674" />
+      <option name="project" value="LOCAL" />
+      <updated>1701749822730</updated>
+    </task>
+    <task id="LOCAL-00675" summary="first commit">
+      <created>1701774746747</created>
+      <option name="number" value="00675" />
+      <option name="presentableId" value="LOCAL-00675" />
+      <option name="project" value="LOCAL" />
+      <updated>1701774746747</updated>
+    </task>
+    <task id="LOCAL-00676" summary="Using revision + previousRevision combo for cache key to ensure that the results are cached for the same two objects&#10;Returning from cache where maxResults value is smaller than cached results&#10;Added first tests">
+      <created>1701831351134</created>
+      <option name="number" value="00676" />
+      <option name="presentableId" value="LOCAL-00676" />
+      <option name="project" value="LOCAL" />
+      <updated>1701831351134</updated>
+    </task>
+    <task id="LOCAL-00677" summary="Moving maxResults decisions to consuming component. getRevisionChanges returns an unadulterated array.">
+      <created>1701833838329</created>
+      <option name="number" value="00677" />
+      <option name="presentableId" value="LOCAL-00677" />
+      <option name="project" value="LOCAL" />
+      <updated>1701833838329</updated>
+    </task>
+    <task id="LOCAL-00678" summary="Move get blockNames to main component">
+      <created>1701835088917</created>
+      <option name="number" value="00678" />
+      <option name="presentableId" value="LOCAL-00678" />
+      <option name="project" value="LOCAL" />
+      <updated>1701835088917</updated>
+    </task>
+    <task id="LOCAL-00679" summary="Have to use map because WeakMap wants the same reference as the object key.">
+      <created>1701835885871</created>
+      <option name="number" value="00679" />
+      <option name="presentableId" value="LOCAL-00679" />
+      <option name="project" value="LOCAL" />
+      <updated>1701835885871</updated>
+    </task>
+    <task id="LOCAL-00680" summary="Remove the trailing comma on truncated results">
+      <created>1701851613435</created>
+      <option name="number" value="00680" />
+      <option name="presentableId" value="LOCAL-00680" />
+      <option name="project" value="LOCAL" />
+      <updated>1701851613435</updated>
+    </task>
+    <task id="LOCAL-00681" summary="Adding a space between translated strings">
+      <created>1701901278373</created>
+      <option name="number" value="00681" />
+      <option name="presentableId" value="LOCAL-00681" />
+      <option name="project" value="LOCAL" />
+      <updated>1701901278373</updated>
+    </task>
+    <task id="LOCAL-00682" summary="Test commit: listing changes, showing `and n more`">
+      <created>1701919397889</created>
+      <option name="number" value="00682" />
+      <option name="presentableId" value="LOCAL-00682" />
+      <option name="project" value="LOCAL" />
+      <updated>1701919397889</updated>
+    </task>
+    <task id="LOCAL-00683" summary="Test commit: grouping changes using tuples">
+      <created>1701922582211</created>
+      <option name="number" value="00683" />
+      <option name="presentableId" value="LOCAL-00683" />
+      <option name="project" value="LOCAL" />
+      <updated>1701922582211</updated>
+    </task>
+    <task id="LOCAL-00684" summary="Test commit: grouping changes using tuples">
+      <created>1701923293166</created>
+      <option name="number" value="00684" />
+      <option name="presentableId" value="LOCAL-00684" />
+      <option name="project" value="LOCAL" />
+      <updated>1701923293166</updated>
+    </task>
+    <task id="LOCAL-00685" summary="Remove conditional rendering of revisions for now">
+      <created>1701924607873</created>
+      <option name="number" value="00685" />
+      <option name="presentableId" value="LOCAL-00685" />
+      <option name="project" value="LOCAL" />
+      <updated>1701924607873</updated>
+    </task>
+    <task id="LOCAL-00686" summary="Testing out lockin pagination to the bottom and giving every item an Apply button">
+      <created>1701936016856</created>
+      <option name="number" value="00686" />
+      <option name="presentableId" value="LOCAL-00686" />
+      <option name="project" value="LOCAL" />
+      <updated>1701936016856</updated>
+    </task>
+    <task id="LOCAL-00687" summary="Reverting back to comma-separate list of changes&#10;Added e2e assertion">
+      <created>1701993805533</created>
+      <option name="number" value="00687" />
+      <option name="presentableId" value="LOCAL-00687" />
+      <option name="project" value="LOCAL" />
+      <updated>1701993805533</updated>
+    </task>
+    <task id="LOCAL-00688" summary="Gradient elements contain both color and gradient properties, therefore they'll always return true for this test if the color property is default (#000)">
+      <created>1702012223090</created>
+      <option name="number" value="00688" />
+      <option name="presentableId" value="LOCAL-00688" />
+      <option name="project" value="LOCAL" />
+      <updated>1702012223091</updated>
+    </task>
+    <task id="LOCAL-00689" summary="Whoops">
+      <created>1702012611427</created>
+      <option name="number" value="00689" />
+      <option name="presentableId" value="LOCAL-00689" />
+      <option name="project" value="LOCAL" />
+      <updated>1702012611427</updated>
+    </task>
+    <task id="LOCAL-00690" summary="CHANGELOG.md">
+      <created>1702012777299</created>
+      <option name="number" value="00690" />
+      <option name="presentableId" value="LOCAL-00690" />
+      <option name="project" value="LOCAL" />
+      <updated>1702012777299</updated>
+    </task>
+    <task id="LOCAL-00691" summary="isTemporaryElement should return false by default so that it will catch changes to the slug&#10;Added tests">
+      <created>1702250902522</created>
+      <option name="number" value="00691" />
+      <option name="presentableId" value="LOCAL-00691" />
+      <option name="project" value="LOCAL" />
+      <updated>1702250902522</updated>
+    </task>
+    <task id="LOCAL-00692" summary="When a user edits a custom color/gradient name by adding digits to `Color n`, e.g., `Color n2` we should class this color as custom and not &quot;Default&quot;, and therefore unsaveable.&#10;Checking the slug index against position index in accordance with getNameForPosition&#10;Renames &quot;temporary&quot; to &quot;default&quot; to be clearer about what the color/gradient is">
+      <created>1702252557659</created>
+      <option name="number" value="00692" />
+      <option name="presentableId" value="LOCAL-00692" />
+      <option name="project" value="LOCAL" />
+      <updated>1702252557659</updated>
+    </task>
+    <task id="LOCAL-00693" summary="Swapping order of author name and changes block&#10;Moving everything into the button so it's clickable.">
+      <created>1702267617228</created>
+      <option name="number" value="00693" />
+      <option name="presentableId" value="LOCAL-00693" />
+      <option name="project" value="LOCAL" />
+      <updated>1702267617228</updated>
+    </task>
+    <task id="LOCAL-00694" summary="Don't live in the past, man">
+      <created>1702268095389</created>
+      <option name="number" value="00694" />
+      <option name="presentableId" value="LOCAL-00694" />
+      <option name="project" value="LOCAL" />
+      <updated>1702268095389</updated>
+    </task>
+    <task id="LOCAL-00695" summary="Remove count from heading - it's in the pagination&#10;Fudge the button">
+      <created>1702269533072</created>
+      <option name="number" value="00695" />
+      <option name="presentableId" value="LOCAL-00695" />
+      <option name="project" value="LOCAL" />
+      <updated>1702269533072</updated>
+    </task>
+    <task id="LOCAL-00696" summary="Don't render the menu if not revertable/removable/duplicable.&#10;Ensure the ellipsis menus shows in patterns.">
+      <created>1702281880489</created>
+      <option name="number" value="00696" />
+      <option name="presentableId" value="LOCAL-00696" />
+      <option name="project" value="LOCAL" />
+      <updated>1702281880489</updated>
+    </task>
+    <option name="localTasksCounter" value="697" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="javascript:npm:react" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:prettier" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:webpack" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:postcss" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="Space.CommitStatus" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="13e49f99-ace7-4eff-94d0-5b4c62d37f18">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/components/src/dropdown" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="17a72e11-ef79-4373-913f-8142de99980d">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/block-library/src/search" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="3b892501-7ec8-4bf3-938e-32744feff3cc">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/block-library/src/image" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="40fa1a6e-db6f-4489-8312-3abc234ad499">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/block-library/src" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="text">
+                    <value>
+                      <list>
+                        <option value=".php" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="6198eb75-6a47-4b83-8cd7-726f3ca6b42c">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/block-editor/src/components/inserter" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="62268483-3a5b-4a7d-a477-d2042d5413c3">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/.github/workflows" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="b9dd664d-387f-4e8f-81b2-0aba736d1c31">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/packages/block-library/src/image" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="e79fa60d-8153-4a2d-8972-d83d0cd350a7">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/Users/ramon/projects/gutenberg/lib/compat/wordpress-6.3" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <MESSAGE value="Revert showing the back button under all conditions." />
+    <MESSAGE value="Open up duplicate action to theme patterns" />
+    <MESSAGE value="Set isDuplicable var" />
+    <MESSAGE value="wp_template post types, for now, are not duplicable" />
+    <MESSAGE value="first commit" />
+    <MESSAGE value="Using revision + previousRevision combo for cache key to ensure that the results are cached for the same two objects&#10;Returning from cache where maxResults value is smaller than cached results&#10;Added first tests" />
+    <MESSAGE value="Moving maxResults decisions to consuming component. getRevisionChanges returns an unadulterated array." />
+    <MESSAGE value="Move get blockNames to main component" />
+    <MESSAGE value="Have to use map because WeakMap wants the same reference as the object key." />
+    <MESSAGE value="Remove the trailing comma on truncated results" />
+    <MESSAGE value="Adding a space between translated strings" />
+    <MESSAGE value="Test commit: listing changes, showing `and n more`" />
+    <MESSAGE value="Test commit: grouping changes using tuples" />
+    <MESSAGE value="Remove conditional rendering of revisions for now" />
+    <MESSAGE value="Testing out lockin pagination to the bottom and giving every item an Apply button" />
+    <MESSAGE value="Reverting back to comma-separate list of changes&#10;Added e2e assertion" />
+    <MESSAGE value="Gradient elements contain both color and gradient properties, therefore they'll always return true for this test if the color property is default (#000)" />
+    <MESSAGE value="Whoops" />
+    <MESSAGE value="CHANGELOG.md" />
+    <MESSAGE value="isTemporaryElement should return false by default so that it will catch changes to the slug&#10;Added tests" />
+    <MESSAGE value="When a user edits a custom color/gradient name by adding digits to `Color n`, e.g., `Color n2` we should class this color as custom and not &quot;Default&quot;, and therefore unsaveable.&#10;Checking the slug index against position index in accordance with getNameForPosition&#10;Renames &quot;temporary&quot; to &quot;default&quot; to be clearer about what the color/gradient is" />
+    <MESSAGE value="Swapping order of author name and changes block&#10;Moving everything into the button so it's clickable." />
+    <MESSAGE value="Don't live in the past, man" />
+    <MESSAGE value="Remove count from heading - it's in the pagination&#10;Fudge the button" />
+    <MESSAGE value="Don't render the menu if not revertable/removable/duplicable.&#10;Ensure the ellipsis menus shows in patterns." />
+    <option name="LAST_COMMIT_MESSAGE" value="Don't render the menu if not revertable/removable/duplicable.&#10;Ensure the ellipsis menus shows in patterns." />
+  </component>
+  <component name="WordPressConfiguration" doNotAskAgain="true" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/compose/src/hooks/use-resize-observer/index.tsx</url>
+          <line>226</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/edit-site/src/components/page-content-focus-manager/disable-non-page-content-blocks.js</url>
+          <line>51</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/edit-site/src/hooks/push-changes-to-global-styles/index.js</url>
+          <line>392</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/core-data/src/resolvers.js</url>
+          <line>192</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/edit-site/src/components/sync-state-with-url/use-sync-path-with-url.js</url>
+          <line>50</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

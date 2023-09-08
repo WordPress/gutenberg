@@ -14,6 +14,7 @@ import {
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -22,7 +23,12 @@ import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	POST_TYPE_LABELS,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 export default function TemplateActions( {
 	postType,
@@ -31,7 +37,7 @@ export default function TemplateActions( {
 	toggleProps,
 	onRemove,
 } ) {
-	const template = useSelect(
+	const record = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
@@ -40,27 +46,69 @@ export default function TemplateActions( {
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const isRemovable = isTemplateRemovable( template );
-	const isRevertable = isTemplateRevertable( template );
+	const { __experimentalDeleteReusableBlock } =
+		useDispatch( reusableBlocksStore );
+	const isRemovable = isTemplateRemovable( record );
+	// Only custom patterns or custom template parts can be renamed or deleted.
+	const isUserPattern = record?.type === PATTERN_TYPES.user;
+	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
+	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
 
-	if ( ! isRemovable && ! isRevertable ) {
+	if (
+		! isRemovable &&
+		! isTemplatePart &&
+		! isTemplate &&
+		! isUserPattern
+	) {
 		return null;
 	}
 
-	async function revertAndSaveTemplate() {
+	const isEditable = isUserPattern || isRemovable;
+	const decodedTitle = decodeEntities(
+		record?.title?.rendered || record?.title?.raw
+	);
+
+	const deletePattern = async ( pattern ) => {
 		try {
-			await revertTemplate( template, { allowUndo: false } );
-			await saveEditedEntityRecord(
-				'postType',
-				template.type,
-				template.id
+			await __experimentalDeleteReusableBlock( pattern.id );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The pattern's title e.g. 'Call to action'.
+					__( '"%s" deleted.' ),
+					decodedTitle
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
 			);
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while deleting the pattern.' );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'edit-site-patterns-error',
+			} );
+		}
+	};
+
+	const deleteItem = async ( item ) => {
+		if ( isTemplateRemovable( item ) ) {
+			removeTemplate( item );
+		} else if ( isUserPattern ) {
+			deletePattern( item );
+		}
+	};
+
+	async function revertAndSaveTemplate( item ) {
+		try {
+			await revertTemplate( record, { allowUndo: false } );
+			await saveEditedEntityRecord( 'postType', item.type, item.id );
 
 			createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" reverted.' ),
-					decodeEntities( template.title.rendered )
+					decodedTitle
 				),
 				{
 					type: 'snackbar',
@@ -68,12 +116,12 @@ export default function TemplateActions( {
 				}
 			);
 		} catch ( error ) {
-			const fallbackErrorMessage =
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'An error occurred while reverting the template.' )
-					: __(
-							'An error occurred while reverting the template part.'
-					  );
+			const fallbackErrorMessage = sprintf(
+				// translators: %s is a post type label, e.g., Template, Template Part or Pattern.
+				__( 'An error occurred while reverting the %s.' ),
+				POST_TYPE_LABELS[ postType ] ??
+					POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
+			);
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
@@ -81,6 +129,12 @@ export default function TemplateActions( {
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
+	}
+
+	const shouldDisplayMenu = isEditable || isTemplateRevertable( record );
+
+	if ( ! shouldDisplayMenu ) {
+		return null;
 	}
 
 	return (
@@ -92,29 +146,32 @@ export default function TemplateActions( {
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
-					{ isRemovable && (
+					{ isEditable && (
 						<>
 							<RenameMenuItem
-								template={ template }
+								postId={ postId }
+								postType={ postType }
 								onClose={ onClose }
 							/>
 							<DeleteMenuItem
+								isDestructive={ true }
 								onRemove={ () => {
-									removeTemplate( template );
+									deleteItem( record );
 									onRemove?.();
 									onClose();
 								} }
-								title={ template.title.rendered }
+								title={ decodedTitle }
 							/>
 						</>
 					) }
-					{ isRevertable && (
+
+					{ isTemplateRevertable( record ) && (
 						<MenuItem
 							info={ __(
 								'Use the template as supplied by the theme.'
 							) }
 							onClick={ () => {
-								revertAndSaveTemplate();
+								revertAndSaveTemplate( record );
 								onClose();
 							} }
 						>

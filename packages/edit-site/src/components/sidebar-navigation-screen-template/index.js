@@ -104,6 +104,11 @@ export default function SidebarNavigationScreenTemplate() {
 		postId
 	);
 
+	// The absence of a post type in the query params for templates
+	// indicates the user has arrived at the template via the "manage all"
+	// page and the back button should return them to that list page.
+	const backPath =
+		postType !== 'wp_template' ? `/${ postType }/all` : `/${ postType }`;
 	return (
 		<SidebarNavigationScreen
 			title={ title }
@@ -114,7 +119,7 @@ export default function SidebarNavigationScreenTemplate() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( `/${ postType }/all` );
+							navigator.goTo( backPath );
 						} }
 					/>
 					<SidebarButton

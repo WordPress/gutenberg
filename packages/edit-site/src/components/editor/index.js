@@ -27,6 +27,7 @@ import {
 	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
+	PostLockedModal,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -285,6 +286,7 @@ export default function Editor( { isLoading } ) {
 							secondarySidebar: secondarySidebarLabel,
 						} }
 					/>
+					<PostLockedModal />
 				</EditorProvider>
 			) }
 		</>
