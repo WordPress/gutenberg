@@ -95,13 +95,13 @@ function FontLibraryProvider( { children } ) {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 
-	const themeFonts = fontFamilies.theme
+	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 
-	const customFonts = fontFamilies.custom
+	const customFonts = fontFamilies?.custom
 		? fontFamilies.custom
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
