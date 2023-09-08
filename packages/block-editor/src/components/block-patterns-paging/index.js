@@ -33,14 +33,18 @@ export default function Pagination( {
 				justify="flex-start"
 				className="block-editor-patterns__grid-pagination"
 			>
-				<HStack expanded={ false } spacing={ 1 }>
+				<HStack
+					expanded={ false }
+					spacing={ 1 }
+					className="block-editor-patterns__grid-pagination-previous"
+				>
 					<Button
 						variant="tertiary"
 						onClick={ () => changePage( 1 ) }
 						disabled={ currentPage === 1 }
 						aria-label={ __( 'First page' ) }
 					>
-						«
+						<span>«</span>
 					</Button>
 					<Button
 						variant="tertiary"
@@ -48,7 +52,7 @@ export default function Pagination( {
 						disabled={ currentPage === 1 }
 						aria-label={ __( 'Previous page' ) }
 					>
-						‹
+						<span>‹</span>
 					</Button>
 				</HStack>
 				<Text variant="muted">
@@ -59,22 +63,27 @@ export default function Pagination( {
 						numPages
 					) }
 				</Text>
-				<HStack expanded={ false } spacing={ 1 }>
+				<HStack
+					expanded={ false }
+					spacing={ 1 }
+					className="block-editor-patterns__grid-pagination-next"
+				>
 					<Button
 						variant="tertiary"
 						onClick={ () => changePage( currentPage + 1 ) }
 						disabled={ currentPage === numPages }
 						aria-label={ __( 'Next page' ) }
 					>
-						›
+						<span>›</span>
 					</Button>
 					<Button
 						variant="tertiary"
 						onClick={ () => changePage( numPages ) }
 						disabled={ currentPage === numPages }
 						aria-label={ __( 'Last page' ) }
+						size="default"
 					>
-						»
+						<span>»</span>
 					</Button>
 				</HStack>
 			</HStack>
