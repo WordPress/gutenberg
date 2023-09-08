@@ -87,6 +87,7 @@
 		"@wordpress/sync": "file:packages/sync",
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/url": "file:packages/url",
+		"@wordpress/undo-manager": "file:packages/undo-manager",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
