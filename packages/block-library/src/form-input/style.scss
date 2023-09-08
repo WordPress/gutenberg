@@ -9,6 +9,10 @@
 		flex-direction: row;
 		gap: 0.5em;
 		align-items: center;
+
+		.wp-block-form-input__label-content {
+			margin-bottom: 0.5em;
+		}
 	}
 
 	/*
