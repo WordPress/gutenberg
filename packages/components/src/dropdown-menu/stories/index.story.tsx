@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState, useId, createContext, useContext } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -135,76 +135,4 @@ WithChildren.args = {
 			</MenuGroup>
 		</>
 	),
-};
-
-const OnlyOneDropdownOpenContext = createContext< {
-	openDropdownId?: string;
-	setOpenDropdownId: ( id: string | undefined ) => void;
-} >( {
-	openDropdownId: undefined,
-	setOpenDropdownId: ( _instanceId ) => {},
-} );
-
-const ItemWithDropdown = () => {
-	const { openDropdownId, setOpenDropdownId } = useContext(
-		OnlyOneDropdownOpenContext
-	);
-
-	const instanceId = useId();
-
-	return (
-		<div>
-			Some text
-			<DropdownMenu
-				label="Open dropdown"
-				icon={ menu }
-				controls={ [
-					{
-						title: 'First Menu Item Label',
-						icon: arrowUp,
-						// eslint-disable-next-line no-console
-						onClick: () => console.log( 'up!' ),
-					},
-					{
-						title: 'Second Menu Item Label',
-						icon: arrowDown,
-						// eslint-disable-next-line no-console
-						onClick: () => console.log( 'down!' ),
-					},
-				] }
-				open={ openDropdownId === instanceId }
-				onToggle={ ( willOpen ) => {
-					if ( willOpen ) {
-						setOpenDropdownId( instanceId );
-					} else {
-						setOpenDropdownId( undefined );
-					}
-				} }
-			/>
-		</div>
-	);
-};
-
-export const OnlyOneOpened: StoryFn< typeof DropdownMenu > = () => {
-	const [ openDropdownId, setOpenDropdownId ] = useState<
-		string | undefined
-	>( undefined );
-
-	return (
-		<OnlyOneDropdownOpenContext.Provider
-			value={ { openDropdownId, setOpenDropdownId } }
-		>
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-			<ItemWithDropdown />
-		</OnlyOneDropdownOpenContext.Provider>
-	);
 };
