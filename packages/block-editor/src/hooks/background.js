@@ -233,7 +233,7 @@ function BackgroundImagePanelItem( props ) {
 							onSelect={ onSelectMedia }
 							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 							render={ ( { open } ) => (
-								<div className="block-editor-hooks__background____inspector-upload-container">
+								<div className="block-editor-hooks__background__inspector-upload-container">
 									<Button
 										onClick={ open }
 										variant="secondary"
