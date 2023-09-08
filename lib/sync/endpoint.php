@@ -1,6 +1,6 @@
 <?php
 /**
- * Adds an http based signaling server for real time collaboration.
+ * Adds a HTTP-based signaling server for real time collaboration.
  *
  * @package gutenberg
  */
