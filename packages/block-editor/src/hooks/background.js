@@ -66,6 +66,10 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 		return true;
 	}
 
+	if ( feature === 'any' ) {
+		return !! support?.backgroundImage;
+	}
+
 	return !! support?.[ feature ];
 }
 
