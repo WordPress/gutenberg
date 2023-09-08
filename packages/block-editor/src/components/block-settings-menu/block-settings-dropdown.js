@@ -270,6 +270,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertAfter();
 							} else if (
 								isMatch(
@@ -279,6 +280,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertBefore();
 							}
 						},
