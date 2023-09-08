@@ -16,7 +16,7 @@
 	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: top;
 		align-items: flex-start;
 	}
 
