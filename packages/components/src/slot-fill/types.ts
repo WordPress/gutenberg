@@ -18,20 +18,23 @@ type SlotPropBase = {
 	 * @default {}
 	 */
 	fillProps?: FillProps;
-
-	/**
-	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
-	 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
-	 * also accept an optional `className`, `id`, etc.  to add to the slot container.
-	 */
-	bubblesVirtually?: boolean;
 };
 
 export type SlotComponentProps =
 	| ( SlotPropBase & {
+			/**
+			 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+			 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
+			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
+			 */
 			bubblesVirtually: true;
 	  } )
 	| ( SlotPropBase & {
+			/**
+			 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+			 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
+			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
+			 */
 			bubblesVirtually?: false;
 
 			/**
