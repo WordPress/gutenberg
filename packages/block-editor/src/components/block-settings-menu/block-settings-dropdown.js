@@ -191,26 +191,25 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
-	// Only override the `open` prop if the current block is not the one that
-	// opened the menu. The logic here is to ensure that non-current
-	// block menus are automatically closed when a new block menu is opened.
-	// This is useful for cases where focus is not present in the current window.
-	// All other behavior of the drop down menu should be otherwise unaffected.
-	const open =
-		! currentClientId || openedBlockSettingsMenu === currentClientId
-			? undefined
-			: false;
+	// When a currentClientId is in use, treat the menu as a controlled component.
+	// This ensures that only one block settings menu is open at a time.
+	const open = ! currentClientId
+		? undefined
+		: openedBlockSettingsMenu === currentClientId || false;
 
 	const onToggle = useCallback(
 		( localOpen ) => {
-			// When the current menu is opened, update the state to reflect
-			// the new current menu. This allows all other instances of the
-			// menu to close if they already open.
-			if ( localOpen ) {
+			if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
 				setOpenedBlockSettingsMenu( currentClientId );
+			} else if (
+				! localOpen &&
+				openedBlockSettingsMenu &&
+				openedBlockSettingsMenu === currentClientId
+			) {
+				setOpenedBlockSettingsMenu( undefined );
 			}
 		},
-		[ currentClientId, setOpenedBlockSettingsMenu ]
+		[ currentClientId, openedBlockSettingsMenu, setOpenedBlockSettingsMenu ]
 	);
 
 	return (
