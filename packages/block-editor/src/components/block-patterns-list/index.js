@@ -93,12 +93,7 @@ function BlockPattern( {
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
 							/>
-							<HStack>
-								{ ! showTooltip && (
-									<div className="block-editor-block-patterns-list__item-title">
-										{ pattern.title }
-									</div>
-								) }
+							<HStack className="block-editor-patterns__pattern-details">
 								{ pattern.id && ! pattern.syncStatus && (
 									<Tooltip
 										position="top center"
@@ -113,6 +108,11 @@ function BlockPattern( {
 											/>
 										</div>
 									</Tooltip>
+								) }
+								{ ! showTooltip && (
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
 								) }
 							</HStack>
 							{ !! pattern.description && (
