@@ -7,7 +7,7 @@ import { focus } from '@wordpress/dom';
 /**
  * Hook used to focus the first tabbable element on mount.
  *
- * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
+ * @param {boolean | 'firstElement' | Function} focusOnMount Focus on mount mode.
  * @return {import('react').RefCallback<HTMLElement>} Ref callback.
  *
  * @example
@@ -73,6 +73,20 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 
 				if ( firstTabbable ) {
 					setFocus( /** @type {HTMLElement} */ ( firstTabbable ) );
+				}
+			}, 0 );
+
+			return;
+		}
+
+		if ( typeof focusOnMountRef?.current === 'function' ) {
+			timerId.current = setTimeout( () => {
+				const tabbables = focus.tabbable.find( node );
+
+				const elementToFocus = focusOnMountRef.current( tabbables );
+
+				if ( elementToFocus ) {
+					setFocus( /** @type {HTMLElement} */ ( elementToFocus ) );
 				}
 			}, 0 );
 

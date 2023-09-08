@@ -315,7 +315,7 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement'`: Focus on mount mode.
+-   _focusOnMount_ `boolean | 'firstElement' | Function`: Focus on mount mode.
 
 _Returns_
 
