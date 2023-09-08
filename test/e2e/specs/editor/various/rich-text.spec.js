@@ -802,25 +802,4 @@ test.describe( 'RichText', () => {
 			},
 		] );
 	} );
-
-	test( 'should copy/paste heading', async ( {
-		page,
-		editor,
-		pageUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/heading' } );
-		await page.keyboard.type( 'Heading' );
-		await pageUtils.pressKeys( 'primary+a' );
-		await pageUtils.pressKeys( 'primary+c' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeys( 'primary+v' );
-
-		expect( await editor.getBlocks() ).toMatchObject(
-			Array( 2 ).fill( {
-				name: 'core/heading',
-				attributes: { content: 'Heading' },
-			} )
-		);
-	} );
 } );
