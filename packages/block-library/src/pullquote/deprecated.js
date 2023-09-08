@@ -65,7 +65,7 @@ function multilineToInline( value ) {
 	values.shift();
 	values.pop();
 
-	return values.join( '\n' );
+	return values.join( '<br>' );
 }
 
 const v5 = {
