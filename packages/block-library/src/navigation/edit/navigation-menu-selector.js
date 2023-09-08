@@ -10,7 +10,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -44,6 +43,7 @@ function NavigationMenuSelector( {
 	actionLabel,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
+	ariaLabel,
 	icon,
 	text = '',
 	toggleProps,
@@ -64,12 +64,6 @@ function NavigationMenuSelector( {
 		canUserCreateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
-
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title'
-	);
 
 	const menuChoices = useMemo( () => {
 		return (
@@ -100,15 +94,18 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus && currentMenuId === null;
 
 	let selectorLabel = '';
-
+	let selectorText = '';
 	if ( isCreatingMenu || isResolvingNavigationMenus ) {
-		selectorLabel = __( 'Loading…' );
+		selectorLabel = selectorText = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
-		selectorLabel = __( 'Choose or create a Navigation menu' );
+		selectorLabel = selectorText = __(
+			'Choose or create a Navigation menu'
+		);
 	} else {
 		// Current Menu's title.
-		selectorLabel = currentTitle;
+		selectorLabel = ariaLabel;
+		selectorText = text;
 	}
 
 	useEffect( () => {
@@ -134,7 +131,7 @@ function NavigationMenuSelector( {
 			label={ selectorLabel }
 			icon={ icon }
 			toggleProps={ toggleProps }
-			text={ text }
+			text={ selectorText }
 		>
 			{ ( { onClose } ) => (
 				<>

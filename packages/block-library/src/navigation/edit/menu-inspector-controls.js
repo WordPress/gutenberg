@@ -13,6 +13,7 @@ import {
 	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
+import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, moreVertical } from '@wordpress/icons';
@@ -142,6 +143,14 @@ const MenuInspectorControls = ( props ) => {
 		blockEditingMode,
 	} = props;
 
+	const [ currentTitle ] = useEntityProp(
+		'postType',
+		'wp_navigation',
+		'title'
+	);
+
+	const { navigationMenus } = useNavigationMenu();
+
 	return (
 		<InspectorControls group="list">
 			<PanelBody title={ null }>
@@ -152,27 +161,33 @@ const MenuInspectorControls = ( props ) => {
 					>
 						{ __( 'Menu' ) }
 					</Heading>
-					<BlockControls group="inline">
-						<NavigationMenuSelector
-							currentMenuId={ currentMenuId }
-							onSelectClassicMenu={ onSelectClassicMenu }
-							onSelectNavigationMenu={ onSelectNavigationMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							actionLabel={ actionLabel }
-							isManageMenusButtonDisabled={
-								isManageMenusButtonDisabled
-							}
-							icon={ chevronDown }
-							text={ __( 'Change' ) }
-							toggleProps={ { iconPosition: 'right' } }
-						/>
-					</BlockControls>
+					{ navigationMenus && navigationMenus.length > 1 && (
+						<BlockControls group="inline">
+							<NavigationMenuSelector
+								currentMenuId={ currentMenuId }
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+								actionLabel={ actionLabel }
+								isManageMenusButtonDisabled={
+									isManageMenusButtonDisabled
+								}
+								ariaLabel={ __( 'Choose Navigation Menu' ) }
+								icon={ chevronDown }
+								text={ currentTitle }
+								toggleProps={ { iconPosition: 'right' } }
+							/>
+						</BlockControls>
+					) }
+
 					{ blockEditingMode === 'default' && (
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
@@ -189,6 +204,7 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled={
 								isManageMenusButtonDisabled
 							}
+							ariaLabel={ currentTitle }
 							icon={ moreVertical }
 							toggleProps={ { isSmall: 'true' } }
 						/>
