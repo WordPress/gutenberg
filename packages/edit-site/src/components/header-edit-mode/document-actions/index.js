@@ -173,6 +173,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			<Button
 				className="edit-site-document-actions__command"
 				onClick={ () => openCommandCenter() }
+				aria-label={ __( 'Command Palette' ) }
 			>
 				<HStack
 					className="edit-site-document-actions__title"
