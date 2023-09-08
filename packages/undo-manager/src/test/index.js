@@ -7,15 +7,19 @@ describe( 'Undo Manager', () => {
 	it( 'stacks undo levels', () => {
 		const undo = createUndoManager();
 
-		undo.record( [
+		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
 		expect( undo.getUndoRecord() ).toEqual( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
 
-		undo.record( [ { id: '1', changes: { value: { from: 1, to: 2 } } } ] );
-		undo.record( [ { id: '1', changes: { value: { from: 2, to: 3 } } } ] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 1, to: 2 } } },
+		] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 2, to: 3 } } },
+		] );
 		expect( undo.getUndoRecord() ).toEqual( [
 			{ id: '1', changes: { value: { from: 2, to: 3 } } },
 		] );
@@ -23,11 +27,15 @@ describe( 'Undo Manager', () => {
 
 	it( 'handles undos/redos', () => {
 		const undo = createUndoManager();
-		undo.record( [
+		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
-		undo.record( [ { id: '1', changes: { value: { from: 1, to: 2 } } } ] );
-		undo.record( [ { id: '1', changes: { value: { from: 2, to: 3 } } } ] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 1, to: 2 } } },
+		] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 2, to: 3 } } },
+		] );
 
 		undo.undo();
 		expect( undo.getUndoRecord() ).toEqual( [
@@ -51,7 +59,9 @@ describe( 'Undo Manager', () => {
 			{ id: '1', changes: { value: { from: 2, to: 3 } } },
 		] );
 
-		undo.record( [ { id: '1', changes: { value: { from: 3, to: 4 } } } ] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 3, to: 4 } } },
+		] );
 		expect( undo.getUndoRecord() ).toEqual( [
 			{ id: '1', changes: { value: { from: 3, to: 4 } } },
 		] );
@@ -60,7 +70,9 @@ describe( 'Undo Manager', () => {
 		// all the levels after the current one.
 		undo.undo();
 		undo.undo();
-		undo.record( [ { id: '1', changes: { value: { from: 2, to: 5 } } } ] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 2, to: 5 } } },
+		] );
 		undo.undo();
 		expect( undo.getUndoRecord() ).toEqual( [
 			{ id: '1', changes: { value: { from: 1, to: 2 } } },
@@ -69,18 +81,20 @@ describe( 'Undo Manager', () => {
 
 	it( 'handles cached edits', () => {
 		const undo = createUndoManager();
-		undo.record( [
+		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
-		undo.record(
+		undo.addRecord(
 			[ { id: '1', changes: { value2: { from: undefined, to: 2 } } } ],
 			true
 		);
-		undo.record(
+		undo.addRecord(
 			[ { id: '1', changes: { value: { from: 1, to: 3 } } } ],
 			true
 		);
-		undo.record( [ { id: '1', changes: { value: { from: 3, to: 4 } } } ] );
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 3, to: 4 } } },
+		] );
 		undo.undo();
 		expect( undo.getUndoRecord() ).toEqual( [
 			{
@@ -95,24 +109,28 @@ describe( 'Undo Manager', () => {
 
 	it( 'handles explicit undo level creation', () => {
 		const undo = createUndoManager();
-		undo.record( [
+		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
-		undo.record( [] );
-		undo.record();
-		undo.undo();
+		// These three calls do nothing because they're empty.
+		undo.addRecord( [] );
+		undo.addRecord();
+		undo.addRecord( [
+			{ id: '1', changes: { value: { from: 1, to: 1 } } },
+		] );
 		// Check that nothing happens if there are no pending
 		// transient edits.
+		undo.undo();
 		expect( undo.getUndoRecord() ).toBe( undefined );
 		undo.redo();
 
 		// Check that transient edits are merged into the last
 		// edits.
-		undo.record(
+		undo.addRecord(
 			[ { id: '1', changes: { value2: { from: undefined, to: 2 } } } ],
 			true
 		);
-		undo.record( [] ); // Records the cached edits.
+		undo.addRecord( [] ); // Records the cached edits.
 		undo.undo();
 		expect( undo.getRedoRecord() ).toEqual( [
 			{
@@ -127,10 +145,10 @@ describe( 'Undo Manager', () => {
 
 	it( 'explicitly creates an undo level when undoing while there are pending transient edits', () => {
 		const undo = createUndoManager();
-		undo.record( [
+		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
 		] );
-		undo.record(
+		undo.addRecord(
 			[ { id: '1', changes: { value2: { from: undefined, to: 2 } } } ],
 			true
 		);
@@ -149,7 +167,7 @@ describe( 'Undo Manager', () => {
 	it( 'supports records as ids', () => {
 		const undo = createUndoManager();
 
-		undo.record(
+		undo.addRecord(
 			[
 				{
 					id: { kind: 'postType', name: 'post', recordId: 1 },
@@ -158,7 +176,7 @@ describe( 'Undo Manager', () => {
 			],
 			true
 		);
-		undo.record(
+		undo.addRecord(
 			[
 				{
 					id: { kind: 'postType', name: 'post', recordId: 1 },
@@ -167,7 +185,7 @@ describe( 'Undo Manager', () => {
 			],
 			true
 		);
-		undo.record(
+		undo.addRecord(
 			[
 				{
 					id: { kind: 'postType', name: 'post', recordId: 2 },
@@ -176,7 +194,7 @@ describe( 'Undo Manager', () => {
 			],
 			true
 		);
-		undo.record();
+		undo.addRecord();
 		expect( undo.getUndoRecord() ).toEqual( [
 			{
 				id: { kind: 'postType', name: 'post', recordId: 1 },

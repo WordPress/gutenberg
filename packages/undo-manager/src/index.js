@@ -97,6 +97,19 @@ export function createUndoManager() {
 		history[ index ] = latestRecord;
 	};
 
+	/**
+	 * Ignore all changes that don't change values.
+	 * @param {HistoryRecord} record
+	 * @return {HistoryRecord} filtered record.
+	 */
+	const filterEqualChanges = ( record ) => {
+		return record.filter( ( { changes } ) => {
+			return Object.values( changes ).some(
+				( { from, to } ) => ! isShallowEqual( from, to )
+			);
+		} );
+	};
+
 	return {
 		/**
 		 * Record changes into the stiory.
@@ -104,13 +117,16 @@ export function createUndoManager() {
 		 * @param {HistoryRecord=} record   A record of changes to record.
 		 * @param {boolean}        isCached Whether to immediately create an undo point or not.
 		 */
-		record( record, isCached = false ) {
-			const isEmpty = ! record || ! record.length;
+		addRecord( record, isCached = false ) {
+			const filteredRecord = record
+				? filterEqualChanges( record )
+				: record;
+			const isEmpty = ! filteredRecord || ! filteredRecord.length;
 			if ( isCached ) {
 				if ( isEmpty ) {
 					return;
 				}
-				record.forEach( ( changes ) => {
+				filteredRecord.forEach( ( changes ) => {
 					cachedRecord = addHistoryChangesIntoRecord(
 						cachedRecord,
 						changes
@@ -124,7 +140,7 @@ export function createUndoManager() {
 				if ( isEmpty ) {
 					return;
 				}
-				history.push( record );
+				history.push( filteredRecord );
 			}
 		},
 
