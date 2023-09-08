@@ -4,10 +4,6 @@
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-/**
  * Internal dependencies
  */
 import { DropdownMenu } from '..';
@@ -47,27 +43,11 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof DropdownMenu > = ( props ) => {
-	const [ open, setOpen ] = useState( false );
-	return (
-		<div style={ { height: 150 } }>
-			<DropdownMenu
-				{ ...props }
-				open={ open }
-				onToggle={ ( willOpen ) => {
-					setOpen( willOpen );
-					props.onToggle?.( willOpen );
-				} }
-				// Only used if uncontrolled (ie. no `open` prop passed)
-				// defaultOpen={ false }
-			/>
-
-			<button onClick={ () => setOpen( ! open ) }>
-				Toggle (controlled update)
-			</button>
-		</div>
-	);
-};
+const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
+	<div style={ { height: 150 } }>
+		<DropdownMenu { ...props } />
+	</div>
+);
 
 export const Default = Template.bind( {} );
 Default.args = {
