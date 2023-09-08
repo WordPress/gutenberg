@@ -11,7 +11,7 @@
  * @access private
  * @internal
  *
- * @param integer $fd      A file descriptor.
+ * @param resource $fd  A file descriptor.
  *
  * @return array Unserialized contents of fd.
  */
