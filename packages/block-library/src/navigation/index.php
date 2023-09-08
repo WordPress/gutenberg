@@ -105,7 +105,6 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
 			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
 		};
-
 		// Add directives to the submenu.
 		if ( $w->next_tag(
 			array(
@@ -113,7 +112,7 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
+			$w->set_attribute( 'data-wp-on--focus', 'actions.core.navigation.openMenuOnFocus' );
 		}
 
 		// Iterate through subitems if exist.
