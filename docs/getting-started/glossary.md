@@ -24,11 +24,13 @@ Learn more about [Block Styles](/docs/explanations/architecture/styles.md#block-
 
 An API for blocks to declare what features they support. By declaring support for a feature, the API would add additional <a href="#attributes">attributes</a> to the block and matching UI controls for most of the existing block supports.
 
-See <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/">Block Supports reference documentation</a> for a deep dive into the API.
+See the <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/">Block Supports reference documentation</a> for a deep dive into the API.
 
 ## Block Theme
 
-A theme built in block forward way that allows Full Site Editing to work. The core of a block theme are its block templates and block template parts. To date, block theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy.
+A theme built in block forward way that allows you to use the Site Editor. The core of a block theme are its block templates and block template parts. To date, block theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy.
+
+See the <a href="https://developer.wordpress.org/themes/">Themes Handbook</a> for more information.
 
 ## Block categories
 
@@ -44,11 +46,13 @@ A unique identifier for a block type, consisting of a plugin-specific namespace 
 
 ## Block Templates
 
-A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. At their core, templates are simply HTML files of block markup that map to templates from the standard WordPress template hierarchy, for example index, single or archive. This helps control the front-end defaults of a site that are not edited via the Page Editor or the Post Editor. See the <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.
+A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. At their core, templates are simply HTML files of block markup that map to templates from the standard WordPress template hierarchy, for example index, single or archive. This helps control the front-end defaults of a site that are not edited via the Page Editor or the Post Editor. 
+
+See the <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.
 
 ## Block Template Parts
 
-Building on Block Templates, these parts help set structure for reusable items like a Footer or Header that one typically sees in a WordPress site. They are primarily site structure and are never to be mixed with the post content editor. With Full Site Editing and block based themes, users can create their own arbitrary Template Parts, save those in the database for their site, and re-use them throughout their site. Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first, carry some semantic meaning (could be swapped between themes such as a header), and can only be inserted in the site editor context (within “templates”).
+Building on Block Templates, these parts help set structure for reusable items like a Footer or Header that one typically sees in a WordPress site. They are primarily site structure and are never to be mixed with the post content editor. In the Site Editor, available when using a Block Theme, users can create their own arbitrary Template Parts, save those in the database for their site, and re-use them throughout their site. Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first, carry some semantic meaning (could be swapped between themes such as a header), and can only be inserted in the Site Eeditor context (within “templates”).
 
 ## Block type
 
@@ -62,13 +66,13 @@ A block which embeds the TinyMCE editor as a block, TinyMCE was the base of the 
 
 A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.
 
-## Full Site Editing
+## Full Site Editor
 
-This refers to a collection of features that ultimately allows users to edit their entire website using blocks as the starting point. This feature set includes everything from block patterns to global styles to templates to design tools for blocks (and more). First released in WordPress 5.9.
+Deprecated term. See <a href="#settings-sidebar">Site Editor.</a>
 
 ## Global Styles
 
-The CSS styles generated by WordPress and enqueued as an embedded stylesheet in the front end of the site. The stylesheet ID is `global-styles-inline-css`. The contents of this stylesheet come from the default `theme.json` of WordPress, the theme's `theme.json`, and the styles provided by the user via the global styles sidebar in the site editor.
+The CSS styles generated by WordPress and enqueued as an embedded stylesheet in the front end of the site. The stylesheet ID is `global-styles-inline-css`. The contents of this stylesheet come from the default `theme.json` of WordPress, the theme's `theme.json`, and the styles provided by the user via the global styles sidebar in the Site Editor.
 
 See [theme.json reference docs](/docs/reference-guides/theme-json-reference.md)</a>, the [how to guide](/docs/how-to-guides/themes/theme-json.md), and an introduction to [styles in the block editor](/docs/explanations/architecture/styles.md).
 
@@ -116,7 +120,7 @@ The panel on the right that contains the document and block settings. The sideba
 
 ## Site Editor
 
-The cohesive experience that allows you to directly edit and navigate between various templates, template parts, styling options, and more.
+The cohesive site editing experience that allows you to directly edit and navigate between various templates, template parts, styling options, and more. First released in WordPress 5.9.
 
 ## Static block
 
