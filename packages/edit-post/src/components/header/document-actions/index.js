@@ -60,6 +60,7 @@ function DocumentActions() {
 			<Button
 				className="edit-post-document-actions__command"
 				onClick={ () => openCommandCenter() }
+				aria-label={ __( 'Command Palette' ) }
 			>
 				<HStack
 					className="edit-post-document-actions__title"
@@ -67,7 +68,12 @@ function DocumentActions() {
 					justify="center"
 				>
 					<BlockIcon icon={ layout } />
-					<Text size="body" as="h1">
+					<Text
+						className="edit-post-document-actions__text"
+						size="body"
+						as="span"
+						color={ undefined }
+					>
 						<VisuallyHidden as="span">
 							{ __( 'Editing template: ' ) }
 						</VisuallyHidden>
