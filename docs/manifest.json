@@ -78,12 +78,6 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "getting-started"
-	},
-	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
