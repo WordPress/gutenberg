@@ -96,7 +96,11 @@ export default function useDragSelection() {
 					return;
 				}
 
-				anchorElement = ownerDocument.activeElement;
+				// Do not rely on the active element because it may change after
+				// the mouse leaves for the first time. See
+				// https://github.com/WordPress/gutenberg/issues/48747.
+				anchorElement = target;
+
 				startMultiSelect();
 
 				// `onSelectionStart` is called after `mousedown` and

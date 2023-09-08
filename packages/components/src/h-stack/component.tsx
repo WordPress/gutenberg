@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { contextConnect, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
+import { contextConnect } from '../ui/context';
 import { View } from '../view';
 import { useHStack } from './hook';
 import type { Props } from './types';

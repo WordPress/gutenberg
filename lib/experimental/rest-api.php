@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
 	/**
 	 * Registers the block patterns REST API routes.
 	 */

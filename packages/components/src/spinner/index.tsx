@@ -30,6 +30,7 @@ export function UnforwardedSpinner(
 			focusable="false"
 			{ ...props }
 			ref={ forwardedRef }
+			data-testid="components-spinner"
 		>
 			{ /* Gray circular background */ }
 			<SpinnerTrack
@@ -50,7 +51,6 @@ export function UnforwardedSpinner(
 /**
  * `Spinner` is a component used to notify users that their action is being processed.
  *
- * @example
  * ```js
  *   import { Spinner } from '@wordpress/components';
  *

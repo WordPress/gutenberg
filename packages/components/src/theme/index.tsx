@@ -18,10 +18,7 @@ import { useCx } from '../utils';
  * Multiple `Theme` components can be nested in order to override specific theme variables.
  *
  *
- * @example
  * ```jsx
- * import { __experimentalTheme as Theme } from '@wordpress/components';
- *
  * const Example = () => {
  *   return (
  *     <Theme accent="red">

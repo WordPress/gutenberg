@@ -8,9 +8,7 @@
 			"gutenberg-test-env",
 			"dom-scroll-into-view",
 			"jest",
-			"@testing-library/jest-dom",
-			"snapshot-diff",
-			"@wordpress/jest-console"
+			"@testing-library/jest-dom"
 		],
 		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
 		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.

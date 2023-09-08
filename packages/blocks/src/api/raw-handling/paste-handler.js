@@ -8,7 +8,6 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
  */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
-import { getBlockInnerHTML } from '../serializer';
 import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -67,6 +66,40 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 }
 
 /**
+ * If we're allowed to return inline content, and there is only one inlineable
+ * block, and the original plain text content does not have any line breaks,
+ * then treat it as inline paste.
+ *
+ * @param {Object} options
+ * @param {Array}  options.blocks
+ * @param {string} options.plainText
+ * @param {string} options.mode
+ */
+function maybeConvertToInline( { blocks, plainText, mode } ) {
+	if (
+		mode === 'AUTO' &&
+		blocks.length === 1 &&
+		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
+	) {
+		const trimRegex = /^[\n]+|[\n]+$/g;
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( trimRegex, '' );
+
+		if (
+			trimmedPlainText !== '' &&
+			trimmedPlainText.indexOf( '\n' ) === -1
+		) {
+			const target = blocks[ 0 ].innerBlocks.length
+				? blocks[ 0 ].innerBlocks[ 0 ]
+				: blocks[ 0 ];
+			return target.attributes.content;
+		}
+	}
+
+	return blocks;
+}
+
+/**
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {Object}  options
@@ -79,6 +112,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
  * @param {Array}   [options.tagName]            The tag into which content will be inserted.
  * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
  *
+ * @param {boolean} [options.disableFilters]     Whether or not to filter non semantic content.
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export function pasteHandler( {
@@ -87,6 +121,7 @@ export function pasteHandler( {
 	mode = 'AUTO',
 	tagName,
 	preserveWhiteSpace,
+	disableFilters,
 } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
@@ -119,6 +154,14 @@ export function pasteHandler( {
 	// See: https://github.com/WordPress/gutenberg/pull/6983#pullrequestreview-125151075
 	if ( String.prototype.normalize ) {
 		HTML = HTML.normalize();
+	}
+
+	if ( disableFilters ) {
+		return maybeConvertToInline( {
+			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
+			plainText,
+			mode,
+		} );
 	}
 
 	// Parse Markdown (and encoded HTML) if:
@@ -219,28 +262,5 @@ export function pasteHandler( {
 		.flat()
 		.filter( Boolean );
 
-	// If we're allowed to return inline content, and there is only one
-	// inlineable block, and the original plain text content does not have any
-	// line breaks, then treat it as inline paste.
-	if (
-		mode === 'AUTO' &&
-		blocks.length === 1 &&
-		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
-	) {
-		const trimRegex = /^[\n]+|[\n]+$/g;
-		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( trimRegex, '' );
-
-		if (
-			trimmedPlainText !== '' &&
-			trimmedPlainText.indexOf( '\n' ) === -1
-		) {
-			return removeInvalidHTML(
-				getBlockInnerHTML( blocks[ 0 ] ),
-				phrasingContentSchema
-			).replace( trimRegex, '' );
-		}
-	}
-
-	return blocks;
+	return maybeConvertToInline( { blocks, plainText, mode } );
 }

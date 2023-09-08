@@ -50,6 +50,17 @@ describe( 'CSS selector wrap', () => {
 		expect( output ).toMatchSnapshot();
 	} );
 
+	it( 'should wrap selectors inside container queries', () => {
+		const callback = wrap( '.my-namespace' );
+		const input = `
+		@container (width > 400px) {
+  			h1 { color: red; }
+		}`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
+
 	it( 'should ignore font-face selectors', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `

@@ -79,9 +79,9 @@ function ScreenRevisions() {
 
 	const selectRevision = ( revision ) => {
 		setGlobalStylesRevision( {
-			styles: revision?.styles,
-			settings: revision?.settings,
-			behaviors: revision?.behaviors,
+			styles: revision?.styles || {},
+			settings: revision?.settings || {},
+			behaviors: revision?.behaviors || {},
 			id: revision?.id,
 		} );
 		setSelectedRevisionId( revision?.id );
@@ -137,20 +137,17 @@ function ScreenRevisions() {
 										}
 									} }
 								>
-									{ __( 'Apply' ) }
+									{ globalStylesRevision?.id === 'parent'
+										? __( 'Reset to defaults' )
+										: __( 'Apply' ) }
 								</Button>
 							</SidebarFixedBottom>
 						) }
 					</div>
 					{ isLoadingRevisionWithUnsavedChanges && (
 						<ConfirmDialog
-							title={ __(
-								'Loading this revision will discard all unsaved changes.'
-							) }
 							isOpen={ isLoadingRevisionWithUnsavedChanges }
-							confirmButtonText={ __(
-								' Discard unsaved changes'
-							) }
+							confirmButtonText={ __( 'Apply' ) }
 							onConfirm={ () =>
 								restoreRevision( globalStylesRevision )
 							}
@@ -158,18 +155,9 @@ function ScreenRevisions() {
 								setIsLoadingRevisionWithUnsavedChanges( false )
 							}
 						>
-							<>
-								<h2>
-									{ __(
-										'Loading this revision will discard all unsaved changes.'
-									) }
-								</h2>
-								<p>
-									{ __(
-										'Do you want to replace your unsaved changes in the editor?'
-									) }
-								</p>
-							</>
+							{ __(
+								'Any unsaved changes will be lost when you apply this revision.'
+							) }
 						</ConfirmDialog>
 					) }
 				</>

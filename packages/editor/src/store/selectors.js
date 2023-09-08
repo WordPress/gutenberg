@@ -289,17 +289,23 @@ export function getCurrentPostAttribute( state, attributeName ) {
  *
  * @return {*} Post attribute value.
  */
-const getNestedEditedPostProperty = ( state, attributeName ) => {
-	const edits = getPostEdits( state );
-	if ( ! edits.hasOwnProperty( attributeName ) ) {
-		return getCurrentPostAttribute( state, attributeName );
-	}
+const getNestedEditedPostProperty = createSelector(
+	( state, attributeName ) => {
+		const edits = getPostEdits( state );
+		if ( ! edits.hasOwnProperty( attributeName ) ) {
+			return getCurrentPostAttribute( state, attributeName );
+		}
 
-	return {
-		...getCurrentPostAttribute( state, attributeName ),
-		...edits[ attributeName ],
-	};
-};
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
+	},
+	( state, attributeName ) => [
+		getCurrentPostAttribute( state, attributeName ),
+		getPostEdits( state )[ attributeName ],
+	]
+);
 
 /**
  * Returns a single attribute of the post being edited, preferring the unsaved
@@ -611,8 +617,8 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			return true;
 		}
 
-		// If the title or excerpt has changed, the post is autosaveable.
-		return [ 'title', 'excerpt' ].some(
+		// If title, excerpt, or meta have changed, the post is autosaveable.
+		return [ 'title', 'excerpt', 'meta' ].some(
 			( field ) =>
 				getPostRawValue( autosave[ field ] ) !==
 				getEditedPostAttribute( state, field )

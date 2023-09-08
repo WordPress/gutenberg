@@ -12,6 +12,7 @@ export default function SidebarNavigationScreenDetailsPanelRow( {
 	label,
 	children,
 	className,
+	...extraProps
 } ) {
 	return (
 		<HStack
@@ -22,6 +23,7 @@ export default function SidebarNavigationScreenDetailsPanelRow( {
 				'edit-site-sidebar-navigation-details-screen-panel__row',
 				className
 			) }
+			{ ...extraProps }
 		>
 			{ children }
 		</HStack>

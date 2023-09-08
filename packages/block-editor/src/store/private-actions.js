@@ -74,45 +74,6 @@ export function showBlockInterface() {
 }
 
 /**
- * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
- */
-
-/**
- * Sets the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string}           clientId The block client ID, or `''` for the root container.
- * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
- *                                    `'contentOnly'`, or `'default'`.
- *
- * @return {Object} Action object.
- */
-export function setBlockEditingMode( clientId = '', mode ) {
-	return {
-		type: 'SET_BLOCK_EDITING_MODE',
-		clientId,
-		mode,
-	};
-}
-
-/**
- * Clears the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string} clientId The block client ID, or `''` for the root container.
- *
- * @return {Object} Action object.
- */
-export function unsetBlockEditingMode( clientId = '' ) {
-	return {
-		type: 'UNSET_BLOCK_EDITING_MODE',
-		clientId,
-	};
-}
-
-/**
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *

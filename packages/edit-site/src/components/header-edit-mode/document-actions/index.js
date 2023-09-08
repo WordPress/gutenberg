@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -17,7 +17,8 @@ import {
 import { BlockIcon } from '@wordpress/block-editor';
 import { store as commandsStore } from '@wordpress/commands';
 import {
-	chevronLeftSmall as chevronLeftSmallIcon,
+	chevronLeftSmall,
+	chevronRightSmall,
 	page as pageIcon,
 	navigation as navigationIcon,
 	symbol,
@@ -32,8 +33,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
 
+const typeLabels = {
+	wp_block: __( 'Editing pattern:' ),
+	wp_navigation: __( 'Editing navigation menu:' ),
+	wp_template: __( 'Editing template:' ),
+	wp_template_part: __( 'Editing template part:' ),
+};
+
 export default function DocumentActions() {
-	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
+	const isPage = useSelect(
+		( select ) => select( editSiteStore ).isPage(),
+		[]
+	);
 	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
@@ -117,8 +128,6 @@ function TemplateDocumentActions( { className, onBack } ) {
 		);
 	}
 
-	const entityLabel = getEntityLabel( record.type );
-
 	let typeIcon = icon;
 	if ( record.type === 'wp_navigation' ) {
 		typeIcon = navigationIcon;
@@ -128,16 +137,15 @@ function TemplateDocumentActions( { className, onBack } ) {
 
 	return (
 		<BaseDocumentActions
-			className={ className }
+			className={ classnames( className, {
+				'is-synced-entity':
+					record.wp_pattern_sync_status !== 'unsynced',
+			} ) }
 			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
-				{ sprintf(
-					/* translators: %s: the entity being edited, like "template"*/
-					__( 'Editing %s: ' ),
-					entityLabel
-				) }
+				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
 			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
@@ -153,7 +161,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			{ onBack && (
 				<Button
 					className="edit-site-document-actions__back"
-					icon={ chevronLeftSmallIcon }
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						onBack();
@@ -182,21 +190,4 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
-}
-
-function getEntityLabel( entityType ) {
-	let label = '';
-	switch ( entityType ) {
-		case 'wp_navigation':
-			label = 'navigation menu';
-			break;
-		case 'wp_template_part':
-			label = 'template part';
-			break;
-		default:
-			label = 'template';
-			break;
-	}
-
-	return label;
 }

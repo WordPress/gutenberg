@@ -1,28 +1,21 @@
 /**
- * External dependencies
- */
-import type { ForwardedRef } from 'react';
-
-/**
  * WordPress dependencies
  */
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
-import { forwardRef, useRef, useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
-import ToggleGroupControlContext from '../context';
-import { useUpdateEffect } from '../../utils/hooks';
+import { useControlledValue } from '../../utils';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlMainControlProps } from '../types';
+import ToggleGroupControlContext from '../context';
+import { useComputeControlledOrUncontrolledValue } from './utils';
+import type {
+	ToggleGroupControlMainControlProps,
+	ToggleGroupControlContextProps,
+} from '../types';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -31,67 +24,56 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		label,
 		onChange,
 		size,
-		value,
+		value: valueProp,
+		id: idProp,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
 		'div',
 		false
 	>,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
-	const baseId = useInstanceId(
+	const generatedId = useInstanceId(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
-	).toString();
-	const [ selectedValue, setSelectedValue ] = useState( value );
-	const groupContext = {
-		baseId,
-		state: selectedValue,
-		setState: setSelectedValue,
-	};
-	const previousValue = usePrevious( value );
+	);
+	const baseId = idProp || generatedId;
 
-	// Propagate groupContext.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if groupContext state changed
-		// from incoming value.
-		if ( previousValue !== groupContext.state ) {
-			onChange( groupContext.state );
-		}
-	}, [ groupContext.state ] );
+	// Use a heuristic to understand if the component is being used in controlled
+	// or uncontrolled mode, and consequently:
+	// - when controlled, convert `undefined` values to `''` (ie. "no value")
+	// - use the `value` prop as the `defaultValue` when uncontrolled
+	const { value, defaultValue } =
+		useComputeControlledOrUncontrolledValue( valueProp );
 
-	// Sync incoming value with groupContext.state.
-	useUpdateEffect( () => {
-		if ( value !== groupContext.state ) {
-			groupContext.setState( value );
-		}
-	}, [ value ] );
+	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+		defaultValue,
+		value,
+		onChange,
+	} );
 
-	return (
-		<ToggleGroupControlContext.Provider
-			value={ {
-				...groupContext,
+	const groupContextValue = useMemo(
+		() =>
+			( {
+				baseId,
+				value: selectedValue,
+				setValue: setSelectedValue,
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,
-			} }
-		>
+			} as ToggleGroupControlContextProps ),
+		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
+	);
+
+	return (
+		<ToggleGroupControlContext.Provider value={ groupContextValue }>
 			<View
 				aria-label={ label }
 				{ ...otherProps }
-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+				ref={ forwardedRef }
 				role="group"
 			>
-				{ resizeListener }
-				<ToggleGroupControlBackdrop
-					state={ groupContext.state }
-					containerRef={ containerRef }
-					containerWidth={ sizes.width }
-					isAdaptiveWidth={ isAdaptiveWidth }
-				/>
 				{ children }
 			</View>
 		</ToggleGroupControlContext.Provider>

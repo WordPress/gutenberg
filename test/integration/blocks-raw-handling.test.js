@@ -291,9 +291,11 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
-		} );
+		} )
+			.map( getBlockContent )
+			.join( '' );
 
-		expect( filtered ).toBe( 'FOO' );
+		expect( filtered ).toBe( '<h1 class="wp-block-heading">FOO</h1>' );
 		expect( console ).toHaveLogged();
 	} );
 
