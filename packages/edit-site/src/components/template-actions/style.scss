@@ -1,0 +1,4 @@
+// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
+.edit-site-list__rename-modal {
+	z-index: z-index(".components-popover") + 1;
+}
