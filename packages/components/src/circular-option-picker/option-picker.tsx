@@ -90,7 +90,11 @@ function ListboxCircularOptionPicker(
 		compositeState.setBaseId( baseId );
 		compositeState.setLoop( !! loop );
 		compositeState.setRTL( rtl );
-	}, [ compositeState, baseId, loop, rtl ] );
+		// Disabling exhaustive-deps check because it expects
+		// `compositeState` to be present, but doing so causes
+		// an infinite loop.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ baseId, loop, rtl ] );
 
 	return (
 		<Composite
