@@ -18,6 +18,7 @@ import {
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
+import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createRegistrySelector } from '@wordpress/data';
@@ -1962,6 +1963,41 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
+		const buildReusableBlockInserterItem = ( reusableBlock ) => {
+			const icon = ! reusableBlock.wp_pattern_sync_status
+				? {
+						src: symbol,
+						foreground: 'var(--wp-block-synced-color)',
+				  }
+				: symbol;
+			const id = `core/block/${ reusableBlock.id }`;
+			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+			const frecency = calculateFrecency( time, count );
+
+			return {
+				id,
+				name: 'core/block',
+				initialAttributes: { ref: reusableBlock.id },
+				title: reusableBlock.title?.raw,
+				icon,
+				category: 'reusable',
+				keywords: [ 'reusable' ],
+				isDisabled: false,
+				utility: 1, // Deprecated.
+				frecency,
+				content: reusableBlock.content.raw,
+				syncStatus: reusableBlock.wp_pattern_sync_status,
+			};
+		};
+
+		const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
+			state,
+			'core/block',
+			rootClientId
+		)
+			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
+			: [];
+
 		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
 			buildScope: 'inserter',
 		} );
@@ -2002,7 +2038,7 @@ export const getInserterItems = createSelector(
 			{ core: [], noncore: [] }
 		);
 		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		return [ ...sortedBlockTypes ];
+		return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -2011,6 +2047,7 @@ export const getInserterItems = createSelector(
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		getReusableBlocks( state ),
 		getBlockTypes(),
 	]
 );
