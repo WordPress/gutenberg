@@ -39,10 +39,14 @@ import type { ModalProps } from './types';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
+/**
+ * Returns the first tabbable element that is not a close button.
+ * See: https://github.com/WordPress/gutenberg/issues/54106.
+ * @param tabbables HTMLElement[] an array of tabbable elements.
+ * @return HTMLElement the first tabbable element that is not a close button.
+ */
 function focusFirstNonCloseButtonElement( tabbables: HTMLElement[] ) {
 	return tabbables.find(
-		// Ignore the `Close` button.
-		// See: https://github.com/WordPress/gutenberg/issues/54106.
 		( tabbableNode ) => tabbableNode?.ariaLabel !== 'Close'
 	);
 }
@@ -55,7 +59,7 @@ function UnforwardedModal(
 		bodyOpenClassName = 'modal-open',
 		role = 'dialog',
 		title = null,
-		focusOnMount = focusFirstNonCloseButtonElement,
+		focusOnMount = true,
 		shouldCloseOnEsc = true,
 		shouldCloseOnClickOutside = true,
 		isDismissible = true,
@@ -83,7 +87,13 @@ function UnforwardedModal(
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+
+	// Modals should ignore the `Close` button which is the first focusable element.
+	// Remap `true` to select the next focusable element instead.
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount === true ? focusFirstNonCloseButtonElement : focusOnMount
+	);
+
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
