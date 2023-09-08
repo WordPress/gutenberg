@@ -32,8 +32,8 @@ function _gutenberg_get_contents_from_file_descriptor( $fd ) {
  * @access private
  * @internal
  *
- * @param integer $fd      A file descriptor.
- * @param array   $content Content to be serialized and written in a file descriptor.
+ * @param resource $fd      A file descriptor.
+ * @param array    $content Content to be serialized and written in a file descriptor.
  */
 function _gutenberg_save_contents_to_file_descriptor( $fd, $content ) {
 	rewind( $fd );
