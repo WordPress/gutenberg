@@ -20,7 +20,7 @@ The [WordPress Design team](http://make.wordpress.org/design/) uses [Figma](http
 
 This section outlines the design principles and patterns of the editor interface—to explain the background of the design, inform future improvements, and help people design great blocks.
 
-<img width="200" src="https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/assets/gutenberg-logo-black.svg" alt="Gutenberg Logo" />
+<img width="200" src="https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/assets/gutenberg-logo-black.svg" alt="Gutenberg Logo" />
 
 The Gutenberg logo was made by [Cristel Rossignol](https://twitter.com/cristelrossi), and is released under the GPL license. [Download the SVG logo](/docs/contributors/assets/gutenberg-logo-black.svg).
 
