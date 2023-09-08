@@ -133,7 +133,7 @@ if ( gutenberg_should_block_use_interactivity_api( 'core/navigation' ) ) {
 					'class_name' => 'wp-block-navigation__submenu-container',
 				)
 			) ) {
-				$w->set_attribute( 'data-wp-on--focusin', 'actions.core.navigation.openMenuOnFocus' );
+				$w->set_attribute( 'data-wp-on--focus', 'actions.core.navigation.openMenuOnFocus' );
 			}
 
 			// Iterate through subitems if exist.
