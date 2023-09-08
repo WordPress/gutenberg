@@ -336,12 +336,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
 		"title": "Global Settings & Styles (theme.json)",
 		"slug": "theme-json",
 		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
