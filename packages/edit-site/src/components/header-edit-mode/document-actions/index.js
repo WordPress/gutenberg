@@ -181,7 +181,11 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 					justify="center"
 				>
 					<BlockIcon icon={ icon } />
-					<Text size="body" as="h1">
+					<Text
+						className="edit-site-document-actions__text"
+						size="body"
+						as="span"
+					>
 						{ children }
 					</Text>
 				</HStack>

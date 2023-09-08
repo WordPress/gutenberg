@@ -37,7 +37,7 @@
 	&.is-synced-entity {
 		.edit-site-document-actions__title {
 			color: var(--wp-block-synced-color);
-			h1 {
+			.edit-site-document-actions__text {
 				color: var(--wp-block-synced-color);
 			}
 		}
@@ -68,7 +68,7 @@
 		flex-shrink: 0;
 	}
 
-	h1 {
+	.edit-site-document-actions__text {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
