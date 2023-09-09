@@ -2,10 +2,10 @@
 
 This is a [GitHub Action](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) which contains various automation to assist with managing the Gutenberg GitHub repository:
 
-- [First Time Contributor](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/first-time-contributor): Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
-- [Add Milestone](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/add-milestone): Assigns the plugin release milestone to a pull request once it is merged.
-- [Assign Fixed Issues](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/assign-fixed-issues): Adds assignee for issues which are marked to be "Fixed" by a pull request, and adds the "In Progress" label.
-- [PR Preview Link](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/pr-preview-link): Adds a comment to new PRs with a link to `http://gutenberg.run/{pr_number}` and Gutenberg plugin build file URL, making it easier for non-tech contributors to test.
+-   [First Time Contributor](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/first-time-contributor): Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
+-   [Add Milestone](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/add-milestone): Assigns the plugin release milestone to a pull request once it is merged.
+-   [Assign Fixed Issues](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/assign-fixed-issues): Adds assignee for issues which are marked to be "Fixed" by a pull request, and adds the "In Progress" label.
+-   [PR Preview Link](https://github.com/WordPress/gutenberg/tree/HEAD/packages/project-management-automation/lib/tasks/pr-preview-link): Adds a comment to new PRs with a link to `http://gutenberg.run/{pr_number}` and Gutenberg plugin build file URL, making it easier for non-tech contributors to test.
 
 # Installation and usage
 
@@ -26,7 +26,7 @@ jobs:
 
 ## Inputs
 
-- `github_token`: Required. GitHub API token to use for making API requests. This should be stored as a secret in the GitHub repository.
+-   `github_token`: Required. GitHub API token to use for making API requests. This should be stored as a secret in the GitHub repository.
 
 ## Outputs
 
@@ -38,4 +38,4 @@ This is an individual package that's part of the Gutenberg project. The project 
 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
-`<br /><br />``<p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." />``</p>`
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
