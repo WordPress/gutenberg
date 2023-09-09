@@ -24,7 +24,9 @@ const noop = () => {};
  *
  * @return {?Array} An array of mime types or the parameter passed if it was "falsy".
  */
-export function getMimeTypesArray( wpMimeTypesObject ) {
+export function getMimeTypesArray(
+	wpMimeTypesObject: null | undefined | Record< string, string >
+): undefined | null | Array< string > {
 	if ( ! wpMimeTypesObject ) {
 		return wpMimeTypesObject;
 	}
