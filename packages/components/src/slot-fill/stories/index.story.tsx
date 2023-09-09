@@ -82,7 +82,8 @@ export const WithSlotChildren: StoryFn< typeof Slot > = ( props ) => {
 		<SlotFillProvider>
 			<h2>Profile</h2>
 			<p>
-				Name: { /* @ts-ignore */ }
+				Name:
+				{ /* @ts-expect-error Not supported children for `<Slot />` when `bubblesVirtually` is true. */ }
 				<Slot { ...props } name="name">
 					{ ( fills ) => {
 						return (
@@ -92,7 +93,8 @@ export const WithSlotChildren: StoryFn< typeof Slot > = ( props ) => {
 				</Slot>
 			</p>
 			<p>
-				Age: { /* @ts-ignore */ }
+				Age:
+				{ /* @ts-expect-error Not support children for `<Slot />` when `bubblesVirtually` is true. */ }
 				<Slot { ...props } name="age">
 					{ ( fills ) => {
 						return (
