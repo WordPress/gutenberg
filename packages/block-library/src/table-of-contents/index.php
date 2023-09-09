@@ -106,14 +106,16 @@ function block_core_table_of_contents_build_headings_tree( $headings ) {
  * @return string $list A list of Table of Content items.
  */
 function block_core_table_of_contents_build_list( $tree ) {
-	$list = '';
+	$list      = '';
+	$permalink = get_permalink();
 
 	foreach ( $tree as $item ) {
 		$heading  = $item['heading'];
 		$children = isset( $item['children'] ) ? '<ol>' . block_core_table_of_contents_build_list( $item['children'] ) . '</ol>' : '';
 
 		if ( ! empty( $heading['link'] ) ) {
-			$content = '<a class="wp-block-table-of-contents__entry" href="' . esc_url( $heading['link'] ) . '">' . esc_html( $heading['content'] ) . '</a>';
+			$pagelink = ! empty( $heading['page'] ) ? add_query_arg( 'page', $heading['page'], $permalink ) : $permalink;
+			$content  = '<a class="wp-block-table-of-contents__entry" href="' . esc_url( $pagelink . $heading['link'] ) . '">' . esc_html( $heading['content'] ) . '</a>';
 		} else {
 			$content = '<span class=wp-block-table-of-contents__entry>' . esc_html( $heading['content'] ) . '</span>';
 		}

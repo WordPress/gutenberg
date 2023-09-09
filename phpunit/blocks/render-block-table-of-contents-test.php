@@ -88,6 +88,9 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 	 * @covers ::render_block_core_table_of_contents
 	 */
 	public function test_render_table_of_contents_from_meta() {
+		$GLOBALS['post'] = self::$page;
+
+		$permalink     = get_permalink( self::$page->ID );
 		$parsed_blocks = parse_blocks( '<!-- wp:table-of-contents /-->' );
 		$block         = new WP_Block(
 			$parsed_blocks[0],
@@ -99,12 +102,12 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 
 		$new_content = gutenberg_render_block_core_table_of_contents( array(), '', $block );
 		$this->assertStringContainsString(
-			'<a class="wp-block-table-of-contents__entry" href="#heading-text">Heading text</a>',
+			'<a class="wp-block-table-of-contents__entry" href="' . $permalink . '#heading-text">Heading text</a>',
 			$new_content,
 			'Failed to render a heading element from meta'
 		);
 		$this->assertStringContainsString(
-			'<a class="wp-block-table-of-contents__entry" href="#a-sub-heading">A sub-heading</a>',
+			'<a class="wp-block-table-of-contents__entry" href="' . $permalink . '#a-sub-heading">A sub-heading</a>',
 			$new_content,
 			'Failed to render a sub-heading element from meta'
 		);
