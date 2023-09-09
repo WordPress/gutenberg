@@ -414,31 +414,35 @@ function TableEdit( {
 							},
 							columnIndex
 						) => (
-							<RichText
-								tagName={ CellTag }
-								key={ columnIndex }
-								className={ classnames(
-									{
-										[ `has-text-align-${ align }` ]: align,
-									},
-									'wp-block-table__cell-content'
-								) }
-								scope={ CellTag === 'th' ? scope : undefined }
-								colSpan={ colspan }
-								rowSpan={ rowspan }
-								value={ content }
-								onChange={ onChange }
-								onFocus={ () => {
-									setSelectedCell( {
-										sectionName: name,
-										rowIndex,
-										columnIndex,
-										type: 'cell',
-									} );
-								} }
-								aria-label={ cellAriaLabel[ name ] }
-								placeholder={ placeholder[ name ] }
-							/>
+							<CellTag key={ columnIndex }>
+								<RichText
+									key={ columnIndex }
+									className={ classnames(
+										{
+											[ `has-text-align-${ align }` ]:
+												align,
+										},
+										'wp-block-table__cell-content'
+									) }
+									scope={
+										CellTag === 'th' ? scope : undefined
+									}
+									colSpan={ colspan }
+									rowSpan={ rowspan }
+									value={ content }
+									onChange={ onChange }
+									onFocus={ () => {
+										setSelectedCell( {
+											sectionName: name,
+											rowIndex,
+											columnIndex,
+											type: 'cell',
+										} );
+									} }
+									aria-label={ cellAriaLabel[ name ] }
+									placeholder={ placeholder[ name ] }
+								/>
+							</CellTag>
 						)
 					) }
 				</tr>
