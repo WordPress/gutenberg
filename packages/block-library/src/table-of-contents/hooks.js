@@ -138,14 +138,14 @@ function observeCallback( select, dispatch, context ) {
 export function useObserveHeadings( { clientId, postType, postId } ) {
 	const registry = useRegistry();
 	useEffect( () => {
-		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
-		// See: https://github.com/WordPress/gutenberg/pull/45513
-		return registry.subscribe( () =>
-			observeCallback( registry.select, registry.dispatch, {
-				clientId,
-				postType,
-				postId,
-			} )
+		return registry.subscribe(
+			() =>
+				observeCallback( registry.select, registry.dispatch, {
+					clientId,
+					postType,
+					postId,
+				} ),
+			blockEditorStore
 		);
 	}, [ registry, clientId, postType, postId ] );
 }
