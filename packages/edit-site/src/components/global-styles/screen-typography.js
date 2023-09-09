@@ -12,7 +12,7 @@ import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
 function ScreenTypography() {
-	const fontFamilies = window.__experimentalFontsAPI ? (
+	const fontFamilies = window.__experimentalFontsLibrary ? (
 		<FontFamilies />
 	) : null;
 	return (

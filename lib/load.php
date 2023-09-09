@@ -137,7 +137,7 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if (
-	$gutenberg_experiments && array_key_exists( 'gutenberg-fonts-api', $gutenberg_experiments )
+	$gutenberg_experiments && array_key_exists( 'gutenberg-fonts-library', $gutenberg_experiments )
 ) {
 	// Loads the Font Library.
 	if ( ! class_exists( 'WP_Font_Library' ) ) {
