@@ -9,6 +9,7 @@
  * Renders the `core/footnotes` block on the server.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -88,6 +89,7 @@ add_action( 'init', 'register_block_core_footnotes' );
  * Saves the footnotes meta value to the revision.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param int $revision_id The revision ID.
  */
@@ -111,6 +113,7 @@ if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
  * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @global int $wp_temporary_footnote_revision_id The footnote revision ID.
  *
@@ -136,6 +139,7 @@ if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
  * `"rest_after_insert_{$post_type}"` action.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @global int $wp_temporary_footnote_revision_id The footnote revision ID.
  *
@@ -174,6 +178,7 @@ if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
  * Restores the footnotes meta value from the revision.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param int $post_id     The post ID.
  * @param int $revision_id The revision ID.
@@ -192,7 +197,7 @@ if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 }
 
 /**
- * Adds the footnotes field to the revision.
+ * Adds the footnotes field to the revisions display.
  *
  * @since 6.3.0
  *
@@ -206,7 +211,7 @@ function wp_add_footnotes_to_revision( $fields ) {
 add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
 
 /**
- * Gets the footnotes field from the revision.
+ * Gets the footnotes field from the revision for the revisions screen.
  *
  * @since 6.3.0
  *
@@ -227,6 +232,7 @@ add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision
  * `_wp_put_post_revision` when it creates a new autosave.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param int|array $autosave The autosave ID or array.
  */
@@ -253,11 +259,14 @@ function _wp_rest_api_autosave_meta( $autosave ) {
 
 	update_post_meta( $id, 'footnotes', wp_slash( $body['meta']['footnotes'] ) );
 }
-// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
-add_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
-// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
-// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
-add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
+
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
+	add_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
+	// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
+	// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
+	add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
+}
 
 /**
  * This is a workaround for the autosave endpoint returning early if the
@@ -270,6 +279,7 @@ add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
  * course, this is temporary fix.
  *
  * @since 6.3.0
+ * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param WP_Post         $prepared_post The prepared post object.
  * @param WP_REST_Request $request       The request object.
@@ -291,5 +301,6 @@ function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 	$prepared_post->footnotes = '[]';
 	return $prepared_post;
 }
-
-add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );
+if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
+	add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );
+}
