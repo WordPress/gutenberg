@@ -257,7 +257,8 @@ function _wp_rest_api_autosave_meta( $autosave ) {
 		return;
 	}
 
-	update_post_meta( $id, 'footnotes', wp_slash( $body['meta']['footnotes'] ) );
+	// Can't use update_post_meta() because it doesn't allow revisions.
+	update_metadata( 'post', $id, 'footnotes', wp_slash( $body['meta']['footnotes'] ) );
 }
 
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
