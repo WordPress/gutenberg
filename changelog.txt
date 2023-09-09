@@ -224,6 +224,7 @@
 ### Tools
 
 - Try: Change PR label enforcer automation not to work on draft PRs by default. ([53417](https://github.com/WordPress/gutenberg/pull/53417))
+- Insert build status comment on new PRs. ([54303](https://github.com/WordPress/gutenberg/pull/54303))
 
 #### Testing
 - Attempt to fix intermittent end-to-end test failure. ([53905](https://github.com/WordPress/gutenberg/pull/53905))
