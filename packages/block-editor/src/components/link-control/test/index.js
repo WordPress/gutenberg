@@ -176,9 +176,7 @@ describe( 'Basic rendering', () => {
 		await user.type( searchInput, 'Hello' );
 
 		// Wait for the spinner SVG icon to be rendered.
-		expect(
-			await screen.findByTestId( 'components-spinner' )
-		).toBeVisible();
+		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
 		// Check the suggestions list is not rendered yet.
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
@@ -192,9 +190,7 @@ describe( 'Basic rendering', () => {
 		// Check the suggestions list is rendered.
 		expect( resultsList ).toBeVisible();
 		// Check the spinner SVG icon is not rendered any longer.
-		expect(
-			screen.queryByTestId( 'components-spinner' )
-		).not.toBeInTheDocument();
+		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 
 		const searchResultElements =
 			within( resultsList ).getAllByRole( 'option' );
@@ -459,18 +455,14 @@ describe( 'Searching for a link', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		expect(
-			await screen.findByTestId( 'components-spinner' )
-		).toBeVisible();
+		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
 		// make the search suggestions fetch return a response
 		resolver( fauxEntitySuggestions );
 
 		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
-		expect(
-			screen.queryByTestId( 'components-spinner' )
-		).not.toBeInTheDocument();
+		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 	} );
 
 	it.each( [ 'With spaces', 'Uppercase', 'lowercase' ] )(
