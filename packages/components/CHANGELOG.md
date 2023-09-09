@@ -25,6 +25,7 @@
 -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
 -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
 -   `Popover`: Remove unused `overlay` type from `positionToPlacement` utility function ([#54101](https://github.com/WordPress/gutenberg/pull/54101)).
+-   `Toolbar/ToolbarDropdownMenu `: Convert to TypeScript ([#54321](https://github.com/WordPress/gutenberg/pull/54321)).
 
 ### Experimental
 
