@@ -4,10 +4,12 @@
 import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
-import type { UploadMediaOptions } from '../types';
+import type { MediaItem, UploadMediaOptions } from '../types';
+import type { Attachment } from '@wordpress/core-data';
 
 const noop = () => {};
 
@@ -71,11 +73,18 @@ export async function uploadMedia( {
 	// Cast filesList to array.
 	const files = [ ...filesList ];
 
-	const filesSet = [];
-	const setAndUpdateFiles = ( idx: number, value ) => {
-		revokeBlobURL( filesSet[ idx ]?.url );
+	const filesSet: Array< MediaItem | null > = [];
+	const setAndUpdateFiles = ( idx: number, value: MediaItem | null ) => {
+		const fileToUpdate = filesSet[ idx ];
+		if ( fileToUpdate === null ) {
+			return;
+		}
+		revokeBlobURL( fileToUpdate.url );
 		filesSet[ idx ] = value;
-		onFileChange( filesSet.filter( Boolean ) );
+		const filteredFiles = filesSet.filter(
+			( f ) => f !== null
+		) as Array< MediaItem >;
+		onFileChange?.( filteredFiles );
 	};
 
 	// Allowed type specified by consumer.
@@ -95,11 +104,14 @@ export async function uploadMedia( {
 
 	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
-	const isAllowedMimeTypeForUser = ( fileType ) => {
+	const isAllowedMimeTypeForUser = ( fileType: string ) => {
+		if ( ! allowedMimeTypesForUser ) {
+			return false;
+		}
 		return allowedMimeTypesForUser.includes( fileType );
 	};
 
-	const validFiles = [];
+	const validFiles: Array< File > = [];
 
 	for ( const mediaFile of files ) {
 		// Verify if user is allowed to upload this mime type.
@@ -185,9 +197,11 @@ export async function uploadMedia( {
 			);
 			// eslint-disable-next-line camelcase
 			const { alt_text, source_url, ...savedMediaProps } = savedMedia;
-			const mediaObject = {
+			const mediaObject: MediaItem = {
 				...savedMediaProps,
 				alt: savedMedia.alt_text,
+				// TODO: Figure out where raw value comes from
+				// @ts-expect-error This needs to be fixed before committing
 				caption: savedMedia.caption?.raw ?? '',
 				title: savedMedia.title.raw,
 				url: savedMedia.source_url,
@@ -221,7 +235,10 @@ export async function uploadMedia( {
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFile( file, additionalData ) {
+function createMediaFromFile(
+	file: File,
+	additionalData: Record< string, string >
+): Promise< Attachment > {
 	// Create upload payload.
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );

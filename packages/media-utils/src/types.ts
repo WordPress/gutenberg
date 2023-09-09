@@ -25,7 +25,7 @@ export interface UploadMediaOptions {
 	/**
 	 * List of files.
 	 */
-	filesList: ArrayLike< File >;
+	filesList: Array< File >;
 
 	/**
 	 * Additional data to include in the request.
