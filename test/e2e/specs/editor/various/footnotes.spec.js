@@ -422,5 +422,21 @@ test.describe( 'Footnotes', () => {
 		await expect(
 			previewPage2.locator( 'ol.wp-block-footnotes li' )
 		).toHaveText( '123″  ↩︎' );
+
+		// Verify that the published post is unchanged.
+		// Navigate to the published post.
+		await previewPage2.close();
+		await editorPage.bringToFront();
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Post' } )
+			.click();
+		await page.locator( 'a:text("View Post")' ).click();
+
+		// Verify that the published post footnote still says "1".
+		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
+			'1 ↩︎'
+		);
 	} );
 } );
