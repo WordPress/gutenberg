@@ -7,7 +7,7 @@ import { proxyMap } from 'valtio/utils';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -109,7 +109,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 export default function SlotFillProvider( {
 	children,
 }: SlotFillProviderProps ) {
-	const [ registry ] = useState( createSlotRegistry );
+	const registry = useMemo( createSlotRegistry, [] );
 	return (
 		<SlotFillContext.Provider value={ registry }>
 			{ children }

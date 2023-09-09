@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import type { Component } from '@wordpress/element';
-import { useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -118,7 +118,7 @@ function createSlotRegistry(): BaseSlotFillContext {
 }
 
 export function SlotFillProvider( { children }: SlotFillProviderProps ) {
-	const [ contextValue ] = useState( createSlotRegistry );
+	const contextValue = useMemo( createSlotRegistry, [] );
 	return (
 		<SlotFillContext.Provider value={ contextValue }>
 			{ children }
