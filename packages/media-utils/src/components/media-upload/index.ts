@@ -12,6 +12,7 @@ const DEFAULT_EMPTY_GALLERY = [];
  * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
  */
 const getFeaturedImageMediaFrame = () => {
+	// @ts-expect-error Should be defined in context
 	const { wp } = window;
 
 	return wp.media.view.MediaFrame.Select.extend( {
@@ -76,6 +77,7 @@ const getFeaturedImageMediaFrame = () => {
  * @return {window.wp.media.view.MediaFrame.Post} The default media workflow.
  */
 const getGalleryDetailsMediaFrame = () => {
+	// @ts-expect-error Should be defined in context
 	const { wp } = window;
 	/**
 	 * Custom gallery details frame.
@@ -211,6 +213,7 @@ const slimImageObject = ( img ) => {
 };
 
 const getAttachmentsCollection = ( ids ) => {
+	// @ts-expect-error Should be defined in context
 	const { wp } = window;
 
 	return wp.media.query( {
@@ -239,6 +242,7 @@ class MediaUpload extends Component {
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
 
+		// @ts-expect-error Should be defined in context
 		const { wp } = window;
 
 		if ( gallery ) {

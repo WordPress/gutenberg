@@ -4,6 +4,10 @@
 import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import type { UploadMediaOptions } from '../types';
 
 const noop = () => {};
 
@@ -61,12 +65,12 @@ export async function uploadMedia( {
 	onError = noop,
 	onFileChange,
 	wpAllowedMimeTypes = null,
-} ) {
+}: UploadMediaOptions ): Promise< void > {
 	// Cast filesList to array.
 	const files = [ ...filesList ];
 
 	const filesSet = [];
-	const setAndUpdateFiles = ( idx, value ) => {
+	const setAndUpdateFiles = ( idx: number, value ) => {
 		revokeBlobURL( filesSet[ idx ]?.url );
 		filesSet[ idx ] = value;
 		onFileChange( filesSet.filter( Boolean ) );
