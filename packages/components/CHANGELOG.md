@@ -9,6 +9,7 @@
 ### Bug Fix
 
 -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
+-   `PaletteEdit`: Don't discards colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
 
 ### Internal
 
