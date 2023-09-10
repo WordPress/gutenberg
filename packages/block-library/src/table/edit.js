@@ -419,15 +419,14 @@ function TableEdit( {
 								scope={ CellTag === 'th' ? scope : undefined }
 								colSpan={ colspan }
 								rowSpan={ rowspan }
+								className={ classnames(
+									{
+										[ `has-text-align-${ align }` ]: align,
+									},
+									'wp-block-table__cell-content'
+								) }
 							>
 								<RichText
-									className={ classnames(
-										{
-											[ `has-text-align-${ align }` ]:
-												align,
-										},
-										'wp-block-table__cell-content'
-									) }
 									value={ content }
 									onChange={ onChange }
 									onFocus={ () => {
