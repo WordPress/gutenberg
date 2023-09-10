@@ -171,6 +171,7 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId
 	);
 	const availableCategories = usePatternsCategories( rootClientId );
+	const container = useRef();
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -203,7 +204,7 @@ export function BlockPatternsCategoryPanel( {
 	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
 		category,
-		'.block-editor-inserter__patterns-category-dialog'
+		container
 	);
 
 	// Hide block pattern preview on unmount.
@@ -214,7 +215,10 @@ export function BlockPatternsCategoryPanel( {
 	}
 
 	return (
-		<div className="block-editor-inserter__patterns-category-panel">
+		<div
+			className="block-editor-inserter__patterns-category-panel"
+			ref={ container }
+		>
 			<div className="block-editor-inserter__patterns-category-panel-title">
 				{ category.label }
 			</div>

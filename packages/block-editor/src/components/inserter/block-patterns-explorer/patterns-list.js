@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -50,6 +50,7 @@ function PatternList( {
 	selectedCategory,
 	patternCategories,
 } ) {
+	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
@@ -115,14 +116,16 @@ function PatternList( {
 
 	const pagingProps = usePatternsPaging(
 		filteredBlockPatterns,
-		selectedCategory,
-		'.components-modal__content.is-scrollable',
+		container,
 		filterValue
 	);
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
-		<div className="block-editor-block-patterns-explorer__list">
+		<div
+			className="block-editor-block-patterns-explorer__list"
+			ref={ container }
+		>
 			{ hasItems && (
 				<PatternsListHeader
 					filterValue={ filterValue }
