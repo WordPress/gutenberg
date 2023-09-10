@@ -74,8 +74,8 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 }
 
 /**
- * Returns a temporary name for a palette item in the format "Color + id".
- * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
+ * Returns a name for a palette item in the format "Color + id".
+ * To ensure there are no duplicate ids, this function checks all slugs.
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
  *
@@ -88,10 +88,10 @@ export function getNameForPosition(
 	elements: PaletteElement[],
 	slugPrefix: string
 ) {
-	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+	const nameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const position = elements.reduce( ( previousValue, currentValue ) => {
 		if ( typeof currentValue?.slug === 'string' ) {
-			const matches = currentValue?.slug.match( temporaryNameRegex );
+			const matches = currentValue?.slug.match( nameRegex );
 			if ( matches ) {
 				const id = parseInt( matches[ 1 ], 10 );
 				if ( id >= previousValue ) {
@@ -103,7 +103,7 @@ export function getNameForPosition(
 	}, 1 );
 
 	return sprintf(
-		/* translators: %s: is a temporary id for a custom color */
+		/* translators: %s: is an id for a custom color */
 		__( 'Color %s' ),
 		position
 	);
@@ -427,7 +427,7 @@ export function PaletteEdit( {
 									: __( 'Add color' )
 							}
 							onClick={ () => {
-								const tempOptionName = getNameForPosition(
+								const optionName = getNameForPosition(
 									elements,
 									slugPrefix
 								);
@@ -437,10 +437,10 @@ export function PaletteEdit( {
 										...gradients,
 										{
 											gradient: DEFAULT_GRADIENT,
-											name: tempOptionName,
+											name: optionName,
 											slug:
 												slugPrefix +
-												kebabCase( tempOptionName ),
+												kebabCase( optionName ),
 										},
 									] );
 								} else {
@@ -448,10 +448,10 @@ export function PaletteEdit( {
 										...colors,
 										{
 											color: DEFAULT_COLOR,
-											name: tempOptionName,
+											name: optionName,
 											slug:
 												slugPrefix +
-												kebabCase( tempOptionName ),
+												kebabCase( optionName ),
 										},
 									] );
 								}
