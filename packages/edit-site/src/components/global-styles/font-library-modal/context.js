@@ -88,7 +88,7 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	// Library Fonts
-	const [ modalTabOepn, setModalTabOepn ] = useState( false );
+	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
 	const baseThemeFonts = baseFontFamilies?.theme
@@ -116,10 +116,10 @@ function FontLibraryProvider( { children } ) {
 		: [];
 
 	useEffect( () => {
-		if ( ! modalTabOepn ) {
+		if ( ! modalTabOpen ) {
 			setLibraryFontSelected( null );
 		}
-	}, [ modalTabOepn ] );
+	}, [ modalTabOpen ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
 		// If font is null, reset the selected font
@@ -141,7 +141,7 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	const toggleModal = ( tabName ) => {
-		setModalTabOepn( tabName || null );
+		setModalTabOpen( tabName || null );
 	};
 
 	// Demo
@@ -327,7 +327,7 @@ function FontLibraryProvider( { children } ) {
 				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
-				modalTabOepn,
+				modalTabOpen,
 				toggleModal,
 				refreshLibrary,
 				saveFontFamilies,
