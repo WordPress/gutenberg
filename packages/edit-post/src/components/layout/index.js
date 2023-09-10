@@ -220,11 +220,17 @@ function Layout() {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// We need to add the show-icon-labels class to the body element so it is applied to modals.
+	if ( showIconLabels ) {
+		document.body.classList.add( 'show-icon-labels' );
+	} else {
+		document.body.classList.remove( 'show-icon-labels' );
+	}
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
 		'is-distraction-free': isDistractionFree && isLargeViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
