@@ -349,7 +349,7 @@ function TableEdit( {
 	useEffect( () => {
 		if ( hasTableCreated ) {
 			tableRef?.current
-				?.querySelector( 'td[contentEditable="true"]' )
+				?.querySelector( 'td div[contentEditable="true"]' )
 				?.focus();
 			setHasTableCreated( false );
 		}
@@ -414,9 +414,13 @@ function TableEdit( {
 							},
 							columnIndex
 						) => (
-							<CellTag key={ columnIndex }>
+							<CellTag
+								key={ columnIndex }
+								scope={ CellTag === 'th' ? scope : undefined }
+								colSpan={ colspan }
+								rowSpan={ rowspan }
+							>
 								<RichText
-									key={ columnIndex }
 									className={ classnames(
 										{
 											[ `has-text-align-${ align }` ]:
@@ -424,11 +428,6 @@ function TableEdit( {
 										},
 										'wp-block-table__cell-content'
 									) }
-									scope={
-										CellTag === 'th' ? scope : undefined
-									}
-									colSpan={ colspan }
-									rowSpan={ rowspan }
 									value={ content }
 									onChange={ onChange }
 									onFocus={ () => {
