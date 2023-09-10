@@ -257,18 +257,6 @@ function Option< T extends Color | Gradient >( {
 	);
 }
 
-function isTemporaryElement(
-	slugPrefix: string,
-	{ slug, color, gradient }: Color | Gradient
-) {
-	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-	return (
-		regex.test( slug ) &&
-		( ( !! color && color === DEFAULT_COLOR ) ||
-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
-	);
-}
-
 function PaletteEditListView< T extends Color | Gradient >( {
 	elements,
 	onChange,
@@ -284,23 +272,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
-	useEffect( () => {
-		return () => {
-			if (
-				elementsReference.current?.some( ( element ) =>
-					isTemporaryElement( slugPrefix, element )
-				)
-			) {
-				const newElements = elementsReference.current.filter(
-					( element ) => ! isTemporaryElement( slugPrefix, element )
-				);
-				onChange( newElements.length ? newElements : undefined );
-			}
-		};
-		// Disable reason: adding the missing dependency here would cause breaking changes that will require
-		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
 
 	const debounceOnChange = useDebounce( onChange, 100 );
 
