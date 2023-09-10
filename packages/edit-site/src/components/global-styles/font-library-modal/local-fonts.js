@@ -114,6 +114,10 @@ function LocalFonts() {
 	};
 
 	const addFontFaceToBrowser = async ( fontFaceData ) => {
+		const editorCanvas = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		);
+		const iframeDocument = editorCanvas.contentDocument;
 		const data = await fontFaceData.file.arrayBuffer();
 		const newFont = new window.FontFace( fontFaceData.fontFamily, data, {
 			style: fontFaceData.fontStyle,
@@ -121,6 +125,7 @@ function LocalFonts() {
 		} );
 		const loadedFace = await newFont.load();
 		document.fonts.add( loadedFace );
+		iframeDocument.fonts.add( loadedFace );
 	};
 
 	/**
