@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -11,7 +16,6 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -71,7 +75,13 @@ function BlockPattern( {
 							role="option"
 							as="div"
 							{ ...composite }
-							className="block-editor-block-patterns-list__item"
+							className={ classnames(
+								'block-editor-block-patterns-list__item',
+								{
+									'block-editor-block-patterns-list__list-item-synced':
+										pattern.id && ! pattern.syncStatus,
+								}
+							) }
 							onClick={ () => {
 								onClick( pattern, blocks );
 								onHover?.( null );
@@ -97,21 +107,6 @@ function BlockPattern( {
 									<div className="block-editor-block-patterns-list__item-title">
 										{ pattern.title }
 									</div>
-								) }
-								{ pattern.id && ! pattern.syncStatus && (
-									<Tooltip
-										position="top center"
-										text={ __(
-											'Editing this pattern will also update anywhere it is usedxx'
-										) }
-									>
-										<div className="block-editor-patterns__pattern-icon-wrapper">
-											<Icon
-												className="block-editor-patterns__pattern-icon"
-												icon={ symbol }
-											/>
-										</div>
-									</Tooltip>
 								) }
 							</div>
 							{ !! pattern.description && (
