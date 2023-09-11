@@ -119,7 +119,7 @@ export function createUndoManager() {
 
 	return {
 		/**
-		 * Record changes into the stiory.
+		 * Record changes into the history.
 		 *
 		 * @param {HistoryRecord=} record   A record of changes to record.
 		 * @param {boolean}        isCached Whether to immediately create an undo point or not.
