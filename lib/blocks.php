@@ -434,9 +434,8 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
 
-
 /**
- * Check if the lightbox should be rendered for a given block.
+ * Complements the lightbox implementation for the 'core/image' block.
  *
  * This function is INTENTIONALLY left out of core as it only provides
  * backwards compatibility for the legacy lightbox syntax that was only
@@ -444,7 +443,7 @@ add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 
  * the block attrbutes and the `theme.json` file.
  *
  * @param array $block The block to check.
- * @return array The block with the lightboxEnabled flag set if the lightbox should be rendered.
+ * @return array The block with the legacyLightboxSettings set if available.
  */
 function gutenberg_should_render_lightbox( $block ) {
 
@@ -452,37 +451,8 @@ function gutenberg_should_render_lightbox( $block ) {
 		return $block;
 	}
 
-	// Get the lightbox setting from the block attributes.
-	if ( isset( $block['attrs']['lightbox'] ) ) {
-		$lightbox_settings = $block['attrs']['lightbox'];
-		// If not present, check legacy syntax.
-	} elseif ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$lightbox_settings = $block['attrs']['behaviors']['lightbox'];
-	}
-
-	// If not present in block attributes, check global settings.
-	if ( ! isset( $lightbox_settings ) ) {
-		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
-
-		// If not present in global settings, check the top-level global settings.
-		if ( true !== $lightbox_settings && ! isset( $lightbox_settings['enabled'] ) ) {
-			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
-		}
-	}
-
-	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
-
-	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
-
-		if ( true === $lightbox_settings || ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) ) {
-			$block['lightboxEnabled'] = true;
-		}
-
-		// The legacy syntax allows setting the animation type.
-		if ( isset( $lightbox_settings['animation'] ) ) {
-			$block['lightboxAnimation'] = $lightbox_settings['animation'];
-		}
+	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
+		$block['legacyLightboxSettings'] = $block['attrs']['behaviors']['lightbox'];
 	}
 
 	return $block;

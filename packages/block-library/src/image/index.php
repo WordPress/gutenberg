@@ -31,29 +31,40 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
-	$should_load_view_script = false;
+	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
+	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
+	$lightbox_enabled  = false;
 
-	if ( isset( $block->parsed_block['lightboxEnabled'] ) ) {
-		$should_load_view_script = true;
+	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
+	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
+
+		if ( true === $lightbox_settings || ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) ) {
+			$lightbox_enabled = true;
+		}
 	}
 
 	// If at least one block in the page has the lightbox, mark the block type as interactive.
-	if ( $should_load_view_script ) {
+	if ( $lightbox_enabled ) {
 		$block->block_type->supports['interactivity'] = true;
 	}
 
+	// Determine whether the view script should be enqueued or not.
 	$view_js_file = 'wp-block-image-view';
 	if ( ! wp_script_is( $view_js_file ) ) {
 		$script_handles = $block->block_type->view_script_handles;
 
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+		if ( ! $lightbox_enabled && in_array( $view_js_file, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
 		}
 		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+		if ( $lightbox_enabled && ! in_array( $view_js_file, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
 		}
+	}
+
+	if ( $lightbox_enabled ) {
+		return block_core_image_render_lightbox( $processor->get_updated_html(), $block->parsed_block, $lightbox_settings );
 	}
 
 	return $processor->get_updated_html();
@@ -67,18 +78,18 @@ function render_block_core_image( $attributes, $content, $block ) {
  * @param  array $block Block data.
  * @return array        Filtered block data.
  */
-function block_core_image_should_render_lightbox( $block ) {
-
-	if ( 'core/image' !== $block['blockName'] ) {
-		return $block;
-	}
+function block_core_image_get_lightbox_settings( $block ) {
 
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
 		// If the lightbox setting is not set in the block attributes, get it from
 		// the global settings.
-	} else {
+	} elseif ( isset( $block['legacyLightboxSettings'] ) ) {
+		$lightbox_settings = $block['legacyLightboxSettings'];
+	}
+
+	if ( ! isset( $lightbox_settings ) ) {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 
 		// If not present in global settings, check the top-level global settings.
@@ -87,25 +98,8 @@ function block_core_image_should_render_lightbox( $block ) {
 		}
 	}
 
-	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
-
-	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
-
-		if ( true === $lightbox_settings || ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) ) {
-			$block['lightboxEnabled'] = true;
-		}
-
-		// The legacy syntax allows setting the animation type.
-		if ( isset( $lightbox_settings['animation'] ) ) {
-			$block['lightboxAnimation'] = $lightbox_settings['animation'];
-		}
-	}
-
-	return $block;
+	return $lightbox_settings ?? null;
 }
-add_filter( 'render_block_data', 'block_core_image_should_render_lightbox', 10, 1 );
-
 
 /**
  * Add the directives and layout needed for the lightbox behavior.
@@ -114,11 +108,7 @@ add_filter( 'render_block_data', 'block_core_image_should_render_lightbox', 10, 
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
-function block_core_image_render_lightbox( $block_content, $block ) {
-
-	if ( ! isset( $block['lightboxEnabled'] ) || false === $block['lightboxEnabled'] ) {
-		return $block_content;
-	}
+function block_core_image_render_lightbox( $block_content, $block, $lightbox_settings ) {
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
@@ -140,8 +130,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// zoom animation; however, here is also support for the legacy syntax,
 	// which supported configuring a fade animation as well.
 	$lightbox_animation = 'zoom';
-	if ( isset( $block['lightboxAnimation'] ) ) {
-		$lightbox_animation = $block['lightboxAnimation'];
+	if ( isset( $lightbox_settings['animation'] ) ) {
+		$lightbox_animation = $lightbox_settings['animation'];
 	}
 
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
@@ -289,10 +279,6 @@ HTML;
 
 	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
 }
-
-// Use priority 15 to run this hook after other hooks/plugins.
-// They could use the `render_block_{$this->name}` filter to modify the markup.
-add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 
 /**
  * Registers the `core/image` block on server.
