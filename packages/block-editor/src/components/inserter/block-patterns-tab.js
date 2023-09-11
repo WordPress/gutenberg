@@ -106,20 +106,20 @@ export function usePatternsCategories( rootClientId, filter = 'all' ) {
 				label: allPatternsCategory.label,
 			} );
 		}
-
+		speak(
+			sprintf(
+				/* translators: %d: number of categories . */
+				_n(
+					'%d category button displayed.',
+					'%d category buttons displayed.',
+					categories.length
+				),
+				categories.length
+			)
+		);
 		return categories;
 	}, [ allCategories, filteredPatterns, hasRegisteredCategory ] );
-	speak(
-		sprintf(
-			/* translators: %d: number of categories . */
-			_n(
-				'%d category button displayed.',
-				'%d category buttons displayed.',
-				populatedCategories.length
-			),
-			populatedCategories.length
-		)
-	);
+
 	return populatedCategories;
 }
 
