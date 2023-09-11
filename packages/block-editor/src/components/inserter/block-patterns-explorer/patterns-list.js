@@ -19,6 +19,8 @@ import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { allPatternsCategory, isPatternFiltered } from '../block-patterns-tab';
+import { BlockPatternsSyncFilter } from '../block-patterns-sync-filter';
+import { PATTERN_TYPES } from '../block-patterns-filter';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -49,6 +51,7 @@ function PatternList( {
 	filterValue,
 	selectedCategory,
 	patternCategories,
+	patternSyncFilter,
 } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
@@ -71,7 +74,9 @@ function PatternList( {
 	const filteredBlockPatterns = useMemo( () => {
 		if ( ! searchValue ) {
 			return allPatterns.filter( ( pattern ) => {
-				if ( isPatternFiltered( pattern, filterValue ) ) {
+				if (
+					isPatternFiltered( pattern, filterValue, patternSyncFilter )
+				) {
 					return false;
 				}
 
@@ -98,6 +103,7 @@ function PatternList( {
 		allPatterns,
 		selectedCategory,
 		registeredPatternCategories,
+		patternSyncFilter,
 	] );
 
 	// Announce search results on change.
@@ -134,6 +140,9 @@ function PatternList( {
 			) }
 			<InserterListbox>
 				{ ! hasItems && <InserterNoResults /> }
+				{ filterValue === PATTERN_TYPES.user && (
+					<BlockPatternsSyncFilter />
+				) }
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ pagingProps.categoryPatternsAsyncList }

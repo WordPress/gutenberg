@@ -4,24 +4,32 @@
 import { Modal } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
-import { SYNC_FILTERS } from '../block-patterns-filter';
+import { PATTERN_FILTERS } from '../block-patterns-filter';
 import { usePatternsCategories } from '../block-patterns-tab';
+import { store as blockEditorStore } from '../../../store';
 
 function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ filterValue, setFilterValue ] = useState( SYNC_FILTERS.all );
+	const [ filterValue, setFilterValue ] = useState( PATTERN_FILTERS.all );
+	const patternSyncFilter = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return settings.patternsSyncFilter || 'all';
+	}, [] );
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
 	);
 	const patternCategories = usePatternsCategories(
 		rootClientId,
-		filterValue
+		filterValue,
+		patternSyncFilter
 	);
 
 	return (
@@ -40,6 +48,8 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 				filterValue={ filterValue }
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
+				patternFilter={ filterValue }
+				patternSyncFilter={ patternSyncFilter }
 			/>
 		</div>
 	);

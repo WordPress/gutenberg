@@ -20,6 +20,7 @@ import {
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,9 +33,14 @@ import BlockPatternsPaging from '../block-patterns-paging';
 import usePatternsPaging from './hooks/use-patterns-paging';
 import {
 	PATTERN_TYPES,
-	SYNC_FILTERS,
+	PATTERN_FILTERS,
 	default as BlockPatternsFilter,
 } from './block-patterns-filter';
+import {
+	BlockPatternsSyncFilter,
+	SYNC_TYPES,
+} from './block-patterns-sync-filter';
+import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
@@ -43,27 +49,54 @@ export const allPatternsCategory = {
 	label: __( 'All' ),
 };
 
-export function isPatternFiltered( pattern, filterValue ) {
-	return (
-		( filterValue === PATTERN_TYPES.theme &&
-			pattern.name.startsWith( 'core/block' ) ) ||
-		( filterValue === PATTERN_TYPES.synced && pattern.syncStatus !== '' ) ||
-		( filterValue === PATTERN_TYPES.unsynced &&
-			pattern.syncStatus !== PATTERN_TYPES.unsynced )
-	);
+export function isPatternFiltered( pattern, filterValue, syncFilter ) {
+	if (
+		filterValue === PATTERN_TYPES.theme &&
+		pattern.name.startsWith( 'core/block' )
+	) {
+		return true;
+	}
+	if ( filterValue === PATTERN_TYPES.user && ! pattern.id ) {
+		return true;
+	}
+	if (
+		filterValue === PATTERN_TYPES.user &&
+		syncFilter === SYNC_TYPES.full &&
+		pattern.syncStatus !== ''
+	) {
+		return true;
+	}
+	if (
+		filterValue === PATTERN_TYPES.user &&
+		syncFilter === SYNC_TYPES.unsynced &&
+		pattern.syncStatus !== 'unsynced'
+	) {
+		return true;
+	}
+	return false;
 }
 
-export function usePatternsCategories( rootClientId, filter = 'all' ) {
+export function usePatternsCategories(
+	rootClientId,
+	filter = 'all',
+	syncFilter
+) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
 		undefined,
 		rootClientId
 	);
-	const filteredPatterns =
-		filter === 'all'
-			? allPatterns
-			: allPatterns.filter(
-					( pattern ) => ! isPatternFiltered( pattern, filter )
-			  );
+
+	const filteredPatterns = useMemo(
+		() =>
+			filter === 'all'
+				? allPatterns
+				: allPatterns.filter(
+						( pattern ) =>
+							! isPatternFiltered( pattern, filter, syncFilter )
+				  ),
+		[ filter, syncFilter, allPatterns ]
+	);
+
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
@@ -170,12 +203,27 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-	const availableCategories = usePatternsCategories( rootClientId );
+	const patternSyncFilter = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return settings.patternsSyncFilter || 'all';
+	}, [] );
+	const availableCategories = usePatternsCategories(
+		rootClientId,
+		patternFilter,
+		patternSyncFilter
+	);
 	const container = useRef();
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
-				if ( isPatternFiltered( pattern, patternFilter ) ) {
+				if (
+					isPatternFiltered(
+						pattern,
+						patternFilter,
+						patternSyncFilter
+					)
+				) {
 					return false;
 				}
 
@@ -198,7 +246,13 @@ export function BlockPatternsCategoryPanel( {
 
 				return availablePatternCategories.length === 0;
 			} ),
-		[ allPatterns, availableCategories, category.name, patternFilter ]
+		[
+			allPatterns,
+			availableCategories,
+			category.name,
+			patternFilter,
+			patternSyncFilter,
+		]
 	);
 
 	const pagingProps = usePatternsPaging(
@@ -223,6 +277,9 @@ export function BlockPatternsCategoryPanel( {
 				{ category.label }
 			</div>
 			<p>{ category.description }</p>
+			{ patternFilter === PATTERN_TYPES.user && (
+				<BlockPatternsSyncFilter />
+			) }
 			<BlockPatternList
 				shownPatterns={ pagingProps.categoryPatternsAsyncList }
 				blockPatterns={ pagingProps.categoryPatterns }
@@ -233,6 +290,7 @@ export function BlockPatternsCategoryPanel( {
 				category={ category.name }
 				isDraggable
 				showTitlesAsTooltip={ showTitlesAsTooltip }
+				patternFilter={ patternFilter }
 			/>
 			{ pagingProps.numPages > 1 && (
 				<BlockPatternsPaging { ...pagingProps } />
@@ -248,8 +306,19 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ patternFilter, setPatternFilter ] = useState( SYNC_FILTERS.all );
-	const categories = usePatternsCategories( rootClientId, patternFilter );
+	const [ patternFilter, setPatternFilter ] = useState( PATTERN_FILTERS.all );
+	const patternSyncFilter = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return settings.patternsSyncFilter || 'all';
+	}, [] );
+
+	const categories = usePatternsCategories(
+		rootClientId,
+		patternFilter,
+		patternSyncFilter
+	);
+
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
