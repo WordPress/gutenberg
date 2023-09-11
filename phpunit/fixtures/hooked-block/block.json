@@ -1,0 +1,7 @@
+{
+	"name": "tests/hooked-block",
+	"__experimentalBlockHooks": {
+		"tests/group-first-child": "firstChild",
+		"tests/group-last-child": "lastChild"
+	}
+}

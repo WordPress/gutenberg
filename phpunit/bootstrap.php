@@ -66,6 +66,9 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
  */
 function _manually_load_plugin() {
 	require dirname( __DIR__ ) . '/lib/load.php';
+	// Temporary fix to ensure that necessary functions are defined.
+	require dirname( __DIR__ ) . '/lib/experimental/block-hooks.php';
+
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
