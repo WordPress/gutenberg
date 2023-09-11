@@ -9,7 +9,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { _x, __, _n, isRTL, sprintf } from '@wordpress/i18n';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -315,6 +315,23 @@ function BlockPatternsTabs( {
 		const settings = getSettings();
 		return settings.patternsSyncFilter || 'all';
 	}, [] );
+	const previousSyncFilter = usePrevious( patternSyncFilter );
+
+	// If the sync filter changes, we need to select the "All" category to avoid
+	// showing a confusing no results screen.
+	useEffect( () => {
+		if (
+			patternSyncFilter !== null &&
+			previousSyncFilter !== patternSyncFilter
+		) {
+			onSelectCategory( allPatternsCategory, patternSourceFilter );
+		}
+	}, [
+		patternSyncFilter,
+		previousSyncFilter,
+		onSelectCategory,
+		patternSourceFilter,
+	] );
 
 	const categories = usePatternsCategories(
 		rootClientId,

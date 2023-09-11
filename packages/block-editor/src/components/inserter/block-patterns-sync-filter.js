@@ -6,8 +6,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -25,15 +24,20 @@ const SYNC_FILTERS = {
 };
 
 export function BlockPatternsSyncFilter() {
-	const [ syncFilter, updateSyncFilter ] = useState( 'all' );
 	const { updateSettings } = useDispatch( blockEditorStore );
+
+	const syncFilter = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return settings.patternsSyncFilter || 'all';
+	}, [] );
 
 	const handleUpdateSyncFilter = ( value ) => {
 		updateSettings( {
 			patternsSyncFilter: value,
 		} );
-		updateSyncFilter( value );
 	};
+
 	return (
 		<ToggleGroupControl
 			className="edit-site-patterns__sync-status-filter"
