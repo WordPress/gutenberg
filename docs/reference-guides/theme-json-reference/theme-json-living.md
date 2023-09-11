@@ -119,6 +119,17 @@ Settings related to layout.
 
 ---
 
+### lightbox
+
+Settings related to the lightbox.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| enabled | boolean |  |  |
+| allowEditing | boolean |  |  |
+
+---
+
 ### position
 
 Settings related to position.
@@ -170,20 +181,6 @@ Settings related to typography.
 ### custom
 
 Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
-
-
----
-
-### enabled
-
-Defines whether the lightbox is enabled or not.
-
-
----
-
-### allowEditing
-
-Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.
 
 
 ---
