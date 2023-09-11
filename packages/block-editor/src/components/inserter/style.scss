@@ -276,6 +276,9 @@ $block-inserter-tabs-height: 44px;
 	nav {
 		height: 100%;
 	}
+	.block-editor-block-patterns__source-filter select.components-select-control__input {
+		height: 40px;
+	}
 }
 
 .block-editor-inserter__block-patterns-tabs {

@@ -28,6 +28,7 @@ export const PATTERN_SOURCE_FILTERS = patternSourceOptions.reduce(
 export default function BlockPatternsSourceFilter( { onChange, value } ) {
 	return (
 		<SelectControl
+			className="block-editor-block-patterns__source-filter"
 			label={ __( 'Filters' ) }
 			options={ patternSourceOptions }
 			value={ value }
