@@ -30,9 +30,6 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
-import Warning from '../warning';
-
-const MAX_DEEP_NESTING_LEVEL = 10;
 
 const identity = ( x ) => x;
 
@@ -81,11 +78,9 @@ export default function BlockList( {
 		isStackedHorizontally,
 		maxWidth,
 		isRTL,
-		nestingLevel,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockParents,
 				getBlockCount,
 				getBlockHierarchyRootClientId,
 				getBlockOrder,
@@ -123,7 +118,6 @@ export default function BlockList( {
 				isStackedHorizontally: orientation === 'horizontal',
 				maxWidth: maxWidthSetting,
 				isRTL: isRTLSetting,
-				nestingLevel: getBlockParents( rootClientId ).length,
 			};
 		},
 		[ filterInnerBlocks, orientation, rootClientId ]
@@ -234,15 +228,6 @@ export default function BlockList( {
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
-	if ( nestingLevel >= MAX_DEEP_NESTING_LEVEL ) {
-		return (
-			<Warning
-				message={ __(
-					'Block cannot be rendered due to be nested deeper than ten levels.'
-				) }
-			/>
-		);
-	}
 	return (
 		<View
 			style={ containerStyle }
