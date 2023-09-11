@@ -20,7 +20,7 @@ export default function ResetDefaultTemplate( { onClick } ) {
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const isPostsPage = useIsPostsPage();
 	const { postType, postId } = useEditedPostContext();
-	const entitiy = useEntityRecord( 'postType', postType, postId );
+	const entity = useEntityRecord( 'postType', postType, postId );
 	const { setPage } = useDispatch( editSiteStore );
 	// The default template in a post is indicated by an empty string.
 	if ( ! currentTemplateSlug || isPostsPage ) {
@@ -30,7 +30,7 @@ export default function ResetDefaultTemplate( { onClick } ) {
 		<MenuGroup>
 			<MenuItem
 				onClick={ async () => {
-					entitiy.edit( { template: '' }, { undoIgnore: true } );
+					entity.edit( { template: '' }, { undoIgnore: true } );
 					onClick();
 					await setPage( {
 						context: { postType, postId },
