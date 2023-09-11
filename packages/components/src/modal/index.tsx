@@ -39,6 +39,8 @@ import type { ModalProps } from './types';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
+const MODAL_HEADER_CLASSNAME = 'components-modal__header';
+
 /**
  * When `firstElement` is passed to `focusOnMount`, this function is optimised to
  * avoid focusing on the `Close` button (or other "header" elements of the Modal
@@ -55,7 +57,7 @@ let openModalCount = 0;
 function getFirstTabbableElement( tabbables: HTMLElement[] ) {
 	// Attempt to locate tabbable outside of the header portion of the Modal.
 	const firstContentTabbable = tabbables.find( ( tabbable ) => {
-		return tabbable.closest( '.components-modal__header' ) === null;
+		return tabbable.closest( `.${ MODAL_HEADER_CLASSNAME }` ) === null;
 	} );
 
 	if ( firstContentTabbable ) {
@@ -284,7 +286,7 @@ function UnforwardedModal(
 						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
-							<div className="components-modal__header">
+							<div className={ MODAL_HEADER_CLASSNAME }>
 								<div className="components-modal__header-heading-container">
 									{ icon && (
 										<span
