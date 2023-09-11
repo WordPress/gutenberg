@@ -10,7 +10,7 @@ describe( 'getNestedValue', () => {
 		expect( result ).toEqual( input );
 	} );
 
-	it( 'should the nested value', () => {
+	it( 'should return the nested value', () => {
 		const input = { x: { y: { z: 123 } } };
 		const result = getNestedValue( input, [ 'x', 'y', 'z' ] );
 
