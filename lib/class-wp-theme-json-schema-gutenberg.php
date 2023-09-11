@@ -97,8 +97,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Migrate away from the previous syntax that used a top-level "behaviors" key
 	 * in the `theme.json` to a new "lightbox" setting.
 	 *
-	 * @since 6.4.0
-	 *
 	 * @param array $old Data with (potentially) behaviors.
 	 * @return array Data with behaviors removed.
 	 */
@@ -115,6 +113,8 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			);
 		}
 
+		// Migrate the behaviors setting to the new syntax. This setting controls
+		// whether the Lightbox UI shows up in the block editor.
 		if ( isset( $old['settings']['blocks']['core/image']['behaviors']['lightbox'] ) ) {
 			_wp_array_set(
 				$new,

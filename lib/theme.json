@@ -275,7 +275,6 @@
 			},
 			"core/image": {
 				"lightbox": {
-					"enabled": null,
 					"allowEditing": true
 				}
 			},
