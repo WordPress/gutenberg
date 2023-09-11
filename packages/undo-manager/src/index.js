@@ -98,16 +98,23 @@ export function createUndoManager() {
 	};
 
 	/**
-	 * Ignore all changes that don't change values.
+	 * Checks whether a record is empty.
+	 * A record is considered empty if it the changes keep the same values.
+	 * Also updates to function values are ignored.
+	 *
 	 * @param {HistoryRecord} record
-	 * @return {HistoryRecord} filtered record.
+	 * @return {boolean} Whether the record is empty.
 	 */
-	const filterEqualChanges = ( record ) => {
-		return record.filter( ( { changes } ) => {
+	const isRecordEmpty = ( record ) => {
+		const filteredRecord = record.filter( ( { changes } ) => {
 			return Object.values( changes ).some(
-				( { from, to } ) => ! isShallowEqual( from, to )
+				( { from, to } ) =>
+					typeof from !== 'function' &&
+					typeof to !== 'function' &&
+					! isShallowEqual( from, to )
 			);
 		} );
+		return ! filteredRecord.length;
 	};
 
 	return {
@@ -118,15 +125,12 @@ export function createUndoManager() {
 		 * @param {boolean}        isCached Whether to immediately create an undo point or not.
 		 */
 		addRecord( record, isCached = false ) {
-			const filteredRecord = record
-				? filterEqualChanges( record )
-				: record;
-			const isEmpty = ! filteredRecord || ! filteredRecord.length;
+			const isEmpty = ! record || isRecordEmpty( record );
 			if ( isCached ) {
 				if ( isEmpty ) {
 					return;
 				}
-				filteredRecord.forEach( ( changes ) => {
+				record.forEach( ( changes ) => {
 					cachedRecord = addHistoryChangesIntoRecord(
 						cachedRecord,
 						changes
@@ -140,7 +144,7 @@ export function createUndoManager() {
 				if ( isEmpty ) {
 					return;
 				}
-				history.push( filteredRecord );
+				history.push( record );
 			}
 		},
 

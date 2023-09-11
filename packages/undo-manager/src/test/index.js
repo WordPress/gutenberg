@@ -211,4 +211,47 @@ describe( 'Undo Manager', () => {
 			},
 		] );
 	} );
+
+	it( 'should ignore empty records', () => {
+		const undo = createUndoManager();
+
+		// All the following changes are considered empty for different reasons.
+		undo.addRecord();
+		undo.addRecord( [] );
+		undo.addRecord( [
+			{ id: '1', changes: { a: { from: 'value', to: 'value' } } },
+		] );
+		undo.addRecord( [
+			{
+				id: '1',
+				changes: {
+					a: { from: 'value', to: 'value' },
+					b: { from: () => {}, to: () => {} },
+				},
+			},
+		] );
+
+		expect( undo.getUndoRecord() ).toBeUndefined();
+
+		// The following changes is not empty
+		// and should also record the function changes in the history.
+
+		undo.addRecord( [
+			{
+				id: '1',
+				changes: {
+					a: { from: 'value1', to: 'value2' },
+					b: { from: () => {}, to: () => {} },
+				},
+			},
+		] );
+
+		const undoRecord = undo.getUndoRecord();
+		expect( undoRecord ).not.toBeUndefined();
+		// b is included in the changes.
+		expect( Object.keys( undoRecord[ 0 ].changes ) ).toEqual( [
+			'a',
+			'b',
+		] );
+	} );
 } );
