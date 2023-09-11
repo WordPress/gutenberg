@@ -371,6 +371,9 @@ export default function Image( {
 
 	const lightboxSetting = useSetting( 'lightbox' );
 
+	const showLightboxToggle =
+		lightboxSetting === true || lightboxSetting?.allowEditing === true;
+
 	const lightboxChecked =
 		lightbox?.enabled ||
 		( ! lightbox && lightboxSetting === true ) ||
@@ -531,24 +534,26 @@ export default function Image( {
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
-					<ToolsPanelItem
-						hasValue={ () => !! lightbox }
-						label={ __( 'Expand on Click' ) }
-						onDeselect={ () => {
-							setAttributes( { lightbox: undefined } );
-						} }
-						isShownByDefault={ true }
-					>
-						<ToggleControl
+					{ showLightboxToggle && (
+						<ToolsPanelItem
+							hasValue={ () => !! lightbox }
 							label={ __( 'Expand on Click' ) }
-							checked={ lightboxChecked }
-							onChange={ ( newValue ) => {
-								setAttributes( {
-									lightbox: { enabled: newValue },
-								} );
+							onDeselect={ () => {
+								setAttributes( { lightbox: undefined } );
 							} }
-						/>
-					</ToolsPanelItem>
+							isShownByDefault={ true }
+						>
+							<ToggleControl
+								label={ __( 'Expand on Click' ) }
+								checked={ lightboxChecked }
+								onChange={ ( newValue ) => {
+									setAttributes( {
+										lightbox: { enabled: newValue },
+									} );
+								} }
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
