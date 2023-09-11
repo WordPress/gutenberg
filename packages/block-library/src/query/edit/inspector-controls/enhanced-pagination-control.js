@@ -15,7 +15,7 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		'This setting requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside Post Template.'
+		'Enhanced pagination requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside Post Template.'
 	);
 
 	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
@@ -37,11 +37,7 @@ export default function EnhancedPaginationControl( {
 			/>
 			{ containsThirdPartyBlocks && (
 				<div>
-					<Notice
-						spokenMessage={ null }
-						status="warning"
-						isDismissible={ false }
-					>
+					<Notice status="warning" isDismissible={ false }>
 						{ enhancedPaginationNotice }
 					</Notice>
 				</div>
