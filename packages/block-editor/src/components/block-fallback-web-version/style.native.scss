@@ -1,0 +1,56 @@
+.sheet__container {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.sheet__icon {
+	size: 36;
+	height: 36;
+	padding-top: 8;
+	padding-bottom: 8;
+	color: $gray;
+}
+
+.sheet__icon--dark {
+	color: $gray-20;
+}
+
+.sheet__text {
+	text-align: center;
+	color: $gray-dark;
+}
+
+.sheet__text--dark {
+	color: $white;
+}
+
+.sheet__title {
+	padding-top: 8;
+	padding-bottom: 12;
+	font-size: 20;
+	font-weight: bold;
+	color: $gray-dark;
+}
+
+.sheet__title--dark {
+	color: $white;
+}
+
+.sheet__description {
+	padding-bottom: 24;
+	font-size: 16;
+	color: $gray-darken-20;
+}
+
+.sheet__description--dark {
+	color: $gray-20;
+}
+
+.sheet__action-button {
+	color: $blue-50;
+}
+
+.sheet__action-button--dark {
+	color: $blue-30;
+}
