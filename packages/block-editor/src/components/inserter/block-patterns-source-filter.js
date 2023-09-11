@@ -10,17 +10,26 @@ export const PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 };
-export const PATTERN_FILTERS = [
+
+const patternSourceOptions = [
 	{ value: 'all', label: __( 'Unfiltered' ) },
 	{ value: PATTERN_TYPES.theme, label: __( 'Theme patterns' ) },
 	{ value: PATTERN_TYPES.user, label: __( 'My patterns' ) },
 ];
 
-export default function BlockPatternsFilter( { onChange, value } ) {
+export const PATTERN_SOURCE_FILTERS = patternSourceOptions.reduce(
+	( patternSourceFilters, { value, label } ) => {
+		patternSourceFilters[ value ] = label;
+		return patternSourceFilters;
+	},
+	{}
+);
+
+export default function BlockPatternsSourceFilter( { onChange, value } ) {
 	return (
 		<SelectControl
 			label={ __( 'Filters' ) }
-			options={ PATTERN_FILTERS }
+			options={ patternSourceOptions }
 			value={ value }
 			onChange={ onChange }
 			aria-label={ __( 'Filter patterns by type' ) }

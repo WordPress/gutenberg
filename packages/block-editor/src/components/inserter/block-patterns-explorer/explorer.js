@@ -11,13 +11,12 @@ import { useSelect } from '@wordpress/data';
  */
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
-import { PATTERN_FILTERS } from '../block-patterns-filter';
 import { usePatternsCategories } from '../block-patterns-tab';
 import { store as blockEditorStore } from '../../../store';
 
 function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ filterValue, setFilterValue ] = useState( PATTERN_FILTERS.all );
+	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 	const patternSyncFilter = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
@@ -28,7 +27,7 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 	);
 	const patternCategories = usePatternsCategories(
 		rootClientId,
-		filterValue,
+		patternSourceFilter,
 		patternSyncFilter
 	);
 
@@ -40,15 +39,14 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 				onClickCategory={ setSelectedCategory }
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				patternSourceFilter={ patternSourceFilter }
+				setPatternSourceFilter={ setPatternSourceFilter }
 			/>
 			<PatternList
 				searchValue={ searchValue }
-				filterValue={ filterValue }
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
-				patternFilter={ filterValue }
+				patternSourceFilter={ patternSourceFilter }
 				patternSyncFilter={ patternSyncFilter }
 			/>
 		</div>

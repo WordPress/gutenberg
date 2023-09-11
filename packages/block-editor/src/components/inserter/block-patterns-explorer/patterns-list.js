@@ -20,7 +20,10 @@ import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { allPatternsCategory, isPatternFiltered } from '../block-patterns-tab';
 import { BlockPatternsSyncFilter } from '../block-patterns-sync-filter';
-import { PATTERN_TYPES } from '../block-patterns-filter';
+import {
+	PATTERN_TYPES,
+	PATTERN_SOURCE_FILTERS,
+} from '../block-patterns-source-filter';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -48,7 +51,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 
 function PatternList( {
 	searchValue,
-	filterValue,
+	patternSourceFilter,
 	selectedCategory,
 	patternCategories,
 	patternSyncFilter,
@@ -75,7 +78,11 @@ function PatternList( {
 		if ( ! searchValue ) {
 			return allPatterns.filter( ( pattern ) => {
 				if (
-					isPatternFiltered( pattern, filterValue, patternSyncFilter )
+					isPatternFiltered(
+						pattern,
+						patternSourceFilter,
+						patternSyncFilter
+					)
 				) {
 					return false;
 				}
@@ -99,7 +106,7 @@ function PatternList( {
 		return searchItems( allPatterns, searchValue );
 	}, [
 		searchValue,
-		filterValue,
+		patternSourceFilter,
 		allPatterns,
 		selectedCategory,
 		registeredPatternCategories,
@@ -108,7 +115,7 @@ function PatternList( {
 
 	// Announce search results on change.
 	useEffect( () => {
-		if ( ! filterValue ) {
+		if ( ! searchValue ) {
 			return;
 		}
 		const count = filteredBlockPatterns.length;
@@ -118,12 +125,13 @@ function PatternList( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
+	}, [ searchValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
 	const pagingProps = usePatternsPaging(
 		filteredBlockPatterns,
+		selectedCategory,
 		container,
-		filterValue
+		patternSourceFilter
 	);
 
 	const hasItems = !! filteredBlockPatterns?.length;
@@ -134,13 +142,16 @@ function PatternList( {
 		>
 			{ hasItems && (
 				<PatternsListHeader
-					filterValue={ filterValue }
+					filterValue={
+						searchValue ||
+						PATTERN_SOURCE_FILTERS[ patternSourceFilter ]
+					}
 					filteredBlockPatternsLength={ filteredBlockPatterns.length }
 				/>
 			) }
 			<InserterListbox>
 				{ ! hasItems && <InserterNoResults /> }
-				{ filterValue === PATTERN_TYPES.user && (
+				{ patternSourceFilter === PATTERN_TYPES.user && (
 					<BlockPatternsSyncFilter />
 				) }
 				{ hasItems && (

@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { default as BlockPatternsFilter } from '../block-patterns-filter';
+import { default as BlockPatternsSourceFilter } from '../block-patterns-source-filter';
 import { allPatternsCategory } from '../block-patterns-tab';
 
 function PatternCategoriesList( {
@@ -56,8 +56,8 @@ function PatternExplorerSidebar( {
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
-	filterValue,
-	setFilterValue,
+	patternSourceFilter,
+	setPatternSourceFilter,
 	searchValue,
 	setSearchValue,
 } ) {
@@ -68,10 +68,10 @@ function PatternExplorerSidebar( {
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
 			/>
-			<BlockPatternsFilter
-				value={ filterValue }
+			<BlockPatternsSourceFilter
+				value={ patternSourceFilter }
 				onChange={ ( value ) => {
-					setFilterValue( value );
+					setPatternSourceFilter( value );
 					onClickCategory( allPatternsCategory.name );
 				} }
 			/>

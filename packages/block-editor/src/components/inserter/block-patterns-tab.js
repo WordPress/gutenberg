@@ -33,9 +33,8 @@ import BlockPatternsPaging from '../block-patterns-paging';
 import usePatternsPaging from './hooks/use-patterns-paging';
 import {
 	PATTERN_TYPES,
-	PATTERN_FILTERS,
-	default as BlockPatternsFilter,
-} from './block-patterns-filter';
+	default as BlockPatternsSourceFilter,
+} from './block-patterns-source-filter';
 import {
 	BlockPatternsSyncFilter,
 	SYNC_TYPES,
@@ -49,25 +48,25 @@ export const allPatternsCategory = {
 	label: __( 'All' ),
 };
 
-export function isPatternFiltered( pattern, filterValue, syncFilter ) {
+export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	if (
-		filterValue === PATTERN_TYPES.theme &&
+		sourceFilter === PATTERN_TYPES.theme &&
 		pattern.name.startsWith( 'core/block' )
 	) {
 		return true;
 	}
-	if ( filterValue === PATTERN_TYPES.user && ! pattern.id ) {
+	if ( sourceFilter === PATTERN_TYPES.user && ! pattern.id ) {
 		return true;
 	}
 	if (
-		filterValue === PATTERN_TYPES.user &&
+		sourceFilter === PATTERN_TYPES.user &&
 		syncFilter === SYNC_TYPES.full &&
 		pattern.syncStatus !== ''
 	) {
 		return true;
 	}
 	if (
-		filterValue === PATTERN_TYPES.user &&
+		sourceFilter === PATTERN_TYPES.user &&
 		syncFilter === SYNC_TYPES.unsynced &&
 		pattern.syncStatus !== 'unsynced'
 	) {
@@ -78,7 +77,7 @@ export function isPatternFiltered( pattern, filterValue, syncFilter ) {
 
 export function usePatternsCategories(
 	rootClientId,
-	filter = 'all',
+	sourceFilter = 'all',
 	syncFilter
 ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
@@ -88,13 +87,17 @@ export function usePatternsCategories(
 
 	const filteredPatterns = useMemo(
 		() =>
-			filter === 'all'
+			sourceFilter === 'all'
 				? allPatterns
 				: allPatterns.filter(
 						( pattern ) =>
-							! isPatternFiltered( pattern, filter, syncFilter )
+							! isPatternFiltered(
+								pattern,
+								sourceFilter,
+								syncFilter
+							)
 				  ),
-		[ filter, syncFilter, allPatterns ]
+		[ sourceFilter, syncFilter, allPatterns ]
 	);
 
 	const hasRegisteredCategory = useCallback(
@@ -306,7 +309,7 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ patternFilter, setPatternFilter ] = useState( PATTERN_FILTERS.all );
+	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 	const patternSyncFilter = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
@@ -315,7 +318,7 @@ function BlockPatternsTabs( {
 
 	const categories = usePatternsCategories(
 		rootClientId,
-		patternFilter,
+		patternSourceFilter,
 		patternSyncFilter
 	);
 
@@ -330,10 +333,10 @@ function BlockPatternsTabs( {
 							role="list"
 							className="block-editor-inserter__block-patterns-tabs"
 						>
-							<BlockPatternsFilter
-								value={ patternFilter }
+							<BlockPatternsSourceFilter
+								value={ patternSourceFilter }
 								onChange={ ( value ) => {
-									setPatternFilter( value );
+									setPatternSourceFilter( value );
 									onSelectCategory(
 										allPatternsCategory,
 										value
@@ -347,7 +350,7 @@ function BlockPatternsTabs( {
 									onClick={ () =>
 										onSelectCategory(
 											category,
-											patternFilter
+											patternSourceFilter
 										)
 									}
 									className={
