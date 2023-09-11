@@ -49,14 +49,25 @@ export default function RenameMenuItem( { item, onClose } ) {
 				throwOnError: true,
 			} );
 
-			createSuccessNotice( __( 'Entity renamed.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				item.type === TEMPLATE_PARTS
+					? __( 'Template part renamed.' )
+					: __( 'Pattern renamed.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				item.type === TEMPLATE_PARTS
+					? __(
+							'An error occurred while reverting the template part.'
+					  )
+					: __( 'An error occurred while reverting the pattern.' );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while renaming the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
