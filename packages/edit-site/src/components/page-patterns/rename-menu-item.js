@@ -79,7 +79,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 						setIsModalOpen( false );
 						onClose();
 					} }
-					overlayClassName="edit-site-list__rename_modal"
+					overlayClassName="edit-site-list__rename-modal"
 				>
 					<form onSubmit={ onRename }>
 						<VStack spacing="5">

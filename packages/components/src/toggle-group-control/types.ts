@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
+import type { TooltipProps } from '../tooltip/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
@@ -56,7 +57,7 @@ export type WithToolTipProps = {
 	/**
 	 * React children
 	 */
-	children: ReactNode;
+	children: TooltipProps[ 'children' ];
 	/**
 	 * Label for the Tooltip component.
 	 */

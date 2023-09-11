@@ -20,6 +20,7 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 import type { ToggleGroupControlProps } from '../types';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -137,9 +138,9 @@ describe.each( [
 			'Click for Delicious Gnocchi'
 		);
 
-		await waitFor( () => expect( tooltip ).toBePositionedPopover() );
+		await waitFor( () => expect( tooltip ).toBeVisible() );
 
-		expect( tooltip ).toBeVisible();
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should not render tooltip', async () => {
