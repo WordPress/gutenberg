@@ -90,7 +90,7 @@ function RichTextMultiline(
 									2,
 									newValues[ index ] + newValues[ index + 1 ]
 								);
-								offset = newValues[ index ].length;
+								offset = newValues[ index ].length - 1;
 							} else {
 								if ( ! newValues[ index - 1 ] ) return;
 								newValues.splice(
@@ -98,7 +98,7 @@ function RichTextMultiline(
 									2,
 									newValues[ index - 1 ] + newValues[ index ]
 								);
-								offset = newValues[ index - 1 ].length;
+								offset = newValues[ index - 1 ].length - 1;
 							}
 							_onChange( newValues );
 							selectionChange(
