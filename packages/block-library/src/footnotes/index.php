@@ -38,7 +38,16 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$styles = '';
+	if ( isset( $attributes['style']['typography']['writingMode'] ) ) {
+		$styles = "writing-mode: {$attributes['style']['typography']['writingMode']};";
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'style' => $styles,
+		)
+	);
 
 	$block_content = '';
 
