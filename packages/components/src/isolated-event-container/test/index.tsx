@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import IsolatedEventContainer from '../';
+import IsolatedEventContainer from '..';
 
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
