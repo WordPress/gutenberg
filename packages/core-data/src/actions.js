@@ -462,7 +462,7 @@ export const redo =
 export const __unstableCreateUndoLevel =
 	() =>
 	( { select } ) => {
-		select.getUndoManager().record();
+		select.getUndoManager().addRecord();
 	};
 
 /**
