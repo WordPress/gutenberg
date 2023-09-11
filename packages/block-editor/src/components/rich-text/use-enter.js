@@ -4,11 +4,7 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	insert,
-	__unstableIsEmptyLine as isEmptyLine,
-	__unstableInsertLineSeparator as insertLineSeparator,
-} from '@wordpress/rich-text';
+import { insert } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -37,8 +33,6 @@ export function useEnter( props ) {
 				value,
 				onReplace,
 				onSplit,
-				onSplitMiddle,
-				multilineTag,
 				onChange,
 				disableLineBreaks,
 				onSplitAtEnd,
@@ -68,42 +62,22 @@ export function useEnter( props ) {
 				}
 			}
 
-			if ( multilineTag ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( {
-						value: _value,
-						onReplace,
-						onSplit,
-						onSplitMiddle,
-						multilineTag,
-					} );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
+			const { text, start, end } = _value;
+			const canSplitAtEnd =
+				onSplitAtEnd && start === end && end === text.length;
 
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( {
-						value: _value,
-						onReplace,
-						onSplit,
-						onSplitMiddle,
-						multilineTag,
-					} );
+			if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( _value, '\n' ) );
 				}
+			} else if ( ! canSplit && canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if ( canSplit ) {
+				splitValue( {
+					value: _value,
+					onReplace,
+					onSplit,
+				} );
 			}
 		}
 

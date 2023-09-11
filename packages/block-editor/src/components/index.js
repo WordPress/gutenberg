@@ -17,6 +17,7 @@ export { default as __experimentalBlockAlignmentMatrixControl } from './block-al
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
+export { default as BlockCanvas } from './block-canvas';
 export {
 	default as BlockControls,
 	BlockFormatControls,

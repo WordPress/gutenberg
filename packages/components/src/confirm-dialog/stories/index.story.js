@@ -87,22 +87,22 @@ const _defaultSnippet = `() => {
 
   return (
     <>
-    <ConfirmDialog
-      isOpen={ isOpen }
-      onConfirm={ handleConfirm }
-      onCancel={ handleCancel }
-    >
-      Would you like to privately publish the post now?
-    </ConfirmDialog>
+      <ConfirmDialog
+        isOpen={ isOpen }
+        onConfirm={ handleConfirm }
+        onCancel={ handleCancel }
+      >
+        Would you like to privately publish the post now?
+      </ConfirmDialog>
 
-    <Heading level={ 1 }>{ confirmVal }</Heading>
+      <Heading level={ 1 }>{ confirmVal }</Heading>
 
-    <Button variant="primary" onClick={ () => setIsOpen( true ) }>
-      Open ConfirmDialog
-    </Button>
+      <Button variant="primary" onClick={ () => setIsOpen( true ) }>
+        Open ConfirmDialog
+      </Button>
     </>
-    );
-  };`;
+  );
+};`;
 _default.args = {};
 _default.parameters = {
 	docs: {
@@ -110,7 +110,6 @@ _default.parameters = {
 			code: _defaultSnippet,
 			language: 'jsx',
 			type: 'auto',
-			format: 'true',
 		},
 	},
 };

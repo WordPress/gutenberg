@@ -131,6 +131,7 @@ export const link = {
 		type: 'data-type',
 		id: 'data-id',
 		target: 'target',
+		rel: 'rel',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
 		if ( isCollapsed( value ) ) {

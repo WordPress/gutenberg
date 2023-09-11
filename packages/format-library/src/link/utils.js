@@ -85,10 +85,16 @@ export function isValidHref( href ) {
  * @param {string}  options.type             The type of the link.
  * @param {string}  options.id               The ID of the link.
  * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
- *
+ * @param {boolean} options.nofollow         Whether this link is marked as no follow relationship.
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
+export function createLinkFormat( {
+	url,
+	type,
+	id,
+	opensInNewWindow,
+	nofollow,
+} ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -101,7 +107,15 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' noreferrer noopener'
+			: 'noreferrer noopener';
+	}
+
+	if ( nofollow ) {
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' nofollow'
+			: 'nofollow';
 	}
 
 	return format;
