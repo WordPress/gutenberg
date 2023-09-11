@@ -53,10 +53,14 @@ export default function ChildLayoutControl( {
 	const blockSupportsAlign = getBlockSupport( blockName, 'align' );
 
 	const supportsWideAlign =
-		blockSupportsAlign === true || blockSupportsAlign?.includes( 'wide' );
+		blockSupportsAlign === true ||
+		( Array.isArray( blockSupportsAlign ) &&
+			blockSupportsAlign?.includes( 'wide' ) );
 
 	const supportsFullAlign =
-		blockSupportsAlign === true || blockSupportsAlign?.includes( 'full' );
+		blockSupportsAlign === true ||
+		( Array.isArray( blockSupportsAlign ) &&
+			blockSupportsAlign?.includes( 'full' ) );
 
 	const parentLayoutTypeToUse = parentLayoutType ?? defaultParentLayoutType;
 
