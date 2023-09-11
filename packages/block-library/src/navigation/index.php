@@ -5,6 +5,16 @@
  * @package WordPress
  */
 
+add_action(
+	'wp_print_scripts',
+	function () {
+		global $wp_scripts;
+		if ( isset( $wp_scripts->registered['wp-block-navigation-view'] ) ) {
+			$wp_scripts->registered['wp-block-navigation-view']->deps[] = 'wp-interactivity';
+		}
+	}
+);
+
 // These functions are used for the __unstableLocation feature and only active
 // when the gutenberg plugin is active.
 if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
@@ -66,7 +76,6 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		return $menu_items_by_parent_id;
 	}
 }
-
 
 /**
  * Add Interactivity API directives to the navigation-submenu and page-list
