@@ -15,7 +15,7 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		'Enhanced pagination requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside Post Template.'
+		'Enhanced pagination requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside the Query Loop block.'
 	);
 
 	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );

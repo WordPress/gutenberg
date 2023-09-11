@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { useContainsThirdPartyBlocks } from '../utils';
 
 const disableEnhancedPaginationDescription = __(
-	'Third-party blocks are not supported inside a Query Loop block with "Enhanced Pagination" enabled.'
+	'Third-party blocks are not supported inside a Query Loop block with enhanced pagination enabled.'
 );
 
 const modalDescriptionId =
@@ -35,7 +35,7 @@ export default function EnhancedPaginationModal( {
 		containsThirdPartyBlocks &&
 		enhancedPagination && (
 			<Modal
-				title={ __( 'Disable "Enhanced Pagination"?' ) }
+				title={ __( "Disable Query Loop's enhanced pagination?" ) }
 				className={ 'wp-block-query-enhanced-pagination-modal' }
 				aria={ {
 					describedby: modalDescriptionId,
