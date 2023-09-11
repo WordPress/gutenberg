@@ -110,6 +110,7 @@ export default function QueryContent( {
 				setQuery={ updateQuery }
 				setDisplayLayout={ updateDisplayLayout }
 				setAttributes={ setAttributes }
+				clientId={ clientId }
 			/>
 			<BlockControls>
 				<QueryToolbar

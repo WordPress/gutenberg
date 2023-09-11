@@ -3,24 +3,22 @@
  */
 import { ToggleControl, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
-import { speak } from '@wordpress/a11y';
+
+/**
+ * Internal dependencies
+ */
+import { useContainsThirdPartyBlocks } from '../../utils';
 
 export default function EnhancedPaginationControl( {
 	enhancedPagination,
 	setAttributes,
+	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		'Enhanced Pagination might cause interactive blocks within the Post Template to stop working. Disable it if you experience any issues.'
+		'This setting requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside Post Template.'
 	);
 
-	const isFirstRender = useRef( true ); // Don't speak on first render.
-	useEffect( () => {
-		if ( ! isFirstRender.current && enhancedPagination ) {
-			speak( enhancedPaginationNotice );
-		}
-		isFirstRender.current = false;
-	}, [ enhancedPagination, enhancedPaginationNotice ] );
+	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
 
 	return (
 		<>
@@ -30,13 +28,14 @@ export default function EnhancedPaginationControl( {
 					'Browsing between pages won’t require a full page reload.'
 				) }
 				checked={ !! enhancedPagination }
+				disabled={ containsThirdPartyBlocks }
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: !! value,
 					} );
 				} }
 			/>
-			{ enhancedPagination && (
+			{ containsThirdPartyBlocks && (
 				<div>
 					<Notice
 						spokenMessage={ null }
