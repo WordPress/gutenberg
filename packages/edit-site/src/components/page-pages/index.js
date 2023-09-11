@@ -20,6 +20,7 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import PagesBulkActions from './pages-bulk-actions';
 import Page from '../page';
 import Link from '../routes/link';
 import PageActions from '../page-actions';
@@ -57,13 +58,15 @@ function ToggleStatusFilter( { onChange } ) {
 const defaultStatus = [ 'publish', 'draft' ];
 
 export default function PagePages() {
+	const [ bulkActionsAnchor, setBulkActionsAnchor ] = useState();
+	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
 	const [ globalFilter, setGlobalFilter ] = useState( '' );
-	const [ rowSelection, setRowSelection ] = useState( {} );
+	// const [ rowSelection, setRowSelection ] = useState( {} );
 	const [ status, setStatus ] = useState( defaultStatus );
 	const [ paginationInfo, setPaginationInfo ] = useState();
 	const [ { pageIndex, pageSize }, setPagination ] = useState( {
 		pageIndex: 0,
-		pageSize: 3,
+		pageSize: 2,
 	} );
 	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
 	const pagination = useMemo(
@@ -90,6 +93,7 @@ export default function PagePages() {
 			pageSize,
 			pageIndex,
 			status,
+			reset,
 		]
 	);
 	const { records, isResolving: isLoading } = useEntityRecords(
@@ -115,7 +119,7 @@ export default function PagePages() {
 			} );
 		} );
 		// Status should not make extra request if already did..
-	}, [ globalFilter, pageSize, status.toString() ] );
+	}, [ globalFilter, pageSize, status.toString(), reset ] );
 
 	const columns = useMemo(
 		() => [
@@ -170,9 +174,7 @@ export default function PagePages() {
 					return (
 						<PageActions
 							postId={ page.id }
-							// onRemove={ () => {
-							// 	Refresh data..
-							// } }
+							onRemove={ () => setResetQuery() }
 						/>
 					);
 				},
@@ -198,18 +200,19 @@ export default function PagePages() {
 						manualSorting: true,
 						manualFiltering: true,
 						manualPagination: true,
-						// enableRowSelection: true,
+						enableRowSelection: true,
 						state: {
 							sorting,
 							globalFilter,
 							pagination,
-							rowSelection,
+							// rowSelection,
 						},
 						pageCount: paginationInfo?.totalPages,
 						onSortingChange: setSorting,
 						onGlobalFilterChange: setGlobalFilter,
 						onPaginationChange: setPagination,
-						onRowSelectionChange: setRowSelection,
+						// onRowSelectionChange: setRowSelection,
+						meta: { resetQuery: setResetQuery },
 					} }
 				>
 					<VStack>
@@ -219,9 +222,11 @@ export default function PagePages() {
 							<DataTableActions />
 						</HStack>
 						<DataTableRows
+							ref={ setBulkActionsAnchor }
 							className="edit-site-table"
 							isLoading={ isLoading }
 						/>
+						<PagesBulkActions anchor={ bulkActionsAnchor } />
 						<HStack justify="space-between">
 							<DataTablePaginationTotalItems
 								totalItems={ paginationInfo?.totalItems }

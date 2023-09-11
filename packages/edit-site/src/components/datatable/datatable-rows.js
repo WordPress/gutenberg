@@ -9,6 +9,7 @@ import { flexRender } from '@tanstack/react-table';
  */
 import { Icon, chevronDown, chevronUp } from '@wordpress/icons';
 import { __experimentalHStack as HStack } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,10 +29,10 @@ function SortingIcon( { header } ) {
 	return <Icon icon={ sortDirection === 'asc' ? chevronUp : chevronDown } />;
 }
 
-export default function DataTableRows( {
-	className = 'datatable-component__table',
-	isLoading = false,
-} ) {
+function DataTableRows(
+	{ className = 'datatable-component__table', isLoading = false },
+	ref
+) {
 	const table = useDataTableContext();
 	const { rows } = table.getRowModel();
 	const hasRows = !! rows?.length;
@@ -42,7 +43,7 @@ export default function DataTableRows( {
 	return (
 		<>
 			{ hasRows && (
-				<table className={ className }>
+				<table ref={ ref } className={ className }>
 					<thead>
 						{ table.getHeaderGroups().map( ( headerGroup ) => (
 							<tr key={ headerGroup.id }>
@@ -128,3 +129,5 @@ export default function DataTableRows( {
 		</>
 	);
 }
+
+export default forwardRef( DataTableRows );
