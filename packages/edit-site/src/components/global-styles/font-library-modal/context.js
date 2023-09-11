@@ -286,9 +286,11 @@ function FontLibraryProvider( { children } ) {
 		// Add custom fonts to the browser.
 		fontsToAdd.forEach( ( font ) => {
 			font.fontFace.forEach( ( face ) => {
+				// Load font faces just in the iframe because they already are in the document.
 				loadFontFaceInBrowser(
 					face,
-					getDisplaySrcFromFontFace( face )
+					getDisplaySrcFromFontFace( face.src ),
+					'iframe'
 				);
 			} );
 		} );
@@ -315,7 +317,7 @@ function FontLibraryProvider( { children } ) {
 		// If the font is already loaded, don't load it again.
 		if ( loadedFontUrls.has( src ) ) return;
 		// Load the font in the browser.
-		loadFontFaceInBrowser( fontFace, src );
+		loadFontFaceInBrowser( fontFace, src, 'document' );
 		// Add the font to the loaded fonts list.
 		loadedFontUrls.add( src );
 	};
