@@ -142,6 +142,12 @@ function TemplateDocumentActions( { className, onBack } ) {
 }
 
 function BaseDocumentActions( { className, icon, children, onBack } ) {
+	const { isCommandCenterOpen } = useSelect( ( select ) => {
+		return {
+			isCommandCenterOpen: select( commandsStore ).isOpen(),
+		};
+	}, [] );
+
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	return (
 		<div
@@ -163,6 +169,8 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 				className="edit-site-document-actions__command"
 				onClick={ () => openCommandCenter() }
 				aria-label={ __( 'Command Palette' ) }
+				aria-haspopup="dialog"
+				aria-expanded={ isCommandCenterOpen }
 			>
 				<HStack
 					className="edit-site-document-actions__title"

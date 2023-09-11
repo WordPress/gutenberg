@@ -20,16 +20,20 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as editPostStore } from '../../../store';
 
 function DocumentActions() {
-	const { template, isEditing } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } =
-			select( editPostStore );
-		const _isEditing = isEditingTemplate();
+	const { template, isCommandCenterOpen, isEditing } = useSelect(
+		( select ) => {
+			const { isEditingTemplate, getEditedPostTemplate } =
+				select( editPostStore );
+			const _isEditing = isEditingTemplate();
 
-		return {
-			template: _isEditing ? getEditedPostTemplate() : null,
-			isEditing: _isEditing,
-		};
-	}, [] );
+			return {
+				template: _isEditing ? getEditedPostTemplate() : null,
+				isEditing: _isEditing,
+				isCommandCenterOpen: select( commandsStore ).isOpen(),
+			};
+		},
+		[]
+	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
@@ -61,6 +65,8 @@ function DocumentActions() {
 				className="edit-post-document-actions__command"
 				onClick={ () => openCommandCenter() }
 				aria-label={ __( 'Command Palette' ) }
+				aria-haspopup="dialog"
+				aria-expanded={ isCommandCenterOpen }
 			>
 				<HStack
 					className="edit-post-document-actions__title"
