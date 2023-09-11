@@ -128,14 +128,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-fonts-library',
-		__( 'Fonts Library', 'gutenberg' ),
+		'gutenberg-font-library',
+		__( 'Font Library', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable the New Fonts Library', 'gutenberg' ),
-			'id'    => 'gutenberg-fonts-library',
+			'label' => __( 'Enable the New Font Library', 'gutenberg' ),
+			'id'    => 'gutenberg-font-library',
 		)
 	);
 	register_setting(

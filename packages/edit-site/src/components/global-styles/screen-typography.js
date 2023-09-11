@@ -12,9 +12,6 @@ import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
 function ScreenTypography() {
-	const fontFamilies = window.__experimentalFontsLibrary ? (
-		<FontFamilies />
-	) : null;
 	return (
 		<>
 			<ScreenHeader
@@ -25,7 +22,7 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
-					{ fontFamilies }
+					{ window.__experimentalFontLibrary && <FontFamilies /> }
 					<TypographyElements />
 				</VStack>
 			</div>
