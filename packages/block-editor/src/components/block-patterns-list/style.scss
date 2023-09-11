@@ -29,7 +29,8 @@
 	.block-editor-block-patterns-list__item-title {
 		padding-top: $grid-unit-10;
 		font-size: 12px;
-		text-align: center;
+		text-align: left;
+		flex-grow: 1;
 	}
 
 	&:hover .block-editor-block-preview__container {
@@ -45,8 +46,21 @@
 		color: var(--wp-admin-theme-color);
 	}
 
+	&.block-editor-block-patterns-list__list-item-synced {
+		.block-editor-block-preview__container:hover {
+			box-shadow:
+				0 0 0 2px var(--wp-block-synced-color),
+				0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+
+	.block-editor-patterns__pattern-details {
+		align-items: flex-start;
+	}
+
 	.block-editor-patterns__pattern-icon-wrapper {
-		text-align: center;
+		min-width: 24px;
+		padding-top: $grid-unit-10;
 		.block-editor-patterns__pattern-icon {
 			fill: var(--wp-block-synced-color);
 		}
