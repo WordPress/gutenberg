@@ -18,9 +18,10 @@ module.exports = {
 	entry: {
 		navigation:
 			'./packages/block-library/src/navigation/view-interactivity.js',
+		image: './packages/block-library/src/image/view-interactivity.js',
 	},
 	output: {
-		filename: './blocks/[name]/private-interactivity.min.js',
+		filename: './blocks/[name]/view-interactivity.min.js',
 		path: join( __dirname, '..', '..', 'build', 'block-library' ),
 		chunkLoadingGlobal: '__WordPressPrivateInteractivityAPI__',
 	},
