@@ -93,6 +93,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 			);
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
+			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
 		}
@@ -183,10 +184,11 @@ function render_block_core_search( $attributes, $content, $block ) {
 				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
 				$button->set_attribute( 'data-wp-bind--type', 'selectors.core.search.type' );
 				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.openSearchInput' );
+				// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
-				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
+				$button->set_attribute( 'type', 'button' );
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
