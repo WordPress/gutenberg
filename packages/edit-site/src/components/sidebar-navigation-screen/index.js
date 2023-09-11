@@ -66,8 +66,8 @@ export default function SidebarNavigationScreen( {
 				justify="flex-start"
 			>
 				<HStack
-					spacing={ 4 }
-					alignment="flex-start"
+					spacing={ 2 }
+					alignment="center"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && (
@@ -118,9 +118,14 @@ export default function SidebarNavigationScreen( {
 							  ) }
 					</Heading>
 					{ actions && (
-						<div className="edit-site-sidebar-navigation-screen__actions">
+						<HStack
+							spacing={ 2 }
+							alignment="center"
+							justify="end"
+							className="edit-site-sidebar-navigation-screen__actions"
+						>
 							{ actions }
-						</div>
+						</HStack>
 					) }
 				</HStack>
 				{ meta && (
