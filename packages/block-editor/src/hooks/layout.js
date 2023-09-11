@@ -828,53 +828,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		let css = `${ selector } {
 			box-sizing: border-box;}`;
 
-		if ( orientation === 'horizontal' ) {
-			// set width
-			if ( layout[ widthProp ] === 'fixed' && width ) {
-				css += `${ selector } {
-					max-width: ${ width };
-					flex-grow: 0;
-					flex-shrink: 1;
-					flex-basis: ${ width };
-					
-				}`;
-			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
-				css += `${ selector } {
-					width: ${ width };
-					flex-shrink: 0;
-					flex-grow: 0;
-					flex-basis: auto;
-				}`;
-			} else if ( layout[ widthProp ] === 'fill' ) {
-				css += `${ selector } {
-					flex-grow: 1;
-					flex-shrink: 1;
-					flex-basis: 100%;
-				}`;
-			} else if ( layout[ widthProp ] === 'fit' ) {
-				css += `${ selector } {
-					flex-grow: 0;
-					flex-shrink: 0;
-					flex-basis: auto;
-					width: fit-content;
-				}`;
-			}
-
-			// set height
-			if ( layout[ heightProp ] === 'fill' ) {
-				css += `${ selector } {
-					align-self: stretch;
-				}`;
-			} else if ( layout[ heightProp ] === 'fit' ) {
-				css += `${ selector } {
-						height: fit-content;
-					}`;
-			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
-				css += `${ selector } {
-						height: ${ height };
-					}`;
-			}
-		} else {
+		if ( isConstrained || orientation === 'vertical' ) {
 			// set width
 			if ( layout[ widthProp ] === 'fixed' && width ) {
 				css += `${ selector } {
@@ -922,6 +876,52 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 					flex-basis: auto;
 					height: auto;
 				}`;
+			}
+		} else {
+			// set width
+			if ( layout[ widthProp ] === 'fixed' && width ) {
+				css += `${ selector } {
+					max-width: ${ width };
+					flex-grow: 0;
+					flex-shrink: 1;
+					flex-basis: ${ width };
+					
+				}`;
+			} else if ( layout[ widthProp ] === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+					flex-shrink: 0;
+					flex-grow: 0;
+					flex-basis: auto;
+				}`;
+			} else if ( layout[ widthProp ] === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+					flex-shrink: 1;
+					flex-basis: 100%;
+				}`;
+			} else if ( layout[ widthProp ] === 'fit' ) {
+				css += `${ selector } {
+					flex-grow: 0;
+					flex-shrink: 0;
+					flex-basis: auto;
+					width: fit-content;
+				}`;
+			}
+
+			// set height
+			if ( layout[ heightProp ] === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( layout[ heightProp ] === 'fit' ) {
+				css += `${ selector } {
+						height: fit-content;
+					}`;
+			} else if ( layout[ heightProp ] === 'fixedNoShrink' ) {
+				css += `${ selector } {
+						height: ${ height };
+					}`;
 			}
 		}
 
