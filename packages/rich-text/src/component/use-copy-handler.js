@@ -35,10 +35,6 @@ export function useCopyHandler( props ) {
 			event.clipboardData.setData( 'text/plain', plainText );
 			event.clipboardData.setData( 'text/html', html );
 			event.clipboardData.setData( 'rich-text', 'true' );
-			event.clipboardData.setData(
-				'rich-text-multi-line-tag',
-				multilineTag || ''
-			);
 			event.preventDefault();
 
 			if ( event.type === 'cut' ) {

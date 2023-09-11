@@ -110,19 +110,10 @@ export function usePasteHandler( props ) {
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
 			if ( isInternal ) {
-				const pastedMultilineTag =
-					clipboardData.getData( 'rich-text-multi-line-tag' ) ||
-					undefined;
-				let pastedValue = create( {
+				const pastedValue = create( {
 					html,
-					multilineTag: pastedMultilineTag,
-					multilineWrapperTags:
-						pastedMultilineTag === 'li'
-							? [ 'ul', 'ol' ]
-							: undefined,
 					preserveWhiteSpace,
 				} );
-				pastedValue = adjustLines( pastedValue, !! multilineTag );
 				addActiveFormats( pastedValue, value.activeFormats );
 				onChange( insert( value, pastedValue ) );
 				return;
