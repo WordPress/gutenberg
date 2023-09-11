@@ -16,6 +16,8 @@ export default function SidebarButton( props ) {
 				'edit-site-sidebar-button',
 				props.className
 			) }
-		/>
+		>
+			{ props.children }
+		</Button>
 	);
 }
