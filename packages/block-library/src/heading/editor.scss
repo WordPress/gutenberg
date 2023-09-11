@@ -1,0 +1,11 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	&.has-text-align-right[style*="writing-mode: vertical-rl"],
+	&.has-text-align-left[style*="writing-mode: vertical-lr"] {
+		rotate: 180deg;
+	}
+}
