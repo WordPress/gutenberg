@@ -83,6 +83,9 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			timerId.current = setTimeout( () => {
 				const tabbables = focus.tabbable.find( node );
 
+				// Ignoring next line because the type is actually callable,
+				// but the linter cannot recognise the outer typeof check.
+				// @ts-ignore
 				const elementToFocus = focusOnMountRef.current( tabbables );
 
 				if ( elementToFocus ) {
