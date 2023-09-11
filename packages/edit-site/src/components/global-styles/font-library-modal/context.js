@@ -203,8 +203,8 @@ function FontLibraryProvider( { children } ) {
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
 			const fontToBeActivated = getIntersectingFontFaces(
-				fonts,
-				fontsInstalled
+				fontsInstalled,
+				fonts
 			);
 			// Activate the font families (add the font families to the global styles).
 			activateCustomFontFamilies( fontToBeActivated );
