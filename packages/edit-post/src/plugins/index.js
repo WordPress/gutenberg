@@ -20,10 +20,12 @@ import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 
 function ManagePatternsMenuItem() {
 	const url = useSelect( ( select ) => {
-		const { canUser } = select( coreStore );
+		const { canUser, getThemeSupports } = select( coreStore );
 		const { getEditorSettings } = select( editorStore );
 
 		const isBlockTheme = getEditorSettings().__unstableIsBlockBasedTheme;
+		const supportsBlockTemplateParts =
+			!! getThemeSupports()[ 'block-template-parts' ];
 		const defaultUrl = addQueryArgs( 'edit.php', {
 			post_type: 'wp_block',
 		} );
@@ -34,7 +36,8 @@ function ManagePatternsMenuItem() {
 		// The site editor and templates both check whether the user has
 		// edit_theme_options capabilities. We can leverage that here and not
 		// display the manage patterns link if the user can't access it.
-		return canUser( 'read', 'templates' ) && isBlockTheme
+		return canUser( 'read', 'templates' ) &&
+			( isBlockTheme || supportsBlockTemplateParts )
 			? patternsUrl
 			: defaultUrl;
 	}, [] );

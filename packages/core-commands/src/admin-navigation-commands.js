@@ -10,7 +10,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
+import {
+	useIsTemplatesAccessible,
+	useIsBlockBasedTheme,
+	useSupportsBlockTemplateParts,
+} from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -19,6 +23,7 @@ export function useAdminNavigationCommands() {
 	const history = useHistory();
 	const isTemplatesAccessible = useIsTemplatesAccessible();
 	const isBlockBasedTheme = useIsBlockBasedTheme();
+	const supportsBlockTemplateParts = useSupportsBlockTemplateParts();
 
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
@@ -45,7 +50,10 @@ export function useAdminNavigationCommands() {
 		label: __( 'Patterns' ),
 		icon: symbol,
 		callback: ( { close } ) => {
-			if ( isTemplatesAccessible && isBlockBasedTheme ) {
+			if (
+				isTemplatesAccessible &&
+				( isBlockBasedTheme || supportsBlockTemplateParts )
+			) {
 				const args = {
 					path: '/patterns',
 				};

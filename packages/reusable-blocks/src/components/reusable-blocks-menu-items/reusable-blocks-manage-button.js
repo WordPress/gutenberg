@@ -20,9 +20,11 @@ function ReusableBlocksManageButton( { clientId } ) {
 			( select ) => {
 				const { getBlock, canRemoveBlock, getBlockCount, getSettings } =
 					select( blockEditorStore );
-				const { canUser } = select( coreStore );
+				const { canUser, getThemeSupports } = select( coreStore );
 				const reusableBlock = getBlock( clientId );
 				const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
+				const supportsBlockTemplateParts =
+					!! getThemeSupports()[ 'block-template-parts' ];
 
 				return {
 					canRemove: canRemoveBlock( clientId ),
@@ -39,7 +41,8 @@ function ReusableBlocksManageButton( { clientId } ) {
 					// has edit_theme_options capabilities. We can leverage that here
 					// and omit the manage patterns link if the user can't access it.
 					managePatternsUrl:
-						isBlockTheme && canUser( 'read', 'templates' )
+						( isBlockTheme || supportsBlockTemplateParts ) &&
+						canUser( 'read', 'templates' )
 							? addQueryArgs( 'site-editor.php', {
 									path: '/patterns',
 							  } )

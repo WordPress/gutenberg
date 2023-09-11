@@ -17,3 +17,11 @@ export function useIsBlockBasedTheme() {
 		[]
 	);
 }
+
+export function useSupportsBlockTemplateParts() {
+	return useSelect(
+		( select ) =>
+			!! select( coreStore ).getThemeSupports()[ 'block-template-parts' ],
+		[]
+	);
+}
