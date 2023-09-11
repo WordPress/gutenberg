@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Update `Modal` so that when passing `firstElement` as the `focusOnMount` prop it will optimize for focusing first element within the Modal's _contents_ as opposed to the entire component. ([#54296](https://github.com/WordPress/gutenberg/pull/54296)).
+
 ### Enhancements
 
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
