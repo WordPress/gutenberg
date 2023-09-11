@@ -8,7 +8,7 @@ import {
 	serialize,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -82,12 +82,10 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		},
 		[ clientIds, rootClientId ]
 	);
-	const content = useSelect(
-		( select ) =>
-			serialize(
-				select( blockEditorStore ).getBlocksByClientId( clientIds )
-			),
-		[ clientIds ]
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const getContent = useCallback(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		[ getBlocksByClientId, clientIds ]
 	);
 
 	if ( ! canConvert ) {
@@ -133,7 +131,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 			</MenuItem>
 			{ isModalOpen && (
 				<CreatePatternModal
-					content={ content }
+					content={ getContent }
 					onSuccess={ ( pattern ) => {
 						handleSuccess( pattern );
 					} }

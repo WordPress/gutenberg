@@ -10,7 +10,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -38,36 +38,26 @@ export default function CreatePatternModal( {
 	const { createPattern } = useDispatch( store );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const onCreate = useCallback(
-		async function ( patternTitle, sync ) {
-			try {
-				const newPattern = await createPattern(
-					patternTitle,
-					sync,
-					content,
-					categories
-				);
-				onSuccess( {
-					pattern: newPattern,
-					categoryId: PATTERN_DEFAULT_CATEGORY,
-				} );
-			} catch ( error ) {
-				createErrorNotice( error.message, {
-					type: 'snackbar',
-					id: 'convert-to-pattern-error',
-				} );
-				onError();
-			}
-		},
-		[
-			createPattern,
-			content,
-			categories,
-			onSuccess,
-			createErrorNotice,
-			onError,
-		]
-	);
+	async function onCreate( patternTitle, sync ) {
+		try {
+			const newPattern = await createPattern(
+				patternTitle,
+				sync,
+				typeof content === 'function' ? content() : content,
+				categories
+			);
+			onSuccess( {
+				pattern: newPattern,
+				categoryId: PATTERN_DEFAULT_CATEGORY,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: 'convert-to-pattern-error',
+			} );
+			onError();
+		}
+	}
 
 	const handleCategorySelection = ( selectedCategories ) => {
 		setCategories( selectedCategories.map( ( cat ) => cat.id ) );

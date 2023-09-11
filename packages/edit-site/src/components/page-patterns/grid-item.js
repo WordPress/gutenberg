@@ -118,7 +118,7 @@ function GridItem( { categoryId, item, ...props } ) {
 			syncStatus: item.reusableBlock.wp_pattern_sync_status,
 		};
 
-		downloadjs(
+		return downloadjs(
 			JSON.stringify( json, null, 2 ),
 			`${ kebabCase( item.title ) }.json`,
 			'application/json'
