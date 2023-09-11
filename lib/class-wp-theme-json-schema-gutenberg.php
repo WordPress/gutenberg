@@ -55,6 +55,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			$theme_json = self::migrate_v1_to_v2( $theme_json );
 		}
 
+		if ( 2 === $theme_json['version'] ) {
+			$theme_json = self::migrate_v2_to_v3( $theme_json );
+		}
+
 		return $theme_json;
 	}
 
@@ -84,6 +88,43 @@ class WP_Theme_JSON_Schema_Gutenberg {
 
 		// Set the new version.
 		$new['version'] = 2;
+
+		return $new;
+	}
+
+
+	/**
+	 * Migrate away from the previous syntax that used a top-level "behaviors" key
+	 * in the `theme.json` to a new "lightbox" setting.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array $old Data with (potentially) behaviors.
+	 * @return array Data with behaviors removed.
+	 */
+	private static function migrate_v2_to_v3( $old ) {
+		// Copy everything.
+		$new = $old;
+
+		// Migrate the old behaviors syntax to the new "lightbox" syntax.
+		if ( isset( $old['behaviors']['blocks']['core/image']['lightbox']['enabled'] ) ) {
+			_wp_array_set(
+				$new,
+				array( 'settings', 'blocks', 'core/image', 'lightbox', 'enabled' ),
+				$old['behaviors']['blocks']['core/image']['lightbox']['enabled']
+			);
+		}
+
+		if ( isset( $old['settings']['blocks']['core/image']['behaviors']['lightbox'] ) ) {
+			_wp_array_set(
+				$new,
+				array( 'settings', 'blocks', 'core/image', 'lightbox', 'allowEditing' ),
+				$old['settings']['blocks']['core/image']['behaviors']['lightbox']
+			);
+		}
+
+		// Set the new version.
+		$new['version'] = 3;
 
 		return $new;
 	}
