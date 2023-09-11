@@ -150,8 +150,10 @@ export default function BlockTools( {
 						isFixed={ hasFixedToolbar }
 					/>
 				</Fill>
-				{ /* Used for the inline rich text toolbar. */ }
-				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
+				<Fill name="__experimentalInlineRichTextTools">
+					{ /* Used for the inline rich text toolbar. */ }
+					<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
+				</Fill>
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
