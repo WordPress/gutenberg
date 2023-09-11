@@ -159,8 +159,10 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
 				// location) to that array after HTML content for the inner blocks wrapper.
-				for ( $chunk_index = 0; $chunk_index < count( $block['innerContent'] ); $chunk_index++ ) {
-					if ( is_null( $block['innerContent'][ $chunk_index ] ) ) {
+				$chunk_index = 0;
+				for ( $index = $chunk_index; $index < count( $block['innerContent'] ); $index++ ) {
+					if ( is_null( $block['innerContent'][ $index ] ) ) {
+						$chunk_index = $index;
 						break;
 					}
 				}
@@ -170,8 +172,10 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to correctly prepend a value (`null`, to mark a block
 				// location) to that array after HTML content for the inner blocks wrapper.
-				for ( $chunk_index = count( $block['innerContent'] ) - 1; $chunk_index >= 0; $chunk_index-- ) {
-					if ( is_null( $block['innerContent'][ $chunk_index ] ) ) {
+				$chunk_index = count( $block['innerContent'] ) - 1;
+				for ( $index = $chunk_index; $index >= 0; $index-- ) {
+					if ( is_null( $block['innerContent'][ $index ] ) ) {
+						$chunk_index = $index;
 						break;
 					}
 				}
