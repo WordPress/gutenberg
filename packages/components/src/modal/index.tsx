@@ -40,15 +40,31 @@ import type { ModalProps } from './types';
 let openModalCount = 0;
 
 /**
- * Returns the first tabbable element that is not a close button.
+ * When `firstElement` is passed to `focusOnMount`, this function is optimised to
+ * avoid focusing on the `Close` button (or other "header" elements of the Modal
+ * and instead focus within the Modal's contents.
+ * However, if no tabbable elements are found within the Modal's contents, the
+ * first tabbable element (likely the `Close` button) will be focused instead.
+ * This ensures that at least one element is focused whilst still optimising
+ * for the best a11y experience.
+ *
  * See: https://github.com/WordPress/gutenberg/issues/54106.
  * @param tabbables HTMLElement[] an array of tabbable elements.
  * @return HTMLElement the first tabbable element that is not a close button.
  */
-function focusFirstNonCloseButtonElement( tabbables: HTMLElement[] ) {
-	return tabbables.find(
-		( tabbableNode ) => tabbableNode?.ariaLabel !== 'Close'
-	);
+function getFirstTabbableElement( tabbables: HTMLElement[] ) {
+	// Attempt to locate tabbable outside of the header portion of the Modal.
+	const firstContentTabbable = tabbables.find( ( tabbable ) => {
+		return tabbable.closest( '.components-modal__header' ) === null;
+	} );
+
+	if ( firstContentTabbable ) {
+		return firstContentTabbable;
+	}
+
+	// Fallback to the first tabbable element anywhere within the Modal.
+	// Likely the `Close` button.
+	return tabbables[ 0 ];
 }
 
 function UnforwardedModal(
@@ -91,7 +107,7 @@ function UnforwardedModal(
 	// Modals should ignore the `Close` button which is the first focusable element.
 	// Remap `true` to select the next focusable element instead.
 	const focusOnMountRef = useFocusOnMount(
-		focusOnMount === true ? focusFirstNonCloseButtonElement : focusOnMount
+		focusOnMount === 'firstElement' ? getFirstTabbableElement : focusOnMount
 	);
 
 	const constrainedTabbingRef = useConstrainedTabbing();
