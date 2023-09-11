@@ -172,12 +172,16 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				const extraArgs = isSiteEditor
 					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
 					: {};
+				const templateLabel =
+					templateType === 'wp_template_part'
+						? __( 'template part' )
+						: __( 'template' );
 
 				return {
 					name: templateType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
-						? record.title?.rendered
+						? record.title?.rendered + ' ' + templateLabel
 						: __( '(no title)' ),
 					icon: icons[ templateType ],
 					callback: ( { close } ) => {
