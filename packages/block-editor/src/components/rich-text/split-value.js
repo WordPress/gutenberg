@@ -8,13 +8,7 @@ import { isEmpty, split, toHTMLString } from '@wordpress/rich-text';
  * as a result of splitting the block by pressing enter, or with blocks as a
  * result of splitting the block by pasting block content in the instance.
  */
-export function splitValue( {
-	value,
-	pastedBlocks = [],
-	onReplace,
-	onSplit,
-	multilineTag,
-} ) {
+export function splitValue( { value, pastedBlocks = [], onReplace, onSplit } ) {
 	if ( ! onReplace || ! onSplit ) {
 		return;
 	}
@@ -38,13 +32,7 @@ export function splitValue( {
 	// the enter key.
 	if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 		blocks.push(
-			onSplit(
-				toHTMLString( {
-					value: before,
-					multilineTag,
-				} ),
-				! isAfterOriginal
-			)
+			onSplit( toHTMLString( { value: before } ), ! isAfterOriginal )
 		);
 		lastPastedBlockIndex += 1;
 	}
@@ -60,13 +48,7 @@ export function splitValue( {
 	// the enter key.
 	if ( ! hasPastedBlocks || ! isEmpty( after ) ) {
 		blocks.push(
-			onSplit(
-				toHTMLString( {
-					value: after,
-					multilineTag,
-				} ),
-				isAfterOriginal
-			)
+			onSplit( toHTMLString( { value: after } ), isAfterOriginal )
 		);
 	}
 
