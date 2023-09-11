@@ -7,9 +7,9 @@ wpStore( {
 	selectors: {
 		core: {
 			search: {
-				ariaLabel: ( { state, context } ) => {
+				ariaLabel: ( { context } ) => {
 					const { ariaLabelCollapsed, ariaLabelExpanded } =
-						state.core.search;
+						context.core.search;
 					return context.core.search.isSearchInputVisible
 						? ariaLabelExpanded
 						: ariaLabelCollapsed;

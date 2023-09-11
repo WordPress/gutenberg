@@ -80,17 +80,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
-			wp_store(
-				array(
-					'selectors' => array(
-						'core' => array(
-							'search' => array(
-								'tabindex' => 'true' === $open_by_default ? '0' : '-1',
-							),
-						),
-					),
-				)
-			);
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
 			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
@@ -156,29 +145,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
-				$aria_label_expanded  = __( 'Submit Search' );
-				$aria_label_collapsed = __( 'Expand search field' );
-				wp_store(
-					array(
-						'state'     => array(
-							'core' => array(
-								'search' => array(
-									'ariaLabelCollapsed' => $aria_label_collapsed,
-									'ariaLabelExpanded'  => $aria_label_expanded,
-								),
-							),
-						),
-						'selectors' => array(
-							'core' => array(
-								'search' => array(
-									'ariaLabel'    => 'true' === $open_by_default ? $aria_label_expanded : $aria_label_collapsed,
-									'ariaControls' => 'true' === $open_by_default ? null : $input_id,
-									'type'         => 'true' === $open_by_default ? 'submit' : 'button',
-								),
-							),
-						),
-					)
-				);
 				$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
 				$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
 				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
@@ -207,9 +173,11 @@ function render_block_core_search( $attributes, $content, $block ) {
 	);
 	$form_directives      = '';
 	if ( $is_expandable_searchfield ) {
-		$form_directives = '
+		$aria_label_expanded  = __( 'Submit Search' );
+		$aria_label_collapsed = __( 'Expand search field' );
+		$form_directives      = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '" } } }\'
+			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '", "ariaLabelExpanded": "' . $aria_label_expanded . '", "ariaLabelCollapsed": "' . $aria_label_collapsed . '" } } }\'
 			data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
 			data-wp-on--keydown="actions.core.search.handleSearchKeydown"
 			data-wp-on--focusout="actions.core.search.handleSearchFocusout"
