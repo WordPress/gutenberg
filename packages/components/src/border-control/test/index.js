@@ -158,7 +158,7 @@ describe( 'BorderControl', () => {
 			const solidButton = getButton( 'Solid' );
 			const dashedButton = getButton( 'Dashed' );
 			const dottedButton = getButton( 'Dotted' );
-			const resetButton = getButton( 'Reset to default' );
+			const resetButton = getButton( 'Reset' );
 
 			expect( customColorPicker ).toBeInTheDocument();
 			expect( colorSwatchButtons.length ).toEqual( colors.length );
@@ -369,7 +369,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			render( <BorderControl { ...props } /> );
 			await openPopover();
-			clickButton( 'Reset to default' );
+			clickButton( 'Reset' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
 				color: undefined,
