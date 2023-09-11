@@ -16,7 +16,7 @@ wpStore( {
 				},
 				ariaControls: ( { context } ) => {
 					return context.core.search.isSearchInputVisible
-						? undefined
+						? null
 						: context.core.search.inputId;
 				},
 				type: ( { context } ) => {
