@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
 ## 1.103.1
 -   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
 
