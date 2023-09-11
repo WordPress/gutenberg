@@ -15,6 +15,7 @@ import { plusCircle } from '@wordpress/icons';
  */
 import Button from '..';
 import Tooltip from '../../tooltip';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -193,7 +194,7 @@ describe( 'Button', () => {
 
 			render( <Button icon={ plusCircle } label="WordPress" /> );
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
@@ -230,12 +231,14 @@ describe( 'Button', () => {
 				/>
 			);
 
-			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
 
 			expect( screen.getByText( 'Label' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
@@ -287,12 +290,14 @@ describe( 'Button', () => {
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should not show the tooltip when icon and children defined', async () => {
@@ -321,12 +326,14 @@ describe( 'Button', () => {
 				</Button>
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
 
 			// Move focus to the button
 			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 	} );
 

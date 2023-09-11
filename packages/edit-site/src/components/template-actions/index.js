@@ -97,7 +97,7 @@ export default function TemplateActions( {
 									onRemove?.();
 									onClose();
 								} }
-								isTemplate={ template.type === 'wp_template' }
+								title={ template.title.rendered }
 							/>
 						</>
 					) }
@@ -120,7 +120,7 @@ export default function TemplateActions( {
 	);
 }
 
-function DeleteMenuItem( { onRemove, isTemplate } ) {
+function DeleteMenuItem( { onRemove, title } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	return (
 		<>
@@ -133,11 +133,11 @@ function DeleteMenuItem( { onRemove, isTemplate } ) {
 				onCancel={ () => setIsModalOpen( false ) }
 				confirmButtonText={ __( 'Delete' ) }
 			>
-				{ isTemplate
-					? __( 'Are you sure you want to delete this template?' )
-					: __(
-							'Are you sure you want to delete this template part?'
-					  ) }
+				{ sprintf(
+					// translators: %s: The template or template part's title.
+					__( 'Are you sure you want to delete "%s"?' ),
+					decodeEntities( title )
+				) }
 			</ConfirmDialog>
 		</>
 	);

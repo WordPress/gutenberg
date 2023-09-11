@@ -37,7 +37,9 @@
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{ "docs/getting-started/outreach.md": [] },
+			{ "docs/getting-started/glossary.md": [] },
+			{ "docs/getting-started/faq.md": [] }
 		]
 	},
 	{
@@ -324,8 +326,6 @@
 					}
 				]
 			},
-			{ "docs/explanations/faq.md": [] },
-			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]
 	},
@@ -386,8 +386,7 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
-					{ "docs/contributors/design/the-block.md": [] },
-					{ "docs/contributors/design/reference.md": [] }
+					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},
 			{
