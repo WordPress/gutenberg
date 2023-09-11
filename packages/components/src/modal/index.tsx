@@ -39,8 +39,6 @@ import type { ModalProps } from './types';
 // Used to count the number of open modals.
 let openModalCount = 0;
 
-const MODAL_HEADER_CLASSNAME = 'components-modal__header';
-
 /**
  * When `firstElement` is passed to `focusOnMount`, this function is optimised to
  * avoid focusing on the `Close` button (or other "header" elements of the Modal
@@ -57,7 +55,7 @@ const MODAL_HEADER_CLASSNAME = 'components-modal__header';
 function getFirstTabbableElement( tabbables: HTMLElement[] ) {
 	// Attempt to locate tabbable outside of the header portion of the Modal.
 	const firstContentTabbable = tabbables.find( ( tabbable ) => {
-		return tabbable.closest( `.${ MODAL_HEADER_CLASSNAME }` ) === null;
+		return tabbable.closest( '.components-modal__header' ) === null;
 	} );
 
 	if ( firstContentTabbable ) {
@@ -106,6 +104,8 @@ function UnforwardedModal(
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
 
+	// Modals should ignore the `Close` button which is the first focusable element.
+	// Remap `true` to select the next focusable element instead.
 	const focusOnMountRef = useFocusOnMount(
 		focusOnMount === 'firstElement' ? getFirstTabbableElement : focusOnMount
 	);
@@ -286,7 +286,7 @@ function UnforwardedModal(
 						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
-							<div className={ MODAL_HEADER_CLASSNAME }>
+							<div className="components-modal__header">
 								<div className="components-modal__header-heading-container">
 									{ icon && (
 										<span
