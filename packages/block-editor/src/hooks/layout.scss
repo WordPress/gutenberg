@@ -46,3 +46,16 @@
 	height: 120px;
 	grid-template-rows: repeat(3, calc(120px / 3));
 }
+
+
+// TODO: refactor this
+.layout-controls-alignment-select .components-custom-select-control__button {
+	display: flex !important;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+.block-layout-controls .components-base-control,
+.block-layout-controls .components-base-control:last-child {
+	margin-bottom: 0;
+}
