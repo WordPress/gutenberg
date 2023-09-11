@@ -28,6 +28,9 @@ export default function ImageSettingsPanel( {
 		} );
 	};
 
+	const lightboxChecked =
+		settings?.lightbox === true ? true : !! settings?.lightbox?.enabled;
+
 	return (
 		<>
 			<ToolsPanel
@@ -44,7 +47,7 @@ export default function ImageSettingsPanel( {
 				>
 					<ToggleControl
 						label={ __( 'Expand on Click' ) }
-						checked={ !! settings?.lightbox?.enabled }
+						checked={ lightboxChecked }
 						onChange={ onChangeLightbox }
 					/>
 				</ToolsPanelItem>

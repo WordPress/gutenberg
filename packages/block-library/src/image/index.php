@@ -82,7 +82,7 @@ function block_core_image_should_render_lightbox( $block ) {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 
 		// If not present in global settings, check the top-level global settings.
-		if ( ! isset( $lightbox_settings['enabled'] ) ) {
+		if ( true !== $lightbox_settings && ! isset( $lightbox_settings['enabled'] ) ) {
 			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 		}
 	}
@@ -90,11 +90,16 @@ function block_core_image_should_render_lightbox( $block ) {
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 
 	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings['enabled'] ) &&
-	true === $lightbox_settings['enabled'] &&
-		'none' === $link_destination
-	) {
-		$block['lightboxEnabled'] = true;
+	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
+
+		if ( true === $lightbox_settings || ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) ) {
+			$block['lightboxEnabled'] = true;
+		}
+
+		// The legacy syntax allows setting the animation type.
+		if ( isset( $lightbox_settings['animation'] ) ) {
+			$block['lightboxAnimation'] = $lightbox_settings['animation'];
+		}
 	}
 
 	return $block;

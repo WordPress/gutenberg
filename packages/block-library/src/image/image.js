@@ -371,15 +371,10 @@ export default function Image( {
 
 	const lightboxSetting = useSetting( 'lightbox' );
 
-	const lightboxChecked = useMemo( () => {
-		// If the lightbox is set in the block attributes, use that.
-		if ( lightbox?.enabled ) return true;
-
-		// If the lightbox is NOT set in the block attributes AND it IS enabled in
-		// the settings, use that.
-		if ( ! lightbox && lightboxSetting?.enabled ) return true;
-		return false;
-	}, [ lightbox, lightboxSetting ] );
+	const lightboxChecked =
+		lightbox?.enabled ||
+		( ! lightbox && lightboxSetting === true ) ||
+		lightboxSetting?.enabled;
 
 	const controls = (
 		<>
