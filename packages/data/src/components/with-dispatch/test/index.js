@@ -16,8 +16,6 @@ import withDispatch from '../';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
-jest.useRealTimers();
-
 describe( 'withDispatch', () => {
 	const storeOptions = {
 		reducer: ( state = 0, action ) => {

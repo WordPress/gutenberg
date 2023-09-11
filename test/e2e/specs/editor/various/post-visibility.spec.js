@@ -78,7 +78,7 @@ test.describe( 'Post visibility', () => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await page.type( 'role=textbox[name="Add title"i]', 'Title' );
+		await editor.canvas.type( 'role=textbox[name="Add title"i]', 'Title' );
 
 		await editor.openDocumentSettingsSidebar();
 
@@ -86,7 +86,7 @@ test.describe( 'Post visibility', () => {
 		await page.click( 'role=button[name="Change date: Immediately"i]' );
 
 		await page.click( 'role=button[name="View next month"i]' );
-		await page.click( 'text=15' );
+		await page.click( 'role=application[name="Calendar"] >> text=15' );
 
 		await page.click( 'role=button[name="Select visibility: Public"i]' );
 

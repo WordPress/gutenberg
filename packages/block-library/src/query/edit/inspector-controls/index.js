@@ -12,9 +12,13 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -24,6 +28,8 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import CreateNewPostLink from './create-new-post-link';
+import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -32,12 +38,11 @@ import {
 	useTaxonomies,
 } from '../../utils';
 
-export default function QueryInspectorControls( {
-	attributes,
-	setQuery,
-	setDisplayLayout,
-} ) {
-	const { query, displayLayout } = attributes;
+const { BlockInfo } = unlock( blockEditorPrivateApis );
+
+export default function QueryInspectorControls( props ) {
+	const { attributes, setQuery, setDisplayLayout, setAttributes } = props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -97,7 +102,7 @@ export default function QueryInspectorControls( {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showColumnsControl = displayLayout?.type === 'flex';
+	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -119,6 +124,18 @@ export default function QueryInspectorControls( {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
+	const enhancedPaginationNotice = __(
+		'Enhanced Pagination might cause interactive blocks within the Post Template to stop working. Disable it if you experience any issues.'
+	);
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && enhancedPagination ) {
+			speak( enhancedPaginationNotice );
+		}
+		isFirstRender.current = false;
+	}, [ enhancedPagination, enhancedPaginationNotice ] );
+
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
@@ -127,11 +144,15 @@ export default function QueryInspectorControls( {
 
 	return (
 		<>
+			<BlockInfo>
+				<CreateNewPostLink { ...props } />
+			</BlockInfo>
 			{ showSettingsPanel && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
 						{ showInheritControl && (
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Inherit query from template' ) }
 								help={ __(
 									'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
@@ -161,7 +182,9 @@ export default function QueryInspectorControls( {
 									label={ __( 'Columns' ) }
 									value={ displayLayout.columns }
 									onChange={ ( value ) =>
-										setDisplayLayout( { columns: value } )
+										setDisplayLayout( {
+											columns: value,
+										} )
 									}
 									min={ 2 }
 									max={ Math.max( 6, displayLayout.columns ) }
@@ -191,6 +214,29 @@ export default function QueryInspectorControls( {
 									setQuery( { sticky: value } )
 								}
 							/>
+						) }
+						<ToggleControl
+							label={ __( 'Enhanced pagination' ) }
+							help={ __(
+								'Browsing between pages won’t require a full page reload.'
+							) }
+							checked={ !! enhancedPagination }
+							onChange={ ( value ) =>
+								setAttributes( {
+									enhancedPagination: !! value,
+								} )
+							}
+						/>
+						{ enhancedPagination && (
+							<div>
+								<Notice
+									spokenMessage={ null }
+									status="warning"
+									isDismissible={ false }
+								>
+									{ enhancedPaginationNotice }
+								</Notice>
+							</div>
 						) }
 					</PanelBody>
 				</InspectorControls>
@@ -247,6 +293,7 @@ export default function QueryInspectorControls( {
 								onDeselect={ () => setQuerySearch( '' ) }
 							>
 								<TextControl
+									__nextHasNoMarginBottom
 									label={ __( 'Keyword' ) }
 									value={ querySearch }
 									onChange={ setQuerySearch }

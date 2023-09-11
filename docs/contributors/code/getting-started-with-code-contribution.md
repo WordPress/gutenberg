@@ -5,7 +5,7 @@ The following guide is for setting up your local environment to contribute to th
 ## Prerequisites
 
 -   Node.js
-    Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using Node.js v14, and npm v6. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
+    Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using Node.js v16, and npm v8. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
 
 We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
 
@@ -126,7 +126,7 @@ Port: {MYSQL_PORT_NUMBER}
 
 **Please note**: the MySQL port number will change each time `wp-env` restarts. If you find you can no longer access your database, simply repeat the steps above to find the new port number and restore your connection.
 
-**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/support/article/creating-database-for-wordpress/).
+**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/documentation/article/creating-database-for-wordpress/).
 
 #### Troubleshooting
 

@@ -6,10 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import {
 	useContext,
 	useMemo,
@@ -24,7 +28,12 @@ import { addFilter } from '@wordpress/hooks';
 import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
+import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
+import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../store';
+
+const { CustomSelectControl } = unlock( componentsPrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -41,7 +50,7 @@ const DEFAULT_OPTION = {
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
-	name: __( 'Sticky' ),
+	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will stick to the top of the window instead of scrolling.'
@@ -51,7 +60,7 @@ const STICKY_OPTION = {
 const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
-	name: __( 'Fixed' ),
+	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will not move when the page is scrolled.'
@@ -196,15 +205,16 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 }
 
 /*
- * Position controls to be rendered in an inspector control panel.
+ * Position controls rendered in an inspector control panel.
  *
  * @param {Object} props
  *
- * @return {WPElement} Padding edit element.
+ * @return {WPElement} Position panel.
  */
-export function PositionEdit( props ) {
+export function PositionPanel( props ) {
 	const {
 		attributes: { style = {} },
+		clientId,
 		name: blockName,
 		setAttributes,
 	} = props;
@@ -213,8 +223,31 @@ export function PositionEdit( props ) {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
+	const { firstParentClientId } = useSelect(
+		( select ) => {
+			const { getBlockParents } = select( blockEditorStore );
+			const parents = getBlockParents( clientId );
+			return { firstParentClientId: parents[ parents.length - 1 ] };
+		},
+		[ clientId ]
+	);
+
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	const stickyHelpText =
+		allowSticky && value === STICKY_OPTION.value && blockInformation
+			? sprintf(
+					/* translators: %s: the name of the parent block. */
+					__(
+						'The block will stick to the scrollable area of the parent %s block.'
+					),
+					blockInformation.title
+			  )
+			: null;
+
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
+		// Display options if they are allowed, or if a block already has a valid value set.
+		// This allows for a block to be switched off from a position type that is not allowed.
 		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
@@ -251,32 +284,38 @@ export function PositionEdit( props ) {
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
 
+	// Only display position controls if there is at least one option to choose from.
 	return Platform.select( {
-		web: (
-			<>
-				<BaseControl className="block-editor-hooks__position-selection">
-					<CustomSelectControl
-						__nextUnconstrainedWidth
-						__next36pxDefaultSize
-						className="block-editor-hooks__position-selection__select-control"
-						label={ __( 'Position' ) }
-						hideLabelFromVision
-						describedBy={ sprintf(
-							// translators: %s: Currently selected font size.
-							__( 'Currently selected position: %s' ),
-							selectedOption.name
-						) }
-						options={ options }
-						value={ selectedOption }
-						__experimentalShowSelectedHint
-						onChange={ ( { selectedItem } ) => {
-							onChangeType( selectedItem.value );
-						} }
-						size={ '__unstable-large' }
-					/>
-				</BaseControl>
-			</>
-		),
+		web:
+			options.length > 1 ? (
+				<InspectorControls group="position">
+					<BaseControl
+						className="block-editor-hooks__position-selection"
+						__nextHasNoMarginBottom
+						help={ stickyHelpText }
+					>
+						<CustomSelectControl
+							__nextUnconstrainedWidth
+							__next36pxDefaultSize
+							className="block-editor-hooks__position-selection__select-control"
+							label={ __( 'Position' ) }
+							hideLabelFromVision
+							describedBy={ sprintf(
+								// translators: %s: Currently selected position.
+								__( 'Currently selected position: %s' ),
+								selectedOption.name
+							) }
+							options={ options }
+							value={ selectedOption }
+							__experimentalShowSelectedHint
+							onChange={ ( { selectedItem } ) => {
+								onChangeType( selectedItem.value );
+							} }
+							size={ '__unstable-large' }
+						/>
+					</BaseControl>
+				</InspectorControls>
+			) : null,
 		native: null,
 	} );
 }
@@ -300,12 +339,7 @@ export const withInspectorControls = createHigherOrderComponent(
 
 		return [
 			showPositionControls && (
-				<InspectorControls
-					key="position"
-					__experimentalGroup="position"
-				>
-					<PositionEdit { ...props } />
-				</InspectorControls>
+				<PositionPanel key="position" { ...props } />
 			),
 			<BlockEdit key="edit" { ...props } />,
 		];
@@ -349,6 +383,10 @@ export const withPositionStyles = createHigherOrderComponent(
 		// Attach a `wp-container-` id-based class name.
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `is-position-${ attributes?.style?.position?.type }` ]:
+				allowPositionStyles &&
+				!! css &&
+				!! attributes?.style?.position?.type,
 		} );
 
 		return (
@@ -360,7 +398,8 @@ export const withPositionStyles = createHigherOrderComponent(
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
-	}
+	},
+	'withPositionStyles'
 );
 
 addFilter(

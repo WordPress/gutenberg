@@ -10,13 +10,8 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import {
-	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
-	CopyHandler,
-} from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -27,7 +22,10 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
+import { unlock } from '../../lock-unlock';
 
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -96,22 +94,19 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<ShortcutProvider>
-			<BlockEditorKeyboardShortcuts.Register />
+		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<BlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
-				</BlockEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				onInput={ onInput }
+				onChange={ onChange }
+				settings={ settings }
+				useSubRegistry={ false }
+				{ ...props }
+			>
+				{ children }
+				<PatternsMenuItems rootClientId={ widgetAreaId } />
+			</ExperimentalBlockEditorProvider>
+		</SlotFillProvider>
 	);
 }

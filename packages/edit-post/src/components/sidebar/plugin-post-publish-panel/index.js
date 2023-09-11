@@ -1,30 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withPluginContext } from '@wordpress/plugins';
+import { usePluginContext } from '@wordpress/plugins';
 import { createSlotFill, PanelBody } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
 
-const PluginPostPublishPanelFill = ( {
-	children,
-	className,
-	title,
-	initialOpen = false,
-	icon,
-} ) => (
-	<Fill>
-		<PanelBody
-			className={ className }
-			initialOpen={ initialOpen || ! title }
-			title={ title }
-			icon={ icon }
-		>
-			{ children }
-		</PanelBody>
-	</Fill>
-);
 /**
  * Renders provided content to the post-publish panel in the publish flow
  * (side panel that opens after a user publishes the post).
@@ -34,6 +15,7 @@ const PluginPostPublishPanelFill = ( {
  * @param {string}                [props.title]                         Title displayed at the top of the panel.
  * @param {boolean}               [props.initialOpen=false]             Whether to have the panel initially opened. When no title is provided it is always opened.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPElement}             props.children                        Children to be rendered
  *
  * @example
  * ```js
@@ -73,14 +55,28 @@ const PluginPostPublishPanelFill = ( {
  *
  * @return {WPComponent} The component to be rendered.
  */
+const PluginPostPublishPanel = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => {
+	const { icon: pluginIcon } = usePluginContext();
 
-const PluginPostPublishPanel = compose(
-	withPluginContext( ( context, ownProps ) => {
-		return {
-			icon: ownProps.icon || context.icon,
-		};
-	} )
-)( PluginPostPublishPanelFill );
+	return (
+		<Fill>
+			<PanelBody
+				className={ className }
+				initialOpen={ initialOpen || ! title }
+				title={ title }
+				icon={ icon ?? pluginIcon }
+			>
+				{ children }
+			</PanelBody>
+		</Fill>
+	);
+};
 
 PluginPostPublishPanel.Slot = Slot;
 

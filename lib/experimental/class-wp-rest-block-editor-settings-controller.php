@@ -6,6 +6,10 @@
  * @subpackage REST_API
  */
 
+if ( class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class used to retrieve the block editor settings via the REST API.
  *
@@ -109,7 +113,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
-		$this->schema = array(
+		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'block-editor-settings-item',
 			'type'       => 'object',
@@ -166,12 +170,6 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'description' => __( 'Whether the V2 of the list block that uses inner blocks should be enabled.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'mobile' ),
-				),
-
-				'__experimentalBlockInspectorAnimation'  => array(
-					'description' => __( 'Whether to enable animation when showing and hiding the block inspector.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'site-editor' ),
 				),
 
 				'alignWide'                              => array(
@@ -316,6 +314,8 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 			),
 		);
+
+		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
 	}

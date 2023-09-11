@@ -52,21 +52,26 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 			focusWidget( widgetId );
 		}
 
+		let previewBound = false;
+
 		function handleReady() {
 			api.previewer.preview.bind(
 				'focus-control-for-setting',
 				handleFocus
 			);
+			previewBound = true;
 		}
 
 		api.previewer.bind( 'ready', handleReady );
 
 		return () => {
 			api.previewer.unbind( 'ready', handleReady );
-			api.previewer.preview.unbind(
-				'focus-control-for-setting',
-				handleFocus
-			);
+			if ( previewBound ) {
+				api.previewer.preview.unbind(
+					'focus-control-for-setting',
+					handleFocus
+				);
+			}
 		};
 	}, [ api, focusWidget ] );
 

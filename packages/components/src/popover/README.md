@@ -6,7 +6,7 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover within the parent to which it should anchor.
+Render a Popover adjacent to its container.
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
@@ -60,7 +60,7 @@ const MyPopover = () => {
 };
 ```
 
-If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
+By default Popovers render at the end of the body of your document. If you want Popover elements to render to a specific location on the page, you must render a `Popover.Slot` further up the element tree:
 
 ```jsx
 import { render } from '@wordpress/element';
@@ -196,9 +196,12 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
-### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'overlay'`
 
 Used to specify the popover's position with respect to its anchor.
+
+`overlay` is a special case that places the popover over the reference element.
+Please note that other placement related props may not behave as excepted.
 
 -   Required: No
 -   Default: `"bottom-start"`

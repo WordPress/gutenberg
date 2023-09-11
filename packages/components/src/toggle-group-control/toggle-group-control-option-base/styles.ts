@@ -83,7 +83,7 @@ const deselectable = css`
 
 	&:focus {
 		box-shadow: inset 0 0 0 1px ${ COLORS.white },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.ui.theme };
+			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
 		outline: 2px solid transparent;
 	}
 `;
@@ -109,3 +109,14 @@ const isIconStyles = ( {
 		padding-right: 0;
 	`;
 };
+
+export const backdropView = css`
+	background: ${ COLORS.gray[ 900 ] };
+	border-radius: ${ CONFIG.controlBorderRadius };
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: -3px;
+`;

@@ -10,7 +10,7 @@ import {
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -21,8 +21,6 @@ describe( 'useQuerySelect', () => {
 	let registry;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
-
 		registry = createRegistry();
 		registry.registerStore( 'testStore', {
 			reducer: () => ( { foo: 'bar' } ),
@@ -31,11 +29,6 @@ describe( 'useQuerySelect', () => {
 				testSelector: ( state, key ) => state[ key ],
 			},
 		} );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	const getTestComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
@@ -177,21 +170,20 @@ describe( 'useQuerySelect', () => {
 			status: 'IDLE',
 		} );
 
-		await act( async () => {
-			jest.advanceTimersToNextTimer();
-		} );
-
 		// Re-render, expect resolved data
 		render(
 			<RegistryProvider value={ registry }>
 				<TestComponent />
 			</RegistryProvider>
 		);
-		expect( querySelectData ).toEqual( {
-			data: 15,
-			isResolving: false,
-			hasResolved: true,
-			status: 'SUCCESS',
-		} );
+
+		await waitFor( () =>
+			expect( querySelectData ).toEqual( {
+				data: 15,
+				isResolving: false,
+				hasResolved: true,
+				status: 'SUCCESS',
+			} )
+		);
 	} );
 } );

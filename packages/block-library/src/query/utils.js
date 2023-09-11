@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -12,11 +7,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { name as queryLoopName } from './block.json';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -63,6 +53,24 @@ export const getEntitiesInfo = ( entities ) => {
 };
 
 /**
+ * Helper util to return a value from a certain path of the object.
+ * Path is specified as a string of properties, separated by dots,
+ * for example: "parent.child".
+ *
+ * @param {Object} object Input object.
+ * @param {string} path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+export const getValueFromObjectPath = ( object, path ) => {
+	const normalizedPath = path.split( '.' );
+	let value = object;
+	normalizedPath.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
+/**
  * Helper util to map records to add a `name` prop from a
  * provided path, in order to handle all entities in the same
  * fashion(implementing`IHasNameAndId` interface).
@@ -74,7 +82,7 @@ export const getEntitiesInfo = ( entities ) => {
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
 		...entity,
-		name: decodeEntities( get( entity, path ) ),
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
 	} ) );
 };
 
@@ -162,7 +170,7 @@ export function useAllowedControls( attributes ) {
 	return useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.allowedControls,
 
@@ -236,25 +244,29 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 	const activeVariationName = useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.name,
 		[ attributes ]
 	);
-	const blockName = `${ queryLoopName }/${ activeVariationName }`;
-	const activeVariationPatterns = useSelect(
+	const blockName = `core/query/${ activeVariationName }`;
+	const hasActiveVariationPatterns = useSelect(
 		( select ) => {
 			if ( ! activeVariationName ) {
-				return;
+				return false;
 			}
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return getPatternsByBlockTypes( blockName, rootClientId );
+			const activePatterns = getPatternsByBlockTypes(
+				blockName,
+				rootClientId
+			);
+			return activePatterns.length > 0;
 		},
-		[ clientId, activeVariationName ]
+		[ clientId, activeVariationName, blockName ]
 	);
-	return activeVariationPatterns?.length ? blockName : queryLoopName;
+	return hasActiveVariationPatterns ? blockName : 'core/query';
 }
 
 /**
@@ -287,10 +299,10 @@ export function useScopedBlockVariations( attributes ) {
 				select( blocksStore );
 			return {
 				activeVariationName: getActiveBlockVariation(
-					queryLoopName,
+					'core/query',
 					attributes
 				)?.name,
-				blockVariations: getBlockVariations( queryLoopName, 'block' ),
+				blockVariations: getBlockVariations( 'core/query', 'block' ),
 			};
 		},
 		[ attributes ]
@@ -313,3 +325,22 @@ export function useScopedBlockVariations( attributes ) {
 	}, [ activeVariationName, blockVariations ] );
 	return variations;
 }
+
+/**
+ * Hook that returns the block patterns for a specific block type.
+ *
+ * @param {string} clientId The block's client ID.
+ * @param {string} name     The block type name.
+ * @return {Object[]} An array of valid block patterns.
+ */
+export const usePatterns = ( clientId, name ) => {
+	return useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return getPatternsByBlockTypes( name, rootClientId );
+		},
+		[ name, clientId ]
+	);
+};

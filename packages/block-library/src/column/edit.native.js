@@ -42,7 +42,6 @@ function ColumnEdit( {
 	hasChildren,
 	isSelected,
 	getStylesFromColorScheme,
-	isParentSelected,
 	contentStyle,
 	columns,
 	selectedColumnIndex,
@@ -112,10 +111,10 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
-		const isFullWidth = columnWidth === screenWidth;
-
 		if ( isSelected ) {
+			const { width: columnWidth } = contentStyle[ clientId ] || {};
+			const isFullWidth = columnWidth === screenWidth;
+
 			return (
 				<View
 					style={ [
@@ -134,23 +133,26 @@ function ColumnEdit( {
 			);
 		}
 		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	}, [ contentStyle, clientId, screenWidth, isSelected, hasChildren ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
 			<View
 				style={ [
-					! isParentSelected &&
-						getStylesFromColorScheme(
-							styles.columnPlaceholder,
-							styles.columnPlaceholderDark
-						),
-					styles.columnPlaceholderNotSelected,
+					getStylesFromColorScheme(
+						styles.columnPlaceholder,
+						styles.columnPlaceholderDark
+					),
 					contentStyle[ clientId ],
 				] }
 			/>
 		);
 	}
+
+	const parentWidth =
+		contentStyle &&
+		contentStyle[ clientId ] &&
+		contentStyle[ clientId ].width;
 
 	return (
 		<>
@@ -211,7 +213,7 @@ function ColumnEdit( {
 			>
 				<InnerBlocks
 					renderAppender={ renderAppender }
-					parentWidth={ contentStyle[ clientId ].width }
+					parentWidth={ parentWidth }
 					blockWidth={ blockWidth }
 				/>
 			</View>
@@ -253,8 +255,6 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const hasChildren = !! getBlockCount( clientId );
-		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
 
 		const blockOrder = getBlockOrder( parentId );
 
@@ -266,7 +266,6 @@ export default compose( [
 
 		return {
 			hasChildren,
-			isParentSelected,
 			isSelected,
 			selectedColumnIndex,
 			columns,

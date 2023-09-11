@@ -113,6 +113,13 @@ function InserterMenu(
 		[ onToggleInsertionPoint, setHoveredItem ]
 	);
 
+	const onHoverPattern = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+		},
+		[ onToggleInsertionPoint ]
+	);
+
 	const onClickPatternCategory = useCallback(
 		( patternCategory ) => {
 			setSelectedPatternCategory( patternCategory );
@@ -145,7 +152,6 @@ function InserterMenu(
 			destinationRootClientId,
 			onInsert,
 			onHover,
-			delayedFilterValue,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
 		]
@@ -254,6 +260,7 @@ function InserterMenu(
 							filterValue={ delayedFilterValue }
 							onSelect={ onSelect }
 							onHover={ onHover }
+							onHoverPattern={ onHoverPattern }
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
@@ -296,6 +303,7 @@ function InserterMenu(
 				<BlockPatternsCategoryDialog
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
+					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
 					showTitlesAsTooltip
 				/>

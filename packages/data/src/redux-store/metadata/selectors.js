@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import createSelector from 'rememo';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ import { selectorArgsToStateKey } from './utils';
  * @return {StateValue|undefined} isResolving value.
  */
 export function getResolutionState( state, selectorName, args ) {
-	const map = get( state, [ selectorName ] );
+	const map = state[ selectorName ];
 	if ( ! map ) {
 		return;
 	}
@@ -136,3 +136,60 @@ export function isResolving( state, selectorName, args ) {
 export function getCachedResolvers( state ) {
 	return state;
 }
+
+/**
+ * Whether the store has any currently resolving selectors.
+ *
+ * @param {State} state Data state.
+ *
+ * @return {boolean} True if one or more selectors are resolving, false otherwise.
+ */
+export function hasResolvingSelectors( state ) {
+	return Object.values( state ).some( ( selectorState ) =>
+		/**
+		 * This uses the internal `_map` property of `EquivalentKeyMap` for
+		 * optimization purposes, since the `EquivalentKeyMap` implementation
+		 * does not support a `.values()` implementation.
+		 *
+		 * @see https://github.com/aduth/equivalent-key-map
+		 */
+		Array.from( selectorState._map.values() ).some(
+			( resolution ) => resolution[ 1 ]?.status === 'resolving'
+		)
+	);
+}
+
+/**
+ * Retrieves the total number of selectors, grouped per status.
+ *
+ * @param {State} state Data state.
+ *
+ * @return {Object} Object, containing selector totals by status.
+ */
+export const countSelectorsByStatus = createSelector(
+	( state ) => {
+		const selectorsByStatus = {};
+
+		Object.values( state ).forEach( ( selectorState ) =>
+			/**
+			 * This uses the internal `_map` property of `EquivalentKeyMap` for
+			 * optimization purposes, since the `EquivalentKeyMap` implementation
+			 * does not support a `.values()` implementation.
+			 *
+			 * @see https://github.com/aduth/equivalent-key-map
+			 */
+			Array.from( selectorState._map.values() ).forEach(
+				( resolution ) => {
+					const currentStatus = resolution[ 1 ]?.status ?? 'error';
+					if ( ! selectorsByStatus[ currentStatus ] ) {
+						selectorsByStatus[ currentStatus ] = 0;
+					}
+					selectorsByStatus[ currentStatus ]++;
+				}
+			)
+		);
+
+		return selectorsByStatus;
+	},
+	( state ) => [ state ]
+);

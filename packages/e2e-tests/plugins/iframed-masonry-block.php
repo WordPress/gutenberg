@@ -9,14 +9,14 @@
 
 add_action(
 	'setup_theme',
-	function() {
+	static function() {
 		add_theme_support( 'block-templates' );
 	}
 );
 
 add_action(
 	'init',
-	function() {
+	static function() {
 		wp_register_script(
 			'iframed-masonry-block-editor',
 			plugin_dir_url( __FILE__ ) . 'iframed-masonry-block/editor.js',

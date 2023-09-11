@@ -13,6 +13,9 @@ import {
 	Button,
 	TextControl,
 	SelectControl,
+	__experimentalGrid as Grid,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	MediaUpload,
@@ -49,7 +52,7 @@ function TrackList( { tracks, onEditPress } ) {
 	} else {
 		content = tracks.map( ( track, index ) => {
 			return (
-				<div
+				<HStack
 					key={ index }
 					className="block-library-video-tracks-editor__track-list-track"
 				>
@@ -65,7 +68,7 @@ function TrackList( { tracks, onEditPress } ) {
 					>
 						{ __( 'Edit' ) }
 					</Button>
-				</div>
+				</HStack>
 			);
 		} );
 	}
@@ -84,15 +87,19 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 	const fileName = src.startsWith( 'blob:' ) ? '' : getFilename( src ) || '';
 	return (
 		<NavigableMenu>
-			<div className="block-library-video-tracks-editor__single-track-editor">
+			<VStack
+				className="block-library-video-tracks-editor__single-track-editor"
+				spacing="4"
+			>
 				<span className="block-library-video-tracks-editor__single-track-editor-edit-track-label">
 					{ __( 'Edit track' ) }
 				</span>
 				<span>
 					{ __( 'File' ) }: <b>{ fileName }</b>
 				</span>
-				<div className="block-library-video-tracks-editor__single-track-editor-label-language">
+				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl
+						__nextHasNoMarginBottom
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus
 						/* eslint-enable jsx-a11y/no-autofocus */
@@ -107,6 +114,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						help={ __( 'Title of track' ) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						onChange={ ( newSrcLang ) =>
 							onChange( {
 								...track,
@@ -117,54 +125,60 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						value={ srcLang }
 						help={ __( 'Language tag (en, fr, etc.)' ) }
 					/>
-				</div>
-				<SelectControl
-					__nextHasNoMarginBottom
-					className="block-library-video-tracks-editor__single-track-editor-kind-select"
-					options={ KIND_OPTIONS }
-					value={ kind }
-					label={ __( 'Kind' ) }
-					onChange={ ( newKind ) => {
-						onChange( {
-							...track,
-							kind: newKind,
-						} );
-					} }
-				/>
-				<div className="block-library-video-tracks-editor__single-track-editor-buttons-container">
-					<Button
-						variant="secondary"
-						onClick={ () => {
-							const changes = {};
-							let hasChanges = false;
-							if ( label === '' ) {
-								changes.label = __( 'English' );
-								hasChanges = true;
-							}
-							if ( srcLang === '' ) {
-								changes.srcLang = 'en';
-								hasChanges = true;
-							}
-							if ( track.kind === undefined ) {
-								changes.kind = DEFAULT_KIND;
-								hasChanges = true;
-							}
-							if ( hasChanges ) {
-								onChange( {
-									...track,
-									...changes,
-								} );
-							}
-							onClose();
+				</Grid>
+				<VStack spacing="8">
+					<SelectControl
+						__nextHasNoMarginBottom
+						className="block-library-video-tracks-editor__single-track-editor-kind-select"
+						options={ KIND_OPTIONS }
+						value={ kind }
+						label={ __( 'Kind' ) }
+						onChange={ ( newKind ) => {
+							onChange( {
+								...track,
+								kind: newKind,
+							} );
 						} }
-					>
-						{ __( 'Close' ) }
-					</Button>
-					<Button isDestructive variant="link" onClick={ onRemove }>
-						{ __( 'Remove track' ) }
-					</Button>
-				</div>
-			</div>
+					/>
+					<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
+						<Button
+							variant="secondary"
+							onClick={ () => {
+								const changes = {};
+								let hasChanges = false;
+								if ( label === '' ) {
+									changes.label = __( 'English' );
+									hasChanges = true;
+								}
+								if ( srcLang === '' ) {
+									changes.srcLang = 'en';
+									hasChanges = true;
+								}
+								if ( track.kind === undefined ) {
+									changes.kind = DEFAULT_KIND;
+									hasChanges = true;
+								}
+								if ( hasChanges ) {
+									onChange( {
+										...track,
+										...changes,
+									} );
+								}
+								onClose();
+							} }
+						>
+							{ __( 'Close' ) }
+						</Button>
+						<Button
+							isDestructive
+							variant="link"
+							onClick={ onRemove }
+						>
+							{ __( 'Remove track' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</VStack>
 		</NavigableMenu>
 	);
 }

@@ -7,6 +7,7 @@ import {
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,7 +45,6 @@ const {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
-	__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 	isTyping,
 	isDraggingBlocks,
 	getDraggedBlockClientIds,
@@ -73,7 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
-	getLastInsertedBlocksClientIds,
+	getBlockEditingMode,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -123,7 +123,7 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
-		registerBlockType( 'core/test-freeform', {
+		registerBlockType( 'core/freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -179,7 +179,7 @@ describe( 'selectors', () => {
 			ancestor: [ 'core/test-block-ancestor' ],
 		} );
 
-		setFreeformContentHandlerName( 'core/test-freeform' );
+		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
@@ -189,7 +189,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
-		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/post-content-child' );
 		unregisterBlockType( 'core/test-block-ancestor' );
 		unregisterBlockType( 'core/test-block-parent' );
@@ -2259,24 +2259,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockInterfaceHidden', () => {
-		it( 'should return the true if toggled true in state', () => {
-			const state = {
-				isBlockInterfaceHidden: true,
-			};
-
-			expect( isBlockInterfaceHidden( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if toggled false in state', () => {
-			const state = {
-				isBlockInterfaceHidden: false,
-			};
-
-			expect( isBlockInterfaceHidden( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
@@ -2493,6 +2475,44 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should cache and return the same object if state has not changed', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: 'clientId1' },
+					selectionEnd: { clientId: 'clientId1' },
+				},
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							clientId1: { clientId: 'clientId1' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							clientId1: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'clientId1' ],
+							clientId1: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+						} )
+					),
+				},
+				insertionPoint: null,
+			};
+
+			const insertionPoint1 = getBlockInsertionPoint( state );
+			const insertionPoint2 = getBlockInsertionPoint( state );
+
+			expect( insertionPoint1 ).toBe( insertionPoint2 );
+		} );
+
 		it( 'should return an object for the nested selected block', () => {
 			const state = {
 				selection: {
@@ -2675,11 +2695,13 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
 					allowedBlockTypes: [ 'core/test-block-a' ],
 				},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				true
@@ -2702,14 +2724,36 @@ describe( 'selectors', () => {
 			);
 		} );
 
+		it( 'should deny blocks when the editor has a disabled editing mode', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					parents: new Map(),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(
+					Object.entries( {
+						'': 'disabled',
+					} )
+				),
+			};
+			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'should deny blocks that restrict parent from being inserted into the root', () => {
 			const state = {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-c' ) ).toBe(
 				false
@@ -2729,9 +2773,11 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2751,11 +2797,13 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					block1: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2775,11 +2823,13 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					block1: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2799,6 +2849,7 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2806,6 +2857,7 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
@@ -2825,6 +2877,7 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2832,10 +2885,39 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
 			).toBe( true );
+		} );
+
+		it( 'should deny blocks from being inserted into a block that has a disabled editing mode', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+						} )
+					),
+					parents: new Map(),
+				},
+				blockListSettings: {},
+				settings: {},
+				blockEditingModes: new Map(
+					Object.entries( {
+						block1: 'disabled',
+					} )
+				),
+			};
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block1' )
+			).toBe( false );
 		} );
 
 		it( 'should prioritise parent over allowedBlocks', () => {
@@ -2851,6 +2933,7 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2858,6 +2941,7 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2877,9 +2961,11 @@ describe( 'selectors', () => {
 							block1: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/post-content-child', 'block1' )
@@ -2891,9 +2977,11 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/post-content-child' )
@@ -2926,6 +3014,7 @@ describe( 'selectors', () => {
 					block2: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -2966,6 +3055,7 @@ describe( 'selectors', () => {
 					block3: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3005,6 +3095,7 @@ describe( 'selectors', () => {
 					block3: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3044,6 +3135,7 @@ describe( 'selectors', () => {
 					block3: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3082,6 +3174,7 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3118,6 +3211,7 @@ describe( 'selectors', () => {
 					block2: {},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3147,6 +3241,7 @@ describe( 'selectors', () => {
 							3: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					1: {
@@ -3157,6 +3252,7 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( true );
 		} );
@@ -3178,6 +3274,7 @@ describe( 'selectors', () => {
 							3: {},
 						} )
 					),
+					parents: new Map(),
 				},
 				blockListSettings: {
 					1: {
@@ -3185,6 +3282,7 @@ describe( 'selectors', () => {
 					},
 				},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
 		} );
@@ -3223,42 +3321,46 @@ describe( 'selectors', () => {
 				// See: https://github.com/WordPress/gutenberg/issues/14580
 				preferences: {},
 				blockListSettings: {},
+				blockEditingModes: new Map(),
 			};
 			const items = getInserterItems( state );
 			const testBlockAItem = items.find(
 				( item ) => item.id === 'core/test-block-a'
 			);
 			expect( testBlockAItem ).toEqual( {
-				id: 'core/test-block-a',
-				name: 'core/test-block-a',
-				initialAttributes: {},
-				title: 'Test Block A',
-				icon: {
-					src: 'test',
-				},
 				category: 'design',
-				keywords: [ 'testing' ],
-				variations: [],
-				isDisabled: false,
-				utility: 1,
+				description: undefined,
+				example: undefined,
 				frecency: 0,
+				icon: { src: 'test' },
+				id: 'core/test-block-a',
+				initialAttributes: {},
+				isDisabled: false,
+				keywords: [ 'testing' ],
+				name: 'core/test-block-a',
+				title: 'Test Block A',
+				utility: 1,
+				variations: [],
 			} );
 			const reusableBlockItem = items.find(
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
-				id: 'core/block/1',
-				name: 'core/block',
-				initialAttributes: { ref: 1 },
-				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
 				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 1,
+				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,
+				icon: {
+					src: symbol,
+					foreground: 'var(--wp-block-synced-color)',
+				},
+				id: 'core/block/1',
+				initialAttributes: { ref: 1 },
+				isDisabled: false,
+				keywords: [ 'reusable' ],
+				name: 'core/block',
+				syncStatus: undefined,
+				title: 'Reusable Block 1',
+				utility: 1,
 			} );
 		} );
 
@@ -3331,6 +3433,7 @@ describe( 'selectors', () => {
 					block3: {},
 					block4: {},
 				},
+				blockEditingModes: new Map(),
 			};
 
 			const stateSecondBlockRestricted = {
@@ -3352,7 +3455,7 @@ describe( 'selectors', () => {
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -3368,7 +3471,7 @@ describe( 'selectors', () => {
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-freeform',
+				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
 				'core/block/1',
@@ -3418,6 +3521,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			const items = getInserterItems( state );
 			const testBlockBItem = items.find(
@@ -3442,6 +3546,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			const items = getInserterItems( state );
 			const reusableBlock2Item = items.find(
@@ -3533,6 +3638,7 @@ describe( 'selectors', () => {
 				settings: {},
 				preferences: {},
 				blockListSettings: {},
+				blockEditingModes: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -3573,6 +3679,7 @@ describe( 'selectors', () => {
 				settings: {},
 				preferences: {},
 				blockListSettings: {},
+				blockEditingModes: new Map(),
 			};
 			const block = { name: 'core/with-tranforms-a' };
 			const items = getBlockTransformItems( state, block );
@@ -3611,6 +3718,7 @@ describe( 'selectors', () => {
 					},
 					block2: {},
 				},
+				blockEditingModes: new Map(),
 			};
 			const blocks = [
 				{ clientId: 'block2', name: 'core/with-tranforms-a' },
@@ -3658,6 +3766,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -3691,6 +3800,7 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 				settings: {},
+				blockEditingModes: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-c' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -4103,6 +4213,12 @@ describe( 'selectors', () => {
 						block2: {},
 					} )
 				),
+				parents: new Map(
+					Object.entries( {
+						block1: '',
+						block2: '',
+					} )
+				),
 			},
 			blockListSettings: {
 				block1: {
@@ -4134,6 +4250,7 @@ describe( 'selectors', () => {
 					},
 				],
 			},
+			blockEditingModes: new Map(),
 		};
 
 		it( 'should return all patterns for root level', () => {
@@ -4231,6 +4348,7 @@ describe( 'selectors', () => {
 						block1: { name: 'core/test-block-a' },
 					} )
 				),
+				parents: new Map(),
 			},
 			blockListSettings: {
 				block1: {
@@ -4261,16 +4379,25 @@ describe( 'selectors', () => {
 					},
 				],
 			},
+			blockEditingModes: new Map(),
 		};
 		it( 'should return empty array if no block name is provided', () => {
 			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
 		} );
-		it( 'shoud return empty array if no match is found', () => {
+		it( 'should return empty array if no match is found', () => {
 			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return the same empty array in both empty array cases', () => {
+			const patterns1 = getPatternsByBlockTypes( state );
+			const patterns2 = getPatternsByBlockTypes(
+				state,
+				'test/block-not-exists'
+			);
+			expect( patterns1 ).toBe( patterns2 );
 		} );
 		it( 'should return proper results when there are matched block patterns', () => {
 			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
@@ -4303,6 +4430,7 @@ describe( 'selectors', () => {
 						block2: { name: 'core/test-block-b' },
 					} )
 				),
+				parents: new Map(),
 				controlledInnerBlocks: { 'block2-clientId': true },
 			},
 			blockListSettings: {
@@ -4345,6 +4473,7 @@ describe( 'selectors', () => {
 					},
 				],
 			},
+			blockEditingModes: new Map(),
 		};
 		describe( 'should return empty array', () => {
 			it( 'when no blocks are selected', () => {
@@ -4565,6 +4694,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			settings: {},
 			preferences: {},
 			blockListSettings: {},
+			blockEditingModes: new Map(),
 		};
 		const items = getInserterItems( state );
 		const expectedResult = [
@@ -4609,6 +4739,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
+		expect( console ).toHaveWarned();
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
@@ -4662,25 +4793,200 @@ describe( '__unstableGetClientIdsTree', () => {
 	} );
 } );
 
-describe( 'getLastInsertedBlocksClientIds', () => {
-	it( 'should return undefined if no blocks have been inserted', () => {
-		const state = {
-			lastBlockInserted: {},
-		};
+describe( 'getBlockEditingMode', () => {
+	const baseState = {
+		settings: {},
+		blocks: {
+			byClientId: new Map( [
+				[ '6cf70164-9097-4460-bcbf-200560546988', {} ], // Header
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ], // Group
+				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ], // |  Post Title
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ], // |  Post Content
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
+				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
+			] ),
+			order: new Map( [
+				[
+					'',
+					[
+						'6cf70164-9097-4460-bcbf-200560546988',
+						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					],
+				],
+				[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+				[
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					[
+						'b26fc763-417d-4f01-b81c-2ec61e14a972',
+						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					],
+				],
+				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					[
+						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+					],
+				],
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
+				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
+			] ),
+			parents: new Map( [
+				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
+				[
+					'b26fc763-417d-4f01-b81c-2ec61e14a972',
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+				],
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+				],
+				[
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				],
+				[
+					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				],
+			] ),
+		},
+		blockListSettings: {
+			'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
+			'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
+		},
+		blockEditingModes: new Map( [] ),
+	};
 
-		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( undefined );
+	const __experimentalHasContentRoleAttribute = jest.fn( () => false );
+	getBlockEditingMode.registry = {
+		select: jest.fn( () => ( {
+			__experimentalHasContentRoleAttribute,
+		} ) ),
+	};
+
+	it( 'should return default by default', () => {
+		expect(
+			getBlockEditingMode(
+				baseState,
+				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+			)
+		).toBe( 'default' );
 	} );
 
-	it( 'should return clientIds if blocks have been inserted', () => {
+	it( 'should return disabled if explicitly set', () => {
 		const state = {
-			lastBlockInserted: {
-				clientIds: [ '123456', '78910' ],
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return contentOnly if explicitly set', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'contentOnly' );
+	} );
+
+	it( 'should return disabled if explicitly set on a parent', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return default if parent is set to contentOnly', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'contentOnly' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'default' );
+	} );
+
+	it( 'should return disabled if overridden by a parent', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [
+				[ '', 'disabled' ],
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+			] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return disabled if explicitly set on root', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'should return default if root is contentOnly', () => {
+		const state = {
+			...baseState,
+			blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
+		};
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'default' );
+	} );
+
+	it( 'should return disabled if parent is locked and the block has no content role', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
+					templateLock: 'contentOnly',
+				},
 			},
 		};
+		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'disabled' );
+	} );
 
-		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
-			'123456',
-			'78910',
-		] );
+	it( 'should return contentOnly if parent is locked and the block has a content role', () => {
+		const state = {
+			...baseState,
+			blockListSettings: {
+				...baseState.blockListSettings,
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
+					templateLock: 'contentOnly',
+				},
+			},
+		};
+		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		expect(
+			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
+		).toBe( 'contentOnly' );
 	} );
 } );

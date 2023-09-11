@@ -38,12 +38,8 @@ const PlaceholderIllustration = (
  * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
  * ```
  */
-export function Placeholder< IconProps = unknown >(
-	props: WordPressComponentProps<
-		PlaceholderProps< IconProps >,
-		'div',
-		false
-	>
+export function Placeholder(
+	props: WordPressComponentProps< PlaceholderProps, 'div', false >
 ) {
 	const {
 		icon,
@@ -79,6 +75,7 @@ export function Placeholder< IconProps = unknown >(
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
+
 	return (
 		<div { ...additionalProps } className={ classes }>
 			{ withIllustration ? PlaceholderIllustration : null }

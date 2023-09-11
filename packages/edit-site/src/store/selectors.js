@@ -10,9 +10,14 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -35,13 +40,14 @@ export const __unstableGetPreference = createRegistrySelector(
 /**
  * Returns whether the given feature is enabled or not.
  *
+ * @deprecated
  * @param {Object} state       Global application state.
  * @param {string} featureName Feature slug.
  *
  * @return {boolean} Is active.
  */
 export function isFeatureActive( state, featureName ) {
-	deprecated( `select( 'core/interface' ).isFeatureActive`, {
+	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
 		since: '6.0',
 		alternative: `select( 'core/preferences' ).get`,
 	} );
@@ -101,6 +107,10 @@ export const getSettings = createSelector(
 			...state.settings,
 			outlineMode: true,
 			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
+			isDistractionFree: !! __unstableGetPreference(
+				state,
+				'distractionFree'
+			),
 			hasFixedToolbar: !! __unstableGetPreference(
 				state,
 				'fixedToolbar'
@@ -137,6 +147,7 @@ export const getSettings = createSelector(
 		getCanUserCreateMedia( state ),
 		state.settings,
 		__unstableGetPreference( state, 'focusMode' ),
+		__unstableGetPreference( state, 'distractionFree' ),
 		__unstableGetPreference( state, 'fixedToolbar' ),
 		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
 		__unstableGetPreference( state, 'showIconLabels' ),
@@ -219,11 +230,35 @@ export function isInserterOpened( state ) {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
-}
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( typeof state.blockInserterPanel === 'object' ) {
+			const { rootClientId, insertionIndex, filterValue } =
+				state.blockInserterPanel;
+			return { rootClientId, insertionIndex, filterValue };
+		}
+
+		if ( hasPageContentFocus( state ) ) {
+			const [ postContentClientId ] =
+				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+					'core/post-content'
+				);
+			if ( postContentClientId ) {
+				return {
+					rootClientId: postContentClientId,
+					insertionIndex: undefined,
+					filterValue: undefined,
+				};
+			}
+		}
+
+		return {
+			rootClientId: undefined,
+			insertionIndex: undefined,
+			filterValue: undefined,
+		};
+	}
+);
 
 /**
  * Returns the current opened/closed state of the list view panel.
@@ -268,32 +303,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = templateParts
-			? // Key template parts by their ID.
-			  templateParts.reduce(
-					( newTemplateParts, part ) => ( {
-						...newTemplateParts,
-						[ part.id ]: part,
-					} ),
-					{}
-			  )
-			: {};
 
-		return ( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				return {
-					templatePart,
-					block,
-				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
 	}
 );
 
@@ -306,17 +317,6 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  */
 export function getEditorMode( state ) {
 	return __unstableGetPreference( state, 'editorMode' );
-}
-
-/**
- * Returns the current canvas mode.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Canvas mode.
- */
-export function __unstableGetCanvasMode( state ) {
-	return state.canvasMode;
 }
 
 /**
@@ -350,4 +350,28 @@ export function isNavigationOpened() {
 		since: '6.2',
 		version: '6.4',
 	} );
+}
+
+/**
+ * Whether or not the editor has a page loaded into it.
+ *
+ * @see setPage
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not the editor has a page loaded into it.
+ */
+export function isPage( state ) {
+	return !! state.editedPost.context?.postId;
+}
+
+/**
+ * Whether or not the editor allows only page content to be edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not focus is on editing page content.
+ */
+export function hasPageContentFocus( state ) {
+	return isPage( state ) ? state.hasPageContentFocus : false;
 }

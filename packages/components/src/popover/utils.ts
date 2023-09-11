@@ -3,7 +3,11 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { MotionProps } from 'framer-motion';
-import type { ReferenceType } from '@floating-ui/react-dom';
+import type {
+	Placement,
+	ReferenceType,
+	VirtualElement,
+} from '@floating-ui/react-dom';
 
 /**
  * Internal dependencies
@@ -16,7 +20,7 @@ import type {
 
 const POSITION_TO_PLACEMENT: Record<
 	NonNullable< PopoverProps[ 'position' ] >,
-	NonNullable< PopoverProps[ 'placement' ] >
+	Placement
 > = {
 	bottom: 'bottom',
 	top: 'top',
@@ -74,13 +78,12 @@ const POSITION_TO_PLACEMENT: Record<
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
  * (used by `floating-ui`).
  *
- * @param  position The legacy position
+ * @param position The legacy position
  * @return The corresponding placement
  */
 export const positionToPlacement = (
 	position: NonNullable< PopoverProps[ 'position' ] >
-): NonNullable< PopoverProps[ 'placement' ] > =>
-	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
+) => POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
 
 /**
  * @typedef AnimationOrigin
@@ -105,13 +108,14 @@ const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
 	left: { originX: 1, originY: 0.5 }, // open from middle, right
 	'left-start': { originX: 1, originY: 0 }, // open from top, right
 	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
+	overlay: { originX: 0.5, originY: 0.5 }, // open from center, center
 };
 
 /**
  * Given the floating-ui `placement`, compute the framer-motion props for the
  * popover's entry animation.
  *
- * @param  placement A placement string from floating ui
+ * @param placement A placement string from floating ui
  * @return The object containing the motion props
  */
 export const placementToMotionAnimationProps = (
@@ -138,25 +142,6 @@ export const placementToMotionAnimationProps = (
 	};
 };
 
-/**
- * Returns the offset of a document's frame element.
- *
- * @param  document The iframe's owner document.
- *
- * @return The offset of the document's frame element, or undefined if the
- * document has no frame element.
- */
-export const getFrameOffset = (
-	document?: Document
-): { x: number; y: number } | undefined => {
-	const frameElement = document?.defaultView?.frameElement;
-	if ( ! frameElement ) {
-		return;
-	}
-	const iframeRect = frameElement.getBoundingClientRect();
-	return { x: iframeRect.left, y: iframeRect.top };
-};
-
 export const getReferenceOwnerDocument = ( {
 	anchor,
 	anchorRef,
@@ -179,7 +164,10 @@ export const getReferenceOwnerDocument = ( {
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	let resultingReferenceOwnerDoc;
-	if ( anchor ) {
+	if ( ( anchor as VirtualElement )?.contextElement ) {
+		resultingReferenceOwnerDoc = ( anchor as VirtualElement ).contextElement
+			?.ownerDocument;
+	} else if ( anchor ) {
 		resultingReferenceOwnerDoc = anchor.ownerDocument;
 	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
@@ -282,3 +270,15 @@ export const getReferenceElement = ( {
 	// Convert any `undefined` value to `null`.
 	return referenceElement ?? null;
 };
+
+/**
+ * Computes the final coordinate that needs to be applied to the floating
+ * element when applying transform inline styles, defaulting to `undefined`
+ * if the provided value is `null` or `NaN`.
+ *
+ * @param c input coordinate (usually as returned from floating-ui)
+ * @return The coordinate's value to be used for inline styles. An `undefined`
+ *         return value means "no style set" for this coordinate.
+ */
+export const computePopoverPosition = ( c: number | null ) =>
+	c === null || Number.isNaN( c ) ? undefined : Math.round( c );

@@ -7,7 +7,7 @@
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 
-export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
 /**
  * Renders a row in the Summary panel of the Document sidebar.

@@ -16,7 +16,7 @@ import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: 'Example: Basic with block supports',
 	icon: 'universal-access-alt',
 	category: 'design',
@@ -73,7 +73,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	var useBlockProps = blockEditor.useBlockProps;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
-		apiVersion: 2,
+		apiVersion: 3,
 		title: 'Example: Basic with block supports',
 		icon: 'universal-access-alt',
 		category: 'design',
@@ -127,7 +127,7 @@ Now, let's alter the block.json file for that block, and add the supports key. (
 
 ```json
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "gutenberg-examples/example-03-editable-esnext",
 	"title": "Example: Basic with block supports",
 	"icon": "universal-access-alt",

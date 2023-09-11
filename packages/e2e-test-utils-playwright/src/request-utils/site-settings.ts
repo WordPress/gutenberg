@@ -26,7 +26,7 @@ type SiteSettings = {
  *
  * @see https://developer.wordpress.org/rest-api/reference/settings/#retrieve-a-site-setting
  *
- * @param  this RequestUtils.
+ * @param this RequestUtils.
  */
 export async function getSiteSettings( this: RequestUtils ) {
 	return await this.rest< SiteSettings >( {
@@ -40,8 +40,8 @@ export async function getSiteSettings( this: RequestUtils ) {
  *
  * @see https://developer.wordpress.org/rest-api/reference/settings/#update-a-site-setting
  *
- * @param  this         RequestUtils.
- * @param  siteSettings The partial settings payload to update.
+ * @param this         RequestUtils.
+ * @param siteSettings The partial settings payload to update.
  */
 export async function updateSiteSettings(
 	this: RequestUtils,

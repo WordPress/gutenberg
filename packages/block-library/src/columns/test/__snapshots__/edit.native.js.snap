@@ -2,60 +2,60 @@
 
 exports[`Columns block adds a column block using the appender 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block changes the vertical alignment on individual Column 1`] = `
-"<!-- wp:columns {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-columns are-vertically-aligned-top\\"><!-- wp:column {\\"verticalAlignment\\":\\"bottom\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-bottom\\"></div>
+"<!-- wp:columns {"verticalAlignment":"top"} -->
+<div class="wp-block-columns are-vertically-aligned-top"><!-- wp:column {"verticalAlignment":"bottom"} -->
+<div class="wp-block-column is-vertically-aligned-bottom"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+<!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block changes vertical alignment on Columns 1`] = `
-"<!-- wp:columns {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-columns are-vertically-aligned-top\\"><!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+"<!-- wp:columns {"verticalAlignment":"top"} -->
+<div class="wp-block-columns are-vertically-aligned-top"><!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+<!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block inserts block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"50%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:50%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"50%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:50%\\"></div>
+<!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block removes column with the remove button 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
@@ -67,153 +67,239 @@ exports[`Columns block removes the only one left Column with the remove button 1
 `;
 
 exports[`Columns block sets current vertical alignment on new Columns 1`] = `
-"<!-- wp:columns {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-columns are-vertically-aligned-top\\"><!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+"<!-- wp:columns {"verticalAlignment":"top"} -->
+<div class="wp-block-columns are-vertically-aligned-top"><!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+<!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"verticalAlignment\\":\\"top\\"} -->
-<div class=\\"wp-block-column is-vertically-aligned-top\\"></div>
+<!-- wp:column {"verticalAlignment":"top"} -->
+<div class="wp-block-column is-vertically-aligned-top"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
+exports[`Columns block transforms a nested Columns block into a Group block 1`] = `
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Columns block when using columns percentage mechanism sets custom values correctly 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"90%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:90%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"90%"} -->
+<div class="wp-block-column" style="flex-basis:90%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"55.5%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:55.5%\\"></div>
+<!-- wp:column {"width":"55.5%"} -->
+<div class="wp-block-column" style="flex-basis:55.5%"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using columns percentage mechanism updates the slider's input value 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"55.6%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:55.6%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"55.6%"} -->
+<div class="wp-block-column" style="flex-basis:55.6%"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 25 / 50 / 25 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"25%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:25%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"25%"} -->
+<div class="wp-block-column" style="flex-basis:25%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"50%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:50%\\"></div>
+<!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"25%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:25%\\"></div>
+<!-- wp:column {"width":"25%"} -->
+<div class="wp-block-column" style="flex-basis:25%"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 33 / 33 / 33 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 33 / 66 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"33.33%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:33.33%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"66.66%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:66.66%\\"></div>
+<!-- wp:column {"width":"66.66%"} -->
+<div class="wp-block-column" style="flex-basis:66.66%"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 50 / 50 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 66 / 33 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column {\\"width\\":\\"66.66%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:66.66%\\"></div>
+<div class="wp-block-columns"><!-- wp:column {"width":"66.66%"} -->
+<div class="wp-block-column" style="flex-basis:66.66%"></div>
 <!-- /wp:column -->
 
-<!-- wp:column {\\"width\\":\\"33.33%\\"} -->
-<div class=\\"wp-block-column\\" style=\\"flex-basis:33.33%\\"></div>
+<!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the columns layout picker sets the predefined percentages for 100 block 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the number of columns setting adds a column block when incrementing the value 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Columns block when using the number of columns setting adds at least 15 Column blocks without limitation 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the number of columns setting reaches the minimum limit of number of column blocks 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Columns block when using the number of columns setting removes a column block when decrementing the value 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;

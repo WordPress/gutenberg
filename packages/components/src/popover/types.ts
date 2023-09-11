@@ -12,10 +12,7 @@ type DomRectWithOwnerDocument = DOMRect & {
 	ownerDocument?: Document;
 };
 
-export type AnimatedWrapperProps = {
-	placement: Placement;
-	shouldAnimate?: boolean;
-};
+type PopoverPlacement = Placement | 'overlay';
 
 export type PopoverAnchorRefReference = MutableRefObject<
 	Element | null | undefined
@@ -111,7 +108,7 @@ export type PopoverProps = {
 	 *
 	 * @default 'bottom-start'
 	 */
-	placement?: Placement;
+	placement?: PopoverPlacement;
 	/**
 	 * Legacy way to specify the popover's position with respect to its anchor.
 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
@@ -148,6 +145,12 @@ export type PopoverProps = {
 	 * @default undefined
 	 */
 	variant?: 'unstyled' | 'toolbar';
+	/**
+	 * Whether to render the popover inline or within the slot.
+	 *
+	 * @default false
+	 */
+	inline?: boolean;
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport

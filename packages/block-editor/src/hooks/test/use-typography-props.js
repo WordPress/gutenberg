@@ -12,6 +12,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 				typography: {
 					letterSpacing: '22px',
 					fontSize: '2rem',
+					textColumns: 3,
 					textTransform: 'uppercase',
 				},
 			},
@@ -19,6 +20,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 		expect( getTypographyClassesAndStyles( attributes ) ).toEqual( {
 			className: 'has-tofu-font-family has-large-font-size',
 			style: {
+				columnCount: 3,
 				letterSpacing: '22px',
 				fontSize: '2rem',
 				textTransform: 'uppercase',
@@ -37,12 +39,20 @@ describe( 'getTypographyClassesAndStyles', () => {
 				},
 			},
 		};
-		expect( getTypographyClassesAndStyles( attributes, true ) ).toEqual( {
+		expect(
+			getTypographyClassesAndStyles( attributes, {
+				typography: {
+					fluid: {
+						minFontSize: '1rem',
+					},
+				},
+			} )
+		).toEqual( {
 			className: 'has-tofu-font-family',
 			style: {
 				letterSpacing: '22px',
 				fontSize:
-					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
+					'clamp(1.25rem, 1.25rem + ((1vw - 0.2rem) * 0.938), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );
@@ -61,14 +71,51 @@ describe( 'getTypographyClassesAndStyles', () => {
 		};
 		expect(
 			getTypographyClassesAndStyles( attributes, {
-				minFontSize: '1rem',
+				typography: {
+					fluid: {
+						minFontSize: '1rem',
+					},
+				},
 			} )
 		).toEqual( {
 			className: 'has-tofu-font-family',
 			style: {
 				textDecoration: 'underline',
 				fontSize:
-					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
+					'clamp(1.25rem, 1.25rem + ((1vw - 0.2rem) * 0.938), 2rem)',
+				textTransform: 'uppercase',
+			},
+		} );
+	} );
+
+	it( 'should use layout.wideSize for the maximum viewport value', () => {
+		const attributes = {
+			fontFamily: 'tofu',
+			style: {
+				typography: {
+					textDecoration: 'underline',
+					fontSize: '2rem',
+					textTransform: 'uppercase',
+				},
+			},
+		};
+		expect(
+			getTypographyClassesAndStyles( attributes, {
+				typography: {
+					fluid: {
+						minFontSize: '1rem',
+					},
+				},
+				layout: {
+					wideSize: '1000px',
+				},
+			} )
+		).toEqual( {
+			className: 'has-tofu-font-family',
+			style: {
+				textDecoration: 'underline',
+				fontSize:
+					'clamp(1.25rem, 1.25rem + ((1vw - 0.2rem) * 1.765), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );

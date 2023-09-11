@@ -7,10 +7,35 @@ import {
 	ToolbarButton,
 	Modal,
 	Button,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { fullscreen } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+
+function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
+	// 'small' to match the rules in editor.scss.
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	if ( isMobileViewport ) {
+		return null;
+	}
+
+	return (
+		<Button
+			onClick={ onClick }
+			icon={ fullscreen }
+			isPressed={ isModalFullScreen }
+			label={
+				isModalFullScreen
+					? __( 'Exit fullscreen' )
+					: __( 'Enter fullscreen' )
+			}
+		/>
+	);
+}
 
 function ClassicEdit( props ) {
 	const styles = useSelect(
@@ -27,7 +52,6 @@ function ClassicEdit( props ) {
 		window.wp.oldEditor.initialize( props.id, {
 			tinymce: {
 				...settings,
-				height: 500,
 				setup( editor ) {
 					editor.on( 'init', () => {
 						const doc = editor.getDoc();
@@ -57,38 +81,52 @@ export default function ModalEdit( props ) {
 		onReplace,
 	} = props;
 	const [ isOpen, setOpen ] = useState( false );
+	const [ isModalFullScreen, setIsModalFullScreen ] = useState( false );
 	const id = `editor-${ clientId }`;
-	const label = __( 'Classic Edit' );
+
+	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
 
 	return (
 		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ () => setOpen( true ) }>
-						{ label }
+						{ __( 'Edit' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
 			{ content && <RawHTML>{ content }</RawHTML> }
 			{ ( isOpen || ! content ) && (
-				<Modal title={ label } __experimentalHideHeader={ true }>
-					<h2
-						style={ {
-							display: 'flex',
-							justifyContent: 'space-between',
-						} }
+				<Modal
+					title={ __( 'Classic Editor' ) }
+					onRequestClose={ onClose }
+					shouldCloseOnClickOutside={ false }
+					overlayClassName="block-editor-freeform-modal"
+					isFullScreen={ isModalFullScreen }
+					className="block-editor-freeform-modal__content"
+					headerActions={
+						<ModalAuxiliaryActions
+							onClick={ () =>
+								setIsModalFullScreen( ! isModalFullScreen )
+							}
+							isModalFullScreen={ isModalFullScreen }
+						/>
+					}
+				>
+					<ClassicEdit id={ id } defaultValue={ content } />
+					<Flex
+						className="block-editor-freeform-modal__actions"
+						justify="flex-end"
+						expanded={ false }
 					>
-						<div>{ label }</div>
-						<div>
-							<Button
-								onClick={ () =>
-									content ? setOpen( false ) : onReplace( [] )
-								}
-							>
+						<FlexItem>
+							<Button variant="tertiary" onClick={ onClose }>
 								{ __( 'Cancel' ) }
 							</Button>
+						</FlexItem>
+						<FlexItem>
 							<Button
-								isPrimary
+								variant="primary"
 								onClick={ () => {
 									setAttributes( {
 										content:
@@ -101,9 +139,8 @@ export default function ModalEdit( props ) {
 							>
 								{ __( 'Save' ) }
 							</Button>
-						</div>
-					</h2>
-					<ClassicEdit id={ id } defaultValue={ content } />
+						</FlexItem>
+					</Flex>
 				</Modal>
 			) }
 		</>

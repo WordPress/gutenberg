@@ -52,6 +52,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		onInsertBlocks,
 		destinationRootClientId
 	);
+
 	const registeredPatternCategories = useMemo(
 		() =>
 			patternCategories.map(
@@ -75,7 +76,12 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			);
 		}
 		return searchItems( allPatterns, filterValue );
-	}, [ filterValue, selectedCategory, allPatterns ] );
+	}, [
+		filterValue,
+		allPatterns,
+		selectedCategory,
+		registeredPatternCategories,
+	] );
 
 	// Announce search results on change.
 	useEffect( () => {
@@ -89,7 +95,7 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
 	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
 		step: INITIAL_INSERTER_RESULTS,

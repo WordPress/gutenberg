@@ -88,7 +88,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 				blockInformation.title
 			) }
 			overlayClassName="block-editor-block-lock-modal"
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			<p>
@@ -188,6 +187,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					</ul>
 					{ hasTemplateLock && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }

@@ -6,11 +6,11 @@ import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { ungroup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import UngroupIcon from './icon';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
@@ -24,7 +24,7 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Ungroup' ) }
-				icon={ UngroupIcon }
+				icon={ ungroup }
 				onClick={ onConvertFromGroup }
 			/>
 		</ToolbarGroup>

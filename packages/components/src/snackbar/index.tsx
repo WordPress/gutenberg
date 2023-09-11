@@ -16,7 +16,8 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
-import type { NoticeAction, SnackbarProps } from './types';
+import type { SnackbarProps } from './types';
+import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 const NOTICE_TIMEOUT = 10000;
@@ -25,8 +26,8 @@ const NOTICE_TIMEOUT = 10000;
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param  message    Message to announce.
- * @param  politeness Politeness to announce.
+ * @param message    Message to announce.
+ * @param politeness Politeness to announce.
  */
 function useSpokenMessage(
 	message: SnackbarProps[ 'spokenMessage' ],
@@ -73,7 +74,7 @@ function UnforwardedSnackbar(
 	}
 
 	function onActionClick(
-		event: MouseEvent,
+		event: MouseEvent< HTMLButtonElement >,
 		onClick: NoticeAction[ 'onClick' ]
 	) {
 		event.stopPropagation();
@@ -139,9 +140,9 @@ function UnforwardedSnackbar(
 							key={ index }
 							href={ url }
 							variant="tertiary"
-							onClick={ ( event: MouseEvent ) =>
-								onActionClick( event, onClick )
-							}
+							onClick={ (
+								event: MouseEvent< HTMLButtonElement >
+							) => onActionClick( event, onClick ) }
 							className="components-snackbar__action"
 						>
 							{ label }

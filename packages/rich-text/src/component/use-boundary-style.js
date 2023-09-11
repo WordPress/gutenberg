@@ -9,11 +9,15 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 export function useBoundaryStyle( { record } ) {
 	const ref = useRef();
-	const { activeFormats = [] } = record.current;
+	const { activeFormats = [], replacements, start } = record.current;
+	const activeReplacement = replacements[ start ];
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
 		// active, because no boundary styles will be visible.
-		if ( ! activeFormats || ! activeFormats.length ) {
+		if (
+			( ! activeFormats || ! activeFormats.length ) &&
+			! activeReplacement
+		) {
 			return;
 		}
 
@@ -46,6 +50,6 @@ export function useBoundaryStyle( { record } ) {
 		if ( globalStyle.innerHTML !== style ) {
 			globalStyle.innerHTML = style;
 		}
-	}, [ activeFormats ] );
+	}, [ activeFormats, activeReplacement ] );
 	return ref;
 }

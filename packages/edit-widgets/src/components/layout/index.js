@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Popover } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,7 +16,7 @@ import Interface from './interface';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout( { blockEditorSettings, onError } ) {
+function Layout( { blockEditorSettings } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -33,13 +32,12 @@ function Layout( { blockEditorSettings, onError } ) {
 	}
 
 	return (
-		<ErrorBoundary onError={ onError }>
+		<ErrorBoundary>
 			<WidgetAreasBlockEditorProvider
 				blockEditorSettings={ blockEditorSettings }
 			>
 				<Interface blockEditorSettings={ blockEditorSettings } />
 				<Sidebar />
-				<Popover.Slot />
 				<PluginArea onError={ onPluginAreaError } />
 				<UnsavedChangesWarning />
 				<WelcomeGuide />

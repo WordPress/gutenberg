@@ -23,7 +23,7 @@ const BASE_QUERY = {
 const getTermIdByTermValue = ( terms, termValue ) => {
 	// First we check for exact match by `term.id` or case sensitive `term.name` match.
 	const termId =
-		termValue?.id || terms.find( ( term ) => term.name === termValue )?.id;
+		termValue?.id || terms?.find( ( term ) => term.name === termValue )?.id;
 	if ( termId ) {
 		return termId;
 	}
@@ -38,7 +38,7 @@ const getTermIdByTermValue = ( terms, termValue ) => {
 	 * In this edge case we always apply the first match from the terms list.
 	 */
 	const termValueLower = termValue.toLocaleLowerCase();
-	return terms.find(
+	return terms?.find(
 		( term ) => term.name.toLocaleLowerCase() === termValueLower
 	)?.id;
 };

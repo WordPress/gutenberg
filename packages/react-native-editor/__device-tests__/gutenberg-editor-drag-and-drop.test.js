@@ -4,7 +4,6 @@
 import { blockNames } from './pages/editor-page';
 import {
 	clearClipboard,
-	clickElementOutsideOfTextInput,
 	dragAndDropAfterElement,
 	isAndroid,
 	setClipboard,
@@ -23,18 +22,21 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 	it( 'should be able to drag & drop a block', async () => {
 		// Initialize the editor with a Spacer and Paragraph block
-		await editorPage.setHtmlContent(
-			[ testData.spacerBlock, testData.paragraphBlockShortText ].join(
-				'\n\n'
-			)
-		);
+		await editorPage.initializeEditor( {
+			initialData: [
+				testData.spacerBlock,
+				testData.paragraphBlockShortText,
+			].join( '\n\n' ),
+		} );
 
 		// Get elements for both blocks
 		const spacerBlock = await editorPage.getBlockAtPosition(
 			blockNames.spacer
 		);
-		const paragraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
+		const paragraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
 
 		// Drag & drop the Spacer block after the Paragraph block
 		await dragAndDropAfterElement(
@@ -48,16 +50,12 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		const firstBlockText =
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( firstBlockText ).toMatch( testData.shortText );
-
-		// Remove the blocks
-		await spacerBlock.click();
-		await editorPage.removeBlockAtPosition( blockNames.spacer, 2 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
 	} );
 
 	onlyOnAndroid(
 		'should be able to long-press on a text-based block to paste a text in a focused textinput',
 		async () => {
+			await editorPage.initializeEditor();
 			// Add a Paragraph block
 			await editorPage.addNewBlock( blockNames.paragraph );
 			const paragraphBlockElement =
@@ -82,15 +80,13 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 			// Expect to have the pasted text in the Paragraph block
 			expect( paragraphText ).toMatch( testData.shortText );
-
-			// Remove the block
-			await editorPage.removeBlockAtPosition( blockNames.paragraph );
 		}
 	);
 
 	onlyOnAndroid(
 		'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput',
 		async () => {
+			await editorPage.initializeEditor();
 			// Add a Shortcode block
 			await editorPage.addNewBlock( blockNames.shortcode );
 			const shortcodeBlockElement =
@@ -118,29 +114,28 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			expect( shortcodeText ).toMatch( testData.shortText );
 
 			// Remove the block
-			await editorPage.removeBlockAtPosition( blockNames.shortcode );
+			await editorPage.removeBlock();
 		}
 	);
 
-	it( 'should be able to drag & drop a text-based block when the textinput is not focused', async () => {
+	it( 'should be able to drag & drop a text-based block when another textinput is focused', async () => {
 		// Initialize the editor with two Paragraph blocks
-		await editorPage.setHtmlContent(
-			[
+		await editorPage.initializeEditor( {
+			initialData: [
 				testData.paragraphBlockShortText,
 				testData.paragraphBlockEmpty,
-			].join( '\n\n' )
+			].join( '\n\n' ),
+		} );
+
+		// Tap on the second block
+		const secondParagraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
 		);
+		await secondParagraphBlock.click();
 
-		// Get elements for both blocks
-		const firstParagraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 1 );
-		const secondParagraphBlock =
-			await editorPage.getParagraphBlockWrapperAtPosition( 2 );
-
-		// Tap on the first Paragraph block outside of the textinput
-		await clickElementOutsideOfTextInput(
-			editorPage.driver,
-			firstParagraphBlock
+		const firstParagraphBlock = await editorPage.getBlockAtPosition(
+			blockNames.paragraph
 		);
 
 		// Drag & drop the first Paragraph block after the second Paragraph block
@@ -156,8 +151,5 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 		// Expect the second Paragraph block to have the expected content
 		expect( secondBlockText ).toMatch( testData.shortText );
-
-		// Remove the block
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 } );

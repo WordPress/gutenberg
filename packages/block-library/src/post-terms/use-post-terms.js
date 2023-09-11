@@ -4,6 +4,8 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+const EMPTY_ARRAY = [];
+
 export default function usePostTerms( { postId, term } ) {
 	const { slug } = term;
 
@@ -12,8 +14,8 @@ export default function usePostTerms( { postId, term } ) {
 			const visible = term?.visibility?.publicly_queryable;
 			if ( ! visible ) {
 				return {
-					postTerms: [],
-					_isLoading: false,
+					postTerms: EMPTY_ARRAY,
+					isLoading: false,
 					hasPostTerms: false,
 				};
 			}
@@ -36,6 +38,6 @@ export default function usePostTerms( { postId, term } ) {
 				hasPostTerms: !! terms?.length,
 			};
 		},
-		[ postId, term?.visibility?.publicly_queryable ]
+		[ postId, term?.visibility?.publicly_queryable, slug ]
 	);
 }

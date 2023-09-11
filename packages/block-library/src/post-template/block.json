@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/post-template",
 	"title": "Post Template",
 	"category": "theme",
@@ -13,15 +13,14 @@
 		"queryContext",
 		"displayLayout",
 		"templateSlug",
-		"previewPostType"
+		"previewPostType",
+		"enhancedPagination"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false,
-		"align": true,
-		"__experimentalLayout": {
-			"allowEditing": false
-		},
+		"align": [ "wide", "full" ],
+		"layout": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -41,6 +40,14 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": {
+				"__experimentalDefault": "1.25em"
+			},
+			"__experimentalDefaultControls": {
+				"blockGap": true
 			}
 		}
 	},

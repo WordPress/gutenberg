@@ -36,7 +36,6 @@ function DuotoneControl( {
 			popoverProps={ {
 				className: 'block-editor-duotone-control__popover',
 				headerTitle: __( 'Duotone' ),
-				variant: 'toolbar',
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event ) => {

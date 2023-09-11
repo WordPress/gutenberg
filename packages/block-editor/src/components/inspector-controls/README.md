@@ -23,7 +23,7 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	title: 'Inspector controls example',
 

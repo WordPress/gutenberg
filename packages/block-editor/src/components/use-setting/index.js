@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -18,6 +13,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
+import { getValueFromObjectPath } from '../../utils/object';
 
 const blockedPaths = [
 	'color',
@@ -165,11 +161,14 @@ export default function useSetting( path ) {
 							candidateClientId
 						);
 					result =
-						get(
+						getValueFromObjectPath(
 							candidateAtts,
 							`settings.blocks.${ blockName }.${ normalizedPath }`
 						) ??
-						get( candidateAtts, `settings.${ normalizedPath }` );
+						getValueFromObjectPath(
+							candidateAtts,
+							`settings.${ normalizedPath }`
+						);
 					if ( result !== undefined ) {
 						// Stop the search for more distant ancestors and move on.
 						break;
@@ -183,7 +182,8 @@ export default function useSetting( path ) {
 				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
 				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
 				result =
-					get( settings, blockPath ) ?? get( settings, defaultsPath );
+					getValueFromObjectPath( settings, blockPath ) ??
+					getValueFromObjectPath( settings, defaultsPath );
 			}
 
 			// Return if the setting was found in either the block instance or the store.

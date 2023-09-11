@@ -91,7 +91,7 @@ export default function ListItemEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
-		useCompactList: true,
+		renderAppender: false,
 	} );
 
 	// Set default placeholder text color from light/dark scheme or base colors

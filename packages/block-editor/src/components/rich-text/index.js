@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	RawHTML,
 	useRef,
 	useCallback,
 	forwardRef,
@@ -19,12 +18,9 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
-	isEmpty,
-	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { Popover } from '@wordpress/components';
 
 /**
@@ -39,6 +35,7 @@ import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
+import { useDelete } from './use-delete';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
@@ -47,7 +44,9 @@ import { useInputEvents } from './use-input-events';
 import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
-import { getMultilineTag, getAllowedFormats } from './utils';
+import { getAllowedFormats } from './utils';
+import { Content } from './content';
+import RichTextMultiline from './multiline';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -68,7 +67,6 @@ function removeNativeProps( props ) {
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -84,12 +82,12 @@ function removeNativeProps( props ) {
 	return restProps;
 }
 
-function RichTextWrapper(
+export function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
-		value: originalValue = '',
-		onChange: originalOnChange,
+		value: adjustedValue = '',
+		onChange: adjustedOnChange,
 		isSelected: originalIsSelected,
 		multiline,
 		inlineToolbar,
@@ -103,31 +101,17 @@ function RichTextWrapper(
 		onMerge,
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
-		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
-		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		...props
 	},
 	forwardedRef
 ) {
-	if ( multiline ) {
-		deprecated( 'wp.blockEditor.RichText multiline prop', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'nested blocks (InnerBlocks)',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
-		} );
-	}
-
-	const instanceId = useInstanceId( RichTextWrapper );
-
-	identifier = identifier || instanceId;
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
@@ -162,33 +146,12 @@ function RichTextWrapper(
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-	let adjustedValue = originalValue;
-	let adjustedOnChange = originalOnChange;
-
-	// Handle deprecated format.
-	if ( Array.isArray( originalValue ) ) {
-		deprecated( 'wp.blockEditor.RichText value prop as children type', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'value prop as string',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
-		} );
-
-		adjustedValue = childrenSource.toHTML( originalValue );
-		adjustedOnChange = ( newValue ) =>
-			originalOnChange(
-				childrenSource.fromDOM(
-					__unstableCreateElement( document, newValue ).childNodes
-				)
-			);
-	}
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
@@ -281,6 +244,7 @@ function RichTextWrapper(
 
 	const {
 		value,
+		getValue,
 		onChange,
 		ref: richTextRef,
 	} = useRichText( {
@@ -296,7 +260,6 @@ function RichTextWrapper(
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
-		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
@@ -315,45 +278,6 @@ function RichTextWrapper(
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
-
-	function onKeyDown( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = value;
-			const isReverse = keyCode === BACKSPACE;
-			const hasActiveFormats =
-				value.activeFormats && !! value.activeFormats.length;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! isCollapsed( value ) ||
-				hasActiveFormats ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-
-			event.preventDefault();
-		}
-	}
 
 	function onFocus() {
 		anchorRef.current?.focus();
@@ -401,7 +325,7 @@ function RichTextWrapper(
 					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
-						value,
+						getValue,
 						onChange,
 						__unstableAllowPrefixTransformations,
 						formatTypes,
@@ -422,19 +346,20 @@ function RichTextWrapper(
 						tagName,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						__unstableEmbedURLOnPaste,
-						multilineTag,
 						preserveWhiteSpace,
 						pastePlainText,
+					} ),
+					useDelete( {
+						value,
+						onMerge,
+						onRemove,
 					} ),
 					useEnter( {
 						removeEditorOnlyFormats,
 						value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
-						multilineTag,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
@@ -449,22 +374,25 @@ function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				onFocus={ unstableOnFocus }
-				onKeyDown={ onKeyDown }
+				// Setting tabIndex to 0 is unnecessary, the element is already
+				// focusable because it's contentEditable. This also fixes a
+				// Safari bug where it's not possible to Shift+Click multi
+				// select blocks when Shift Clicking into an element with
+				// tabIndex because Safari will focus the element. However,
+				// Safari will correctly ignore nested contentEditable elements.
+				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
 			/>
 		</>
 	);
 }
 
-const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
+function RichTextSwitcher( props, ref ) {
+	let value = props.value;
+	let onChange = props.onChange;
+
+	// Handle deprecated format.
 	if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
 			since: '6.1',
@@ -473,25 +401,34 @@ ForwardedRichTextContainer.Content = ( {
 			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 		} );
 
-		value = childrenSource.toHTML( value );
+		value = childrenSource.toHTML( props.value );
+		onChange = ( newValue ) =>
+			props.onChange(
+				childrenSource.fromDOM(
+					__unstableCreateElement( document, newValue ).childNodes
+				)
+			);
 	}
 
-	const MultilineTag = getMultilineTag( multiline );
+	const Component = props.multiline
+		? RichTextMultiline
+		: ForwardedRichTextWrapper;
+	const instanceId = useInstanceId( RichTextSwitcher );
 
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
+	return (
+		<Component
+			{ ...props }
+			identifier={ props.identifier || instanceId }
+			value={ value }
+			onChange={ onChange }
+			ref={ ref }
+		/>
+	);
+}
 
-	const content = <RawHTML>{ value }</RawHTML>;
+const ForwardedRichTextContainer = forwardRef( RichTextSwitcher );
 
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ content }</Tag>;
-	}
-
-	return content;
-};
-
+ForwardedRichTextContainer.Content = Content;
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };

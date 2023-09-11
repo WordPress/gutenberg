@@ -1,8 +1,9 @@
 const injectCss = `
-window.injectCss = (css) => {
+window.injectCss = (css, id) => {
     const style = document.createElement('style');
     style.innerHTML = css;
     style.type = 'text/css';
+    style.id = id;
     document.head.appendChild(style);
 }
 `;

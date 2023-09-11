@@ -13,13 +13,13 @@ const blocksTab = {
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
 const reusableBlocksTab = {
 	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+	/* translators: Locally created Patterns tab title in the block inserter. */
+	title: __( 'Synced patterns' ),
 	icon: reusableBlockIcon,
 };
 const mediaTab = {
@@ -52,15 +52,7 @@ function InserterTabs( {
 			tempTabs.push( reusableBlocksTab );
 		}
 		return tempTabs;
-	}, [
-		prioritizePatterns,
-		blocksTab,
-		showPatterns,
-		patternsTab,
-		showReusableBlocks,
-		showMedia,
-		reusableBlocksTab,
-	] );
+	}, [ prioritizePatterns, showPatterns, showReusableBlocks, showMedia ] );
 
 	return (
 		<TabPanel

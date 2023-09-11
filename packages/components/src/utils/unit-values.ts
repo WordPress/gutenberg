@@ -4,7 +4,7 @@ const UNITED_VALUE_REGEX =
 /**
  * Parses a number and unit from a value.
  *
- * @param  toParse Value to parse
+ * @param toParse Value to parse
  *
  * @return  The extracted number and unit.
  */
@@ -27,8 +27,8 @@ export function parseCSSUnitValue(
 /**
  * Combines a value and a unit into a unit value.
  *
- * @param  value
- * @param  unit
+ * @param value
+ * @param unit
  *
  * @return The unit value.
  */

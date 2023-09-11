@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -49,7 +44,7 @@ export function PublishButtonLabel( {
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving } ) => {
+	withSelect( ( select ) => {
 		const {
 			isCurrentPostPublished,
 			isEditedPostBeingScheduled,
@@ -62,13 +57,10 @@ export default compose( [
 		return {
 			isPublished: isCurrentPostPublished(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};
