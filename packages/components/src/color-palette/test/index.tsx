@@ -256,7 +256,11 @@ describe( 'ColorPalette', () => {
 		// Clear the color, confirm that the relative values are cleared/updated.
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
-		expect( screen.queryByText( colorName ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( colorName, {
+				selector: '.components-color-palette__custom-color-name',
+			} )
+		).not.toBeInTheDocument();
 		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {

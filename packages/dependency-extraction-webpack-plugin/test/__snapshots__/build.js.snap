@@ -32,7 +32,7 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`combine-assets\` should pro
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'b0e5d8b4c38533765be8');
+"<?php return array('dependencies' => array('wp-blob'), 'version' => '0627f8793e7cd59541db');
 "
 `;
 
@@ -217,7 +217,7 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` shou
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '66079b05b32ae1e16886');
+"<?php return array('dependencies' => array(), 'version' => '5fa1791a041e1b19555f');
 "
 `;
 

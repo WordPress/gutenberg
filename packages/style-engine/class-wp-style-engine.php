@@ -41,6 +41,21 @@ final class WP_Style_Engine {
 	 * @var array
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
+		'background' => array(
+			'backgroundImage' => array(
+				'property_keys' => array(
+					'default' => 'background-image',
+				),
+				'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
+				'path'          => array( 'background', 'backgroundImage' ),
+			),
+			'backgroundSize'  => array(
+				'property_keys' => array(
+					'default' => 'background-size',
+				),
+				'path'          => array( 'background', 'backgroundSize' ),
+			),
+		),
 		'color'      => array(
 			'text'       => array(
 				'property_keys' => array(
@@ -538,6 +553,41 @@ final class WP_Style_Engine {
 				$css_declarations[ $individual_css_property ] = $value;
 			}
 		}
+		return $css_declarations;
+	}
+
+	/**
+	 * Style value parser that constructs a CSS definition array comprising a single CSS property and value.
+	 * If the provided value is an array containing a `url` property, the function will return a CSS definition array
+	 * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
+	 * e.g., array( 'background-image' => "url( '...' )" ).
+	 *
+	 * @param array $style_value      A single raw style value from $block_styles array.
+	 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+	 */
+	protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
+		if ( empty( $style_value ) ) {
+			return array();
+		}
+
+		$css_declarations = array();
+
+		if ( isset( $style_definition['property_keys']['default'] ) ) {
+			$value = null;
+
+			if ( ! empty( $style_value['url'] ) ) {
+				$value = "url('" . $style_value['url'] . "')";
+			} elseif ( is_string( $style_value ) ) {
+				$value = $style_value;
+			}
+
+			if ( null !== $value ) {
+				$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
+			}
+		}
+
 		return $css_declarations;
 	}
 
