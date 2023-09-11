@@ -279,6 +279,26 @@
 				}
 			}
 		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"lightbox": {
+					"description": "Settings related to the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether the lightbox is enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
+							"type": "boolean"
+						}
+					}
+				}
+			}
+		},
 		"settingsPropertiesPosition": {
 			"type": "object",
 			"properties": {
@@ -662,23 +682,10 @@
 				}
 			}
 		},
-		"settingsPropertiesLightbox": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"enabled": {
-					"description": "Defines whether the lightbox is enabled or not.",
-					"type": "boolean"
-				},
-				"allowEditing": {
-					"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
-					"type": "boolean"
-				}
-			}
-		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
@@ -687,8 +694,7 @@
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
-				{ "$ref": "#/definitions/settingsPropertiesCustom" },
-				{ "$ref": "#/definitions/settingsPropertiesLightbox" }
+				{ "$ref": "#/definitions/settingsPropertiesCustom" }
 			]
 		},
 		"settingsPropertiesComplete": {
@@ -704,12 +710,12 @@
 						"color": {},
 						"dimensions": {},
 						"layout": {},
+						"lightbox": {},
 						"position": {},
 						"shadow": {},
 						"spacing": {},
 						"typography": {},
-						"custom": {},
-						"lightbox": {}
+						"custom": {}
 					},
 					"additionalProperties": false
 				}
@@ -2173,6 +2179,7 @@
 						},
 						"color": {},
 						"layout": {},
+						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},
@@ -2180,7 +2187,6 @@
 						"position": {},
 						"dimensions": {},
 						"custom": {},
-						"lightbox": {},
 						"blocks": {
 							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
