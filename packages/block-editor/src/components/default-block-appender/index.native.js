@@ -36,7 +36,14 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ 'core/paragraph' ];
-	const textStyles = blockGlobalStyles?.typography ?? undefined;
+	const { fontSize, lineHeight } = blockGlobalStyles?.typography || {};
+
+	const textStyles = blockGlobalStyles?.typography
+		? {
+				...( fontSize && { fontSize } ),
+				...( lineHeight && { lineHeight } ),
+		  }
+		: undefined;
 
 	const value =
 		typeof placeholder === 'string'
