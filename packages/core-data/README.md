@@ -40,6 +40,61 @@ function MyAuthorsListBase() {
 }
 ```
 
+### Reading & Saving a Site Option
+
+This example shows toggling a WordPress option. (Sometimes these options are called site or blog
+options -- but these are different from multisite options).
+
+```jsx
+import { CheckboxControl } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Toggle a WordPress option.
+ *
+ * Before this code works the setting must be registered in a php file so that it is available with the REST API (also the user
+ * checking the box must have appropriate permissions to change the option).
+ *
+ * The setting can be enabled by:
+ * ```php
+ * function register_example_checkbox_setting() {
+ *    register_setting( 'option', 'example_checkbox_enabled', [
+ *       'type' => 'string',
+ *       'show_in_rest' => true,
+ *    ] );
+ * }
+ * add_action( 'rest_api_init', 'register_example_checkbox_setting` );
+ * add_action( 'admin_init', 'register_example_checkbox_setting' );
+ * ```
+ */
+export function ToggleSiteOptionCheckbox() {
+	// This calls the REST API to retrieve the setting. (Use `getEditedEntityRecord` so any changes to the checkbox are displayed from the block).
+	const isChecked = useSelect( select => select( coreStore ).getEditedEntityRecord( 'root','site' ).example_checkbox_enabled );
+	// These functions are required for editing and saving the data.
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( coreStore );
+	// A function for changing the value.
+	const setChecked = _checked => {
+		// This only marks the current data as "edited".  It is not pushed until the post is saved.
+		editEntityRecord( 'root', 'site', undefined, {
+			example_checkbox_enabled: _checked
+		} );
+		// To immediately save the record you can call this function, but it may save other edited records for the site settings.
+		saveEditedEntityRecord( 'root', 'site', undefined, {
+			example_checkbox_enabled: _checked
+		} );
+	}
+	return (
+		<>
+		<CheckboxControl
+			value={ isChecked }
+			onChange={ value => setChecked( value ) }
+			label='Example checkbox'
+		/>
+	)
+}
+```
+
 ## Actions
 
 The following set of dispatching action creators are available on the object returned by `wp.data.dispatch( 'core' )`:
