@@ -236,60 +236,6 @@ export default function HeaderEditMode() {
 										/>
 									) }
 									<ToolbarItem
-										ref={ inserterButton }
-										as={ Button }
-										className="edit-site-header-edit-mode__inserter-toggle"
-										variant="primary"
-										isPressed={ isInserterOpen }
-										onMouseDown={ preventDefault }
-										onClick={ toggleInserter }
-										disabled={ ! isVisualMode }
-										icon={ plus }
-										label={
-											showIconLabels
-												? shortLabel
-												: longLabel
-										}
-										showTooltip={ ! showIconLabels }
-									/>
-									{ ! isDistractionFree && (
-										<ToolbarItem
-											as={ Button }
-											className="edit-site-header-edit-mode__list-view-toggle"
-											disabled={
-												! isVisualMode ||
-												isZoomedOutView
-											}
-											icon={ listView }
-											isPressed={ isListViewOpen }
-											/* translators: button label text should, if possible, be under 16 characters. */
-											label={ __( 'List View' ) }
-											onClick={ toggleListView }
-											shortcut={ listViewShortcut }
-											showTooltip={ ! showIconLabels }
-											variant={
-												showIconLabels
-													? 'tertiary'
-													: undefined
-											}
-											aria-expanded={ isListViewOpen }
-										/>
-									) }
-									{ isZoomedOutViewExperimentEnabled &&
-										! isDistractionFree &&
-										! hasFixedToolbar && (
-											<ToolbarItem
-												as={ ToolSelector }
-												showTooltip={ ! showIconLabels }
-												variant={
-													showIconLabels
-														? 'tertiary'
-														: undefined
-												}
-												disabled={ ! isVisualMode }
-											/>
-										) }
-									<ToolbarItem
 										as={ UndoButton }
 										showTooltip={ ! showIconLabels }
 										variant={
@@ -327,6 +273,7 @@ export default function HeaderEditMode() {
 													? 'tertiary'
 													: undefined
 											}
+											aria-expanded={ isListViewOpen }
 										/>
 									) }
 									{ isZoomedOutViewExperimentEnabled &&
