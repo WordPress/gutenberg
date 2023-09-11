@@ -72,8 +72,14 @@ function append( element, child ) {
 
 	if ( type ) {
 		let addAttribute;
-		if ( type === 'svg' || element.namespaceURI === NS_SVG ) {
+		const isSVGTag = type === 'svg';
+		const isSVGContext = element.namespaceURI === NS_SVG;
+		if ( isSVGTag || isSVGContext ) {
 			child = element.ownerDocument.createElementNS( NS_SVG, type );
+			// Disables editing at top-level SVG elements.
+			if ( isSVGTag && ! isSVGContext ) {
+				child.setAttribute( 'contentEditable', false );
+			}
 			addAttribute = ( key, value ) => {
 				if ( key === 'xlink:href' )
 					child.setAttributeNS( NS_XLINK, key, value );
