@@ -43,9 +43,7 @@ wpStore( {
 					}
 				},
 				closeSearchInput: ( { context } ) => {
-					if ( context.core.search.isSearchInputVisible ) {
-						context.core.search.isSearchInputVisible = false;
-					}
+					context.core.search.isSearchInputVisible = false;
 				},
 				handleSearchKeydown: ( store ) => {
 					const { actions, event, ref } = store;
