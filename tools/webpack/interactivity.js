@@ -8,6 +8,11 @@ const { join } = require( 'path' );
  */
 const { baseConfig, plugins } = require( './shared' );
 
+/**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
 module.exports = {
 	...baseConfig,
 	watchOptions: {
@@ -16,12 +21,10 @@ module.exports = {
 	},
 	name: 'interactivity',
 	entry: {
-		navigation:
-			'./packages/block-library/src/navigation/view-interactivity.js',
-		image: './packages/block-library/src/image/view-interactivity.js',
+		navigation: './packages/block-library/src/navigation/view.js',
 	},
 	output: {
-		filename: './block-library/blocks/[name]/view-interactivity.min.js',
+		filename: './block-library/blocks/[name]/view.min.js',
 		path: join( __dirname, '..', '..', 'build' ),
 		chunkLoadingGlobal: '__WordPressPrivateInteractivityAPI__',
 	},
@@ -73,8 +76,9 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
-		// new DependencyExtractionWebpackPlugin( {
-		// 	injectPolyfill: false,
-		// } ),
+		new DependencyExtractionWebpackPlugin( {
+			injectPolyfill: false,
+			useDefaults: false,
+		} ),
 	].filter( Boolean ),
 };
