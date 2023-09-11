@@ -6,24 +6,41 @@ const { join } = require( 'path' );
 /**
  * Internal dependencies
  */
-const { baseConfig } = require( './shared' );
+const { baseConfig, plugins } = require( './shared' );
 
 module.exports = {
 	...baseConfig,
+	watchOptions: {
+		ignored: [ '**/node_modules' ],
+		aggregateTimeout: 500,
+	},
 	name: 'interactivity',
 	entry: {
-		index: {
-			import: `./packages/interactivity/src/index.js`,
-			library: {
-				name: [ 'wp', 'interactivity' ],
-				type: 'window',
-			},
-		},
+		navigation:
+			'./packages/block-library/src/navigation/view-interactivity.js',
 	},
 	output: {
-		devtoolNamespace: 'wp',
-		filename: './build/interactivity/[name].min.js',
-		path: join( __dirname, '..', '..' ),
+		filename: './blocks/[name]/private-interactivity.min.js',
+		path: join( __dirname, '..', '..', 'build', 'block-library' ),
+		chunkLoadingGlobal: '__WordPressPrivateInteractivityAPI__',
+	},
+	optimization: {
+		...baseConfig.optimization,
+		runtimeChunk: {
+			name: 'private-interactivity',
+		},
+		splitChunks: {
+			cacheGroups: {
+				interactivity: {
+					name: 'private-interactivity',
+					test: /[\\/]packages[\\/]interactivity[\\/]|[\\/]node_modules[\\/]/,
+					filename: './interactivity/[name].min.js',
+					chunks: 'all',
+					minSize: 0,
+					priority: -10,
+				},
+			},
+		},
 	},
 	module: {
 		rules: [
@@ -53,8 +70,10 @@ module.exports = {
 			},
 		],
 	},
-	watchOptions: {
-		ignored: [ '**/node_modules' ],
-		aggregateTimeout: 500,
-	},
+	plugins: [
+		...plugins,
+		// new DependencyExtractionWebpackPlugin( {
+		// 	injectPolyfill: false,
+		// } ),
+	].filter( Boolean ),
 };
