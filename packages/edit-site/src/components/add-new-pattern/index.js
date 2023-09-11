@@ -3,7 +3,7 @@
  */
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -19,7 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
-import { USER_PATTERN_CATEGORY } from '../page-patterns/utils';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -36,7 +35,8 @@ export default function AddNewPattern() {
 	}, [] );
 	const { __experimentalCreatePatternFromFile: createPatternFromFile } =
 		useDispatch( patternsStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
 
 	function handleCreatePattern( { pattern, categoryId } ) {
@@ -128,10 +128,18 @@ export default function AddNewPattern() {
 					if ( ! file ) return;
 					try {
 						const pattern = await createPatternFromFile( file );
-						handleCreatePattern( {
-							pattern,
-							categoryId: USER_PATTERN_CATEGORY,
-						} );
+
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: The imported pattern's title.
+								__( 'Imported "%s" from JSON.' ),
+								pattern.title.raw
+							),
+							{
+								type: 'snackbar',
+								id: 'import-pattern-success',
+							}
+						);
 					} catch ( err ) {
 						createErrorNotice( err.message, {
 							type: 'snackbar',
