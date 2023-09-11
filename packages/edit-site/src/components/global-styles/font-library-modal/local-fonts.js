@@ -18,6 +18,7 @@ import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
+import { loadFontFaceInBrowser } from './utils';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -65,7 +66,11 @@ function LocalFonts() {
 		const fontFacesLoaded = await Promise.all(
 			files.map( async ( fontFile ) => {
 				const fontFaceData = await getFontFaceMetadata( fontFile );
-				await addFontFaceToBrowser( fontFaceData );
+				await loadFontFaceInBrowser(
+					fontFaceData,
+					fontFaceData.file,
+					'all'
+				);
 				return fontFaceData;
 			} )
 		);
@@ -111,16 +116,6 @@ function LocalFonts() {
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
 		};
-	};
-
-	const addFontFaceToBrowser = async ( fontFaceData ) => {
-		const data = await fontFaceData.file.arrayBuffer();
-		const newFont = new window.FontFace( fontFaceData.fontFamily, data, {
-			style: fontFaceData.fontStyle,
-			weight: fontFaceData.fontWeight,
-		} );
-		const loadedFace = await newFont.load();
-		document.fonts.add( loadedFace );
 	};
 
 	/**
