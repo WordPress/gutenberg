@@ -21,6 +21,15 @@ describe( 'recordToDom', () => {
 			expect( selection ).toEqual( { startPath, endPath } );
 		} );
 	} );
+
+	spec.filter( ( props ) => 'NS_URI' in props ).forEach(
+		( { description, NS_URI, record, selectTarget } ) => {
+			it( `${ description } with correct namespace`, () => {
+				const { body } = toDom( { value: record } );
+				expect( selectTarget( body ).namespaceURI ).toEqual( NS_URI );
+			} );
+		}
+	);
 } );
 
 describe( 'applyValue', () => {
@@ -96,34 +105,5 @@ describe( 'applyValue', () => {
 			expect( body.innerHTML ).toEqual( future );
 			expect( count ).toEqual( movedCount );
 		} );
-	} );
-} );
-
-describe( 'toDom-SVG', () => {
-	let body;
-	beforeAll( () => {
-		const svg = { type: 'svg' };
-		const use = { type: 'use', attributes: { 'xlink:href': '#logo' } };
-		body = toDom( {
-			value: {
-				start: 0,
-				end: 1,
-				formats: [ [ svg ] ],
-				replacements: [ use ],
-				text: '\ufffc',
-			},
-		} ).body;
-	} );
-
-	it( 'should create nodes with svg namespace', () => {
-		const target = body.firstElementChild;
-		expect( target.namespaceURI ).toEqual( 'http://www.w3.org/2000/svg' );
-	} );
-
-	it( 'should create attribute xlink:href with xlink namespace', () => {
-		const target = body
-			.querySelector( 'use' )
-			.getAttributeNode( 'xlink:href' );
-		expect( target.namespaceURI ).toEqual( 'http://www.w3.org/1999/xlink' );
 	} );
 } );

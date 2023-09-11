@@ -150,6 +150,21 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle SVG 1`] = `
+<body>
+  <svg
+    contentEditable="false"
+  >
+    
+    <path
+      d="M0,0 v2 h4"
+    />
+    
+  </svg>
+  
+</body>
+`;
+
 exports[`recordToDom should handle br 1`] = `
 <body>
   
@@ -212,6 +227,22 @@ exports[`recordToDom should handle selection before br 1`] = `
     data-rich-text-line-break="true"
   />
   b
+</body>
+`;
+
+exports[`recordToDom should handle xlink 1`] = `
+<body>
+  <svg
+    contentEditable="false"
+  >
+    
+    <use
+      href="#a"
+      xlink:href="#a"
+    />
+    
+  </svg>
+  
 </body>
 `;
 
