@@ -374,7 +374,7 @@ export default function Image( {
 	const lightboxChecked =
 		lightbox?.enabled ||
 		( ! lightbox && lightboxSetting === true ) ||
-		lightboxSetting?.enabled;
+		( ! lightbox && lightboxSetting?.enabled );
 
 	const controls = (
 		<>
