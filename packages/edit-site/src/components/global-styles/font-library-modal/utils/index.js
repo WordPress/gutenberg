@@ -74,7 +74,15 @@ export function mergeFontFamilies( existing = [], incoming = [] ) {
 	return Array.from( map.values() );
 }
 
+/*
+ * Loads the font face from a URL and adds it to the browser.
+ * It also adds it to the iframe document.
+ */
 export async function loadFontFaceInBrowser( fontFace, src ) {
+	const editorCanvas = document.querySelector(
+		'iframe[name="editor-canvas"]'
+	);
+	const iframeDocument = editorCanvas.contentDocument;
 	// eslint-disable-next-line no-undef
 	const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
 		style: fontFace.fontStyle,
@@ -82,6 +90,7 @@ export async function loadFontFaceInBrowser( fontFace, src ) {
 	} );
 	const loadedFace = await newFont.load();
 	document.fonts.add( loadedFace );
+	iframeDocument.fonts.add( loadedFace );
 }
 
 export function getDisplaySrcFromFontFace( input, urlPrefix ) {
