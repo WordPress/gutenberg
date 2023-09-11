@@ -23,6 +23,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', true );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',
 				wp_json_encode(
