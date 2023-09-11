@@ -18,6 +18,7 @@
 
 ### Internal
 
+-   `Toolbar/ToolbarDropdownMenu `: Convert to TypeScript ([#54321](https://github.com/WordPress/gutenberg/pull/54321)).
 -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
 -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
 -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
