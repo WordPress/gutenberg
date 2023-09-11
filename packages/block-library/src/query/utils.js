@@ -347,21 +347,17 @@ export const usePatterns = ( clientId, name ) => {
 
 /**
  * Hook that returns whether the Query Loop with the given `clientId` contains
- * third-party blocks inside its Post Template block.
+ * any third-party block.
  *
  * @param {string} clientId The block's client ID.
  * @return {boolean} True if it contains third-party blocks.
  */
 export const useContainsThirdPartyBlocks = ( clientId ) =>
 	useSelect( ( select ) => {
-		const { getClientIdsOfDescendants, getBlockName, getBlocks } =
+		const { getClientIdsOfDescendants, getBlockName } =
 			select( blockEditorStore );
 
-		const postTemplate = getBlocks( clientId ).find(
-			( innerBlock ) => innerBlock.name === 'core/post-template'
-		);
-
-		return getClientIdsOfDescendants( [ postTemplate.clientId ] ).some(
+		return getClientIdsOfDescendants( [ clientId ] ).some(
 			( descendantClientId ) =>
 				! getBlockName( descendantClientId ).startsWith( 'core/' )
 		);
