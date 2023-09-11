@@ -113,6 +113,8 @@ function LocalFonts() {
 		};
 	};
 
+	/* Loads the font face to the browser from the file as an arrayBuffer
+	 * and adds it to the document and iframe document */
 	const addFontFaceToBrowser = async ( fontFaceData ) => {
 		const editorCanvas = document.querySelector(
 			'iframe[name="editor-canvas"]'

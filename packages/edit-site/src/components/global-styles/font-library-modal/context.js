@@ -283,6 +283,15 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			custom: newCustomFonts,
 		} );
+		// Add custom fonts to the browser.
+		fontsToAdd.forEach( ( font ) => {
+			font.fontFace.forEach( ( face ) => {
+				loadFontFaceInBrowser(
+					face,
+					getDisplaySrcFromFontFace( face )
+				);
+			} );
+		} );
 	};
 
 	const toggleActivateFont = ( font, face ) => {
