@@ -79,7 +79,7 @@ describe( 'Undo Manager', () => {
 		] );
 	} );
 
-	it( 'handles cached edits', () => {
+	it( 'handles staged edits', () => {
 		const undo = createUndoManager();
 		undo.addRecord( [
 			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
@@ -130,7 +130,7 @@ describe( 'Undo Manager', () => {
 			[ { id: '1', changes: { value2: { from: undefined, to: 2 } } } ],
 			true
 		);
-		undo.addRecord( [] ); // Records the cached edits.
+		undo.addRecord( [] ); // Records the staged edits.
 		undo.undo();
 		expect( undo.getRedoRecord() ).toEqual( [
 			{

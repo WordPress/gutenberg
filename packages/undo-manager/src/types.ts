@@ -11,7 +11,7 @@ export type HistoryChanges = {
 export type HistoryRecord = Array< HistoryChanges >;
 
 export type UndoManager = {
-	addRecord: ( record: HistoryRecord, isCached: boolean ) => void;
+	addRecord: ( record: HistoryRecord, isStaged: boolean ) => void;
 	undo: () => void;
 	redo: () => void;
 	getUndoRecord: () => HistoryRecord;

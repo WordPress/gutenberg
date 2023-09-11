@@ -76,7 +76,7 @@ export function createUndoManager() {
 	/**
 	 * @type {HistoryRecord}
 	 */
-	let cachedRecord = [];
+	let stagedRecord = [];
 	/**
 	 * @type {number}
 	 */
@@ -87,13 +87,13 @@ export function createUndoManager() {
 		offset = 0;
 	};
 
-	const appendCachedRecordToLatestHistoryRecord = () => {
+	const appendStagedRecordToLatestHistoryRecord = () => {
 		const index = history.length === 0 ? 0 : history.length - 1;
 		let latestRecord = history[ index ] ?? [];
-		cachedRecord.forEach( ( changes ) => {
+		stagedRecord.forEach( ( changes ) => {
 			latestRecord = addHistoryChangesIntoRecord( latestRecord, changes );
 		} );
-		cachedRecord = [];
+		stagedRecord = [];
 		history[ index ] = latestRecord;
 	};
 
@@ -122,24 +122,24 @@ export function createUndoManager() {
 		 * Record changes into the history.
 		 *
 		 * @param {HistoryRecord=} record   A record of changes to record.
-		 * @param {boolean}        isCached Whether to immediately create an undo point or not.
+		 * @param {boolean}        isStaged Whether to immediately create an undo point or not.
 		 */
-		addRecord( record, isCached = false ) {
+		addRecord( record, isStaged = false ) {
 			const isEmpty = ! record || isRecordEmpty( record );
-			if ( isCached ) {
+			if ( isStaged ) {
 				if ( isEmpty ) {
 					return;
 				}
 				record.forEach( ( changes ) => {
-					cachedRecord = addHistoryChangesIntoRecord(
-						cachedRecord,
+					stagedRecord = addHistoryChangesIntoRecord(
+						stagedRecord,
 						changes
 					);
 				} );
 			} else {
 				dropPendingRedos();
-				if ( cachedRecord.length ) {
-					appendCachedRecordToLatestHistoryRecord();
+				if ( stagedRecord.length ) {
+					appendStagedRecordToLatestHistoryRecord();
 				}
 				if ( isEmpty ) {
 					return;
@@ -149,9 +149,9 @@ export function createUndoManager() {
 		},
 
 		undo() {
-			if ( cachedRecord.length ) {
+			if ( stagedRecord.length ) {
 				dropPendingRedos();
-				appendCachedRecordToLatestHistoryRecord();
+				appendStagedRecordToLatestHistoryRecord();
 			}
 			offset -= 1;
 		},
