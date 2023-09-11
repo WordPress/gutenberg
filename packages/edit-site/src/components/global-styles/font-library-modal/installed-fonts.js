@@ -140,12 +140,8 @@ function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
 		<HStack justify="space-between">
 			<div>
 				{ shouldDisplayDeleteButton && (
-					<Button
-						isDestructive
-						variant="link"
-						onClick={ handleUninstallClick }
-					>
-						{ __( 'Delete permanently' ) }
+					<Button onClick={ handleUninstallClick }>
+						{ __( 'Delete' ) }
 					</Button>
 				) }
 			</div>
