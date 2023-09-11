@@ -46,8 +46,7 @@ function FontLibraryProvider( { children } ) {
 	const fontFamiliesHasChanges =
 		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
 
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
@@ -82,9 +81,6 @@ function FontLibraryProvider( { children } ) {
 		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 			'settings.typography.fontFamilies',
 		] );
-		createSuccessNotice( __( `Font families were updated succesfully.` ), {
-			type: 'snackbar',
-		} );
 	};
 
 	// Library Fonts
@@ -212,10 +208,6 @@ function FontLibraryProvider( { children } ) {
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',
 			] );
-			createSuccessNotice(
-				__( `Font families were installed succesfully.` ),
-				{ type: 'snackbar' }
-			);
 			refreshLibrary();
 			return true;
 		} catch ( e ) {
@@ -243,11 +235,6 @@ function FontLibraryProvider( { children } ) {
 			);
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
-
-			createSuccessNotice( __( `Font families were uninstalled.` ), {
-				type: 'snackbar',
-			} );
-
 			return true;
 		} catch ( e ) {
 			// eslint-disable-next-line no-console
