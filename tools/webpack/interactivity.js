@@ -21,8 +21,8 @@ module.exports = {
 		image: './packages/block-library/src/image/view-interactivity.js',
 	},
 	output: {
-		filename: './blocks/[name]/view-interactivity.min.js',
-		path: join( __dirname, '..', '..', 'build', 'block-library' ),
+		filename: './block-library/blocks/[name]/view-interactivity.min.js',
+		path: join( __dirname, '..', '..', 'build' ),
 		chunkLoadingGlobal: '__WordPressPrivateInteractivityAPI__',
 	},
 	optimization: {
@@ -35,7 +35,7 @@ module.exports = {
 				interactivity: {
 					name: 'private-interactivity',
 					test: /[\\/]packages[\\/]interactivity[\\/]|[\\/]node_modules[\\/]/,
-					filename: './interactivity/[name].min.js',
+					filename: './interactivity/index.min.js',
 					chunks: 'all',
 					minSize: 0,
 					priority: -10,
