@@ -15,6 +15,8 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
+	createContext,
+	useContext,
 } from '@wordpress/element';
 import {
 	useInstanceId,
@@ -35,9 +37,10 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
-// Used to track and dismiss the prior modal when another opens.
+// Used to track and dismiss the prior modal when another opens unless nested.
 let openModalCount = 0;
-let dismissOpenModal: ModalProps[ 'onRequestClose' ];
+let dismissOpenModal: ModalProps[ 'onRequestClose' ] | undefined;
+const context = createContext( false );
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -119,12 +122,12 @@ function UnforwardedModal(
 		}
 	}, [ contentRef ] );
 
-	const refOnRequestClose =
-		useRef< ModalProps[ 'onRequestClose' ] >( onRequestClose );
+	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
 	useEffect( () => {
 		refOnRequestClose.current = onRequestClose;
 	}, [ onRequestClose ] );
 
+	const isNested = useContext( context );
 	useEffect( () => {
 		ariaHelper.modalize( ref.current );
 		return () => ariaHelper.unmodalize();
@@ -135,10 +138,10 @@ function UnforwardedModal(
 
 		if ( openModalCount === 1 ) {
 			document.body.classList.add( bodyOpenClassName );
-		} else if ( openModalCount > 1 ) {
-			dismissOpenModal();
+		} else if ( openModalCount > 1 && ! isNested ) {
+			dismissOpenModal?.();
 		}
-		dismissOpenModal = onRequestClose;
+		if ( ! isNested ) dismissOpenModal = refOnRequestClose.current;
 
 		return () => {
 			openModalCount--;
@@ -147,7 +150,7 @@ function UnforwardedModal(
 				document.body.classList.remove( bodyOpenClassName );
 			}
 		};
-	}, [ bodyOpenClassName ] );
+	}, [ bodyOpenClassName, isNested ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -227,7 +230,7 @@ function UnforwardedModal(
 		},
 	};
 
-	return createPortal(
+	const modal = (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
@@ -322,7 +325,15 @@ function UnforwardedModal(
 					</div>
 				</div>
 			</StyleProvider>
-		</div>,
+		</div>
+	);
+
+	return createPortal(
+		isNested ? (
+			modal
+		) : (
+			<context.Provider value={ true }>{ modal }</context.Provider>
+		),
 		document.body
 	);
 }
