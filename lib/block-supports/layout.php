@@ -604,7 +604,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( empty( $fallback_layout ) ) {
 		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
 	}
-	$used_layout = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $fallback_layout;
+	$used_layout = $block['attrs']['layout'] ?? $fallback_layout;
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
