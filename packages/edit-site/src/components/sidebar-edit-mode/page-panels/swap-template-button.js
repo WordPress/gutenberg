@@ -31,11 +31,11 @@ export default function SwapTemplateButton( { onClick } ) {
 	}
 	const onTemplateSelect = async ( template ) => {
 		entitiy.edit( { template: template.name }, { undoIgnore: true } );
-		onClose();
-		onClick();
 		await setPage( {
 			context: { postType, postId },
 		} );
+		onClose(); // Close the template suggestions modal first.
+		onClick();
 	};
 	return (
 		<>
