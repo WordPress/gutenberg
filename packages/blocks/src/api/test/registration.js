@@ -133,6 +133,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -280,6 +281,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 				save: expect.any( Function ),
 			} );
 		} );
@@ -317,6 +319,7 @@ describe( 'blocks', () => {
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				}
 			);
 		} );
@@ -350,6 +353,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -362,6 +366,9 @@ describe( 'blocks', () => {
 						fontSize: 'fontSize',
 					},
 					uses_context: [ 'textColor' ],
+					block_hooks: {
+						'tests/my-block': 'after',
+					},
 				},
 			} );
 
@@ -385,6 +392,9 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {
+					'tests/my-block': 'after',
+				},
 			} );
 		} );
 
@@ -421,6 +431,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -490,6 +501,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -522,6 +534,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -568,6 +581,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -628,6 +642,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -655,6 +670,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -742,6 +758,7 @@ describe( 'blocks', () => {
 										supports: {},
 										styles: [],
 										variations: [],
+										blockHooks: {},
 										save: () => null,
 										...blockSettingsWithDeprecations,
 									},
@@ -916,6 +933,7 @@ describe( 'blocks', () => {
 						keywords: [ 'variation' ],
 					},
 				],
+				blockHooks: {},
 				edit: Edit,
 				save: noop,
 			} );
@@ -988,6 +1006,7 @@ describe( 'blocks', () => {
 						keywords: [ 'variation (translated)' ],
 					},
 				],
+				blockHooks: {},
 				edit: Edit,
 				save: noop,
 			} );
@@ -1042,6 +1061,7 @@ describe( 'blocks', () => {
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -1060,6 +1080,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -1140,6 +1161,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -1166,6 +1188,7 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 	} );
@@ -1199,6 +1222,7 @@ describe( 'blocks', () => {
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -1215,6 +1239,7 @@ describe( 'blocks', () => {
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 			] );
 		} );
