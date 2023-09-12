@@ -15,7 +15,7 @@ export function useHasImageSettingsPanel( name, settings ) {
 export default function ImageSettingsPanel( {
 	onChange,
 	userSettings,
-	settings,
+	lightboxSettings,
 	panelId,
 } ) {
 	const resetLightbox = () => {
@@ -29,7 +29,7 @@ export default function ImageSettingsPanel( {
 	};
 
 	const lightboxChecked =
-		settings?.lightbox === true ? true : !! settings?.lightbox?.enabled;
+		lightboxSettings === true ? true : !! lightboxSettings?.enabled;
 
 	return (
 		<>
