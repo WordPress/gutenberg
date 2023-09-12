@@ -43,22 +43,24 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$global_settings = gutenberg_get_global_settings();
+	$global_settings          = gutenberg_get_global_settings();
+	$theme_has_sticky_support = $global_settings['position']['sticky'] ?? false;
+	$theme_has_fixed_support  = $global_settings['position']['fixed'] ?? false;
 
 	// Only allow output for position types that the theme supports.
 	$allowed_position_types = array();
-	if ( isset( $global_settings['position']['sticky'] ) && true === $global_settings['position']['sticky'] ) {
+	if ( true === $theme_has_sticky_support ) {
 		$allowed_position_types[] = 'sticky';
 	}
-	if ( isset( $global_settings['position']['fixed'] ) && true === $global_settings['position']['fixed'] ) {
+	if ( true === $theme_has_fixed_support ) {
 		$allowed_position_types[] = 'fixed';
 	}
 
-	$style_attribute = isset( $block['attrs']['style'] ) ? $block['attrs']['style'] : array();
+	$style_attribute = $block['attrs']['style'] ?? null;
 	$class_name      = wp_unique_id( 'wp-container-' );
 	$selector        = ".$class_name";
 	$position_styles = array();
-	$position_type   = isset( $style_attribute['position']['type'] ) ? $style_attribute['position']['type'] : '';
+	$position_type   = $style_attribute['position']['type'] ?? '';
 	$wrapper_classes = array();
 
 	if (
@@ -69,8 +71,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		$sides             = array( 'top', 'right', 'bottom', 'left' );
 
 		foreach ( $sides as $side ) {
-			$side_value = isset( $style_attribute['position'][ $side ] ) ? $style_attribute['position'][ $side ] : null;
-
+			$side_value = $style_attribute['position'][ $side ] ?? null;
 			if ( null !== $side_value ) {
 				/*
 				 * For fixed or sticky top positions,
