@@ -458,7 +458,4 @@ function gutenberg_should_render_lightbox( $block ) {
 	return $block;
 }
 
-// Run with a priority of 15 to ensure it runs after
-// `block_core_image_should_render_lightbox` core filter (that has a
-// priority of 10).
 add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
