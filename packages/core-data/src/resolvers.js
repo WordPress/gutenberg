@@ -15,6 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import { getSyncProvider } from './sync';
 
 /**
  * Requests authors from the REST API.
@@ -71,51 +72,98 @@ export const getEntityRecord =
 		);
 
 		try {
-			if ( query !== undefined && query._fields ) {
-				// If requesting specific fields, items and query association to said
-				// records are stored by ID reference. Thus, fields must always include
-				// the ID.
-				query = {
-					...query,
-					_fields: [
-						...new Set( [
-							...( getNormalizedCommaSeparable( query._fields ) ||
-								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
-						] ),
-					].join(),
-				};
-			}
+			// Entity supports configs,
+			// use the sync algorithm instead of the old fetch behavior.
+			if (
+				window.__experimentalEnableSync &&
+				entityConfig.syncConfig &&
+				! query
+			) {
+				const objectId = entityConfig.getSyncObjectId( key );
 
-			// Disable reason: While true that an early return could leave `path`
-			// unused, it's important that path is derived using the query prior to
-			// additional query modifications in the condition below, since those
-			// modifications are relevant to how the data is tracked in state, and not
-			// for how the request is made to the REST API.
+				// Loads the persisted document.
+				await getSyncProvider().bootstrap(
+					entityConfig.syncObjectType,
+					objectId,
+					( record ) => {
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							record,
+							query
+						);
+					}
+				);
 
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const path = addQueryArgs(
-				entityConfig.baseURL + ( key ? '/' + key : '' ),
-				{
-					...entityConfig.baseURLParams,
-					...query,
+				// Boostraps the edited document as well (and load from peers).
+				await getSyncProvider().bootstrap(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					( record ) => {
+						dispatch( {
+							type: 'EDIT_ENTITY_RECORD',
+							kind,
+							name,
+							recordId: key,
+							edits: record,
+							meta: {
+								undo: undefined,
+							},
+						} );
+					}
+				);
+			} else {
+				if ( query !== undefined && query._fields ) {
+					// If requesting specific fields, items and query association to said
+					// records are stored by ID reference. Thus, fields must always include
+					// the ID.
+					query = {
+						...query,
+						_fields: [
+							...new Set( [
+								...( getNormalizedCommaSeparable(
+									query._fields
+								) || [] ),
+								entityConfig.key || DEFAULT_ENTITY_KEY,
+							] ),
+						].join(),
+					};
 				}
-			);
 
-			if ( query !== undefined ) {
-				query = { ...query, include: [ key ] };
+				// Disable reason: While true that an early return could leave `path`
+				// unused, it's important that path is derived using the query prior to
+				// additional query modifications in the condition below, since those
+				// modifications are relevant to how the data is tracked in state, and not
+				// for how the request is made to the REST API.
 
-				// The resolution cache won't consider query as reusable based on the
-				// fields, so it's tested here, prior to initiating the REST request,
-				// and without causing `getEntityRecords` resolution to occur.
-				const hasRecords = select.hasEntityRecords( kind, name, query );
-				if ( hasRecords ) {
-					return;
+				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+				const path = addQueryArgs(
+					entityConfig.baseURL + ( key ? '/' + key : '' ),
+					{
+						...entityConfig.baseURLParams,
+						...query,
+					}
+				);
+
+				if ( query !== undefined ) {
+					query = { ...query, include: [ key ] };
+
+					// The resolution cache won't consider query as reusable based on the
+					// fields, so it's tested here, prior to initiating the REST request,
+					// and without causing `getEntityRecords` resolution to occur.
+					const hasRecords = select.hasEntityRecords(
+						kind,
+						name,
+						query
+					);
+					if ( hasRecords ) {
+						return;
+					}
 				}
-			}
 
-			const record = await apiFetch( { path } );
-			dispatch.receiveEntityRecords( kind, name, record, query );
+				const record = await apiFetch( { path } );
+				dispatch.receiveEntityRecords( kind, name, record, query );
+			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}

@@ -323,7 +323,7 @@ _Returns_
 
 ### useFocusReturn
 
-When opening modals/sidebars/dialogs, the focus must move to the opened area and return to the previously focused element when closed. The current hook implements the returning behavior.
+Adds the unmount behavior of returning focus to the element which had it previously as is expected for roles like menus or dialogs.
 
 _Usage_
 

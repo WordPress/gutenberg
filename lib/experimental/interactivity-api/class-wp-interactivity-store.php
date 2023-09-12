@@ -48,16 +48,6 @@ class WP_Interactivity_Store {
 	}
 
 	/**
-	 * Serialize store data to JSON.
-	 *
-	 * @return string|false Serialized JSON data.
-	 */
-	static function serialize() {
-		// TODO: Escape?
-		return wp_json_encode( self::$store );
-	}
-
-	/**
 	 * Reset the store data.
 	 */
 	static function reset() {
@@ -71,7 +61,9 @@ class WP_Interactivity_Store {
 		if ( empty( self::$store ) ) {
 			return;
 		}
-		$store = self::serialize();
-		echo "<script id=\"wp-interactivity-store-data\" type=\"application/json\">$store</script>";
+		echo sprintf(
+			'<script id="wp-interactivity-store-data" type="application/json">%s</script>',
+			wp_json_encode( self::$store, JSON_HEX_TAG | JSON_HEX_AMP )
+		);
 	}
 }

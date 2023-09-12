@@ -101,8 +101,8 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  * @return {string} The preset value if it can be found.
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
-	// Return value as-is if it is already a preset;
-	if ( isValueSpacingPreset( value ) || value === '0' ) {
+	// Return value as-is if it is undefined or is already a preset, or '0';
+	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
 	}
 

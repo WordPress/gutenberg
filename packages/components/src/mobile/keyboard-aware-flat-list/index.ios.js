@@ -154,7 +154,7 @@ export const KeyboardAwareFlatList = ( {
 			scrollEventThrottle={ 16 }
 			style={ style }
 		>
-			<FlatList { ...props } />
+			<FlatList { ...props } scrollEnabled={ false } />
 		</AnimatedScrollView>
 	);
 };

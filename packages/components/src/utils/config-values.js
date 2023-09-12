@@ -9,14 +9,14 @@ const CONTROL_PADDING_X = '12px';
 
 const CONTROL_PROPS = {
 	controlSurfaceColor: COLORS.white,
-	controlTextActiveColor: COLORS.ui.theme,
+	controlTextActiveColor: COLORS.theme.accent,
 	controlPaddingX: CONTROL_PADDING_X,
 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
 	controlBackgroundColor: COLORS.white,
 	controlBorderRadius: '2px',
 	controlBoxShadow: 'transparent',
-	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
+	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,

@@ -159,9 +159,7 @@ describe( 'Gallery block', () => {
 		/* eslint-enable jest/no-conditional-expect */
 	} );
 
-	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
-	// is addressed.
-	it.skip( 'block remains selected after dismissing the media options picker', async () => {
+	it( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -620,6 +618,20 @@ describe( 'Gallery block', () => {
 		fireEvent.press( getByText( 'Media File' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'does not display MediaReplaceFlow component within the block toolbar', async () => {
+		const screen = await initializeWithGalleryBlock( {
+			numberOfItems: 3,
+			media,
+		} );
+		const { queryByTestId } = screen;
+
+		fireEvent.press( getBlock( screen, 'Gallery' ) );
+
+		// Expect the native MediaReplaceFlow component to not be present in the block toolbar
+		const mediaReplaceFlow = queryByTestId( 'media-replace-flow' );
+		expect( mediaReplaceFlow ).toBeNull();
 	} );
 
 	// Test cases related to TC013 - Settings - Columns

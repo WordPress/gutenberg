@@ -51,7 +51,7 @@ describe( 'getNormalizedTitle', () => {
 			undefined,
 			{
 				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App Android/iOS' } ],
+				labels: [ { name: 'Mobile App - i.e. Android or iOS' } ],
 			},
 		],
 		[

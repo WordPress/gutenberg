@@ -56,7 +56,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 	add_filter( 'excerpt_more', $filter_latest_posts_excerpt_more );
 
-	if ( isset( $attributes['categories'] ) ) {
+	if ( ! empty( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
 	if ( isset( $attributes['selectedAuthor'] ) ) {

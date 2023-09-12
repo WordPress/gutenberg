@@ -5,6 +5,12 @@
  * Breakpoint mixins
  */
 
+@mixin break-xhuge() {
+	@media (min-width: #{ ($break-xhuge) }) {
+		@content;
+	}
+}
+
 @mixin break-huge() {
 	@media (min-width: #{ ($break-huge) }) {
 		@content;

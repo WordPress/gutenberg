@@ -18,6 +18,17 @@
 				state.show = ! state.show;
 				state.width += foo.bar;
 			},
+			toggleValue: ( { context } ) => {
+				const previousValue = ( 'previousValue' in context )
+					? context.previousValue
+					// Any string works here; we just want to toggle the value
+					// to ensure Preact renders the same we are hydrating in the
+					// first place.
+					: 'tacocat';
+
+				context.previousValue = context.value;
+				context.value = previousValue;
+			}
 		},
 	} );
 } )( window );

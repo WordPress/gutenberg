@@ -49,7 +49,9 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
-	const isSynced = isReusableBlock( item ) || isTemplatePart( item );
+	const isSynced =
+		( isReusableBlock( item ) && item.syncStatus !== 'unsynced' ) ||
+		isTemplatePart( item );
 
 	return (
 		<InserterDraggableBlocks

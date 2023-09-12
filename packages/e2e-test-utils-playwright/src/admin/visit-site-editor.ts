@@ -63,8 +63,11 @@ export async function visitSiteEditor(
 		.first()
 		.waitFor();
 
-	// TODO: Ideally the content underneath the spinner should be marked inert until it's ready.
+	// TODO: Ideally the content underneath the canvas loader should be marked inert until it's ready.
 	await this.page
-		.locator( '.edit-site-canvas-spinner' )
-		.waitFor( { state: 'hidden' } );
+		.locator( '.edit-site-canvas-loader' )
+		// Bigger timeout is needed for larger entities, for example the large
+		// post html fixture that we load for performance tests, which often
+		// doesn't make it under the default 10 seconds.
+		.waitFor( { state: 'hidden', timeout: 60_000 } );
 }
