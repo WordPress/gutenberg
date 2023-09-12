@@ -8,7 +8,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __, _n, isRTL, sprintf } from '@wordpress/i18n';
+import { _x, __, isRTL } from '@wordpress/i18n';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -19,7 +19,6 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
-import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -136,17 +135,6 @@ export function usePatternsCategories(
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		speak(
-			sprintf(
-				/* translators: %d: number of categories . */
-				_n(
-					'%d category button displayed.',
-					'%d category buttons displayed.',
-					categories.length
-				),
-				categories.length
-			)
-		);
 		return categories;
 	}, [ allCategories, filteredPatterns, hasRegisteredCategory ] );
 
