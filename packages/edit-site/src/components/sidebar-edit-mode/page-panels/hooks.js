@@ -33,6 +33,7 @@ function useTemplates() {
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
+				post_type: 'page',
 			} ),
 		[]
 	);

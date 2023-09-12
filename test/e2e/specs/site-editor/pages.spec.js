@@ -177,11 +177,12 @@ test.describe( 'Pages', () => {
 			.getByRole( 'menu', { name: 'Template options' } )
 			.getByText( 'Swap template' )
 			.click();
-		await page
-			.locator( '.block-editor-block-patterns-list__item-title', {
-				name: 'demo',
-			} )
-			.click();
+		const templateItem = page.locator(
+			'.block-editor-block-patterns-list__item-title'
+		);
+		// Empty theme's custom template with `postTypes: ['post']`, should not be suggested.
+		await expect( templateItem ).toHaveCount( 1 );
+		await templateItem.click();
 		await expect( templateOptionsButton ).toHaveText( 'demo' );
 		await editor.saveSiteEditorEntities();
 
@@ -193,5 +194,23 @@ test.describe( 'Pages', () => {
 		await expect( resetButton ).toBeVisible();
 		await resetButton.click();
 		await expect( templateOptionsButton ).toHaveText( 'Single Entries' );
+	} );
+	test( 'swap template options should respect the declared `postTypes`', async ( {
+		page,
+		editor,
+	} ) => {
+		await draftNewPage( page );
+		await editor.openDocumentSettingsSidebar();
+		const templateOptionsButton = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } );
+		await templateOptionsButton.click();
+		// Empty theme has only one custom template with `postTypes: ['post']`,
+		// so it should not be suggested.
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Template options' } )
+				.getByText( 'Swap template' )
+		).toHaveCount( 0 );
 	} );
 } );
