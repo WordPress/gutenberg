@@ -14,6 +14,8 @@ import { getTemplatePartIcon } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
 import { file, starFilled, lockSmall } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -105,6 +107,10 @@ export default function SidebarNavigationScreenPatterns() {
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
 	const { myPatterns } = useMyPatterns();
+	const isBlockBasedTheme = useSelect(
+		( select ) => !! select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
 
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
@@ -124,6 +130,7 @@ export default function SidebarNavigationScreenPatterns() {
 
 	return (
 		<SidebarNavigationScreen
+			isRoot={ ! isBlockBasedTheme }
 			title={ __( 'Patterns' ) }
 			description={ __(
 				'Manage what patterns are available when editing the site.'
