@@ -14,14 +14,12 @@ import { store as editSiteStore } from '../../store';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 export default function SaveButton( {
-	textForDisabledState = __( 'Saved' ),
-	textForIsDirtyState = __( 'Activate & Save' ),
-	textForDefaultState = __( 'Save' ),
-	textForIsSavingState = __( 'Saving' ),
 	className = 'edit-site-save-button__button',
 	variant = 'primary',
 	showTooltip = true,
+	defaultLabel,
 	icon,
+	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
@@ -53,15 +51,14 @@ export default function SaveButton( {
 			return __( 'Activate' );
 		}
 
-		if ( isDirty ) {
-			return textForIsDirtyState;
-		} else if ( isSaving ) {
-			return textForIsSavingState;
+		if ( isSaving ) {
+			return __( 'Saving' );
 		} else if ( disabled ) {
-			return textForDisabledState;
+			return __( 'Saved' );
+		} else if ( defaultLabel ) {
+			return defaultLabel;
 		}
-
-		return textForDefaultState;
+		return __( 'Save' );
 	};
 	const label = getLabel();
 
@@ -87,6 +84,7 @@ export default function SaveButton( {
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 		>
 			{ label }
 		</Button>

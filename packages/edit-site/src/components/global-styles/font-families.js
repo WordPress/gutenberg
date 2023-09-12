@@ -23,15 +23,15 @@ import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 
 function FontFamilies() {
-	const { modalTabOepn, toggleModal, themeFonts, customFonts } =
+	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
 		useContext( FontLibraryContext );
 
 	return (
 		<>
-			{ !! modalTabOepn && (
+			{ !! modalTabOpen && (
 				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
-					initialTabName={ modalTabOepn }
+					initialTabName={ modalTabOpen }
 				/>
 			) }
 

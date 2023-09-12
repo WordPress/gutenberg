@@ -46,8 +46,7 @@ function FontLibraryProvider( { children } ) {
 	const fontFamiliesHasChanges =
 		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
 
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
@@ -82,13 +81,10 @@ function FontLibraryProvider( { children } ) {
 		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 			'settings.typography.fontFamilies',
 		] );
-		createSuccessNotice( __( `Font families were updated succesfully.` ), {
-			type: 'snackbar',
-		} );
 	};
 
 	// Library Fonts
-	const [ modalTabOepn, setModalTabOepn ] = useState( false );
+	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
 	const baseThemeFonts = baseFontFamilies?.theme
@@ -116,10 +112,10 @@ function FontLibraryProvider( { children } ) {
 		: [];
 
 	useEffect( () => {
-		if ( ! modalTabOepn ) {
+		if ( ! modalTabOpen ) {
 			setLibraryFontSelected( null );
 		}
-	}, [ modalTabOepn ] );
+	}, [ modalTabOpen ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
 		// If font is null, reset the selected font
@@ -141,7 +137,7 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	const toggleModal = ( tabName ) => {
-		setModalTabOepn( tabName || null );
+		setModalTabOpen( tabName || null );
 	};
 
 	// Demo
@@ -203,8 +199,8 @@ function FontLibraryProvider( { children } ) {
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
 			const fontToBeActivated = getIntersectingFontFaces(
-				fonts,
-				fontsInstalled
+				fontsInstalled,
+				fonts
 			);
 			// Activate the font families (add the font families to the global styles).
 			activateCustomFontFamilies( fontToBeActivated );
@@ -212,10 +208,6 @@ function FontLibraryProvider( { children } ) {
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',
 			] );
-			createSuccessNotice(
-				__( `Font families were installed succesfully.` ),
-				{ type: 'snackbar' }
-			);
 			refreshLibrary();
 			return true;
 		} catch ( e ) {
@@ -243,11 +235,6 @@ function FontLibraryProvider( { children } ) {
 			);
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
-
-			createSuccessNotice( __( `Font families were uninstalled.` ), {
-				type: 'snackbar',
-			} );
-
 			return true;
 		} catch ( e ) {
 			// eslint-disable-next-line no-console
@@ -283,6 +270,17 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			custom: newCustomFonts,
 		} );
+		// Add custom fonts to the browser.
+		fontsToAdd.forEach( ( font ) => {
+			font.fontFace.forEach( ( face ) => {
+				// Load font faces just in the iframe because they already are in the document.
+				loadFontFaceInBrowser(
+					face,
+					getDisplaySrcFromFontFace( face.src ),
+					'iframe'
+				);
+			} );
+		} );
 	};
 
 	const toggleActivateFont = ( font, face ) => {
@@ -306,7 +304,7 @@ function FontLibraryProvider( { children } ) {
 		// If the font is already loaded, don't load it again.
 		if ( loadedFontUrls.has( src ) ) return;
 		// Load the font in the browser.
-		loadFontFaceInBrowser( fontFace, src );
+		loadFontFaceInBrowser( fontFace, src, 'document' );
 		// Add the font to the loaded fonts list.
 		loadedFontUrls.add( src );
 	};
@@ -327,7 +325,7 @@ function FontLibraryProvider( { children } ) {
 				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
-				modalTabOepn,
+				modalTabOpen,
 				toggleModal,
 				refreshLibrary,
 				saveFontFamilies,

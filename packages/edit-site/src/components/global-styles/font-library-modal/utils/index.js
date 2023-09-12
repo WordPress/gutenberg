@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { cleanForSlug } from '@wordpress/url';
-
-/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
@@ -74,14 +69,38 @@ export function mergeFontFamilies( existing = [], incoming = [] ) {
 	return Array.from( map.values() );
 }
 
-export async function loadFontFaceInBrowser( fontFace, src ) {
+/*
+ * Loads the font face from a URL and adds it to the browser.
+ * It also adds it to the iframe document.
+ */
+export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
+	let dataSource;
+
+	if ( typeof source === 'string' ) {
+		dataSource = `url(${ source })`;
+		// eslint-disable-next-line no-undef
+	} else if ( source instanceof File ) {
+		dataSource = await source.arrayBuffer();
+	}
+
 	// eslint-disable-next-line no-undef
-	const newFont = new FontFace( fontFace.fontFamily, `url( ${ src } )`, {
+	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
 		style: fontFace.fontStyle,
 		weight: fontFace.fontWeight,
 	} );
+
 	const loadedFace = await newFont.load();
-	document.fonts.add( loadedFace );
+
+	if ( addTo === 'document' || addTo === 'all' ) {
+		document.fonts.add( loadedFace );
+	}
+
+	if ( addTo === 'iframe' || addTo === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		iframeDocument.fonts.add( loadedFace );
+	}
 }
 
 export function getDisplaySrcFromFontFace( input, urlPrefix ) {
@@ -167,19 +186,19 @@ export function getPreviewStyle( family ) {
 
 export function makeFormDataFromFontFamilies( fontFamilies ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family ) => {
+	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
 		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face ) => {
+			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
 				if ( face.file ) {
 					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const slugifiedName = cleanForSlug( face.file.name );
+					const fileId = `file-${ familyIndex }-${ faceIndex }`;
 					// Add the files to the formData
-					formData.append( slugifiedName, face.file, face.file.name );
+					formData.append( fileId, face.file, face.file.name );
 					// remove the file object from the face object the file is referenced by the uploadedFile key
 					const { file, ...faceWithoutFileProperty } = face;
 					const newFace = {
 						...faceWithoutFileProperty,
-						uploadedFile: slugifiedName,
+						uploadedFile: fileId,
 					};
 					return newFace;
 				}
