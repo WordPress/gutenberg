@@ -64,3 +64,9 @@ Refer to the individual guides below for setup instuctions.
 -   [Guide to using `wp-now`](/docs/getting-started/devenv/guide-to-using-wp-now/)
 
 Of the two, `wp-env` is the more robust and complete solution. It's also the recommended tool for Gutenberg development. On the other hand, `wp-now` offers a simplified setup and does not require Docker. Both are valid approaches, so the choice is yours.
+
+## Additional resources
+
+-   [Node.js](https://nodejs.org/en) (Official documentation)
+-   [Node Version Manager](https://github.com/nvm-sh/nvm) (Official documentation)
+-   [Installing Node.js and npm for local WordPress development](https://learn.wordpress.org/tutorial/installing-node-js-and-npm-for-local-wordpress-development/) (Learn WordPress tutorial)

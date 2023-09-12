@@ -2,15 +2,15 @@
 
 The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-env`) lets you set up a local WordPress environment (site) for building and testing plugins and themes, without any additional configuration.
 
-## Quick start
+Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#install-node-js-development-tools) if you have not already done so.
 
-If you have not already installed [Node.js development tools](/docs/getting-started/devenv#install-node-js-development-tools), do so now.
+## Quick start
  
 1. Download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your operating system.
-2. Run `npm -g install @wordpress/env` in the terminal to install `wp-env`.
+2. Run `npm -g install @wordpress/env` in the terminal to install `wp-env` globally.
 3. In the terminal, navigate to an existing plugin directory, theme directory, or a new working directory.
 4. Run `wp-env start` in the terminal to start the local WordPress environment.
-5. Navigate to `http://localhost:8888/wp-admin/` and log into the WordPress dashboard using username `admin` and password `password`.
+5. After the script runs, navigate to `http://localhost:8888/wp-admin/` and log into the WordPress dashboard using username `admin` and password `password`.
 
 ## Set up Docker Desktop
 
@@ -36,7 +36,11 @@ npm -g install @wordpress/env
 
 This will install the `wp-env` globally, allowing the tool to be run from any directory. To confirm it's installed and available, run `wp-env --version`, and the version number should appear. 
 
-Next, navigate to an existing plugin directory, theme directory, or a new working directory in the terminal and run `wp-env start`.
+Next, navigate to an existing plugin directory, theme directory, or a new working directory in the terminal and run:
+
+```sh
+wp-env start
+```
 
 Once the script completes, you can access the local environment at: [http://localhost:8888/](http://localhost:8888/). Log into the WordPress dashboard using username `admin` and password `password`.
 
@@ -48,7 +52,7 @@ For more information on controlling the Docker environment, see the [@wordpress/
 
 ### Where to run `wp-env`
 
-The `wp-env` tool can run from partically anywhere. When using the script while developing a single plugin, `wp-env start` can mount and activate the plugin automatically when run from the directory containing the plugin. This also works for themes when run from the directory in which you are developing the theme.
+The `wp-env` tool can run from practically anywhere. When using the script while developing a single plugin, `wp-env start` can mount and activate the plugin automatically when run from the directory containing the plugin. This also works for themes when run from the directory in which you are developing the theme.
 
 A generic WordPress environment will be created if you run `wp-env start` from a directory that is not a plugin or theme. The script will display the following warning, but ignore if this is your intention.
 
@@ -56,7 +60,7 @@ A generic WordPress environment will be created if you run `wp-env start` from a
 !! Warning: could not find a .wp-env.json configuration file and could not determine if 'DIR' is a WordPress installation, a plugin, or a theme.
 ```
 
-You can also use the `.wp-env.json` configuration file to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package](/packages/env/README.md#wp-envjson) readme for more details.
+You can also use the `.wp-env.json` configuration file to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package](/packages/env/README.md#wp-envjson) readme for more configuration details.
 
 ### Uninstall or reset `wp-env`
 
@@ -129,4 +133,8 @@ wp-env start
 
 Your environment should now be set up at `http://localhost:8888/`.
 
+## Additional resources
 
+-   [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
+-   [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
+-   [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
