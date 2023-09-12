@@ -368,6 +368,17 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
+    class EditorSettings: GutenbergEditorSettings {
+        var isFSETheme: Bool = false
+        var galleryWithImageBlocks: Bool = false
+        var quoteBlockV2: Bool = false
+        var listBlockV2: Bool = false
+        var rawStyles: String? = nil
+        var rawFeatures: String? = nil
+        var colors: [[String: String]]? = nil
+        var gradients: [[String: String]]? = nil
+    }
+    
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
@@ -419,6 +430,26 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergEditorSettings() -> GutenbergEditorSettings? {
+        guard ProcessInfo.processInfo.arguments.count >= 3 else {
+            return nil
+        }
+        
+        let initialProps = ProcessInfo.processInfo.arguments[2]
+
+        if let data = initialProps.data(using: .utf8) {
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let settings = EditorSettings()
+
+                    settings.rawStyles = json["rawStyles"] as? String
+                    settings.rawFeatures = json["rawFeatures"] as? String
+                    return settings
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
         return nil
     }
 
