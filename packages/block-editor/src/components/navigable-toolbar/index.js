@@ -10,9 +10,16 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -165,6 +172,7 @@ function UnforwardNavigableToolbar(
 		shouldUseKeyboardFocusShortcut = true,
 		__experimentalInitialIndex: initialIndex,
 		__experimentalOnIndexChange: onIndexChange,
+		focusEditorOnEscape = true,
 		...props
 	},
 	ref
@@ -181,6 +189,13 @@ function UnforwardNavigableToolbar(
 		onIndexChange,
 		shouldUseKeyboardFocusShortcut
 	);
+
+	const { lastFocus } = useSelect( ( select ) => {
+		const { getLastFocus } = select( blockEditorStore );
+		return {
+			lastFocus: getLastFocus(),
+		};
+	}, [] );
 
 	useEffect( () => {
 		const navigableToolbarRef = toolbarRef.current;
@@ -200,6 +215,31 @@ function UnforwardNavigableToolbar(
 			};
 		}
 	}, [ handleOnKeyDown, toolbarRef ] );
+
+
+	// TODO: Not sure if this is a good idea... but it's working for now and gets the behavior we're after with the fewest lines of code, but also is limiting.
+	useEffect( () => {
+		const navigableToolbarRef = toolbarRef.current;
+
+		if ( focusEditorOnEscape ) {
+			const handleKeyDown = ( event ) => {
+				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
+					// Focus the last focused element when pressing escape.
+					event.preventDefault();
+					lastFocus.current.focus();
+				}
+			};
+
+			navigableToolbarRef.addEventListener( 'keydown', handleKeyDown );
+
+			return () => {
+				navigableToolbarRef.removeEventListener(
+					'keydown',
+					handleKeyDown
+				);
+			};
+		}
+	}, [ focusEditorOnEscape, toolbarRef, lastFocus ] );
 
 	if ( isAccessibleToolbar ) {
 		return (

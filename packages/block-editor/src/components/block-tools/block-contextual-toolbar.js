@@ -17,7 +17,6 @@ import {
 } from '@wordpress/components';
 import { next, previous } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -39,7 +38,6 @@ function UnforwardBlockContextualToolbar(
 	const {
 		blockType,
 		blockEditingMode,
-		lastFocus,
 		hasParents,
 		showParentSelector,
 		selectedBlockClientId,
@@ -47,7 +45,6 @@ function UnforwardBlockContextualToolbar(
 		const {
 			getBlockName,
 			getBlockParents,
-			getLastFocus,
 			getSelectedBlockClientIds,
 			getBlockEditingMode,
 		} = select( blockEditorStore );
@@ -65,7 +62,6 @@ function UnforwardBlockContextualToolbar(
 				_selectedBlockClientId &&
 				getBlockType( getBlockName( _selectedBlockClientId ) ),
 			blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
-			lastFocus: getLastFocus(),
 			hasParents: parents.length,
 			showParentSelector:
 				parentBlockType &&
@@ -183,12 +179,6 @@ function UnforwardBlockContextualToolbar(
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			handleOnKeyDown={ ( event ) => {
-				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
-					event.preventDefault();
-					lastFocus.current.focus();
-				}
-			} }
 			{ ...props }
 		>
 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
