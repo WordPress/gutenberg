@@ -50,6 +50,8 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// logic seems very specific to the image and will likely never be a part
 	// of behaviors, even in the future. With that in mind, we've rewritten the lightbox
 	// to be a feature of the image block and will also soon remove the block_supports.
+	// *Note: This logic for generating the lightbox markup has been duplicated and moved
+	// to the image block's index.php.*
 	// See https://github.com/WordPress/gutenberg/issues/53403.
 	_deprecated_function( 'gutenberg_render_behaviors_support_lightbox', '17', '' );
 
