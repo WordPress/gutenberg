@@ -160,7 +160,7 @@ test.describe( 'Heading', () => {
 		await textColor.click();
 
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'option', {
 				name: 'Color: Luminous vivid orange',
 			} )
 			.click();

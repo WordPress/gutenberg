@@ -26,10 +26,17 @@ import { store as editPostStore } from '.';
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( isDistractionFree ) {
+			dispatch.toggleDistractionFree();
+		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editPostStore.name, name );
+	};
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
@@ -210,7 +217,7 @@ export const toggleFeature =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core/edit-post', 'editorMode', mode );
@@ -218,6 +225,15 @@ export const switchEditorMode =
 		// Unselect blocks when we switch to the code editor.
 		if ( mode !== 'visual' ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if (
+			mode === 'text' &&
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'distractionFree' )
+		) {
+			dispatch.toggleDistractionFree();
 		}
 
 		const message =
@@ -479,12 +495,20 @@ export function setIsInserterOpened( value ) {
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
  * @return {Object} Action object.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( isDistractionFree && isOpen ) {
+			dispatch.toggleDistractionFree();
+		}
+		dispatch( {
+			type: 'SET_IS_LIST_VIEW_OPENED',
+			isOpen,
+		} );
 	};
-}
 
 /**
  * Returns an action object used to switch to template editing.
@@ -588,5 +612,48 @@ export const initializeMetaBoxes =
 
 		dispatch( {
 			type: 'META_BOXES_INITIALIZED',
+		} );
+	};
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core/edit-post', 'fixedToolbar', false );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+				dispatch.closeGeneralSidebar();
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set(
+					'core/edit-post',
+					'distractionFree',
+					! isDistractionFree
+				);
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/edit-post/distraction-free-mode/notice',
+						type: 'snackbar',
+					}
+				);
 		} );
 	};

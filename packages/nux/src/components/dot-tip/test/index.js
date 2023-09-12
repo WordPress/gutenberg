@@ -10,14 +10,6 @@ import userEvent from '@testing-library/user-event';
 import { DotTip } from '..';
 
 describe( 'DotTip', () => {
-	beforeEach( () => {
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.useRealTimers();
-	} );
-
 	it( 'should not render anything if invisible', () => {
 		render(
 			<DotTip>
@@ -35,6 +27,7 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
+		// Wait for the dialog element to be positioned (aligned with the button)
 		await waitFor( () =>
 			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
 		);
@@ -43,9 +36,7 @@ describe( 'DotTip', () => {
 	} );
 
 	it( 'should call onDismiss when the dismiss button is clicked', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onDismiss = jest.fn();
 
 		render(
@@ -64,9 +55,7 @@ describe( 'DotTip', () => {
 	} );
 
 	it( 'should call onDisable when the X button is clicked', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onDisable = jest.fn();
 
 		render(
