@@ -11,8 +11,18 @@
  * @since 6.4.0
  */
 function register_block_core_table_of_contents() {
-	// @todo: Register meta for all post types that use Block Editor.
-	foreach ( array( 'post', 'page' ) as $post_type ) {
+	$supported_post_types = get_post_types(
+		array(
+			'public'       => true,
+			'show_in_rest' => true,
+		)
+	);
+
+	foreach ( $supported_post_types as $post_type ) {
+		if ( ! post_type_supports( $post_type, 'editor' ) ) {
+			continue;
+		}
+
 		register_post_meta(
 			$post_type,
 			'table_of_contents',
