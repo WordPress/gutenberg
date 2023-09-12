@@ -141,7 +141,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		}
 
 		// Get all the attributes that have a connection.
-		$connected_attributes = isset( $block['attrs']['connections']['attributes'] ) ? $block['attrs']['connections']['attributes'] : false;
+		$connected_attributes = $block['attrs']['connections']['attributes'] ?? false;
 		if ( ! $connected_attributes ) {
 			return $block_content;
 		}

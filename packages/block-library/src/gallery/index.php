@@ -44,7 +44,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content ) {
-	$gap = isset( $attributes['style']['spacing']['blockGap'] ) ? $attributes['style']['spacing']['blockGap'] : null;
+	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
