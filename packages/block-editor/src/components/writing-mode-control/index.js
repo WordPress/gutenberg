@@ -7,19 +7,34 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
-import { textHorizontal, textVertical } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import {
+	textHorizontal,
+	textUpright,
+	textVertical,
+	textVerticalUp,
+} from '@wordpress/icons';
 
 const WRITING_MODES = [
 	{
 		name: __( 'Horizontal' ),
-		value: 'horizontal-tb',
+		value: 'horizontal',
 		icon: textHorizontal,
 	},
 	{
-		name: __( 'Vertical' ),
-		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
+		name: __( 'Top to bottom' ),
+		value: 'top-to-bottom',
 		icon: textVertical,
+	},
+	{
+		name: __( 'Bottom to top' ),
+		value: 'bottom-to-top',
+		icon: textVerticalUp,
+	},
+	{
+		name: __( 'Upright' ),
+		value: 'upright',
+		icon: textUpright,
 	},
 ];
 

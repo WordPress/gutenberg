@@ -7,7 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -20,7 +20,6 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import TextOrientationControl from '../text-orientation-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -354,18 +353,50 @@ export default function TypographyPanel( {
 
 	// Text Orientation
 	const hasTextOrientationControl = useHasTextOrientationControl( settings );
-	const textOrientation = decodeValue(
-		inheritedValue?.typography?.textOrientation
-	);
-	const setTextOrientation = useCallback(
+
+	const setWritingModeAndTextOrientation = useCallback(
 		( newValue ) => {
-			onChange(
-				setImmutably(
-					value,
-					[ 'typography', 'textOrientation' ],
-					newValue || undefined
-				)
+			let newWritingMode, newTextOrientation;
+			switch ( newValue ) {
+				case 'bottom-to-top':
+					newTextOrientation = undefined;
+					newWritingMode = 'sideways-lr';
+					break;
+
+				case 'top-to-bottom':
+					newTextOrientation = undefined;
+					newWritingMode = 'sideways-rl';
+					break;
+
+				case 'upright':
+					newTextOrientation = 'upright';
+					newWritingMode = isRTL() ? 'vertical-lr' : 'vertical-rl';
+					break;
+
+				case 'horizontal':
+					newTextOrientation = undefined;
+					newWritingMode = 'horizontal-tb';
+					break;
+
+				default:
+					newTextOrientation = undefined;
+					newWritingMode = undefined;
+					break;
+			}
+
+			const newWritingModeAttributes = setImmutably(
+				value,
+				[ 'typography', 'writingMode' ],
+				newWritingMode || undefined
 			);
+
+			const newTextOrientationAttributes = setImmutably(
+				newWritingModeAttributes,
+				[ 'typography', 'textOrientation' ],
+				newTextOrientation || undefined
+			);
+
+			onChange( newTextOrientationAttributes );
 		},
 		[ onChange, value ]
 	);
@@ -554,7 +585,7 @@ export default function TypographyPanel( {
 				>
 					<WritingModeControl
 						value={ writingMode }
-						onChange={ setWritingMode }
+						onChange={ setWritingModeAndTextOrientation }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 						style={
@@ -563,17 +594,6 @@ export default function TypographyPanel( {
 								: {}
 						}
 					/>
-					{ hasTextOrientationControl &&
-						hasWritingMode &&
-						( writingMode === 'vertical-lr' ||
-							writingMode === 'vertical-rl' ) && (
-							<TextOrientationControl
-								value={ textOrientation }
-								onChange={ setTextOrientation }
-								size="__unstable-large"
-								__nextHasNoMarginBottom
-							/>
-						) }
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

@@ -260,6 +260,7 @@ export { default as textHorizontal } from './library/text-horizontal';
 export { default as textMixed } from './library/text-mixed';
 export { default as textUpright } from './library/text-upright';
 export { default as textVertical } from './library/text-vertical';
+export { default as textVerticalUp } from './library/text-vertical-up';
 export { default as tablet } from './library/tablet';
 export { default as title } from './library/title';
 export { default as tip } from './library/tip';
