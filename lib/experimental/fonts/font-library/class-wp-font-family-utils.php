@@ -61,7 +61,7 @@ class WP_Font_Family_Utils {
 				__( 'Fonts must have the same slug to be merged.', 'gutenberg' )
 			);
 		}
-	
+
 		$font_faces_1      = isset( $font1['fontFace'] ) ? $font1['fontFace'] : array();
 		$font_faces_2      = isset( $font2['fontFace'] ) ? $font2['fontFace'] : array();
 		$merged_font_faces = array_merge( $font_faces_1, $font_faces_2 );
