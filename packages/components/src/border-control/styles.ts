@@ -165,10 +165,10 @@ export const resetButton = css`
 
 	/* Override button component styling */
 	&& {
-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
-		height: 46px;
+		height: 40px;
 	}
 `;
 
@@ -180,10 +180,10 @@ export const borderControlStylePicker = css`
 
 export const borderStyleButton = css`
 	&&&&& {
-		min-width: 30px;
-		width: 30px;
-		height: 30px;
-		padding: 3px;
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 4px;
 	}
 `;
 
