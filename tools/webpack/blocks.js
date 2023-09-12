@@ -19,7 +19,7 @@ const { baseConfig, plugins, stylesTransform } = require( './shared' );
  * Matches a block's filepaths in the form build-module/<filename>.js
  */
 const blockViewRegex = new RegExp(
-	/build-module\/(?!.*(?:navigation|image)).*(?<filename>.*\/view.*).js$/
+	/build-module\/(?!.*(?:navigation|image|query)).*(?<filename>.*\/view.*).js$/
 );
 
 /**

@@ -5,6 +5,16 @@
  * @package WordPress
  */
 
+add_action(
+	'wp_print_scripts',
+	function () {
+		global $wp_scripts;
+		if ( isset( $wp_scripts->registered['wp-block-query-view'] ) ) {
+			$wp_scripts->registered['wp-block-query-view']->deps[] = 'wp-interactivity';
+		}
+	}
+);
+
 /**
  * Modifies the static `core/query` block on the server.
  *
