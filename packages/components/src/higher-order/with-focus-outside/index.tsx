@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 /**
  * WordPress dependencies
  */
@@ -11,9 +9,14 @@ import {
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
-		const bindFocusOutsideHandler = useCallback(
-			( node ) =>
+		const [ handleFocusOutside, setHandleFocusOutside ] = useState<
+			undefined | ( ( event: React.FocusEvent ) => void )
+		>( undefined );
+
+		const bindFocusOutsideHandler = useCallback<
+			( node: React.FocusEvent ) => void
+		>(
+			( node: any ) =>
 				setHandleFocusOutside( () =>
 					node?.handleFocusOutside
 						? node.handleFocusOutside.bind( node )

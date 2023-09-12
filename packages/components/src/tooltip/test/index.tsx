@@ -272,9 +272,9 @@ describe( 'Tooltip', () => {
 			</Modal>
 		);
 
-		const tooltip = await screen.findByRole( 'tooltip', { hidden: true } );
-
-		expect( tooltip ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /close/i } )
+		).not.toBeInTheDocument();
 
 		await user.hover(
 			screen.getByRole( 'button', {
@@ -282,7 +282,11 @@ describe( 'Tooltip', () => {
 			} )
 		);
 
-		await waitFor( () => expect( tooltip ).toBeVisible() );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'tooltip', { name: /close/i } )
+			).toBeVisible()
+		);
 
 		await user.keyboard( '[Escape]' );
 
@@ -291,11 +295,19 @@ describe( 'Tooltip', () => {
 		await cleanupTooltip( user );
 	} );
 
-	it( 'should associate the tooltip text with its anchor via the accessible description', async () => {
+	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
+		const user = userEvent.setup();
+
 		render( <Tooltip { ...props } /> );
 
+		await user.hover(
+			screen.getByRole( 'button', {
+				name: /Button/i,
+			} )
+		);
+
 		expect(
-			screen.getByRole( 'button', { description: 'tooltip text' } )
+			await screen.findByRole( 'button', { description: 'tooltip text' } )
 		).toBeInTheDocument();
 	} );
 } );
