@@ -117,7 +117,7 @@ describe.each( [
 			for ( let i = 0; i < allTabs.length; i++ ) {
 				expect(
 					screen.queryByText( TABS_WITH_ICON[ i ].title )
-				).not.toBeVisible();
+				).not.toBeInTheDocument();
 
 				await user.hover( allTabs[ i ] );
 
@@ -160,37 +160,37 @@ describe.each( [
 
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
-			expect( screen.queryByText( 'Alpha' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
 			await user.keyboard( '[Tab]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
+			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure gamma is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Gamma' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
+			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			// Move selection with arrow keys. Make sure beta is focused, and that
 			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
 			await user.keyboard( '[ArrowLeft]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
 			expect( await getSelectedTab() ).toHaveFocus();
 
 			await cleanupTooltip( user );

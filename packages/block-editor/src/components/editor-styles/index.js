@@ -16,10 +16,9 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import transformStyles from '../../utils/transform-styles';
 
-const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles ) {
+function useDarkThemeBodyClassName( styles, scope ) {
 	return useCallback(
 		( node ) => {
 			if ( ! node ) {
@@ -28,9 +27,7 @@ function useDarkThemeBodyClassName( styles ) {
 
 			const { ownerDocument } = node;
 			const { defaultView, body } = ownerDocument;
-			const canvas = ownerDocument.querySelector(
-				EDITOR_STYLES_SELECTOR
-			);
+			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
 
 			let backgroundColor;
 
@@ -63,11 +60,11 @@ function useDarkThemeBodyClassName( styles ) {
 				body.classList.add( 'is-dark-theme' );
 			}
 		},
-		[ styles ]
+		[ styles, scope ]
 	);
 }
 
-export default function EditorStyles( { styles } ) {
+export default function EditorStyles( { styles, scope } ) {
 	const stylesArray = useMemo(
 		() => Object.values( styles ?? [] ),
 		[ styles ]
@@ -76,9 +73,9 @@ export default function EditorStyles( { styles } ) {
 		() =>
 			transformStyles(
 				stylesArray.filter( ( style ) => style?.css ),
-				EDITOR_STYLES_SELECTOR
+				scope
 			),
-		[ stylesArray ]
+		[ stylesArray, scope ]
 	);
 
 	const transformedSvgs = useMemo(
@@ -94,7 +91,7 @@ export default function EditorStyles( { styles } ) {
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ useDarkThemeBodyClassName( stylesArray ) } />
+			<style ref={ useDarkThemeBodyClassName( stylesArray, scope ) } />
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }

@@ -291,7 +291,7 @@ _Parameters_
 
 _Returns_
 
--   `number`: The resolved template ID for the page route.
+-   `Object`: Action object.
 
 ### setHasPageContentFocus
 
