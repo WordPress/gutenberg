@@ -31,10 +31,6 @@ export default meta;
 
 const Template: StoryFn< typeof Tabs > = ( props ) => {
 	return (
-		// Ignore reason: `children` and `tabs` props are mutually exclusive.
-		// When we ambiguously pass `props` here in Storybook, TS doesn't know
-		// what to expect, so it errors.
-		// @ts-expect-error
 		<Tabs { ...props }>
 			<Tabs.TabList>
 				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
@@ -64,10 +60,6 @@ export const Default = Template.bind( {} );
 
 const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
-		// Ignore reason: `children` and `tabs` props are mutually exclusive.
-		// When we ambiguously pass `props` here in Storybook, TS doesn't know
-		// what to expect, so it errors.
-		// @ts-expect-error
 		<Tabs { ...props }>
 			<Tabs.TabList>
 				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' } disabled={ true }>
@@ -99,10 +91,6 @@ const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 		// SlotFill is used here to ensure the icon's tooltips are not
 		// rendered inline, as that would cause them to inherit the tab's opacity.
 		<SlotFillProvider>
-			{ /* Ignore reason: `children` and `tabs` props are mutually 
-			exclusive. When we ambiguously pass `props` here in Storybook, TS
-			doesn't know what to expect, so it errors.
-			@ts-expect-error */ }
 			<Tabs { ...props }>
 				<Tabs.TabList>
 					<Tabs.Tab
@@ -140,10 +128,6 @@ ManualActivation.args = {
 const UsingSlotFillTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<SlotFillProvider>
-			{ /* Ignore reason: `children` and `tabs` props are mutually 
-			exclusive. When we ambiguously pass `props` here in Storybook, TS
-			doesn't know what to expect, so it errors.
-			@ts-expect-error */ }
 			<Tabs { ...props }>
 				<Tabs.TabList>
 					<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
@@ -206,10 +190,6 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 						borderRight: '1px solid #333',
 					} }
 				>
-					{ /* Ignore reason: `children` and `tabs` props are mutually
-		exclusive. When we ambiguously pass `props` here in Storybook, TS
-		doesn't know what to expect, so it errors.
-		@ts-expect-error */ }
 					<Tabs { ...props }>
 						<div
 							style={ {
@@ -263,38 +243,6 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 };
 export const InsertCustomElements = CloseButtonTemplate.bind( {} );
 
-const MonolithicTemplate: StoryFn< typeof Tabs > = ( props ) => {
-	return <Tabs { ...props } />;
-};
-
-export const Monolithic = MonolithicTemplate.bind( {} );
-Monolithic.args = {
-	tabs: [
-		{
-			id: 'tab1',
-			title: 'Tab 1',
-			content: <p>Selected tab: Tab 1</p>,
-		},
-		{
-			id: 'tab2',
-			title: 'Tab 2',
-			content: <p>Selected tab: Tab 2</p>,
-		},
-		{
-			id: 'tab3',
-			title: 'Tab 3',
-			content: <p>Selected tab: Tab 3</p>,
-			tab: { disabled: true },
-		},
-		{
-			id: 'tab4',
-			title: 'Tab 4',
-			content: <p>Selected tab: Tab 4</p>,
-			tab: { icon: wordpress },
-		},
-	],
-};
-
 const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	const [ selectedTabId, setSelectedTabId ] = useState<
 		string | undefined | null
@@ -302,10 +250,6 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 
 	return (
 		<>
-			{ /* Ignore reason: `children` and `tabs` props are mutually
-		exclusive. When we ambiguously pass `props` here in Storybook, TS
-		doesn't know what to expect, so it errors.
-		@ts-expect-error */ }
 			<Tabs
 				{ ...props }
 				selectedTabId={ selectedTabId }

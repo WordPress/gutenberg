@@ -73,7 +73,6 @@ const TabsContext = createContext< TabsContextProps >( undefined );
  */
 
 function Tabs( {
-	tabs,
 	activeClass = 'is-active',
 	selectOnMove = true,
 	initialTabId,
@@ -167,29 +166,7 @@ function Tabs( {
 
 	return (
 		<TabsContext.Provider value={ { store, instanceId, activeClass } }>
-			{ tabs ? (
-				<>
-					<Tabs.TabList>
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								{ ...tab.tab }
-							>
-								{ ! tab.tab?.icon && tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-					{ tabs.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</>
-			) : (
-				<>{ children }</>
-			) }
+			{ children }
 		</TabsContext.Provider>
 	);
 }

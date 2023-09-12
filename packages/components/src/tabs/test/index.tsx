@@ -49,7 +49,6 @@ const ControlledTabs = ( props: TabsProps ) => {
 	>( props?.selectedTabId );
 
 	return (
-		// @ts-expect-error
 		<Tabs
 			{ ...props }
 			selectedTabId={ selectedTabId }
