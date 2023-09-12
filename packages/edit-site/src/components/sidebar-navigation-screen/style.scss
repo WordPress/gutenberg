@@ -134,6 +134,7 @@
 	.components-input-control__input {
 		color: $gray-200 !important;
 		background: $gray-800 !important;
+		border-radius: $radius-block-ui;
 	}
 	.components-input-control__backdrop {
 		border: 4px !important;

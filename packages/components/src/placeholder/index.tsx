@@ -75,6 +75,7 @@ export function Placeholder(
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
+
 	return (
 		<div { ...additionalProps } className={ classes }>
 			{ withIllustration ? PlaceholderIllustration : null }

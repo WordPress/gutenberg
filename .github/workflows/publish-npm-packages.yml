@@ -31,27 +31,30 @@ jobs:
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
               with:
                   path: cli
                   ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Configure git user name and email (for publishing)
               run: |
@@ -61,14 +64,14 @@ jobs:
 
             - name: Setup Node.js
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

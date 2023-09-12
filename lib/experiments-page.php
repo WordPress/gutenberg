@@ -104,14 +104,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-auto-inserting-blocks',
-		__( 'Auto-inserting blocks', 'gutenberg' ),
+		'gutenberg-block-hooks',
+		__( 'Block hooks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Auto-inserting blocks', 'gutenberg' ),
-			'id'    => 'gutenberg-auto-inserting-blocks',
+			'label' => __( 'Block hooks allow automatically inserting a block in a position relative to another.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-hooks',
 		)
 	);
 

@@ -53,6 +53,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.4 compat.
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -63,7 +64,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
 		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
 	}
 	require_once __DIR__ . '/experimental/rest-api.php';
@@ -110,8 +111,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
-	require __DIR__ . '/experimental/auto-inserting-blocks.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
+	require __DIR__ . '/experimental/block-hooks.php';
 }
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
@@ -229,3 +230,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/behaviors.php';
+require __DIR__ . '/block-supports/background.php';

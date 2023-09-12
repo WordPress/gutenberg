@@ -215,6 +215,29 @@ export default function QueryInspectorControls( props ) {
 								}
 							/>
 						) }
+						<ToggleControl
+							label={ __( 'Enhanced pagination' ) }
+							help={ __(
+								'Browsing between pages won’t require a full page reload.'
+							) }
+							checked={ !! enhancedPagination }
+							onChange={ ( value ) =>
+								setAttributes( {
+									enhancedPagination: !! value,
+								} )
+							}
+						/>
+						{ enhancedPagination && (
+							<div>
+								<Notice
+									spokenMessage={ null }
+									status="warning"
+									isDismissible={ false }
+								>
+									{ enhancedPaginationNotice }
+								</Notice>
+							</div>
+						) }
 					</PanelBody>
 				</InspectorControls>
 			) }
@@ -293,36 +316,6 @@ export default function QueryInspectorControls( props ) {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			<InspectorControls>
-				<PanelBody
-					title={ __( 'User Experience' ) }
-					initialOpen={ false }
-				>
-					<ToggleControl
-						label={ __( 'Enhanced pagination' ) }
-						help={ __(
-							"Don't refresh the page when paginating to another page."
-						) }
-						checked={ !! enhancedPagination }
-						onChange={ ( value ) =>
-							setAttributes( {
-								enhancedPagination: !! value,
-							} )
-						}
-					/>
-					{ enhancedPagination && (
-						<div>
-							<Notice
-								spokenMessage={ null }
-								status="warning"
-								isDismissible={ false }
-							>
-								{ enhancedPaginationNotice }
-							</Notice>
-						</div>
-					) }
-				</PanelBody>
-			</InspectorControls>
 		</>
 	);
 }
