@@ -146,6 +146,7 @@ async function runPerformanceTests( branches, options ) {
 		logTask( 1, 'Removing existing files' );
 		fs.rmSync( baseDir, { recursive: true } );
 	}
+
 	logTask( 1, 'Creating base directory:', fAccent( baseDir ) );
 	fs.mkdirSync( baseDir );
 
@@ -192,11 +193,14 @@ async function runPerformanceTests( branches, options ) {
 	logTask( 1, 'Setting up test runner' );
 
 	const testRunnerDir = path.join( baseDir + '/tests' );
+
 	logTask( 2, 'Copying source to:', fAccent( testRunnerDir ) );
 	await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
+
 	logTask( 2, 'Checking out branch:', fAccent( testRunnerBranch ) );
 	// @ts-ignore
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
+
 	logTask( 2, 'Installing dependencies and building' );
 	await runShellScript(
 		`bash -c "${ [
@@ -229,18 +233,20 @@ async function runPerformanceTests( branches, options ) {
 
 	const branchDirs = {};
 	for ( const branch of branches ) {
-		logTask( 2, fAccent( branch ) );
+		logTask( 2, 'Branch:', fAccent( branch ) );
 		const sanitizedBranchName = sanitizeBranchName( branch );
 		const envDir = path.join( envsDir, sanitizedBranchName );
+
 		logTask( 3, 'Creating directory:', fAccent( envDir ) );
 		fs.mkdirSync( envDir );
 		// @ts-ignore
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
+
 		logTask( 3, 'Copying source to:', fAccent( buildDir ) );
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
-		logTask( 3, 'Checking out:', fAccent( branch ) );
 
+		logTask( 3, 'Checking out:', fAccent( branch ) );
 		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
@@ -256,6 +262,7 @@ async function runPerformanceTests( branches, options ) {
 		);
 
 		const wpEnvConfigPath = path.join( envDir, '.wp-env.json' );
+
 		logTask( 3, 'Saving wp-env config to:', fAccent( wpEnvConfigPath ) );
 
 		fs.writeFileSync(
@@ -313,7 +320,7 @@ async function runPerformanceTests( branches, options ) {
 	logTask( 0, 'Running the tests' );
 
 	if ( wpZipUrl ) {
-		logTask( 1, 'Using:', fAccent( 'WordPress v%s' ), options.wpVersion );
+		logTask( 1, 'Using:', fAccent( `WordPress v${ options.wpVersion }` ) );
 	} else {
 		logTask( 1, 'Using:', fAccent( 'WordPress trunk' ) );
 	}
@@ -329,15 +336,19 @@ async function runPerformanceTests( branches, options ) {
 				) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
 			for ( const branch of branches ) {
+				logTask( 2, 'Branch:', fAccent( branch ) );
+
 				const sanitizedBranchName = sanitizeBranchName( branch );
 				const runKey = `${ testSuite }_${ sanitizedBranchName }_round-${ i }`;
 				// @ts-ignore
 				const envDir = branchDirs[ branch ];
-				logTask( 2, 'Branch:', fAccent( branch ) );
+
 				logTask( 3, 'Starting the environment.' );
 				await runShellScript( `${ wpEnvPath } start`, envDir );
+
 				logTask( 3, 'Running the test.' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
+
 				logTask( 3, 'Stopping the environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
@@ -388,6 +399,7 @@ async function runPerformanceTests( branches, options ) {
 			ARTIFACTS_PATH,
 			testSuite + RESULTS_FILE_SUFFIX
 		);
+
 		logTask( 1, 'Saving:', fAccent( calculatedResultsPath ) );
 		fs.writeFileSync(
 			calculatedResultsPath,
