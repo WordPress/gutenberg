@@ -38,7 +38,7 @@ export default function Home() {
 	return (
 		<Layout
 			title={ `Hello from ${ siteConfig.title }` }
-			description="Build block editors using Gutenberg as a Platform"
+			description="Build block editors using Gutenberg as a Framework"
 		>
 			<HomepageHeader />
 			<main>

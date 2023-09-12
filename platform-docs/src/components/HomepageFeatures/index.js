@@ -26,8 +26,8 @@ const FeatureList = [
 		Svg: require( '@site/static/img/undraw_docusaurus_tree.svg' ).default,
 		description: (
 			<>
-				Gutenberg as a platform allows you to custumize the UI of your
-				block editor as you wish.
+				Gutenberg allows you to custumize the UI of your block editor as
+				you wish.
 			</>
 		),
 	},

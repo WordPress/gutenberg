@@ -9,7 +9,7 @@ const darkCodeTheme = require( 'prism-react-renderer/themes/dracula' );
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-	title: 'Gutenberg as a Platform',
+	title: 'Gutenberg Block Editor',
 	tagline: 'Build block based editors, with HTML and JSON output',
 	favicon: 'https://s.w.org/images/wmark.png',
 
@@ -54,7 +54,7 @@ const config = {
 			// Replace with your project's social card
 			image: 'https://s.w.org/images/wmark.png',
 			navbar: {
-				title: 'Gutenberg as a Platform',
+				title: 'Gutenberg Block Editor',
 				logo: {
 					alt: 'Gutenberg logo',
 					src: 'img/logo.svg',

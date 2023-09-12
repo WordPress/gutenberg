@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Getting Started
 
-Let's discover **Gutenberg as a Platform in less than 10 minutes**.
+Let's discover how to use the **Gutenberg Block Editor** to build your own block editor in less than 10 minutes**.
 
 
 ## What you'll need
