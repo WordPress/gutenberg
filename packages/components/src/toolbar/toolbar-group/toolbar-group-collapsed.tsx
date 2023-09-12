@@ -10,6 +10,7 @@ import DropdownMenu from '../../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
 import ToolbarItem from '../toolbar-item';
 import type { ToolbarGroupCollapsedProps } from './types';
+import type { DropdownMenuProps } from '../../dropdown-menu/types';
 
 function ToolbarGroupCollapsed( {
 	controls = [],
@@ -21,11 +22,9 @@ function ToolbarGroupCollapsed( {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	const renderDropdownMenu = (
-		internalToggleProps?: Record< string, any > // ExtractHTMLAttributes<any>
+		internalToggleProps?: DropdownMenuProps[ 'toggleProps' ]
 	) => (
 		<DropdownMenu
-			// TODO: Any idea how best to solve this
-			// @ts-expect-error Dropdown Menu expects dropdown menu types.
 			controls={ controls }
 			toggleProps={ {
 				...internalToggleProps,
