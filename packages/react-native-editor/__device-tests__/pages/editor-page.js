@@ -53,8 +53,8 @@ class EditorPage {
 		}
 	}
 
-	async initializeEditor( { initialData } = {} ) {
-		await launchApp( this.driver, { initialData } );
+	async initializeEditor( { initialData, rawStyles, rawFeatures } = {} ) {
+		await launchApp( this.driver, { initialData, rawStyles, rawFeatures } );
 
 		// Stores initial values from the editor for different helpers.
 		const addButton = await this.driver.elementsByAccessibilityId(
