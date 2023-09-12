@@ -32,6 +32,7 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  */
 
 const fAccent = formats.success;
+const fTitle = formats.title;
 const fWarning = formats.warning;
 
 /**
@@ -112,17 +113,21 @@ async function runPerformanceTests( branches, options ) {
 		branches = [ 'trunk' ];
 	}
 
-	log( formats.title( '\n💃 Performance Tests 🕺\n' ) );
+	log( fTitle( '\n💃 Performance Tests 🕺' ) );
 	log(
-		[
-			'Welcome! This tool runs the performance tests on multiple branches and displays a comparison table.',
-			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
-			fWarning( 'Make sure these ports are not used before continuing.' ),
-		].join( '\n' )
+		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.'
 	);
 
 	if ( ! runningInCI ) {
-		log( '' );
+		log(
+			fWarning(
+				[
+					'\nIn order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
+					'Make sure these ports are not used before continuing.\n',
+				].join( '\n' )
+			)
+		);
+
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
@@ -313,7 +318,7 @@ async function runPerformanceTests( branches, options ) {
 		return path.basename( file, '.spec.js' );
 	} );
 
-	logTask( 0, 'Running the tests' );
+	logTask( 0, 'Running tests' );
 
 	if ( wpZipUrl ) {
 		logTask( 1, 'Using:', fAccent( `WordPress v${ options.wpVersion }` ) );
@@ -339,13 +344,13 @@ async function runPerformanceTests( branches, options ) {
 				// @ts-ignore
 				const envDir = branchDirs[ branch ];
 
-				logTask( 3, 'Starting the environment.' );
+				logTask( 3, 'Starting environment' );
 				await runShellScript( `${ wpEnvPath } start`, envDir );
 
-				logTask( 3, 'Running the test.' );
+				logTask( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
 
-				logTask( 3, 'Stopping the environment' );
+				logTask( 3, 'Stopping environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
 		}
@@ -415,7 +420,7 @@ async function runPerformanceTests( branches, options ) {
 	);
 
 	for ( const testSuite of testSuites ) {
-		logTask( 0, testSuite );
+		logTask( 0, fAccent( testSuite ) );
 
 		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
