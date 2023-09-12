@@ -151,9 +151,8 @@ function PatternList( {
 			) }
 			<InserterListbox>
 				{ ! hasItems && <InserterNoResults /> }
-				{ patternSourceFilter === PATTERN_TYPES.user && (
-					<BlockPatternsSyncFilter />
-				) }
+				{ patternSourceFilter === PATTERN_TYPES.user &&
+					! searchValue && <BlockPatternsSyncFilter /> }
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ pagingProps.categoryPatternsAsyncList }
