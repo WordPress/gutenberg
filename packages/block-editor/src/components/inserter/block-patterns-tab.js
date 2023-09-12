@@ -327,21 +327,18 @@ function BlockPatternsTabs( {
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<nav aria-label={ __( 'Block pattern categories' ) }>
-						<ItemGroup
-							role="list"
-							className="block-editor-inserter__block-patterns-tabs"
-						>
-							<BlockPatternsSourceFilter
-								value={ patternSourceFilter }
-								onChange={ ( value ) => {
-									setPatternSourceFilter( value );
-									onSelectCategory(
-										allPatternsCategory,
-										value
-									);
-								} }
-							/>
+					<nav
+						aria-label={ __( 'Block pattern categories' ) }
+						className="block-editor-inserter__block-patterns-tabs"
+					>
+						<BlockPatternsSourceFilter
+							value={ patternSourceFilter }
+							onChange={ ( value ) => {
+								setPatternSourceFilter( value );
+								onSelectCategory( allPatternsCategory, value );
+							} }
+						/>
+						<ItemGroup role="list">
 							{ categories.map( ( category ) => (
 								<Item
 									role="listitem"
