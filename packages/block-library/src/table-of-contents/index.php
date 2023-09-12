@@ -113,15 +113,17 @@ function block_core_table_of_contents_build_headings_tree( $headings ) {
  * @since 6.4.0
  *
  * @param array $tree An array of nested headings.
+ * @param array $args Additional arguments used for building the list.
+ *
  * @return string $list A list of Table of Content items.
  */
-function block_core_table_of_contents_build_list( $tree ) {
+function block_core_table_of_contents_build_list( $tree, $args ) {
 	$list      = '';
-	$permalink = get_permalink();
+	$permalink = get_permalink( $args['postId'] );
 
 	foreach ( $tree as $item ) {
 		$heading  = $item['heading'];
-		$children = isset( $item['children'] ) ? '<ol>' . block_core_table_of_contents_build_list( $item['children'] ) . '</ol>' : '';
+		$children = isset( $item['children'] ) ? '<ol>' . block_core_table_of_contents_build_list( $item['children'], $args ) . '</ol>' : '';
 
 		if ( ! empty( $heading['link'] ) ) {
 			$pagelink = ! empty( $heading['page'] ) ? add_query_arg( 'page', $heading['page'], $permalink ) : $permalink;
@@ -179,6 +181,6 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 	return sprintf(
 		'<nav %1$s><ol>%2$s</ol></nav>',
 		get_block_wrapper_attributes(),
-		block_core_table_of_contents_build_list( $tree )
+		block_core_table_of_contents_build_list( $tree, array( 'postId' => $block->context['postId'] ) )
 	);
 }
