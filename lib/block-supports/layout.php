@@ -222,7 +222,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string CSS styles on success. Else, empty string.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
-	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_type   = $layout['type'] ?? 'default';
 	$layout_styles = array();
 
 	if ( 'default' === $layout_type ) {
@@ -403,7 +403,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( is_array( $gap_value ) ) {
-					$gap_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
