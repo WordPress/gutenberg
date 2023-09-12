@@ -55,7 +55,7 @@ export function PageAttributesParent() {
 			const postId = getCurrentPostId();
 			const postIsHierarchical = pType?.hierarchical ?? false;
 			const query = {
-				per_page: 101,
+				per_page: 100,
 				exclude: postId,
 				parent_exclude: postId,
 				orderby: 'menu_order',
