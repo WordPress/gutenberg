@@ -5,6 +5,16 @@
  * @package WordPress
  */
 
+add_action(
+	'wp_print_scripts',
+	function () {
+		global $wp_scripts;
+		if ( isset( $wp_scripts->registered['wp-block-image-view'] ) ) {
+			$wp_scripts->registered['wp-block-image-view']->deps[] = 'wp-interactivity';
+		}
+	}
+);
+
 /**
  * Renders the `core/image` block on the server,
  * adding a data-id attribute to the element if core/gallery has added on pre-render.

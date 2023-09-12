@@ -22,6 +22,7 @@ module.exports = {
 	name: 'interactivity',
 	entry: {
 		navigation: './packages/block-library/src/navigation/view.js',
+		image: './packages/block-library/src/image/view.js',
 	},
 	output: {
 		filename: './block-library/blocks/[name]/view.min.js',

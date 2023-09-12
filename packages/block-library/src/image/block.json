@@ -128,5 +128,5 @@
 	],
 	"editorStyle": "wp-block-image-editor",
 	"style": "wp-block-image",
-	"viewScript": "file:./view-interactivity.min.js"
+	"viewScript": "file:./view.min.js"
 }
