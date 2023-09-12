@@ -40,10 +40,9 @@ import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
 import { getTextContent } from '../get-text-content';
-import { isEmpty, isEmptyLine } from '../is-empty';
+import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
-import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import { getFormatColors } from '../get-format-colors';
@@ -436,7 +435,7 @@ export class RichText extends Component {
 		}
 		const isReverse = keyCode === BACKSPACE;
 
-		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+		const { onDelete } = this.props;
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
@@ -450,24 +449,6 @@ export class RichText extends Component {
 			this.onFormatChange( newValue );
 			event.preventDefault();
 			return;
-		}
-
-		if ( multilineTag ) {
-			if (
-				isReverse &&
-				value.start === 0 &&
-				value.end === 0 &&
-				isEmptyLine( value )
-			) {
-				newValue = removeLineSeparator( value, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( value, isReverse );
-			}
-			if ( newValue ) {
-				this.onFormatChange( newValue );
-				event.preventDefault();
-				return;
-			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.

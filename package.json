@@ -86,6 +86,7 @@
 		"@wordpress/style-engine": "file:packages/style-engine",
 		"@wordpress/sync": "file:packages/sync",
 		"@wordpress/token-list": "file:packages/token-list",
+		"@wordpress/undo-manager": "file:packages/undo-manager",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
@@ -253,7 +254,7 @@
 		"uglify-js": "3.13.7",
 		"uuid": "8.3.0",
 		"wd": "1.12.1",
-		"webpack": "5.65.0",
+		"webpack": "5.76.0",
 		"webpack-bundle-analyzer": "4.4.2",
 		"worker-farm": "1.7.0"
 	},

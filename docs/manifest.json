@@ -336,12 +336,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
 		"title": "Global Settings & Styles (theme.json)",
 		"slug": "theme-json",
 		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
@@ -1926,6 +1920,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
@@ -2295,12 +2295,6 @@
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
 		"markdown_source": "../docs/contributors/design/the-block.md",
-		"parent": "design"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/design/reference.md",
 		"parent": "design"
 	},
 	{

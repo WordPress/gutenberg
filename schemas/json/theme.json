@@ -43,7 +43,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -254,6 +254,23 @@
 							"description": "Allow users to set text colors.",
 							"type": "boolean",
 							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesBackground": {
+			"type": "object",
+			"properties": {
+				"background": {
+					"description": "Settings related to background.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -705,6 +722,7 @@
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBackground" },
 				{ "$ref": "#/definitions/settingsPropertiesBehaviors" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
@@ -726,6 +744,7 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"background": {},
 						"behaviors": {},
 						"border": {},
 						"color": {},
@@ -2212,6 +2231,7 @@
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
+						"background": {},
 						"color": {},
 						"layout": {},
 						"spacing": {},
