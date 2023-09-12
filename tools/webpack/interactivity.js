@@ -30,6 +30,19 @@ module.exports = {
 		path: join( __dirname, '..', '..', 'build' ),
 		chunkLoadingGlobal: '__WordPressPrivateInteractivityAPI__',
 	},
+	resolve: {
+		alias: {
+			'@wordpress/interactivity': join(
+				__dirname,
+				'..',
+				'..',
+				'packages',
+				'interactivity',
+				'src',
+				'index.js'
+			),
+		},
+	},
 	optimization: {
 		...baseConfig.optimization,
 		runtimeChunk: {

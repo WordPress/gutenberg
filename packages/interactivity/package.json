@@ -21,7 +21,9 @@
 	"engines": {
 		"node": ">=12"
 	},
-	"main": "src/index.js",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"@preact/signals": "^1.1.3",
 		"deepsignal": "^1.3.6",
