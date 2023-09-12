@@ -117,8 +117,8 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					icon={ false }
-					label="More rich text controls"
+					icon={ null }
+					title="More rich text controls"
 					controls={ [
 						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
@@ -131,7 +131,7 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup
 				icon={ more }
-				label="Align"
+				title="Align"
 				isCollapsed
 				controls={ [
 					{
