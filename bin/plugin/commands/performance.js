@@ -31,10 +31,8 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
-/**
- * Formats a log string to be accented.
- */
 const fAccent = formats.success;
+const fWarning = formats.warning;
 
 /**
  * A logging helper for printing tasks and their subtasks.
@@ -119,9 +117,7 @@ async function runPerformanceTests( branches, options ) {
 		[
 			'Welcome! This tool runs the performance tests on multiple branches and displays a comparison table.',
 			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
-			formats.warning(
-				'Make sure these ports are not used before continuing.'
-			),
+			fWarning( 'Make sure these ports are not used before continuing.' ),
 		].join( '\n' )
 	);
 
@@ -365,8 +361,9 @@ async function runPerformanceTests( branches, options ) {
 
 	// Calculate medians from all rounds.
 	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
+		logTask( 1, 'Test suite:', fAccent( testSuite ) );
 
+		results[ testSuite ] = {};
 		for ( const branch of branches ) {
 			const sanitizedBranchName = sanitizeBranchName( branch );
 			const resultsRounds = resultFiles
@@ -376,14 +373,13 @@ async function runPerformanceTests( branches, options ) {
 					)
 				)
 				.map( ( file ) => {
-					logTask( 1, 'Reading:', fAccent( file ) );
+					logTask( 2, 'Reading from:', fAccent( file ) );
 					return readJSONFile( file );
 				} );
 
 			const metrics = Object.keys( resultsRounds[ 0 ] );
 			results[ testSuite ][ branch ] = {};
 
-			logTask( 1, 'Calculating medians from all rounds' );
 			for ( const metric of metrics ) {
 				const values = resultsRounds
 					.map( ( round ) => round[ metric ] )
@@ -400,7 +396,11 @@ async function runPerformanceTests( branches, options ) {
 			testSuite + RESULTS_FILE_SUFFIX
 		);
 
-		logTask( 1, 'Saving:', fAccent( calculatedResultsPath ) );
+		logTask(
+			2,
+			'Saving curated results to:',
+			fAccent( calculatedResultsPath )
+		);
 		fs.writeFileSync(
 			calculatedResultsPath,
 			JSON.stringify( results[ testSuite ], null, 2 )
@@ -409,7 +409,7 @@ async function runPerformanceTests( branches, options ) {
 
 	logTask( 0, 'Printing results' );
 	log(
-		formats.warning(
+		fWarning(
 			'\nPlease note that client side metrics EXCLUDE the server response time.'
 		)
 	);
