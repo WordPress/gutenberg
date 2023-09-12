@@ -73,7 +73,7 @@ export default function ReusableBlockEdit( {
 			return;
 		}
 
-		const isConstrained = __unstableParentLayout.type === 'constrained';
+		const isConstrained = __unstableParentLayout?.type === 'constrained';
 		const hasFullAlignment = blocks.some( ( block ) =>
 			fullAlignments.includes( block.attributes.align )
 		);
