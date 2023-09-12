@@ -106,14 +106,11 @@ export function BlockSettingsDropdown( {
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
 
-	const { openedBlockSettingsMenu } = useSelect( ( select ) => {
-		const { getOpenedBlockSettingsMenu } = unlock(
-			select( blockEditorStore )
-		);
-		return {
-			openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
-		};
-	}, [] );
+	const openedBlockSettingsMenu = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getOpenedBlockSettingsMenu(),
+		[]
+	);
 
 	const { setOpenedBlockSettingsMenu } = unlock(
 		useDispatch( blockEditorStore )
