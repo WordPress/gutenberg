@@ -12,7 +12,7 @@ export const PATTERN_TYPES = {
 };
 
 const patternSourceOptions = [
-	{ value: 'all', label: __( 'Unfiltered' ) },
+	{ value: 'all', label: __( 'All' ) },
 	{ value: PATTERN_TYPES.theme, label: __( 'Theme patterns' ) },
 	{ value: PATTERN_TYPES.user, label: __( 'My patterns' ) },
 ];
@@ -34,6 +34,7 @@ export default function BlockPatternsSourceFilter( { onChange, value } ) {
 			value={ value }
 			onChange={ onChange }
 			aria-label={ __( 'Filter patterns by type' ) }
+			hideLabelFromVision
 		/>
 	);
 }

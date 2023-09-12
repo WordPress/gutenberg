@@ -15,7 +15,7 @@ export const SYNC_TYPES = {
 };
 
 const patternSyncOptions = [
-	{ value: 'all', label: __( 'Any' ) },
+	{ value: 'all', label: __( 'All' ) },
 	{ value: SYNC_TYPES.full, label: __( 'Synced' ) },
 	{ value: SYNC_TYPES.unsynced, label: __( 'Standard' ) },
 ];
@@ -38,7 +38,7 @@ export function BlockPatternsSyncFilter() {
 	return (
 		<SelectControl
 			className="block-editor-patterns__sync-status-filter"
-			label={ __( 'Sync type' ) }
+			label={ __( 'Syncing' ) }
 			options={ patternSyncOptions }
 			value={ syncFilter }
 			onChange={ ( value ) => handleUpdateSyncFilter( value ) }
