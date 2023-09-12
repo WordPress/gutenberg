@@ -80,13 +80,15 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		}
 
 		if ( typeof focusOnMountRef?.current === 'function' ) {
+			// Store a reference to the function to ensure that the
+			// focusOnMountRef will still hold a reference to a function
+			// when the timeout fires.
+			const focusOnMountFunc = focusOnMountRef.current;
+
 			timerId.current = setTimeout( () => {
 				const tabbables = focus.tabbable.find( node );
 
-				// Ignoring next line because the type is actually callable,
-				// but the linter cannot recognise the outer typeof check.
-				// @ts-ignore
-				const elementToFocus = focusOnMountRef.current( tabbables );
+				const elementToFocus = focusOnMountFunc( tabbables );
 
 				if ( elementToFocus ) {
 					setFocus( /** @type {HTMLElement} */ ( elementToFocus ) );
