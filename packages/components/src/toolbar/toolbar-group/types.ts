@@ -40,15 +40,6 @@ export type ToolbarGroupProps = {
 	 * ARIA label for dropdown menu if is collapsed.
 	 */
 	title?: string;
-
-	// TODO: Rekit
-	icon?: any;
-	label?: string;
-
-	/**
-	 * Props to be passed.
-	 */
-	props?: any;
 };
 
 export type ToolbarGroupCollapsedProps = Omit< ToolbarGroupProps, 'props' > & {
