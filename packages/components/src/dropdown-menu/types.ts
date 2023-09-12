@@ -59,7 +59,7 @@ type ToggleProps = Partial<
 	>
 > & {
 	as?: React.ElementType | keyof JSX.IntrinsicElements;
-	'data-toolbar-item': boolean;
+	'data-toolbar-item'?: boolean;
 };
 
 export type DropdownMenuProps = {
