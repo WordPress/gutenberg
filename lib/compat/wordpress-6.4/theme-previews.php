@@ -12,7 +12,7 @@
  * @return array The editor settings.
  */
 function gutenberg_theme_preview_block_editor_settings_all( $settings ) {
-	$settings['__experimentalDashboardLink'] = 'themes.php';
+	$settings['__experimentalDashboardLink']     = 'themes.php';
 	$settings['__experimentalDashboardLinkText'] = __( 'Go back to the theme showcase' );
 	return $settings;
 }
