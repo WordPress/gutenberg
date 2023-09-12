@@ -39,6 +39,10 @@ export default function ImageSettingsPanel( {
 				panelId={ panelId }
 			>
 				<ToolsPanelItem
+					// We use the `userSettings` prop instead of `settings`, because `settings`
+					// contains the core/theme values for the lightbox and we want to show the
+					// "RESET" button ONLY when the user has explicitly set a value in the
+					// Global Styles.
 					hasValue={ () => !! userSettings?.lightbox }
 					label={ __( 'Expand on Click' ) }
 					onDeselect={ resetLightbox }
