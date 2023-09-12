@@ -206,14 +206,16 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 								$face_index
 							);
 						}
+						error_log( print_r( $files, true ) );
 
 						if ( isset( $font_face['uploadedFile'] ) ) {
 							if ( ! isset( $files[ $font_face['uploadedFile'] ] ) ) {
 								$error_messages[] = sprintf(
 									// translators: 1: font family index, 2: font face index.
-									__( 'Font family [%1$s] Font face [%2$s] file is not defined in the request files.', 'gutenberg' ),
-									$family_index,
-									$face_index
+									__( 'Font family [%1$s] Font face [%2$s] file is not defined in the request files ([%3$s]).', 'gutenberg' ),
+									$font_family['name'],
+									$font_face['fontFace'][$face_index]['fontWeight'] + " " + $font_face['fontFace'][$face_index]['fontStyle'],
+									$font_face['uploadedFile'] 
 								);
 							}
 						}
