@@ -52,7 +52,7 @@ function render_block_core_block( $attributes, $block_content ) {
 			return $parsed_block;
 		}
 
-		$alignment = _wp_array_get( $parsed_block, array( 'attrs', 'align' ), null );
+		$alignment       = _wp_array_get( $parsed_block, array( 'attrs', 'align' ), null );
 		$full_alignments = array( 'full', 'left', 'right' );
 
 		if ( in_array( $alignment, $full_alignments, true ) ) {
