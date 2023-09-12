@@ -209,14 +209,9 @@ function Tab( {
 		<Ariakit.Tab
 			store={ store }
 			id={ instancedTabId }
-			className={ classnames(
-				'components-tab-panel__tabs-item',
-				className,
-				{
-					[ activeClass ]:
-						instancedTabId === store.useState().activeId,
-				}
-			) }
+			className={ classnames( 'components-tabs__tabs-item', className, {
+				[ activeClass ]: instancedTabId === store.useState().activeId,
+			} ) }
 			style={ style }
 			disabled={ disabled }
 			render={
