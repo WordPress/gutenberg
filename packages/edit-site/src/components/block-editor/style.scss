@@ -179,8 +179,8 @@
 @include break-medium() {
 	.block-editor-block-contextual-toolbar.is-fixed {
 		// Minus one to account for the bottom border of the .is-fixed parent.
-		height: $header-height - 1;
+		height: $header-height - $border-width;
 		// Ensure the block tools icons remain aligned with the main toolbar items.
-		padding-top: 1px;
+		padding-top: $border-width;
 	}
 }
