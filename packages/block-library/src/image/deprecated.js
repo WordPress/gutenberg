@@ -1049,14 +1049,13 @@ const v8 = {
 	migrate( { width, height, ...attributes } ) {
 		const {
 			behaviors: {
-				lightbox: { enabled, animation },
+				lightbox: { enabled },
 			},
 		} = attributes;
 		const newAttributes = {
 			...attributes,
 			lightbox: {
 				enabled,
-				animation,
 			},
 		};
 		delete newAttributes.behaviors;

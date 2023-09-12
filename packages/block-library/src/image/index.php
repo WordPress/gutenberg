@@ -64,7 +64,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	if ( $lightbox_enabled ) {
-		return block_core_image_render_lightbox( $processor->get_updated_html(), $block->parsed_block, $lightbox_settings );
+		return block_core_image_render_lightbox( $processor->get_updated_html(), $block->parsed_block );
 	}
 
 	return $processor->get_updated_html();
@@ -111,7 +111,7 @@ function block_core_image_get_lightbox_settings( $block ) {
  * @param  array  $lightbox_settings    Lightbox settings: enabled, animation.
  * @return string                Filtered block content.
  */
-function block_core_image_render_lightbox( $block_content, $block, $lightbox_settings ) {
+function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
@@ -129,13 +129,8 @@ function block_core_image_render_lightbox( $block_content, $block, $lightbox_set
 	}
 	$content = $processor->get_updated_html();
 
-	// Currently, the only animation type surfaced in the UI is the default
-	// zoom animation; however, here is also support for the legacy syntax,
-	// which supported configuring a fade animation as well.
+	// Currently, we are only enabling the zoom animation.
 	$lightbox_animation = 'zoom';
-	if ( isset( $lightbox_settings['animation'] ) ) {
-		$lightbox_animation = $lightbox_settings['animation'];
-	}
 
 	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
 	$z = new WP_HTML_Tag_Processor( $content );
