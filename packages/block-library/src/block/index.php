@@ -67,7 +67,11 @@ function render_block_core_block( $attributes, $block_content ) {
 		return $parsed_block;
 	};
 
-	add_filter( 'render_block_data', $filter_alignments, 10, 3 );
+	// Only need to add the render_block_data filter when the pattern has saved
+	// a wrapper element in its block content.
+	if ( $block_content ) {
+		add_filter( 'render_block_data', $filter_alignments, 10, 3 );
+	}
 
 	// Handle embeds for reusable blocks.
 	global $wp_embed;
@@ -78,14 +82,14 @@ function render_block_core_block( $attributes, $block_content ) {
 
 	unset( $seen_refs[ $attributes['ref'] ] );
 
-	remove_filter( 'render_block_data', $filter_alignments, 10 );
-
 	// Older block versions used only the post's content without incorporating
 	// the editor's wrapper. Newer versions added a wrapper through saved
 	// markup, so utilize it to return only the post's content when appropriate.
 	if ( ! $block_content ) {
 		return $content;
 	}
+
+	remove_filter( 'render_block_data', $filter_alignments, 10 );
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$processor->next_tag();
