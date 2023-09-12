@@ -403,7 +403,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( is_array( $gap_value ) ) {
-					$gap_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+					$gap_value = isset( $gap_value[ $gap_side ] ) ? $gap_value[ $gap_side ] : $fallback_gap_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
@@ -487,7 +487,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( is_array( $gap_value ) ) {
-					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+					$process_value = isset( $gap_value[ $gap_side ] ) ? $gap_value[ $gap_side ] : $fallback_gap_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
@@ -537,7 +537,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$layout_from_parent    = $block['attrs']['style']['layout']['selfStretch'] ?? null;
+	$layout_from_parent    = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
 	if ( ! $block_supports_layout && ! $layout_from_parent ) {
 		return $block_content;
@@ -600,11 +600,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$global_settings = gutenberg_get_global_settings();
-	$fallback_layout = $block_type->supports['layout']['default'] ?? array();
+	$fallback_layout = isset( $block_type->supports['layout']['default'] ) ? $block_type->supports['layout']['default'] : array();
 	if ( empty( $fallback_layout ) ) {
-		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
+		$fallback_layout = isset( $block_type->supports['__experimentalLayout']['default'] ) ? $block_type->supports['__experimentalLayout']['default'] : array();
 	}
-	$used_layout = $block['attrs']['layout'] ?? $fallback_layout;
+	$used_layout = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $fallback_layout;
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
@@ -615,7 +615,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout['type'] = 'constrained';
 	}
 
-	$root_padding_aware_alignments = $global_settings['useRootPaddingAwareAlignments'] ?? false;
+	$root_padding_aware_alignments = isset( $global_settings['useRootPaddingAwareAlignments'] ) ? $global_settings['useRootPaddingAwareAlignments'] : false;
 
 	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) && 'constrained' === $used_layout['type'] ) {
 		$class_names[] = 'has-global-padding';
@@ -641,9 +641,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Get classname for layout type.
 	if ( isset( $used_layout['type'] ) ) {
-		$layout_classname = $layout_definitions[ $used_layout['type'] ]['className'] ?? '';
+		$layout_classname = isset( $layout_definitions[ $used_layout['type'] ]['className'] ) ? $layout_definitions[ $used_layout['type'] ]['className'] : '';
 	} else {
-		$layout_classname = $layout_definitions['default']['className'] ?? '';
+		$layout_classname = isset( $layout_definitions['default']['className'] ) ? $layout_definitions['default']['className'] : '';
 	}
 
 	if ( $layout_classname && is_string( $layout_classname ) ) {
@@ -656,7 +656,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 */
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
-		$gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
+		$gap_value = isset( $block['attrs']['style']['spacing']['blockGap'] ) ? $block['attrs']['style']['spacing']['blockGap'] : null;
 
 		/*
 		 * Skip if gap value contains unsupported characters.
@@ -671,8 +671,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 		}
 
-		$fallback_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? '0.5em';
-		$block_spacing      = $block['attrs']['style']['spacing'] ?? null;
+		$fallback_gap_value = isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) ? $block_type->supports['spacing']['blockGap']['__experimentalDefault'] : '0.5em';
+		$block_spacing      = isset( $block['attrs']['style']['spacing'] ) ? $block['attrs']['style']['spacing'] : null;
 
 		/*
 		 * If a block's block.json skips serialization for spacing or spacing.blockGap,
@@ -680,7 +680,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 */
 		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
-		$block_gap             = $global_settings['spacing']['blockGap'] ?? null;
+		$block_gap             = isset( $global_settings['spacing']['blockGap'] ) ? $global_settings['spacing']['blockGap'] : null;
 		$has_block_gap_support = isset( $block_gap );
 
 		$style = gutenberg_get_layout_style(
@@ -759,7 +759,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * @var string|null
 	 */
 	$inner_block_wrapper_classes = null;
-	$first_chunk                 = $block['innerContent'][0] ?? null;
+	$first_chunk                 = isset( $block['innerContent'][0] ) ? $block['innerContent'][0] : null;
 	if ( is_string( $first_chunk ) && count( $block['innerContent'] ) > 1 ) {
 		$first_chunk_processor = new WP_HTML_Tag_Processor( $first_chunk );
 		while ( $first_chunk_processor->next_tag() ) {
