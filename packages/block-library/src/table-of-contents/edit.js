@@ -15,10 +15,12 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { renderToString } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,7 +51,15 @@ export default function TableOfContentsEdit( {
 } ) {
 	useObserveHeadings( clientId );
 
-	const blockProps = useBlockProps();
+	const instanceId = useInstanceId( TableOfContentsEdit );
+	const instanceIdDesc = sprintf(
+		'table-of-contents-edit-%d-desc',
+		instanceId
+	);
+
+	const blockProps = useBlockProps( {
+		'aria-describedby': instanceIdDesc,
+	} );
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -143,6 +153,9 @@ export default function TableOfContentsEdit( {
 						disableLinkActivation={ true }
 					/>
 				</ol>
+				<VisuallyHidden id={ instanceIdDesc }>
+					{ __( 'Table of Contents links disabled in editor.' ) }
+				</VisuallyHidden>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }
