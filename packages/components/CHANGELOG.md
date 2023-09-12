@@ -2,6 +2,7 @@
 
 ## Unreleased
 -   `ProgressBar`: Export component to allow it to be used ([#54404](https://github.com/WordPress/gutenberg/pull/54404)).
+-   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
 
 ### Enhancements
 
