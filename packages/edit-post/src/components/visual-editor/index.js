@@ -265,6 +265,9 @@ export default function VisualEditor( { styles } ) {
 		? postContentLayout
 		: fallbackLayout;
 
+	const postEditorLayout =
+		blockListLayout?.type === 'default' ? fallbackLayout : blockListLayout;
+
 	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
@@ -337,7 +340,7 @@ export default function VisualEditor( { styles } ) {
 									/>
 									<LayoutStyle
 										selector=".block-editor-block-list__layout.is-root-container"
-										layout={ blockListLayout }
+										layout={ postEditorLayout }
 									/>
 									{ align && (
 										<LayoutStyle css={ alignCSS } />
