@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
 import icon from './icon';
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { getHeadingsFromMeta, useObserveHeadings } from './hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -69,10 +69,7 @@ export default function TableOfContentsEdit( {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	const [ meta ] = useEntityProp( 'postType', postType, 'meta', postId );
-	const headings = meta?.table_of_contents
-		? JSON.parse( meta.table_of_contents )
-		: [];
-
+	const headings = getHeadingsFromMeta( meta );
 	const headingTree = linearToNestedHeadingList( headings );
 
 	const toolbarControls = canInsertList && (

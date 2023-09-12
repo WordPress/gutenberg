@@ -28,7 +28,7 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 
 		add_post_meta(
 			self::$page->ID,
-			'table_of_contents',
+			'core_table_of_contents',
 			'[{"content":"Heading text","level":2,"link":"#heading-text"},{"content":"A sub-heading","level":3,"link":"#a-sub-heading"}]',
 			true
 		);

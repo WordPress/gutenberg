@@ -12,6 +12,16 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+export const META_KEY = 'core_table_of_contents';
+
+export function getHeadingsFromMeta( meta ) {
+	if ( ! meta?.[ META_KEY ] ) {
+		return [];
+	}
+
+	return JSON.parse( meta[ META_KEY ] );
+}
+
 function getLatestHeadings( select, clientId ) {
 	const {
 		getBlockAttributes,
@@ -112,9 +122,7 @@ function observeCallback( select, dispatch, context ) {
 	const { editEntityRecord } = dispatch( coreStore );
 
 	const meta = getEditedEntityRecord( 'postType', postType, postId ).meta;
-	const storedHeadings = meta?.table_of_contents
-		? JSON.parse( meta.table_of_contents )
-		: [];
+	const storedHeadings = getHeadingsFromMeta( meta );
 
 	const headings = getLatestHeadings( select, clientId );
 	if ( ! fastDeepEqual( headings, storedHeadings ) ) {
@@ -125,7 +133,7 @@ function observeCallback( select, dispatch, context ) {
 			{
 				meta: {
 					...meta,
-					table_of_contents: JSON.stringify( headings ),
+					[ META_KEY ]: JSON.stringify( headings ),
 				},
 			},
 			{

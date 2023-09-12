@@ -25,7 +25,7 @@ function register_block_core_table_of_contents() {
 
 		register_post_meta(
 			$post_type,
-			'table_of_contents',
+			'core_table_of_contents',
 			array(
 				'show_in_rest' => true,
 				'single'       => true,
@@ -162,7 +162,7 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$headings = get_post_meta( $block->context['postId'], 'table_of_contents', true );
+	$headings = get_post_meta( $block->context['postId'], 'core_table_of_contents', true );
 
 	if ( ! $headings ) {
 		return '';
