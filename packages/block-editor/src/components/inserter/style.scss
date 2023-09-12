@@ -271,7 +271,8 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__block-patterns-tabs-container {
+.block-editor-inserter__block-patterns-tabs-container,
+.block-editor-block-patterns-explorer__sidebar {
 	height: 100%;
 	nav {
 		height: 100%;
