@@ -89,6 +89,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primaryShift"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ! isActive && (
@@ -100,6 +102,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ( addingLink || isActive ) && (
@@ -127,6 +131,7 @@ export const link = {
 		type: 'data-type',
 		id: 'data-id',
 		target: 'target',
+		rel: 'rel',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
 		if ( isCollapsed( value ) ) {

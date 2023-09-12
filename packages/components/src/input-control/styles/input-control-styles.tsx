@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css, SerializedStyles } from '@emotion/react';
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
 

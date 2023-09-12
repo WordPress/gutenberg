@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { act, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ describe( 'AlignmentMatrixControl', () => {
 
 	describe( 'Change value', () => {
 		const alignments = [ 'center left', 'center center', 'bottom center' ];
+		const user = userEvent.setup();
 
 		it.each( alignments )(
 			'should change value on %s cell click',
@@ -37,7 +39,9 @@ describe( 'AlignmentMatrixControl', () => {
 					<AlignmentMatrixControl value="center" onChange={ spy } />
 				);
 
-				await act( () => getCell( alignment ).focus() );
+				await user.click( getCell( alignment ) );
+
+				expect( getCell( alignment ) ).toHaveFocus();
 
 				expect( spy ).toHaveBeenCalledWith( alignment );
 			}

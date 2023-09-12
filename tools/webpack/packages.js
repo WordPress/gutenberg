@@ -24,7 +24,11 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // Experimental or other packages that should be private are bundled when used.
 // That way, we can iterate on these package without making them part of the public API.
 // See: https://github.com/WordPress/gutenberg/pull/19809
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const BUNDLED_PACKAGES = [
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/undo-manager',
+];
 
 // PHP files in packages that have to be copied during build.
 const bundledPackagesPhpConfig = [

@@ -12,7 +12,8 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
 import { space } from '../../ui/utils/space';
 import * as styles from '../styles';

@@ -157,7 +157,7 @@ export default function SidebarNavigationScreenPages() {
 					<>
 						{ ( isLoadingPages || isLoadingTemplates ) && (
 							<ItemGroup>
-								<Item>{ __( 'Loading pages' ) }</Item>
+								<Item>{ __( 'Loading pages…' ) }</Item>
 							</ItemGroup>
 						) }
 						{ ! ( isLoadingPages || isLoadingTemplates ) && (

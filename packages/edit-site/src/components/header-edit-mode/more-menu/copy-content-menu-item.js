@@ -16,28 +16,27 @@ import { store as editSiteStore } from '../../../store';
 
 export default function CopyContentMenuItem() {
 	const { createNotice } = useDispatch( noticesStore );
-	const getText = useSelect( ( select ) => {
-		return () => {
-			const { getEditedPostId, getEditedPostType } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const record = getEditedEntityRecord(
-				'postType',
-				getEditedPostType(),
-				getEditedPostId()
-			);
-			if ( record ) {
-				if ( typeof record.content === 'function' ) {
-					return record.content( record );
-				} else if ( record.blocks ) {
-					return __unstableSerializeAndClean( record.blocks );
-				} else if ( record.content ) {
-					return record.content;
-				}
-			}
+	const { getEditedPostId, getEditedPostType } = useSelect( editSiteStore );
+	const { getEditedEntityRecord } = useSelect( coreStore );
+
+	function getText() {
+		const record = getEditedEntityRecord(
+			'postType',
+			getEditedPostType(),
+			getEditedPostId()
+		);
+		if ( ! record ) {
 			return '';
-		};
-	}, [] );
+		}
+
+		if ( typeof record.content === 'function' ) {
+			return record.content( record );
+		} else if ( record.blocks ) {
+			return __unstableSerializeAndClean( record.blocks );
+		} else if ( record.content ) {
+			return record.content;
+		}
+	}
 
 	function onSuccess() {
 		createNotice( 'info', __( 'All content copied.' ), {

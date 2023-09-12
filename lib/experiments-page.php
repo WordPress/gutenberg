@@ -44,6 +44,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-sync-collaboration',
+		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-zoomed-out-view',
 		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -92,14 +104,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-auto-inserting-blocks',
-		__( 'Auto-inserting blocks', 'gutenberg' ),
+		'gutenberg-block-hooks',
+		__( 'Block hooks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Auto-inserting blocks', 'gutenberg' ),
-			'id'    => 'gutenberg-auto-inserting-blocks',
+			'label' => __( 'Block hooks allow automatically inserting a block in a position relative to another.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-hooks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-custom-fields',
+		__( 'Connections', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test Connections', 'gutenberg' ),
+			'id'    => 'gutenberg-connections',
 		)
 	);
 

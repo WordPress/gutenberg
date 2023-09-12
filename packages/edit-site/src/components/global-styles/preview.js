@@ -18,8 +18,9 @@ import { useState, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { useStylesPreviewColors } from './hooks';
 
-const { useGlobalSetting, useGlobalStyle, useGlobalStylesOutput } = unlock(
+const { useGlobalStyle, useGlobalStylesOutput } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -76,22 +77,11 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
 	const disableMotion = useReducedMotion();
-	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
-	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
-	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ containerResizeListener, { width } ] = useResizeObserver();
 	const ratio = width ? width / normalizedWidth : 1;
 
-	const paletteColors = ( themeColors ?? [] )
-		.concat( customColors ?? [] )
-		.concat( coreColors ?? [] );
-	const highlightedColors = paletteColors
-		.filter(
-			// we exclude these two colors because they are already visible in the preview.
-			( { color } ) => color !== backgroundColor && color !== headingColor
-		)
-		.slice( 0, 2 );
+	const { paletteColors, highlightedColors } = useStylesPreviewColors();
 
 	// Reset leaked styles from WP common.css and remove main content layout padding and border.
 	const editorStyles = useMemo( () => {

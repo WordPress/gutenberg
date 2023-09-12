@@ -12,9 +12,9 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	cog,
 	code,
 	keyboard,
+	listView,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -75,6 +75,37 @@ function usePageContentFocusCommands() {
 			icon: page,
 			callback: ( { close } ) => {
 				setHasPageContentFocus( true );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
+function useEditorModeCommands() {
+	const { switchEditorMode } = useDispatch( editSiteStore );
+	const { canvasMode, editorMode } = useSelect(
+		( select ) => ( {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: select( editSiteStore ).getEditorMode(),
+		} ),
+		[]
+	);
+
+	if ( canvasMode !== 'edit' || editorMode !== 'text' ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( editorMode === 'text' ) {
+		commands.push( {
+			name: 'core/exit-code-editor',
+			label: __( 'Exit code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'visual' );
 				close();
 			},
 		} );
@@ -164,28 +195,38 @@ function useEditUICommands() {
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
-		setIsInserterOpened,
+		toggleDistractionFree,
 		setIsListViewOpened,
 		switchEditorMode,
 	} = useDispatch( editSiteStore );
-	const { canvasMode, editorMode, activeSidebar, showBlockBreadcrumbs } =
-		useSelect(
-			( select ) => ( {
-				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-				editorMode: select( editSiteStore ).getEditorMode(),
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editSiteStore.name ),
-				showBlockBreadcrumbs: select( preferencesStore ).get(
-					'core/edit-site',
-					'showBlockBreadcrumbs'
-				),
-			} ),
-			[]
-		);
+	const {
+		canvasMode,
+		editorMode,
+		activeSidebar,
+		showBlockBreadcrumbs,
+		isListViewOpen,
+		isDistractionFree,
+	} = useSelect( ( select ) => {
+		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		return {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: getEditorMode(),
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
+			isListViewOpen: isListViewOpened(),
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+		};
+	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
-	const { get: getPreference } = useSelect( preferencesStore );
-	const { set: setPreference, toggle } = useDispatch( preferencesStore );
+	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	if ( canvasMode !== 'edit' ) {
@@ -225,7 +266,6 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'focusMode' );
 			close();
@@ -235,22 +275,8 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
-		icon: cog,
 		callback: ( { close } ) => {
-			setPreference( 'core/edit-site', 'fixedToolbar', false );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-			toggle( 'core/edit-site', 'distractionFree' );
-			createInfoNotice(
-				getPreference( 'core/edit-site', 'distractionFree' )
-					? __( 'Distraction free mode turned on.' )
-					: __( 'Distraction free mode turned off.' ),
-				{
-					id: 'core/edit-site/distraction-free-mode/notice',
-					type: 'snackbar',
-				}
-			);
+			toggleDistractionFree();
 			close();
 		},
 	} );
@@ -258,27 +284,30 @@ function useEditUICommands() {
 	commands.push( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'fixedToolbar' );
+			if ( isDistractionFree ) {
+				toggleDistractionFree();
+			}
 			close();
 		},
 	} );
 
-	commands.push( {
-		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
-		icon: code,
-		callback: ( { close } ) => {
-			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
-			close();
-		},
-	} );
+	if ( editorMode === 'visual' ) {
+		commands.push( {
+			name: 'core/toggle-code-editor',
+			label: __( 'Open code editor' ),
+			icon: code,
+			callback: ( { close } ) => {
+				switchEditorMode( 'text' );
+				close();
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
-		icon: cog,
+		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -286,7 +315,7 @@ function useEditUICommands() {
 
 	commands.push( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
+		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
@@ -298,9 +327,27 @@ function useEditUICommands() {
 		label: showBlockBreadcrumbs
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
-		icon: cog,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			close();
+			createInfoNotice(
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
+				{
+					id: 'core/edit-site/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-list-view',
+		label: __( 'Toggle list view' ),
+		icon: listView,
+		callback: ( { close } ) => {
+			setIsListViewOpened( ! isListViewOpen );
 			close();
 		},
 	} );
@@ -312,6 +359,12 @@ function useEditUICommands() {
 }
 
 export function useEditModeCommands() {
+	useCommandLoader( {
+		name: 'core/exit-code-editor',
+		hook: useEditorModeCommands,
+		context: 'site-editor-edit',
+	} );
+
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,

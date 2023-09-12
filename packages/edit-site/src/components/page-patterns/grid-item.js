@@ -27,7 +27,7 @@ import {
 	footer,
 	symbolFilled as uncategorized,
 	symbol,
-	moreHorizontal,
+	moreVertical,
 	lockSmall,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -154,7 +154,8 @@ function GridItem( { categoryId, item, ...props } ) {
 						: undefined
 				}
 			>
-				{ isEmpty && __( 'Empty pattern' ) }
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
@@ -220,13 +221,12 @@ function GridItem( { categoryId, item, ...props } ) {
 					</Flex>
 				</HStack>
 				<DropdownMenu
-					icon={ moreHorizontal }
+					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					className="edit-site-patterns__dropdown"
 					popoverProps={ { placement: 'bottom-end' } }
 					toggleProps={ {
 						className: 'edit-site-patterns__button',
-						isSmall: true,
 						describedBy: sprintf(
 							/* translators: %s: pattern name */
 							__( 'Action menu for %s pattern' ),
@@ -254,6 +254,7 @@ function GridItem( { categoryId, item, ...props } ) {
 							/>
 							{ isCustomPattern && (
 								<MenuItem
+									isDestructive={ ! hasThemeFile }
 									onClick={ () =>
 										setIsDeleteDialogOpen( true )
 									}
