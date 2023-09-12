@@ -22,7 +22,7 @@ If you do not already have a preferred code editor, [Visual Studio Code](https:/
 
 These tools are used to convert the JavaScript you will write into a format browsers can run. This is called transpiling or the build step.
 
-Note that the script `npx` will be automatically installed with `node`. This script is used to run packages not yet installed and is commonly used when scaffolding blocks with the [`create-block`](/docs/reference-guides/packages/packages-create-block/) package.
+Note that the script `npx` will be automatically installed with `node`. This script is used to run packages not yet installed and is commonly used when scaffolding blocks with the [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
 
 ### Mac and Linux
 
@@ -60,8 +60,8 @@ Many tools are available for setting up a local WordPress environment (site) on 
 
 Refer to the individual guides below for setup instuctions.
 
--   [Guide to using `wp-env`](/docs/getting-started/devenv/guide-to-using-wp-env/)
--   [Guide to using `wp-now`](/docs/getting-started/devenv/guide-to-using-wp-now/)
+-   [Guide to using `wp-env`](/docs/getting-started/devenv/guide-to-using-wp-env.md)
+-   [Guide to using `wp-now`](/docs/getting-started/devenv/guide-to-using-wp-now.md)
 
 Of the two, `wp-env` is the more robust and complete solution. It's also the recommended tool for Gutenberg development. On the other hand, `wp-now` offers a simplified setup and does not require Docker. Both are valid approaches, so the choice is yours.
 
