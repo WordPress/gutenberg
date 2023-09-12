@@ -56,13 +56,9 @@ const v1 = {
 
 		return (
 			<nav { ...useBlockProps.save() }>
-				<ol>
-					<TableOfContentsList
-						nestedHeadingList={ linearToNestedHeadingList(
-							headings
-						) }
-					/>
-				</ol>
+				<TableOfContentsList
+					nestedHeadingList={ linearToNestedHeadingList( headings ) }
+				/>
 			</nav>
 		);
 	},
