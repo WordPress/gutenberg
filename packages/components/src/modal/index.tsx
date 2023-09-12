@@ -49,10 +49,10 @@ let openModalCount = 0;
  * for the best a11y experience.
  *
  * See: https://github.com/WordPress/gutenberg/issues/54106.
- * @param tabbables HTMLElement[] an array of tabbable elements.
- * @return HTMLElement the first tabbable element that is not a close button.
+ * @param tabbables Element[] an array of tabbable elements.
+ * @return Element the first tabbable element that is not a close button.
  */
-function getFirstTabbableElement( tabbables: HTMLElement[] ) {
+function getFirstTabbableElement( tabbables: Element[] ) {
 	// Attempt to locate tabbable outside of the header portion of the Modal.
 	const firstContentTabbable = tabbables.find( ( tabbable ) => {
 		return tabbable.closest( '.components-modal__header' ) === null;
