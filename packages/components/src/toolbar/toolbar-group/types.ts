@@ -3,19 +3,23 @@
  */
 import type { ReactNode } from 'react';
 
-// TODO: Type these props correctly
-type ToolbarControls = {
-	// icon?: string;
-	// title?: string;
-	// onClick: ( event?: Event ) => void;
-	// isActive?: boolean;
+/**
+ * Internal dependencies
+ */
+import type { DropdownOption } from '../../dropdown-menu/types';
+
+export type ToolbarGroupControls = DropdownOption & {
+	/**
+	 * An optional subscript associated to the control.
+	 */
+	subscript?: string;
 };
 
 export type ToolbarGroupProps = {
 	/**
 	 * The controls to render in this toolbar.
 	 */
-	controls?: ToolbarControls[];
+	controls?: ToolbarGroupControls[];
 
 	/**
 	 * Any other things to render inside the toolbar besides the controls.
