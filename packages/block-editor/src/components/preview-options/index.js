@@ -81,8 +81,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ typeof children === 'function' &&
-						children( renderProps ) }
+					{ children?.( renderProps ) }
 				</>
 			) }
 		</DropdownMenu>
