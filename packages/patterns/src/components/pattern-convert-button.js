@@ -20,6 +20,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
+import { unlock } from '../lock-unlock';
 
 /**
  * Menu control to convert block(s) to a pattern block.
@@ -32,7 +33,9 @@ import CreatePatternModal from './create-pattern-modal';
 export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { __experimentalSetEditingPattern } = useDispatch( patternsStore );
+	// Ignore reason: false positive of the lint rule.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { setEditingPattern } = unlock( useDispatch( patternsStore ) );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const canConvert = useSelect(
 		( select ) => {
@@ -98,7 +101,7 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		} );
 
 		replaceBlocks( clientIds, newBlock );
-		__experimentalSetEditingPattern( newBlock.clientId, true );
+		setEditingPattern( newBlock.clientId, true );
 
 		createSuccessNotice(
 			pattern.wp_pattern_sync_status === 'unsynced'

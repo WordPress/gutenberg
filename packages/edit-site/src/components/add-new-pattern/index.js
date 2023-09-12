@@ -33,8 +33,7 @@ export default function AddNewPattern() {
 		const settings = select( editSiteStore ).getSettings();
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
-	const { __experimentalCreatePatternFromFile: createPatternFromFile } =
-		useDispatch( patternsStore );
+	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
