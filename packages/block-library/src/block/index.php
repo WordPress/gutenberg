@@ -124,3 +124,31 @@ function register_block_core_block() {
 	);
 }
 add_action( 'init', 'register_block_core_block' );
+
+/**
+ * Filter to short circuit rendering of old deprecated pattern blocks which
+ * haven't any saved content and need to skip any application of block supports.
+ *
+ * @param string|null $pre_render The pre-rendered content. Default null.
+ * @param array       $block      The block being rendered.
+ *
+ * @return string|null;
+ */
+function block_core_block_pre_render( $pre_render, $block ) {
+	if ( 'core/block' !== $block['blockName'] ) {
+		return null;
+	}
+
+	$attributes = _wp_array_get( $block, array( 'attrs' ), array() );
+	$inner_html = _wp_array_get( $block, array( 'innerHTML' ), null );
+
+	// Pattern's without wrappers will not have saved inner HTML and need to
+	// avoid layout supports applied via render_block.
+	if ( $inner_html ) {
+		return null;
+	}
+
+	return render_block_core_block( $attributes, $inner_html );
+}
+
+add_filter( 'pre_render_block', 'block_core_block_pre_render', 10, 2 );
