@@ -45,4 +45,3 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 		$this->assertSame( 404, $response->get_status() );
 	}
 }
-
