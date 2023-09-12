@@ -836,7 +836,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		$block_content = str_replace( 'is-layout-constrained ', '', $block_content );
 	}
 
-	$replace_regex = sprintf(
+	$replace_regex   = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
 	);
