@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Update `useFocusOnMount` to allow passing a callback as the primary argument. This allows for consumers to optionally implement custom focus handling. ([#54296](https://github.com/WordPress/gutenberg/pull/54296)).
+
 ## 6.18.0 (2023-08-31)
 
 ## 6.17.0 (2023-08-16)
