@@ -123,7 +123,7 @@ function block_core_table_of_contents_build_list( $tree, $args ) {
 
 	foreach ( $tree as $item ) {
 		$heading  = $item['heading'];
-		$children = isset( $item['children'] ) ? '<ol>' . block_core_table_of_contents_build_list( $item['children'], $args ) . '</ol>' : '';
+		$children = isset( $item['children'] ) ? block_core_table_of_contents_build_list( $item['children'], $args ) : '';
 
 		if ( ! empty( $heading['link'] ) ) {
 			$pagelink = ! empty( $heading['page'] ) ? add_query_arg( 'page', $heading['page'], $permalink ) : $permalink;
@@ -135,7 +135,7 @@ function block_core_table_of_contents_build_list( $tree, $args ) {
 		$list .= '<li>' . $content . $children . '</li>';
 	}
 
-	return $list;
+	return '<ol>' . $list . '</ol>';
 }
 
 /**
@@ -179,7 +179,7 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 	$tree = block_core_table_of_contents_build_headings_tree( $headings );
 
 	return sprintf(
-		'<nav %1$s><ol>%2$s</ol></nav>',
+		'<nav %1$s>%2$s</nav>',
 		get_block_wrapper_attributes(),
 		block_core_table_of_contents_build_list( $tree, array( 'postId' => $block->context['postId'] ) )
 	);

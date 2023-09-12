@@ -16,7 +16,7 @@ export default function TableOfContentsList( {
 	nestedHeadingList: NestedHeadingData[];
 } ): WPElement {
 	return (
-		<>
+		<ol>
 			{ nestedHeadingList.map( ( node, index ) => {
 				const { content, link } = node.heading;
 
@@ -32,15 +32,13 @@ export default function TableOfContentsList( {
 					<li key={ index }>
 						{ entry }
 						{ node.children ? (
-							<ol>
-								<TableOfContentsList
-									nestedHeadingList={ node.children }
-								/>
-							</ol>
+							<TableOfContentsList
+								nestedHeadingList={ node.children }
+							/>
 						) : null }
 					</li>
 				);
 			} ) }
-		</>
+		</ol>
 	);
 }
