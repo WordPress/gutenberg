@@ -15,7 +15,11 @@ import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 import ToolbarContext from '../toolbar-context';
-import type { ToolbarGroupProps } from './types';
+import type { ToolbarGroupProps, ToolbarGroupControls } from './types';
+
+function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
+	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
+}
 
 /**
  * Renders a collapsible group of controls
@@ -73,9 +77,11 @@ function ToolbarGroup( {
 	);
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	let controlSets: ToolbarGroupControls[][];
+	if ( isNestedArray( controls ) ) {
+		controlSets = controls;
+	} else {
+		controlSets = [ controls ];
 	}
 
 	if ( isCollapsed ) {
@@ -93,8 +99,7 @@ function ToolbarGroup( {
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
-				// @ts-expect-error Type issue
-				controlSet.map( ( control: any, indexOfControl: number ) => (
+				controlSet.map( ( control, indexOfControl: number ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
 						containerClassName={
