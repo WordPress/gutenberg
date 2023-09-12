@@ -7,7 +7,7 @@ import { focus } from '@wordpress/dom';
 /**
  * Hook used to focus the first tabbable element on mount.
  *
- * @param {boolean | 'firstElement' | Function} focusOnMount Focus on mount mode.
+ * @param {boolean | 'firstElement' | ((tabbables: Element[]) => Element | null | undefined) } focusOnMount Focus on mount mode. May optionally be a callback that receives an array of tabbable elements and should return the element to focus.
  * @return {import('react').RefCallback<HTMLElement>} Ref callback.
  *
  * @example

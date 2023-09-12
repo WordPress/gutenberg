@@ -315,7 +315,7 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement' | Function`: Focus on mount mode.
+-   _focusOnMount_ `boolean | 'firstElement' | ((tabbables: Element[]) => Element | null | undefined)`: Focus on mount mode. May optionally be a callback that receives an array of tabbable elements and should return the element to focus.
 
 _Returns_
 
