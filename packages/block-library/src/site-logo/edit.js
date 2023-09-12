@@ -13,7 +13,7 @@ import {
 	useState,
 	useRef,
 } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	MenuItem,
 	PanelBody,
@@ -29,6 +29,8 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -41,6 +43,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -51,6 +54,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import useClientWidth from '../image/use-client-width';
+import { unlock } from '../lock-unlock';
 
 /**
  * Module constants
@@ -59,6 +63,19 @@ import { MIN_SIZE } from '../image/constants';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 const SiteLogo = ( {
 	alt,
@@ -73,6 +90,7 @@ const SiteLogo = ( {
 	iconId,
 	setIcon,
 	canUserEdit,
+	...otherProps
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -131,6 +149,7 @@ const SiteLogo = ( {
 					naturalHeight: event.target.naturalHeight,
 				} );
 			} }
+			{ ...otherProps }
 		/>
 	);
 
@@ -402,7 +421,9 @@ export default function LogoEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const { width, shouldSyncIcon } = attributes;
+	const { DimensionsTool } = unlock( blockEditorPrivateApis );
+
+	const { width, height, shouldSyncIcon, scale, aspectRatio } = attributes;
 	const ref = useRef();
 
 	const {
@@ -557,6 +578,17 @@ export default function LogoEdit( {
 				setIcon={ setIcon }
 				iconId={ siteIconId }
 				canUserEdit={ canUserEdit }
+				style={ {
+					aspectRatio:
+						! ( width && height ) && aspectRatio
+							? aspectRatio
+							: undefined,
+					width:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					height:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					objectFit: scale,
+				} }
 			/>
 		);
 	}
@@ -572,7 +604,15 @@ export default function LogoEdit( {
 				preview={ logoImage }
 				withIllustration={ true }
 				style={ {
-					width,
+					aspectRatio:
+						! ( width && height ) && aspectRatio
+							? aspectRatio
+							: undefined,
+					width:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					height:
+						( width && height ) || aspectRatio ? '100%' : undefined,
+					objectFit: scale,
 				} }
 			>
 				{ content }
@@ -590,6 +630,54 @@ export default function LogoEdit( {
 	} );
 
 	const label = __( 'Add a site logo' );
+
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
+
+	const resetAll = () => {
+		setAttributes( {
+			width: undefined,
+			height: undefined,
+			scale: undefined,
+			aspectRatio: undefined,
+		} );
+	};
+
+	const dimensionsControl = (
+		<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			<DimensionsTool
+				value={ { width, height, scale, aspectRatio } }
+				onChange={ ( {
+					width: newWidth,
+					height: newHeight,
+					scale: newScale,
+					aspectRatio: newAspectRatio,
+				} ) => {
+					// Rebuilding the object forces setting `undefined`
+					// for values that are removed since setAttributes
+					// doesn't do anything with keys that aren't set.
+					setAttributes( {
+						// CSS includes `height: auto`, but we need
+						// `width: auto` to fix the aspect ratio when
+						// only height is set due to the width and
+						// height attributes set via the server.
+						width: ! newWidth && newHeight ? 'auto' : newWidth,
+						height: newHeight,
+						scale: newScale,
+						aspectRatio: newAspectRatio,
+					} );
+				} }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				scaleOptions={ scaleOptions }
+				unitsOptions={ dimensionsUnitsOptions }
+			/>
+		</ToolsPanel>
+	);
 
 	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
 		<InspectorControls>
@@ -641,6 +729,7 @@ export default function LogoEdit( {
 					) }
 				</div>
 			</PanelBody>
+			{ dimensionsControl }
 		</InspectorControls>
 	);
 
