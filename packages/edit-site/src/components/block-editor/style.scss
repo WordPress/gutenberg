@@ -173,3 +173,14 @@
 	}
 }
 
+// These site editor-specific are to ensure the fixed block toolbar
+// sits neatly within the header. See: https://github.com/WordPress/gutenberg/pull/54131
+// Can be removed when the header is refactored to be consistent across editors.
+@include break-medium() {
+	.block-editor-block-contextual-toolbar.is-fixed {
+		// Minus one to account for the bottom border of the .is-fixed parent.
+		height: $header-height - 1;
+		// Ensure the block tools icons remain aligned with the main toolbar items.
+		padding-top: 1px;
+	}
+}

@@ -155,8 +155,7 @@
 			display: flex;
 
 			// Mimic the height of the parent, vertically align center, and provide a max-height.
-			// Minus one to account for the bottom border of the .is-fixed parent.
-			height: $header-height - 1;
+			height: $header-height;
 			align-items: center;
 
 			&.is-collapsed {
