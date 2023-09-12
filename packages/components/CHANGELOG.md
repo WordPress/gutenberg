@@ -29,6 +29,10 @@
 -   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
 -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
 
+### Documentation
+
+-   Button `focus` prop: Update documentation to remove the button `focus` prop ([#51808](https://github.com/WordPress/gutenberg/pull/51808)).
+
 ### Experimental
 
 -   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#54036](https://github.com/WordPress/gutenberg/pull/54036).
@@ -131,10 +135,6 @@
 -   `Guide`: Place focus on the guide's container instead of its first tabbable ([#52300](https://github.com/WordPress/gutenberg/pull/52300)).
 
 ## 25.2.0 (2023-06-23)
-
-### Documentation
-
--   Button `focus` prop: Update documentation to remove the button `focus` prop ([#50972](https://github.com/WordPress/gutenberg/issues/50972)).
 
 ### Enhancements
 
