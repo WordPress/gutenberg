@@ -108,7 +108,6 @@ function block_core_image_get_lightbox_settings( $block ) {
  *
  * @param  string $block_content        Rendered block content.
  * @param  array  $block                Block object.
- * @param  array  $lightbox_settings    Lightbox settings: enabled, animation.
  * @return string                Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
