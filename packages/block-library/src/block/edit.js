@@ -31,11 +31,16 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 
-const fullAlignments = [ 'full', 'left', 'right' ];
+const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
-export default function ReusableBlockEdit( { attributes, setAttributes } ) {
+export default function ReusableBlockEdit( {
+	attributes,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
 	const { ref } = attributes;
 	const [ inferredAlignment, setInferredAlignment ] = useState();
+
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -60,35 +65,32 @@ export default function ReusableBlockEdit( { attributes, setAttributes } ) {
 	);
 
 	useEffect( () => {
-		// Determine the widest setting of all the contained blocks.
-		let widestAlignment;
-		for ( const block of blocks ) {
-			const { align } = block.attributes;
-
-			if ( fullAlignments.includes( align ) ) {
-				widestAlignment = 'full';
-				break;
-			}
-
-			if ( align === 'wide' ) {
-				widestAlignment = align;
-			}
-		}
-
-		// If we don't have a wide or full alignment set, we can remove
-		// the default layout attribute.
-		if ( ! widestAlignment ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: undefined } );
-			setInferredAlignment( widestAlignment );
+		// We only track the initial alignment so that if the user could
+		// initially apply wide or full alignments to inner blocks, that ability
+		// is maintained even if they temporarily remove the last inner block
+		// with that wide/full alignment.
+		if ( ! blocks?.length || inferredAlignment !== undefined ) {
 			return;
 		}
 
-		// Adopt the widest alignment of the pattern block's children.
+		const isConstrained = __unstableParentLayout.type === 'constrained';
+		const hasFullAlignment = blocks.some( ( block ) =>
+			fullAlignments.includes( block.attributes.align )
+		);
+		const alignment = isConstrained && hasFullAlignment ? 'full' : null;
+
+		setInferredAlignment( alignment );
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { layout: { type: 'constrained' } } );
-		setInferredAlignment( widestAlignment );
-	}, [ blocks, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
+		setAttributes( {
+			layout: alignment ? __unstableParentLayout : undefined,
+		} );
+	}, [
+		blocks,
+		inferredAlignment,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableParentLayout,
+	] );
 
 	const blockProps = useBlockProps( {
 		className: classnames(

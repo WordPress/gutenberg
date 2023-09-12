@@ -53,9 +53,10 @@ function render_block_core_block( $attributes, $block_content ) {
 		}
 
 		$alignment = _wp_array_get( $parsed_block, array( 'attrs', 'align' ), null );
+		$full_alignments = array( 'full', 'left', 'right' );
 
-		if ( 'full' === $alignment ) {
-			$widest_alignment = $alignment;
+		if ( in_array( $alignment, $full_alignments, true ) ) {
+			$widest_alignment = 'full';
 			return $parsed_block;
 		}
 
