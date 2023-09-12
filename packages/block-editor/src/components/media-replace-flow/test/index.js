@@ -55,6 +55,11 @@ describe( 'General media replace flow', () => {
 				name: 'Replace',
 			} )
 		);
+
+		expect( console ).toHaveWarnedWith(
+			'`position` prop in wp.components.tooltip is deprecated since version 6.4. Please use `placement` prop instead.'
+		);
+
 		const uploadMenu = screen.getByRole( 'menu' );
 
 		await waitFor( () => expect( uploadMenu ).toBePositionedPopover() );

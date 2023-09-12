@@ -156,6 +156,10 @@ describe( 'BoxControl', () => {
 				'100'
 			);
 
+			expect( console ).toHaveWarnedWith(
+				'`position` prop in wp.components.tooltip is deprecated since version 6.4. Please use `placement` prop instead.'
+			);
+
 			expect(
 				screen.getByRole( 'textbox', { name: 'Top' } )
 			).toHaveValue( '100' );

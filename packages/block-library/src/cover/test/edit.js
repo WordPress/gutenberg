@@ -63,6 +63,10 @@ describe( 'Cover block', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
 			await setup();
 
+			expect( console ).toHaveWarnedWith(
+				'`position` prop in wp.components.tooltip is deprecated since version 6.4. Please use `placement` prop instead.'
+			);
+
 			expect(
 				screen.getByRole( 'group', {
 					name: 'To edit this block, you need permission to upload media.',
