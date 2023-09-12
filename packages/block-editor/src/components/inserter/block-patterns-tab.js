@@ -136,12 +136,6 @@ export function usePatternsCategories(
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		if ( filteredPatterns.length > 0 ) {
-			categories.unshift( {
-				name: allPatternsCategory.name,
-				label: allPatternsCategory.label,
-			} );
-		}
 		speak(
 			sprintf(
 				/* translators: %d: number of categories . */
