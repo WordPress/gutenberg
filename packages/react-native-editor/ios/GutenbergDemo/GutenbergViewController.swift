@@ -369,10 +369,10 @@ extension GutenbergViewController: GutenbergWebDelegate {
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
     class EditorSettings: GutenbergEditorSettings {
-        var isFSETheme: Bool = false
-        var galleryWithImageBlocks: Bool = false
-        var quoteBlockV2: Bool = false
-        var listBlockV2: Bool = false
+        var isFSETheme: Bool = true
+        var galleryWithImageBlocks: Bool = true
+        var quoteBlockV2: Bool = true
+        var listBlockV2: Bool = true
         var rawStyles: String? = nil
         var rawFeatures: String? = nil
         var colors: [[String: String]]? = nil
