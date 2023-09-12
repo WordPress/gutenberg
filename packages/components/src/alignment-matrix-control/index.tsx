@@ -17,7 +17,7 @@ import Cell from './cell';
 import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
-import { GRID, getItemId, getItemValue, normalizeValue } from './utils';
+import { GRID, getItemId, normalizeValue } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
 import type {
 	AlignmentMatrixControlProps,
@@ -74,11 +74,6 @@ export function AlignmentMatrixControl( {
 
 	const compositeStore = useCompositeStore( {
 		defaultActiveId,
-		setActiveId: ( activeId ) => {
-			if ( activeId ) {
-				handleOnChange( getItemValue( baseId, activeId ) );
-			}
-		},
 		rtl: isRTL(),
 	} );
 
@@ -110,6 +105,7 @@ export function AlignmentMatrixControl( {
 								isActive={ isActive }
 								key={ cell }
 								value={ cell }
+								onFocus={ () => handleOnChange( cell ) }
 							/>
 						);
 					} ) }
