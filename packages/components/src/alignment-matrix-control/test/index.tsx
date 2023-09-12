@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -17,10 +17,23 @@ const getCell = ( name: string ) => {
 	return within( getControl() ).getByRole( 'gridcell', { name } );
 };
 
+const asyncRender = async ( jsx: any ) => {
+	const view = render( jsx );
+	await act( async () => {
+		// This allows the component to properly establish
+		// its initial state, that sometimes isn't otherwise
+		// ready in time for tests to start.
+		await new Promise( requestAnimationFrame );
+		await new Promise( requestAnimationFrame );
+		await new Promise( requestAnimationFrame );
+	} );
+	return view;
+};
+
 describe( 'AlignmentMatrixControl', () => {
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			render( <AlignmentMatrixControl /> );
+		it( 'should render', async () => {
+			await asyncRender( <AlignmentMatrixControl /> );
 
 			expect( getControl() ).toBeInTheDocument();
 		} );
@@ -28,9 +41,10 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should be centered by default', async () => {
 			const user = userEvent.setup();
 
-			render( <AlignmentMatrixControl /> );
+			await asyncRender( <AlignmentMatrixControl /> );
 
 			await user.tab();
+
 			expect( getCell( 'center center' ) ).toHaveFocus();
 		} );
 	} );
@@ -52,7 +66,7 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					render(
+					await asyncRender(
 						<AlignmentMatrixControl
 							value="center"
 							onChange={ spy }
@@ -62,7 +76,6 @@ describe( 'AlignmentMatrixControl', () => {
 					await user.click( getCell( alignment ) );
 
 					expect( getCell( alignment ) ).toHaveFocus();
-
 					expect( spy ).toHaveBeenCalledWith( alignment );
 				} );
 			} );
@@ -79,10 +92,13 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					render( <AlignmentMatrixControl onChange={ spy } /> );
+					await asyncRender(
+						<AlignmentMatrixControl onChange={ spy } />
+					);
 
 					await user.tab();
 					await user.keyboard( `[${ keyRef }]` );
+
 					expect( getCell( cellRef ) ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
 				} );
@@ -98,12 +114,14 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					render( <AlignmentMatrixControl onChange={ spy } /> );
+					await asyncRender(
+						<AlignmentMatrixControl onChange={ spy } />
+					);
 
 					const cell = getCell( cellRef );
 					await user.click( cell );
-
 					await user.keyboard( `[${ keyRef }]` );
+
 					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
 				} );
