@@ -5,6 +5,6 @@
  * @param {number} clientId the clientID of the block.
  * @return {boolean} Whether the pattern is in the editing state.
  */
-export function __experimentalIsEditingPattern( state, clientId ) {
+export function isEditingPattern( state, clientId ) {
 	return state.isEditingPattern[ clientId ];
 }

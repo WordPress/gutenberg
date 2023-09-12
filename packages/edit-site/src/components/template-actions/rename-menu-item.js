@@ -56,14 +56,25 @@ export default function RenameMenuItem( { template, onClose } ) {
 				}
 			);
 
-			createSuccessNotice( __( 'Entity renamed.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				template.type === 'wp_template'
+					? __( 'Template renamed.' )
+					: __( 'Template part renamed.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				template.type === 'wp_template'
+					? __( 'An error occurred while renaming the template.' )
+					: __(
+							'An error occurred while renaming the template part.'
+					  );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while renaming the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
