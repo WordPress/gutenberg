@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -17,11 +14,11 @@ export const SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
-const SYNC_FILTERS = {
-	all: __( 'All' ),
-	[ SYNC_TYPES.full ]: __( 'Synced' ),
-	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
-};
+const patternSyncOptions = [
+	{ value: 'all', label: __( 'Any' ) },
+	{ value: SYNC_TYPES.full, label: __( 'Synced' ) },
+	{ value: SYNC_TYPES.unsynced, label: __( 'Standard' ) },
+];
 
 export function BlockPatternsSyncFilter() {
 	const { updateSettings } = useDispatch( blockEditorStore );
@@ -39,23 +36,13 @@ export function BlockPatternsSyncFilter() {
 	};
 
 	return (
-		<ToggleGroupControl
+		<SelectControl
 			className="block-editor-patterns__sync-status-filter"
-			hideLabelFromVision
-			label={ __( 'Filter by sync status' ) }
+			label={ __( 'Sync type' ) }
+			options={ patternSyncOptions }
 			value={ syncFilter }
-			isBlock
 			onChange={ ( value ) => handleUpdateSyncFilter( value ) }
-			__nextHasNoMarginBottom
-		>
-			{ Object.entries( SYNC_FILTERS ).map( ( [ key, syncLabel ] ) => (
-				<ToggleGroupControlOption
-					className="block-editor-patterns__sync-status-filter-option"
-					key={ key }
-					value={ key }
-					label={ syncLabel }
-				/>
-			) ) }
-		</ToggleGroupControl>
+			aria-label={ __( 'Filter patterns by sync type' ) }
+		/>
 	);
 }

@@ -29,7 +29,7 @@ export default function BlockPatternsSourceFilter( { onChange, value } ) {
 	return (
 		<SelectControl
 			className="block-editor-block-patterns__source-filter"
-			label={ __( 'Filters' ) }
+			label={ __( 'Pattern source' ) }
 			options={ patternSourceOptions }
 			value={ value }
 			onChange={ onChange }
