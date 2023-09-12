@@ -37,14 +37,14 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
 
 2. Quit and restart the terminal.
-3. Run `nvm install node` in the terminal to install the lastest version of `node`.
-4. Run `node -v` and `npm -v` in the terminal to verify the install `node` and `npm` versions.
+3. Run `nvm install node` in the terminal to install the latest `node` version.
+4. Run `node -v` and `npm -v` in the terminal to verify the installed `node` and `npm` versions.
 
 If needed, you can also install specific versions of `node`. For example, install v18 by running `nvm install 18`, and switch between different versions by running `nvm use [version-number]`. See the `nvm` [usage guide](https://github.com/nvm-sh/nvm#usage) for more details.
 
 ### Windows or alternative installs
 
-You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website, the latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
+You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
 
 ### Troubleshooting
 
