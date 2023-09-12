@@ -442,6 +442,8 @@ add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 
  * introduced in Gutenberg. The legacy syntax was using the `behaviors` key in
  * the block attrbutes and the `theme.json` file.
  *
+ * @since 16.7.0
+ *
  * @param array $block The block to check.
  * @return array The block with the legacyLightboxSettings set if available.
  */
