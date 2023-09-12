@@ -44,6 +44,10 @@ const getMockedReusableBlock = ( id ) => ( {
 	type: 'wp_block',
 } );
 
+const getPatternHtml = ( id ) => `<!-- wp:block {"ref":${ id }} -->
+<div class="wp-block-block"></div>
+<!-- /wp:block -->`;
+
 beforeAll( () => {
 	// Register all core blocks.
 	registerCoreBlocks();
@@ -118,13 +122,13 @@ describe( 'Synced patterns', () => {
 		);
 
 		expect( reusableBlock ).toBeDefined();
-		expect( getEditorHtml() ).toBe( '<!-- wp:block {"ref":1} /-->' );
+		expect( getEditorHtml() ).toBe( getPatternHtml( 1 ) );
 	} );
 
 	it( 'renders warning when the block does not exist', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 3;
-		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
+		const initialHtml = getPatternHtml( id );
 
 		const screen = await initializeEditor( {
 			initialHtml,
@@ -145,7 +149,7 @@ describe( 'Synced patterns', () => {
 	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
-		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
+		const initialHtml = getPatternHtml( id );
 		const endpoint = `/wp/v2/blocks/${ id }`;
 
 		// Return mocked response for the block endpoint.

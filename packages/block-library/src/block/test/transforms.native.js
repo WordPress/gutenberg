@@ -11,7 +11,9 @@ import {
 
 const block = 'Pattern';
 const initialHtml = `
-<!-- wp:block {"ref":130} /-->`;
+<!-- wp:block {"ref":130} -->
+<div class="wp-block-block"></div>
+<!-- /wp:block -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const blockTransforms = [ ...transformsWithInnerBlocks ];
