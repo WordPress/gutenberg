@@ -186,12 +186,13 @@ export default function HeaderEditMode() {
 
 	return (
 		<div
+			role="menubar"
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
-				<span role="menubar">
+				<>
 					<NavigableToolbar
 						as={ motion.div }
 						className="edit-site-header-edit-mode__start"
@@ -312,7 +313,7 @@ export default function HeaderEditMode() {
 						name="__experimentalInlineRichTextTools"
 						bubblesVirtually
 					/>
-				</span>
+				</>
 			) }
 
 			{ ! isDistractionFree && (

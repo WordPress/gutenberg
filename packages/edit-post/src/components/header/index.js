@@ -45,7 +45,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		);
 
 	return (
-		<div className="edit-post-header">
+		<div role="menubar" className="edit-post-header">
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }

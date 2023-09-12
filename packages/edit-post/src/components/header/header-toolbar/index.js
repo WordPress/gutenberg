@@ -131,7 +131,7 @@ function HeaderToolbar() {
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
-		<span role="menubar">
+		<>
 			<NavigableToolbar
 				className="edit-post-header-toolbar"
 				aria-label={ toolbarAriaLabel }
@@ -193,7 +193,7 @@ function HeaderToolbar() {
 				name="__experimentalInlineRichTextTools"
 				bubblesVirtually
 			/>
-		</span>
+		</>
 	);
 }
 
