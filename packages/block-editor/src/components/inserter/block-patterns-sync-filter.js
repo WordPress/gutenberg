@@ -4,6 +4,7 @@
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +23,14 @@ const patternSyncOptions = [
 
 export function BlockPatternsSyncFilter() {
 	const { updateSettings } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		updateSettings( {
+			patternsSyncFilter: 'all',
+		} );
+		// The first time the component is mounted, we want to reset the sync filter setting.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const syncFilter = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
