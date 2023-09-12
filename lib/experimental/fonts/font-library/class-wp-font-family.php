@@ -498,9 +498,9 @@ class WP_Font_Family {
 
 	/**
 	 * Gets the font faces that are in both the existing and incoming font families.
-	 * 
+	 *
 	 * @since 6.4.0
-	 * 
+	 *
 	 * @param array $existing The existing font faces.
 	 * @param array $incoming The incoming font faces.
 	 * @return array The font faces that are in both the existing and incoming font families.
@@ -528,23 +528,23 @@ class WP_Font_Family {
 	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
 	 */
 	private function update_font_post( $post ) {
-		$post_font_data       = json_decode( $post->post_content, true );
-		$new_data             = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
-		$intersecting         = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
+		$post_font_data = json_decode( $post->post_content, true );
+		$new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
+		$intersecting   = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
 
 		if ( ! empty( $intersecting ) ) {
-			$serialized_font_faces = array_map( 'serialize', $new_data['fontFace'] );
+			$serialized_font_faces   = array_map( 'serialize', $new_data['fontFace'] );
 			$serialized_intersecting = array_map( 'serialize', $intersecting );
 
 			$diff = array_diff( $serialized_font_faces, $serialized_intersecting );
 
 			$new_data['fontFace'] = array_values( array_map( 'unserialize', $diff ) );
-			
+
 			foreach ( $intersecting as $intersect ) {
 				$this->delete_font_face_assets( $intersect );
 			}
 		}
-		$this->data           = $new_data;
+		$this->data = $new_data;
 
 		$post = array(
 			'ID'           => $post->ID,
