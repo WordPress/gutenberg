@@ -56,7 +56,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		}
 
 		if ( 2 === $theme_json['version'] ) {
-			$theme_json = self::migrate_v2_to_v3( $theme_json );
+			$theme_json = self::migrate_deprecated_lightbox_behaviors( $theme_json );
 		}
 
 		return $theme_json;
@@ -97,10 +97,12 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Migrate away from the previous syntax that used a top-level "behaviors" key
 	 * in the `theme.json` to a new "lightbox" setting.
 	 *
+	 * @since 16.7.0
+	 *
 	 * @param array $old Data with (potentially) behaviors.
 	 * @return array Data with behaviors removed.
 	 */
-	private static function migrate_v2_to_v3( $old ) {
+	private static function migrate_deprecated_lightbox_behaviors( $old ) {
 		// Copy everything.
 		$new = $old;
 
@@ -122,9 +124,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				$old['settings']['blocks']['core/image']['behaviors']['lightbox']
 			);
 		}
-
-		// Set the new version.
-		$new['version'] = 3;
 
 		return $new;
 	}
