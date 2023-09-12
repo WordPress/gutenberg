@@ -24,7 +24,7 @@
 		"parent": "devenv"
 	},
 	{
-		"title": "GuideToUsingWpNow",
+		"title": "Guide to using wp-now",
 		"slug": "guide-to-using-wp-now",
 		"markdown_source": "../docs/getting-started/devenv/guide-to-using-wp-now.md",
 		"parent": "devenv"
