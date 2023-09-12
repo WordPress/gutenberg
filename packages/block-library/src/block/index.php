@@ -146,7 +146,7 @@ function block_core_block_pre_render( $pre_render, $block ) {
 	$attributes = _wp_array_get( $block, array( 'attrs' ), array() );
 	$inner_html = _wp_array_get( $block, array( 'innerHTML' ), null );
 
-	// Pattern's without wrappers will not have saved inner HTML and need to
+	// Patterns without wrappers will not have saved inner HTML and need to
 	// avoid layout supports applied via render_block.
 	if ( $inner_html ) {
 		return null;
