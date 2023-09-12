@@ -47,8 +47,6 @@ function Tooltip( props: TooltipProps ) {
 		}
 	}
 
-	const DEFAULT_PLACEMENT = 'bottom';
-
 	// Compute tooltip's placement:
 	// - give priority to `placement` prop, if defined
 	// - otherwise, compute it from the legacy `position` prop (if defined)
@@ -58,15 +56,12 @@ function Tooltip( props: TooltipProps ) {
 		computedPlacement = placement;
 	} else if ( position !== undefined ) {
 		computedPlacement = positionToPlacement( position );
-	}
-	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
-
-	if ( position !== undefined ) {
 		deprecated( '`position` prop in wp.components.tooltip', {
 			since: '6.4',
 			alternative: '`placement` prop',
 		} );
 	}
+	computedPlacement = computedPlacement || 'bottom';
 
 	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,
