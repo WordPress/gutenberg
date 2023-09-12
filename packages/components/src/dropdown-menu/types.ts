@@ -29,7 +29,7 @@ export type DropdownOption = {
 	/**
 	 * A callback function to invoke when the option is selected.
 	 */
-	onClick?: () => void;
+	onClick?: ( event?: React.MouseEvent ) => void;
 	/**
 	 * Whether or not the control is currently active.
 	 */
