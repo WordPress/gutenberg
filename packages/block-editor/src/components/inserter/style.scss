@@ -458,6 +458,10 @@ $block-inserter-tabs-height: 44px;
 		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
+	.block-editor-patterns__sync-status-filter {
+		width: fit-content;
+	}
+
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-gap: $grid-unit-40;

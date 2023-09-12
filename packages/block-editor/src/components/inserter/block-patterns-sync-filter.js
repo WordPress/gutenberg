@@ -40,7 +40,7 @@ export function BlockPatternsSyncFilter() {
 
 	return (
 		<ToggleGroupControl
-			className="edit-site-patterns__sync-status-filter"
+			className="block-editor-patterns__sync-status-filter"
 			hideLabelFromVision
 			label={ __( 'Filter by sync status' ) }
 			value={ syncFilter }
@@ -50,7 +50,7 @@ export function BlockPatternsSyncFilter() {
 		>
 			{ Object.entries( SYNC_FILTERS ).map( ( [ key, syncLabel ] ) => (
 				<ToggleGroupControlOption
-					className="edit-site-patterns__sync-status-filter-option"
+					className="block-editor-patterns__sync-status-filter-option"
 					key={ key }
 					value={ key }
 					label={ syncLabel }
