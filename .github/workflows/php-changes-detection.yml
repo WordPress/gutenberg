@@ -17,7 +17,7 @@ jobs:
 
             - name: Get changed PHP files
               id: changed-files-php
-              uses: tj-actions/changed-files@48566bbcc22ceb7c5809ebdd27377309f2c3de8c # v39
+              uses: tj-actions/changed-files@6ee9cdc5816333acda68e01cf12eedc619e28316 # v39
               with:
                   files: |
                       *.{php}
