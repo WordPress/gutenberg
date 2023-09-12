@@ -136,7 +136,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | null`: The current global styles.
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -371,7 +371,7 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 

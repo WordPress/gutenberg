@@ -11,17 +11,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import normalizeRecordKey from '../../utils/normalize-record-key';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
-	const { params } = useLocation();
-
-	const { postType } = params;
-
-	const postId = normalizeRecordKey( params?.postId );
-
+	const { params: { postId, postType } = {} } = useLocation();
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
@@ -72,7 +66,7 @@ export default function useInitEditedEntityFromURL() {
 		// In all other cases, we need to set the home page in the site editor view.
 		if ( homepageId ) {
 			setPage( {
-				context: { postType: 'page', postId: Number( homepageId ) },
+				context: { postType: 'page', postId: homepageId },
 			} );
 		} else if ( ! isRequestingSite ) {
 			setPage( {

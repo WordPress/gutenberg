@@ -7,17 +7,18 @@ import { __ } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
-import CreatePatternModal from '../create-pattern-modal';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory } = unlock( routerPrivateApis );
+const { CreatePatternModal } = unlock( editPatternsPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
@@ -65,6 +66,8 @@ export default function AddNewPattern() {
 		},
 	];
 
+	// Remove condition when command palette issues are resolved.
+	// See: https://github.com/WordPress/gutenberg/issues/52154.
 	if ( ! isTemplatePartsMode ) {
 		controls.push( {
 			icon: symbolFilled,
@@ -85,8 +88,8 @@ export default function AddNewPattern() {
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal
-					closeModal={ () => setShowPatternModal( false ) }
-					onCreate={ handleCreatePattern }
+					onClose={ () => setShowPatternModal( false ) }
+					onSuccess={ handleCreatePattern }
 					onError={ handleError }
 				/>
 			) }

@@ -151,7 +151,7 @@ _Returns_
 
 ### create
 
-Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any input, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by two newlines. The optional functions can be used to filter out content.
+Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any input, an empty value will be created. The optional functions can be used to filter out content.
 
 A value will have the following shape, which you are strongly encouraged not to modify without the use of helper functions:
 
@@ -174,8 +174,6 @@ _Parameters_
 -   _$1.text_ `[string]`: Text to create value from.
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
--   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
--   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
 -   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to collapse white space characters.
 -   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
@@ -416,13 +414,12 @@ _Returns_
 
 ### toHTMLString
 
-Create an HTML string from a Rich Text value. If a `multilineTag` is provided, text separated by a line separator will be wrapped in it.
+Create an HTML string from a Rich Text value.
 
 _Parameters_
 
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
--   _$1.multilineTag_ `[string]`: Multiline tag.
 -   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_

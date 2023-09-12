@@ -18,15 +18,17 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentTitle from './document-title';
+import DocumentActions from './document-actions';
 
 const slideY = {
 	hidden: { y: '-50px' },
+	distractionFreeInactive: { y: 0 },
 	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
 const slideX = {
 	hidden: { x: '-100%' },
+	distractionFreeInactive: { x: 0 },
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
@@ -60,8 +62,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar />
-				<div className="edit-post-header__document-title">
-					<DocumentTitle />
+				<div className="edit-post-header__center">
+					<DocumentActions />
 				</div>
 			</motion.div>
 			<motion.div

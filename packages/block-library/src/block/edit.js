@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -10,8 +9,6 @@ import {
 import {
 	Placeholder,
 	Spinner,
-	ToolbarGroup,
-	ToolbarButton,
 	TextControl,
 	PanelBody,
 } from '@wordpress/components';
@@ -21,16 +18,12 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { ungroup } from '@wordpress/icons';
 
-export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+export default function ReusableBlockEdit( { attributes: { ref } } ) {
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -38,21 +31,6 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-
-	const { canRemove, innerBlockCount } = useSelect(
-		( select ) => {
-			const { canRemoveBlock, getBlockCount } =
-				select( blockEditorStore );
-			return {
-				canRemove: canRemoveBlock( clientId ),
-				innerBlockCount: getBlockCount( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
-		useDispatch( reusableBlocksStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -112,22 +90,6 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ canRemove && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={
-								innerBlockCount > 1
-									? __( 'Detach patterns' )
-									: __( 'Detach pattern' )
-							}
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody>
 					<TextControl

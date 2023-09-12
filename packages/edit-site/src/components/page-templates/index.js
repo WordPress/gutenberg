@@ -8,8 +8,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -21,7 +20,6 @@ import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
 
 export default function PageTemplates() {
 	const { records: templates } = useEntityRecords(
@@ -31,15 +29,6 @@ export default function PageTemplates() {
 			per_page: -1,
 		}
 	);
-
-	const { canCreate } = useSelect( ( select ) => {
-		const { supportsTemplatePartsMode } =
-			select( editSiteStore ).getSettings();
-		return {
-			postType: select( coreStore ).getPostType( 'wp_template' ),
-			canCreate: ! supportsTemplatePartsMode,
-		};
-	} );
 
 	const columns = [
 		{
@@ -89,13 +78,11 @@ export default function PageTemplates() {
 		<Page
 			title={ __( 'Templates' ) }
 			actions={
-				canCreate && (
-					<AddNewTemplate
-						templateType={ 'wp_template' }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
-				)
+				<AddNewTemplate
+					templateType={ 'wp_template' }
+					showIcon={ false }
+					toggleProps={ { variant: 'primary' } }
+				/>
 			}
 		>
 			{ templates && <Table data={ templates } columns={ columns } /> }

@@ -51,7 +51,7 @@ function UnforwardedRangeControl(
 		allowReset = false,
 		beforeIcon,
 		className,
-		color: colorProp = COLORS.ui.theme,
+		color: colorProp = COLORS.theme.accent,
 		currentInput,
 		disabled = false,
 		help,

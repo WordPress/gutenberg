@@ -9,7 +9,8 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
-	__experimentalGetElementClassName as getBorderClassesAndStyles,
+	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
 /**
@@ -545,11 +546,114 @@ const v5 = {
 
 /**
  * Deprecation for adding width and height as style rules on the inner img.
- * It also updates the widht and height attributes to be strings instead of numbers.
  *
  * @see https://github.com/WordPress/gutenberg/pull/31366
  */
 const v6 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			__experimentalRole: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: 'figcaption',
+			__experimentalRole: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			__experimentalRole: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			__experimentalRole: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			__experimentalRole: 'content',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		anchor: true,
+		behaviors: {
+			lightbox: true,
+		},
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
 	save( { attributes } ) {
 		const {
 			url,
@@ -618,7 +722,9 @@ const v6 = {
 				) }
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
-						className={ getBorderClassesAndStyles( 'caption' ) }
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						tagName="figcaption"
 						value={ caption }
 					/>
@@ -634,4 +740,211 @@ const v6 = {
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+/**
+ * Deprecation for converting to string width and height block attributes and
+ * removing the width and height img element attributes which are not needed
+ * as they get added by the TODO hook.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/53274
+ */
+const v7 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			__experimentalRole: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: 'figcaption',
+			__experimentalRole: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			__experimentalRole: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			__experimentalRole: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			__experimentalRole: 'content',
+		},
+		width: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		anchor: true,
+		behaviors: {
+			lightbox: true,
+		},
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
+	migrate( { width, height, ...attributes } ) {
+		return {
+			...attributes,
+			width: `${ width }px`,
+			height: `${ height }px`,
+		};
+	},
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = classnames( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					aspectRatio,
+					objectFit: scale,
+					width,
+					height,
+				} }
+				width={ width }
+				height={ height }
+				title={ title }
+			/>
+		);
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v7, v6, v5, v4, v3, v2, v1 ];

@@ -158,6 +158,46 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	}
 
 	/**
+	 * Tests that the correct filters are applied to the context parameter.
+	 *
+	 * By default, the REST response for the Posts Controller will not return all fields
+	 * when the context is set to 'embed'. Assert that correct additional fields are added
+	 * to the embedded Navigation Post, when the navigation fallback endpoint
+	 * is called with the `_embed` param.
+	 *
+	 * @covers wp_add_fields_to_navigation_fallback_embedded_links
+	 */
+	public function test_embedded_navigation_post_contains_required_fields() {
+		// First we'll use the navigation fallback to get a link to the navigation endpoint.
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
+		$response = rest_get_server()->dispatch( $request );
+		$links    = $response->get_links();
+
+		// Extract the navigation endpoint URL from the response.
+		$embedded_navigation_href = $links['self'][0]['href'];
+		preg_match( '/\?rest_route=(.*)/', $embedded_navigation_href, $matches );
+		$navigation_endpoint = $matches[1];
+
+		// Fetch the "linked" navigation post from the endpoint, with the context parameter set to 'embed' to simulate fetching embedded links.
+		$request = new WP_REST_Request( 'GET', $navigation_endpoint );
+		$request->set_param( 'context', 'embed' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		// Verify that the additional status field is present.
+		$this->assertArrayHasKey( 'status', $data, 'Response title should contain a "status" field.' );
+
+		// Verify that the additional content fields are present.
+		$this->assertArrayHasKey( 'content', $data, 'Response should contain a "content" field.' );
+		$this->assertArrayHasKey( 'raw', $data['content'], 'Response content should contain a "raw" field.' );
+		$this->assertArrayHasKey( 'rendered', $data['content'], 'Response content should contain a "rendered" field.' );
+		$this->assertArrayHasKey( 'block_version', $data['content'], 'Response should contain a "block_version" field.' );
+
+		// Verify that the additional title.raw field is present.
+		$this->assertArrayHasKey( 'raw', $data['title'], 'Response title should contain a "raw" key.' );
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {

@@ -165,4 +165,22 @@ class WP_Interactivity_Store_Test extends WP_UnitTestCase {
 			$rendered
 		);
 	}
+
+	public function test_store_should_also_escape_tags_and_amps() {
+		WP_Interactivity_Store::merge_data(
+			array(
+				'state' => array(
+					'amps' => 'http://site.test/?foo=1&baz=2&bar=3',
+					'tags' => 'Do not do this: <!-- <script>',
+				),
+			)
+		);
+		ob_start();
+		WP_Interactivity_Store::render();
+		$rendered = ob_get_clean();
+		$this->assertSame(
+			'<script id="wp-interactivity-store-data" type="application/json">{"state":{"amps":"http:\/\/site.test\/?foo=1\u0026baz=2\u0026bar=3","tags":"Do not do this: \u003C!-- \u003Cscript\u003E"}}</script>',
+			$rendered
+		);
+	}
 }

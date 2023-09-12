@@ -22,11 +22,12 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 	it( 'should be able to drag & drop a block', async () => {
 		// Initialize the editor with a Spacer and Paragraph block
-		await editorPage.setHtmlContent(
-			[ testData.spacerBlock, testData.paragraphBlockShortText ].join(
-				'\n\n'
-			)
-		);
+		await editorPage.initializeEditor( {
+			initialData: [
+				testData.spacerBlock,
+				testData.paragraphBlockShortText,
+			].join( '\n\n' ),
+		} );
 
 		// Get elements for both blocks
 		const spacerBlock = await editorPage.getBlockAtPosition(
@@ -49,16 +50,12 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		const firstBlockText =
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( firstBlockText ).toMatch( testData.shortText );
-
-		// Remove the blocks
-		await spacerBlock.click();
-		await editorPage.removeBlock();
-		await editorPage.removeBlock();
 	} );
 
 	onlyOnAndroid(
 		'should be able to long-press on a text-based block to paste a text in a focused textinput',
 		async () => {
+			await editorPage.initializeEditor();
 			// Add a Paragraph block
 			await editorPage.addNewBlock( blockNames.paragraph );
 			const paragraphBlockElement =
@@ -83,15 +80,13 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 			// Expect to have the pasted text in the Paragraph block
 			expect( paragraphText ).toMatch( testData.shortText );
-
-			// Remove the block
-			await editorPage.removeBlock();
 		}
 	);
 
 	onlyOnAndroid(
 		'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput',
 		async () => {
+			await editorPage.initializeEditor();
 			// Add a Shortcode block
 			await editorPage.addNewBlock( blockNames.shortcode );
 			const shortcodeBlockElement =
@@ -125,12 +120,12 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 	it( 'should be able to drag & drop a text-based block when another textinput is focused', async () => {
 		// Initialize the editor with two Paragraph blocks
-		await editorPage.setHtmlContent(
-			[
+		await editorPage.initializeEditor( {
+			initialData: [
 				testData.paragraphBlockShortText,
 				testData.paragraphBlockEmpty,
-			].join( '\n\n' )
-		);
+			].join( '\n\n' ),
+		} );
 
 		// Tap on the second block
 		const secondParagraphBlock = await editorPage.getBlockAtPosition(

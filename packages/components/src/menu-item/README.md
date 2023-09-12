@@ -34,6 +34,13 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
+### `disabled`
+
+-   Type: `boolean`
+-   Required: No
+
+Refer to documentation for [Button's `disabled` prop](/packages/components/src/button/README.md#disabled-boolean).
+
 ### `info`
 
 -   Type: `string`
@@ -63,7 +70,7 @@ Determines where to display the provided `icon`.
 -   Type: `boolean`
 -   Required: No
 
-Whether or not the menu item is currently selected.
+Whether or not the menu item is currently selected. `isSelected` is only taken into account when the `role` prop is either `"menuitemcheckbox"` or `"menuitemradio"`.
 
 ### `shortcut`
 

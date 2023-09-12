@@ -8,11 +8,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as queryLoopName } from './block.json';
-
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
@@ -175,7 +170,7 @@ export function useAllowedControls( attributes ) {
 	return useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.allowedControls,
 
@@ -249,25 +244,29 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 	const activeVariationName = useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.name,
 		[ attributes ]
 	);
-	const blockName = `${ queryLoopName }/${ activeVariationName }`;
-	const activeVariationPatterns = useSelect(
+	const blockName = `core/query/${ activeVariationName }`;
+	const hasActiveVariationPatterns = useSelect(
 		( select ) => {
 			if ( ! activeVariationName ) {
-				return;
+				return false;
 			}
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return getPatternsByBlockTypes( blockName, rootClientId );
+			const activePatterns = getPatternsByBlockTypes(
+				blockName,
+				rootClientId
+			);
+			return activePatterns.length > 0;
 		},
-		[ clientId, activeVariationName ]
+		[ clientId, activeVariationName, blockName ]
 	);
-	return activeVariationPatterns?.length ? blockName : queryLoopName;
+	return hasActiveVariationPatterns ? blockName : 'core/query';
 }
 
 /**
@@ -300,10 +299,10 @@ export function useScopedBlockVariations( attributes ) {
 				select( blocksStore );
 			return {
 				activeVariationName: getActiveBlockVariation(
-					queryLoopName,
+					'core/query',
 					attributes
 				)?.name,
-				blockVariations: getBlockVariations( queryLoopName, 'block' ),
+				blockVariations: getBlockVariations( 'core/query', 'block' ),
 			};
 		},
 		[ attributes ]

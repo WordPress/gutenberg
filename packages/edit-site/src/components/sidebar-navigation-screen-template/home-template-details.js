@@ -198,8 +198,10 @@ export default function HomeTemplateDetails() {
 				<SidebarNavigationScreenDetailsPanelRow>
 					<CheckboxControl
 						className="edit-site-sidebar-navigation-screen__input-control"
-						label="Allow comments on new posts"
-						help="Changes will apply to new posts only. Individual posts may override these settings."
+						label={ __( 'Allow comments on new posts' ) }
+						help={ __(
+							'Changes will apply to new posts only. Individual posts may override these settings.'
+						) }
 						checked={ commentsOnNewPostsValue }
 						onChange={ setAllowCommentsOnNewPosts }
 					/>
