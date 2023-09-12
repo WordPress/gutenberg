@@ -18,9 +18,15 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Guide to using wp-env",
+		"slug": "guide-to-using-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/guide-to-using-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "GuideToUsingWpNow",
+		"slug": "guide-to-using-wp-now",
+		"markdown_source": "../docs/getting-started/devenv/guide-to-using-wp-now.md",
 		"parent": "devenv"
 	},
 	{
