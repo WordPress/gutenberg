@@ -41,10 +41,11 @@ export default function SidebarNavigationScreen( {
 	description,
 	backPath: backPathProp,
 } ) {
-	const { dashboardLink } = useSelect( ( select ) => {
+	const { dashboardLink, dashboardLinkText } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return {
 			dashboardLink: getSettings().__experimentalDashboardLink,
+			dashboardLinkText: getSettings().__experimentalDashboardLinkText,
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
@@ -92,9 +93,7 @@ export default function SidebarNavigationScreen( {
 						<SidebarButton
 							icon={ icon }
 							label={
-								! isPreviewingTheme()
-									? __( 'Go to the Dashboard' )
-									: __( 'Go back to the theme showcase' )
+								dashboardLinkText || __( 'Go to the Dashboard' )
 							}
 							href={ dashboardLink || 'index.php' }
 						/>
