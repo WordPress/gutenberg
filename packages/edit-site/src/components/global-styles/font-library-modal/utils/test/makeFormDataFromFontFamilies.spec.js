@@ -32,12 +32,8 @@ describe( 'makeFormDataFromFontFamilies', () => {
 		expect( formData instanceof FormData ).toBeTruthy();
 
 		// Check if files are added correctly
-		expect( formData.get( 'test-font1-woff2' ).name ).toBe(
-			'test-font1.woff2'
-		);
-		expect( formData.get( 'test-font2-woff2' ).name ).toBe(
-			'test-font2.woff2'
-		);
+		expect( formData.get( 'file-0-0' ).name ).toBe( 'test-font1.woff2' );
+		expect( formData.get( 'file-0-1' ).name ).toBe( 'test-font2.woff2' );
 
 		// Check if 'fontFamilies' key in FormData is correct
 		const expectedFontFamilies = [
@@ -46,12 +42,12 @@ describe( 'makeFormDataFromFontFamilies', () => {
 					{
 						fontWeight: '500',
 						fontStyle: 'normal',
-						uploadedFile: 'test-font1-woff2',
+						uploadedFile: 'file-0-0',
 					},
 					{
 						fontWeight: '400',
 						fontStyle: 'normal',
-						uploadedFile: 'test-font2-woff2',
+						uploadedFile: 'file-0-1',
 					},
 				],
 				slug: 'bebas',
