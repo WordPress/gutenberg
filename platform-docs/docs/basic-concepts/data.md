@@ -76,7 +76,7 @@ const columnsBlock = {
 
 ## HTML serialization and parsing
 
-While block editors powered by Gutenberg manipuate and edit the content as a JavaScript array of blocks, the Gutenberg framework also offers a way to serialize the blocks into HTML and parse them back.
+While block editors powered by Gutenberg manipulate and edit the content as a JavaScript array of blocks, the Gutenberg framework also offers a way to serialize the blocks into HTML and parse them back.
 
 ```js
 import { serialize, parse } from '@wordpress/blocks';
@@ -90,7 +90,7 @@ const parsedValue = parse( html ); // This should be equivalent to value.
 
 ### Delimiters and Parsing Expression Grammar
 
-In order keep to keep the metadata of the blocks within the serialized HTML, we chose to use HTML comments in order to keep the formality, explicitness, and unambiguity in the existing HTML syntax.
+In order to keep the metadata of the blocks within the serialized HTML, we chose to use HTML comments in order to keep the formality, explicitness, and unambiguity in the existing HTML syntax.
 
 By storing data in HTML comments, we would know that we wouldn't break the rest of the HTML in the document, that browsers should ignore it, and that we could simplify our approach to parsing the document.
 

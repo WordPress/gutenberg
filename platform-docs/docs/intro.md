@@ -29,7 +29,7 @@ To build a block editor, you need to install the following dependencies
 
 ## Setup vite to use JSX and @wordpress/element as a pragma
 
-We're going to be using JSX to write our UI and components. So one of the first step we need to do is to configure our build tooling properly to be able to do so.
+We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling properly to be able to do so.
 
 If you're using vite, you can create a `vite.config.js` file at the root of your application and paste the following content:
 
@@ -105,7 +105,7 @@ function Editor() {
       onInput={setBlocks}
     >
       {/*
-          The BlockCanvas component render the block list within an iframe
+          The BlockCanvas component renders the block list within an iframe
           and wire up all the necessary events to make the block editor work.
         */}
       <BlockCanvas height="500px" />
