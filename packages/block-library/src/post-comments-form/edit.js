@@ -51,7 +51,7 @@ export default function PostCommentsFormEdit( {
 			<div { ...blockProps }>
 				<CommentsForm postId={ postId } postType={ postType } />
 				<VisuallyHidden id={ instanceIdDesc }>
-					{ __( 'Comments form disabled on back-end.' ) }
+					{ __( 'Comments form disabled in editor.' ) }
 				</VisuallyHidden>
 			</div>
 		</>

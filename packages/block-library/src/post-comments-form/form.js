@@ -37,7 +37,7 @@ const CommentsFormPlaceholder = () => {
 						name="comment"
 						cols="45"
 						rows="8"
-						aria-disabled="true"
+						readOnly
 					/>
 				</p>
 				<p className="form-submit wp-block-button">
