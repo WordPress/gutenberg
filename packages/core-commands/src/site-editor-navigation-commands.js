@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCommandLoader } from '@wordpress/commands';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -172,16 +172,19 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				const extraArgs = isSiteEditor
 					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
 					: {};
+
 				const templateLabel =
 					templateType === 'wp_template_part'
-						? __( 'template part' )
-						: __( 'template' );
+						? /* translators: %s: name of the template, e.g. "Header" */
+						  __( '%s template part' )
+						: /* translators: %s: name of the template, e.g. "Home" */
+						  __( '%s template' );
 
 				return {
 					name: templateType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
-						? record.title?.rendered + ' ' + templateLabel
+						? sprintf( templateLabel, record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ templateType ],
 					callback: ( { close } ) => {
