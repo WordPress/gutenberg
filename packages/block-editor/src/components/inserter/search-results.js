@@ -38,6 +38,7 @@ function InserterSearchResults( {
 	filterValue,
 	onSelect,
 	onHover,
+	onHoverPattern,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -189,7 +190,7 @@ function InserterSearchResults( {
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
 					onClickPattern={ onSelectBlockPattern }
-					onHover={ onHover }
+					onHover={ onHoverPattern }
 					isDraggable={ isDraggable }
 				/>
 			</div>

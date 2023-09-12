@@ -25,6 +25,7 @@ const {
 	findPluginReleaseBranchName,
 } = require( './common' );
 const { join } = require( 'path' );
+const pluginConfig = require( '../config' );
 
 /**
  * Release type names.
@@ -99,7 +100,7 @@ async function checkoutNpmReleaseBranch( {
 	 * `trunk` commits from within the past week.
 	 */
 	await SimpleGit( gitWorkingDirectoryPath )
-		.fetch( npmReleaseBranch, [ '--depth=100' ] )
+		.fetch( 'origin', npmReleaseBranch, [ '--depth=100' ] )
 		.checkout( npmReleaseBranch );
 	log(
 		'>> The local npm release branch ' +
@@ -149,6 +150,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 		 */
 		await repo
 			.raw( 'rm', '-r', '.' )
+			.fetch( 'origin', pluginReleaseBranch, [ '--depth=1' ] )
 			.raw( 'checkout', `origin/${ pluginReleaseBranch }`, '--', '.' );
 
 		const { commit: commitHash } = await repo.commit(
@@ -411,13 +413,27 @@ async function publishPackagesToNpm( {
 		);
 	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
 		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		try {
+			await command(
+				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		} catch {
+			log(
+				'>> Trying to finish failed publishing of modified npm packages.'
+			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
+			await command(
+				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		}
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
@@ -431,13 +447,27 @@ async function publishPackagesToNpm( {
 		);
 
 		log( '>> Publishing modified packages to npm.' );
-		await command(
-			`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		try {
+			await command(
+				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		} catch {
+			log(
+				'>> Trying to finish failed publishing of modified npm packages.'
+			);
+			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
+			await command(
+				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		}
 	}
 
 	const afterCommitHash = await SimpleGit( gitWorkingDirectoryPath ).revparse(
@@ -530,7 +560,11 @@ async function runPackagesRelease( config, customMessages ) {
 			config.abortMessage,
 			async () => {
 				log( '>> Cloning the Git repository' );
-				await SimpleGit( gitPath ).clone( config.gitRepositoryURL );
+				await SimpleGit().clone(
+					pluginConfig.gitRepositoryURL,
+					gitPath,
+					[ '--depth=1', '--no-single-branch' ]
+				);
 				log( `   >> successfully clone into: ${ gitPath }` );
 			}
 		);

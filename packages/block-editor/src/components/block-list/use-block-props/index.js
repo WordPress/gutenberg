@@ -53,6 +53,32 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
+ * Use of this hook on the outermost element of a block is required if using API >= v2.
+ *
+ * @example
+ * ```js
+ * import { useBlockProps } from '@wordpress/block-editor';
+ *
+ * export default function Edit() {
+ *
+ *   const blockProps = useBlockProps(
+ *     className: 'my-custom-class',
+ *     style: {
+ *       color: '#222222',
+ *       backgroundColor: '#eeeeee'
+ *     }
+ *   )
+ *
+ *   return (
+ *	    <div { ...blockProps }>
+ *
+ *     </div>
+ *   )
+ * }
+ *
+ * ```
+ *
+ *
  * @param {Object}  props                    Optional. Props to pass to the element. Must contain
  *                                           the ref if one is defined.
  * @param {Object}  options                  Options for internal use only.

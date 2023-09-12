@@ -274,5 +274,5 @@ export const SubmenuRtlChevronIcon = styled( Icon )`
 		{
 			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
 		}
-	)() }
+	) }
 `;

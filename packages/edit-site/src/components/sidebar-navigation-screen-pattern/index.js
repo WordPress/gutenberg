@@ -16,15 +16,15 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import normalizeRecordKey from '../../utils/normalize-record-key';
+import TemplateActions from '../template-actions';
 
 export default function SidebarNavigationScreenPattern() {
+	const navigator = useNavigator();
+	const {
+		params: { postType, postId },
+	} = navigator;
 	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
-	const { params } = useNavigator();
-	const { postType } = params;
-	const postId = normalizeRecordKey( params?.postId );
 
 	useInitEditedEntityFromURL();
 
@@ -41,11 +41,21 @@ export default function SidebarNavigationScreenPattern() {
 	return (
 		<SidebarNavigationScreen
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<>
+					<TemplateActions
+						postType={ postType }
+						postId={ postId }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( backPath );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</>
 			}
 			backPath={ backPath }
 			{ ...patternDetails }

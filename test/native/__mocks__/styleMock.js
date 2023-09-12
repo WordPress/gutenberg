@@ -204,4 +204,8 @@ module.exports = {
 	},
 	picker: {},
 	pickerPointer: {},
+	columnsContainer: {
+		marginLeft: 16,
+		minWidth: 32,
+	},
 };

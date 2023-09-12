@@ -21,7 +21,19 @@
 
 	<div data-wp-effect="effects.changeFocus"></div>
 
+	<div
+		data-testid="short-circuit infinite loops"
+		data-wp-effect="effects.infiniteLoop"
+		data-wp-text="state.counter"
+	>
+		0
+	</div>
+
 	<button data-testid="toggle" data-wp-on--click="actions.toggle">
 		Update
+	</button>
+
+	<button data-testid="increment" data-wp-on--click="actions.increment">
+		Increment
 	</button>
 </div>

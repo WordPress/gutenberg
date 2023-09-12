@@ -119,6 +119,7 @@ const SocialLinkEdit = ( {
 				toValue: 1,
 				duration: ANIMATION_DURATION,
 				easing: Easing.circle,
+				useNativeDriver: false,
 			} ),
 		] ).start( () => setHasUrl( true ) );
 	}
@@ -157,7 +158,7 @@ const SocialLinkEdit = ( {
 		  );
 
 	return (
-		<View>
+		<View style={ styles.container }>
 			{ isSelected && (
 				<>
 					<BlockControls>

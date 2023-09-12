@@ -6,11 +6,8 @@ import type { ReactElement } from 'react';
 /**
  * Internal dependencies
  */
-import {
-	hasConnectNamespace,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
+import { hasConnectNamespace, useContextSystem } from '../ui/context';
 import { FlexItem, useFlex } from '../flex';
 import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../ui/utils/get-valid-children';

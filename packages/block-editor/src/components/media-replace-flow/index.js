@@ -179,7 +179,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ accept }
-								multiple={ multiple }
+								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem

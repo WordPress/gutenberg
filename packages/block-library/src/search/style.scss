@@ -53,6 +53,10 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 .wp-block-search.wp-block-search__button-only {
 	.wp-block-search__button {
 		margin-left: 0;
+		// Prevent unintended text wrapping.
+		flex-shrink: 0;
+		// Ensure minimum input field width in small viewports.
+		max-width: calc(100% - 100px);
 	}
 }
 

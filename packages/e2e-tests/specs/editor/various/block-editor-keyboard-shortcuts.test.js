@@ -90,9 +90,9 @@ describe( 'block editor keyboard shortcuts', () => {
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Create pattern/reusable block' );
+			await clickMenuItem( 'Create pattern' );
 			const reusableBlockNameInputSelector =
-				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+				'.patterns-menu-items__convert-modal .components-text-control__input';
 			const nameInput = await page.waitForSelector(
 				reusableBlockNameInputSelector
 			);
@@ -102,7 +102,7 @@ describe( 'block editor keyboard shortcuts', () => {
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'Delete' );
 			await clickOnCloseModalButton(
-				'.reusable-blocks-menu-items__convert-modal'
+				'.patterns-menu-items__convert-modal'
 			);
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
