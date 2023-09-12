@@ -29,7 +29,7 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 		add_post_meta(
 			self::$page->ID,
 			'core_table_of_contents',
-			'[{"content":"Heading text","level":2,"link":"#heading-text"},{"content":"A sub-heading","level":3,"link":"#a-sub-heading"}]',
+			'[{"content":"Heading text","level":2,"link":"#heading-text","page":null},{"content":"A sub-heading","level":3,"link":"#a-sub-heading","page":null},{"content":"Missing anchor","level":2,"link":null,"page":null}]',
 			true
 		);
 	}
@@ -110,6 +110,11 @@ class Tests_Blocks_Render_Table_Of_Contents extends WP_UnitTestCase {
 			'<a class="wp-block-table-of-contents__entry" href="' . $permalink . '#a-sub-heading">A sub-heading</a>',
 			$new_content,
 			'Failed to render a sub-heading element from meta'
+		);
+		$this->assertStringContainsString(
+			'<span class="wp-block-table-of-contents__entry">Missing anchor</span>',
+			$new_content,
+			'Failed to render a heading element with a missing anchor'
 		);
 	}
 }

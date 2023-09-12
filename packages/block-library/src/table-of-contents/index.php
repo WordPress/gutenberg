@@ -129,7 +129,7 @@ function block_core_table_of_contents_build_list( $tree, $args ) {
 			$pagelink = ! empty( $heading['page'] ) ? add_query_arg( 'page', $heading['page'], $permalink ) : $permalink;
 			$content  = '<a class="wp-block-table-of-contents__entry" href="' . esc_url( $pagelink . $heading['link'] ) . '">' . esc_html( $heading['content'] ) . '</a>';
 		} else {
-			$content = '<span class=wp-block-table-of-contents__entry>' . esc_html( $heading['content'] ) . '</span>';
+			$content = '<span class="wp-block-table-of-contents__entry">' . esc_html( $heading['content'] ) . '</span>';
 		}
 
 		$list .= '<li>' . $content . $children . '</li>';
