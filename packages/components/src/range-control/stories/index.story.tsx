@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import RangeControl from '..';
 
 const ICONS = { starEmpty, starFilled, styles, wordpress };
 
-const meta: ComponentMeta< typeof RangeControl > = {
+const meta: Meta< typeof RangeControl > = {
 	component: RangeControl,
 	title: 'Components/RangeControl',
 	argTypes: {
@@ -48,15 +48,12 @@ const meta: ComponentMeta< typeof RangeControl > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof RangeControl > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 	const [ value, setValue ] = useState< number >();
 
 	return (
@@ -71,9 +68,7 @@ const Template: ComponentStory< typeof RangeControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof RangeControl > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
 Default.args = {
 	help: 'Please select how transparent you would like this.',
 	initialPosition: 50,
@@ -87,7 +82,7 @@ Default.args = {
  * values. This also overrides both `withInputField` and `showTooltip` props to
  * `false`.
  */
-export const WithAnyStep: ComponentStory< typeof RangeControl > = ( {
+export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -113,7 +108,7 @@ WithAnyStep.args = {
 	step: 'any',
 };
 
-const MarkTemplate: ComponentStory< typeof RangeControl > = ( {
+const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 	label,
 	onChange,
 	...args
@@ -168,7 +163,7 @@ const marksWithNegatives = [
  * automatically generated or custom mark indicators can be provided by an
  * `Array`.
  */
-export const WithIntegerStepAndMarks: ComponentStory< typeof RangeControl > =
+export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithIntegerStepAndMarks.args = {
@@ -184,7 +179,7 @@ WithIntegerStepAndMarks.args = {
  * `step` ticks. Marks may be automatically generated or custom mark indicators
  * can be provided by an `Array`.
  */
-export const WithDecimalStepAndMarks: ComponentStory< typeof RangeControl > =
+export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithDecimalStepAndMarks.args = {
@@ -203,9 +198,8 @@ WithDecimalStepAndMarks.args = {
  * indicators can represent negative values as well. Marks may be automatically
  * generated or custom mark indicators can be provided by an `Array`.
  */
-export const WithNegativeMinimumAndMarks: ComponentStory<
-	typeof RangeControl
-> = MarkTemplate.bind( {} );
+export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
+	MarkTemplate.bind( {} );
 
 WithNegativeMinimumAndMarks.args = {
 	marks: marksWithNegatives,
@@ -219,7 +213,7 @@ WithNegativeMinimumAndMarks.args = {
  * indicators can represent negative values as well. Marks may be automatically
  * generated or custom mark indicators can be provided by an `Array`.
  */
-export const WithNegativeRangeAndMarks: ComponentStory< typeof RangeControl > =
+export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithNegativeRangeAndMarks.args = {
@@ -234,7 +228,7 @@ WithNegativeRangeAndMarks.args = {
  * non-integer values. This may still be used in conjunction with `marks`
  * rendering a visual representation of `step` ticks.
  */
-export const WithAnyStepAndMarks: ComponentStory< typeof RangeControl > =
+export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithAnyStepAndMarks.args = {

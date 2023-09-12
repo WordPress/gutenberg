@@ -3,8 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { BlockInspector } from '@wordpress/block-editor';
-
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
@@ -15,6 +14,8 @@ import { store as editSiteStore } from '../../store';
 import SiteEditorCanvas from './site-editor-canvas';
 import getBlockEditorProvider from './get-block-editor-provider';
 
+import { unlock } from '../../lock-unlock';
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function BlockEditor() {
 	const entityType = useSelect(
 		( select ) => select( editSiteStore ).getEditedPostType(),
@@ -34,7 +35,7 @@ export default function BlockEditor() {
 
 			<SiteEditorCanvas />
 
-			<ReusableBlocksMenuItems />
+			<PatternsMenuItems />
 		</BlockEditorProvider>
 	);
 }

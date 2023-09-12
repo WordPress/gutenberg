@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import FormTokenField from '../';
 
-const meta: ComponentMeta< typeof FormTokenField > = {
+const meta: Meta< typeof FormTokenField > = {
 	component: FormTokenField,
 	title: 'Components/FormTokenField',
 	argTypes: {
@@ -28,7 +28,7 @@ const meta: ComponentMeta< typeof FormTokenField > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -42,9 +42,7 @@ const continents = [
 	'Oceania',
 ];
 
-const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
-	...args
-} ) => {
+const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
 	const [ selectedContinents, setSelectedContinents ] = useState<
 		ComponentProps< typeof FormTokenField >[ 'value' ]
 	>( [] );
@@ -58,14 +56,15 @@ const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof FormTokenField > =
-	DefaultTemplate.bind( {} );
+export const Default: StoryFn< typeof FormTokenField > = DefaultTemplate.bind(
+	{}
+);
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,
 };
 
-export const Async: ComponentStory< typeof FormTokenField > = ( {
+export const Async: StoryFn< typeof FormTokenField > = ( {
 	suggestions,
 	...args
 } ) => {
@@ -102,7 +101,7 @@ Async.args = {
 	suggestions: continents,
 };
 
-export const DropdownSelector: ComponentStory< typeof FormTokenField > =
+export const DropdownSelector: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
 DropdownSelector.args = {
 	...Default.args,
@@ -115,7 +114,7 @@ DropdownSelector.args = {
  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
  * and is subject to change.)
  */
-export const WithCustomRenderItem: ComponentStory< typeof FormTokenField > =
+export const WithCustomRenderItem: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
@@ -129,7 +128,7 @@ WithCustomRenderItem.args = {
  * `true` will be tokenized. (This is still an experimental feature and is
  * subject to change.)
  */
-export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
+export const WithValidatedInput: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
 WithValidatedInput.args = {
 	...Default.args,

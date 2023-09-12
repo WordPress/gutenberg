@@ -240,4 +240,75 @@ test.describe( 'Columns', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'following paragraph', () => {
+		const columnsBlock = {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+			],
+		};
+
+		test( 'should be deleted on Backspace when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( columnsBlock );
+			await editor.insertBlock( { name: 'core/paragraph' } );
+
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				columnsBlock,
+			] );
+
+			// Ensure focus is on the columns block.
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [] );
+		} );
+
+		test( 'should only select Columns on Backspace when non-empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const paragraphBlock = {
+				name: 'core/paragraph',
+				attributes: { content: 'a' },
+			};
+			await editor.insertBlock( columnsBlock );
+			await editor.insertBlock( paragraphBlock );
+
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				columnsBlock,
+				paragraphBlock,
+			] );
+
+			// Ensure focus is on the columns block.
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				paragraphBlock,
+			] );
+		} );
+	} );
 } );

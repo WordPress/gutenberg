@@ -70,6 +70,8 @@ import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import AccessibleDescription from './accessible-description';
+import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -677,12 +679,23 @@ function Navigation( {
 		</>
 	);
 
+	const accessibleDescriptionId = `${ clientId }-desc`;
+
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
-			<TagName { ...blockProps }>
+			<TagName
+				{ ...blockProps }
+				aria-describedby={
+					! isPlaceholder ? accessibleDescriptionId : undefined
+				}
+			>
+				<AccessibleDescription id={ accessibleDescriptionId }>
+					{ __( 'Unsaved Navigation Menu.' ) }
+				</AccessibleDescription>
+
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
@@ -848,7 +861,17 @@ function Navigation( {
 				) }
 
 				{ ! isLoading && (
-					<TagName { ...blockProps }>
+					<TagName
+						{ ...blockProps }
+						aria-describedby={
+							! isPlaceholder
+								? accessibleDescriptionId
+								: undefined
+						}
+					>
+						<AccessibleMenuDescription
+							id={ accessibleDescriptionId }
+						/>
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }

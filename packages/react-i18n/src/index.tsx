@@ -54,7 +54,7 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  *
  * @example
  * ```js
- * import { createI18n } from '@wordpress/react-i18n';
+ * import { createI18n } from '@wordpress/i18n';
  * import { I18nProvider } from '@wordpress/react-i18n';
  * const i18n = createI18n();
  *

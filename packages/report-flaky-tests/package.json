@@ -28,7 +28,7 @@
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",
-		"jest-message-util": "^29.5.0"
+		"jest-message-util": "^29.6.2"
 	},
 	"publishConfig": {
 		"access": "public"

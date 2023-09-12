@@ -17,6 +17,7 @@ export { default as __experimentalBlockAlignmentMatrixControl } from './block-al
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
+export { default as BlockCanvas } from './block-canvas';
 export {
 	default as BlockControls,
 	BlockFormatControls,
@@ -166,3 +167,9 @@ export { useBlockEditingMode } from './block-editing-mode';
 
 export { default as BlockEditorProvider } from './provider';
 export { default as useSetting } from './use-setting';
+export { useBlockCommands } from './use-block-commands';
+
+/*
+ * The following rename hint component can be removed in 6.4.
+ */
+export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';

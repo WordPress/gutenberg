@@ -20,13 +20,9 @@ import {
 	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
 	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
 	create,
-	replace,
 	split,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
@@ -338,32 +334,20 @@ function RichTextWrapper(
 				onCustomEnter();
 			}
 
-			if ( multiline ) {
-				if ( shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( value ) ) {
-					splitValue( value );
-				} else {
-					onChange( insertLineSeparator( value ) );
-				}
-			} else {
-				const { text, start: splitStart, end: splitEnd } = value;
-				const canSplitAtEnd =
-					onSplitAtEnd &&
-					splitStart === splitEnd &&
-					splitEnd === text.length;
+			const { text, start: splitStart, end: splitEnd } = value;
+			const canSplitAtEnd =
+				onSplitAtEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length;
 
-				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( value );
+			if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
 				}
+			} else if ( ! canSplit && canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if ( canSplit ) {
+				splitValue( value );
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -471,20 +455,8 @@ function RichTextWrapper(
 			} );
 
 			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
+				const valueToInsert = create( { html: content } );
 				addActiveFormats( valueToInsert, activeFormats );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
-
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL

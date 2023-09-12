@@ -72,7 +72,9 @@ const setupDriver = async () => {
 	const safeBranchName = branch.replace( /\//g, '-' );
 	if ( isLocalEnvironment() ) {
 		try {
-			appiumProcess = await AppiumLocal.start( localAppiumPort );
+			appiumProcess = await AppiumLocal.start( {
+				port: localAppiumPort,
+			} );
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console

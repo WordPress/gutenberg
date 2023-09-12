@@ -346,8 +346,8 @@
 
 	.block-editor-list-view-block-select-button__image {
 		background-size: cover;
-		width: 20px;
-		height: 20px;
+		width: 18px;
+		height: 18px;
 		border-radius: $radius-block-ui;
 
 		&:not(:only-child) {
@@ -355,7 +355,7 @@
 		}
 
 		&:not(:first-child) {
-			margin-left: -5px;
+			margin-left: #{$grid-unit-15 * -0.5};
 		}
 	}
 

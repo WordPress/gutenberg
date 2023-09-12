@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Improved error messages and codes printed on the console ([#53743](https://github.com/WordPress/gutenberg/pull/53743)).
+
+## 7.12.0 (2023-08-31)
+
+## 7.11.0 (2023-08-16)
+
 ## 7.10.0 (2023-08-10)
 
 ## 7.9.0 (2023-07-20)
@@ -26,7 +34,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 6.11.0 (2023-03-01)
 
