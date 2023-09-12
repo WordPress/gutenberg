@@ -64,30 +64,12 @@ class WP_Font_Family_Utils {
 	
 		$font_faces_1      = isset( $font1['fontFace'] ) ? $font1['fontFace'] : array();
 		$font_faces_2      = isset( $font2['fontFace'] ) ? $font2['fontFace'] : array();
-
 		$merged_font_faces = array_merge( $font_faces_1, $font_faces_2 );
-	
-		$unique_faces_map = array(); 
-	
-		foreach ( $merged_font_faces as $font_face ) {
-			$fontStyle  = isset( $font_face['fontStyle'] ) ? $font_face['fontStyle'] : '';
-			$fontWeight = isset( $font_face['fontWeight'] ) ? $font_face['fontWeight'] : '';
-	
-			// Create a unique key based on fontStyle and fontWeight
-			$unique_key = $fontStyle . '_' . $fontWeight;
-	
-			// If this is a new face based on fontStyle and fontWeight, add it to the unique_faces_map
-			if ( ! isset( $unique_faces_map[ $unique_key ] ) ) {
-				$unique_faces_map[$unique_key] = $font_face;
-			} else {
-				// Overwrite the old src with the new one.
-				$unique_faces_map[ $unique_key ]['src'] = $font_face['src'];
-				// TODO: remove the old font face asset.
-			}
-		}
-	
-		$unique_faces = array_values( $unique_faces_map );
-	
+
+		$serialized_faces        = array_map( 'serialize', $merged_font_faces );
+		$unique_serialized_faces = array_unique( $serialized_faces );
+		$unique_faces            = array_map( 'unserialize', $unique_serialized_faces );
+
 		$merged_font             = array_merge( $font1, $font2 );
 		$merged_font['fontFace'] = $unique_faces;
 		
