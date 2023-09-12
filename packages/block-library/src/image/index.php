@@ -31,9 +31,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
-	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
-	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_enabled  = false;
+	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
+	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
 	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
 	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
@@ -106,8 +106,9 @@ function block_core_image_get_lightbox_settings( $block ) {
 /**
  * Add the directives and layout needed for the lightbox behavior.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param  string $block_content        Rendered block content.
+ * @param  array  $block                Block object.
+ * @param  array  $lightbox_settings    Lightbox settings: enabled, animation.
  * @return string                Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block, $lightbox_settings ) {
