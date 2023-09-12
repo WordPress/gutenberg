@@ -6,9 +6,15 @@ To contribute to the Gutenberg project itself, refer to the additional documenta
 
 A development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential components are:
 
-1.  Node.js development tools
-2.  Code editor
+1.  Code editor
+2.  Node.js development tools
 3.  Local WordPress environment (site)
+
+## Choose a code editor
+
+Use any code editor that you're most comfortable with. The key is having a way to open, edit, and save text files.
+
+If you do not already have a preferred code editor, [Visual Studio Code](https://code.visualstudio.com/) (VS Code) is a popular choice for JavaScript development among Core contributors. It works well across the three major platforms (Windows, Linux, and Mac) and is open-source and actively maintained by Microsoft. VS Code also has a vibrant community providing plugins and extensions, including many for WordPress development.
 
 ## Install Node.js development tools
 
@@ -31,25 +37,22 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
 
 2. Quit and restart the terminal.
-3. Run `nvm install 18` in the terminal to install `node` v18.
-4. Run `node -v` and `npm -v` in the terminal to confirm `node` v18+ and `npm` v9+ are installed.
-5. (Optional) If needed, you can install additional versions of `node` on your machine. Switch between them by running `nvm use [version-number]`.
+3. Run `nvm install node` in the terminal to install the lastest version of `node`.
+4. Run `node -v` and `npm -v` in the terminal to verify the install `node` and `npm` versions.
 
-#### Troubleshooting
-
-If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file. 
-
-The default shell is `zsh` on macOS, so create the profile file by running `touch ~/.zshrc` in the terminal. It's fine to run if the file already exists. For Ubuntu, including WSL, the default profile is `bash`, so use `touch ~/.bashrc` instead. Then repeat steps 2-4.
+If needed, you can also install specific versions of `node`. For example, install v18 by running `nvm install 18`, and switch between different versions by running `nvm use [version-number]`. See the `nvm` [usage guide](https://github.com/nvm-sh/nvm#usage) for more details.
 
 ### Windows or alternative installs
 
-You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website, v18 is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
+You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website, the latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
 
-## Choose a code editor
+### Troubleshooting
 
-Use any code editor that you're most comfortable with. The key is having a way to open, edit, and save text files.
+If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file. 
 
-If you do not already have a preferred code editor, [Visual Studio Code](https://code.visualstudio.com/) (VS Code) is a popular choice for JavaScript development among Core contributors. It works well across the three major platforms (Windows, Linux, and Mac) and is open-source and actively maintained by Microsoft. VS Code also has a vibrant community providing plugins and extensions, including many for WordPress development. 
+The default shell is `zsh` on macOS, so create the profile file by running `touch ~/.zshrc` in the terminal. It's fine to run if the file already exists. The default profile is `bash` for Ubuntu, including WSL, so use `touch ~/.bashrc` instead. Then repeat steps 2-4.
+
+The latest `node` version should work for most development projects, but be aware that some packages and tools have specific requirements. If you encounter issues, you might need to install and use a previous `node` version.
 
 ## Set up a local WordPress environment
 
