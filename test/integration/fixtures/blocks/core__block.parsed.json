@@ -5,7 +5,7 @@
 			"ref": 123
 		},
 		"innerBlocks": [],
-		"innerHTML": "",
-		"innerContent": []
+		"innerHTML": "\n<div class=\"wp-block-block\"></div>\n",
+		"innerContent": [ "\n<div class=\"wp-block-block\"></div>\n" ]
 	}
 ]
