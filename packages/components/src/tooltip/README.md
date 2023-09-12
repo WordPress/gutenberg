@@ -44,7 +44,7 @@ Option to hide the tooltip when the anchor is clicked.
 
 #### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
 
-Used to specify the tooltip's position with respect to its anchor.
+Used to specify the tooltip's placement with respect to its anchor. Further details and examples can be found in `floating-ui`'s [documentation for 'Placements'](https://floating-ui.com/docs/tutorial#placements).
 
 -   Required: No
 -   Default: `'bottom'`
