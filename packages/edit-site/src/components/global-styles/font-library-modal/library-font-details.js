@@ -1,11 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
-	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 
 /**
@@ -13,12 +11,7 @@ import {
  */
 import LibraryFontVariant from './library-font-variant';
 
-function LibraryFontDetails( {
-	font,
-	isConfirmDeleteOpen,
-	handleConfirmUninstall,
-	handleCancelUninstall,
-} ) {
+function LibraryFontDetails( { font } ) {
 	const fontFaces =
 		font.fontFace && font.fontFace.length
 			? font.fontFace.sort( ( a, b ) =>
@@ -34,24 +27,7 @@ function LibraryFontDetails( {
 
 	return (
 		<>
-			<ConfirmDialog
-				isOpen={ isConfirmDeleteOpen }
-				cancelButtonText={ __( 'No, keep the font' ) }
-				confirmButtonText={ __( 'Yes, uninstall' ) }
-				onCancel={ handleCancelUninstall }
-				onConfirm={ handleConfirmUninstall }
-			>
-				{ sprintf(
-					/* translators: %s: Name of the font. */
-					__(
-						'Would you like to remove %s and all its variants and assets?'
-					),
-					font.name
-				) }
-			</ConfirmDialog>
-
 			<Spacer margin={ 4 } />
-
 			<VStack spacing={ 0 }>
 				<Spacer margin={ 8 } />
 				{ fontFaces.map( ( face, i ) => (

@@ -7,6 +7,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	Button,
+	Spinner,
 } from '@wordpress/components';
 
 /**
@@ -18,6 +19,7 @@ import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import LocalFonts from './local-fonts';
+import ConfirmDeleteDialog from './confirm-delete-dialog';
 
 function InstalledFonts() {
 	const {
@@ -27,6 +29,7 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected,
 		refreshLibrary,
 		uninstallFont,
+		isResolvingLibrary,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
@@ -80,8 +83,16 @@ function InstalledFonts() {
 				/>
 			}
 		>
+			<ConfirmDeleteDialog
+				font={ libraryFontSelected }
+				isConfirmDeleteOpen={ isConfirmDeleteOpen }
+				handleConfirmUninstall={ handleConfirmUninstall }
+				handleCancelUninstall={ handleCancelUninstall }
+			/>
+
 			{ ! libraryFontSelected && (
 				<>
+					{ isResolvingLibrary && <Spinner /> }
 					{ baseCustomFonts.length > 0 && (
 						<>
 							<Spacer margin={ 2 } />
