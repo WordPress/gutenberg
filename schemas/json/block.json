@@ -173,10 +173,6 @@
 							"type": "string",
 							"description": "Use an attribute source to extract the value from an attribute in the markup. The attribute is specified by the attribute field, which must be supplied.\n\nExample: Extract the src attribute from an image found in the block’s markup."
 						},
-						"multiline": {
-							"type": "string",
-							"description": "Use the multiline property to extract the inner HTML of matching tag names for the use in RichText with the multiline prop."
-						},
 						"query": {
 							"type": "object",
 							"description": "Use query to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources."
