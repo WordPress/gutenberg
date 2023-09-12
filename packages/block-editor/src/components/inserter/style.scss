@@ -457,6 +457,11 @@ $block-inserter-tabs-height: 44px;
 	&__list {
 		margin-left: $sidebar-width;
 		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
 	}
 
 	.block-editor-block-patterns-list {
@@ -744,10 +749,10 @@ $block-inserter-tabs-height: 44px;
 	margin: 0;
 }
 
-.block-editor-patterns__sync-status-filter
-.components-input-control__container {
-	width: fit-content;
-	select.components-select-control__input {
-		height: 40px;
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
 	}
 }
