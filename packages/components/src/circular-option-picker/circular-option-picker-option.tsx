@@ -13,7 +13,7 @@ import { Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { CircularOptionPickerContext } from './option-picker-context';
+import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { CompositeItem } from '../composite';
 import Tooltip from '../tooltip';

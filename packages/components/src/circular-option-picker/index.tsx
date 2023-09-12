@@ -1,10 +1,13 @@
 /**
  * Internal dependencies
  */
-import CircularOptionPicker from './option-picker';
+import CircularOptionPicker from './circular-option-picker';
 
-export { Option } from './option-picker-option';
-export { OptionGroup } from './option-picker-option-group';
-export { ButtonAction, DropdownLinkAction } from './option-picker-actions';
+export { Option } from './circular-option-picker-option';
+export { OptionGroup } from './circular-option-picker-option-group';
+export {
+	ButtonAction,
+	DropdownLinkAction,
+} from './circular-option-picker-actions';
 
 export default CircularOptionPicker;

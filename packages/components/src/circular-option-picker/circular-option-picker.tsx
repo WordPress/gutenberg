@@ -13,16 +13,19 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { CircularOptionPickerContext } from './option-picker-context';
+import { CircularOptionPickerContext } from './circular-option-picker-context';
 import { Composite, useCompositeState } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
 	ButtonsCircularOptionPickerProps,
 } from './types';
-import { Option } from './option-picker-option';
-import { OptionGroup } from './option-picker-option-group';
-import { ButtonAction, DropdownLinkAction } from './option-picker-actions';
+import { Option } from './circular-option-picker-option';
+import { OptionGroup } from './circular-option-picker-option-group';
+import {
+	ButtonAction,
+	DropdownLinkAction,
+} from './circular-option-picker-actions';
 
 /**
  *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
