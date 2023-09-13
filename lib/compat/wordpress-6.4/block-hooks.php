@@ -13,10 +13,10 @@
  * @return array Updated settings array.
  */
 function gutenberg_add_hooked_blocks( $settings, $metadata ) {
-	if ( ! isset( $metadata['__experimentalBlockHooks'] ) ) {
+	if ( ! isset( $metadata['blockHooks'] ) ) {
 		return $settings;
 	}
-	$block_hooks = $metadata['__experimentalBlockHooks'];
+	$block_hooks = $metadata['blockHooks'];
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
