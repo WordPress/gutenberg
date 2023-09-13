@@ -31,7 +31,7 @@
 
 ### Documentation
 
--   Button `focus` prop: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
+-   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
 
 ### Experimental
 
