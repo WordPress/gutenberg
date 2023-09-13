@@ -17,10 +17,7 @@
 		"html": false,
 		"inserter": false,
 		"layout": {
-			"allowEditing": false,
-			"default": {
-				"type": "constrained"
-			}
+			"allowEditing": false
 		}
 	}
 }
