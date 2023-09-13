@@ -194,4 +194,4 @@ For example, a button block, deeply nested in several levels of block `X` that u
 ### `directInsert`
 
 - **Type:** `Boolean`
-- **Default:** - `undefined`. Determines whether the default block should be inserted directly into the InnerBlocks area by the block appender.
+- **Default:** - `undefined`. Determines whether the default block is inserted directly into the InnerBlocks area by the block appender. Direct insertion is automatic if `defaultBlock` is defined or `allowedBlocks` specifies a single block type that has no variations. This setting can be used to override the automated behavior.

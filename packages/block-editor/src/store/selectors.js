@@ -2230,7 +2230,7 @@ export const getDirectInsertBlock = createSelector(
 			state.blockListSettings[ rootClientId ]?.defaultBlock;
 		const directInsert =
 			state.blockListSettings[ rootClientId ]?.directInsert;
-		if ( ! defaultBlock || ! directInsert ) {
+		if ( ! defaultBlock || directInsert === false ) {
 			return;
 		}
 		if ( typeof directInsert === 'function' ) {

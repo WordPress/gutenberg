@@ -201,7 +201,10 @@ class PrivateInserter extends Component {
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsertBlock ) {
+		if (
+			hasSingleBlockType ||
+			( directInsertBlock && hasSingleBlockType )
+		) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
