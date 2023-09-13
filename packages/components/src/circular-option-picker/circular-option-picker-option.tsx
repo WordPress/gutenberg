@@ -21,26 +21,43 @@ import type { OptionProps } from './types';
 
 const hasSelectedOption = new Map();
 
-function renderOptionAsButton( props: {
+function OptionAsButton( props: {
+	id?: string;
 	className?: string;
 	isPressed?: boolean;
 } ) {
 	return <Button { ...props }></Button>;
 }
 
-function renderOptionAsOption( props: {
+function OptionAsOption( props: {
 	id: string;
 	className?: string;
 	isSelected?: boolean;
 	compositeState: any;
 } ) {
-	const { className, isSelected, compositeState, ...additionalProps } = props;
+	const { id, className, isSelected, compositeState, ...additionalProps } =
+		props;
+	const { baseId, currentId, setCurrentId } = compositeState as any;
+
+	useEffect( () => {
+		// If we call `setCurrentId` here, it doesn't update for other
+		// Option renders in the same pass. So we have to store our own
+		// map to make sure that we only set the first selected option.
+		// We still need to check `currentId` because the control will
+		// update this as the user moves around, and that state should
+		// be maintained as the group gains and loses focus.
+		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
+			hasSelectedOption.set( baseId, true );
+			setCurrentId( id );
+		}
+	}, [ baseId, currentId, id, isSelected, setCurrentId ] );
 
 	return (
 		<CompositeItem
 			{ ...additionalProps }
 			{ ...compositeState }
 			as={ Button }
+			id={ id }
 			className={ classnames( className, {
 				'is-pressed': isSelected,
 			} ) }
@@ -58,27 +75,9 @@ export function Option( {
 	...additionalProps
 }: OptionProps ) {
 	const compositeState = useContext( CircularOptionPickerContext );
-	const { baseId, currentId, setCurrentId } = compositeState as any;
+	const { baseId } = compositeState as any;
 	const isComposite = !! baseId;
 	const id = useInstanceId( Option, baseId );
-
-	useEffect( () => {
-		// If we call `setCurrentId` here, it doesn't update for other
-		// Option renders in the same pass. So we have to store our own
-		// map to make sure that we only set the first selected option.
-		// We still need to check `currentId` because the control will
-		// update this as the user moves around, and that state should
-		// be maintained as the group gains and loses focus.
-		if (
-			isComposite &&
-			isSelected &&
-			! currentId &&
-			! hasSelectedOption.get( baseId )
-		) {
-			hasSelectedOption.set( baseId, true );
-			setCurrentId( id );
-		}
-	}, [ baseId, currentId, id, isComposite, isSelected, setCurrentId ] );
 
 	const commonProps = {
 		id,
@@ -86,16 +85,15 @@ export function Option( {
 		...additionalProps,
 	};
 
-	const optionControl = isComposite
-		? renderOptionAsOption( {
-				...commonProps,
-				isSelected,
-				compositeState,
-		  } )
-		: renderOptionAsButton( {
-				...commonProps,
-				isPressed: isSelected,
-		  } );
+	const optionControl = isComposite ? (
+		<OptionAsOption
+			{ ...commonProps }
+			compositeState={ compositeState }
+			isSelected={ isSelected }
+		/>
+	) : (
+		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
+	);
 
 	return (
 		<div
