@@ -43,7 +43,7 @@ export const getItemPriority = ( name, searchValue ) => {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const { isHierarchical, parentPost, parentPostId, items } = useSelect(
+	const { isHierarchical, parentPost, parentPostId, pageItems } = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecords, getEntityRecord } =
 				select( coreStore );
@@ -74,15 +74,13 @@ export function PageAttributesParent() {
 				parentPost: pageId
 					? getEntityRecord( 'postType', postTypeSlug, pageId )
 					: null,
-				items: postIsHierarchical
+				pageItems: postIsHierarchical
 					? getEntityRecords( 'postType', postTypeSlug, query )
-					: [],
+					: null,
 			};
 		},
 		[ fieldValue ]
 	);
-
-	const pageItems = items || [];
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
@@ -104,6 +102,10 @@ export function PageAttributesParent() {
 
 			return sortedNodes.flat();
 		};
+
+		if ( ! pageItems ) {
+			return [];
+		}
 
 		let tree = pageItems.map( ( item ) => ( {
 			id: item.id,
