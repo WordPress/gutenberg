@@ -101,7 +101,20 @@ function InspectorImagePreview( { label, url: imgUrl } ) {
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
-				<img src={ imgUrl } alt="" />
+				<span
+					className="block-editor-hooks__background__inspector-image-indicator"
+					aria-hidden
+				>
+					{ imgUrl && (
+						<span
+							className="block-editor-hooks__background__inspector-image-indicator-image"
+							aria-hidden
+							style={ {
+								backgroundImage: `url(${ imgUrl })`,
+							} }
+						/>
+					) }
+				</span>
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
@@ -254,11 +267,18 @@ function BackgroundImagePanelItem( props ) {
 								<div className="block-editor-hooks__background__inspector-upload-container">
 									<Button
 										onClick={ open }
-										variant="secondary"
+										aria-label={ __(
+											'Background image style'
+										) }
 									>
-										{ __( 'Add background image' ) }
+										<InspectorImagePreview
+											label={ __( 'Image' ) }
+										/>
 									</Button>
-									<DropZone onFilesDrop={ onFilesDrop } />
+									<DropZone
+										onFilesDrop={ onFilesDrop }
+										label={ __( 'Drop to upload' ) }
+									/>
 								</div>
 							) }
 						/>
