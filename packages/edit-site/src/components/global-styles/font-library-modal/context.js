@@ -48,6 +48,7 @@ function FontLibraryProvider( { children } ) {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
+	const [ isInstalling, setIsInstalling ] = useState( false );
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	const refreshLibrary = () => {
@@ -191,6 +192,7 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	async function installFonts( fonts ) {
+		setIsInstalling( true );
 		try {
 			// Prepare formData to install.
 			const formData = makeFormDataFromFontFamilies( fonts );
@@ -209,6 +211,7 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
+			setIsInstalling( false );
 			return true;
 		} catch ( e ) {
 			// eslint-disable-next-line no-console
@@ -216,6 +219,7 @@ function FontLibraryProvider( { children } ) {
 			createErrorNotice( __( 'Error installing fonts.' ), {
 				type: 'snackbar',
 			} );
+			setIsInstalling( false );
 			return false;
 		}
 	}
@@ -332,6 +336,7 @@ function FontLibraryProvider( { children } ) {
 				fontFamiliesHasChanges,
 				isResolvingLibrary,
 				hasResolvedLibrary,
+				isInstalling,
 			} }
 		>
 			{ children }

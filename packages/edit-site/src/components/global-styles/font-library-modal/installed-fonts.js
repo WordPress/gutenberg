@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useContext, useEffect, useState } from '@wordpress/element';
 import {
+	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 	Button,
@@ -20,6 +21,8 @@ import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import LocalFonts from './local-fonts';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
+import { unlock } from '../../../lock-unlock';
+const { ProgressBar } = unlock( componentsPrivateApis );
 
 function InstalledFonts() {
 	const {
@@ -145,10 +148,11 @@ function InstalledFonts() {
 }
 
 function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
-	const { saveFontFamilies, fontFamiliesHasChanges } =
+	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
 		useContext( FontLibraryContext );
 	return (
 		<HStack justify="space-between">
+			{ isInstalling && <ProgressBar /> }
 			<div>
 				{ shouldDisplayDeleteButton && (
 					<Button variant="tertiary" onClick={ handleUninstallClick }>
