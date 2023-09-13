@@ -59,7 +59,7 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 // @core-merge: This code needs to be removed.
 add_action(
 	'enqueue_block_editor_assets',
-	function() {
+	function () {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
 	}
 );
