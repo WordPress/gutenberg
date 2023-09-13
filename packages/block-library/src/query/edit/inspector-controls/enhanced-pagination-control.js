@@ -36,11 +36,13 @@ export default function EnhancedPaginationControl( {
 				} }
 			/>
 			{ containsThirdPartyBlocks && (
-				<div>
-					<Notice status="warning" isDismissible={ false }>
-						{ enhancedPaginationNotice }
-					</Notice>
-				</div>
+				<Notice
+					status="warning"
+					isDismissible={ false }
+					className="wp-block-query__enhanced-pagination-notice"
+				>
+					{ enhancedPaginationNotice }
+				</Notice>
 			) }
 		</>
 	);
