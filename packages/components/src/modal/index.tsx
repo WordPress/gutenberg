@@ -40,17 +40,17 @@ import type { ModalProps } from './types';
 let openModalCount = 0;
 
 /**
- * When `firstElement` is passed to `focusOnMount`, this function is optimised to
+ * When `firstElement` is passed to `focusOnMount`, this function is optimized to
  * avoid focusing on the `Close` button (or other "header" elements of the Modal
  * and instead focus within the Modal's contents.
  * However, if no tabbable elements are found within the Modal's contents, the
  * first tabbable element (likely the `Close` button) will be focused instead.
- * This ensures that at least one element is focused whilst still optimising
+ * This ensures that at least one element is focused whilst still optimizing
  * for the best a11y experience.
  *
  * See: https://github.com/WordPress/gutenberg/issues/54106.
  * @param tabbables Element[] an array of tabbable elements.
- * @return Element the first tabbable element that is not a close button.
+ * @return Element the first tabbable element in the Modal contents (or any tabbable element if none are found in content).
  */
 function getFirstTabbableElement( tabbables: Element[] ) {
 	// Attempt to locate tabbable outside of the header portion of the Modal.
