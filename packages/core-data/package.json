@@ -43,6 +43,7 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/sync": "file:../sync",
+		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"equivalent-key-map": "^0.2.2",

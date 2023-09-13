@@ -32,7 +32,7 @@ store( {
 	actions: {
 		core: {
 			query: {
-				navigate: async ( { event, ref, context, state } ) => {
+				navigate: async ( { event, ref, context } ) => {
 					if ( isValidLink( ref ) && isValidEvent( event ) ) {
 						event.preventDefault();
 
@@ -42,7 +42,7 @@ store( {
 						// Don't announce the navigation immediately, wait 300 ms.
 						const timeout = setTimeout( () => {
 							context.core.query.message =
-								state.core.query.loadingText;
+								context.core.query.loadingText;
 							context.core.query.animation = 'start';
 						}, 300 );
 
@@ -55,9 +55,9 @@ store( {
 						// same, we use a no-break space similar to the @wordpress/a11y
 						// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
 						context.core.query.message =
-							state.core.query.loadedText +
+							context.core.query.loadedText +
 							( context.core.query.message ===
-							state.core.query.loadedText
+							context.core.query.loadedText
 								? '\u00A0'
 								: '' );
 

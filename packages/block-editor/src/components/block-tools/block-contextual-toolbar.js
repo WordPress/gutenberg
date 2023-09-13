@@ -112,9 +112,9 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			return;
 		}
 
-		// get the width of the pinned items in the post editor
+		// get the width of the pinned items in the post editor or widget editor
 		const pinnedItems = document.querySelector(
-			'.edit-post-header__settings'
+			'.edit-post-header__settings, .edit-widgets-header__actions'
 		);
 
 		// get the width of the left header in the site editor

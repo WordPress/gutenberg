@@ -33,7 +33,11 @@ function App() {
 	} );
 
 	return (
-		<div className="playground">
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className="playground"
+			onKeyDown={ ( event ) => event.stopPropagation() }
+		>
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ updateBlocks }
@@ -59,4 +63,37 @@ export default {
 
 export const _default = () => {
 	return <App />;
+};
+
+function EditorBox() {
+	const [ blocks, updateBlocks ] = useState( [] );
+
+	useEffect( () => {
+		registerCoreBlocks();
+	}, [] );
+
+	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className="editor-box"
+			style={ { border: '1px solid #eee' } }
+			onKeyDown={ ( event ) => event.stopPropagation() }
+		>
+			<BlockEditorProvider
+				value={ blocks }
+				onInput={ updateBlocks }
+				onChange={ updateBlocks }
+				settings={ {
+					hasFixedToolbar: true,
+				} }
+			>
+				<BlockTools />
+				<BlockCanvas height="100%" styles={ editorStyles } />
+			</BlockEditorProvider>
+		</div>
+	);
+}
+
+export const Box = () => {
+	return <EditorBox />;
 };

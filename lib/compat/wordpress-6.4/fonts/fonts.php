@@ -34,20 +34,20 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 		$wp_font_face = new WP_Font_Face();
 		$wp_font_face->generate_and_print( $fonts );
 	}
-
-	// @core-merge: do not merge this code into Core.
-	add_filter(
-		'block_editor_settings_all',
-		static function( $settings ) {
-			ob_start();
-			// @core-merge: add only this line into Core's `_wp_get_iframed_editor_assets()` function after `wp_print_styles()`.
-			wp_print_font_faces();
-			$styles = ob_get_clean();
-
-			// Add the font-face styles to iframed editor assets.
-			$settings['__unstableResolvedAssets']['styles'] .= $styles;
-			return $settings;
-		},
-		11
-	);
 }
+
+// @core-merge: do not merge this code into Core.
+add_filter(
+	'block_editor_settings_all',
+	static function ( $settings ) {
+		ob_start();
+		// @core-merge: add only this line into Core's `_wp_get_iframed_editor_assets()` function after `wp_print_styles()`.
+		wp_print_font_faces();
+		$styles = ob_get_clean();
+
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
+		return $settings;
+	},
+	11
+);
