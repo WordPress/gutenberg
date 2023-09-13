@@ -130,7 +130,7 @@ class WP_Fonts extends WP_Dependencies {
 	 * @since X.X.X
 	 *
 	 * @param string $provider_id The provider's unique ID.
-	 * @param string $class_name       The provider class name.
+	 * @param string $class_name  The provider class name.
 	 * @return bool True if successfully registered, else false.
 	 */
 	public function register_provider( $provider_id, $class_name ) {
