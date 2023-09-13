@@ -7,7 +7,7 @@ import {
 	MenuItemsChoice,
 	DropdownMenu,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -41,7 +41,6 @@ function NavigationMenuSelector( {
 	currentMenuId,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
-	onCreateNew,
 	actionLabel,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
@@ -130,13 +129,14 @@ function NavigationMenuSelector( {
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
-			icon={ moreVertical }
-			toggleProps={ { isSmall: true } }
+			icon={ chevronDown }
+			text={ currentTitle ? currentTitle : __( 'Navigation menu' ) }
+			toggleProps={ { iconPosition: 'right' } }
 		>
 			{ ( { onClose } ) => (
 				<>
 					{ showNavigationMenus && hasNavigationMenus && (
-						<MenuGroup label={ __( 'Menus' ) }>
+						<MenuGroup label={ __( 'Navigation Menus' ) }>
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
@@ -173,27 +173,22 @@ function NavigationMenuSelector( {
 							} ) }
 						</MenuGroup>
 					) }
-
-					{ canUserCreateNavigationMenu && (
-						<MenuGroup label={ __( 'Tools' ) }>
-							<MenuItem
-								disabled={ isCreatingMenu }
-								onClick={ () => {
-									onClose();
-									onCreateNew();
-									setIsCreatingMenu( true );
-								} }
-							>
-								{ __( 'Create new menu' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
 				</>
 			) }
 		</DropdownMenu>
 	);
 
-	return NavigationMenuSelectorDropdown;
+	// TODO If there are more than one...
+	if (
+		( showNavigationMenus &&
+			hasNavigationMenus &&
+			navigationMenus?.length > 1 ) ||
+		( showClassicMenus && hasClassicMenus )
+	) {
+		return NavigationMenuSelectorDropdown;
+	}
+
+	return currentTitle ? currentTitle : __( 'Navigation' );
 }
 
 export default NavigationMenuSelector;
