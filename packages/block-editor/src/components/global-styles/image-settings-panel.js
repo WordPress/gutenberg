@@ -8,8 +8,17 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
-export function useHasImageSettingsPanel( name, settings ) {
-	return name === 'core/image' && settings?.lightbox?.allowEditing;
+export function useHasImageSettingsPanel( name, settings, userSettings ) {
+	// Note: If lightbox userSettings exists, that means
+	// they were defined via the Global Styles UI and
+	// will NOT be a boolean value or contain the `allowEditing`
+	// property, so we should show the settings panel in those cases.
+	return (
+		( name === 'core/image' &&
+			( settings?.lightbox === true ||
+				settings?.lightbox?.allowEditing ) ) ||
+		!! userSettings?.lightbox
+	);
 }
 
 export default function ImageSettingsPanel( {
