@@ -95,7 +95,7 @@ function block_core_image_get_lightbox_settings( $block ) {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 
 		// If not present in global settings, check the top-level global settings.
-		if ( true !== $lightbox_settings && ! isset( $lightbox_settings['enabled'] ) ) {
+		if ( ! isset( $lightbox_settings ) ) {
 			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 		}
 	}
