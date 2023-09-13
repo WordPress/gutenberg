@@ -53,7 +53,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// *Note: This logic for generating the lightbox markup has been duplicated and moved
 	// to the image block's index.php.*
 	// See https://github.com/WordPress/gutenberg/issues/53403.
-	_deprecated_function( 'gutenberg_render_behaviors_support_lightbox', '17', '' );
+	_deprecated_function( 'gutenberg_render_behaviors_support_lightbox', 'Gutenberg 17.0.0', '' );
 
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
