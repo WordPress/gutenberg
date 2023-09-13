@@ -267,10 +267,6 @@ export function BlockPatternsCategoryPanel( {
 	// Hide block pattern preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
-	if ( ! currentCategoryPatterns.length ) {
-		return null;
-	}
-
 	return (
 		<div
 			className="block-editor-inserter__patterns-category-panel"
@@ -283,18 +279,23 @@ export function BlockPatternsCategoryPanel( {
 			{ patternFilter === PATTERN_TYPES.user && (
 				<BlockPatternsSyncFilter />
 			) }
-			<BlockPatternList
-				shownPatterns={ pagingProps.categoryPatternsAsyncList }
-				blockPatterns={ pagingProps.categoryPatterns }
-				onClickPattern={ onClickPattern }
-				onHover={ onHover }
-				label={ category.label }
-				orientation="vertical"
-				category={ category.name }
-				isDraggable
-				showTitlesAsTooltip={ showTitlesAsTooltip }
-				patternFilter={ patternFilter }
-			/>
+			{ ! currentCategoryPatterns.length && (
+				<div>{ __( 'No results found' ) }</div>
+			) }
+			{ currentCategoryPatterns.length > 0 && (
+				<BlockPatternList
+					shownPatterns={ pagingProps.categoryPatternsAsyncList }
+					blockPatterns={ pagingProps.categoryPatterns }
+					onClickPattern={ onClickPattern }
+					onHover={ onHover }
+					label={ category.label }
+					orientation="vertical"
+					category={ category.name }
+					isDraggable
+					showTitlesAsTooltip={ showTitlesAsTooltip }
+					patternFilter={ patternFilter }
+				/>
+			) }
 			{ pagingProps.numPages > 1 && (
 				<BlockPatternsPaging { ...pagingProps } />
 			) }
