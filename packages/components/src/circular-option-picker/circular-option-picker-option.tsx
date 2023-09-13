@@ -80,19 +80,21 @@ export function Option( {
 		}
 	}, [ baseId, currentId, id, isComposite, isSelected, setCurrentId ] );
 
+	const commonProps = {
+		id,
+		className: 'components-circular-option-picker__option',
+		...additionalProps,
+	};
+
 	const optionControl = isComposite
 		? renderOptionAsOption( {
-				id,
-				className: 'components-circular-option-picker__option',
+				...commonProps,
 				isSelected,
 				compositeState,
-				...additionalProps,
 		  } )
 		: renderOptionAsButton( {
-				id,
-				className: 'components-circular-option-picker__option',
+				...commonProps,
 				isPressed: isSelected,
-				...additionalProps,
 		  } );
 
 	return (
