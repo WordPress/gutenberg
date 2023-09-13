@@ -15,13 +15,6 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 [Create a Block Tutorial](/docs/getting-started/create-block/README.md) - Learn how to create your first block for the WordPress block editor.
 
-[Full Site Editing](/docs/getting-started/full-site-editing.md) - Full Site Editing (FSE) is an umbrella project name for the collection of features that bring the experience and extendability of blocks to all parts of your site—from settings and styles, to templates and themes, and more.
-
--   Learn [about using theme.json](/docs/how-to-guides/themes/theme-json.md) to define settings and styles for your theme.
-
--   [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md) - Learn how block themes use blocks to build templates and the theme.json to provide styles.
--   [Convert a Classic Theme to a Block Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/) - Learn how to adopt various pieces of full site editing in your classic theme.
-
 ## Ways to Stay Informed
 
 New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 

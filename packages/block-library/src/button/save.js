@@ -35,6 +35,7 @@ export default function save( { attributes, className } ) {
 	}
 
 	const TagName = tagName || 'a';
+	const isButtonTag = 'button' === TagName;
 	const buttonType = type || 'button';
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
@@ -70,14 +71,14 @@ export default function save( { attributes, className } ) {
 		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName={ TagName }
-				type={ 'button' === TagName ? buttonType : null }
+				type={ isButtonTag ? buttonType : null }
 				className={ buttonClasses }
-				href={ 'button' === TagName ? null : url }
+				href={ isButtonTag ? null : url }
 				title={ title }
 				style={ buttonStyle }
 				value={ text }
-				target={ 'button' === TagName ? null : linkTarget }
-				rel={ 'button' === TagName ? null : rel }
+				target={ isButtonTag ? null : linkTarget }
+				rel={ isButtonTag ? null : rel }
 			/>
 		</div>
 	);

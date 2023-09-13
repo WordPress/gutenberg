@@ -35,7 +35,7 @@ export default function CreatePatternModal( {
 } ) {
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
 	const [ title, setTitle ] = useState( '' );
-	const { __experimentalCreatePattern: createPattern } = useDispatch( store );
+	const { createPattern } = useDispatch( store );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onCreate = useCallback(
