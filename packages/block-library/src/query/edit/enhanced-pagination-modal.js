@@ -38,7 +38,7 @@ export default function EnhancedPaginationModal( {
 		isOpen && (
 			<Modal
 				title={ __( 'Enhanced pagination will be disabled' ) }
-				className={ 'wp-block-query-enhanced-pagination-modal' }
+				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
 				} }

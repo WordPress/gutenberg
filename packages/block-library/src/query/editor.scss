@@ -53,7 +53,7 @@
 	}
 }
 
-.wp-block-query-enhanced-pagination-modal {
+.wp-block-query__enhanced-pagination-modal {
 	@include break-small() {
 		max-width: $break-mobile;
 	}
