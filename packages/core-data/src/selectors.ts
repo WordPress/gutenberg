@@ -59,6 +59,11 @@ interface QueriedData {
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
 
+interface QueriedDataRevisions {
+	items: Record< string, any >;
+	queries: Record< string, Array< number > >;
+}
+
 interface EntityState< EntityRecord extends ET.EntityRecord > {
 	edits: Record< string, Partial< EntityRecord > >;
 	saving: Record<
@@ -67,6 +72,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
+	revisions?: QueriedDataRevisions;
 }
 
 interface EntityConfig {
@@ -1240,4 +1246,34 @@ export function getCurrentThemeGlobalStylesRevisions(
 	}
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
+}
+
+/*
+	@TODO - let's just concentrate on refactoring the existing selectors to use the new queries.
+	- cache the queries using the id + query as the key
+	- if the revision count has changed, bust the query cache
+	- Another idea, create a WeakMap { parentKey: [ ..revisions ] } using the revision count to calculate where the revisions go in the array
+
+
+ */
+export function getEntityRecordRevisions(
+	state: State,
+	kind: string,
+	name: string,
+	key: EntityRecordKey,
+	query: Record< string, string | number > = {}
+): Array< object > | null {
+	if ( ! name || ! key ) {
+		return null;
+	}
+
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState = state.entities.records?.[ kind ]?.[ name ]?.revisions;
+	console.log( 'state.entities.records?.[ kind ]?.[ name ]?.revisions', queriedState );
+
+	if ( ! queriedState ) {
+		return null;``
+	}
+	return getQueriedItems( queriedState, query );
 }

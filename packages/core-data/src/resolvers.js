@@ -658,3 +658,58 @@ export const getNavigationFallbackId =
 			] );
 		}
 	};
+
+/**
+ * Requests an entity's record from the REST API.
+ *
+ * @param {string}           postType Post type.
+ * @param {number|string}    parentId The parent id of the revisions
+ * @param                    name
+ * @param                    key
+ * @param {Object|undefined} query    Optional object of query parameters to
+ *                                    include with request.
+ */
+export const getEntityRecordRevisions =
+	( kind, name, key, query = {} ) =>
+	async ( { select, dispatch } ) => {
+		const record = await select.getEntityRecord( kind, name, key );
+		//const count = record?._links?.[ 'version-history' ]?.[ 0 ]?.count || 0;
+		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+
+		if ( ! revisionsURL ) {
+			return;
+		}
+
+		const response = await apiFetch( {
+			url: addQueryArgs( revisionsURL, query ),
+		} );
+
+		const items = response?.map( ( revision ) =>
+			Object.fromEntries(
+				Object.entries( revision ).map( ( [ property, value ] ) => [
+					camelCase( property ),
+					value,
+				] )
+			)
+		);
+
+		dispatch( {
+			type: 'RECEIVE_REVISION_ITEMS',
+			kind,
+			name,
+			key,
+			query,
+			items,
+			// count,
+			invalidateCache: false,
+		} );
+	};
+
+// getEntityRecordRevisions.shouldInvalidate = ( action, name, key ) => {
+// 	return (
+// 		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+// 		action.invalidateCache &&
+// 		name === action.name &&
+// 		key === action.key
+// 	);
+// };

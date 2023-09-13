@@ -14,7 +14,10 @@ import { createUndoManager } from '@wordpress/undo-manager';
  * Internal dependencies
  */
 import { ifMatchingAction, replaceAction } from './utils';
-import { reducer as queriedDataReducer } from './queried-data';
+import {
+	reducer as queriedDataReducer,
+	revisionsQueriedDataReducer,
+} from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
@@ -236,15 +239,26 @@ function entity( entityConfig ) {
 		),
 
 		// Inject the entity config into the action.
+		// Temp: Except for revisions where the key is the parentId of the revisions.
+		// @TODO need a way to determine if revision. New item in entity config?
 		replaceAction( ( action ) => {
 			return {
 				...action,
-				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				key:
+					entityConfig.kind === 'root' &&
+					entityConfig.name === 'globalStyles'
+						? action.key
+						: entityConfig.key || DEFAULT_ENTITY_KEY,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
+			// @TODO limit revisions to globalStyles only
+			...( entityConfig.kind === 'root' &&
+			entityConfig.name === 'globalStyles'
+				? { revisions: revisionsQueriedDataReducer }
+				: {} ),
 
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
@@ -560,7 +574,6 @@ export function themeGlobalStyleRevisions( state = {}, action ) {
 				[ action.currentId ]: action.revisions,
 			};
 	}
-
 	return state;
 }
 

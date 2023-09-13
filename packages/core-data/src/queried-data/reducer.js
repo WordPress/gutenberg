@@ -132,6 +132,36 @@ export function items( state = {}, action ) {
 }
 
 /**
+ * Reducer tracking revision items state, keyed by parent ID.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+
+export function revisionItems( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REVISION_ITEMS':
+			return {
+				...state,
+				[ action.key ]: {
+					...state[ action.key ],
+					...action.items.reduce( ( accumulator, value ) => {
+						const itemId = value.id;
+						accumulator[ itemId ] = conservativeMapItem(
+							state?.[ action.key ]?.[ itemId ],
+							value
+						);
+						return accumulator;
+					}, {} ),
+				},
+			};
+	}
+	return state;
+}
+
+/**
  * Reducer tracking item completeness, keyed by ID. A complete item is one for
  * which all fields are known. This is used in supporting `_fields` queries,
  * where not all properties associated with an entity are necessarily returned.
@@ -225,7 +255,7 @@ const receiveQueries = compose( [
 ] )( ( state = null, action ) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
 
-	if ( type !== 'RECEIVE_ITEMS' ) {
+	if ( type !== 'RECEIVE_ITEMS' && type !== 'RECEIVE_REVISION_ITEMS' ) {
 		return state;
 	}
 
@@ -276,6 +306,28 @@ const queries = ( state = {}, action ) => {
 			return state;
 	}
 };
+
+/**
+ * Reducer tracking queries state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const revisionQueries = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'RECEIVE_REVISION_ITEMS':
+			return receiveQueries( state, action );
+		default:
+			return state;
+	}
+};
+
+export const revisionsQueriedDataReducer = combineReducers( {
+	items: revisionItems,
+	queries: revisionQueries,
+} );
 
 export default combineReducers( {
 	items,
