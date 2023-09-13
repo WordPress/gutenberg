@@ -16,9 +16,12 @@ import { useContext } from '@wordpress/element';
  */
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
-import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
+/**
+ * External dependencies
+ */
+import { Font } from 'lib-font';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
