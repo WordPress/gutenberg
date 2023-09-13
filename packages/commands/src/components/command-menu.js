@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -53,9 +54,14 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 					>
 						<HStack
 							alignment="left"
-							className="commands-command-menu__item"
+							className={ classnames(
+								'commands-command-menu__item',
+								{
+									'has-icon': command.icon,
+								}
+							) }
 						>
-							<Icon icon={ command.icon } />
+							{ command.icon && <Icon icon={ command.icon } /> }
 							<span>
 								<TextHighlight
 									text={ command.label }
@@ -123,9 +129,11 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className="commands-command-menu__item"
+						className={ classnames( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<Icon icon={ command.icon } />
+						{ command.icon && <Icon icon={ command.icon } /> }
 						<span>
 							<TextHighlight
 								text={ command.label }
@@ -189,7 +197,7 @@ export function CommandMenu() {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the command palette' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',

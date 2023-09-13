@@ -13,7 +13,7 @@ import {
 	useBlockProps,
 	PlainText,
 	HeadingLevelDropdown,
-	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -24,9 +24,6 @@ import { useEntityProp } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
-
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },

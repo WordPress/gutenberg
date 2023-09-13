@@ -5,6 +5,7 @@
 -   [**core/block-directory**: Block directory](/docs/reference-guides/data/data-core-block-directory.md)
 -   [**core/block-editor**: The Block Editor’s Data](/docs/reference-guides/data/data-core-block-editor.md)
 -   [**core/blocks**: Block Types Data](/docs/reference-guides/data/data-core-blocks.md)
+-   [**core/commands**: Command Palette](/docs/reference-guides/data/data-core-commands.md)
 -   [**core/customize-widgets**: Customize Widgets](/docs/reference-guides/data/data-core-customize-widgets.md)
 -   [**core/edit-post**: The Editor’s UI Data](/docs/reference-guides/data/data-core-edit-post.md)
 -   [**core/edit-site**: Edit Site](/docs/reference-guides/data/data-core-edit-site.md)

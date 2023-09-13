@@ -14,7 +14,7 @@ export type WordPressComponentProps<
 > = P &
 	// The `children` prop is being explicitly omitted since it is otherwise implicitly added
 	// by `ComponentPropsWithRef`. The context is that components should require the `children`
-	// prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+	// prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
 	Omit< React.ComponentPropsWithoutRef< T >, 'as' | keyof P | 'children' > &
 	( IsPolymorphic extends true
 		? {

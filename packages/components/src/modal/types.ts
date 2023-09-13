@@ -70,6 +70,14 @@ export type ModalProps = {
 	 */
 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
 	/**
+	 * Elements that are injected into the modal header to the left of the close button (if rendered).
+	 * Hidden if `__experimentalHideHeader` is `true`.
+	 *
+	 * @default null
+	 */
+	headerActions?: ReactNode;
+
+	/**
 	 * If this property is added, an icon will be added before the title.
 	 */
 	icon?: JSX.Element;

@@ -12,6 +12,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1006,9 +1007,17 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
+		if (
+			! blockAType.merge &&
+			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
+
 		const blockB = select.getBlock( clientIdB );
 
-		if ( blockAType && ! blockAType.merge ) {
+		if ( ! blockAType.merge ) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1810,7 +1819,6 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
  *                                                                                                   This is used to avoid making a request to the external resource when the user
- *
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -1878,3 +1886,42 @@ export const registerInserterMediaCategory =
 			},
 		} );
 	};
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Sets the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
+ *                                    `'contentOnly'`, or `'default'`.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockEditingMode( clientId = '', mode ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		clientId,
+		mode,
+	};
+}
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
+export function unsetBlockEditingMode( clientId = '' ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
+		clientId,
+	};
+}

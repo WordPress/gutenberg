@@ -63,6 +63,8 @@ function DuotonePicker( {
 	disableCustomDuotone,
 	value,
 	onChange,
+	'aria-label': ariaLabel,
+	'aria-labelledby': ariaLabelledby,
 }: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
@@ -120,8 +122,18 @@ function DuotonePicker( {
 		);
 	} );
 
+	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+	if ( ariaLabel ) {
+		ariaProps = { 'aria-label': ariaLabel };
+	} else if ( ariaLabelledby ) {
+		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	} else {
+		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+	}
+
 	return (
 		<CircularOptionPicker
+			{ ...ariaProps }
 			options={ unsetable ? [ unsetOption, ...options ] : options }
 			actions={
 				!! clearable && (

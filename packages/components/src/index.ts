@@ -17,7 +17,11 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion, __unstableAnimatePresence } from './animation';
+export {
+	__unstableMotion,
+	__unstableAnimatePresence,
+	__unstableMotionContext,
+} from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -128,6 +132,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as __experimentalProgressBar } from './progress-bar';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';
