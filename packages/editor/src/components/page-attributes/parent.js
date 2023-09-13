@@ -129,7 +129,7 @@ export function PageAttributesParent() {
 			} );
 		}
 		return opts;
-	}, [ pageItems, fieldValue ] );
+	}, [ pageItems, fieldValue, parentPost, parentPostId ] );
 
 	if ( ! isHierarchical ) {
 		return null;
