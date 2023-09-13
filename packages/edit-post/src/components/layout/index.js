@@ -63,6 +63,7 @@ import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import useCommonCommands from '../../hooks/commands/use-common-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 
@@ -132,6 +133,7 @@ function useEditorStyles() {
 
 function Layout() {
 	useCommands();
+	useCommonCommands();
 	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
