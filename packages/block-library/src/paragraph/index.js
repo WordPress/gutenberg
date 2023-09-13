@@ -28,6 +28,12 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return attributes?.metadata?.name;
+		}
+
 		if ( context === 'accessibility' ) {
 			const { content } = attributes;
 			return ! content || content.length === 0 ? __( 'Empty' ) : content;
