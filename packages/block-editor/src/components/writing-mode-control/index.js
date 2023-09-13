@@ -8,12 +8,7 @@ import classnames from 'classnames';
  */
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	textHorizontal,
-	textUpright,
-	textVertical,
-	textVerticalUp,
-} from '@wordpress/icons';
+import { textHorizontal, textUpright, textVertical } from '@wordpress/icons';
 
 const WRITING_MODES = [
 	{
@@ -25,11 +20,6 @@ const WRITING_MODES = [
 		name: __( 'Top to bottom' ),
 		value: 'top-to-bottom',
 		icon: textVertical,
-	},
-	{
-		name: __( 'Bottom to top' ),
-		value: 'bottom-to-top',
-		icon: textVerticalUp,
 	},
 	{
 		name: __( 'Upright' ),

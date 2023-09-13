@@ -354,49 +354,48 @@ export default function TypographyPanel( {
 	// Text Orientation
 	const hasTextOrientationControl = useHasTextOrientationControl( settings );
 
+	// Returns the new text orientation and writing mode based on the value from the control.
+	const getTextOrientationAndWritingMode = ( valueFromControl ) => {
+		switch ( valueFromControl ) {
+			case 'top-to-bottom':
+				return {
+					newTextOrientation: 'mixed',
+					newWritingMode: isRTL() ? 'vertical-lr' : 'vertical-rl',
+				};
+
+			case 'upright':
+				return {
+					newTextOrientation: 'upright',
+					newWritingMode: isRTL() ? 'vertical-lr' : 'vertical-rl',
+				};
+
+			case 'horizontal':
+				return {
+					newTextOrientation: undefined,
+					newWritingMode: 'horizontal-tb',
+				};
+
+			default:
+				return {
+					newTextOrientation: undefined,
+					newWritingMode: undefined,
+				};
+		}
+	};
+
 	const setWritingModeAndTextOrientation = useCallback(
 		( newValue ) => {
-			let newWritingMode, newTextOrientation;
-			switch ( newValue ) {
-				case 'bottom-to-top':
-					newTextOrientation = undefined;
-					newWritingMode = 'sideways-lr';
-					break;
+			const { newTextOrientation, newWritingMode } =
+				getTextOrientationAndWritingMode( newValue );
 
-				case 'top-to-bottom':
-					newTextOrientation = undefined;
-					newWritingMode = 'sideways-rl';
-					break;
-
-				case 'upright':
-					newTextOrientation = 'upright';
-					newWritingMode = isRTL() ? 'vertical-lr' : 'vertical-rl';
-					break;
-
-				case 'horizontal':
-					newTextOrientation = undefined;
-					newWritingMode = 'horizontal-tb';
-					break;
-
-				default:
-					newTextOrientation = undefined;
-					newWritingMode = undefined;
-					break;
-			}
-
-			const newWritingModeAttributes = setImmutably(
-				value,
-				[ 'typography', 'writingMode' ],
-				newWritingMode || undefined
-			);
-
-			const newTextOrientationAttributes = setImmutably(
-				newWritingModeAttributes,
-				[ 'typography', 'textOrientation' ],
-				newTextOrientation || undefined
-			);
-
-			onChange( newTextOrientationAttributes );
+			return onChange( {
+				...value,
+				typography: {
+					...value?.typography,
+					textOrientation: newTextOrientation,
+					writingMode: newWritingMode,
+				},
+			} );
 		},
 		[ onChange, value ]
 	);
