@@ -46,7 +46,7 @@ export default function EnhancedPaginationModal( {
 				shouldCloseOnEsc={ false }
 				shouldCloseOnClickOutside={ false }
 			>
-				<VStack alignment="right" spacing={ 8 }>
+				<VStack alignment="right" spacing={ 5 }>
 					<span id={ modalDescriptionId }>
 						{ disableEnhancedPaginationDescription }
 					</span>
