@@ -21,7 +21,7 @@ const labelStyles = css`
 `;
 
 const focusBoxShadow = css`
-	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
+	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
 `;
 
 export const borderControl = css`
