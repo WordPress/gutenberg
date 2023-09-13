@@ -280,7 +280,9 @@ ancestor: [ 'core/columns' ],
 -   **Type:** `Object`
 -   **Since**: `WordPress 6.4.0`
 
-Block Hooks is the API that allows a block to hook into the rendering of another block or multiple blocks. It will enable a block to render its content before or after another block. Alternatively, it's possible to hook into the rendering of a parent block and prepend or append the block to the list of inner blocks. The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Allowed target values are:
+Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
+
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Allowed target values are:
 
 -   `before` – inject before the target block.
 -   `after` - inject after the target block.
