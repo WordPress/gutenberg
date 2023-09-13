@@ -344,6 +344,8 @@ add_action( 'init', 'register_block_core_navigation_link' );
  * See 53826
  */
 function register_block_core_navigation_link_variations() {
+	// Directly set the variations on the registered block type
+	// because there's no server side registration for variations (see #47170).
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
 	if ( ! $navigation_block_type ) {
 		return;
