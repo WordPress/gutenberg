@@ -324,9 +324,6 @@ function BlockPatternsTabs( {
 		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
 			onSelectCategory( allPatternsCategory, patternSourceFilter );
 		}
-		return () => {
-			onSelectCategory( null, 'all' );
-		};
 	}, [
 		patternSyncFilter,
 		previousSyncFilter,
