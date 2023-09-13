@@ -49,7 +49,7 @@ List<String> dirs = [
 android {
     namespace "org.wordpress.mobile.ReactNativeAztec"
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 24
