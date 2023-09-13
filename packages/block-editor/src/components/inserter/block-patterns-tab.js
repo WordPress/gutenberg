@@ -45,7 +45,7 @@ const noop = () => {};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All' ),
+	label: __( 'All categories' ),
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
@@ -134,6 +134,12 @@ export function usePatternsCategories(
 			categories.push( {
 				name: 'uncategorized',
 				label: _x( 'Uncategorized' ),
+			} );
+		}
+		if ( filteredPatterns.length > 0 ) {
+			categories.unshift( {
+				name: allPatternsCategory.name,
+				label: allPatternsCategory.label,
 			} );
 		}
 		speak(
@@ -307,19 +313,20 @@ function BlockPatternsTabs( {
 	const patternSyncFilter = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
-		return settings.patternsSyncFilter || 'all';
+		return settings.patternsSyncFilter;
 	}, [] );
 	const previousSyncFilter = usePrevious( patternSyncFilter );
 
 	// If the sync filter changes, we need to select the "All" category to avoid
-	// showing a confusing no results screen.
+	// showing a confusing no results screen. We also need to clear the category
+	// selection when the component unmounts.
 	useEffect( () => {
-		if (
-			patternSyncFilter !== null &&
-			previousSyncFilter !== patternSyncFilter
-		) {
+		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
 			onSelectCategory( allPatternsCategory, patternSourceFilter );
 		}
+		return () => {
+			onSelectCategory( null, 'all' );
+		};
 	}, [
 		patternSyncFilter,
 		previousSyncFilter,

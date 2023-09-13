@@ -12,7 +12,7 @@ export const PATTERN_TYPES = {
 };
 
 const patternSourceOptions = [
-	{ value: 'all', label: __( 'All' ) },
+	{ value: 'all', label: __( 'All pattern types' ) },
 	{ value: PATTERN_TYPES.theme, label: __( 'Theme patterns' ) },
 	{ value: PATTERN_TYPES.user, label: __( 'My patterns' ) },
 ];
