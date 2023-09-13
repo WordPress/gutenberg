@@ -190,6 +190,11 @@ export function BlockSettingsDropdown( {
 
 	// When a currentClientId is in use, treat the menu as a controlled component.
 	// This ensures that only one block settings menu is open at a time.
+	// This is a temporary solution to work around an issue with `onFocusOutside`
+	// where it does not allow a dropdown to be closed if focus was never within
+	// the dropdown to begin with. Examples include a user either CMD+Clicking or
+	// right clicking into an inactive window.
+	// See: https://github.com/WordPress/gutenberg/pull/54083
 	const open = ! currentClientId
 		? undefined
 		: openedBlockSettingsMenu === currentClientId || false;
