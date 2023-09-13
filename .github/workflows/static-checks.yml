@@ -54,7 +54,7 @@ jobs:
                   echo ::set-output name=modified::$(if [ -n "$(git status --porcelain docs/manifest.json)" ]; then echo "true"; else echo "false"; fi)
 
             - name: Rebuild docs manifest
-              if: steps.docs-check.outputs.modified == 'true'
+              if: steps.docs-manifest-check.outputs.modified == 'true'
               run: |
                   git checkout ${{ github.head_ref }}
                   git add docs/manifest.json
