@@ -28,8 +28,13 @@ export default function ImageSettingsPanel( {
 		} );
 	};
 
-	const lightboxChecked =
-		settings?.lightbox === true ? true : !! settings?.lightbox?.enabled;
+	let lightboxChecked = false;
+
+	if ( settings?.lightbox === true ) {
+		lightboxChecked = true;
+	} else if ( settings?.lightbox?.enabled ) {
+		lightboxChecked = settings.lightbox.enabled;
+	}
 
 	return (
 		<>
