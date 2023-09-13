@@ -24,6 +24,16 @@
 			300ms
 			ease-in;
 	}
+
+	&.start-animation,
+	&.finish-animation {
+		@media (prefers-reduced-motion: reduce) {
+			transition-duration: 0s;
+			transition-delay: 0s;
+			animation-duration: 1ms;
+			animation-delay: 0s;
+		}
+	}
 }
 
 @keyframes wp-block-query__enhanced-pagination-start-animation {
