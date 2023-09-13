@@ -9,15 +9,17 @@ import {
 	DropZone,
 	FlexItem,
 	MenuItem,
+	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Platform, useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -96,7 +98,7 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	} );
 }
 
-function InspectorImagePreview( { label, filename, url: imgUrl } ) {
+function InspectorImagePreview( { label, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (
 		<ItemGroup as="span">
@@ -111,11 +113,6 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
-							aria-describedby={ sprintf(
-								/* translators: %s: file name */
-								__( 'This background image file name is %s' ),
-								filename
-							) }
 						/>
 					) }
 				</span>
@@ -133,6 +130,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 }
 
 function BackgroundImagePanelItem( props ) {
+	const instanceId = useInstanceId( BackgroundImagePanelItem );
 	const { attributes, clientId, setAttributes } = props;
 
 	const { id, title, url } =
@@ -270,11 +268,17 @@ function BackgroundImagePanelItem( props ) {
 							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 							render={ ( { open } ) => (
 								<div className="block-editor-hooks__background__inspector-upload-container">
-									<Button
-										onClick={ open }
-										aria-describedby={ __(
+									<VisuallyHidden
+										as="span"
+										id={ `block-editor-hooks__background__inspector-empty-state-${ instanceId }` }
+									>
+										{ __(
 											'No background image selected. Open Media Library to select an image.'
 										) }
+									</VisuallyHidden>
+									<Button
+										onClick={ open }
+										id={ `block-editor-hooks__background__inspector-empty-state-${ instanceId }` }
 									>
 										<InspectorImagePreview
 											label={ __( 'Background image' ) }
