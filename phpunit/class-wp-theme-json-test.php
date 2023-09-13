@@ -1604,7 +1604,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$sanitized_theme_json = $theme_json->get_raw_data();
 		$this->assertIsArray( $sanitized_theme_json, 'Sanitized theme.json is not an array data type' );
 		$this->assertArrayNotHasKey( 'styles', $sanitized_theme_json, 'Sanitized theme.json should not have a "styles" key' );
-
 	}
 
 	/**
@@ -1892,7 +1891,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected   = $base_styles . '.wp-block-separator{background-color: blue;border-color: pink;}';
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 		$this->assertEquals( $expected, $stylesheet );
-
 	}
 
 	public function test_get_custom_css_handles_global_custom_css() {
@@ -2098,7 +2096,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( 'var(--wp--preset--font-size--s)', $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Style variations: Assert the originally correct values are still correct.' );
 		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
-
 	}
 
 	public function test_resolve_variables() {
@@ -2253,5 +2250,4 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
 		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
 	}
-
 }
