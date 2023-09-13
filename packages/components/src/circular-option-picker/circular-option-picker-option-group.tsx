@@ -13,9 +13,10 @@ export function OptionGroup( {
 	options,
 	...additionalProps
 }: OptionGroupProps ) {
-	const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby } =
-		additionalProps as any;
-	const role = ariaLabel || ariaLabelledby ? 'group' : undefined;
+	const role =
+		'aria-label' in additionalProps || 'aria-labelledby' in additionalProps
+			? 'group'
+			: undefined;
 
 	return (
 		<div

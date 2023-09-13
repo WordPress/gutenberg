@@ -3,4 +3,10 @@
  */
 import { createContext } from '@wordpress/element';
 
-export const CircularOptionPickerContext = createContext( {} );
+/**
+ * Internal dependencies
+ */
+import type { CircularOptionPickerContextProps } from './types';
+
+export const CircularOptionPickerContext =
+	createContext< CircularOptionPickerContextProps >( {} );

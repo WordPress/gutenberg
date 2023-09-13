@@ -77,10 +77,9 @@ function ListboxCircularOptionPicker(
 	props: Omit<
 		ListboxCircularOptionPickerProps,
 		'asButtons' | 'actions' | 'options'
-	>
+	> & { baseId: string }
 ) {
-	const { id, loop = true, children, ...additionalProps } = props;
-	const baseId = useInstanceId( CircularOptionPicker, 'option-picker', id );
+	const { baseId, loop = true, children, ...additionalProps } = props;
 	const rtl = isRTL();
 
 	const compositeState = useCompositeState( { baseId, loop, rtl } );
@@ -107,13 +106,18 @@ function ListboxCircularOptionPicker(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ rtl ] );
 
+	const compositeContext = {
+		isComposite: true,
+		...compositeState,
+	};
+
 	return (
 		<Composite
 			{ ...additionalProps }
 			{ ...compositeState }
 			role={ 'listbox' }
 		>
-			<CircularOptionPickerContext.Provider value={ compositeState }>
+			<CircularOptionPickerContext.Provider value={ compositeContext }>
 				{ children }
 			</CircularOptionPickerContext.Provider>
 		</Composite>
@@ -124,15 +128,15 @@ function ButtonsCircularOptionPicker(
 	props: Omit<
 		ButtonsCircularOptionPickerProps,
 		'asButtons' | 'actions' | 'options'
-	>
+	> & { baseId: string }
 ) {
-	const { children, ...additionalProps } = props;
+	const { children, baseId, ...additionalProps } = props;
 
-	// We're including an empty context here, so as to prevent
-	// any nesting issues.
 	return (
 		<div { ...additionalProps }>
-			<CircularOptionPickerContext.Provider value={ {} }>
+			<CircularOptionPickerContext.Provider
+				value={ { isComposite: false, baseId } }
+			>
 				{ children }
 			</CircularOptionPickerContext.Provider>
 		</div>
@@ -149,6 +153,12 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		...additionalProps
 	} = props;
 
+	const baseId = useInstanceId(
+		CircularOptionPicker,
+		'components-circular-option-picker',
+		additionalProps.id
+	);
+
 	const OptionPickerImplementation = asButtons
 		? ButtonsCircularOptionPicker
 		: ListboxCircularOptionPicker;
@@ -156,6 +166,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	return (
 		<OptionPickerImplementation
 			{ ...additionalProps }
+			baseId={ baseId }
 			className={ classnames(
 				'components-circular-option-picker',
 				className

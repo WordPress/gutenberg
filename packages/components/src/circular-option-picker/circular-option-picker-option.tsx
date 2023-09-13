@@ -17,7 +17,11 @@ import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { CompositeItem } from '../composite';
 import Tooltip from '../tooltip';
-import type { OptionProps } from './types';
+import type {
+	OptionProps,
+	CircularOptionPickerCompositeState,
+	CircularOptionPickerContextProps,
+} from './types';
 
 const hasSelectedOption = new Map();
 
@@ -33,10 +37,13 @@ function OptionAsOption( props: {
 	id: string;
 	className?: string;
 	isSelected?: boolean;
-	compositeState: any;
+	context: CircularOptionPickerContextProps;
 } ) {
-	const { id, isSelected, compositeState, ...additionalProps } = props;
-	const { baseId, currentId, setCurrentId } = compositeState as any;
+	const { id, isSelected, context, ...additionalProps } = props;
+	const { isComposite, ..._compositeState } = context;
+	const compositeState =
+		_compositeState as CircularOptionPickerCompositeState;
+	const { baseId, currentId, setCurrentId } = compositeState;
 
 	useEffect( () => {
 		// If we call `setCurrentId` here, it doesn't update for other
@@ -64,7 +71,6 @@ function OptionAsOption( props: {
 			// on `isPressed`. However, `role="option"` uses
 			// `aria-selected` instead, so we have to explicitly
 			// remove it as an attribute here.
-			aria-pressed={ null }
 		/>
 	);
 }
@@ -76,10 +82,12 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const compositeState = useContext( CircularOptionPickerContext );
-	const { baseId } = compositeState as any;
-	const isComposite = !! baseId;
-	const id = useInstanceId( Option, baseId );
+	const compositeContext = useContext( CircularOptionPickerContext );
+	const { isComposite, baseId } = compositeContext;
+	const id = useInstanceId(
+		Option,
+		baseId || 'components-circular-option-picker__option'
+	);
 
 	const commonProps = {
 		id,
@@ -90,7 +98,7 @@ export function Option( {
 	const optionControl = isComposite ? (
 		<OptionAsOption
 			{ ...commonProps }
-			compositeState={ compositeState }
+			context={ compositeContext }
 			isSelected={ isSelected }
 		/>
 	) : (
