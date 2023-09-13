@@ -1913,9 +1913,17 @@ export function blockEditingModes( state = new Map(), action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the clientId of the block settings menu that is currently open.
+ *
+ * @param {string|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
 export function openedBlockSettingsMenu( state = null, action ) {
 	if ( 'SET_OPENED_BLOCK_SETTINGS_MENU' === action.type ) {
-		return action?.clientId;
+		return action?.clientId ?? null;
 	}
 	return state;
 }
