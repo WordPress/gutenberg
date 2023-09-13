@@ -170,8 +170,8 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 			} elseif ( 'last_child' === $relative_position ) {
 				array_push( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-				// when rendering blocks, we also need to correctly prepend a value (`null`, to mark a block
-				// location) to that array after HTML content for the inner blocks wrapper.
+				// when rendering blocks, we also need to correctly append a value (`null`, to mark a block
+				// location) to that array before the remaining HTML content for the inner blocks wrapper.
 				$chunk_index = count( $block['innerContent'] ) - 1;
 				for ( $index = $chunk_index; $index >= 0; $index-- ) {
 					if ( is_null( $block['innerContent'][ $index ] ) ) {
