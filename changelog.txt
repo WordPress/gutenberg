@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 16.6.0-rc.1 =
+= 16.6.0 =
 
 ## Changelog
 
@@ -10,7 +10,7 @@
 - Add Slot and Fill directives. ([53958](https://github.com/WordPress/gutenberg/pull/53958))
 - Query block: Client-side pagination. ([53812](https://github.com/WordPress/gutenberg/pull/53812))
 - Update `data-wp-bind` directive logic. ([54003](https://github.com/WordPress/gutenberg/pull/54003))
-
+- Query block: Move "Enhance pagination" toggle under Settings. ([54198](https://github.com/WordPress/gutenberg/pull/54198))
 
 ### Enhancements
 
@@ -164,6 +164,11 @@
 
 #### Block API
 - Auto-inserting blocks: Add block inspector panel. ([52969](https://github.com/WordPress/gutenberg/pull/52969))
+- - Auto-inserting blocks: Add block icon to block inspector panel toggles. ([54029](https://github.com/WordPress/gutenberg/pull/54029))
+- Auto-inserting blocks: Remove toggle if block is present elsewhere. ([54024](https://github.com/WordPress/gutenberg/pull/54024))
+- Rename "auto inserting blocks" to "block hooks". ([54147](https://github.com/WordPress/gutenberg/pull/54147))
+
+
 
 
 ### Documentation
@@ -195,6 +200,9 @@
 - Edit Site: Rename `CanvasSpinner` to `CanvasLoader`. ([53728](https://github.com/WordPress/gutenberg/pull/53728))
 - Enforce valid function names in the packages/block-library/src/*/*.php files. ([53438](https://github.com/WordPress/gutenberg/pull/53438))
 - Fonts Library: Update properties name from snake case to camel case to match the rest of the properties. ([53746](https://github.com/WordPress/gutenberg/pull/53746))
+
+#### Block API
+- Auto-inserting blocks: Remove obsolete TODO, fix REST API field description. ([54208](https://github.com/WordPress/gutenberg/pull/54208))
 
 #### Post Editor
 - Editor: Fix the 'useSelect' warning in the 'useIsDirty' hook. ([53759](https://github.com/WordPress/gutenberg/pull/53759))
@@ -248,6 +256,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @afercia @andrewserong @anton-vlasenko @bangank36 @brookewp @ciampo @colorful-tones @DAreRodz @dcalhoun @derekblank @ellatrix @felixarntz @geriux @glendaviesnz @gziolo @hellofromtonya @jasmussen @jblz @JEverhart383 @jordesign @jorgefilipecosta @jsnajdr @juanmaguitar @krokodok @luisherranz @Mamaduka @margolisj @matiasbenedetto @mburridge @mirka @mklute101 @mokagio @ndiego @ntsekouras @oandregal @ocean90 @ockham @priethor @ramonjd @richtabor @SiobhyB @Smit2808 @stokesman @t-hamano @torounit @tyxla @walbo @WunderBart @youknowriad
+
+
 
 
 = 16.5.1 =

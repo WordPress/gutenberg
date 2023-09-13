@@ -57,6 +57,10 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		text,
 		noIcons,
 
+		open,
+		defaultOpen,
+		onToggle: onToggleProp,
+
 		// Context
 		variant,
 	} = useContextSystem< DropdownMenuProps & DropdownMenuInternalContext >(
@@ -211,6 +215,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 					</NavigableMenu>
 				);
 			} }
+			open={ open }
+			defaultOpen={ defaultOpen }
+			onToggle={ onToggleProp }
 		/>
 	);
 }

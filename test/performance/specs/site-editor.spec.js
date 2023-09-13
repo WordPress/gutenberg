@@ -85,9 +85,7 @@ test.describe( 'Site Editor Performance', () => {
 		).toBeDisabled();
 
 		// Get the ID of the saved page.
-		testPageId = await page.evaluate( () =>
-			new URL( document.location ).searchParams.get( 'post' )
-		);
+		testPageId = new URL( page.url() ).searchParams.get( 'post' );
 
 		// Open the test page in Site Editor.
 		await admin.visitSiteEditor( {
@@ -109,17 +107,12 @@ test.describe( 'Site Editor Performance', () => {
 			// Go to the test page URL.
 			await testPage.goto( draftURL );
 
-			// Wait for the canvas to appear.
-			await testPage
-				.locator( '.edit-site-canvas-loader' )
-				.waitFor( { state: 'hidden', timeout: 60_000 } );
-
 			// Wait for the first block.
 			await testPage
 				.frameLocator( 'iframe[name="editor-canvas"]' )
 				.locator( '.wp-block' )
 				.first()
-				.waitFor( { timeout: 60_000 } );
+				.waitFor( { timeout: 120_000 } );
 
 			// Save the results.
 			if ( i >= throwaway ) {

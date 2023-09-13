@@ -10,10 +10,9 @@ import userEvent from '@testing-library/user-event';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockEditorProvider,
-	BlockList,
 	BlockTools,
 	BlockInspector,
-	WritingFlow,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
@@ -27,6 +26,11 @@ import {
  * Internal dependencies
  */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
+import { unlock } from '../../../packages/block-library/src/lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 // Polyfill for String.prototype.replaceAll until CI is runnig Node 15 or higher.
 if ( ! String.prototype.replaceAll ) {
@@ -73,9 +77,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 		>
 			<BlockInspector />
 			<BlockTools>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
+				<BlockCanvas height="100%" shouldIframe={ false } />
 			</BlockTools>
 		</BlockEditorProvider>
 	);
