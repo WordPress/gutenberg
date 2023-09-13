@@ -31,10 +31,6 @@ describe( 'DownloadableBlockListItem', () => {
 		render(
 			<DownloadableBlockListItem onClick={ jest.fn() } item={ plugin } />
 		);
-
-		expect( console ).toHaveWarnedWith(
-			'`position` prop in wp.components.tooltip is deprecated since version 6.4. Please use `placement` prop instead.'
-		);
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
 		expect( author ).toBeInTheDocument();

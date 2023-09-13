@@ -23,10 +23,6 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		expect( console ).toHaveWarnedWith(
-			'`position` prop in wp.components.tooltip is deprecated since version 6.4. Please use `placement` prop instead.'
-		);
-
 		const monthInput = screen.getByLabelText( 'Month' );
 		const dayInput = screen.getByLabelText( 'Day' );
 		const yearInput = screen.getByLabelText( 'Year' );
