@@ -25,6 +25,7 @@ function Tooltip( props: TooltipProps ) {
 	const {
 		children,
 		delay = TOOLTIP_DELAY,
+		hideOnClick = true,
 		position = 'bottom',
 		shortcut,
 		text,
@@ -55,7 +56,7 @@ function Tooltip( props: TooltipProps ) {
 		<>
 			<Ariakit.TooltipAnchor
 				onBlur={ tooltipStore.hide }
-				onClick={ tooltipStore.hide }
+				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
 			>

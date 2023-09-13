@@ -12,6 +12,12 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
+	 * Option to hide the tooltip when the anchor is clicked.
+	 *
+	 * @default true
+	 */
+	hideOnClick?: boolean;
+	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
 	 * @default 700
