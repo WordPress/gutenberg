@@ -71,15 +71,15 @@ module.exports = {
 				...config.module,
 				rules: [
 					...config.module.rules,
-					/*{
+					{
 						// Adds a `sourceLink` parameter to the story metadata, based on the file path
-						test: /\/stories\/.+\.(j|t)sx?$/,
+						test: /\/stories\/.+\.story\.(j|t)sx?$/,
 						loader: path.resolve(
 							__dirname,
 							'./webpack/source-link-loader.js'
 						),
 						enforce: 'post',
-					},*/
+					},
 					{
 						test: /\.scss$/,
 						exclude: /\.lazy\.scss$/,
