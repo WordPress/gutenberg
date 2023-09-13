@@ -7,6 +7,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,11 +26,16 @@ export default function EnhancedPaginationModal( {
 	attributes: { enhancedPagination },
 	setAttributes,
 } ) {
+	const [ isOpen, setOpen ] = useState( false );
+
 	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
 
+	useEffect( () => {
+		setOpen( containsThirdPartyBlocks && enhancedPagination );
+	}, [ containsThirdPartyBlocks, enhancedPagination, setOpen ] );
+
 	return (
-		containsThirdPartyBlocks &&
-		enhancedPagination && (
+		isOpen && (
 			<Modal
 				title={ __( 'Enhanced pagination will be disabled' ) }
 				className={ 'wp-block-query-enhanced-pagination-modal' }
@@ -40,10 +46,10 @@ export default function EnhancedPaginationModal( {
 				shouldCloseOnEsc={ false }
 				shouldCloseOnClickOutside={ false }
 			>
-				<p id={ modalDescriptionId }>
-					{ disableEnhancedPaginationDescription }
-				</p>
-				<VStack alignment="right" spacing={ 3 }>
+				<VStack alignment="right" spacing={ 8 }>
+					<span id={ modalDescriptionId }>
+						{ disableEnhancedPaginationDescription }
+					</span>
 					<Button
 						variant="primary"
 						onClick={ () => {
