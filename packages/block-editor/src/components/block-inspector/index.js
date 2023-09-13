@@ -39,7 +39,7 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				getBlockName,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			return getClientIdsOfDescendants( [ topLevelLockedBlock ] ).filter(
+			return getClientIdsOfDescendants( topLevelLockedBlock ).filter(
 				( clientId ) =>
 					getBlockName( clientId ) !== 'core/list-item' &&
 					getBlockEditingMode( clientId ) === 'contentOnly'

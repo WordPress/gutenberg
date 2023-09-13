@@ -161,12 +161,12 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 		return $mock;
 	}
 
-	protected function setup_object_mock( $method, $class ) {
+	protected function setup_object_mock( $method, $class_name ) {
 		if ( is_string( $method ) ) {
 			$method = array( $method );
 		}
 
-		return $this->getMockBuilder( $class )->setMethods( $method )->getMock();
+		return $this->getMockBuilder( $class_name )->setMethods( $method )->getMock();
 	}
 
 	protected function get_registered_handles() {
@@ -193,15 +193,15 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 		return $this->get_property_value( 'queued_before_register', WP_Dependencies::class, $wp_fonts );
 	}
 
-	protected function get_reflection_property( $property_name, $class = 'WP_Fonts' ) {
-		$property = new ReflectionProperty( $class, $property_name );
+	protected function get_reflection_property( $property_name, $class_name = 'WP_Fonts' ) {
+		$property = new ReflectionProperty( $class_name, $property_name );
 		$property->setAccessible( true );
 
 		return $property;
 	}
 
-	protected function get_property_value( $property_name, $class, $wp_fonts = null ) {
-		$property = $this->get_reflection_property( $property_name, $class );
+	protected function get_property_value( $property_name, $class_name, $wp_fonts = null ) {
+		$property = $this->get_reflection_property( $property_name, $class_name );
 
 		if ( ! $wp_fonts ) {
 			$wp_fonts = wp_fonts();
@@ -210,19 +210,19 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 		return $property->getValue( $wp_fonts );
 	}
 
-	protected function setup_property( $class, $property_name ) {
-		$key = $this->get_property_key( $class, $property_name );
+	protected function setup_property( $class_name, $property_name ) {
+		$key = $this->get_property_key( $class_name, $property_name );
 
 		if ( ! isset( $this->property[ $key ] ) ) {
-			$this->property[ $key ] = new ReflectionProperty( $class, 'providers' );
+			$this->property[ $key ] = new ReflectionProperty( $class_name, 'providers' );
 			$this->property[ $key ]->setAccessible( true );
 		}
 
 		return $this->property[ $key ];
 	}
 
-	protected function get_property_key( $class, $property_name ) {
-		return $class . '::$' . $property_name;
+	protected function get_property_key( $class_name, $property_name ) {
+		return $class_name . '::$' . $property_name;
 	}
 
 	/**
