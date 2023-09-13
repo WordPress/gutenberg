@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Platform, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 
@@ -96,22 +96,26 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	} );
 }
 
-function InspectorImagePreview( { label, url: imgUrl } ) {
+function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
 				<span
-					className="block-editor-hooks__background__inspector-image-indicator"
+					className="block-editor-hooks__background__inspector-image-indicator-wrapper"
 					aria-hidden
 				>
 					{ imgUrl && (
 						<span
-							className="block-editor-hooks__background__inspector-image-indicator-image"
-							aria-hidden
+							className="block-editor-hooks__background__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
+							aria-describedby={ sprintf(
+								/* translators: %s: file name */
+								__( 'This background image file name is %s' ),
+								filename
+							) }
 						/>
 					) }
 				</span>
@@ -245,7 +249,8 @@ function BackgroundImagePanelItem( props ) {
 						onSelect={ onSelectMedia }
 						name={
 							<InspectorImagePreview
-								label={ title }
+								label={ __( 'Background image' ) }
+								filename={ title }
 								url={ url }
 							/>
 						}
@@ -267,12 +272,12 @@ function BackgroundImagePanelItem( props ) {
 								<div className="block-editor-hooks__background__inspector-upload-container">
 									<Button
 										onClick={ open }
-										aria-label={ __(
-											'Background image style'
+										aria-describedby={ __(
+											'No background image selected. Open Media Library to select an image.'
 										) }
 									>
 										<InspectorImagePreview
-											label={ __( 'Image' ) }
+											label={ __( 'Background image' ) }
 										/>
 									</Button>
 									<DropZone
