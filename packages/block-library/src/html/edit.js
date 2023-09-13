@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useContext, useState } from '@wordpress/element';
 import {
 	BlockControls,
@@ -25,8 +25,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
 
-	const instanceId = useInstanceId( HTMLEdit );
-	const instanceIdDesc = sprintf( 'html-edit-%d-desc', instanceId );
+	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
 
 	function switchToPreview() {
 		setIsPreview( true );
@@ -38,7 +37,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
-		'aria-describedby': isPreview ? instanceIdDesc : undefined,
+		'aria-describedby': isPreview ? instanceId : undefined,
 	} );
 
 	return (
@@ -67,7 +66,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 						content={ attributes.content }
 						isSelected={ isSelected }
 					/>
-					<VisuallyHidden id={ instanceIdDesc }>
+					<VisuallyHidden id={ instanceId }>
 						{ __(
 							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
 						) }
