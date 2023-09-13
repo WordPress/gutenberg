@@ -36,27 +36,32 @@
 	}
 }
 
-.block-editor-hooks__background__inspector-image-indicator {
-	background: #fff linear-gradient(-45deg, #0000 48%, #ddd 0, #ddd 52%, #0000 0);
-	border-radius: 50% !important;
-	box-shadow: inset 0 0 0 1px #0003;
+.block-editor-hooks__background__inspector-media-replace-container {
+	.components-dropdown {
+		display: block;
+	}
+}
+
+.block-editor-hooks__background__inspector-image-indicator-wrapper {
+	background: #fff linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%); // Show a diagonal line (crossed out) for empty background image.
+	border-radius: $radius-round !important; // Override the default border-radius inherited from FlexItem.
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 	display: block;
 	width: 20px;
 	height: 20px;
 	flex: none;
 }
 
-
-.block-editor-hooks__background__inspector-image-indicator-image {
+.block-editor-hooks__background__inspector-image-indicator {
 	background-size: cover;
-	border-radius: 50%;
+	border-radius: $radius-round;
 	width: 20px;
 	height: 20px;
 	display: block;
 	position: relative;
 }
 
-.block-editor-hooks__background__inspector-image-indicator-image::after {
+.block-editor-hooks__background__inspector-image-indicator::after {
 	content: "";
 	position: absolute;
 	top: -1px;
@@ -65,27 +70,7 @@
 	right: -1px;
 	border-radius: $radius-round;
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-	// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
+	// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
 	border: 1px solid transparent;
 	box-sizing: inherit;
-}
-
-.block-editor-hooks__background__inspector-media-replace-container {
-	.components-dropdown {
-		display: block;
-	}
-
-	img {
-		width: 20px;
-		min-width: 20px;
-		aspect-ratio: 1;
-		// box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-		border-radius: 50% !important;
-	}
-
-	.block-editor-hooks__background__inspector-readonly-logo-preview {
-		padding: 6px 12px;
-		display: flex;
-		height: $grid-unit-50;
-	}
 }
