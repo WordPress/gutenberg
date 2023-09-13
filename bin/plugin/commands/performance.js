@@ -36,13 +36,13 @@ const fTitle = formats.title;
 const fWarning = formats.warning;
 
 /**
- * A logging helper for printing tasks and their subtasks.
+ * A logging helper for printing steps and their substeps.
  *
  * @param {number} sub  Value to indent the log.
  * @param {any}    msg  Message to log.
  * @param {...any} args Rest of the arguments to pass to console.log.
  */
-function logTask( sub, msg, ...args ) {
+function logStep( sub, msg, ...args ) {
 	const indent = '    ';
 	const prefix = sub === 0 ? '▶\u00A0' : '>\u00A0';
 	const newline = sub === 0 ? '\n' : '';
@@ -131,7 +131,7 @@ async function runPerformanceTests( branches, options ) {
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
-	logTask( 0, 'Setting up' );
+	logStep( 0, 'Setting up' );
 
 	/**
 	 * @type {string[]} git refs against which to run tests;
@@ -144,28 +144,28 @@ async function runPerformanceTests( branches, options ) {
 	const baseDir = path.join( os.tmpdir(), 'wp-performance-tests' );
 
 	if ( fs.existsSync( baseDir ) ) {
-		logTask( 1, 'Removing existing files' );
+		logStep( 1, 'Removing existing files' );
 		fs.rmSync( baseDir, { recursive: true } );
 	}
 
-	logTask( 1, 'Creating base directory:', fAccent( baseDir ) );
+	logStep( 1, 'Creating base directory:', fAccent( baseDir ) );
 	fs.mkdirSync( baseDir );
 
-	logTask( 1, 'Setting up repository' );
+	logStep( 1, 'Setting up repository' );
 	const sourceDir = path.join( baseDir, 'source' );
 
-	logTask( 2, 'Creating directory:', fAccent( sourceDir ) );
+	logStep( 2, 'Creating directory:', fAccent( sourceDir ) );
 	fs.mkdirSync( sourceDir );
 
 	// @ts-ignore
 	const sourceGit = SimpleGit( sourceDir );
-	logTask( 2, 'Initializing:', fAccent( config.gitRepositoryURL ) );
+	logStep( 2, 'Initializing:', fAccent( config.gitRepositoryURL ) );
 	await sourceGit
 		.raw( 'init' )
 		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
 
 	for ( const [ i, branch ] of branches.entries() ) {
-		logTask(
+		logStep(
 			2,
 			`Fetching environment branch (${ i + 1 } of ${ branches.length }):`,
 			fAccent( branch )
@@ -175,7 +175,7 @@ async function runPerformanceTests( branches, options ) {
 
 	const testRunnerBranch = options.testsBranch || branches[ 0 ];
 	if ( options.testsBranch && ! branches.includes( options.testsBranch ) ) {
-		logTask(
+		logStep(
 			2,
 			'Fetching test runner branch:',
 			fAccent( options.testsBranch )
@@ -188,21 +188,21 @@ async function runPerformanceTests( branches, options ) {
 			options.testsBranch
 		);
 	} else {
-		logTask( 2, 'Using test runner branch:', fAccent( testRunnerBranch ) );
+		logStep( 2, 'Using test runner branch:', fAccent( testRunnerBranch ) );
 	}
 
-	logTask( 1, 'Setting up test runner' );
+	logStep( 1, 'Setting up test runner' );
 
 	const testRunnerDir = path.join( baseDir + '/tests' );
 
-	logTask( 2, 'Copying source to:', fAccent( testRunnerDir ) );
+	logStep( 2, 'Copying source to:', fAccent( testRunnerDir ) );
 	await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
 
-	logTask( 2, 'Checking out branch:', fAccent( testRunnerBranch ) );
+	logStep( 2, 'Checking out branch:', fAccent( testRunnerBranch ) );
 	// @ts-ignore
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
-	logTask( 2, 'Installing dependencies and building' );
+	logStep( 2, 'Installing dependencies and building' );
 	await runShellScript(
 		`bash -c "${ [
 			'source $HOME/.nvm/nvm.sh',
@@ -214,10 +214,10 @@ async function runPerformanceTests( branches, options ) {
 		testRunnerDir
 	);
 
-	logTask( 1, 'Setting up test environments' );
+	logStep( 1, 'Setting up test environments' );
 
 	const envsDir = path.join( baseDir, 'environments' );
-	logTask( 2, 'Creating parent directory:', fAccent( envsDir ) );
+	logStep( 2, 'Creating parent directory:', fAccent( envsDir ) );
 	fs.mkdirSync( envsDir );
 
 	let wpZipUrl = null;
@@ -234,24 +234,24 @@ async function runPerformanceTests( branches, options ) {
 
 	const branchDirs = {};
 	for ( const branch of branches ) {
-		logTask( 2, 'Branch:', fAccent( branch ) );
+		logStep( 2, 'Branch:', fAccent( branch ) );
 		const sanitizedBranchName = sanitizeBranchName( branch );
 		const envDir = path.join( envsDir, sanitizedBranchName );
 
-		logTask( 3, 'Creating directory:', fAccent( envDir ) );
+		logStep( 3, 'Creating directory:', fAccent( envDir ) );
 		fs.mkdirSync( envDir );
 		// @ts-ignore
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
 
-		logTask( 3, 'Copying source to:', fAccent( buildDir ) );
+		logStep( 3, 'Copying source to:', fAccent( buildDir ) );
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
-		logTask( 3, 'Checking out:', fAccent( branch ) );
+		logStep( 3, 'Checking out:', fAccent( branch ) );
 		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
-		logTask( 3, 'Installing dependencies and building' );
+		logStep( 3, 'Installing dependencies and building' );
 		await runShellScript(
 			`bash -c "${ [
 				'source $HOME/.nvm/nvm.sh',
@@ -264,7 +264,7 @@ async function runPerformanceTests( branches, options ) {
 
 		const wpEnvConfigPath = path.join( envDir, '.wp-env.json' );
 
-		logTask( 3, 'Saving wp-env config to:', fAccent( wpEnvConfigPath ) );
+		logStep( 3, 'Saving wp-env config to:', fAccent( wpEnvConfigPath ) );
 
 		fs.writeFileSync(
 			wpEnvConfigPath,
@@ -309,54 +309,54 @@ async function runPerformanceTests( branches, options ) {
 		);
 	}
 
-	logTask( 0, 'Looking for test files' );
+	logStep( 0, 'Looking for test files' );
 
 	const testSuites = getFilesFromDir(
 		path.join( testRunnerDir, 'test/performance/specs' )
 	).map( ( file ) => {
-		logTask( 1, 'Found:', fAccent( file ) );
+		logStep( 1, 'Found:', fAccent( file ) );
 		return path.basename( file, '.spec.js' );
 	} );
 
-	logTask( 0, 'Running tests' );
+	logStep( 0, 'Running tests' );
 
 	if ( wpZipUrl ) {
-		logTask( 1, 'Using:', fAccent( `WordPress v${ options.wpVersion }` ) );
+		logStep( 1, 'Using:', fAccent( `WordPress v${ options.wpVersion }` ) );
 	} else {
-		logTask( 1, 'Using:', fAccent( 'WordPress trunk' ) );
+		logStep( 1, 'Using:', fAccent( 'WordPress trunk' ) );
 	}
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
 
 	for ( const testSuite of testSuites ) {
 		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
-			logTask(
+			logStep(
 				1,
 				`Suite: ${ fAccent(
 					testSuite
 				) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
 			for ( const branch of branches ) {
-				logTask( 2, 'Branch:', fAccent( branch ) );
+				logStep( 2, 'Branch:', fAccent( branch ) );
 
 				const sanitizedBranchName = sanitizeBranchName( branch );
 				const runKey = `${ testSuite }_${ sanitizedBranchName }_round-${ i }`;
 				// @ts-ignore
 				const envDir = branchDirs[ branch ];
 
-				logTask( 3, 'Starting environment' );
+				logStep( 3, 'Starting environment' );
 				await runShellScript( `${ wpEnvPath } start`, envDir );
 
-				logTask( 3, 'Running tests' );
+				logStep( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
 
-				logTask( 3, 'Stopping environment' );
+				logStep( 3, 'Stopping environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
 		}
 	}
 
-	logTask( 0, 'Calculating results' );
+	logStep( 0, 'Calculating results' );
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
 		file.endsWith( RESULTS_FILE_SUFFIX )
@@ -366,7 +366,7 @@ async function runPerformanceTests( branches, options ) {
 
 	// Calculate medians from all rounds.
 	for ( const testSuite of testSuites ) {
-		logTask( 1, 'Test suite:', fAccent( testSuite ) );
+		logStep( 1, 'Test suite:', fAccent( testSuite ) );
 
 		results[ testSuite ] = {};
 		for ( const branch of branches ) {
@@ -378,7 +378,7 @@ async function runPerformanceTests( branches, options ) {
 					)
 				)
 				.map( ( file ) => {
-					logTask( 2, 'Reading from:', fAccent( file ) );
+					logStep( 2, 'Reading from:', fAccent( file ) );
 					return readJSONFile( file );
 				} );
 
@@ -401,7 +401,7 @@ async function runPerformanceTests( branches, options ) {
 			testSuite + RESULTS_FILE_SUFFIX
 		);
 
-		logTask(
+		logStep(
 			2,
 			'Saving curated results to:',
 			fAccent( calculatedResultsPath )
@@ -412,7 +412,7 @@ async function runPerformanceTests( branches, options ) {
 		);
 	}
 
-	logTask( 0, 'Printing results' );
+	logStep( 0, 'Printing results' );
 	log(
 		fWarning(
 			'\nPlease note that client side metrics EXCLUDE the server response time.'
@@ -420,7 +420,7 @@ async function runPerformanceTests( branches, options ) {
 	);
 
 	for ( const testSuite of testSuites ) {
-		logTask( 0, fAccent( testSuite ) );
+		logStep( 0, fAccent( testSuite ) );
 
 		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
