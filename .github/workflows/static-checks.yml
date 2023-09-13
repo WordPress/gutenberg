@@ -1,7 +1,7 @@
 name: Static Analysis (Linting, License, Type checks...)
 
 on:
-    pull_request_target:
+    pull_request:
     push:
         branches:
             - trunk
@@ -12,14 +12,14 @@ on:
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
     # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.sha }}
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
 jobs:
     check:
         name: All
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
@@ -42,25 +42,32 @@ jobs:
               # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
+            - name: Debug github.head_ref
+              run: |
+                  echo ${{ github.head_ref }}
+                  echo ${{ github.ref }}
+                  echo ${{ github.event.pull_request.head.ref }}
+                  echo ${{ github.event.pull_request.base.ref }}
+
             - name: Configure git user name and email
               run: |
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email bangank36@gmail.com
-
             - name: Check for modified files in docs/
               id: docs-manifest-check
               run: |
+                  git branch
+                  git checkout ${{ github.head_ref }}
                   npm run docs:build
                   echo ::set-output name=modified::$(if [ -n "$(git status --porcelain docs/manifest.json)" ]; then echo "true"; else echo "false"; fi)
-
+                  git status
             - name: Rebuild docs manifest
               if: steps.docs-manifest-check.outputs.modified == 'true'
               run: |
-                  git checkout ${{ github.head_ref }}
+                  git branch
                   git add docs/manifest.json
-                  git commit -m "Rebuild docs manifests"
+                  git commit -m "github-actions: Update docs manifest"
                   git push origin ${{ github.head_ref }}
-
             - name: Lint JavaScript and Styles
               run: npm run lint
 
