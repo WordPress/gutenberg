@@ -201,7 +201,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               <div
                 aria-label="Custom color picker."
                 class="components-circular-option-picker"
-                id="option-picker-0"
+                id="components-circular-option-picker-0"
                 role="listbox"
               >
                 <div
@@ -217,7 +217,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         aria-label="Color: red"
                         aria-selected="true"
                         class="components-button components-circular-option-picker__option is-pressed"
-                        id="option-picker-0-0"
+                        id="components-circular-option-picker-0-0"
                         role="option"
                         style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
                         tabindex="0"
