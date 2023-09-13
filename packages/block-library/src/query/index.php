@@ -23,9 +23,19 @@ function render_block_core_query( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', true );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',
-				wp_json_encode( array( 'core' => array( 'query' => (object) array() ) ) )
+				wp_json_encode(
+					array(
+						'core' => array(
+							'query' => array(
+								'loadingText' => __( 'Loading page, please wait.' ),
+								'loadedText'  => __( 'Page Loaded.' ),
+							),
+						),
+					)
+				)
 			);
 			$content = $p->get_updated_html();
 
@@ -48,20 +58,6 @@ function render_block_core_query( $attributes, $content, $block ) {
 				></div>',
 				$last_div_position,
 				0
-			);
-
-			// Use state to send translated strings.
-			wp_store(
-				array(
-					'state' => array(
-						'core' => array(
-							'query' => array(
-								'loadingText' => __( 'Loading page, please wait.' ),
-								'loadedText'  => __( 'Page Loaded.' ),
-							),
-						),
-					),
-				)
 			);
 		}
 	}

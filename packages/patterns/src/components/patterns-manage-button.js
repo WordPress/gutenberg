@@ -51,8 +51,7 @@ function PatternsManageButton( { clientId } ) {
 			[ clientId ]
 		);
 
-	const { __experimentalConvertSyncedPatternToStatic: convertBlockToStatic } =
-		useDispatch( editorStore );
+	const { convertSyncedPatternToStatic } = useDispatch( editorStore );
 
 	if ( ! isVisible ) {
 		return null;
@@ -64,7 +63,9 @@ function PatternsManageButton( { clientId } ) {
 				{ __( 'Manage patterns' ) }
 			</MenuItem>
 			{ canRemove && (
-				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
+				<MenuItem
+					onClick={ () => convertSyncedPatternToStatic( clientId ) }
+				>
 					{ innerBlockCount > 1
 						? __( 'Detach patterns' )
 						: __( 'Detach pattern' ) }

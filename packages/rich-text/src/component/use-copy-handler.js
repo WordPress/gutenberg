@@ -17,8 +17,7 @@ export function useCopyHandler( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onCopy( event ) {
-			const { record, multilineTag, preserveWhiteSpace } =
-				propsRef.current;
+			const { record, preserveWhiteSpace } = propsRef.current;
 			const { ownerDocument } = element;
 			if (
 				isCollapsed( record.current ) ||
@@ -33,7 +32,6 @@ export function useCopyHandler( props ) {
 
 			let html = toHTMLString( {
 				value: selectedRecord,
-				multilineTag,
 				preserveWhiteSpace,
 			} );
 
