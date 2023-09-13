@@ -39,7 +39,7 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 // @core-merge: do not merge this code into Core.
 add_filter(
 	'block_editor_settings_all',
-	static function( $settings ) {
+	static function ( $settings ) {
 		ob_start();
 		// @core-merge: add only this line into Core's `_wp_get_iframed_editor_assets()` function after `wp_print_styles()`.
 		wp_print_font_faces();

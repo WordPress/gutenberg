@@ -158,6 +158,7 @@ export function getPreviewStyle( family ) {
 	if ( ! Array.isArray( family.fontFace ) ) {
 		style.fontWeight = '400';
 		style.fontStyle = 'normal';
+		return style;
 	}
 
 	if ( family.fontFace ) {
