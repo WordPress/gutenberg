@@ -111,6 +111,8 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		aspectRatio,
+		scale,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -335,7 +337,16 @@ export function ImageEdit( {
 				instructions={ __(
 					'Upload an image file, pick one from your media library, or add one with a URL.'
 				) }
-				style={ isSelected ? undefined : borderProps.style }
+				style={ {
+					aspectRatio:
+						! ( width && height ) && aspectRatio
+							? aspectRatio
+							: undefined,
+					width: height && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : height,
+					objectFit: scale,
+					...borderProps.style,
+				} }
 			>
 				{ content }
 			</Placeholder>
@@ -344,23 +355,21 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ ( temporaryURL || url ) && (
-				<Image
-					temporaryURL={ temporaryURL }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					onReplace={ onReplace }
-					onSelectImage={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onUploadError={ onUploadError }
-					containerRef={ ref }
-					context={ context }
-					clientId={ clientId }
-					blockEditingMode={ blockEditingMode }
-				/>
-			) }
+			<Image
+				temporaryURL={ temporaryURL }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				onReplace={ onReplace }
+				onSelectImage={ onSelectImage }
+				onSelectURL={ onSelectURL }
+				onUploadError={ onUploadError }
+				containerRef={ ref }
+				context={ context }
+				clientId={ clientId }
+				blockEditingMode={ blockEditingMode }
+			/>
 			{ ! url && blockEditingMode === 'default' && (
 				<BlockControls group="block">
 					<BlockAlignmentControl
