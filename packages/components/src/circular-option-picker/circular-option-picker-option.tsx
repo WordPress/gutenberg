@@ -53,7 +53,7 @@ function renderOptionAsOption( props: {
 export function Option( {
 	className,
 	isSelected,
-	selectedIconProps,
+	selectedIconProps = {},
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
@@ -107,12 +107,7 @@ export function Option( {
 			) : (
 				optionControl
 			) }
-			{ isSelected && (
-				<Icon
-					icon={ check }
-					{ ...( selectedIconProps ? selectedIconProps : {} ) }
-				/>
-			) }
+			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
 		</div>
 	);
 }
