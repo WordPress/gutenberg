@@ -131,22 +131,11 @@ describe( 'Modal', () => {
 	} );
 
 	describe( 'Focus handling', () => {
-		it( 'should focus the first focusable element in the contents (if found) when `firstElement` passed as value for `focusOnMount` prop', async () => {
-			const originalOffsetWidth = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetWidth'
-			);
+		let originalOffsetWidth: PropertyDescriptor | undefined;
+		let originalOffsetHeight: PropertyDescriptor | undefined;
+		let originalGetClientRects: PropertyDescriptor | undefined;
 
-			const originalOffsetHeight = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetHeight'
-			);
-
-			const originalGetClientRects = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'getClientRects'
-			);
-
+		beforeEach( () => {
 			/**
 			 * The test environment does not have a layout engine, so we need to mock
 			 * the offsetWidth, offsetHeight and getClientRects methods to return a
@@ -155,6 +144,21 @@ describe( 'Modal', () => {
 			 * to determine if the element is visible or not.
 			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
 			 */
+			originalOffsetWidth = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'offsetWidth'
+			);
+
+			originalOffsetHeight = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'offsetHeight'
+			);
+
+			originalGetClientRects = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'getClientRects'
+			);
+
 			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
 				configurable: true,
 				value: 100,
@@ -169,7 +173,28 @@ describe( 'Modal', () => {
 				configurable: true,
 				value: () => [ 1, 2, 3 ],
 			} );
+		} );
 
+		afterEach( () => {
+			// Restore original HTMLElement prototype.
+			// See beforeEach for details.
+			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
+				configurable: true,
+				value: originalOffsetWidth,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
+				configurable: true,
+				value: originalOffsetHeight,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
+				configurable: true,
+				value: originalGetClientRects,
+			} );
+		} );
+
+		it( 'should focus the first focusable element in the contents (if found) when `firstElement` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
 			const FocusMountDemo = () => {
@@ -208,63 +233,9 @@ describe( 'Modal', () => {
 			expect(
 				screen.getByTestId( 'first-focusable-element' )
 			).toHaveFocus();
-
-			// Restore original HTMLElement prototype
-			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
-				configurable: true,
-				value: originalOffsetWidth,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
-				configurable: true,
-				value: originalOffsetHeight,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
-				configurable: true,
-				value: originalGetClientRects,
-			} );
 		} );
 
 		it( 'should focus the first focusable element anywhere within the dialog when `firstElement` passed as value for `focusOnMount` prop but there is no focusable element in the Modal contents', async () => {
-			const originalOffsetWidth = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetWidth'
-			);
-
-			const originalOffsetHeight = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetHeight'
-			);
-
-			const originalGetClientRects = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'getClientRects'
-			);
-
-			/**
-			 * The test environment does not have a layout engine, so we need to mock
-			 * the offsetWidth, offsetHeight and getClientRects methods to return a
-			 * value that is not 0. This ensures that the focusable elements can be
-			 * found by the `focusOnMount` logic which depends on layout information
-			 * to determine if the element is visible or not.
-			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
-			 */
-			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
-				configurable: true,
-				value: 100,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
-				configurable: true,
-				value: 100,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
-				configurable: true,
-				value: () => [ 1, 2, 3 ],
-			} );
-
 			const user = userEvent.setup();
 
 			const FocusMountDemo = () => {
@@ -296,22 +267,6 @@ describe( 'Modal', () => {
 					name: 'Close',
 				} )
 			).toHaveFocus();
-
-			// Restore original HTMLElement prototype
-			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
-				configurable: true,
-				value: originalOffsetWidth,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
-				configurable: true,
-				value: originalOffsetHeight,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
-				configurable: true,
-				value: originalGetClientRects,
-			} );
 		} );
 
 		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
