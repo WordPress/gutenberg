@@ -139,6 +139,7 @@ function ButtonEdit( props ) {
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
 	const opensInNewTab = linkTarget === '_blank';
+	const isLinkTag = 'a' === TagName;
 
 	function startEditing( event ) {
 		event.preventDefault();
@@ -220,7 +221,7 @@ function ButtonEdit( props ) {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				{ ! isURLSet && 'a' === TagName && (
+				{ ! isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -229,7 +230,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && 'a' === TagName && (
+				{ isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -240,7 +241,7 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-			{ 'a' === TagName && isSelected && ( isEditingURL || isURLSet ) && (
+			{ isLinkTag && isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
 					placement="bottom"
 					onClose={ () => {
@@ -279,7 +280,7 @@ function ButtonEdit( props ) {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				{ 'a' === TagName && (
+				{ isLinkTag && (
 					<TextControl
 						__nextHasNoMarginBottom
 						label={ __( 'Link rel' ) }
