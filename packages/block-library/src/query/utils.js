@@ -352,13 +352,17 @@ export const usePatterns = ( clientId, name ) => {
  * @param {string} clientId The block's client ID.
  * @return {boolean} True if it contains third-party blocks.
  */
-export const useContainsThirdPartyBlocks = ( clientId ) =>
-	useSelect( ( select ) => {
-		const { getClientIdsOfDescendants, getBlockName } =
-			select( blockEditorStore );
+export const useContainsThirdPartyBlocks = ( clientId ) => {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
 
-		return getClientIdsOfDescendants( [ clientId ] ).some(
-			( descendantClientId ) =>
-				! getBlockName( descendantClientId ).startsWith( 'core/' )
-		);
-	} );
+			return getClientIdsOfDescendants( clientId ).some(
+				( descendantClientId ) =>
+					! getBlockName( descendantClientId ).startsWith( 'core/' )
+			);
+		},
+		[ clientId ]
+	);
+};
