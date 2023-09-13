@@ -298,7 +298,9 @@ Block Hooks is the API that allows a block to hook into the rendering of another
 }
 ```
 
-It’s crucial to emphasize that the Block Hooks feature is designed to work only with static templates, template parts, and patterns loaded from HTML files shipped with the theme. It also integrates with patterns registered on the server by the site. The modification will never apply to the post content or patterns crafted by the user, nor theme templates and template parts modified by the user.
+It’s crucial to emphasize that the Block Hooks feature is only designed to work with _static_ block-based templates, template parts, and patterns. For patterns, this includes those provided by the theme, from [Block Pattern Directory](https://wordpress.org/patterns/), or from calls to [`register_block_pattern`](https://developer.wordpress.org/reference/functions/register_block_pattern/).
+
+Block Hooks will not work with post content or patterns crafted by the user, such as synced patterns, or theme templates and template parts that have been modified by the user.
 
 ## Block Collections
 
