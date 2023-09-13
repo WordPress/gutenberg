@@ -1,9 +1,12 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
 import { forwardRef, useContext } from '@wordpress/element';
+
+/**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -11,15 +14,19 @@ import { forwardRef, useContext } from '@wordpress/element';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import DropdownMenu from '../../dropdown-menu';
+import type { DropdownMenuProps } from '../../dropdown-menu/types';
 
-function ToolbarDropdownMenu( props, ref ) {
+function ToolbarDropdownMenu(
+	props: DropdownMenuProps,
+	ref: ForwardedRef< any >
+) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
 		return <DropdownMenu { ...props } />;
 	}
 
-	// ToobarItem will pass all props to the render prop child, which will pass
+	// ToolbarItem will pass all props to the render prop child, which will pass
 	// all props to the toggle of DropdownMenu. This means that ToolbarDropdownMenu
 	// has the same API as DropdownMenu.
 	return (

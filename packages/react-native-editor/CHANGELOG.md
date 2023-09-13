@@ -12,6 +12,9 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
 
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
 ## 1.103.1
 -   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
 

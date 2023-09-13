@@ -10,7 +10,10 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	CopyHandler,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -104,7 +107,7 @@ export default function WidgetAreasBlockEditorProvider( {
 				useSubRegistry={ false }
 				{ ...props }
 			>
-				{ children }
+				<CopyHandler>{ children }</CopyHandler>
 				<PatternsMenuItems rootClientId={ widgetAreaId } />
 			</ExperimentalBlockEditorProvider>
 		</SlotFillProvider>

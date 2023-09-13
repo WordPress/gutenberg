@@ -3,14 +3,14 @@
  */
 import getNestedValue from '../get-nested-value';
 
-describe( 'setNestedValue', () => {
+describe( 'getNestedValue', () => {
 	it( 'should return the same object unmodified if path is an empty array', () => {
 		const input = { x: 'y' };
 		const result = getNestedValue( input, [] );
 		expect( result ).toEqual( input );
 	} );
 
-	it( 'should the nested value', () => {
+	it( 'should return the nested value', () => {
 		const input = { x: { y: { z: 123 } } };
 		const result = getNestedValue( input, [ 'x', 'y', 'z' ] );
 
@@ -38,7 +38,7 @@ describe( 'setNestedValue', () => {
 		expect( result ).toEqual( 456 );
 	} );
 
-	it( 'should return the nested value if it different to undefined', () => {
+	it( 'should return the nested value if it is different to undefined', () => {
 		const input = { x: { y: { z: null } } };
 		const result = getNestedValue( input, 'x.y.z', 456 );
 

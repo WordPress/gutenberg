@@ -97,14 +97,13 @@ function StartPageOptionsModal() {
 
 export default function StartPageOptions() {
 	const shouldEnableModal = useSelect( ( select ) => {
-		const { getEditedPostContent, isEditedPostSaveable } =
-			select( editorStore );
+		const { isCleanNewPost } = select( editorStore );
 		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
+
 		return (
-			! isEditedPostSaveable() &&
-			'' === getEditedPostContent() &&
 			! isEditingTemplate() &&
-			! isFeatureActive( 'welcomeGuide' )
+			! isFeatureActive( 'welcomeGuide' ) &&
+			isCleanNewPost()
 		);
 	}, [] );
 
