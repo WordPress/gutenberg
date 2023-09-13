@@ -15,9 +15,10 @@ import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
+	const lastFocus = useRef();
+	const lastBlock = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const lastFocus = useRef();
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
 	const { setNavigationMode } = useDispatch( blockEditorStore );
@@ -40,7 +41,35 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
+			// Try to focus the last element.
 			lastFocus.current.focus();
+			// Check to see if focus worked.
+			if (
+				lastFocus.current.ownerDocument.activeElement ===
+				lastFocus.current
+			) {
+				// Looks like yes, return early.
+				return;
+			}
+			// Access the last known block and try to find a new area to focus.
+			const selectedBlock = lastBlock.current;
+			if ( ! selectedBlock ) {
+				// TODO: Should this be handled?
+				return;
+			}
+			// Get first tabbable in the block if one exists.
+			const firstBlockTabbable = focus.tabbable.findNext( selectedBlock );
+			// Check to ensure tabbable element is inside the current block.
+			const tabbableInSelectedBlock = firstBlockTabbable
+				? isInSameBlock( firstBlockTabbable, selectedBlock )
+				: false;
+			if ( tabbableInSelectedBlock ) {
+				// Focus the found tabbable in the selected block.
+				firstBlockTabbable.focus();
+			} else {
+				// Focus the block wrapper if no tabbable was found.
+				selectedBlock.focus();
+			}
 		} else {
 			setNavigationMode( true );
 
@@ -158,7 +187,10 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
+			// Capture the last element with focus.
 			lastFocus.current = event.target;
+			// Capture the last known block before focus leaves writing flow.
+			lastBlock.current = event.target.closest( '[data-block]' );
 
 			const { ownerDocument } = node;
 
