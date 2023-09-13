@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#53976](https://github.com/WordPress/gutenberg/pull/53976)).
+
 ### Bug Fix
 
 -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
