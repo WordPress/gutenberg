@@ -78,6 +78,7 @@ _Usage_
 
 ```js
 import { useCommand } from '@wordpress/commands';
+import { plus } from '@wordpress/icons';
 
 useCommand( {
 	name: 'myplugin/my-command-name',
@@ -102,6 +103,14 @@ _Usage_
 
 ```js
 import { useCommandLoader } from '@wordpress/commands';
+import { post, page, layout, symbolFilled } from '@wordpress/icons';
+
+const icons = {
+    post,
+    page,
+    wp_template: layout,
+    wp_template_part: symbolFilled,
+};
 
 function usePageSearchCommandLoader( { search } ) {
     // Retrieve the pages for the "search" term.

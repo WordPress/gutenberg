@@ -17,6 +17,14 @@ import { store as commandsStore } from '../store';
  * @example
  * ```js
  * import { useCommandLoader } from '@wordpress/commands';
+ * import { post, page, layout, symbolFilled } from '@wordpress/icons';
+ *
+ * const icons = {
+ *     post,
+ *     page,
+ *     wp_template: layout,
+ *     wp_template_part: symbolFilled,
+ * };
  *
  * function usePageSearchCommandLoader( { search } ) {
  *     // Retrieve the pages for the "search" term.

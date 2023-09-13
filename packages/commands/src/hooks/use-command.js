@@ -17,6 +17,7 @@ import { store as commandsStore } from '../store';
  * @example
  * ```js
  * import { useCommand } from '@wordpress/commands';
+ * import { plus } from '@wordpress/icons';
  *
  * useCommand( {
  *     name: 'myplugin/my-command-name',
