@@ -78,8 +78,8 @@ class Tests_Fonts_WpFontsFamilyUtils_MergeFontsData extends WP_UnitTestCase {
 	public function test_should_merge( array $font1, array $font2, array $expected_result ) {
 		$result = WP_Font_Family_Utils::merge_fonts_data( $font1, $font2 );
 		$this->assertSame( $expected_result, $result, 'Merged font data should match expected result.' );
-		$json_result  = wp_json_encode( $result );
-		$this->assertStringContainsString('"fontFace":[', $json_result, 'fontFace data should be enconded as an array and not an object.' );
+		$json_result = wp_json_encode( $result );
+		$this->assertStringContainsString( '"fontFace":[', $json_result, 'fontFace data should be enconded as an array and not an object.' );
 	}
 
 	/**
@@ -230,7 +230,7 @@ class Tests_Fonts_WpFontsFamilyUtils_MergeFontsData extends WP_UnitTestCase {
 					),
 				),
 			),
-			'repeated font faces with non consecutive index positions' => array (
+			'repeated font faces with non consecutive index positions' => array(
 				'font1'           => array(
 					'slug'       => 'piazzolla',
 					'name'       => 'Piazzolla',
@@ -294,7 +294,7 @@ class Tests_Fonts_WpFontsFamilyUtils_MergeFontsData extends WP_UnitTestCase {
 						),
 					),
 				),
-			)
+			),
 		);
 	}
 }
