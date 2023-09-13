@@ -60,6 +60,10 @@ function OptionAsOption( props: {
 			role="option"
 			isPressed={ isSelected }
 			aria-selected={ !! isSelected }
+			// `Button` sets `aria-pressed` as standard, based
+			// on `isPressed`. However, `role="option"` uses
+			// `aria-selected` instead, so we have to explicitly
+			// remove it as an attribute here.
 			aria-pressed={ null }
 		/>
 	);
