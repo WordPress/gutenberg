@@ -131,7 +131,7 @@ describe( 'Modal', () => {
 	} );
 
 	describe( 'Focus handling', () => {
-		it( 'should focus the first focusable element in the contents when `firstElement` passed as value for `focusOnMount` prop', async () => {
+		it( 'should focus the first focusable element in the contents (if found) when `firstElement` passed as value for `focusOnMount` prop', async () => {
 			const originalOffsetWidth = Object.getOwnPropertyDescriptor(
 				HTMLElement.prototype,
 				'offsetWidth'
@@ -171,6 +171,7 @@ describe( 'Modal', () => {
 			} );
 
 			const user = userEvent.setup();
+
 			const FocusMountDemo = () => {
 				const [ isShown, setIsShown ] = useState( false );
 				return (
@@ -197,6 +198,7 @@ describe( 'Modal', () => {
 					</>
 				);
 			};
+
 			render( <FocusMountDemo /> );
 
 			const opener = screen.getByRole( 'button' );
@@ -222,6 +224,168 @@ describe( 'Modal', () => {
 				configurable: true,
 				value: originalGetClientRects,
 			} );
+		} );
+
+		it( 'should focus the first focusable element anywhere within the dialog when `firstElement` passed as value for `focusOnMount` prop but there is no focusable element in the Modal contents', async () => {
+			const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'offsetWidth'
+			);
+
+			const originalOffsetHeight = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'offsetHeight'
+			);
+
+			const originalGetClientRects = Object.getOwnPropertyDescriptor(
+				HTMLElement.prototype,
+				'getClientRects'
+			);
+
+			/**
+			 * The test environment does not have a layout engine, so we need to mock
+			 * the offsetWidth, offsetHeight and getClientRects methods to return a
+			 * value that is not 0. This ensures that the focusable elements can be
+			 * found by the `focusOnMount` logic which depends on layout information
+			 * to determine if the element is visible or not.
+			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
+			 */
+			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
+				configurable: true,
+				value: 100,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
+				configurable: true,
+				value: () => [ 1, 2, 3 ],
+			} );
+
+			const user = userEvent.setup();
+
+			const FocusMountDemo = () => {
+				const [ isShown, setIsShown ] = useState( false );
+				return (
+					<>
+						<button onClick={ () => setIsShown( true ) }>📣</button>
+						{ isShown && (
+							<Modal
+								focusOnMount="firstElement"
+								onRequestClose={ () => setIsShown( false ) }
+							>
+								<p>Modal content with no focusable elements.</p>
+							</Modal>
+						) }
+					</>
+				);
+			};
+
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			// The close button is the first focusable element in the dialog.
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Close',
+				} )
+			).toHaveFocus();
+
+			// Restore original HTMLElement prototype
+			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
+				configurable: true,
+				value: originalOffsetWidth,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
+				configurable: true,
+				value: originalOffsetHeight,
+			} );
+
+			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
+				configurable: true,
+				value: originalGetClientRects,
+			} );
+		} );
+
+		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+			const FocusMountDemo = () => {
+				const [ isShown, setIsShown ] = useState( false );
+				return (
+					<>
+						<button onClick={ () => setIsShown( true ) }>📣</button>
+						{ isShown && (
+							<Modal
+								focusOnMount
+								onRequestClose={ () => setIsShown( false ) }
+							>
+								<p>Modal content</p>
+								<a
+									href="https://wordpress.org"
+									data-testid="first-focusable-element"
+								>
+									First Focusable Element
+								</a>
+
+								<a href="https://wordpress.org">
+									Another Focusable Element
+								</a>
+							</Modal>
+						) }
+					</>
+				);
+			};
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
+		} );
+
+		it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+			const FocusMountDemo = () => {
+				const [ isShown, setIsShown ] = useState( false );
+				return (
+					<>
+						<button onClick={ () => setIsShown( true ) }>📣</button>
+						{ isShown && (
+							<Modal
+								focusOnMount={ false }
+								onRequestClose={ () => setIsShown( false ) }
+							>
+								<p>Modal content</p>
+								<a
+									href="https://wordpress.org"
+									data-testid="first-focusable-element"
+								>
+									First Focusable Element
+								</a>
+
+								<a href="https://wordpress.org">
+									Another Focusable Element
+								</a>
+							</Modal>
+						) }
+					</>
+				);
+			};
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect( opener ).toHaveFocus();
 		} );
 	} );
 } );
