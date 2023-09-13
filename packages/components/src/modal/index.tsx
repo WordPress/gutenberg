@@ -104,7 +104,7 @@ function UnforwardedModal(
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
 
-	// Modals should ignore the `Close` button which is the first focusable element.
+	// If focusOnMount is `firstElement`, Modals should ignore the `Close` button which is the first focusable element.
 	// Remap `true` to select the next focusable element instead.
 	const focusOnMountRef = useFocusOnMount(
 		focusOnMount === 'firstElement' ? getFirstTabbableElement : focusOnMount
