@@ -77,7 +77,6 @@ export function PageAttributesParent() {
 				items: postIsHierarchical
 					? getEntityRecords( 'postType', postTypeSlug, query )
 					: [],
-				postType: pType,
 			};
 		},
 		[ fieldValue ]
