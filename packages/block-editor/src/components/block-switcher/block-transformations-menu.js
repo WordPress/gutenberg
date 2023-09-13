@@ -89,7 +89,7 @@ const BlockTransformationsMenu = ( {
 	);
 	return (
 		<>
-			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
+			<MenuGroup label={ __( 'Turn into' ) } className={ className }>
 				{ hoveredTransformItemName && (
 					<PreviewBlockPopover
 						blocks={ switchToBlockType(
