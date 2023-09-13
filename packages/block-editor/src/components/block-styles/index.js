@@ -71,6 +71,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 					return (
 						<Button
+							__next40pxDefaultSize
 							className={ classnames(
 								'block-editor-block-styles__item',
 								{
