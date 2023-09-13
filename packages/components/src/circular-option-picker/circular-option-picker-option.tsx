@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useContext, useEffect } from '@wordpress/element';
+import { forwardRef, useContext, useEffect } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 
 /**
@@ -25,20 +26,28 @@ import type {
 
 const hasSelectedOption = new Map();
 
-function OptionAsButton( props: {
-	id?: string;
-	className?: string;
-	isPressed?: boolean;
-} ) {
-	return <Button { ...props }></Button>;
+function UnforwardedOptionAsButton(
+	props: {
+		id?: string;
+		className?: string;
+		isPressed?: boolean;
+	},
+	forwardedRef: ForwardedRef< any >
+) {
+	return <Button { ...props } ref={ forwardedRef }></Button>;
 }
 
-function OptionAsOption( props: {
-	id: string;
-	className?: string;
-	isSelected?: boolean;
-	context: CircularOptionPickerContextProps;
-} ) {
+const OptionAsButton = forwardRef( UnforwardedOptionAsButton );
+
+function UnforwardedOptionAsOption(
+	props: {
+		id: string;
+		className?: string;
+		isSelected?: boolean;
+		context: CircularOptionPickerContextProps;
+	},
+	forwardedRef: ForwardedRef< any >
+) {
 	const { id, className, isSelected, context, ...additionalProps } = props;
 	const { isComposite, ..._compositeState } = context;
 	const compositeState =
@@ -69,9 +78,12 @@ function OptionAsOption( props: {
 			} ) }
 			role="option"
 			aria-selected={ !! isSelected }
+			ref={ forwardedRef }
 		/>
 	);
 }
+
+const OptionAsOption = forwardRef( UnforwardedOptionAsOption );
 
 export function Option( {
 	className,
