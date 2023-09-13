@@ -31,7 +31,7 @@ function register_block_core_table_of_contents() {
 				'show_in_rest'  => true,
 				'single'        => true,
 				'type'          => 'string',
-				'auth_callback' => '__return_true'
+				'auth_callback' => '__return_true',
 			)
 		);
 	}
@@ -178,11 +178,16 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$tree = block_core_table_of_contents_build_headings_tree( $headings );
+	$tree               = block_core_table_of_contents_build_headings_tree( $headings );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'aria-label' => __( 'Table of Contents' ),
+		)
+	);
 
 	return sprintf(
 		'<nav %1$s>%2$s</nav>',
-		get_block_wrapper_attributes(),
+		$wrapper_attributes,
 		block_core_table_of_contents_build_list( $tree, array( 'postId' => $block->context['postId'] ) )
 	);
 }
