@@ -43,44 +43,47 @@ export const getItemPriority = ( name, searchValue ) => {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const { isHierarchical, parentPost, parentPostId, pageItems } = useSelect(
-		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } =
-				select( coreStore );
-			const { getCurrentPostId, getEditedPostAttribute } =
-				select( editorStore );
-			const postTypeSlug = getEditedPostAttribute( 'type' );
-			const pageId = getEditedPostAttribute( 'parent' );
-			const pType = getPostType( postTypeSlug );
-			const postId = getCurrentPostId();
-			const postIsHierarchical = pType?.hierarchical ?? false;
-			const query = {
-				per_page: 100,
-				exclude: postId,
-				parent_exclude: postId,
-				orderby: 'menu_order',
-				order: 'asc',
-				_fields: 'id,title,parent',
-			};
+	const { isHierarchical, parentPostId, parentPostTitle, pageItems } =
+		useSelect(
+			( select ) => {
+				const { getPostType, getEntityRecords, getEntityRecord } =
+					select( coreStore );
+				const { getCurrentPostId, getEditedPostAttribute } =
+					select( editorStore );
+				const postTypeSlug = getEditedPostAttribute( 'type' );
+				const pageId = getEditedPostAttribute( 'parent' );
+				const pType = getPostType( postTypeSlug );
+				const postId = getCurrentPostId();
+				const postIsHierarchical = pType?.hierarchical ?? false;
+				const query = {
+					per_page: 100,
+					exclude: postId,
+					parent_exclude: postId,
+					orderby: 'menu_order',
+					order: 'asc',
+					_fields: 'id,title,parent',
+				};
 
-			// Perform a search when the field is changed.
-			if ( !! fieldValue ) {
-				query.search = fieldValue;
-			}
+				// Perform a search when the field is changed.
+				if ( !! fieldValue ) {
+					query.search = fieldValue;
+				}
 
-			return {
-				isHierarchical: postIsHierarchical,
-				parentPostId: pageId,
-				parentPost: pageId
+				const parentPost = pageId
 					? getEntityRecord( 'postType', postTypeSlug, pageId )
-					: null,
-				pageItems: postIsHierarchical
-					? getEntityRecords( 'postType', postTypeSlug, query )
-					: null,
-			};
-		},
-		[ fieldValue ]
-	);
+					: null;
+
+				return {
+					isHierarchical: postIsHierarchical,
+					parentPostId: pageId,
+					parentPostTitle: parentPost ? getTitle( parentPost ) : '',
+					pageItems: postIsHierarchical
+						? getEntityRecords( 'postType', postTypeSlug, query )
+						: null,
+				};
+			},
+			[ fieldValue ]
+		);
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
@@ -124,14 +127,14 @@ export function PageAttributesParent() {
 		const optsHasParent = opts.find(
 			( item ) => item.value === parentPostId
 		);
-		if ( parentPost && ! optsHasParent ) {
+		if ( parentPostTitle && ! optsHasParent ) {
 			opts.unshift( {
 				value: parentPostId,
-				label: getTitle( parentPost ),
+				label: parentPostTitle,
 			} );
 		}
 		return opts;
-	}, [ pageItems, fieldValue, parentPost, parentPostId ] );
+	}, [ pageItems, fieldValue, parentPostTitle, parentPostId ] );
 
 	if ( ! isHierarchical ) {
 		return null;
