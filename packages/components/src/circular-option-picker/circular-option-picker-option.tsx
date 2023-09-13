@@ -35,8 +35,7 @@ function OptionAsOption( props: {
 	isSelected?: boolean;
 	compositeState: any;
 } ) {
-	const { id, className, isSelected, compositeState, ...additionalProps } =
-		props;
+	const { id, isSelected, compositeState, ...additionalProps } = props;
 	const { baseId, currentId, setCurrentId } = compositeState as any;
 
 	useEffect( () => {
@@ -58,11 +57,10 @@ function OptionAsOption( props: {
 			{ ...compositeState }
 			as={ Button }
 			id={ id }
-			className={ classnames( className, {
-				'is-pressed': isSelected,
-			} ) }
 			role="option"
+			isPressed={ isSelected }
 			aria-selected={ !! isSelected }
+			aria-pressed={ null }
 		/>
 	);
 }
