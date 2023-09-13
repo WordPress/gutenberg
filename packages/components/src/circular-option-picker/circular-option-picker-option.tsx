@@ -39,7 +39,7 @@ function OptionAsOption( props: {
 	isSelected?: boolean;
 	context: CircularOptionPickerContextProps;
 } ) {
-	const { id, isSelected, context, ...additionalProps } = props;
+	const { id, className, isSelected, context, ...additionalProps } = props;
 	const { isComposite, ..._compositeState } = context;
 	const compositeState =
 		_compositeState as CircularOptionPickerCompositeState;
@@ -64,13 +64,11 @@ function OptionAsOption( props: {
 			{ ...compositeState }
 			as={ Button }
 			id={ id }
+			className={ classnames( className, {
+				'is-pressed': isSelected,
+			} ) }
 			role="option"
-			isPressed={ isSelected }
 			aria-selected={ !! isSelected }
-			// `Button` sets `aria-pressed` as standard, based
-			// on `isPressed`. However, `role="option"` uses
-			// `aria-selected` instead, so we have to explicitly
-			// remove it as an attribute here.
 		/>
 	);
 }
