@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -792,7 +793,7 @@ export const saveEditedEntityRecord =
  * @param {string} kind        Kind of the entity.
  * @param {string} name        Name of the entity.
  * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
  * @param {Object} options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
@@ -807,10 +808,9 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			recordId
 		);
 		const editsToSave = {};
-		for ( const edit in edits ) {
-			if ( itemsToSave.some( ( item ) => item === edit ) ) {
-				editsToSave[ edit ] = edits[ edit ];
-			}
+
+		for ( const item of itemsToSave ) {
+			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
@@ -827,7 +827,6 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		if ( recordId ) {
 			editsToSave[ entityIdKey ] = recordId;
 		}
-
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,

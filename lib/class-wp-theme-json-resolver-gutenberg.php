@@ -408,18 +408,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * When given an array, this will remove any keys with the name `//`.
 	 *
-	 * @param array $array The array to filter.
+	 * @param array $json_array The array to filter.
 	 * @return array The filtered array.
 	 */
-	private static function remove_json_comments( $array ) {
-		unset( $array['//'] );
-		foreach ( $array as $k => $v ) {
+	private static function remove_json_comments( $json_array ) {
+		unset( $json_array['//'] );
+		foreach ( $json_array as $k => $v ) {
 			if ( is_array( $v ) ) {
-				$array[ $k ] = static::remove_json_comments( $v );
+				$json_array[ $k ] = static::remove_json_comments( $v );
 			}
 		}
 
-		return $array;
+		return $json_array;
 	}
 
 	/**

@@ -20,6 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
+import EnhancedPaginationModal from './enhanced-pagination-modal';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -103,13 +104,20 @@ export default function QueryContent( {
 			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
 		),
 	};
+
 	return (
 		<>
+			<EnhancedPaginationModal
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
 			<QueryInspectorControls
 				attributes={ attributes }
 				setQuery={ updateQuery }
 				setDisplayLayout={ updateDisplayLayout }
 				setAttributes={ setAttributes }
+				clientId={ clientId }
 			/>
 			<BlockControls>
 				<QueryToolbar

@@ -244,7 +244,6 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 	}
 
 	return $block_content;
-
 }
 
 /**

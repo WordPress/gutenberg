@@ -17,8 +17,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
-import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
-import { speak } from '@wordpress/a11y';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,6 +27,7 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
 import { unlock } from '../../../lock-unlock';
 import {
@@ -41,7 +41,8 @@ import {
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout, setAttributes } = props;
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
 	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
@@ -124,18 +125,6 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
-	const enhancedPaginationNotice = __(
-		'Enhanced Pagination might cause interactive blocks within the Post Template to stop working. Disable it if you experience any issues.'
-	);
-
-	const isFirstRender = useRef( true ); // Don't speak on first render.
-	useEffect( () => {
-		if ( ! isFirstRender.current && enhancedPagination ) {
-			speak( enhancedPaginationNotice );
-		}
-		isFirstRender.current = false;
-	}, [ enhancedPagination, enhancedPaginationNotice ] );
-
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
@@ -215,29 +204,11 @@ export default function QueryInspectorControls( props ) {
 								}
 							/>
 						) }
-						<ToggleControl
-							label={ __( 'Enhanced pagination' ) }
-							help={ __(
-								'Browsing between pages won’t require a full page reload.'
-							) }
-							checked={ !! enhancedPagination }
-							onChange={ ( value ) =>
-								setAttributes( {
-									enhancedPagination: !! value,
-								} )
-							}
+						<EnhancedPaginationControl
+							enhancedPagination={ enhancedPagination }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
 						/>
-						{ enhancedPagination && (
-							<div>
-								<Notice
-									spokenMessage={ null }
-									status="warning"
-									isDismissible={ false }
-								>
-									{ enhancedPaginationNotice }
-								</Notice>
-							</div>
-						) }
 					</PanelBody>
 				</InspectorControls>
 			) }
