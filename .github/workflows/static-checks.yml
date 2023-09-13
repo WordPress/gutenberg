@@ -1,7 +1,7 @@
 name: Static Analysis (Linting, License, Type checks...)
 
 on:
-    pull_request:
+    pull_request_target:
     push:
         branches:
             - trunk
@@ -12,14 +12,14 @@ on:
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
     # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
 jobs:
     check:
         name: All
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
 
         steps:
             - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
