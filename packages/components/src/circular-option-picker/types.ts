@@ -50,32 +50,46 @@ type CommonCircularOptionPickerProps = {
 	asButtons?: boolean;
 };
 
-export type ListboxCircularOptionPickerProps =
-	CommonCircularOptionPickerProps & {
-		asButtons?: false;
-		/**
-		 * Prevents keyboard interaction from wrapping around.
-		 * Only used when `asButtons` is not true.
-		 *
-		 * @default true
-		 */
-		loop?: boolean;
-	} & (
-			| {
-					'aria-label': string;
-					'aria-labelledby'?: never;
-			  }
-			| {
-					'aria-label'?: never;
-					'aria-labelledby': string;
-			  }
-		 );
+type WithBaseId = {
+	baseId: string;
+};
 
-export type ButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps;
+type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+} & (
+		| {
+				'aria-label': string;
+				'aria-labelledby'?: never;
+		  }
+		| {
+				'aria-label'?: never;
+				'aria-labelledby': string;
+		  }
+	 );
+
+export type ListboxCircularOptionPickerProps = WithBaseId &
+	Omit<
+		FullListboxCircularOptionPickerProps,
+		'asButtons' | 'actions' | 'options'
+	>;
+
+type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps;
+
+export type ButtonsCircularOptionPickerProps = WithBaseId &
+	Omit<
+		FullButtonsCircularOptionPickerProps,
+		'asButtons' | 'actions' | 'options'
+	>;
 
 export type CircularOptionPickerProps =
-	| ListboxCircularOptionPickerProps
-	| ButtonsCircularOptionPickerProps;
+	| ( { asButtons?: false } & FullListboxCircularOptionPickerProps )
+	| ( { asButtons: true } & FullButtonsCircularOptionPickerProps );
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<

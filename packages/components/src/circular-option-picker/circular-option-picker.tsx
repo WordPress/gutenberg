@@ -74,10 +74,7 @@ import {
  */
 
 function ListboxCircularOptionPicker(
-	props: Omit<
-		ListboxCircularOptionPickerProps,
-		'asButtons' | 'actions' | 'options'
-	> & { baseId: string }
+	props: ListboxCircularOptionPickerProps
 ) {
 	const { baseId, loop = true, children, ...additionalProps } = props;
 	const rtl = isRTL();
@@ -125,10 +122,7 @@ function ListboxCircularOptionPicker(
 }
 
 function ButtonsCircularOptionPicker(
-	props: Omit<
-		ButtonsCircularOptionPickerProps,
-		'asButtons' | 'actions' | 'options'
-	> & { baseId: string }
+	props: ButtonsCircularOptionPickerProps
 ) {
 	const { children, baseId, ...additionalProps } = props;
 

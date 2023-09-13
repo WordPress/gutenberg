@@ -250,24 +250,33 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
-	let ariaProps:
-		| { 'aria-label': string }
-		| { 'aria-labelledby': string }
-		| {} = {};
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
 
-	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel };
-	} else if ( ariaLabelledby ) {
-		ariaProps = {
-			'aria-labelledby': ariaLabelledby,
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
+	} else {
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
 		};
-	} else if ( ! asButtons ) {
-		ariaProps = {
-			'aria-label': __( 'Custom color picker.' ),
-		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
-
-	const metaProps = asButtons ? { asButtons } : { loop };
 
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
@@ -322,7 +331,6 @@ function UnforwardedColorPalette(
 				/>
 			) }
 			<CircularOptionPicker
-				{ ...ariaProps }
 				{ ...metaProps }
 				actions={ actions }
 				options={
