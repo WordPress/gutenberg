@@ -10,7 +10,7 @@ require_once __DIR__ . '/wp-font-face-tests-dataset.php';
 /**
  * Abstracts the common tasks for the Font Face tests.
  */
-abstract class WP_Font_Face_TestCase extends WP_UnitTestCase {
+abstract class WP_Font_Face_UnitTestCase extends WP_UnitTestCase {
 	use WP_Font_Face_Tests_Datasets;
 
 	/**
@@ -62,6 +62,7 @@ abstract class WP_Font_Face_TestCase extends WP_UnitTestCase {
 		parent::set_up_before_class();
 
 		if ( self::$requires_switch_theme_fixtures ) {
+			// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
 			self::$theme_root = realpath( GUTENBERG_DIR_TESTDATA . '/themedir1' );
 		}
 	}
@@ -103,85 +104,33 @@ abstract class WP_Font_Face_TestCase extends WP_UnitTestCase {
 		}
 
 		if ( self::$requires_switch_theme_fixtures ) {
-			// Clean up the filters to modify the theme root.
+			$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 			remove_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
 			remove_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
 			remove_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
 
-			WP_Theme_JSON_Resolver::clean_cached_data();
+			wp_clean_themes_cache();
+			// @core-merge: the function_exists() is not needed in Core.
+			if ( function_exists( 'wp_clean_theme_json_cache' ) ) {
+				wp_clean_theme_json_cache();
+			}
+
+			// @core-merge: start of the plugin only code block. Do not merge into Core.
 			if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
 				WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 			}
+			if ( function_exists( '_gutenberg_clean_theme_json_caches' ) ) {
+				_gutenberg_clean_theme_json_caches();
+			}
+			// @core-merge: end of the plugin only code block.
+
+			unset( $GLOBALS['wp_themes'] );
 		}
 
 		parent::tear_down();
 	}
 
-	public function clean_up_global_scope() {
-		parent::clean_up_global_scope();
-
-		if ( self::$requires_switch_theme_fixtures ) {
-			$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
-			wp_clean_themes_cache();
-
-			if ( function_exists( 'wp_clean_theme_json_cache' ) ) {
-				wp_clean_theme_json_cache();
-			}
-
-			if ( function_exists( '_gutenberg_clean_theme_json_caches' ) ) {
-				_gutenberg_clean_theme_json_caches();
-			}
-
-			unset( $GLOBALS['wp_themes'] );
-		}
-	}
-
 	public function filter_set_theme_root() {
 		return self::$theme_root;
-	}
-
-	protected function get_reflection_property( $property_name, $class_name = 'WP_Fonts' ) {
-		$property = new ReflectionProperty( $class_name, $property_name );
-		$property->setAccessible( true );
-
-		return $property;
-	}
-
-	protected function get_property_value( $property_name, $class_name, $wp_fonts = null ) {
-		$property = $this->get_reflection_property( $property_name, $class_name );
-
-		if ( ! $wp_fonts ) {
-			$wp_fonts = wp_fonts();
-		}
-
-		return $property->getValue( $wp_fonts );
-	}
-
-	protected function setup_property( $class_name, $property_name ) {
-		$key = $this->get_property_key( $class_name, $property_name );
-
-		if ( ! isset( $this->property[ $key ] ) ) {
-			$this->property[ $key ] = new ReflectionProperty( $class_name, 'providers' );
-			$this->property[ $key ]->setAccessible( true );
-		}
-
-		return $this->property[ $key ];
-	}
-
-	protected function get_property_key( $class_name, $property_name ) {
-		return $class_name . '::$' . $property_name;
-	}
-
-	/**
-	 * Opens the accessibility to access the given private or protected method.
-	 *
-	 * @param string $method_name Name of the method to open.
-	 * @return ReflectionMethod Instance of the method, ie to invoke it in the test.
-	 */
-	protected function get_reflection_method( $method_name ) {
-		$method = new ReflectionMethod( WP_Fonts::class, $method_name );
-		$method->setAccessible( true );
-
-		return $method;
 	}
 }
