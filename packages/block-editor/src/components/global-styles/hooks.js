@@ -50,6 +50,7 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox',
 	'lightbox.enabled',
 	'lightbox.allowEditing',
 	'position.fixed',
