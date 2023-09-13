@@ -23,13 +23,15 @@ function register_block_core_table_of_contents() {
 			continue;
 		}
 
+		// The post meta is only "protected" to prevent exposing serialized content in Custom Fields.
 		register_post_meta(
 			$post_type,
-			'core_table_of_contents',
+			'_core_table_of_contents',
 			array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'string',
+				'auth_callback' => '__return_true'
 			)
 		);
 	}
@@ -164,7 +166,7 @@ function render_block_core_table_of_contents( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$headings = get_post_meta( $block->context['postId'], 'core_table_of_contents', true );
+	$headings = get_post_meta( $block->context['postId'], '_core_table_of_contents', true );
 
 	if ( ! $headings ) {
 		return '';

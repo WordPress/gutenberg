@@ -12,7 +12,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-export const META_KEY = 'core_table_of_contents';
+export const META_KEY = '_core_table_of_contents';
 
 export function getHeadingsFromMeta( meta ) {
 	if ( ! meta?.[ META_KEY ] ) {
