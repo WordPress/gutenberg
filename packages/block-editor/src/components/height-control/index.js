@@ -26,6 +26,28 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
 	vh: { max: 100, step: 1 },
 	em: { max: 50, step: 0.1 },
 	rem: { max: 50, step: 0.1 },
+	svw: { max: 100, step: 1 },
+	lvw: { max: 100, step: 1 },
+	dvw: { max: 100, step: 1 },
+	svh: { max: 100, step: 1 },
+	lvh: { max: 100, step: 1 },
+	dvh: { max: 100, step: 1 },
+	vi: { max: 100, step: 1 },
+	svi: { max: 100, step: 1 },
+	lvi: { max: 100, step: 1 },
+	dvi: { max: 100, step: 1 },
+	vb: { max: 100, step: 1 },
+	svb: { max: 100, step: 1 },
+	lvb: { max: 100, step: 1 },
+	dvb: { max: 100, step: 1 },
+	vmin: { max: 100, step: 1 },
+	svmin: { max: 100, step: 1 },
+	lvmin: { max: 100, step: 1 },
+	dvmin: { max: 100, step: 1 },
+	vmax: { max: 100, step: 1 },
+	svmax: { max: 100, step: 1 },
+	lvmax: { max: 100, step: 1 },
+	dvmax: { max: 100, step: 1 },
 };
 
 /**
@@ -86,10 +108,36 @@ export default function HeightControl( {
 			// Convert to pixel value assuming a root size of 16px.
 			onChange( Math.round( currentValue * 16 ) + newUnit );
 		} else if (
-			[ 'vh', 'vw', '%' ].includes( newUnit ) &&
+			[
+				'%',
+				'vw',
+				'svw',
+				'lvw',
+				'dvw',
+				'vh',
+				'svh',
+				'lvh',
+				'dvh',
+				'vi',
+				'svi',
+				'lvi',
+				'dvi',
+				'vb',
+				'svb',
+				'lvb',
+				'dvb',
+				'vmin',
+				'svmin',
+				'lvmin',
+				'dvmin',
+				'vmax',
+				'svmax',
+				'lvmax',
+				'dvmax',
+			].includes( newUnit ) &&
 			currentValue > 100
 		) {
-			// When converting to `vh`, `vw`, or `%` units, cap the new value at 100.
+			// When converting to `%` or viewport-relative units, cap the new value at 100.
 			onChange( 100 + newUnit );
 		}
 	};
