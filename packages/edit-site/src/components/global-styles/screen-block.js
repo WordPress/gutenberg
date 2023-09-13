@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -222,39 +219,6 @@ function ScreenBlock( { name, variation } ) {
 		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
-	const lightboxSettings = useSelect( ( select ) => {
-		const editorSettings = select( blockEditorStore ).getSettings();
-
-		const blockSettings =
-			editorSettings.__experimentalFeatures?.blocks?.[ 'core/image' ]
-				?.lightbox;
-		const defaultsSetting = editorSettings.__experimentalFeatures?.lightbox;
-
-		// By default, the theme.json lightbox 'enabled' property is
-		// undefined in theme.json, so we need to check the top-level
-		// settings to see if the lightbox has been enabled there.
-		if (
-			blockSettings &&
-			blockSettings !== true &&
-			! blockSettings.hasOwnProperty( 'enabled' ) &&
-			defaultsSetting
-		) {
-			if ( defaultsSetting === true ) {
-				return {
-					...blockSettings,
-					enabled: true,
-				};
-			} else if ( defaultsSetting.hasOwnProperty( 'enabled' ) ) {
-				return {
-					...blockSettings,
-					enabled: defaultsSetting.enabled,
-				};
-			}
-		}
-
-		return blockSettings ?? defaultsSetting;
-	}, [] );
-
 	return (
 		<>
 			<ScreenHeader
@@ -330,7 +294,7 @@ function ScreenBlock( { name, variation } ) {
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
 					userSettings={ userSettings }
-					lightboxSettings={ lightboxSettings }
+					settings={ settings }
 				/>
 			) }
 

@@ -24,6 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	useSetting,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -368,44 +369,15 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSettings = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const blockSettings =
-			settings.__experimentalFeatures?.blocks?.[ 'core/image' ]?.lightbox;
-		const defaultsSetting = settings.__experimentalFeatures?.lightbox;
-
-		// By default, the theme.json lightbox 'enabled' property is
-		// undefined in theme.json, so we need to check the top-level
-		// settings to see if the lightbox has been enabled there.
-		if (
-			blockSettings &&
-			blockSettings !== true &&
-			! blockSettings.hasOwnProperty( 'enabled' ) &&
-			defaultsSetting
-		) {
-			if ( defaultsSetting === true ) {
-				return {
-					...blockSettings,
-					enabled: true,
-				};
-			} else if ( defaultsSetting.hasOwnProperty( 'enabled' ) ) {
-				return {
-					...blockSettings,
-					enabled: defaultsSetting.enabled,
-				};
-			}
-		}
-
-		return blockSettings ?? defaultsSetting;
-	}, [] );
+	const lightboxSetting = useSetting( 'lightbox' );
 
 	const showLightboxToggle =
-		lightboxSettings === true || lightboxSettings?.allowEditing === true;
+		lightboxSetting === true || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		lightbox?.enabled ||
-		( ! lightbox && lightboxSettings === true ) ||
-		( ! lightbox && lightboxSettings?.enabled );
+		( ! lightbox && lightboxSetting === true ) ||
+		( ! lightbox && lightboxSetting?.enabled );
 
 	const controls = (
 		<>
