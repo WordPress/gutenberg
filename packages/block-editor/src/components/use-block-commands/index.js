@@ -230,7 +230,7 @@ const useActionsCommands = () => {
 	if ( canRemove ) {
 		commands.push( {
 			name: 'remove',
-			label: __( 'Remove' ),
+			label: __( 'Delete' ),
 			callback: () => removeBlocks( clientIds, true ),
 			icon: remove,
 		} );
