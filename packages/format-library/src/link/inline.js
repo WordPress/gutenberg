@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, createInterpolateElement } from '@wordpress/element';
+import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -241,11 +241,22 @@ function InlineLinkUI( {
 		);
 	}
 
+	const hasLink = linkValue?.url;
+
+	// Focus should only be moved into the Popover when the Link is being **created**.
+	// When the link has already been created it is in a pseudo "preview" mode and thus
+	// focus should remain on the rich text because at this point the Link dialog is
+	// partially informational and thus the user should be able to continue editing the
+	// rich text.
+	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
+	// otherwise it causes a render of the content.
+	const focusOnMount = useRef( hasLink ? false : 'firstElement' );
+
 	return (
 		<Popover
 			role="dialog"
 			anchor={ popoverAnchor }
-			focusOnMount={ 'firstElement' }
+			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			onFocusOutside={ () => stopAddingLink( false ) }
 			placement="bottom"
