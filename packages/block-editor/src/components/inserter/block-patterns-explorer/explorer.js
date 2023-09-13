@@ -32,10 +32,7 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 	// If the sync filter changes, we need to select the "All" category to avoid
 	// showing a confusing no results screen.
 	useEffect( () => {
-		if (
-			patternSyncFilter !== null &&
-			previousSyncFilter !== patternSyncFilter
-		) {
+		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
 			setSelectedCategory( initialCategory?.name );
 		}
 	}, [

@@ -318,8 +318,7 @@ function BlockPatternsTabs( {
 	const previousSyncFilter = usePrevious( patternSyncFilter );
 
 	// If the sync filter changes, we need to select the "All" category to avoid
-	// showing a confusing no results screen. We also need to clear the category
-	// selection when the component unmounts.
+	// showing a confusing no results screen.
 	useEffect( () => {
 		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
 			onSelectCategory( allPatternsCategory, patternSourceFilter );
