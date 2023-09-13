@@ -129,4 +129,39 @@ describe( 'Modal', () => {
 			screen.getByText( 'A sweet button', { selector: 'button' } )
 		).toBeInTheDocument();
 	} );
+
+	describe( 'Focus handling', () => {
+		it( 'should focus the first focusable element in the contents when `firstElement` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+			const FocusMountDemo = () => {
+				const [ isShown, setIsShown ] = useState( false );
+				return (
+					<>
+						<button onClick={ () => setIsShown( true ) }>📣</button>
+						{ isShown && (
+							<Modal
+								focusOnMount="firstElement"
+								onRequestClose={ () => setIsShown( false ) }
+							>
+								<p>Modal content</p>
+								<a
+									href="https://wordpress.org"
+									data-testid="button-with-focus"
+								>
+									Button
+								</a>
+							</Modal>
+						) }
+					</>
+				);
+			};
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect( screen.getByTestId( 'button-with-focus' ) ).toHaveFocus();
+		} );
+	} );
 } );
