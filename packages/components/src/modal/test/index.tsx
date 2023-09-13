@@ -184,9 +184,13 @@ describe( 'Modal', () => {
 								<p>Modal content</p>
 								<a
 									href="https://wordpress.org"
-									data-testid="button-with-focus"
+									data-testid="first-focusable-element"
 								>
-									Button
+									First Focusable Element
+								</a>
+
+								<a href="https://wordpress.org">
+									Another Focusable Element
 								</a>
 							</Modal>
 						) }
@@ -199,7 +203,9 @@ describe( 'Modal', () => {
 
 			await user.click( opener );
 
-			expect( screen.getByTestId( 'button-with-focus' ) ).toHaveFocus();
+			expect(
+				screen.getByTestId( 'first-focusable-element' )
+			).toHaveFocus();
 
 			// Restore original HTMLElement prototype
 			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
