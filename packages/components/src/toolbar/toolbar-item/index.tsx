@@ -43,7 +43,9 @@ function ToolbarItem(
 		return children( allProps );
 	}
 
-	const render = isRenderProp ? children : Component && <Component />;
+	const render = isRenderProp
+		? children
+		: Component && <Component>{ children }</Component>;
 
 	return (
 		<BaseToolbarItem

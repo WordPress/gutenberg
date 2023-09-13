@@ -254,6 +254,7 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<>
 			<FormTokenField
+				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }

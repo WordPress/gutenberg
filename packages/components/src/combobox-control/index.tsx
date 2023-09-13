@@ -36,16 +36,18 @@ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props'
 
 const noop = () => {};
 
+interface DetectOutsideComponentProps {
+	onFocusOutside: ( event: React.FocusEvent ) => void;
+	children?: React.ReactNode;
+}
+
 const DetectOutside = withFocusOutside(
-	class extends Component {
-		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
-		handleFocusOutside( event ) {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+	class extends Component< DetectOutsideComponentProps > {
+		handleFocusOutside( event: React.FocusEvent ) {
 			this.props.onFocusOutside( event );
 		}
 
 		render() {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 			return this.props.children;
 		}
 	}

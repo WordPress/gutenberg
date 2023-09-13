@@ -70,9 +70,9 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'get_callback' => function( $object ) {
-					if ( ! empty( $object['wp_id'] ) ) {
-						$post = get_post( $object['wp_id'] );
+				'get_callback' => function ( $template_object ) {
+					if ( ! empty( $template_object['wp_id'] ) ) {
+						$post = get_post( $template_object['wp_id'] );
 						if ( $post && isset( $post->post_modified ) ) {
 							return mysql_to_rfc3339( $post->post_modified );
 						}
@@ -85,9 +85,9 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
 
-// If the Auto-inserting Blocks experiment is enabled, we load the block patterns
+// If the Block Hooks experiment is enabled, we load the block patterns
 // controller in lib/experimental/rest-api.php instead.
-if ( ! gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
+if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
 	/**
 	 * Registers the block patterns REST API routes.
 	 */

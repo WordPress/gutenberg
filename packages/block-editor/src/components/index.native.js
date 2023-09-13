@@ -38,13 +38,13 @@ export {
 } from './rich-text';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
+export { default as MediaUpload } from './media-upload';
 export {
-	default as MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
-} from './media-upload';
+} from './media-upload/constants';
 export {
 	default as MediaUploadProgress,
 	MEDIA_UPLOAD_STATE_UPLOADING,

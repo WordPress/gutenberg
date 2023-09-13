@@ -49,7 +49,7 @@ export default function SidebarNavigationScreenTemplates() {
 		<SidebarNavigationScreen
 			title={ __( 'Templates' ) }
 			description={ __(
-				'Express the layout of your site with templates'
+				'Express the layout of your site with templates.'
 			) }
 			actions={
 				canCreate && (

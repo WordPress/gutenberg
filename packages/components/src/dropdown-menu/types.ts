@@ -140,6 +140,22 @@ export type DropdownMenuProps = {
 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
 	 */
 	controls?: DropdownOption[] | DropdownOption[][];
+	/**
+	 * The controlled open state of the dropdown menu.
+	 * Must be used in conjunction with `onToggle`.
+	 */
+	open?: boolean;
+	/**
+	 * The open state of the dropdown menu when initially rendered.
+	 * Use when you do not need to control its open state. It will be overridden
+	 * by the `open` prop if it is specified on the component's first render.
+	 */
+	defaultOpen?: boolean;
+	/**
+	 * A callback invoked when the state of the dropdown menu changes
+	 * from open to closed and vice versa.
+	 */
+	onToggle?: ( willOpen: boolean ) => void;
 };
 
 export type DropdownMenuInternalContext = {

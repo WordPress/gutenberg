@@ -21,7 +21,6 @@ import {
 	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
@@ -33,13 +32,9 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<BlockList />
-					</WritingFlow>
-				</BlockTools>
-			</SlotFillProvider>
+			<BlockTools>
+				<BlockCanvas height="400px" />
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
@@ -116,6 +111,38 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
+### BlockCanvas
+
+BlockCanvas component is a component used to display the canvas of the block editor. What we call the canvas is an iframe containing the block list that you can manipulate. The component is also responsible of wiring up all the necessary hooks to enable the keyboard navigation across blocks in the editor and inject content styles into the iframe.
+
+_Usage_
+
+```jsx
+function MyBlockEditor() {
+	const [ blocks, updateBlocks ] = useState( [] );
+	return (
+		<BlockEditorProvider
+			value={ blocks }
+			onInput={ updateBlocks }
+			onChange={ persistBlocks }
+		>
+			<BlockCanvas height="400px" />
+		</BlockEditorProvider>
+	);
+}
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.height_ `string`: Canvas height, defaults to 300px.
+-   _props.styles_ `Array`: Content styles to inject into the iframe.
+-   _props.children_ `WPElement`: Content of the canvas, defaults to the BlockList component.
 
 _Returns_
 

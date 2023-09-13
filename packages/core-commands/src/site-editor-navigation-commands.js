@@ -10,7 +10,6 @@ import {
 	post,
 	page,
 	layout,
-	symbol,
 	symbolFilled,
 	styles,
 	navigation,
@@ -292,24 +291,6 @@ function useSiteEditorBasicNavigationCommands() {
 			callback: ( { close } ) => {
 				const args = {
 					path: '/wp_template',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-patterns',
-			label: __( 'Patterns' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
 				};
 				const targetUrl = addQueryArgs( 'site-editor.php', args );
 				if ( isSiteEditor ) {

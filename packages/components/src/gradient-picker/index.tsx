@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -40,7 +41,7 @@ function SingleOrigin( {
 	gradients,
 	onChange,
 	value,
-	actions,
+	...otherProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
 		return gradients.map( ( { gradient, name }, index ) => (
@@ -70,10 +71,10 @@ function SingleOrigin( {
 		) );
 	}, [ gradients, value, onChange, clearGradient ] );
 	return (
-		<CircularOptionPicker
+		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ gradientOptions }
-			actions={ actions }
+			{ ...otherProps }
 		/>
 	);
 }
@@ -84,15 +85,17 @@ function MultipleOrigin( {
 	gradients,
 	onChange,
 	value,
-	actions,
 	headingLevel,
 }: PickerProps< OriginObject > ) {
+	const instanceId = useInstanceId( MultipleOrigin );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
+				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel }>
+						<ColorHeading level={ headingLevel } id={ id }>
 							{ name }
 						</ColorHeading>
 						<SingleOrigin
@@ -102,9 +105,7 @@ function MultipleOrigin( {
 								onChange( gradient, index )
 							}
 							value={ value }
-							{ ...( gradients.length === index + 1
-								? { actions }
-								: {} ) }
+							aria-labelledby={ id }
 						/>
 					</VStack>
 				);
@@ -114,10 +115,35 @@ function MultipleOrigin( {
 }
 
 function Component( props: PickerProps< any > ) {
-	if ( isMultipleOriginArray( props.gradients ) ) {
-		return <MultipleOrigin { ...props } />;
+	const {
+		actions,
+		headingLevel,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		...otherProps
+	} = props;
+	const options = isMultipleOriginArray( props.gradients ) ? (
+		<MultipleOrigin headingLevel={ headingLevel } { ...otherProps } />
+	) : (
+		<SingleOrigin { ...otherProps } />
+	);
+
+	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+	if ( ariaLabel ) {
+		ariaProps = { 'aria-label': ariaLabel };
+	} else if ( ariaLabelledby ) {
+		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	} else {
+		ariaProps = { 'aria-label': __( 'Custom gradient picker.' ) };
 	}
-	return <SingleOrigin { ...props } />;
+
+	return (
+		<CircularOptionPicker
+			{ ...ariaProps }
+			actions={ actions }
+			options={ options }
+		/>
+	);
 }
 
 /**

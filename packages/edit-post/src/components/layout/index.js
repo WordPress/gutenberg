@@ -283,7 +283,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
-			<SettingsSidebar />
+
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
@@ -375,6 +375,7 @@ function Layout() {
 			<PostSyncStatusModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
+			<SettingsSidebar />
 		</>
 	);
 }
