@@ -74,12 +74,3 @@ global.nativeLoggingHook = nativeLoggingHook;
 
 // Use Server-Sent Events
 global.EventSource = EventSource;
-
-// Sooper dooper hacky.. this needs to be changed :) (maybe with a bridge method implementation)
-global.localStorage = ( () => {
-	const storageItems = new Map();
-	return {
-		getItem: ( key ) => storageItems.get( key ),
-		setItem: ( key, value ) => storageItems.set( key, value ),
-	};
-} )();
