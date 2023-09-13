@@ -62,10 +62,6 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * Handles a wp_ajax signaling server request.
 	 */
 	public static function do_wp_ajax_action() {
-		error_reporting( E_ALL );
-		ini_set( 'display_errors', '1' );
-		session_write_close();
-
 		static::initialize_paths();
 
 		if ( empty( $_REQUEST ) || empty( $_REQUEST['unique'] ) ) {
@@ -149,6 +145,9 @@ class Gutenberg_HTTP_Signaling_Server {
 		header( 'Cache-Control: no-cache' );
 		echo 'retry: 3000' . PHP_EOL;
 		$fd = fopen( static::$subscriber_to_messages_path, 'c+' );
+		if( ! $fd ) {
+			die( 'Could not open required file.' );
+		}
 		flock( $fd, LOCK_EX );
 		$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd );
 		if ( isset( $subscriber_to_messages[ static::$subscriber_id ] ) && count( $subscriber_to_messages[ static::$subscriber_id ] ) > 0 ) {
@@ -220,6 +219,9 @@ class Gutenberg_HTTP_Signaling_Server {
 	 */
 	private static function handle_message_operation( $message ) {
 		$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
+		if( ! $fd_topics_subscriber ) {
+			die( 'Could not open required file.' );
+		}
 		flock( $fd_topics_subscriber, LOCK_EX );
 		$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
 
@@ -232,6 +234,9 @@ class Gutenberg_HTTP_Signaling_Server {
 				break;
 			case 'publish':
 				$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+				if( ! $fd_subscriber_messages ) {
+					die( 'Could not open required file.' );
+				}
 				flock( $fd_subscriber_messages, LOCK_EX );
 				$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
 				$topic                  = $message['topic'];
@@ -251,6 +256,9 @@ class Gutenberg_HTTP_Signaling_Server {
 				break;
 			case 'ping':
 				$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+				if( ! $fd_subscriber_messages ) {
+					die( 'Could not open required file.' );
+				}
 				flock( $fd_subscriber_messages, LOCK_EX );
 				$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
 				if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
@@ -272,6 +280,9 @@ class Gutenberg_HTTP_Signaling_Server {
 	 */
 	private static function clean_up_old_connections() {
 		$fd_subscribers_last_connection = fopen( static::$subscribers_to_last_connection_path, 'c+' );
+		if( ! $fd_subscribers_last_connection ) {
+			die( 'Could not open required file.' );
+		}
 		flock( $fd_subscribers_last_connection, LOCK_EX );
 		$subscribers_to_last_connection_time                           = static::get_contents_from_file_descriptor( $fd_subscribers_last_connection );
 		$subscribers_to_last_connection_time[ static::$subscriber_id ] = time();
@@ -283,8 +294,13 @@ class Gutenberg_HTTP_Signaling_Server {
 				$needs_cleanup = true;
 			}
 		}
+		static::save_contents_to_file_descriptor( $fd_subscribers_last_connection, $subscribers_to_last_connection_time );
+
 		if ( $needs_cleanup ) {
 			$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+			if( ! $fd_subscriber_messages ) {
+				die( 'Could not open required file.' );
+			}
 			flock( $fd_subscriber_messages, LOCK_EX );
 			$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
 			foreach ( $subscriber_to_messages as $subscriber_id => $messages ) {
@@ -293,10 +309,11 @@ class Gutenberg_HTTP_Signaling_Server {
 				}
 			}
 			static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
-			flock( $fd_subscriber_messages, LOCK_UN );
-			fclose( $fd_subscriber_messages );
 
 			$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
+			if( ! $fd_topics_subscriber ) {
+				die( 'Could not open required file.' );
+			}
 			flock( $fd_topics_subscriber, LOCK_EX );
 			$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
 			foreach ( $topics_to_subscribers as $topic => $subscribers ) {
@@ -307,11 +324,14 @@ class Gutenberg_HTTP_Signaling_Server {
 				}
 			}
 			static::save_contents_to_file_descriptor( $fd_topics_subscriber, $topics_to_subscribers );
+
+			flock( $fd_subscriber_messages, LOCK_UN );
+			fclose( $fd_subscriber_messages );
+
 			flock( $fd_topics_subscriber, LOCK_UN );
 			fclose( $fd_topics_subscriber );
 		}
-
-		static::save_contents_to_file_descriptor( $fd_subscribers_last_connection, $subscribers_to_last_connection_time );
+		
 		flock( $fd_subscribers_last_connection, LOCK_UN );
 		fclose( $fd_subscribers_last_connection );
 	}
