@@ -50,9 +50,9 @@ export type DuotonePickerProps = {
 	 * Prevents keyboard interaction from wrapping around.
 	 * Only used when `asButtons` is not true.
 	 *
-	 * @default false
+	 * @default true
 	 */
-	disableLooping?: boolean;
+	loop?: boolean;
 } & (
 	| {
 			/**

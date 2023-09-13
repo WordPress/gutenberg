@@ -117,7 +117,7 @@ function MultipleOrigin( {
 function Component( props: PickerProps< any > ) {
 	const {
 		asButtons,
-		disableLooping,
+		loop,
 		actions,
 		headingLevel,
 		'aria-label': ariaLabel,
@@ -147,7 +147,7 @@ function Component( props: PickerProps< any > ) {
 		};
 	}
 
-	const metaProps = asButtons ? { asButtons } : { disableLooping };
+	const metaProps = asButtons ? { asButtons } : { loop };
 
 	return (
 		<CircularOptionPicker

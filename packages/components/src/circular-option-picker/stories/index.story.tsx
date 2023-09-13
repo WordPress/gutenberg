@@ -111,12 +111,21 @@ const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 );
 
 export const Default = Template.bind( {} );
-Default.args = { options: <DefaultOptions /> };
+Default.args = {
+	'aria-label': 'Circular Option Picker',
+	options: <DefaultOptions />,
+};
 
 export const AsButtons = Template.bind( {} );
 AsButtons.args = {
 	...Default.args,
 	asButtons: true,
+};
+
+export const WithLoopingDisabled = Template.bind( {} );
+WithLoopingDisabled.args = {
+	...Default.args,
+	loop: false,
 };
 
 export const WithButtonAction = Template.bind( {} );

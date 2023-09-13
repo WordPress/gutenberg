@@ -51,14 +51,14 @@ type CommonCircularOptionPickerProps = {
 
 export type ListboxCircularOptionPickerProps =
 	CommonCircularOptionPickerProps & {
-		asButtons: false | undefined;
+		asButtons?: false;
 		/**
 		 * Prevents keyboard interaction from wrapping around.
 		 * Only used when `asButtons` is not true.
 		 *
-		 * @default false
+		 * @default true
 		 */
-		disableLooping?: boolean;
+		loop?: boolean;
 	} & (
 			| {
 					'aria-label': string;

@@ -69,7 +69,7 @@ describe( 'CircularOptionPicker', () => {
 		} );
 	} );
 
-	describe( 'when `disableLooping` is not set', () => {
+	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
 			const user = userEvent.setup();
 
@@ -89,7 +89,7 @@ describe( 'CircularOptionPicker', () => {
 		} );
 	} );
 
-	describe( 'when `disableLooping` is false', () => {
+	describe( 'when `loop` is true', () => {
 		it( 'should loop', async () => {
 			const user = userEvent.setup();
 
@@ -97,7 +97,7 @@ describe( 'CircularOptionPicker', () => {
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
-					disableLooping={ false }
+					loop={ true }
 				/>
 			);
 
@@ -110,14 +110,14 @@ describe( 'CircularOptionPicker', () => {
 		} );
 	} );
 
-	describe( 'when `disableLooping` is true', () => {
+	describe( 'when `loop` is false', () => {
 		it( 'should not loop', async () => {
 			const user = userEvent.setup();
 
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
-					disableLooping={ true }
+					loop={ false }
 					options={ MULTIPLE_OPTIONS }
 				/>
 			);

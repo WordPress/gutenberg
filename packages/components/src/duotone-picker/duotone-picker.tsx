@@ -56,7 +56,7 @@ import type { DuotonePickerProps } from './types';
  */
 function DuotonePicker( {
 	asButtons,
-	disableLooping,
+	loop,
 	clearable = true,
 	unsetable = true,
 	colorPalette,
@@ -141,7 +141,7 @@ function DuotonePicker( {
 		};
 	}
 
-	const metaProps = asButtons ? { asButtons } : { disableLooping };
+	const metaProps = asButtons ? { asButtons } : { loop };
 
 	return (
 		<CircularOptionPicker

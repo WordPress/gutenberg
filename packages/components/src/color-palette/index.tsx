@@ -179,7 +179,7 @@ function UnforwardedColorPalette(
 ) {
 	const {
 		asButtons,
-		disableLooping,
+		loop,
 		clearable = true,
 		colors = [],
 		disableCustomColors = false,
@@ -267,7 +267,7 @@ function UnforwardedColorPalette(
 		};
 	}
 
-	const metaProps = asButtons ? { asButtons } : { disableLooping };
+	const metaProps = asButtons ? { asButtons } : { loop };
 
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>

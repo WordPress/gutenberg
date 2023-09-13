@@ -79,10 +79,9 @@ function ListboxCircularOptionPicker(
 		'asButtons' | 'actions' | 'options'
 	>
 ) {
-	const { id, disableLooping, children, ...additionalProps } = props;
+	const { id, loop = true, children, ...additionalProps } = props;
 	const baseId = useInstanceId( CircularOptionPicker, 'option-picker', id );
 	const rtl = isRTL();
-	const loop = ! disableLooping;
 
 	const compositeState = useCompositeState( { baseId, loop, rtl } );
 

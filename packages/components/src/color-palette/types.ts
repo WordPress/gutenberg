@@ -93,9 +93,9 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * Prevents keyboard interaction from wrapping around.
 	 * Only used when `asButtons` is not true.
 	 *
-	 * @default false
+	 * @default true
 	 */
-	disableLooping?: boolean;
+	loop?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
