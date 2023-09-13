@@ -53,7 +53,7 @@ jobs:
               run: |
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email bangank36@gmail.com
-            - name: Check for modified files in docs/
+            - name: Rebuild docs manifest
               id: docs-manifest-check
               run: |
                   git branch
@@ -61,13 +61,15 @@ jobs:
                   npm run docs:build
                   echo ::set-output name=modified::$(if [ -n "$(git status --porcelain docs/manifest.json)" ]; then echo "true"; else echo "false"; fi)
                   git status
-            - name: Rebuild docs manifest
+
+            - name: Commit docs manifest changes
               if: steps.docs-manifest-check.outputs.modified == 'true'
               run: |
                   git branch
                   git add docs/manifest.json
                   git commit -m "github-actions: Update docs manifest"
                   git push origin ${{ github.head_ref }}
+
             - name: Lint JavaScript and Styles
               run: npm run lint
 
