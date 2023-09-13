@@ -10,17 +10,17 @@ Let's discover how to use the **Gutenberg Block Editor** to build your own block
 ## What you'll need
 
 - [Node.js](https://nodejs.org/en/download/) version 16.14 or above.
-- We're going to be using "vite" to setup our SPA that contains a block editor. You can use your own setup, and your own application for this.
+- We're going to be using "vite" to setup our single page application (SPA) that contains a block editor. You can use your own setup, and your own application for this.
 
 ## Preparing the SPA powered by Vite.
 
 First bootstrap a vite project using `npm create vite@latest` and pick `Vanilla` variant and `JavaScript` as a language.
 
-Once done, you should be able to navigate to your application folder and run it locally using `npm run dev` and opening the displayed local URL in the browser.
+Once done, you can navigate to your application folder and run it locally using `npm run dev`. Open the displayed local URL in a browser.
 
 ## Installing dependencies
 
-To build a block editor, you need to install the following dependencies
+To build a block editor, you need to install the following dependencies:
 
  - `@wordpress/block-editor`
  - `@wordpress/element`
@@ -29,7 +29,7 @@ To build a block editor, you need to install the following dependencies
 
 ## Setup vite to use JSX and @wordpress/element as a pragma
 
-We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling properly to be able to do so.
+We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling.
 
 If you're using vite, you can create a `vite.config.js` file at the root of your application and paste the following content:
 
@@ -65,7 +65,7 @@ root.render(<h1>Hello, world</h1>);
 ```
  - Update the script file in your `index.html` to `index.jsx` instead of `main.js`.
 
-After restarting your local build (aka `npm run dev`), you should see the Hello world heading appearing in your browser.
+After restarting your local build (aka `npm run dev`), you should see the **"Hello, world"** heading appearing in your browser.
 
 ## Bootstrap your block editor
 
@@ -118,4 +118,4 @@ const root = createRoot(document.getElementById("app"));
 root.render(<Editor />);
 ```
 
-That's it, you now have a very basic block editor with several block types included by default: paragraphs, headings, lists, quotes, images...
+That's it! You now have a very basic block editor with several block types included by default: paragraphs, headings, lists, quotes, images...
