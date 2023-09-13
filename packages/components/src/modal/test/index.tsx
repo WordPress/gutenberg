@@ -131,67 +131,27 @@ describe( 'Modal', () => {
 	} );
 
 	describe( 'Focus handling', () => {
-		let originalOffsetWidth: PropertyDescriptor | undefined;
-		let originalOffsetHeight: PropertyDescriptor | undefined;
-		let originalGetClientRects: PropertyDescriptor | undefined;
+		let originalGetClientRects: () => DOMRectList;
 
 		beforeEach( () => {
 			/**
 			 * The test environment does not have a layout engine, so we need to mock
-			 * the offsetWidth, offsetHeight and getClientRects methods to return a
-			 * value that is not 0. This ensures that the focusable elements can be
+			 * the getClientRects method. This ensures that the focusable elements can be
 			 * found by the `focusOnMount` logic which depends on layout information
 			 * to determine if the element is visible or not.
 			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
 			 */
-			originalOffsetWidth = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetWidth'
-			);
-
-			originalOffsetHeight = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'offsetHeight'
-			);
-
-			originalGetClientRects = Object.getOwnPropertyDescriptor(
-				HTMLElement.prototype,
-				'getClientRects'
-			);
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
-				configurable: true,
-				value: 100,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
-				configurable: true,
-				value: 100,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
-				configurable: true,
-				value: () => [ 1, 2, 3 ],
-			} );
+			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+			window.HTMLElement.prototype.getClientRects = function () {
+				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+			};
 		} );
 
 		afterEach( () => {
 			// Restore original HTMLElement prototype.
 			// See beforeEach for details.
-			Object.defineProperty( HTMLElement.prototype, 'offsetWidth', {
-				configurable: true,
-				value: originalOffsetWidth,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'offsetHeight', {
-				configurable: true,
-				value: originalOffsetHeight,
-			} );
-
-			Object.defineProperty( HTMLElement.prototype, 'getClientRects', {
-				configurable: true,
-				value: originalGetClientRects,
-			} );
+			window.HTMLElement.prototype.getClientRects =
+				originalGetClientRects;
 		} );
 
 		it( 'should focus the first focusable element in the contents (if found) when `firstElement` passed as value for `focusOnMount` prop', async () => {
