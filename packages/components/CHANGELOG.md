@@ -2,7 +2,6 @@
 
 ## Unreleased
 -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
--   `ProgressBar`: Export component to allow it to be used ([#54404](https://github.com/WordPress/gutenberg/pull/54404)).
 
 ### Enhancements
 
