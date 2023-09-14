@@ -32,7 +32,16 @@ test.describe( 'Block moving mode', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second Paragraph' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			},
+		] );
 	} );
 
 	test( 'can move block in the nested block', async ( { editor, page } ) => {
@@ -76,7 +85,34 @@ test.describe( 'Block moving mode', () => {
 		await page.keyboard.press( 'ArrowDown' ); // Move down in the second group block.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Second Paragraph' },
+					},
+				],
+			},
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Third Paragraph' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'First Paragraph' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Fourth Paragraph' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'can not move inside its own block', async ( { editor, page } ) => {
