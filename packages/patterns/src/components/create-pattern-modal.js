@@ -98,6 +98,7 @@ export default function CreatePatternModal( {
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
+						className="patterns-create-modal__name-input"
 					/>
 					<CategorySelector
 						onCategorySelection={ handleCategorySelection }
