@@ -49,4 +49,4 @@ function enqueue_test_meta_attribute_block() {
 		true
 	);
 }
-add_action( 'enqueue_block_assets', 'enqueue_test_meta_attribute_block' );
+add_action( 'enqueue_block_editor_assets', 'enqueue_test_meta_attribute_block' );
