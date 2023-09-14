@@ -67,10 +67,16 @@ export default function TemplateActions( {
 				}
 			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				template.type === 'wp_template'
+					? __( 'An error occurred while reverting the template.' )
+					: __(
+							'An error occurred while reverting the template part.'
+					  );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while reverting the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}

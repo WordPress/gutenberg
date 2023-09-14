@@ -265,7 +265,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/file
 -	**Category:** media
--	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding)
+-	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), interactivity, spacing (margin, padding)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Footnotes
@@ -420,7 +420,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), inserter, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
 
 ## Custom Link
@@ -562,7 +562,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 -	**Name:** core/post-content
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
 ## Date
@@ -758,7 +758,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/search
 -	**Category:** widgets
--	**Supports:** align (center, left, right), color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (center, left, right), color (background, gradients, text), interactivity, typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** buttonBehavior, buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator

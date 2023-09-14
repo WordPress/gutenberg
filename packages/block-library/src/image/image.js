@@ -379,6 +379,54 @@ export default function Image( {
 		( ! lightbox && lightboxSetting === true ) ||
 		( ! lightbox && lightboxSetting?.enabled );
 
+	const dimensionsControl = (
+		<DimensionsTool
+			value={ { width, height, scale, aspectRatio } }
+			onChange={ ( {
+				width: newWidth,
+				height: newHeight,
+				scale: newScale,
+				aspectRatio: newAspectRatio,
+			} ) => {
+				// Rebuilding the object forces setting `undefined`
+				// for values that are removed since setAttributes
+				// doesn't do anything with keys that aren't set.
+				setAttributes( {
+					// CSS includes `height: auto`, but we need
+					// `width: auto` to fix the aspect ratio when
+					// only height is set due to the width and
+					// height attributes set via the server.
+					width: ! newWidth && newHeight ? 'auto' : newWidth,
+					height: newHeight,
+					scale: newScale,
+					aspectRatio: newAspectRatio,
+				} );
+			} }
+			defaultScale="cover"
+			defaultAspectRatio="auto"
+			scaleOptions={ scaleOptions }
+			unitsOptions={ dimensionsUnitsOptions }
+		/>
+	);
+
+	const resetAll = () => {
+		setAttributes( {
+			width: undefined,
+			height: undefined,
+			scale: undefined,
+			aspectRatio: undefined,
+			lightbox: undefined,
+		} );
+	};
+
+	const sizeControls = (
+		<InspectorControls>
+			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				{ isResizable && dimensionsControl }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -457,18 +505,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () =>
-						setAttributes( {
-							width: undefined,
-							height: undefined,
-							scale: undefined,
-							aspectRatio: undefined,
-							lightbox: undefined,
-						} )
-					}
-				>
+				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -497,38 +534,7 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable && (
-						<DimensionsTool
-							value={ { width, height, scale, aspectRatio } }
-							onChange={ ( {
-								width: newWidth,
-								height: newHeight,
-								scale: newScale,
-								aspectRatio: newAspectRatio,
-							} ) => {
-								// Rebuilding the object forces setting `undefined`
-								// for values that are removed since setAttributes
-								// doesn't do anything with keys that aren't set.
-								setAttributes( {
-									// CSS includes `height: auto`, but we need
-									// `width: auto` to fix the aspect ratio when
-									// only height is set due to the width and
-									// height attributes set via the server.
-									width:
-										! newWidth && newHeight
-											? 'auto'
-											: newWidth,
-									height: newHeight,
-									scale: newScale,
-									aspectRatio: newAspectRatio,
-								} );
-							} }
-							defaultScale="cover"
-							defaultAspectRatio="auto"
-							scaleOptions={ scaleOptions }
-							unitsOptions={ dimensionsUnitsOptions }
-						/>
-					) }
+					{ isResizable && dimensionsControl }
 					<ResolutionTool
 						value={ sizeSlug }
 						onChange={ updateImage }
@@ -759,6 +765,10 @@ export default function Image( {
 				{ img }
 			</ResizableBox>
 		);
+	}
+
+	if ( ! url && ! temporaryURL ) {
+		return sizeControls;
 	}
 
 	return (

@@ -8,6 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -138,6 +139,7 @@ export function FlatTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
@@ -204,12 +206,18 @@ export function FlatTermSelector( { slug } ) {
 			newTermNames.map( ( termName ) =>
 				findOrCreateTerm( { name: termName } )
 			)
-		).then( ( newTerms ) => {
-			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms )
-			);
-		} );
+		)
+			.then( ( newTerms ) => {
+				const newAvailableTerms = availableTerms.concat( newTerms );
+				return onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms )
+				);
+			} )
+			.catch( ( error ) => {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+			} );
 	}
 
 	function appendTerm( newTerm ) {
@@ -254,6 +262,7 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<>
 			<FormTokenField
+				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }

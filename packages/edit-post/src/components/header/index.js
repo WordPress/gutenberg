@@ -22,11 +22,13 @@ import DocumentActions from './document-actions';
 
 const slideY = {
 	hidden: { y: '-50px' },
+	distractionFreeInactive: { y: 0 },
 	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
 const slideX = {
 	hidden: { x: '-100%' },
+	distractionFreeInactive: { x: 0 },
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 

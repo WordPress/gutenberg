@@ -245,19 +245,20 @@ export const __unstableGetClientIdsTree = createSelector(
  * given. Returned ids are ordered first by the order of the ids given, then
  * by the order that they appear in the editor.
  *
- * @param {Object} state     Global application state.
- * @param {Array}  clientIds Array of blocks to inspect.
+ * @param {Object}          state     Global application state.
+ * @param {string|string[]} clientIds Client ID(s) for which descendant blocks are to be returned.
  *
- * @return {Array} ids of descendants.
+ * @return {Array} Client IDs of descendants.
  */
 export const getClientIdsOfDescendants = createSelector(
 	( state, clientIds ) => {
+		const givenIds = Array.isArray( clientIds ) ? clientIds : [ clientIds ];
 		const collectedIds = [];
-		for ( const givenId of clientIds ) {
+		for ( const givenId of givenIds ) {
 			for ( const descendantId of getBlockOrder( state, givenId ) ) {
 				collectedIds.push(
 					descendantId,
-					...getClientIdsOfDescendants( state, [ descendantId ] )
+					...getClientIdsOfDescendants( state, descendantId )
 				);
 			}
 		}
@@ -281,7 +282,7 @@ export const getClientIdsWithDescendants = createSelector(
 		for ( const topLevelId of getBlockOrder( state ) ) {
 			collectedIds.push(
 				topLevelId,
-				...getClientIdsOfDescendants( state, [ topLevelId ] )
+				...getClientIdsOfDescendants( state, topLevelId )
 			);
 		}
 		return collectedIds;

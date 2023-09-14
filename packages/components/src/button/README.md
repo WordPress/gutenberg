@@ -145,12 +145,6 @@ Whether the button is disabled. If `true`, this will force a `button` element to
 
 -   Required: No
 
-#### `focus`: `boolean`
-
-Whether the button is focused.
-
--   Required: No
-
 #### `href`: `string`
 
 If provided, renders `a` instead of `button`.

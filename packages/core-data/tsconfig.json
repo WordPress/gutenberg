@@ -19,6 +19,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../private-apis" },
 		{ "path": "../sync" },
+		{ "path": "../undo-manager" },
 		{ "path": "../url" }
 	],
 	"include": [ "src/**/*" ]

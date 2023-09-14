@@ -25,6 +25,7 @@ function Tooltip( props: TooltipProps ) {
 	const {
 		children,
 		delay = TOOLTIP_DELAY,
+		hideOnClick = true,
 		position = 'bottom',
 		shortcut,
 		text,
@@ -49,17 +50,19 @@ function Tooltip( props: TooltipProps ) {
 		timeout: delay,
 	} );
 
+	const isTooltipOpen = tooltipStore.useState( 'open' );
+
 	return (
 		<>
 			<Ariakit.TooltipAnchor
 				onBlur={ tooltipStore.hide }
-				onClick={ tooltipStore.hide }
+				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
-			{ isOnlyChild && ( text || shortcut ) && (
+			{ isOnlyChild && ( text || shortcut ) && isTooltipOpen && (
 				<Ariakit.Tooltip
 					className="components-tooltip"
 					gutter={ 4 }
