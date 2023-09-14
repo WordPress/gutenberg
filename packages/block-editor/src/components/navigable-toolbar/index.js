@@ -9,9 +9,16 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { ESCAPE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -94,7 +101,8 @@ function useToolbarFocus(
 	isAccessibleToolbar,
 	defaultIndex,
 	onIndexChange,
-	shouldUseKeyboardFocusShortcut
+	shouldUseKeyboardFocusShortcut,
+	focusEditorOnEscape = true
 ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
@@ -151,6 +159,39 @@ function useToolbarFocus(
 			onIndexChange( index );
 		};
 	}, [ initialIndex, initialFocusOnMount ] );
+
+	const { lastFocus } = useSelect( ( select ) => {
+		const { getLastFocus } = select( blockEditorStore );
+		return {
+			lastFocus: getLastFocus(),
+		};
+	}, [] );
+
+	/**
+	 * Handles returning focus to the block editor canvas when pressing escape.
+	 */
+	useEffect( () => {
+		const navigableToolbarRef = ref.current;
+
+		if ( focusEditorOnEscape ) {
+			const handleKeyDown = ( event ) => {
+				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
+					// Focus the last focused element when pressing escape.
+					event.preventDefault();
+					lastFocus.current.focus();
+				}
+			};
+
+			navigableToolbarRef.addEventListener( 'keydown', handleKeyDown );
+
+			return () => {
+				navigableToolbarRef.removeEventListener(
+					'keydown',
+					handleKeyDown
+				);
+			};
+		}
+	}, [ focusEditorOnEscape, lastFocus ] );
 }
 
 function NavigableToolbar( {
