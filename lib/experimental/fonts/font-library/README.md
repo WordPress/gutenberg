@@ -86,81 +86,6 @@ Let's say you want to install a font family using font files you are providing i
 }
 ```
 
-
-### Create a plugin to provide my font collection
-
-Creating a plugin to provide a font collection can be as simple as this:
-
-```php
-
-<?php
-/*
-Plugin Name: My Font Collection
-Plugin URI: https://your-website.com/
-Description: Add a font collection to your WordPress Font Library.
-Version: 1.0
-Author: Your Name
-Author URI: https://your-website.com/
-License: GPLv2 or later
-Text Domain: my-font-collection
-*/
-
-$my_config = array (
-    'id'             => 'my-font-collection',
-    'name'           => 'My Font Collection',
-    'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-    'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
-);
-
-if ( function_exists( 'wp_register_font_collection' ) ) {
-    wp_register_font_collection ( $my_config );
-}
-
-?>
-
-```
-
-### API endpoints
-
-#### Install font families
-Install a font family is to save a font definition in WordPress and make it available to be activated and used by the user.
-
-Save a font family may or may not include storing the font files assets localy to disk in `/wp-content/fonts` folder. That depends on how the font family sent to this endpoint is defined.
-
-```
-POST /wp-json/wp/v2/fonts
-```
-
-Example:
-
-#### Uninstall font families
-Uninstall a font family is to remove the font definition from WordPress and make it unavailable for users to activate and save.
-
-If the font family being uninstalled is using local font file assets, those files will be removed from the `/wp-content/fonts` folder.
-
-```
-DELETE /wp-json/wp/v2/fonts
-```
-
-Example:
-
-#### Get font collections
-Gets the list of fonts collections available.
-
-```
-GET /wp-json/wp/v2/fonts/collections
-```
-
-Example:
-
-#### Get a font collection
-Get a particular font collection and its data.
-```
-GET /wp-json/wp/v2/fonts/collections/<id>
-```
-
-Example:
-
 ### Extensibility
 Font Library is able to manage different font collections. A font collection is simply a list of font families ready to be installed by the user. Extenders can provide multiple typographic collections.
 
@@ -246,3 +171,78 @@ Example of a data JSON file providing 2 font families with 2 font faces each and
   ]
 }
 ```
+
+### Create a plugin to provide my font collection
+
+Creating a plugin to provide a font collection can be as simple as this:
+
+```php
+
+<?php
+/*
+Plugin Name: My Font Collection
+Plugin URI: https://your-website.com/
+Description: Add a font collection to your WordPress Font Library.
+Version: 1.0
+Author: Your Name
+Author URI: https://your-website.com/
+License: GPLv2 or later
+Text Domain: my-font-collection
+*/
+
+$my_config = array (
+    'id'             => 'my-font-collection',
+    'name'           => 'My Font Collection',
+    'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
+    'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
+);
+
+if ( function_exists( 'wp_register_font_collection' ) ) {
+    wp_register_font_collection ( $my_config );
+}
+
+?>
+
+```
+
+### API endpoints
+
+#### Install font families
+Install a font family is to save a font definition in WordPress and make it available to be activated and used by the user.
+
+Save a font family may or may not include storing the font files assets localy to disk in `/wp-content/fonts` folder. That depends on how the font family sent to this endpoint is defined.
+
+```
+POST /wp-json/wp/v2/fonts
+```
+
+Example:
+
+#### Uninstall font families
+Uninstall a font family is to remove the font definition from WordPress and make it unavailable for users to activate and save.
+
+If the font family being uninstalled is using local font file assets, those files will be removed from the `/wp-content/fonts` folder.
+
+```
+DELETE /wp-json/wp/v2/fonts
+```
+
+Example:
+
+#### Get font collections
+Gets the list of fonts collections available.
+
+```
+GET /wp-json/wp/v2/fonts/collections
+```
+
+Example:
+
+#### Get a font collection
+Get a particular font collection and its data.
+```
+GET /wp-json/wp/v2/fonts/collections/<id>
+```
+
+Example:
+
