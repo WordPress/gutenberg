@@ -46,6 +46,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
+	// This variable is a constant and its value is always false at this moment.
+	// It is defined this way because some values depend on it, in case it changes in the future.
+	$open_by_default = 'false';
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
@@ -77,6 +80,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
 		if ( $is_expandable_searchfield ) {
+			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.core.search.isSearchInputVisible' );
+			$input->set_attribute( 'data-wp-bind--tabindex', 'selectors.core.search.tabindex' );
+			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
 		}
@@ -139,11 +145,16 @@ function render_block_core_search( $attributes, $content, $block ) {
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
+				$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
+				$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
+				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.core.search.isSearchInputVisible' );
+				$button->set_attribute( 'data-wp-bind--type', 'selectors.core.search.type' );
+				$button->set_attribute( 'data-wp-on--click', 'actions.core.search.openSearchInput' );
+				// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 				$button->set_attribute( 'aria-label', __( 'Expand search field' ) );
-				$button->set_attribute( 'data-toggled-aria-label', __( 'Submit Search' ) );
 				$button->set_attribute( 'aria-controls', 'wp-block-search__input-' . $input_id );
 				$button->set_attribute( 'aria-expanded', 'false' );
-				$button->set_attribute( 'type', 'button' ); // Will be set to submit after clicking.
+				$button->set_attribute( 'type', 'button' );
 			} else {
 				$button->set_attribute( 'aria-label', wp_strip_all_tags( $attributes['buttonText'] ) );
 			}
@@ -160,11 +171,24 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$wrapper_attributes   = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
 	);
+	$form_directives      = '';
+	if ( $is_expandable_searchfield ) {
+		$aria_label_expanded  = __( 'Submit Search' );
+		$aria_label_collapsed = __( 'Expand search field' );
+		$form_directives      = '
+			data-wp-interactive
+			data-wp-context=\'{ "core": { "search": { "isSearchInputVisible": ' . $open_by_default . ', "inputId": "' . $input_id . '", "ariaLabelExpanded": "' . $aria_label_expanded . '", "ariaLabelCollapsed": "' . $aria_label_collapsed . '" } } }\'
+			data-wp-class--wp-block-search__searchfield-hidden="!context.core.search.isSearchInputVisible"
+			data-wp-on--keydown="actions.core.search.handleSearchKeydown"
+			data-wp-on--focusout="actions.core.search.handleSearchFocusout"
+		';
+	}
 
 	return sprintf(
-		'<form role="search" method="get" action="%s" %s>%s</form>',
+		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
+		$form_directives,
 		$label . $field_markup
 	);
 }

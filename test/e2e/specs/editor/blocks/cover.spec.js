@@ -34,7 +34,7 @@ test.describe( 'Cover', () => {
 		} );
 
 		// Locate the Black color swatch.
-		const blackColorSwatch = coverBlock.getByRole( 'button', {
+		const blackColorSwatch = coverBlock.getByRole( 'option', {
 			name: 'Color: Black',
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
@@ -112,7 +112,7 @@ test.describe( 'Cover', () => {
 		// Choose a color swatch to transform the placeholder block into
 		// a functioning block.
 		await coverBlock
-			.getByRole( 'button', {
+			.getByRole( 'option', {
 				name: 'Color: Black',
 			} )
 			.click();
@@ -135,7 +135,7 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 		await coverBlock
-			.getByRole( 'button', {
+			.getByRole( 'option', {
 				name: 'Color: Black',
 			} )
 			.click();

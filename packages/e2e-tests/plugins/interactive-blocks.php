@@ -9,7 +9,7 @@
 
 add_action(
 	'init',
-	function() {
+	function () {
 		// Register all blocks found in the `interactive-blocks` folder.
 		if ( file_exists( __DIR__ . '/interactive-blocks/' ) ) {
 			$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
@@ -30,8 +30,8 @@ add_action(
 				);
 
 				register_block_type_from_metadata( $block_folder );
-			};
-		};
+			}
+		}
 
 		// Temporary fix to disable SSR of directives during E2E testing. This
 		// is required at this moment, as SSR for directives is not stabilized
@@ -43,6 +43,5 @@ add_action(
 				'gutenberg_interactivity_process_directives_in_root_blocks'
 			);
 		}
-
 	}
 );

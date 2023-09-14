@@ -19,19 +19,19 @@ class Tests_Fonts_WpRegisterFontProvider extends WP_Fonts_TestCase {
 	 * @dataProvider data_register_providers
 	 *
 	 * @param string $provider_id Provider ID.
-	 * @param string $class       Provider class name.
+	 * @param string $class_name  Provider class name.
 	 */
-	public function test_should_register_provider( $provider_id, $class ) {
+	public function test_should_register_provider( $provider_id, $class_name ) {
 		$mock = $this->set_up_mock( 'register_provider' );
 		$mock->expects( $this->once() )
 			->method( 'register_provider' )
 			->with(
 				$this->identicalTo( $provider_id ),
-				$this->identicalTo( $class )
+				$this->identicalTo( $class_name )
 			)
 			->will( $this->returnValue( true ) );
 
-		$this->assertTrue( wp_register_font_provider( $provider_id, $class ), 'wp_register_font_provider() should return true' );
+		$this->assertTrue( wp_register_font_provider( $provider_id, $class_name ), 'wp_register_font_provider() should return true' );
 	}
 
 	/**
@@ -56,20 +56,19 @@ class Tests_Fonts_WpRegisterFontProvider extends WP_Fonts_TestCase {
 	 * @dataProvider data_invalid_providers
 	 *
 	 * @param string $provider_id Provider ID.
-	 * @param string $class       Provider class name.
+	 * @param string $class_name  Provider class name.
 	 */
-	public function test_should_not_register( $provider_id, $class ) {
+	public function test_should_not_register( $provider_id, $class_name ) {
 		$mock = $this->set_up_mock( 'register_provider' );
 		$mock->expects( $this->once() )
 			->method( 'register_provider' )
 			->with(
 				$this->identicalTo( $provider_id ),
-				$this->identicalTo( $class )
+				$this->identicalTo( $class_name )
 			)
 			->will( $this->returnValue( false ) );
 
-		$this->assertFalse( wp_register_font_provider( $provider_id, $class ), 'wp_register_font_provider() should return false' );
-
+		$this->assertFalse( wp_register_font_provider( $provider_id, $class_name ), 'wp_register_font_provider() should return false' );
 	}
 
 	/**

@@ -12,7 +12,6 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 // eslint-disable-next-line no-unused-vars
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -154,24 +153,22 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	}
 
 	return (
-		<ShortcutProvider>
-			<SlotFillProvider>
-				<ExperimentalEditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					__unstableTemplate={ isTemplateMode ? template : undefined }
-					{ ...props }
-				>
-					<ErrorBoundary>
-						<EditorInitialization postId={ postId } />
-						<Layout />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</ExperimentalEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<SlotFillProvider>
+			<ExperimentalEditorProvider
+				settings={ editorSettings }
+				post={ post }
+				initialEdits={ initialEdits }
+				useSubRegistry={ false }
+				__unstableTemplate={ isTemplateMode ? template : undefined }
+				{ ...props }
+			>
+				<ErrorBoundary>
+					<EditorInitialization postId={ postId } />
+					<Layout />
+				</ErrorBoundary>
+				<PostLockedModal />
+			</ExperimentalEditorProvider>
+		</SlotFillProvider>
 	);
 }
 

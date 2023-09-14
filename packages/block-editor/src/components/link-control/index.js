@@ -14,6 +14,7 @@ import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -355,6 +356,7 @@ function LinkControl( {
 						className={ classnames( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
+							'has-actions': showActions,
 						} ) }
 					>
 						{ showTextControl && (
@@ -388,6 +390,17 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 						/>
+						{ ! showActions && (
+							<div className="block-editor-link-control__search-enter">
+								<Button
+									onClick={ isDisabled ? noop : handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									aria-disabled={ isDisabled }
+								/>
+							</div>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -422,11 +435,7 @@ function LinkControl( {
 									settings={ settings?.filter(
 										( { id } ) => id === 'opensInNewTab'
 									) }
-									onChange={ ( { opensInNewTab } ) => {
-										onChange( {
-											opensInNewTab,
-										} );
-									} }
+									onChange={ onChange }
 								/>
 							);
 						}
@@ -479,5 +488,6 @@ function LinkControl( {
 }
 
 LinkControl.ViewerFill = ViewerFill;
+LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
 export default LinkControl;

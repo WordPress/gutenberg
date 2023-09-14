@@ -8,5 +8,12 @@
 			"wideSize": "1100px"
 		}
 	},
+	"customTemplates": [
+		{
+			"name": "custom-template",
+			"title": "Custom",
+			"postTypes": [ "post" ]
+		}
+	],
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

@@ -42,7 +42,7 @@ test.describe( 'Style Book', () => {
 		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="View"i]' )
-		).not.toBeVisible();
+		).toBeDisabled();
 	} );
 
 	test( 'should have tabs containing block examples', async ( { page } ) => {

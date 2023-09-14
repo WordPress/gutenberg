@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -391,20 +392,29 @@ export const editEntityRecord =
 				edit.edits
 			);
 		} else {
+			if ( ! options.undoIgnore ) {
+				select.getUndoManager().addRecord(
+					[
+						{
+							id: { kind, name, recordId },
+							changes: Object.keys( edits ).reduce(
+								( acc, key ) => {
+									acc[ key ] = {
+										from: editedRecord[ key ],
+										to: edits[ key ],
+									};
+									return acc;
+								},
+								{}
+							),
+						},
+					],
+					options.isCached
+				);
+			}
 			dispatch( {
 				type: 'EDIT_ENTITY_RECORD',
 				...edit,
-				meta: {
-					undo: ! options.undoIgnore && {
-						...edit,
-						// Send the current values for things like the first undo stack entry.
-						edits: Object.keys( edits ).reduce( ( acc, key ) => {
-							acc[ key ] = editedRecord[ key ];
-							return acc;
-						}, {} ),
-						isCached: options.isCached,
-					},
-				},
 			} );
 		}
 	};
@@ -416,13 +426,14 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoEdits();
+		const undoEdit = select.getUndoManager().getUndoRecord();
 		if ( ! undoEdit ) {
 			return;
 		}
+		select.getUndoManager().undo();
 		dispatch( {
 			type: 'UNDO',
-			stackedEdits: undoEdit,
+			record: undoEdit,
 		} );
 	};
 
@@ -433,13 +444,14 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getRedoEdits();
+		const redoEdit = select.getUndoManager().getRedoRecord();
 		if ( ! redoEdit ) {
 			return;
 		}
+		select.getUndoManager().redo();
 		dispatch( {
 			type: 'REDO',
-			stackedEdits: redoEdit,
+			record: redoEdit,
 		} );
 	};
 
@@ -448,9 +460,11 @@ export const redo =
  *
  * @return {Object} Action object.
  */
-export function __unstableCreateUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
-}
+export const __unstableCreateUndoLevel =
+	() =>
+	( { select } ) => {
+		select.getUndoManager().addRecord();
+	};
 
 /**
  * Action triggered to save an entity record.
@@ -779,7 +793,7 @@ export const saveEditedEntityRecord =
  * @param {string} kind        Kind of the entity.
  * @param {string} name        Name of the entity.
  * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
  * @param {Object} options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
@@ -794,10 +808,9 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			recordId
 		);
 		const editsToSave = {};
-		for ( const edit in edits ) {
-			if ( itemsToSave.some( ( item ) => item === edit ) ) {
-				editsToSave[ edit ] = edits[ edit ];
-			}
+
+		for ( const item of itemsToSave ) {
+			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
@@ -814,7 +827,6 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		if ( recordId ) {
 			editsToSave[ entityIdKey ] = recordId;
 		}
-
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,
