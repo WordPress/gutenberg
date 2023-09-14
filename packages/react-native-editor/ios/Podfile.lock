@@ -396,14 +396,14 @@ PODS:
     - React-Core
   - RNTAztecView (1.103.3):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.19.8)
+    - WordPress-Aztec-iOS (~> 1.19.9)
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - WordPress-Aztec-iOS (1.19.8)
+  - WordPress-Aztec-iOS (1.19.9)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -620,10 +620,10 @@ SPEC CHECKSUMS:
   RNReanimated: df2567658c01135f9ff4709d372675bcb9fd1d83
   RNScreens: 68fd1060f57dd1023880bf4c05d74784b5392789
   RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
-  RNTAztecView: c129286fa23931d33661e65392f46f7c4b6890a6
+  RNTAztecView: e040a6aa70f30017fa97a7e901ca2a3881b170ec
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
+  WordPress-Aztec-iOS: fbebd569c61baa252b3f5058c0a2a9a6ada686bb
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
 
 PODFILE CHECKSUM: 13786fe1bd037b8f06258137c3f1269a82608b59
