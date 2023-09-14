@@ -6,19 +6,21 @@ The Font Library is available globally, independently of the theme activated, si
 
 ### Glossary
 
+- **Font family**: Is a typographic family that may include different variants. Typical examples are `Arial`, `Helvetica`, `Inter`.
+- **Font face**: Is a typographic variant of a font family. Each font family may include one or more font faces. Each font face has some unique characteristics as font weight (light, regular, bold, etc.) and font style (italic, normal, etc.). Typical examples are `Helvetica bold italic`, `Inter light normal`.
 - **Install font family**: Is to make a font family available to the user in the Font Library. The user will be able to activate and use the installed font families.
-- **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user is able to use them in the site elements.
-- **Deactivate font family**: Is to make a font family not usable. If a font family is not active it won't appear in the font pickers.
-- **Uninstall font family**: Is to remove permanently the font family from the Font Library. 
+- **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user can use them in the site elements.
+- **Deactivate font family**: Is to make a font family unusable. If a font family is not active, it won't appear in the font pickers.
+- **Uninstall font family**: Is to remove the font family from the Font Library permanently. 
 
-### Diferent types of installations
+### Different types of installations
 
-The library allow extenders to define how the fonts will be installed in WordPress. When users install a font family, its definition will always be saved to the database what can vary is where are the font face assets located.
+The library allows extenders to define how WordPress will install fonts. When users install a font family, its definition will always be saved to the database. What can vary is where are the font face file assets stored.
 
-Let's see the different type of installations:
+Let's see the different types of installations:
 
 #### Install a font with no font file assets (system fonts)
-Let's say you want to install a font family that dosn't need any font assets to work, these types of fonts are usually called system fonts. You could define these font families like this:
+Let's say you want to install a font family that doesn't need any font assets to work; these fonts are usually called system fonts. You could define these font families like this:
 
 ```json
 {
@@ -30,7 +32,7 @@ Let's say you want to install a font family that dosn't need any font assets to 
 ```
 
 #### Install a font with external assets
-Let's say you want to install a font family that need to add font faces using external font file assets. In this way your font face assets will be always serverd from the external url you indicated in `src` property of the font faces. Your font families should look like this:
+Let's say you want to install a font family that needs to add font faces using external font file assets. In this way, your font face assets will always be served from the external URL you indicated in the `src` property of the font faces. Your font families should look like this:
 ```json
 {
     "name": "Piazzolla",
@@ -48,7 +50,7 @@ Let's say you want to install a font family that need to add font faces using ex
 ```
 
 ####  Install a font from external sources and serve it from your site
-Let's say you want to install a font family that use assets located outside of your site and download it while installing to serve them always from your WordPress `/wp-content/fonts` folder. This can be useful if you want to avoid depending on external sites for technical or legal reasons. In that case you need to set the `downloadFromUrl` property on each font face.
+Let's say you want to install a font family that uses assets located outside of your site and download it while installing to serve them always from your WordPress `/wp-content/fonts` folder. This can be useful if you want to avoid depending on external sites for technical or legal reasons. In that case, you need to set the `downloadFromUrl` property on each font face.
 
 ```json
 {
@@ -67,7 +69,7 @@ Let's say you want to install a font family that use assets located outside of y
 ```
 
 #### Install a font providing the font asset
-Let's say you want to install a font family using font files you are providing in an http request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. As the previous way this can be useful if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your http request and add a reference for it in the font face definition. 
+Let's say you want to install a font family using the font files you are providing in an HTTP request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. As the previous way, this can be useful if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your HTTP request and add a reference for it in the font face definition. 
 
 
 ```json
