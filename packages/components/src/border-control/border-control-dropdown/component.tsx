@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 
@@ -30,7 +31,7 @@ import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
 import type { ColorProps, DropdownProps } from '../types';
 
-const getAriaLabelColorValue = ( colorValue: string ) => {
+const getAriaDescriptionColorValue = ( colorValue: string ) => {
 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
 	return colorValue.replace( /^var\((.+)\)$/, '$1' );
 };
@@ -65,7 +66,7 @@ const getColorObject = (
 	return colors.find( ( color ) => color.color === colorValue );
 };
 
-const getToggleAriaLabel = (
+const getToggleAriaDescription = (
 	colorValue: CSSProperties[ 'borderColor' ],
 	colorObject: ColorObject | undefined,
 	style: CSSProperties[ 'borderStyle' ],
@@ -73,60 +74,69 @@ const getToggleAriaLabel = (
 ) => {
 	if ( isStyleEnabled ) {
 		if ( colorObject ) {
-			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
+			const ariaDescriptionValue = getAriaDescriptionColorValue(
+				colorObject.color
+			);
 			return style
 				? sprintf(
 						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
-						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
+						'The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
 						colorObject.name,
-						ariaLabelValue,
+						ariaDescriptionValue,
 						style
 				  )
 				: sprintf(
 						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
-						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+						'The currently selected color is called "%1$s" and has a value of "%2$s".',
 						colorObject.name,
-						ariaLabelValue
+						ariaDescriptionValue
 				  );
 		}
 
 		if ( colorValue ) {
-			const ariaLabelValue = getAriaLabelColorValue( colorValue );
+			const ariaDescriptionValue =
+				getAriaDescriptionColorValue( colorValue );
 			return style
 				? sprintf(
 						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
-						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
-						ariaLabelValue,
+						'The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
+						ariaDescriptionValue,
 						style
 				  )
 				: sprintf(
 						// translators: %1$s: The color's hex code e.g: "#f00".
-						'Border color and style picker. The currently selected color has a value of "%1$s".',
-						ariaLabelValue
+						'The currently selected color has a value of "%1$s".',
+						ariaDescriptionValue
 				  );
 		}
 
-		return __( 'Border color and style picker.' );
+		if ( style ) {
+			return sprintf(
+				// translators: %1$s: The current border style selection e.g. "solid".
+				'The currently selected style is "%1$s". No color is selected. Select a color to display the border.',
+				style
+			);
+		}
 	}
 
 	if ( colorObject ) {
 		return sprintf(
 			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g: "#f00".
-			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+			'The currently selected color is called "%1$s" and has a value of "%2$s".',
 			colorObject.name,
-			getAriaLabelColorValue( colorObject.color )
+			getAriaDescriptionColorValue( colorObject.color )
 		);
 	}
 
 	if ( colorValue ) {
 		return sprintf(
 			// translators: %1$s: The color's hex code e.g: "#f00".
-			'Border color picker. The currently selected color has a value of "%1$s".',
-			getAriaLabelColorValue( colorValue )
+			'The currently selected color has a value of "%1$s".',
+			getAriaDescriptionColorValue( colorValue )
 		);
 	}
 
-	return __( 'Border color picker.' );
+	return __( 'Select a border color and style.' );
 };
 
 const BorderControlDropdown = (
@@ -155,8 +165,12 @@ const BorderControlDropdown = (
 
 	const { color, style } = border || {};
 	const colorObject = getColorObject( color, colors );
+	const descriptionId = useInstanceId(
+		BorderControlDropdown,
+		'border-control-dropdown'
+	);
 
-	const toggleAriaLabel = getToggleAriaLabel(
+	const toggleAriaDescription = getToggleAriaDescription(
 		color,
 		colorObject,
 		style,
@@ -171,21 +185,26 @@ const BorderControlDropdown = (
 	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
 		onToggle,
 	} ) => (
-		<Button
-			onClick={ onToggle }
-			variant="tertiary"
-			aria-label={ toggleAriaLabel }
-			tooltipPosition={ dropdownPosition }
-			label={ __( 'Border color and style picker' ) }
-			showTooltip={ true }
-		>
-			<span className={ indicatorWrapperClassName }>
-				<ColorIndicator
-					className={ indicatorClassName }
-					colorValue={ color }
-				/>
-			</span>
-		</Button>
+		<>
+			<div id={ descriptionId } style={ { display: 'none' } }>
+				{ toggleAriaDescription }
+			</div>
+			<Button
+				onClick={ onToggle }
+				variant="tertiary"
+				tooltipPosition={ dropdownPosition }
+				label={ __( 'Border color and style picker' ) }
+				showTooltip={ true }
+				aria-describedby={ descriptionId }
+			>
+				<span className={ indicatorWrapperClassName }>
+					<ColorIndicator
+						className={ indicatorClassName }
+						colorValue={ color }
+					/>
+				</span>
+			</Button>
+		</>
 	);
 
 	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
