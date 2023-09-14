@@ -245,7 +245,7 @@
  * @since 6.2.1 Fix: Support for various invalid comments; attribute updates are case-insensitive.
  * @since 6.3.2 Fix: Skip HTML-like content inside rawtext elements such as STYLE.
  */
-class Gutenberg_HTML_Tag_Processor_6_3 {
+class Gutenberg_HTML_Tag_Processor_6_4 {
 	/**
 	 * The maximum number of bookmarks allowed to exist at
 	 * any given time.
@@ -534,7 +534,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *     @type string|null $class_name   Tag must contain this whole class name to match.
 	 *     @type string|null $tag_closers  "visit" or "skip": whether to stop on tag closers, e.g. </div>.
 	 * }
-	 * @return boolean Whether a tag was matched.
+	 * @return bool Whether a tag was matched.
 	 */
 	public function next_tag( $query = null ) {
 		$this->parse_query( $query );
@@ -711,7 +711,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			return false;
 		}
 
-		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) >= self::MAX_BOOKMARKS ) {
+		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) >= static::MAX_BOOKMARKS ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Too many bookmarks: cannot create any more.' ),
@@ -1007,7 +1007,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 
 			if ( '/' === $this->html[ $at + 1 ] ) {
 				$this->is_closing_tag = true;
-				$at++;
+				++$at;
 			} else {
 				$this->is_closing_tag = false;
 			}
@@ -1076,7 +1076,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 					 *
 					 * See https://html.spec.whatwg.org/#parse-error-incorrectly-closed-comment
 					 */
-					$closer_at--; // Pre-increment inside condition below reduces risk of accidental infinite looping.
+					--$closer_at; // Pre-increment inside condition below reduces risk of accidental infinite looping.
 					while ( ++$closer_at < strlen( $html ) ) {
 						$closer_at = strpos( $html, '--', $closer_at );
 						if ( false === $closer_at ) {
@@ -1157,7 +1157,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			 * See https://html.spec.whatwg.org/#parse-error-missing-end-tag-name
 			 */
 			if ( '>' === $html[ $at + 1 ] ) {
-				$at++;
+				++$at;
 				continue;
 			}
 
@@ -1614,7 +1614,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			return false;
 		}
 
-		if ( ++$this->seek_count > self::MAX_SEEK_OPS ) {
+		if ( ++$this->seek_count > static::MAX_SEEK_OPS ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Too many calls to seek() - this can lead to performance issues.' ),
@@ -1819,7 +1819,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * @param string $prefix Prefix of requested attribute names.
 	 * @return array|null List of attribute names, or `null` when no tag opener is matched.
 	 */
-	function get_attribute_names_with_prefix( $prefix ) {
+	public function get_attribute_names_with_prefix( $prefix ) {
 		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
 			return null;
 		}
@@ -2308,7 +2308,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @return boolean Whether the given tag and its attribute match the search criteria.
+	 * @return bool Whether the given tag and its attribute match the search criteria.
 	 */
 	private function matches() {
 		if ( $this->is_closing_tag && ! $this->stop_on_tag_closers ) {
