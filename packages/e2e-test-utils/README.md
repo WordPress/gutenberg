@@ -182,12 +182,22 @@ _Parameters_
 
 ### createURL
 
-Creates new URL by parsing base URL, WPPath and query string.
+Creates new URL by parsing given WPPath and query params, relative to the WP base.
+
+Given `query` params are merged with the ones already present in the path.
+Any overlapping ones will be overwritten.
+
+_Usage_
+
+```js
+createURL( '/foo?a=b&bar=f', { bar: 'baz', fiz: 'a/b/c' } );
+// "http://localhost:8889/foo?a=b&bar=baz&fiz=a%2Fb%2Fc"
+```
 
 _Parameters_
 
--   _WPPath_ `string`: String to be serialized as pathname.
--   _query_ `?string`: String to be serialized as query portion of URL.
+-   _WPPath_ `[string]`: String to be serialized as pathname.
+-   _query_ `[string|Object|Array]`: Query parameters in any format supported by {@link <https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams/URLSearchParams> | URLSearchParams}.
 
 _Returns_
 
