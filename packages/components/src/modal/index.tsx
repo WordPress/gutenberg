@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
+import type {
+	ForwardedRef,
+	KeyboardEvent,
+	MutableRefObject,
+	UIEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -38,9 +43,9 @@ import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
-let openModalCount = 0;
-let dismissOpenModal: ModalProps[ 'onRequestClose' ] | undefined;
-const context = createContext( false );
+const context = createContext<
+	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
+>( [] );
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -127,30 +132,29 @@ function UnforwardedModal(
 		refOnRequestClose.current = onRequestClose;
 	}, [ onRequestClose ] );
 
-	const isNested = useContext( context );
 	useEffect( () => {
 		ariaHelper.modalize( ref.current );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
+	const dismissers = useContext( context );
 	useEffect( () => {
-		openModalCount++;
+		const openModalCount = dismissers.push( refOnRequestClose );
 
 		if ( openModalCount === 1 ) {
 			document.body.classList.add( bodyOpenClassName );
-		} else if ( openModalCount > 1 && ! isNested ) {
-			dismissOpenModal?.();
+		} else if ( openModalCount > 1 ) {
+			dismissers[ 0 ].current?.();
 		}
-		if ( ! isNested ) dismissOpenModal = refOnRequestClose.current;
 
 		return () => {
-			openModalCount--;
+			dismissers.shift();
 
-			if ( openModalCount === 0 ) {
+			if ( dismissers.length === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
 			}
 		};
-	}, [ bodyOpenClassName, isNested ] );
+	}, [ bodyOpenClassName, dismissers ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -328,12 +332,12 @@ function UnforwardedModal(
 		</div>
 	);
 
+	const nextLevelDismissers = useRef( [] );
+
 	return createPortal(
-		isNested ? (
-			modal
-		) : (
-			<context.Provider value={ true }>{ modal }</context.Provider>
-		),
+		<context.Provider value={ nextLevelDismissers.current }>
+			{ modal }
+		</context.Provider>,
 		document.body
 	);
 }
