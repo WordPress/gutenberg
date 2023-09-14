@@ -375,7 +375,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +394,22 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch.ensureDefaultBlock();
 	};
 
 /**
