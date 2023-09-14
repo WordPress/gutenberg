@@ -193,6 +193,14 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			selectBlock( startingBlockClientId );
 			setBlockMovingClientId( null );
 		}
+		// Prevent the block from being moved into itself.
+		if (
+			startingBlockClientId &&
+			selectedBlockClientId === startingBlockClientId &&
+			navigateIn
+		) {
+			return;
+		}
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 			if ( focusedBlockUid ) {
 				event.preventDefault();
