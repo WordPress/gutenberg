@@ -28,7 +28,7 @@ import {
 	Warning,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useState, useMemo } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ import { unlock } from '../lock-unlock';
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
-	const [ inferredAlignment, setInferredAlignment ] = useState();
+	const inferredAlignmentRef = useRef();
 
 	return useMemo( () => {
 		// Exit early if the pattern's blocks haven't loaded yet.
@@ -46,24 +46,24 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 			return {};
 		}
 
-		let alignment = inferredAlignment;
+		let alignment = inferredAlignmentRef.current;
 
 		// Only track the initial alignment so that temporarily removed
 		// alignments can be reapplied.
-		if ( inferredAlignment === undefined ) {
+		if ( alignment === undefined ) {
 			const isConstrained = parentLayout?.type === 'constrained';
 			const hasFullAlignment = blocks.some( ( block ) =>
 				fullAlignments.includes( block.attributes.align )
 			);
 
 			alignment = isConstrained && hasFullAlignment ? 'full' : null;
-			setInferredAlignment( alignment );
+			inferredAlignmentRef.current = alignment;
 		}
 
 		const layout = alignment ? parentLayout : undefined;
 
 		return { alignment, layout };
-	}, [ blocks, inferredAlignment, parentLayout ] );
+	}, [ blocks, parentLayout ] );
 };
 
 export default function ReusableBlockEdit( {
