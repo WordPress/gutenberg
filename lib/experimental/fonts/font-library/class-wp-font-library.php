@@ -27,8 +27,7 @@ class WP_Font_Library {
 	*/
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
-		'ttf'   => 'font/sfnt',
-		// 'ttf'   => PHP_VERSION_ID >= 80112 ? 'font/ttf' : 'application/x-font-ttf',
+		'ttf'   => PHP_VERSION_ID >= 80112 ? 'font/sfnt' : 'application/font-sfnt', //'application/x-font-ttf',
 		'woff'  => PHP_VERSION_ID >= 80112 ? 'font/woff' : 'application/font-woff',
 		'woff2' => PHP_VERSION_ID >= 80112 ? 'font/woff2' : 'application/font-woff2',
 	);
