@@ -82,8 +82,8 @@ export default function useStateWithHistory< T >( initialValue: T ) {
 				isStaged,
 			} );
 		}, [] ),
-		hasUndo: !! state.manager.hasUndo(),
-		hasRedo: !! state.manager.hasRedo(),
+		hasUndo: state.manager.hasUndo(),
+		hasRedo: state.manager.hasRedo(),
 		undo: useCallback( () => {
 			dispatch( { type: 'UNDO' } );
 		}, [] ),
