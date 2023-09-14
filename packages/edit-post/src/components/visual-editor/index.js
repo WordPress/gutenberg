@@ -66,6 +66,15 @@ function getPostContentAttributes( blocks ) {
 	}
 }
 
+function checkForPostContentAtRootLevel( blocks ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/post-content' ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
@@ -221,6 +230,26 @@ export default function VisualEditor( { styles } ) {
 		postContentAttributes,
 	] );
 
+	const hasPostContentAtRootLevel = useMemo( () => {
+		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+			return false;
+		}
+		// When in template editing mode, we can access the blocks directly.
+		if ( editedPostTemplate?.blocks ) {
+			return checkForPostContentAtRootLevel( editedPostTemplate?.blocks );
+		}
+		// If there are no blocks, we have to parse the content string.
+		// Best double-check it's a string otherwise the parse function gets unhappy.
+		const parseableContent =
+			typeof editedPostTemplate?.content === 'string'
+				? editedPostTemplate?.content
+				: '';
+
+		return (
+			checkForPostContentAtRootLevel( parse( parseableContent ) ) || false
+		);
+	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
+
 	const { layout = {}, align = '' } = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
@@ -264,6 +293,11 @@ export default function VisualEditor( { styles } ) {
 	const blockListLayout = postContentAttributes
 		? postContentLayout
 		: fallbackLayout;
+
+	const postEditorLayout =
+		blockListLayout?.type === 'default' && ! hasPostContentAtRootLevel
+			? fallbackLayout
+			: blockListLayout;
 
 	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
@@ -337,7 +371,7 @@ export default function VisualEditor( { styles } ) {
 									/>
 									<LayoutStyle
 										selector=".block-editor-block-list__layout.is-root-container"
-										layout={ blockListLayout }
+										layout={ postEditorLayout }
 									/>
 									{ align && (
 										<LayoutStyle css={ alignCSS } />

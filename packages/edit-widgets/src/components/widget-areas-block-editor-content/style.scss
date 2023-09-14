@@ -11,8 +11,7 @@
 	flex-grow: 1;
 
 	> div:last-of-type,
-	.block-editor-writing-flow,
-	.block-editor-writing-flow > div {
+	.block-editor-writing-flow {
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
@@ -32,6 +31,104 @@
 		&.is-tertiary,
 		&.has-icon {
 			padding: 6px;
+		}
+	}
+}
+
+// Fixed contextual toolbar
+@include editor-left(".edit-widgets-block-editor .block-editor-block-contextual-toolbar.is-fixed");
+
+
+.edit-widgets-block-editor .block-editor-block-contextual-toolbar.is-fixed {
+	position: sticky;
+	top: 0;
+	z-index: z-index(".block-editor-block-popover");
+	display: block;
+	width: 100%;
+
+	// on desktop and tablet viewports the toolbar is fixed
+	// on top of interface header
+	$toolbar-margin: $grid-unit-80 * 3 - 2 * $grid-unit + $grid-unit-05;
+
+	@include break-medium() {
+		// leave room for block inserter, undo and redo, list view
+		margin-left: $toolbar-margin;
+		// position on top of interface header
+		position: fixed;
+		top: $admin-bar-height;
+		// Don't fill up when empty
+		min-height: initial;
+		// remove the border
+		border-bottom: none;
+		// has to be flex for collapse button to fit
+		display: flex;
+
+		// Mimic the height of the parent, vertically align center, and provide a max-height.
+		height: $header-height;
+		align-items: center;
+
+
+		// on tablet viewports the toolbar is fixed
+		// on top of interface header and covers the whole header
+		// except for the inserter on the left
+		width: calc(100% - #{$toolbar-margin});
+
+		&.is-collapsed {
+			width: initial;
+		}
+
+		&:empty {
+			width: initial;
+		}
+
+		.is-fullscreen-mode & {
+			// leave room for block inserter, undo and redo, list view
+			// and some margin left
+			margin-left: $grid-unit-80 * 4 - 2 * $grid-unit;
+
+			top: 0;
+
+			&.is-collapsed {
+				width: initial;
+			}
+
+			&:empty {
+				width: initial;
+			}
+		}
+
+		.show-icon-labels & {
+			margin-left: $grid-unit-80 + 2 * $grid-unit; // inserter and margin
+			width: calc(100% + 40px - #{$toolbar-margin}); //there are no undo, redo and list view buttons
+
+			.is-fullscreen-mode & {
+				margin-left: $grid-unit * 18; // site hub, inserter and margin
+			}
+		}
+
+		.blocks-widgets-container & {
+			margin-left: $grid-unit-80 * 2.4;
+
+			&.is-collapsed {
+				margin-left: $grid-unit-80 * 4.2;
+			}
+		}
+	}
+
+	// on desktop viewports the toolbar is fixed
+	// on top of interface header and leaves room
+	// for the block inserter the publish button
+	@include break-large() {
+		width: auto;
+		.show-icon-labels & {
+			width: auto; //there are no undo, redo and list view buttons
+		}
+
+		.is-fullscreen-mode & {
+			// in full screen mode we need to account for
+			// the combined with of the tools at the right of the header and the margin left
+			// of the toolbar which includes four buttons
+			width: calc(100% - 280px - #{4 * $grid-unit-80});
 		}
 	}
 }

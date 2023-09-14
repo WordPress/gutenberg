@@ -52,7 +52,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.4 compat.
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -63,9 +65,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
-		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
-	}
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -95,6 +94,7 @@ require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // WordPress 6.4 compat.
 require __DIR__ . '/compat/wordpress-6.4/blocks.php';
+require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 
@@ -110,9 +110,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
-	require __DIR__ . '/experimental/block-hooks.php';
-}
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
 require __DIR__ . '/experimental/interactivity-api/scripts.php';
@@ -152,8 +149,14 @@ if (
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
-		require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 	}
+
+	/*
+	 * As _gutenberg_get_iframed_editor_assets_6_4() overrides Core's _wp_get_iframed_editor_assets(),
+	 * load this file to ensure wp_print_font_faces() is invoked to load the styles into the
+	 * iframed editor.
+	 */
+	require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 
 	// Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 	// @core-merge: do not merge the BC layer files into WordPress Core.

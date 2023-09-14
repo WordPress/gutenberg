@@ -11,6 +11,7 @@
 	"attributes": {
 		"tagName": {
 			"type": "string",
+			"enum": [ "a", "button" ],
 			"default": "a"
 		},
 		"type": {

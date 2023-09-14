@@ -78,12 +78,6 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "getting-started"
-	},
-	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -334,12 +328,6 @@
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
 	},
 	{
 		"title": "Global Settings & Styles (theme.json)",
@@ -1923,6 +1911,12 @@
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
 		"parent": "packages"
 	},
 	{

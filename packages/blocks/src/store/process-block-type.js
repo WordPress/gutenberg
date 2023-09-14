@@ -55,6 +55,7 @@ export const processBlockType =
 			supports: {},
 			styles: [],
 			variations: [],
+			blockHooks: {},
 			save: () => null,
 			...select.getBootstrappedBlockType( name ),
 			...blockSettings,
