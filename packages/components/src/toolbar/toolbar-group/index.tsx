@@ -105,7 +105,7 @@ function ToolbarGroup( {
 						containerClassName={
 							indexOfSet > 0 && indexOfControl === 0
 								? 'has-left-divider'
-								: null
+								: undefined
 						}
 						{ ...control }
 					/>

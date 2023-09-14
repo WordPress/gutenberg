@@ -6,7 +6,10 @@ import type { ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { DropdownOption } from '../../dropdown-menu/types';
+import type {
+	DropdownMenuProps,
+	DropdownOption,
+} from '../../dropdown-menu/types';
 
 export type ToolbarGroupControls = DropdownOption & {
 	/**
@@ -15,16 +18,11 @@ export type ToolbarGroupControls = DropdownOption & {
 	subscript?: string;
 };
 
-export type ToolbarGroupProps = {
+type ToolbarGroupPropsBase = {
 	/**
 	 * The controls to render in this toolbar.
 	 */
-	controls?: ToolbarGroupControls[];
-
-	/**
-	 * Any other things to render inside the toolbar besides the controls.
-	 */
-	children?: ReactNode;
+	controls?: ToolbarGroupControls[] | ToolbarGroupControls[][];
 
 	/**
 	 * Class to set on the container div.
@@ -32,27 +30,83 @@ export type ToolbarGroupProps = {
 	className?: string;
 
 	/**
-	 * Turns ToolbarGroup into a dropdown menu.
+	 * Any other things to render inside the toolbar besides the controls.
 	 */
-	isCollapsed?: boolean;
-
-	/**
-	 * ARIA label for dropdown menu if is collapsed.
-	 */
-	title?: string;
+	children?: ReactNode;
 };
 
-export type ToolbarGroupCollapsedProps = Omit< ToolbarGroupProps, 'props' > & {
-	/**
-	 * Props to be passed to the drop down.
-	 */
-	toggleProps?: Record< string, any >;
+// export type ToolbarGroupProps = {
+// 	/**
+// 	 * The controls to render in this toolbar.
+// 	 */
+// 	controls?: ToolbarGroupControls[] | ToolbarGroupControls[][];
 
-	/**
-	 * Props to be passed.
-	 */
-	props?: any;
-};
+// 	/**
+// 	 * Any other things to render inside the toolbar besides the controls.
+// 	 */
+// 	children?: ReactNode;
+
+// 	/**
+// 	 * Class to set on the container div.
+// 	 */
+// 	className?: string;
+
+// 	/**
+// 	 * Turns ToolbarGroup into a dropdown menu.
+// 	 */
+// 	isCollapsed?: boolean;
+
+// 	/**
+// 	 * ARIA label for dropdown menu if is collapsed.
+// 	 */
+// 	title?: string;
+
+// 	// TODO: Looks like this was needed, should the group be sharing other props?
+// 	icon?: string;
+// };
+
+export type ToolbarGroupProps = ToolbarGroupPropsBase &
+	(
+		| {
+				/**
+				 * When true, turns `ToolbarGroup` into a dropdown menu.
+				 */
+				isCollapsed?: false;
+				/**
+				 * Any other things to render inside the toolbar besides the controls.
+				 */
+				children?: ReactNode;
+				title?: never;
+		  }
+		| {
+				/**
+				 * When true, turns `ToolbarGroup` into a dropdown menu.
+				 */
+				isCollapsed: true;
+				/**
+				 * Any other things to render inside the toolbar besides the controls.
+				 */
+				children?: ToolbarGroupCollapsedProps[ 'children' ];
+				/**
+				 * ARIA label for dropdown menu if is collapsed.
+				 */
+				title: string;
+		  }
+	 );
+
+// export type ToolbarGroupCollapsedProps = ToolbarGroupProps & {
+// 	/**
+// 	 * Props to be passed to the drop down.
+// 	 */
+// 	toggleProps?: Record< string, any >;
+
+// 	/**
+// 	 * Props to be passed.
+// 	 */
+// 	props?: any;
+// };
+
+export type ToolbarGroupCollapsedProps = DropdownMenuProps;
 
 export type ToolbarGroupContainerProps = {
 	/**
