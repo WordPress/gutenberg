@@ -13,6 +13,7 @@ import ColorIndicator from '../../color-indicator';
 import Icon from '../../icon';
 import { HStack } from '../../h-stack';
 import type { ColorListPickerProps, ColorOptionProps } from './types';
+import { useInstanceId } from '@wordpress/compose';
 
 function ColorOption( {
 	label,
@@ -23,6 +24,8 @@ function ColorOption( {
 	onChange,
 }: ColorOptionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
+	const labelId = useInstanceId( ColorOption, 'color-list-picker-option' );
+
 	return (
 		<>
 			<Button
@@ -38,11 +41,12 @@ function ColorOption( {
 					) : (
 						<Icon icon={ swatch } />
 					) }
-					<span>{ label }</span>
+					<span id={ labelId }>{ label }</span>
 				</HStack>
 			</Button>
 			{ isOpen && (
 				<ColorPalette
+					aria-labelledby={ labelId }
 					className="components-color-list-picker__color-picker"
 					colors={ colors }
 					value={ value }
