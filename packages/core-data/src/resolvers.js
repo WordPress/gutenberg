@@ -630,9 +630,17 @@ export const getUserPatternCategories =
 				_fields: 'id,name,description,slug',
 			}
 		);
+
+		const mappedPatternCategories =
+			patternCategories?.map( ( userCategory ) => ( {
+				...userCategory,
+				label: userCategory.name,
+				name: userCategory.slug,
+			} ) ) || [];
+
 		dispatch( {
 			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
-			patternCategories,
+			patternCategories: mappedPatternCategories,
 		} );
 	};
 
