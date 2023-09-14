@@ -47,6 +47,22 @@ HTML;
 	/**
 	 * @ticket 59313
 	 */
+	public function test_inject_hooked_block_at_first_child_position_no_child_blocks() {
+		$content = '<!-- wp:tests/group-first-child {"layout":{"type":"constrained"}} /-->';
+
+		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
+		$blocks     = parse_blocks( $content );
+		$result     = gutenberg_serialize_blocks( $blocks );
+
+		unregister_block_type( $block_type->name );
+
+		$expected_result = '<!-- wp:tests/group-first-child {"layout":{"type":"constrained"}} --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-first-child -->';
+		$this->assertSame( $expected_result, $result );
+	}
+
+	/**
+	 * @ticket 59313
+	 */
 	public function test_inject_hooked_block_at_last_child_position() {
 		$content = <<<HTML
 <!-- wp:tests/group-last-child {"layout":{"type":"constrained"}} -->
@@ -73,6 +89,22 @@ HTML;
 	</div>
 <!-- /wp:tests/group-last-child -->
 HTML;
+		$this->assertSame( $expected_result, $result );
+	}
+
+	/**
+	 * @ticket 59313
+	 */
+	public function test_inject_hooked_block_at_last_child_position_no_child_blocks() {
+		$content = '<!-- wp:tests/group-last-child {"layout":{"type":"constrained"}} /-->';
+
+		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
+		$blocks     = parse_blocks( $content );
+		$result     = gutenberg_serialize_blocks( $blocks );
+
+		unregister_block_type( $block_type->name );
+
+		$expected_result = '<!-- wp:tests/group-last-child {"layout":{"type":"constrained"}} --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-last-child -->';
 		$this->assertSame( $expected_result, $result );
 	}
 }
