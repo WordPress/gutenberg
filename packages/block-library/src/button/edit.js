@@ -102,7 +102,7 @@ function ButtonEdit( props ) {
 
 	const TagName = tagName || 'a';
 
-	function updateLinkAttributes( opensInNewWindow, nofollow ) {
+	function updateLinkAttributes( newUrl, opensInNewWindow, nofollow ) {
 		let newLinkTarget;
 		let updatedRel = rel || '';
 
@@ -126,6 +126,7 @@ function ButtonEdit( props ) {
 		}
 
 		setAttributes( {
+			url: prependHTTP( newUrl ),
 			linkTarget: newLinkTarget,
 			rel: updatedRel || undefined,
 		} );
@@ -283,14 +284,13 @@ function ButtonEdit( props ) {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
 							nofollow: newNoFollow,
-						} ) => {
-							setAttributes( { url: prependHTTP( newURL ) } );
-
+						} ) =>
 							updateLinkAttributes(
+								newURL,
 								newOpensInNewTab,
 								newNoFollow
-							);
-						} }
+							)
+						}
 						onRemove={ () => {
 							unlink();
 							richTextRef.current?.focus();

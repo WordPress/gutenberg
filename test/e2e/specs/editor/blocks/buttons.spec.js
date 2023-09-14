@@ -186,42 +186,50 @@ test.describe( 'Buttons', () => {
 			} )
 			.click();
 
+		const newTabCheckbox = page.getByLabel( 'Open in new tab' );
+		const noFollowCheckbox = page.getByLabel( 'nofollow' );
+
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		const checkbox = page.getByLabel( 'Open in new tab' );
-		await checkbox.click();
+		await newTabCheckbox.click();
 
 		// Toggle should still have focus and be checked.
-		await expect( checkbox ).toBeChecked();
-		await expect( checkbox ).toBeFocused();
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( newTabCheckbox ).toBeFocused();
 
-		// Tab back to the Save button and apply the link.
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
 
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/" target="_blank" rel="noreferrer noopener">WordPress</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
+		// The link should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noreferrer noopener',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
 
 		// Edit link again.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Navigate to and toggle the "nofollow" checkbox.
-		await page.getByLabel( 'nofollow' ).click();
+		await noFollowCheckbox.click();
 
 		// expect settings for `Open in new tab` and `No follow`
-		await expect( page.getByLabel( 'Open in new tab' ) ).toBeChecked();
-		await expect( page.getByLabel( 'nofollow' ) ).toBeChecked();
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( noFollowCheckbox ).toBeChecked();
 
-		// Tab back to the Save button and apply the link.
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
@@ -229,14 +237,22 @@ test.describe( 'Buttons', () => {
 			.click();
 
 		// Check the content again.
-		const newContent = await editor.getEditedPostContent();
-		expect( newContent ).toBe(
-			`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.wordpress.org/" target="_blank" rel="noreferrer noopener nofollow">WordPress</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noreferrer noopener nofollow',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'can resize width', async ( { editor, page } ) => {
