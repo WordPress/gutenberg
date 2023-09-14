@@ -205,7 +205,42 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should not add a token with the input's value when pressing the tab key", async () => {
+		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
+			await user.type( input, 'grapefruit' );
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
+			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnBlur
+				/>
+			);
+			await user.clear( input );
+
+			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
+			await user.type( input, 'grapefruit' );
+
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
+				'grapefruit',
+			] );
+			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
+		} );
+
+		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
 			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
