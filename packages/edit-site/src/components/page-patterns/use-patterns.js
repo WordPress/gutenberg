@@ -116,11 +116,20 @@ const selectThemePatterns = ( select ) => {
 
 	return { patterns, isResolving: false };
 };
-const selectPatterns = ( select, { categoryId, search = '' } = {} ) => {
+const selectPatterns = (
+	select,
+	{ categoryId, search = '', syncStatus } = {}
+) => {
 	const { patterns: themePatterns } = selectThemePatterns( select );
 	const { patterns: userPatterns } = selectUserPatterns( select );
 
 	let patterns = [ ...( themePatterns || [] ), ...( userPatterns || [] ) ];
+
+	if ( syncStatus ) {
+		patterns = patterns.filter(
+			( pattern ) => pattern.syncStatus === syncStatus
+		);
+	}
 
 	if ( categoryId ) {
 		patterns = searchItems( patterns, search, {
@@ -205,7 +214,11 @@ export const usePatterns = (
 					search,
 				} );
 			} else if ( categoryType === PATTERNS ) {
-				return selectPatterns( select, { categoryId, search } );
+				return selectPatterns( select, {
+					categoryId,
+					search,
+					syncStatus,
+				} );
 			} else if ( categoryType === USER_PATTERNS ) {
 				return selectUserPatterns( select, { search, syncStatus } );
 			}
