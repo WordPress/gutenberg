@@ -418,7 +418,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 
 	/**
 	 * Tests that duplicate font faces with same font style and weight but different file extensions are merged.
-	 * 
+	 *
 	 * @dataProvider data_install_with_duplicate_font_faces
 	 * @param array $font_families Font families to install in theme.json format.
 	 * @param array $files         Font files to install.
@@ -443,7 +443,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 	public function data_install_with_duplicate_font_faces() {
 		return array(
 			'with duplicate font faces' => array(
-				'font_families' => array(
+				'font_families'     => array(
 					array(
 						'fontFamily' => 'Piazzolla',
 						'slug'       => 'piazzolla',
@@ -481,7 +481,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 						),
 					),
 				),
-				'files'         => array(),
+				'files'             => array(),
 			),
 		);
 	}
