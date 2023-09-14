@@ -77,7 +77,6 @@ export type TabsProps = {
 	 * instanceId internally.
 	 *
 	 * This prop puts the component into controlled mode. A value of
-	 * `undefined` returns the component to uncontrolled mode. A value of
 	 * `null` will result in no tab being selected.
 	 */
 	selectedTabId?: string | null;
@@ -85,7 +84,7 @@ export type TabsProps = {
 
 export type TabListProps = {
 	/**
-	 * The children elements
+	 * The children elements, which should be a series of `Tabs.TabPanel` components.
 	 */
 	children?: React.ReactNode;
 	/**
@@ -133,7 +132,7 @@ export type TabProps = {
 
 export type TabPanelProps = {
 	/**
-	 * The children elements
+	 * The children elements, generally the content to display on the tabpanel.
 	 */
 	children?: React.ReactNode;
 	/**

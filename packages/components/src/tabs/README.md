@@ -177,7 +177,6 @@ The id of the tab to be selected upon mounting of component. If this prop is not
 _Note: this prop will be overridden by the `selectedTabId` prop if it is provided. (Controlled Mode)_
 
 -   Required: No
--   Default: none
 
 ###### `onSelect`: `( ( selectedId: string | null | undefined ) => void )`
 
@@ -192,6 +191,12 @@ The orientation of the `tablist` (`vertical` or `horizontal`)
 
 -   Required: No
 -   Default: `horizontal`
+
+###### `selectedTabId`: `string | null | undefined`
+
+The ID of the tab to display. This id is prepended with the `Tabs` instanceId internally.
+This prop puts the component into controlled mode. A value of `null` will result in no tab being selected.
+- Required: No
 
 #### TabList
 
@@ -276,6 +281,8 @@ The children elements, generally the content to display on the tabpanel.
 ###### `id`: `string`
 
 The id of the tabpanel, which is combined with the `Tabs` instance ID and the suffix `-view`
+
+- Required: Yes
 
 ###### `className`: `string`
 
