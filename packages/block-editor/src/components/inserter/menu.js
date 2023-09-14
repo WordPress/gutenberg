@@ -223,6 +223,15 @@ function InserterMenu(
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
 		selectedMediaCategory;
+
+	const handleSetSelectedTab = ( value ) => {
+		// If no longer on patterns tab remove the category setting.
+		if ( value !== 'patterns' ) {
+			setSelectedPatternCategory( null );
+		}
+		setSelectedTab( value );
+	};
+
 	return (
 		<div className="block-editor-inserter__menu">
 			<div
@@ -266,7 +275,7 @@ function InserterMenu(
 						showReusableBlocks={ hasReusableBlocks }
 						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
-						onSelect={ setSelectedTab }
+						onSelect={ handleSetSelectedTab }
 					>
 						{ getCurrentTab }
 					</InserterTabs>
