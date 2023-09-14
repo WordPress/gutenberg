@@ -9,7 +9,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { renderToString, useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
@@ -23,7 +23,7 @@ import {
 } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
-import { PresetDuotoneFilter } from '../duotone/components';
+import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
@@ -164,11 +164,9 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
 				presetByOrigin[ origin ].map( ( preset ) =>
-					renderToString(
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
+					getDuotoneFilter(
+						`wp-duotone-${ preset.slug }`,
+						preset.colors
 					)
 				)
 			)

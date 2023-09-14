@@ -322,7 +322,7 @@ export default function PageListEdit( {
 						<ComboboxControl
 							__next40pxDefaultSize
 							className="editor-page-attributes__parent"
-							label={ __( 'Parent page' ) }
+							label={ __( 'Parent' ) }
 							value={ parentPageID }
 							options={ pagesTree }
 							onChange={ ( value ) =>

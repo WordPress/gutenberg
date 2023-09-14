@@ -904,7 +904,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( state.undoManager.getUndoRecord() );
+	return state.undoManager.hasUndo();
 }
 
 /**
@@ -916,7 +916,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( state.undoManager.getRedoRecord() );
+	return state.undoManager.hasRedo();
 }
 
 /**
