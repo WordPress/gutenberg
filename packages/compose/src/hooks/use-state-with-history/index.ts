@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createUndoManager } from '@wordpress/undo-manager';
-import { useCallback, useMemo, useReducer } from '@wordpress/element';
+import { useCallback, useReducer } from '@wordpress/element';
 import type { UndoManager } from '@wordpress/undo-manager';
 
 type UndoRedoState< T > = {
@@ -60,6 +60,13 @@ function undoRedoReducer< T >(
 	return state;
 }
 
+function initReducer< T >( value: T ) {
+	return {
+		manager: createUndoManager(),
+		value,
+	};
+}
+
 /**
  * useState with undo/redo history.
  *
@@ -67,11 +74,11 @@ function undoRedoReducer< T >(
  * @return Value, setValue, hasUndo, hasRedo, undo, redo.
  */
 export default function useStateWithHistory< T >( initialValue: T ) {
-	const undoManager = useMemo( () => createUndoManager(), [] );
-	const [ state, dispatch ] = useReducer( undoRedoReducer, {
-		manager: undoManager,
-		value: initialValue,
-	} );
+	const [ state, dispatch ] = useReducer(
+		undoRedoReducer,
+		initialValue,
+		initReducer
+	);
 
 	return {
 		value: state.value,
