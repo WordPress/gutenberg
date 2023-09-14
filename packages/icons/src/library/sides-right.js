@@ -6,10 +6,10 @@ import { SVG, Path } from '@wordpress/primitives';
 const sidesRight = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
-			d="m8 6.5h8v-1.5h-8zm0 12.5h8v-1.5h-8zm-3-3h1.5v-8h-1.5zm12.5-8v8h1.5v-8z"
+			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
 			style={ { fill: '#1e1e1e', opacity: 0.25 } }
 		/>
-		<Path d="m17.5 16v-8h1.5v8z" style={ { fill: '#1e1e1e' } } />
+		<Path d="m18 16.5v-9h1.5v9z" />
 	</SVG>
 );
 
