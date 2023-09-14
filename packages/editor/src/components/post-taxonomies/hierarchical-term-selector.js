@@ -3,6 +3,7 @@
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	CheckboxControl,
@@ -216,6 +217,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ availableTerms ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
@@ -227,7 +230,9 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const addTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			throwOnError: true,
+		} );
 	};
 
 	/**
@@ -289,12 +294,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-
-		const newTerm = await addTerm( {
-			name: formName,
-			parent: formParent ? formParent : undefined,
-		} );
-
+		let newTerm;
+		try {
+			newTerm = await addTerm( {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			return;
+		}
 		const defaultName =
 			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(

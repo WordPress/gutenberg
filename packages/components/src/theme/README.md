@@ -40,8 +40,8 @@ If you would like your custom component to be themeable as a child of the `Theme
 -  Grayscale:
    -  `--wp-components-color-gray-100`: Used for light gray backgrounds.
    -  `--wp-components-color-gray-200`: Used sparingly for light borders.
-	 -	`--wp-components-color-gray-300`: Used for most borders.
-	 -	`--wp-components-color-gray-400`
-	 -	`--wp-components-color-gray-600`: Meets 3:1 UI or large text contrast against white.
-	 -	`--wp-components-color-gray-700`: Meets 4.6:1 text contrast against white.
-	 -	`--wp-components-color-gray-800`
+   -	`--wp-components-color-gray-300`: Used for most borders.
+   -	`--wp-components-color-gray-400`
+   -	`--wp-components-color-gray-600`: Meets 3:1 UI or large text contrast against white.
+   -	`--wp-components-color-gray-700`: Meets 4.6:1 text contrast against white.
+   -	`--wp-components-color-gray-800`

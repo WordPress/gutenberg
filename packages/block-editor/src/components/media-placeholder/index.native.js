@@ -7,12 +7,6 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	MediaUpload,
-	MEDIA_TYPE_IMAGE,
-	MEDIA_TYPE_VIDEO,
-	MEDIA_TYPE_AUDIO,
-} from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { cloneElement, useCallback, useRef } from '@wordpress/element';
 import { Icon, plusCircleFilled } from '@wordpress/icons';
@@ -22,6 +16,12 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 import { useBlockEditContext } from '../block-edit/context';
+import MediaUpload from '../media-upload';
+import {
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
+} from '../media-upload/constants';
 
 const isMediaEqual = ( media1, media2 ) =>
 	media1.id === media2.id || media1.url === media2.url;

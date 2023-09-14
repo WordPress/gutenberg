@@ -104,7 +104,7 @@ function gutenberg_wp_block_register_post_meta() {
 		$post_type,
 		'wp_pattern_sync_status',
 		array(
-			'auth_callback'     => function() {
+			'auth_callback'     => function () {
 				return current_user_can( 'edit_posts' );
 			},
 			'sanitize_callback' => 'sanitize_text_field',

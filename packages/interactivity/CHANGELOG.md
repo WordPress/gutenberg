@@ -4,6 +4,12 @@
 
 ### Enhancements
 
+-   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
+
+## 2.2.0 (2023-08-31)
+
+### Enhancements
+
 -   Support keys using `data-wp-key`. ([#53844](https://github.com/WordPress/gutenberg/pull/53844))
 -   Merge new server-side rendered context on client-side navigation. ([#53853](https://github.com/WordPress/gutenberg/pull/53853))
 -   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))

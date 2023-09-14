@@ -162,7 +162,6 @@ function GroupEdit( {
 				<View>
 					{ innerBlocksProps.children }
 					<GroupPlaceHolder
-						clientId={ clientId }
 						name={ name }
 						onSelect={ selectVariation }
 					/>

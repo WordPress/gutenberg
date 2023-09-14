@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
 
 ## 1.103.3
 -   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
@@ -27,6 +29,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix horizontal rule style extensions [#53917]
 -   [*] Add block outline to all Social Link blocks when selected [#54011]
 -   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
 
 ## 1.102.1
 - [**] Fix Voice Over and assistive keyboards [#53895]

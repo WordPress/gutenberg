@@ -167,7 +167,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'styles',
 		'example',
 		'variations',
-		'__experimentalAutoInsert',
+		'blockHooks',
 	];
 
 	const settings = Object.fromEntries(
