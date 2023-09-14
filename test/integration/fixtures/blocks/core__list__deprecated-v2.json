@@ -5,7 +5,7 @@
 		"attributes": {
 			"ordered": true,
 			"values": "",
-			"type": "A"
+			"type": "upper-alpha"
 		},
 		"innerBlocks": [
 			{
