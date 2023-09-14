@@ -837,8 +837,12 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+
+
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
+
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -862,6 +866,9 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]               = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements']   = $schema_styles_elements;
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
+			$schema_styles_blocks[ $block ]['.current-item'] = $styles_non_top_level;
+
+
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;
@@ -890,6 +897,12 @@ class WP_Theme_JSON_Gutenberg {
 				$output[ $subtree ] = static::resolve_custom_css_format( $result );
 			}
 		}
+
+		// if(isset($output['styles']['blocks']['core/navigation'])) {
+		// 	echo "<pre>";
+		// 	var_dump($output['styles']['blocks']['core/navigation']);
+		// 	echo "</pre>";
+		// }
 
 		return $output;
 	}
@@ -2387,6 +2400,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
+
 			$selector = null;
 			if ( isset( $selectors[ $name ]['selector'] ) ) {
 				$selector = $selectors[ $name ]['selector'];
@@ -2419,7 +2433,16 @@ class WP_Theme_JSON_Gutenberg {
 				'selectors'  => $feature_selectors,
 				'duotone'    => $duotone_selector,
 				'variations' => $variation_selectors,
+				// 'state_selectors' => $selectors[ $name ]['.current-item'],
 			);
+
+			$nodes[] = array(
+				'name' => 'core/navigation',
+				'path' => array( 'styles', 'blocks', 'core/navigation', '.current-item' ),
+				'selector' => '.wp-block-navigation .current-item'
+			);
+
+
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
 				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
