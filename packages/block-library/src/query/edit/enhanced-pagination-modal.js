@@ -15,7 +15,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useContainsThirdPartyBlocks } from '../utils';
 
 const disableEnhancedPaginationDescription = __(
-	'Plugin blocks are not supported. For enhanced pagination to work, remove the plugin block, then re-enable it in settings.'
+	'Plugin blocks are not supported yet. For enhanced pagination to work, remove the plugin block, then re-enable it in settings.'
 );
 
 const modalDescriptionId =
