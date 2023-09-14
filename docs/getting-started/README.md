@@ -17,7 +17,7 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 ## Learn WordPress Courses
 
-For more educational resources, visit [Learn WordPress](https://learn.wordpress.org/). Here is a selection of current course offerings.
+At [Learn WordPress](https://learn.wordpress.org/), you can find [tutorials](https://learn.wordpress.org/tutorials/), [courses](https://learn.wordpress.org/courses/), and [online workshops](https://learn.wordpress.org/online-workshops/) to learn more about developing for the Block Editor. Here is a selection of current offerings.
 
 -   [Intro to Block Development: Build Your First Custom Block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)
 -   [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/)
