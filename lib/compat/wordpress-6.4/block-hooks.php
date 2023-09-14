@@ -13,10 +13,10 @@
  * @return array Updated settings array.
  */
 function gutenberg_add_hooked_blocks( $settings, $metadata ) {
-	if ( ! isset( $metadata['__experimentalBlockHooks'] ) ) {
+	if ( ! isset( $metadata['blockHooks'] ) ) {
 		return $settings;
 	}
-	$block_hooks = $metadata['__experimentalBlockHooks'];
+	$block_hooks = $metadata['blockHooks'];
 
 	/**
 	 * Map the camelCased position string from block.json to the snake_cased block type position
@@ -152,20 +152,34 @@ function gutenberg_add_hooked_block( $hooked_block, $position, $anchor_block ) {
  * @return callable A function that accepts a block's content and returns the content with the inserted block.
  */
 function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $anchor_block_type ) {
-	return function( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
+	return function ( $block ) use ( $inserted_block, $relative_position, $anchor_block_type ) {
 		if ( $anchor_block_type === $block['blockName'] ) {
 			if ( 'first_child' === $relative_position ) {
 				array_unshift( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_unshift( $block['innerContent'], null );
+				// location) to that array after HTML content for the inner blocks wrapper.
+				$chunk_index = 0;
+				for ( $index = $chunk_index; $index < count( $block['innerContent'] ); $index++ ) {
+					if ( is_null( $block['innerContent'][ $index ] ) ) {
+						$chunk_index = $index;
+						break;
+					}
+				}
+				array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
 			} elseif ( 'last_child' === $relative_position ) {
 				array_push( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_push( $block['innerContent'], null );
+				// when rendering blocks, we also need to correctly append a value (`null`, to mark a block
+				// location) to that array before the remaining HTML content for the inner blocks wrapper.
+				$chunk_index = count( $block['innerContent'] );
+				for ( $index = count( $block['innerContent'] ); $index > 0; $index-- ) {
+					if ( is_null( $block['innerContent'][ $index - 1 ] ) ) {
+						$chunk_index = $index;
+						break;
+					}
+				}
+				array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
 			}
 			return $block;
 		}
@@ -173,7 +187,7 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 		$anchor_block_index = array_search( $anchor_block_type, array_column( $block['innerBlocks'], 'blockName' ), true );
 		if ( false !== $anchor_block_index && ( 'after' === $relative_position || 'before' === $relative_position ) ) {
 			if ( 'after' === $relative_position ) {
-				$anchor_block_index++;
+				++$anchor_block_index;
 			}
 			array_splice( $block['innerBlocks'], $anchor_block_index, 0, array( $inserted_block ) );
 
@@ -181,9 +195,9 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 			$chunk_index = 0;
 			while ( $anchor_block_index > 0 ) {
 				if ( ! is_string( $block['innerContent'][ $chunk_index ] ) ) {
-					$anchor_block_index--;
+					--$anchor_block_index;
 				}
-				$chunk_index++;
+				++$chunk_index;
 			}
 			// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 			// when rendering blocks, we also need to insert a value (`null`, to mark a block
@@ -204,7 +218,7 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
  * @return callable A filter for the `rest_prepare_block_type` hook that adds a `block_hooks` field to the network response.
  */
 function gutenberg_add_block_hooks_field_to_block_type_controller( $inserted_block_type, $position, $anchor_block_type ) {
-	return function( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
+	return function ( $response, $block_type ) use ( $inserted_block_type, $position, $anchor_block_type ) {
 		if ( $block_type->name !== $inserted_block_type ) {
 			return $response;
 		}

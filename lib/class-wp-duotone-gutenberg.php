@@ -482,7 +482,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS variable name.
 	 */
 	private static function get_css_custom_property_name( $slug ) {
-		return  "--wp--preset--duotone--$slug";
+		return "--wp--preset--duotone--$slug";
 	}
 
 	/**
@@ -492,7 +492,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The ID of the duotone filter.
 	 */
 	private static function get_filter_id( $slug ) {
-		return  "wp-duotone-$slug";
+		return "wp-duotone-$slug";
 	}
 
 	/**

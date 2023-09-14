@@ -29,6 +29,9 @@
 		"anchor": true,
 		"ariaLabel": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true
+		},
 		"color": {
 			"gradients": true,
 			"heading": true,

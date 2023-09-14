@@ -9,13 +9,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 } from '@wordpress/blocks';
-import {
-	isEmpty,
-	insert,
-	create,
-	replace,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
-} from '@wordpress/rich-text';
+import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -26,23 +20,6 @@ import { splitValue } from './split-value';
 import { shouldDismissPastedFiles } from '../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
-
-/**
- * Replaces line separators with line breaks if not multiline.
- * Replaces line breaks with line separators if multiline.
- *
- * @param {RichTextValue} value       Value to adjust.
- * @param {boolean}       isMultiline Whether to adjust to multiline or not.
- *
- * @return {RichTextValue} Adjusted value.
- */
-function adjustLines( value, isMultiline ) {
-	if ( isMultiline ) {
-		return replace( value, /\n+/g, LINE_SEPARATOR );
-	}
-
-	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
-}
 
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
@@ -59,7 +36,6 @@ export function usePasteHandler( props ) {
 				onReplace,
 				onSplit,
 				__unstableEmbedURLOnPaste,
-				multilineTag,
 				preserveWhiteSpace,
 				pastePlainText,
 			} = propsRef.current;
@@ -178,7 +154,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
-						multilineTag,
 					} );
 				}
 
@@ -220,12 +195,7 @@ export function usePasteHandler( props ) {
 			} );
 
 			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				valueToInsert = adjustLines( valueToInsert, !! multilineTag );
-
+				const valueToInsert = create( { html: content } );
 				addActiveFormats( valueToInsert, value.activeFormats );
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
@@ -237,7 +207,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: content,
 						onReplace,
 						onSplit,
-						multilineTag,
 					} );
 				}
 			}
