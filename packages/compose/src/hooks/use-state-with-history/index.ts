@@ -2,7 +2,63 @@
  * WordPress dependencies
  */
 import { createUndoManager } from '@wordpress/undo-manager';
-import { useCallback, useRef, useState, useEffect } from '@wordpress/element';
+import { useCallback, useMemo, useReducer } from '@wordpress/element';
+import type { UndoManager } from '@wordpress/undo-manager';
+
+type UndoRedoState< T > = {
+	manager: UndoManager;
+	value: T;
+};
+
+function undoRedoReducer< T >(
+	state: UndoRedoState< T >,
+	action:
+		| { type: 'UNDO' }
+		| { type: 'REDO' }
+		| { type: 'RECORD'; value: T; isStaged: boolean }
+): UndoRedoState< T > {
+	switch ( action.type ) {
+		case 'UNDO': {
+			const undoRecord = state.manager.undo();
+			if ( undoRecord ) {
+				return {
+					...state,
+					value: undoRecord[ 0 ].changes.prop.from,
+				};
+			}
+			return state;
+		}
+		case 'REDO': {
+			const redoRecord = state.manager.redo();
+			if ( redoRecord ) {
+				return {
+					...state,
+					value: redoRecord[ 0 ].changes.prop.to,
+				};
+			}
+			return state;
+		}
+		case 'RECORD': {
+			state.manager.addRecord(
+				[
+					{
+						id: 'object',
+						changes: {
+							prop: { from: state.value, to: action.value },
+						},
+					},
+				],
+				action.isStaged
+			);
+			return {
+				...state,
+				value: action.value,
+			};
+		}
+	}
+
+	return state;
+}
 
 /**
  * useState with undo/redo history.
@@ -11,44 +67,28 @@ import { useCallback, useRef, useState, useEffect } from '@wordpress/element';
  * @return Value, setValue, hasUndo, hasRedo, undo, redo.
  */
 export default function useStateWithHistory< T >( initialValue: T ) {
-	const manager = useRef( createUndoManager() );
-	const [ value, setValue ] = useState( initialValue );
-	const currentValue = useRef( value );
-	useEffect( () => {
-		currentValue.current = value;
-	}, [ value ] );
+	const undoManager = useMemo( () => createUndoManager(), [] );
+	const [ state, dispatch ] = useReducer( undoRedoReducer, {
+		manager: undoManager,
+		value: initialValue,
+	} );
 
 	return {
-		value,
+		value: state.value,
 		setValue: useCallback( ( newValue: T, isStaged: boolean ) => {
-			manager.current.addRecord(
-				[
-					{
-						id: 'object',
-						changes: {
-							prop: { from: currentValue.current, to: newValue },
-						},
-					},
-				],
-				isStaged
-			);
-			setValue( newValue );
+			dispatch( {
+				type: 'RECORD',
+				value: newValue,
+				isStaged,
+			} );
 		}, [] ),
-		hasUndo: !! manager.current.getUndoRecord(),
-		hasRedo: !! manager.current.getRedoRecord(),
+		hasUndo: !! state.manager.hasUndo(),
+		hasRedo: !! state.manager.hasRedo(),
 		undo: useCallback( () => {
-			const undoRecord = manager.current.getUndoRecord();
-			if ( undoRecord ) {
-				manager.current.undo();
-				setValue( undoRecord[ 0 ].changes.prop.from );
-			}
+			dispatch( { type: 'UNDO' } );
 		}, [] ),
 		redo: useCallback( () => {
-			const redoRecord = manager.current.getRedoRecord();
-			if ( redoRecord ) {
-				manager.current.redo();
-				setValue( redoRecord[ 0 ].changes.prop.to );
-			}
+			dispatch( { type: 'REDO' } );
 		}, [] ),
 	};
 }

@@ -29,7 +29,7 @@ const TestComponent = () => {
 };
 
 describe( 'useStateWithHistory', () => {
-	it( 'should  allow undo/redo', async () => {
+	it( 'should allow undo/redo', async () => {
 		render( <TestComponent /> );
 		const input = screen.getByRole( 'textbox' );
 		expect( input ).toHaveValue( 'foo' );
