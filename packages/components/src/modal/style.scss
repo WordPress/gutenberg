@@ -146,4 +146,22 @@
 		outline: 2px solid transparent;
 		outline-offset: -2px;
 	}
+
+	@include break-small() {
+		&.width-small,
+		.width-medium,
+		.width-large {
+			width: 100%;
+		}
+
+		&.width-small {
+			max-width: 300px;
+		}
+		&.width-medium {
+			max-width: 600px;
+		}
+		&.width-large {
+			max-width: 900px;
+		}
+	}
 }

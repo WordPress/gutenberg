@@ -63,7 +63,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 			{ isOpen && (
 				<Modal
 					onRequestClose={ closeModal }
-					style={ { maxWidth: '600px' } }
+					contentWidth="medium"
 					{ ...args }
 				>
 					<p>

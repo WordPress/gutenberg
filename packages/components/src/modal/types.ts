@@ -97,6 +97,15 @@ export type ModalProps = {
 	 */
 	isFullScreen?: boolean;
 	/**
+	 * If this property is added, it will constrain the `max-width` of the modal's
+	 * contents, preventing it from growing too wide. This prop only applies
+	 * when `isFullScreen` is `false`.
+	 *
+	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
+	 * modal's contents, or using the `style` prop to set a specific `max-width`.
+	 */
+	contentWidth?: 'small' | 'medium' | 'large';
+	/**
 	 *  Handle the key down on the modal frame `div`.
 	 */
 	onKeyDown?: KeyboardEventHandler< HTMLDivElement >;
