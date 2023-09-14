@@ -195,16 +195,14 @@ class PrivateInserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
+			directInsert,
 			directInsertBlock,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 		} = this.props;
 
-		if (
-			hasSingleBlockType ||
-			( directInsertBlock && hasSingleBlockType )
-		) {
+		if ( hasSingleBlockType || ( directInsertBlock && directInsert ) ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -228,51 +226,55 @@ class PrivateInserter extends Component {
 }
 
 export const ComposedPrivateInserter = compose( [
-	withSelect(
-		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
-			const {
-				getBlockRootClientId,
-				hasInserterItems,
-				getAllowedBlocks,
-				getDirectInsertBlock,
-				getSettings,
-			} = select( blockEditorStore );
+	withSelect( ( select, { clientId, rootClientId, shouldDirectInsert } ) => {
+		const {
+			getBlock,
+			getBlockRootClientId,
+			hasInserterItems,
+			getAllowedBlocks,
+			getSettings,
+			getBlockListSettings,
+		} = select( blockEditorStore );
 
-			const { getBlockVariations } = select( blocksStore );
+		const { getBlockVariations } = select( blocksStore );
 
-			rootClientId =
-				rootClientId || getBlockRootClientId( clientId ) || undefined;
+		rootClientId =
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-			const allowedBlocks = getAllowedBlocks( rootClientId );
+		const allowedBlocks = getAllowedBlocks( rootClientId );
 
-			const directInsertBlock =
-				shouldDirectInsert && getDirectInsertBlock( rootClientId );
+		const { defaultBlock, directInsert } =
+			getBlockListSettings( rootClientId ) ?? {};
 
-			const settings = getSettings();
+		const resolvedDirectInsert =
+			shouldDirectInsert ?? typeof directInsert === 'function'
+				? directInsert( getBlock( rootClientId ) )
+				: directInsert;
 
-			const hasSingleBlockType =
-				allowedBlocks?.length === 1 &&
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-					?.length === 0;
+		const settings = getSettings();
 
-			let allowedBlockType = false;
-			if ( hasSingleBlockType ) {
-				allowedBlockType = allowedBlocks[ 0 ];
-			}
+		const hasSingleBlockType =
+			allowedBlocks?.length === 1 &&
+			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+				?.length === 0;
 
-			return {
-				hasItems: hasInserterItems( rootClientId ),
-				hasSingleBlockType,
-				blockTitle: allowedBlockType ? allowedBlockType.title : '',
-				allowedBlockType,
-				directInsertBlock,
-				rootClientId,
-				prioritizePatterns:
-					settings.__experimentalPreferPatternsOnRoot &&
-					! rootClientId,
-			};
+		let allowedBlockType = false;
+		if ( hasSingleBlockType ) {
+			allowedBlockType = allowedBlocks[ 0 ];
 		}
-	),
+
+		return {
+			hasItems: hasInserterItems( rootClientId ),
+			hasSingleBlockType,
+			blockTitle: allowedBlockType ? allowedBlockType.title : '',
+			allowedBlockType,
+			directInsert: resolvedDirectInsert,
+			directInsertBlock: defaultBlock,
+			rootClientId,
+			prioritizePatterns:
+				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
