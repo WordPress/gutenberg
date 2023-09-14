@@ -29,7 +29,7 @@ class WP_Font_Library {
 	*/
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
-		'ttf'   => PHP_VERSION_ID >= 80102 ? 'font/sfnt' : PHP_7_TTF_MIME_TYPE,
+		'ttf'   => PHP_VERSION_ID >= 80102 ? 'font/sfnt' : self::PHP_7_TTF_MIME_TYPE,
 		'woff'  => PHP_VERSION_ID >= 80102 ? 'font/woff' : 'application/font-woff',
 		'woff2' => PHP_VERSION_ID >= 80102 ? 'font/woff2' : 'application/font-woff2',
 	);
