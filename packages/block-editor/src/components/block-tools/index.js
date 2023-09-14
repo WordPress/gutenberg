@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Fill, Popover } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	Fill,
+	Popover,
+} from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 
@@ -127,6 +131,10 @@ export default function BlockTools( {
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
+	// TODO: Import this from somewhere so it can be used in the post editor and site editor headers consistently.
+	const selectedBlockToolsSlotName = '__experimentalSelectedBlockTools';
+	const blockToolsSlot = useSlot( selectedBlockToolsSlotName );
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
@@ -139,13 +147,27 @@ export default function BlockTools( {
 				<EmptyBlockInserter
 					__unstableContentRef={ __unstableContentRef }
 				/>
-				<Fill name="__experimentalSelectedBlockTools">
-					<SelectedBlockTools isFixed={ hasFixedToolbar } />
-				</Fill>
-				<Fill name="__experimentalInlineRichTextTools">
-					{ /* Used for the inline rich text toolbar. */ }
-					<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
-				</Fill>
+				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
+				{ blockToolsSlot?.ref?.current ? (
+					<Fill name="__experimentalSelectedBlockTools">
+						<SelectedBlockTools isFixed={ hasFixedToolbar } />
+						{ /* Used for the inline rich text toolbar. */ }
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					</Fill>
+				) : (
+					<>
+						<SelectedBlockTools isFixed={ hasFixedToolbar } />
+						{ /* Used for the inline rich text toolbar. */ }
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					</>
+				) }
+
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
