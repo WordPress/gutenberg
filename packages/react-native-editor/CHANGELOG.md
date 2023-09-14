@@ -10,6 +10,14 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
+## 1.103.1
+-   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
 
 ## 1.103.0
 -   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
@@ -18,6 +26,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix horizontal rule style extensions [#53917]
 -   [*] Add block outline to all Social Link blocks when selected [#54011]
 -   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
 
 ## 1.102.1
 - [**] Fix Voice Over and assistive keyboards [#53895]

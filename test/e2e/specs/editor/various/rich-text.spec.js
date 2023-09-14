@@ -585,7 +585,7 @@ test.describe( 'RichText', () => {
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 
 		const result = {

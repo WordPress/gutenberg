@@ -112,9 +112,9 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			return;
 		}
 
-		// get the width of the pinned items in the post editor
+		// get the width of the pinned items in the post editor or widget editor
 		const pinnedItems = document.querySelector(
-			'.edit-post-header__settings'
+			'.edit-post-header__settings, .edit-widgets-header__actions'
 		);
 
 		// get the width of the left header in the site editor
@@ -132,7 +132,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 		const marginLeft = parseFloat( computedToolbarStyle.marginLeft );
 		const pinnedItemsWidth = computedPinnedItemsStyle
-			? parseFloat( computedPinnedItemsStyle.width ) + 10 // 10 is the pinned items padding
+			? parseFloat( computedPinnedItemsStyle.width )
 			: 0;
 		const leftHeaderWidth = computedLeftHeaderStyle
 			? parseFloat( computedLeftHeaderStyle.width )
@@ -143,6 +143,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			leftHeaderWidth +
 			pinnedItemsWidth +
 			marginLeft +
+			( pinnedItems || leftHeader ? 2 : 0 ) + // Prevents button focus border from being cut off
 			( isFullscreen ? 0 : 160 ) // the width of the admin sidebar expanded
 		}px)`;
 	}, [

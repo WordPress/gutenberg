@@ -165,7 +165,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				selectedBlockClientId;
 		} else if ( navigateIn ) {
 			focusedBlockUid =
-				getClientIdsOfDescendants( [ selectedBlockClientId ] )[ 0 ] ??
+				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();

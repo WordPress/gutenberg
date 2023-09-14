@@ -83,7 +83,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     }
     ```
 
-2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).
+2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/getting-started/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/getting-started/glossary/#dynamic-block).
 
 3.  Add `init.js` file to the directory of the new block:
 
