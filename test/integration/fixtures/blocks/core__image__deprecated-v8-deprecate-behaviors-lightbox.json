@@ -1,0 +1,18 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"lightbox": {
+				"enabled": true
+			},
+			"id": 8,
+			"sizeSlug": "large",
+			"linkDestination": "none"
+		},
+		"innerBlocks": []
+	}
+]
