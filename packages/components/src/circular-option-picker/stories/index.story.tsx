@@ -127,6 +127,17 @@ WithLoopingDisabled.args = {
 	...Default.args,
 	loop: false,
 };
+WithLoopingDisabled.parameters = {
+	docs: {
+		source: {
+			code: `<CircularOptionPicker
+  aria-label="${ WithLoopingDisabled.args[ 'aria-label' ] }"
+  loop={false}
+  options={<DefaultOptions />}
+/>`,
+		},
+	},
+};
 
 export const WithButtonAction = Template.bind( {} );
 WithButtonAction.args = {
