@@ -41,22 +41,25 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			// Try to focus the last element which had focus.
-			lastFocus.current.focus();
-			// Check to see if focus worked.
-			if (
-				lastFocus.current.ownerDocument.activeElement ===
-				lastFocus.current
-			) {
-				// Looks like yes, return early.
-				return;
+			// If last focus position matches last block, this likely means we're on the last block wrapper. Let's try to find a better place to focus before defaulting to the wrapper.
+			if ( lastBlock.current !== lastFocus.current ) {
+				// Try to focus the last element which had focus.
+				lastFocus.current.focus();
+				// Check to see if focus worked.
+				if (
+					lastFocus.current.ownerDocument.activeElement ===
+					lastFocus.current
+				) {
+					// Looks like yes, return early.
+					return;
+				}
 			}
 			// Last element focus did not work. Now try to find the first tabbable in the last block to focus.
 			const firstBlockTabbable = focus.tabbable.findNext(
 				lastBlock.current
 			);
 			// Check to ensure tabbable is inside the last block and that it is a form element.
-			if ( isInSameBlock( lastBlock.current, firstBlockTabbable ) ) {
+			if ( isInsideRootBlock( lastBlock.current, firstBlockTabbable ) ) {
 				// Focus the found tabbable in the last block.
 				firstBlockTabbable.focus();
 			} else {
