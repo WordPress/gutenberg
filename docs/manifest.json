@@ -1230,6 +1230,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Tabs",
+		"slug": "tabs",
+		"markdown_source": "../packages/components/src/tabs/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
