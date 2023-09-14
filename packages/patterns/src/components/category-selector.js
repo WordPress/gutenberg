@@ -111,7 +111,6 @@ export default function CategorySelector( { onCategorySelection } ) {
 				onInputChange={ debouncedSearch }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				label={ __( 'Categories' ) }
-				tokenizeOnBlur={ true }
 			/>
 		</>
 	);

@@ -73,7 +73,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
-		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
 		props,
 		'wp.components.FormTokenField'
@@ -168,9 +167,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
-			if ( tokenizeOnBlur && inputHasValidValue() ) {
-				addNewToken( incompleteTokenValue );
-			}
 		} else {
 			// Reset to initial state
 			setIncompleteTokenValue( '' );
@@ -455,7 +451,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive && ! tokenizeOnBlur ) {
+		if ( isActive ) {
 			focus();
 		}
 	}
