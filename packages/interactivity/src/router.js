@@ -86,7 +86,15 @@ export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
 	navigatingTo = href;
 	prefetch( url, options );
-	const page = await pages.get( url );
+
+	// Create a promise that resolves when the specified timeout ends. The
+	// timeout value is 10 seconds by default.
+	const { timeout = 10000 } = options;
+	const timeoutPromise = new Promise( ( resolve ) =>
+		setTimeout( () => resolve( false ), timeout )
+	);
+
+	const page = await Promise.race( [ pages.get( url ), timeoutPromise ] );
 
 	// Once the page is fetched, the destination URL could have changed (e.g.,
 	// by clicking another link in the meantime). If so, bail out, and let the
