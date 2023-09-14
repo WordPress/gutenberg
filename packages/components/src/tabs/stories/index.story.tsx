@@ -13,7 +13,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Tabs from '..';
-import Popover from '../../popover';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
@@ -88,32 +87,22 @@ export const DisabledTab = DisabledTabTemplate.bind( {} );
 
 const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
-		// SlotFill is used here to ensure the icon's tooltips are not
-		// rendered inline, as that would cause them to inherit the tab's opacity.
-		<SlotFillProvider>
-			<Tabs { ...props }>
-				<Tabs.TabList>
-					<Tabs.Tab
-						id={ 'tab1' }
-						title={ 'Tab 1' }
-						icon={ wordpress }
-					/>
-					<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' } icon={ link } />
-					<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' } icon={ more } />
-				</Tabs.TabList>
-				<Tabs.TabPanel id={ 'tab1' }>
-					<p>Selected tab: Tab 1</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab2' }>
-					<p>Selected tab: Tab 2</p>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab3' }>
-					<p>Selected tab: Tab 3</p>
-				</Tabs.TabPanel>
-			</Tabs>
-			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		<Tabs { ...props }>
+			<Tabs.TabList>
+				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' } icon={ wordpress } />
+				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' } icon={ link } />
+				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' } icon={ more } />
+			</Tabs.TabList>
+			<Tabs.TabPanel id={ 'tab1' }>
+				<p>Selected tab: Tab 1</p>
+			</Tabs.TabPanel>
+			<Tabs.TabPanel id={ 'tab2' }>
+				<p>Selected tab: Tab 2</p>
+			</Tabs.TabPanel>
+			<Tabs.TabPanel id={ 'tab3' }>
+				<p>Selected tab: Tab 3</p>
+			</Tabs.TabPanel>
+		</Tabs>
 	);
 };
 export const WithTabIconsAndTooltips = WithTabIconsAndTooltipsTemplate.bind(
