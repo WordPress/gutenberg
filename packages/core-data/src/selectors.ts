@@ -317,6 +317,7 @@ export const getEntityRecord = createSelector(
 		key: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined => {
+		console.log( 'state', state );
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
@@ -1273,7 +1274,7 @@ export function getEntityRecordRevisions(
 	console.log( 'state.entities.records?.[ kind ]?.[ name ]?.revisions', queriedState );
 
 	if ( ! queriedState ) {
-		return null;``
+		return null;
 	}
 	return getQueriedItems( queriedState, query );
 }
