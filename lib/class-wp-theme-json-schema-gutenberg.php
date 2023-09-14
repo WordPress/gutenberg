@@ -2,9 +2,12 @@
 /**
  * WP_Theme_JSON_Schema_Gutenberg class
  *
- * @package WordPress
- * @subpackage Theme
- * @since 5.9.0
+ * This class/file will NOT be backported to Core. It exists to provide a
+ * migration path for theme.json files that used the deprecated "behaviors".
+ * This file will be removed from Gutenberg in version 17.0.0.
+ *
+ * @package gutenberg
+ * @since 16.7.0
  */
 
 if ( class_exists( 'WP_Theme_JSON_Schema_Gutenberg' ) ) {
@@ -96,6 +99,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	/**
 	 * Migrate away from the previous syntax that used a top-level "behaviors" key
 	 * in the `theme.json` to a new "lightbox" setting.
+	 *
+	 * This function SHOULD NOT be ported to Core!!!
+	 *
+	 * It is a temporary migration that will be removed in Gutenberg 17.0.0
 	 *
 	 * @since 16.7.0
 	 *
