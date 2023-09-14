@@ -30,6 +30,7 @@ class DependencyExtractionWebpackPlugin {
 				outputFormat: 'php',
 				outputFilename: null,
 				useDefaults: true,
+				__experimentalInteractiveBlockFiles: [],
 			},
 			options
 		);
@@ -144,6 +145,7 @@ class DependencyExtractionWebpackPlugin {
 			injectPolyfill,
 			outputFormat,
 			outputFilename,
+			__experimentalInteractiveBlockFiles,
 		} = this.options;
 
 		// Dump actually externalized dependencies to a report file.
@@ -183,6 +185,15 @@ class DependencyExtractionWebpackPlugin {
 			const chunkDeps = new Set();
 			if ( injectPolyfill ) {
 				chunkDeps.add( 'wp-polyfill' );
+			}
+
+			// Temporary fix for Interactivity API for the time when it's private in WordPress core.
+			if (
+				__experimentalInteractiveBlockFiles.some( ( name ) =>
+					chunkJSFile.includes( name )
+				)
+			) {
+				chunkDeps.add( 'wp-interactivity' );
 			}
 
 			const processModule = ( { userRequest } ) => {
