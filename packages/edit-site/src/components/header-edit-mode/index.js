@@ -186,55 +186,25 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 
 	return (
 		<div
+			role="menubar"
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
 				<>
-				<NavigableToolbar
-					as={ motion.div }
-					className="edit-site-header-edit-mode__start"
-					aria-label={ __( 'Document tools' ) }
-					shouldUseKeyboardFocusShortcut={
-						! blockToolbarCanBeFocused
-					}
-					variants={ toolbarVariants }
-					transition={ toolbarTransition }
-				>
-					<div className="edit-site-header-edit-mode__toolbar">
-						{ ! isDistractionFree && (
-							<ToolbarItem
-								ref={ inserterButton }
-								as={ Button }
-								className="edit-site-header-edit-mode__inserter-toggle"
-								variant="primary"
-								isPressed={ isInserterOpen }
-								onMouseDown={ preventDefault }
-								onClick={ toggleInserter }
-								disabled={ ! isVisualMode }
-								icon={ plus }
-								label={
-									showIconLabels ? shortLabel : longLabel
-								}
-								showTooltip={ ! showIconLabels }
-								aria-expanded={ isInserterOpen }
-							/>
-						) }
-						{ isLargeViewport && (
-							<>
-								{ ! hasFixedToolbar && (
-									<ToolbarItem
-										as={ ToolSelector }
-										showTooltip={ ! showIconLabels }
-										variant={
-											showIconLabels
-												? 'tertiary'
-												: undefined
-										}
-										disabled={ ! isVisualMode }
-									/>
-								) }
+					<NavigableToolbar
+						as={ motion.div }
+						className="edit-site-header-edit-mode__start"
+						aria-label={ __( 'Document tools' ) }
+						shouldUseKeyboardFocusShortcut={
+							! blockToolbarCanBeFocused
+						}
+						variants={ toolbarVariants }
+						transition={ toolbarTransition }
+					>
+						<div className="edit-site-header-edit-mode__toolbar">
+							{ ! isDistractionFree && (
 								<ToolbarItem
 									ref={ inserterButton }
 									as={ Button }
@@ -249,33 +219,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 										showIconLabels ? shortLabel : longLabel
 									}
 									showTooltip={ ! showIconLabels }
+									aria-expanded={ isInserterOpen }
 								/>
-								{ ! isDistractionFree && (
-									<ToolbarItem
-										as={ Button }
-										className="edit-site-header-edit-mode__list-view-toggle"
-										disabled={
-											! isVisualMode || isZoomedOutView
-										}
-										icon={ listView }
-										isPressed={ isListViewOpen }
-										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'List View' ) }
-										onClick={ toggleListView }
-										ref={ setListViewToggleElement }
-										shortcut={ listViewShortcut }
-										showTooltip={ ! showIconLabels }
-										variant={
-											showIconLabels
-												? 'tertiary'
-												: undefined
-										}
-										aria-expanded={ isListViewOpen }
-									/>
-								) }
-								{ isZoomedOutViewExperimentEnabled &&
-									! isDistractionFree &&
-									! hasFixedToolbar && (
+							) }
+							{ isLargeViewport && (
+								<>
+									{ ! hasFixedToolbar && (
 										<ToolbarItem
 											as={ ToolSelector }
 											showTooltip={ ! showIconLabels }
@@ -291,18 +240,14 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 										as={ UndoButton }
 										showTooltip={ ! showIconLabels }
 										variant={
-											showIconLabels
-												? 'tertiary'
-												: undefined
+											showIconLabels ? 'tertiary' : undefined
 										}
 									/>
 									<ToolbarItem
 										as={ RedoButton }
 										showTooltip={ ! showIconLabels }
 										variant={
-											showIconLabels
-												? 'tertiary'
-												: undefined
+											showIconLabels ? 'tertiary' : undefined
 										}
 									/>
 									{ ! isDistractionFree && (
@@ -325,6 +270,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 													? 'tertiary'
 													: undefined
 											}
+											aria-expanded={ isListViewOpen }
 										/>
 									) }
 									{ isZoomedOutViewExperimentEnabled &&
