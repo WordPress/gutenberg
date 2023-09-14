@@ -172,9 +172,9 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to correctly append a value (`null`, to mark a block
 				// location) to that array before the remaining HTML content for the inner blocks wrapper.
-				$chunk_index = 0;
-				for ( $index = count( $block['innerContent'] ) - 1; $index >= 0; $index-- ) {
-					if ( is_null( $block['innerContent'][ $index ] ) ) {
+				$chunk_index = count( $block['innerContent'] );
+				for ( $index = count( $block['innerContent'] ); $index > 0; $index-- ) {
+					if ( is_null( $block['innerContent'][ $index - 1 ] ) ) {
 						$chunk_index = $index;
 						break;
 					}

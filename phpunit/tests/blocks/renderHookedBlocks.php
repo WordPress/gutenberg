@@ -47,8 +47,8 @@ HTML;
 	/**
 	 * @ticket 59313
 	 */
-	public function test_inject_hooked_block_at_first_child_position_no_child_blocks() {
-		$content = '<!-- wp:tests/group-first-child {"layout":{"type":"constrained"}} /-->';
+	public function test_inject_hooked_block_at_first_child_position_no_inner_content() {
+		$content = '<!-- wp:tests/group-first-child /-->';
 
 		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
 		$blocks     = parse_blocks( $content );
@@ -56,7 +56,32 @@ HTML;
 
 		unregister_block_type( $block_type->name );
 
-		$expected_result = '<!-- wp:tests/group-first-child {"layout":{"type":"constrained"}} --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-first-child -->';
+		$expected_result = '<!-- wp:tests/group-first-child --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-first-child -->';
+		$this->assertSame( $expected_result, $result );
+	}
+
+	/**
+	 * @ticket 59313
+	 */
+	public function test_inject_hooked_block_at_first_child_position_no_child_blocks() {
+		$content = <<<HTML
+<!-- wp:tests/group-first-child -->
+	<div class="wp-block-group"></div>
+<!-- /wp:tests/group-first-child -->
+HTML;
+
+		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
+		$blocks     = parse_blocks( $content );
+		$result     = gutenberg_serialize_blocks( $blocks );
+
+		unregister_block_type( $block_type->name );
+
+		// @todo In the perfect world, the hooked block would be injected inside the `div` tag.
+		$expected_result = <<<HTML
+<!-- wp:tests/group-first-child --><!-- wp:tests/hooked-block /-->
+	<div class="wp-block-group"></div>
+<!-- /wp:tests/group-first-child -->
+HTML;
 		$this->assertSame( $expected_result, $result );
 	}
 
@@ -95,8 +120,8 @@ HTML;
 	/**
 	 * @ticket 59313
 	 */
-	public function test_inject_hooked_block_at_last_child_position_no_child_blocks() {
-		$content = '<!-- wp:tests/group-last-child {"layout":{"type":"constrained"}} /-->';
+	public function test_inject_hooked_block_at_last_child_position_no_inner_content() {
+		$content = '<!-- wp:tests/group-last-child /-->';
 
 		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
 		$blocks     = parse_blocks( $content );
@@ -104,7 +129,32 @@ HTML;
 
 		unregister_block_type( $block_type->name );
 
-		$expected_result = '<!-- wp:tests/group-last-child {"layout":{"type":"constrained"}} --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-last-child -->';
+		$expected_result = '<!-- wp:tests/group-last-child --><!-- wp:tests/hooked-block /--><!-- /wp:tests/group-last-child -->';
+		$this->assertSame( $expected_result, $result );
+	}
+
+	/**
+	 * @ticket 59313
+	 */
+	public function test_inject_hooked_block_at_last_child_position_no_child_blocks() {
+		$content = <<<HTML
+<!-- wp:tests/group-last-child -->
+	<div class="wp-block-group"></div>
+<!-- /wp:tests/group-last-child -->
+HTML;
+
+		$block_type = register_block_type( GUTENBERG_DIR_TESTFIXTURES . '/hooked-block/' );
+		$blocks     = parse_blocks( $content );
+		$result     = gutenberg_serialize_blocks( $blocks );
+
+		unregister_block_type( $block_type->name );
+
+		// @todo In the perfect world, the hooked block would be injected inside the `div` tag.
+		$expected_result = <<<HTML
+<!-- wp:tests/group-last-child -->
+	<div class="wp-block-group"></div>
+<!-- wp:tests/hooked-block /--><!-- /wp:tests/group-last-child -->
+HTML;
 		$this->assertSame( $expected_result, $result );
 	}
 }
