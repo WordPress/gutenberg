@@ -95,7 +95,12 @@ function block_core_image_get_lightbox_settings( $block ) {
 		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 
 		// If not present in global settings, check the top-level global settings.
-		if ( ! is_bool( $lightbox_settings ) && ! isset( $lightbox_settings['enabled'] ) && ! isset( $lightbox_settings['allowEditing'] ) ) {
+		//
+		// NOTE: If no block-level settings are found, the previous call to
+		// `gutenberg_get_global_settings` will return the whole `theme.json`
+		// structure in which case we can check if the "lightbox" key is present at
+		// the top-level of the global settings and use its value.
+		if ( ! is_bool( $lightbox_settings ) && isset( $lightbox_settings['lightbox'] )  ) {
 			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 		}
 	}
