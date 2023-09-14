@@ -185,7 +185,7 @@ describe( 'prPreviewLink', () => {
 							data: [
 								{
 									id: 789,
-									body: '<!--gutenberg-run-placeholder:cmt@v1-->Mocked existing comment',
+									body: `<!--${ COMMENT_PLACEHOLDER }-->Mocked existing comment`,
 								},
 							],
 						} );
@@ -222,7 +222,7 @@ describe( 'prPreviewLink', () => {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			comment_id: 789, // Existing comment ID
-			body: '<!--gutenberg-run-placeholder:cmt@v1-->Mocked rendered comment',
+			body: `<!--${ COMMENT_PLACEHOLDER }-->Mocked rendered comment`,
 		} );
 		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
 		expect(
@@ -271,7 +271,7 @@ describe( 'prPreviewLink', () => {
 							data: [
 								{
 									id: 789,
-									body: '<!--gutenberg-run-placeholder:cmt@v1-->Mocked existing comment',
+									body: `<!--${ COMMENT_PLACEHOLDER }-->Mocked existing comment`,
 								},
 							],
 						} );
@@ -300,7 +300,7 @@ describe( 'prPreviewLink', () => {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			comment_id: 789, // Existing comment ID
-			body: '<!--gutenberg-run-placeholder:cmt@v1-->Mocked failed build comment',
+			body: `<!--${ COMMENT_PLACEHOLDER }-->Mocked failed build comment`,
 		} );
 		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
 		expect(
