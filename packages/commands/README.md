@@ -1,46 +1,46 @@
 # Commands
 
-Commands is a generic package that allows registering and modifying commands to be displayed using the commands menu (also called `cmd+k`).
+Commands is a generic package that allows registering and modifying commands to be displayed using the commands menu, also called the Command Palette. The Command Palette can be accessed in the Editor using `cmd+k`.
 
 ## Types of commands
 
 There are two ways to register commands: static or dynamic. Both methods receive a command object as an argument, which provides:
 
--   `name`: A unique machine readable name for the command
--   `label`: A human readable label
+-   `name`: A unique machine-readable name for the command
+-   `label`: A human-readable label
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
 -   `context`: (Optional) The context of the command
 
 ### Static commands
 
-Static commands can be registered using the `wp.data.dispatch( wp.commands.store ).registerCommand` action or using the `wp.commands.useCommand` React hook. See the `useCommand` [code example](#usecommand) below.
+Static commands can be registered using the `wp.data.dispatch( wp.commands.store ).registerCommand` action or using the `wp.commands.useCommand` React hook. Static commands are commonly used to perform a specific action. These could include adding a new page or opening a section of the Editor interface, such as opening the Editor Preferences modal. See the `useCommand` [code example](#usecommand) below.
 
 ### Dynamic commands
 
-Dynamic commands, on the other hand, are registered using “command loaders", `wp.commands.useCommandLoader`. These loaders are needed when the command list depends on a search term entered by the user in the command palette input or when some commands are only available when some conditions are met.
+Dynamic commands, on the other hand, are registered using “command loaders", `wp.commands.useCommandLoader`. These loaders are needed when the command list depends on a search term entered by the user in the Command Palette input or when some commands are only available when some conditions are met.
 
-For example, when a user types "contact", the command palette needs to filter the available pages using that input. See the `useCommandLoader` [code example](#usecommandloader) below.
+For example, when a user types "contact", the Command Palette needs to filter the available pages using that input to try and find the Contact page. See the `useCommandLoader` [code example](#usecommandloader) below.
 
 ## Contextual commands
 
-Static and dynamic commands can be contextual. This means that in a given context (for example, when navigating the Site Editor or editing a template), some specific commands are given more priority and are visible as soon as you open the command palette. Also, when typing the command palette, these contextual commands are shown above the rest of the commands.
+Static and dynamic commands can be contextual. This means that in a given context (for example, when navigating the Site Editor or editing a template), some specific commands are given more priority and are visible as soon as you open the Command Palette. Also, when typing the Command Palette, these contextual commands are shown above the rest of the commands.
 
 At the moment, two contexts have been implemented:
 
 -   `site-editor`: This is the context that is set when you are navigating in the site editor (sidebar visible).
 -   `site-editor-edit`: This is the context that is set when you are editing a document (template, template part or page) in the site editor.
-    As the usage of the command palette expands, more contexts will be added.
+    As the usage of the Command Palette expands, more contexts will be added.
 
 Attaching a command or command loader to a given context is as simple as adding the `context` property (with the right context value from the available contexts above) to the `useCommand` or `useCommandLoader` calls.
 
 ## WordPress Data API
 
-The command palette also offers a number of [selectors and actions](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) to manipulate its state which includes:
+The Command Palette also offers a number of [selectors and actions](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) to manipulate its state, which include:
 
 -   Retrieving the registered commands and command loaders using the following selectors `getCommands` and `getCommandLoader`
--   Checking if the command palette is open using the `isOpen` selector.
--   Programmatically open or close the command palette using the `open` and `close` actions.
+-   Checking if the Command Palette is open using the `isOpen` selector.
+-   Programmatically open or close the Command Palette using the `open` and `close` actions.
 
 See the [Commands Data](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-commands/) documentation for more information.
 
@@ -62,9 +62,20 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Store definition for the commands namespace.
 
+See how the Commands Store is being used in components like [site-hub](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-site/src/components/site-hub/index.js#L23) and [document-actions](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/header/document-actions/index.js#L14).
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Usage_
+
+```js
+import { store as commandsStore } from '@wordpress/commands';
+import { useDispatch } from '@wordpress/data';
+...
+const { open: openCommandCenter } = useDispatch( commandsStore );
+```
 
 _Type_
 
