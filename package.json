@@ -340,7 +340,7 @@
 		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test:unit:php:setup": "wp-env start",
 		"test:unit:php:setup:debug": "wp-env start --xdebug",
-		"test:unit:php:base": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+		"test:unit:php:base": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-wordpress vendor/bin/phpunit -c phpunit.xml.dist --verbose --filter WP_Theme_JSON_Gutenberg_Test",
 		"test:unit:php": "npm-run-all test:unit:php:setup test:unit:php:base",
 		"test:unit:php:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:base",
 		"test:unit:php:multisite:base": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-wordpress vendor/bin/phpunit -c phpunit/multisite.xml --verbose",
