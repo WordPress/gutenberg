@@ -4,7 +4,6 @@ export const PATTERNS = 'pattern';
 export const DEFAULT_TYPE = PATTERNS;
 export const TEMPLATE_PARTS = 'wp_template_part';
 export const USER_PATTERNS = 'wp_block';
-export const USER_PATTERN_CATEGORY = 'my-patterns';
 
 export const CORE_PATTERN_SOURCES = [
 	'core',

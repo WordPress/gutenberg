@@ -14,7 +14,7 @@ import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
-export const USER_PATTERN_CATEGORY = 'my-patterns';
+export const ALL_PATTERNS_CATEGORY = 'all-patterns';
 
 export const SYNC_TYPES = {
 	full: undefined,
@@ -51,7 +51,7 @@ export default function CreatePatternModal( {
 				);
 				onSuccess( {
 					pattern: newPattern,
-					categoryId: USER_PATTERN_CATEGORY,
+					categoryId: ALL_PATTERNS_CATEGORY,
 				} );
 			} catch ( error ) {
 				createErrorNotice( error.message, {
