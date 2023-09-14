@@ -53,7 +53,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	// Preallocate array since size is known.
 	const mergedItemIds = new Array( size );
-
+console.log( 'mergedItemIds, size', mergedItemIds, size );
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
 		const isInNextItemsRange =
@@ -255,13 +255,58 @@ const receiveQueries = compose( [
 ] )( ( state = null, action ) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
 
-	if ( type !== 'RECEIVE_ITEMS' && type !== 'RECEIVE_REVISION_ITEMS' ) {
+	if ( type !== 'RECEIVE_ITEMS' ) {
 		return state;
 	}
 
 	return getMergedItemIds(
 		state || [],
 		action.items.map( ( item ) => item[ key ] ),
+		page,
+		perPage
+	);
+} );
+
+const receiveRevisionQueries = compose( [
+	// Limit to matching action type so we don't attempt to replace action on
+	// an unhandled action.
+	//ifMatchingAction( ( action ) => 'query' in action ),
+
+	// Inject query parts into action for use both in `onSubKey` and reducer.
+	replaceAction( ( action ) => {
+		// `ifMatchingAction` still passes on initialization, where state is
+		// undefined and a query is not assigned. Avoid attempting to parse
+		// parts. `onSubKey` will omit by lack of `stableKey`.
+		if ( action.query ) {
+			return {
+				...action,
+				...getQueryParts( action.query ),
+			};
+		}
+
+		return action;
+	} ),
+
+	// onSubKey( 'context' ),
+
+	// Queries shape is shared, but keyed by query `stableKey` part. Original
+	// reducer tracks only a single query object.
+	onSubKey( 'stableKey' ),
+] )( ( state = null, action ) => {
+	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
+
+	if ( type !== 'RECEIVE_REVISION_ITEMS' ) {
+		return state;
+	}
+console.log( 'getMergedItemIds', state, getMergedItemIds(
+	state || [],
+	action.items.map( ( item ) => item[ key ] ),
+	page,
+	perPage
+) );
+	return getMergedItemIds(
+		state || [],
+		action.items.map( ( item ) => item.id ),
 		page,
 		perPage
 	);
@@ -316,9 +361,11 @@ const queries = ( state = {}, action ) => {
  * @return {Object} Next state.
  */
 const revisionQueries = ( state = {}, action ) => {
+	console.log( 'revisionQueries state', state, action );
+
 	switch ( action.type ) {
 		case 'RECEIVE_REVISION_ITEMS':
-			return receiveQueries( state, action );
+			return receiveRevisionQueries( state, action );
 		default:
 			return state;
 	}
