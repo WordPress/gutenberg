@@ -2,6 +2,10 @@
 /**
  * Behaviors block support flag.
  *
+ * This file will NOT be backported to Core. It exists to provide a
+ * migration path for theme.json files that used the deprecated "behaviors".
+ * This file will be removed from Gutenberg in version 17.0.0.
+ *
  * @package gutenberg
  */
 
@@ -37,7 +41,6 @@ function gutenberg_register_behaviors_support( $block_type ) {
 
 /**
  * Add the directives and layout needed for the lightbox behavior.
- * This functions shouldn't be in this file. It should be moved to a package (or somewhere else), where all the behaviors logic is defined.
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
