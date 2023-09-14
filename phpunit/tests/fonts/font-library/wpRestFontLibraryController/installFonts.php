@@ -423,17 +423,17 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 	 * @param array $font_families Font families to install in theme.json format.
 	 * @param array $files         Font files to install.
 	 */
-	public function test_install_with_duplicate_font_faces( $font_families, $files = array() ) {
+	public function test_install_with_duplicate_font_faces( $font_families, $files = array(), $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
 		$install_request->set_param( 'fontFamilies', $font_families_json );
 		$install_request->set_file_params( $files );
 
 		$response = rest_get_server()->dispatch( $install_request );
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$data = $response->get_data();
 
-		$this->assertCount( 1, $data[0]['fontFace'], 'Duplicate font faces were not removed / added incorrectly.' );
+		$this->assertCount( 1, $expected_response[0]['fontFace'], 'Duplicate font faces were not removed / added incorrectly.' );
 		$this->assertSame( 'http://example.com/fonts/piazzolla_400_italic.ttf', $data[0]['fontFace'][0]['src'], 'The src attribute does not match the expected font file' );
 	}
 
@@ -462,6 +462,21 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontWeight'      => '400',
 								'src'             => 'http://example.com/fonts/piazzolla_400_italic.woff',
 								'downloadFromUrl' => 'http://example.com/fonts/piazzolla_400_italic.woff',
+							),
+						),
+					),
+				),
+				'expected_response' => array(
+					array(
+						'fontFamily' => 'Piazzolla',
+						'slug'       => 'piazzolla',
+						'name'       => 'Piazzolla',
+						'fontFace'   => array(
+							array(
+								'fontFamily' => 'Piazzolla',
+								'fontStyle'  => 'italic',
+								'fontWeight' => '400',
+								'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
 							),
 						),
 					),
