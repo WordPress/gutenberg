@@ -1,5 +1,7 @@
 # Glossary
 
+[Attribute sources]("#attribute-sources"), [Attributes]("#attributes"), [Block]("#block"), [Block Styles]("#block-styles"), [Block Supports]("#block-supports"), [Block Theme]("#block-theme"), [Block categories]("#block-categories"), [Block Inserter Library]("#block-inserter-library"), [Block name]("#block-name"), [Block Templates]("#block-templates"), [Block Template Parts]("#block-template-parts"), [Block type]("#block-type"), [Classic block]("#classic-block"), [Dynamic block]("#dynamic-block"), [Full Site Editing]("#full-site-editing"), [Global Styles]("#global-styles"), [Inspector]("#inspector"), [Local Styles]("#local-styles"), [Navigation Block]("#navigation-block"), [Patterns]("#patterns"), [Post settings]("#post-settings"), [Query Block]("#query-block"), [Reusable block]("#reusable-block"), [RichText]("#richtext"), [Serialization]("#serialization"), [Settings Sidebar]("#settings-sidebar"), [Site Editor]("#site-editor"), [Static block]("#static-block"), [Template Editing Mode]("#template-editing-mode"), [Theme Blocks]("#theme-blocks"), [TinyMCE]("#tinymce"), [Toolbar]("#toolbar")
+
 ## Attribute sources
 
 An object describing the attributes shape of a block. The keys can be named as most appropriate to describe the state of a block type. The value for each key is a function which describes the strategy by which the attribute value should be extracted from the content of a saved post's content. When processed, a new object is created, taking the form of the keys defined in the attribute sources, where each value is the result of the attribute source function.
@@ -34,7 +36,7 @@ A theme built in block forward way that allows Full Site Editing to work. The co
 
 These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Library.
 
-## Block ~Inserter~ Library
+## Block -Inserter- Library
 
 Primary interface for selecting from the available blocks, triggered by plus icon buttons on Blocks or in the top-left of the editor interface.
 
