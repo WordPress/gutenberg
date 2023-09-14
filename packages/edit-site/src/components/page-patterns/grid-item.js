@@ -184,12 +184,10 @@ function GridItem( { categoryId, item, ...props } ) {
 								'Editing this pattern will also update anywhere it is used'
 							) }
 						>
-							<span>
-								<Icon
-									className="edit-site-patterns__pattern-icon"
-									icon={ itemIcon }
-								/>
-							</span>
+							<Icon
+								className="edit-site-patterns__pattern-icon"
+								icon={ itemIcon }
+							/>
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
@@ -213,9 +211,11 @@ function GridItem( { categoryId, item, ...props } ) {
 								position="top center"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
-								<span className="edit-site-patterns__pattern-lock-icon">
-									<Icon icon={ lockSmall } size={ 24 } />
-								</span>
+								<Icon
+									className="edit-site-patterns__pattern-lock-icon"
+									icon={ lockSmall }
+									size={ 24 }
+								/>
 							</Tooltip>
 						) }
 					</Flex>
