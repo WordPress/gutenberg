@@ -75,35 +75,42 @@ function PatternList( {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
+		const filteredPatterns = allPatterns.filter( ( pattern ) => {
+			if (
+				isPatternFiltered(
+					pattern,
+					patternSourceFilter,
+					patternSyncFilter
+				)
+			) {
+				return false;
+			}
+
+			if ( selectedCategory === allPatternsCategory.name ) {
+				return true;
+			}
+
+			if ( selectedCategory === 'uncategorized' ) {
+				const hasKnownCategory = pattern.categories.some(
+					( category ) =>
+						registeredPatternCategories.includes( category )
+				);
+
+				return ! pattern.categories?.length || ! hasKnownCategory;
+			}
+
+			return pattern.categories?.includes( selectedCategory );
+		} );
+
 		if ( ! searchValue ) {
-			return allPatterns.filter( ( pattern ) => {
-				if (
-					isPatternFiltered(
-						pattern,
-						patternSourceFilter,
-						patternSyncFilter
-					)
-				) {
-					return false;
-				}
-
-				if ( selectedCategory === allPatternsCategory.name ) {
-					return true;
-				}
-
-				if ( selectedCategory === 'uncategorized' ) {
-					const hasKnownCategory = pattern.categories.some(
-						( category ) =>
-							registeredPatternCategories.includes( category )
-					);
-
-					return ! pattern.categories?.length || ! hasKnownCategory;
-				}
-
-				return pattern.categories?.includes( selectedCategory );
-			} );
+			return filteredPatterns;
 		}
-		return searchItems( allPatterns, searchValue );
+
+		return searchItems(
+			filteredPatterns,
+			searchValue,
+			patternSourceFilter
+		);
 	}, [
 		searchValue,
 		patternSourceFilter,
