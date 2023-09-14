@@ -92,7 +92,7 @@ export function showBlockInterface() {
  */
 export const privateRemoveBlocks =
 	( clientIds, selectPrevious = true, forceRemove = false ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
 		}
@@ -154,11 +154,12 @@ export const privateRemoveBlocks =
 			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
+		registry.batch( () => {
+			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch( ensureDefaultBlock() );
+		} );
 	};
 
 /**

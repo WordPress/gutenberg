@@ -375,7 +375,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +394,18 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch.ensureDefaultBlock();
 	};
 
 /**
