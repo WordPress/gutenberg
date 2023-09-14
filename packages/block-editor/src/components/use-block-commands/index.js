@@ -112,6 +112,60 @@ export const useTransformCommands = () => {
 };
 
 const useActionsCommands = () => {
+	const { clientIds } = useSelect( ( select ) => {
+		const { getSelectedBlockClientIds } = select( blockEditorStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+
+		return {
+			clientIds: selectedBlockClientIds,
+		};
+	}, [] );
+
+	const { getBlockRootClientId, canMoveBlocks, getBlockCount } =
+		useSelect( blockEditorStore );
+
+	const { setBlockMovingClientId, setNavigationMode, selectBlock } =
+		useDispatch( blockEditorStore );
+
+	if ( ! clientIds || clientIds.length < 1 ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+
+	const canMove =
+		canMoveBlocks( clientIds, rootClientId ) &&
+		getBlockCount( rootClientId ) !== 1;
+
+	const commands = [];
+
+	if ( canMove ) {
+		commands.push( {
+			name: 'move-to',
+			label: __( 'Move to' ),
+			callback: () => {
+				setNavigationMode( true );
+				selectBlock( clientIds[ 0 ] );
+				setBlockMovingClientId( clientIds[ 0 ] );
+			},
+			icon: move,
+		} );
+	}
+
+	return {
+		isLoading: false,
+		commands: commands.map( ( command ) => ( {
+			...command,
+			name: 'core/block-editor/action-' + command.name,
+			callback: ( { close } ) => {
+				command.callback();
+				close();
+			},
+		} ) ),
+	};
+};
+
+const useQuickActionsCommands = () => {
 	const { clientIds, isUngroupable, isGroupable } = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientIds,
@@ -130,9 +184,7 @@ const useActionsCommands = () => {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlocksByClientId,
-		canMoveBlocks,
 		canRemoveBlocks,
-		getBlockCount,
 	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
@@ -145,9 +197,6 @@ const useActionsCommands = () => {
 		duplicateBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		setBlockMovingClientId,
-		setNavigationMode,
-		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	const onGroup = () => {
@@ -196,9 +245,6 @@ const useActionsCommands = () => {
 		);
 	} );
 	const canRemove = canRemoveBlocks( clientIds, rootClientId );
-	const canMove =
-		canMoveBlocks( clientIds, rootClientId ) &&
-		getBlockCount( rootClientId ) !== 1;
 
 	const commands = [];
 
@@ -265,19 +311,6 @@ const useActionsCommands = () => {
 		} );
 	}
 
-	if ( canMove ) {
-		commands.push( {
-			name: 'move-to',
-			label: __( 'Move to' ),
-			callback: () => {
-				setNavigationMode( true );
-				selectBlock( clientIds[ 0 ] );
-				setBlockMovingClientId( clientIds[ 0 ] );
-			},
-			icon: move,
-		} );
-	}
-
 	return {
 		isLoading: false,
 		commands: commands.map( ( command ) => ( {
@@ -299,6 +332,10 @@ export const useBlockCommands = () => {
 	useCommandLoader( {
 		name: 'core/block-editor/blockActions',
 		hook: useActionsCommands,
+	} );
+	useCommandLoader( {
+		name: 'core/block-editor/blockQuickActions',
+		hook: useQuickActionsCommands,
 		context: 'block-selection-edit',
 	} );
 };
