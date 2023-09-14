@@ -201,19 +201,18 @@ const useActionsCommands = () => {
 		getBlockCount( rootClientId ) !== 1;
 
 	const commands = [];
+
+	if ( canDuplicate ) {
+		commands.push( {
+			name: 'duplicate',
+			label: __( 'Duplicate' ),
+			callback: () => duplicateBlocks( clientIds, true ),
+			icon: copy,
+		} );
+	}
+
 	if ( canInsertDefaultBlock ) {
 		commands.push(
-			{
-				name: 'add-after',
-				label: __( 'Add after' ),
-				callback: () => {
-					const clientId = Array.isArray( clientIds )
-						? clientIds[ clientIds.length - 1 ]
-						: clientId;
-					insertAfterBlock( clientId );
-				},
-				icon: add,
-			},
 			{
 				name: 'add-before',
 				label: __( 'Add before' ),
@@ -224,9 +223,39 @@ const useActionsCommands = () => {
 					insertBeforeBlock( clientId );
 				},
 				icon: add,
+			},
+			{
+				name: 'add-after',
+				label: __( 'Add after' ),
+				callback: () => {
+					const clientId = Array.isArray( clientIds )
+						? clientIds[ clientIds.length - 1 ]
+						: clientId;
+					insertAfterBlock( clientId );
+				},
+				icon: add,
 			}
 		);
 	}
+
+	if ( isGroupable ) {
+		commands.push( {
+			name: 'Group',
+			label: __( 'Group' ),
+			callback: onGroup,
+			icon: group,
+		} );
+	}
+
+	if ( isUngroupable ) {
+		commands.push( {
+			name: 'ungroup',
+			label: __( 'Ungroup' ),
+			callback: onUngroup,
+			icon: ungroup,
+		} );
+	}
+
 	if ( canRemove ) {
 		commands.push( {
 			name: 'remove',
@@ -235,14 +264,7 @@ const useActionsCommands = () => {
 			icon: remove,
 		} );
 	}
-	if ( canDuplicate ) {
-		commands.push( {
-			name: 'duplicate',
-			label: __( 'Duplicate' ),
-			callback: () => duplicateBlocks( clientIds, true ),
-			icon: copy,
-		} );
-	}
+
 	if ( canMove ) {
 		commands.push( {
 			name: 'move-to',
@@ -255,22 +277,7 @@ const useActionsCommands = () => {
 			icon: move,
 		} );
 	}
-	if ( isUngroupable ) {
-		commands.push( {
-			name: 'ungroup',
-			label: __( 'Ungroup' ),
-			callback: onUngroup,
-			icon: ungroup,
-		} );
-	}
-	if ( isGroupable ) {
-		commands.push( {
-			name: 'Group',
-			label: __( 'Group' ),
-			callback: onGroup,
-			icon: group,
-		} );
-	}
+
 	return {
 		isLoading: false,
 		commands: commands.map( ( command ) => ( {
