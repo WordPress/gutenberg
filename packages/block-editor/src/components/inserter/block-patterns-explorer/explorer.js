@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { Modal } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,25 +26,9 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 		initialCategory?.name
 	);
 
-	const previousSyncFilter = usePrevious( patternSyncFilter );
-
-	// If the sync filter changes, we need to select the "All" category to avoid
-	// showing a confusing no results screen.
-	useEffect( () => {
-		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
-			setSelectedCategory( initialCategory?.name );
-		}
-	}, [
-		patternSyncFilter,
-		previousSyncFilter,
-		patternSourceFilter,
-		initialCategory?.name,
-	] );
-
 	const patternCategories = usePatternsCategories(
 		rootClientId,
-		patternSourceFilter,
-		patternSyncFilter
+		patternSourceFilter
 	);
 
 	return (
