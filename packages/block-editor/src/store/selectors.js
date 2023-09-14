@@ -3023,7 +3023,7 @@ export const isGroupable = createRegistrySelector(
 		}
 );
 
-/*
+/**
  * Returns the element of the last element that had focus when focus left the editor canvas.
  *
  * @param {Object} state Block editor state.
