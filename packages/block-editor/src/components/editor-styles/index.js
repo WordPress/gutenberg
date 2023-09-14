@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo, createContext } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -20,8 +20,6 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 extend( [ namesPlugin, a11yPlugin ] );
-
-export const updateStyleContext = createContext( () => {} );
 
 function useDarkThemeBodyClassName( styles, scope ) {
 	return useCallback(
