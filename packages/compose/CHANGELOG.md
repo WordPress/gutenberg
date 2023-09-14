@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+-   `useStateWithHistory`: Add a new hook to manage state with undo/redo support.
+
 ## 6.18.0 (2023-08-31)
 
 ## 6.17.0 (2023-08-16)
