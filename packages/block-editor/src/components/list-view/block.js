@@ -90,13 +90,11 @@ function ListViewBlock( {
 		},
 		[ clientId ]
 	);
-
-	const { allowRightClickOverrides } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			allowRightClickOverrides: getSettings().allowRightClickOverrides,
-		};
-	} );
+	const allowRightClickOverrides = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().allowRightClickOverrides,
+		[]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
