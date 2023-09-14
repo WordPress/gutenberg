@@ -104,6 +104,7 @@ function ButtonEdit( props ) {
 
 	function updateLinkAttributes( newUrl, opensInNewWindow, nofollow ) {
 		let newLinkTarget;
+		// Since `rel` is editable attribute, we need to check for existing values and proceed accordingly. 
 		let updatedRel = rel || '';
 
 		if ( opensInNewWindow ) {
