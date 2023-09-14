@@ -31,22 +31,17 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
-const fAccent = formats.success;
-const fTitle = formats.title;
-const fWarning = formats.warning;
-
 /**
  * A logging helper for printing steps and their substeps.
  *
- * @param {number} sub  Value to indent the log.
- * @param {any}    msg  Message to log.
- * @param {...any} args Rest of the arguments to pass to console.log.
+ * @param {number} indent Value to indent the log.
+ * @param {any}    msg    Message to log.
+ * @param {...any} args   Rest of the arguments to pass to console.log.
  */
-function logStep( sub, msg, ...args ) {
-	const indent = '    ';
-	const prefix = sub === 0 ? '▶\u00A0' : '>\u00A0';
-	const newline = sub === 0 ? '\n' : '';
-	return log( newline + indent.repeat( sub ) + prefix + msg, ...args );
+function logAtIndent( indent, msg, ...args ) {
+	const prefix = indent === 0 ? '▶ ' : '> ';
+	const newline = indent === 0 ? '\n' : '';
+	return log( newline + '    '.repeat( indent ) + prefix + msg, ...args );
 }
 
 /**
@@ -113,25 +108,23 @@ async function runPerformanceTests( branches, options ) {
 		branches = [ 'trunk' ];
 	}
 
-	log( fTitle( '\n💃 Performance Tests 🕺' ) );
+	log( formats.title( '\n💃 Performance Tests 🕺' ) );
 	log(
 		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.'
 	);
 
 	if ( ! runningInCI ) {
 		log(
-			fWarning(
-				[
-					'\nIn order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
-					'Make sure these ports are not used before continuing.\n',
-				].join( '\n' )
+			formats.warning(
+				'\nIn order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.' +
+					'\nMake sure these ports are not used before continuing.\n'
 			)
 		);
 
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
-	logStep( 0, 'Setting up' );
+	logAtIndent( 0, 'Setting up' );
 
 	/**
 	 * @type {string[]} git refs against which to run tests;
@@ -144,41 +137,45 @@ async function runPerformanceTests( branches, options ) {
 	const baseDir = path.join( os.tmpdir(), 'wp-performance-tests' );
 
 	if ( fs.existsSync( baseDir ) ) {
-		logStep( 1, 'Removing existing files' );
+		logAtIndent( 1, 'Removing existing files' );
 		fs.rmSync( baseDir, { recursive: true } );
 	}
 
-	logStep( 1, 'Creating base directory:', fAccent( baseDir ) );
+	logAtIndent( 1, 'Creating base directory:', formats.success( baseDir ) );
 	fs.mkdirSync( baseDir );
 
-	logStep( 1, 'Setting up repository' );
+	logAtIndent( 1, 'Setting up repository' );
 	const sourceDir = path.join( baseDir, 'source' );
 
-	logStep( 2, 'Creating directory:', fAccent( sourceDir ) );
+	logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 	fs.mkdirSync( sourceDir );
 
 	// @ts-ignore
 	const sourceGit = SimpleGit( sourceDir );
-	logStep( 2, 'Initializing:', fAccent( config.gitRepositoryURL ) );
+	logAtIndent(
+		2,
+		'Initializing:',
+		formats.success( config.gitRepositoryURL )
+	);
 	await sourceGit
 		.raw( 'init' )
 		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
 
 	for ( const [ i, branch ] of branches.entries() ) {
-		logStep(
+		logAtIndent(
 			2,
 			`Fetching environment branch (${ i + 1 } of ${ branches.length }):`,
-			fAccent( branch )
+			formats.success( branch )
 		);
 		await sourceGit.raw( 'fetch', '--depth=1', 'origin', branch );
 	}
 
 	const testRunnerBranch = options.testsBranch || branches[ 0 ];
 	if ( options.testsBranch && ! branches.includes( options.testsBranch ) ) {
-		logStep(
+		logAtIndent(
 			2,
 			'Fetching test runner branch:',
-			fAccent( options.testsBranch )
+			formats.success( options.testsBranch )
 		);
 		// @ts-ignore
 		await sourceGit.raw(
@@ -188,36 +185,38 @@ async function runPerformanceTests( branches, options ) {
 			options.testsBranch
 		);
 	} else {
-		logStep( 2, 'Using test runner branch:', fAccent( testRunnerBranch ) );
+		logAtIndent(
+			2,
+			'Using test runner branch:',
+			formats.success( testRunnerBranch )
+		);
 	}
 
-	logStep( 1, 'Setting up test runner' );
+	logAtIndent( 1, 'Setting up test runner' );
 
 	const testRunnerDir = path.join( baseDir + '/tests' );
 
-	logStep( 2, 'Copying source to:', fAccent( testRunnerDir ) );
+	logAtIndent( 2, 'Copying source to:', formats.success( testRunnerDir ) );
 	await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
 
-	logStep( 2, 'Checking out branch:', fAccent( testRunnerBranch ) );
+	logAtIndent(
+		2,
+		'Checking out branch:',
+		formats.success( testRunnerBranch )
+	);
 	// @ts-ignore
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
-	logStep( 2, 'Installing dependencies and building' );
+	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "${ [
-			'source $HOME/.nvm/nvm.sh',
-			'nvm install',
-			'npm ci',
-			'npx playwright install chromium --with-deps',
-			'npm run build:packages',
-		].join( ' && ' ) }"`,
+		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build:packages"`,
 		testRunnerDir
 	);
 
-	logStep( 1, 'Setting up test environments' );
+	logAtIndent( 1, 'Setting up test environments' );
 
 	const envsDir = path.join( baseDir, 'environments' );
-	logStep( 2, 'Creating parent directory:', fAccent( envsDir ) );
+	logAtIndent( 2, 'Creating parent directory:', formats.success( envsDir ) );
 	fs.mkdirSync( envsDir );
 
 	let wpZipUrl = null;
@@ -234,37 +233,36 @@ async function runPerformanceTests( branches, options ) {
 
 	const branchDirs = {};
 	for ( const branch of branches ) {
-		logStep( 2, 'Branch:', fAccent( branch ) );
+		logAtIndent( 2, 'Branch:', formats.success( branch ) );
 		const sanitizedBranchName = sanitizeBranchName( branch );
 		const envDir = path.join( envsDir, sanitizedBranchName );
 
-		logStep( 3, 'Creating directory:', fAccent( envDir ) );
+		logAtIndent( 3, 'Creating directory:', formats.success( envDir ) );
 		fs.mkdirSync( envDir );
 		// @ts-ignore
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
 
-		logStep( 3, 'Copying source to:', fAccent( buildDir ) );
+		logAtIndent( 3, 'Copying source to:', formats.success( buildDir ) );
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
-		logStep( 3, 'Checking out:', fAccent( branch ) );
+		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
 		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
-		logStep( 3, 'Installing dependencies and building' );
+		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "${ [
-				'source $HOME/.nvm/nvm.sh',
-				'nvm install',
-				'npm ci',
-				'npm run build',
-			].join( ' && ' ) }"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"`,
 			buildDir
 		);
 
 		const wpEnvConfigPath = path.join( envDir, '.wp-env.json' );
 
-		logStep( 3, 'Saving wp-env config to:', fAccent( wpEnvConfigPath ) );
+		logAtIndent(
+			3,
+			'Saving wp-env config to:',
+			formats.success( wpEnvConfigPath )
+		);
 
 		fs.writeFileSync(
 			wpEnvConfigPath,
@@ -309,54 +307,58 @@ async function runPerformanceTests( branches, options ) {
 		);
 	}
 
-	logStep( 0, 'Looking for test files' );
+	logAtIndent( 0, 'Looking for test files' );
 
 	const testSuites = getFilesFromDir(
 		path.join( testRunnerDir, 'test/performance/specs' )
 	).map( ( file ) => {
-		logStep( 1, 'Found:', fAccent( file ) );
+		logAtIndent( 1, 'Found:', formats.success( file ) );
 		return path.basename( file, '.spec.js' );
 	} );
 
-	logStep( 0, 'Running tests' );
+	logAtIndent( 0, 'Running tests' );
 
 	if ( wpZipUrl ) {
-		logStep( 1, 'Using:', fAccent( `WordPress v${ options.wpVersion }` ) );
+		logAtIndent(
+			1,
+			'Using:',
+			formats.success( `WordPress v${ options.wpVersion }` )
+		);
 	} else {
-		logStep( 1, 'Using:', fAccent( 'WordPress trunk' ) );
+		logAtIndent( 1, 'Using:', formats.success( 'WordPress trunk' ) );
 	}
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
 
 	for ( const testSuite of testSuites ) {
 		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
-			logStep(
+			logAtIndent(
 				1,
-				`Suite: ${ fAccent(
-					testSuite
-				) } (round ${ i } of ${ TEST_ROUNDS })`
+				// prettier-ignore
+				`Suite: ${ formats.success( testSuite ) } (round ${ i } of ${ TEST_ROUNDS })`
 			);
+
 			for ( const branch of branches ) {
-				logStep( 2, 'Branch:', fAccent( branch ) );
+				logAtIndent( 2, 'Branch:', formats.success( branch ) );
 
 				const sanitizedBranchName = sanitizeBranchName( branch );
 				const runKey = `${ testSuite }_${ sanitizedBranchName }_round-${ i }`;
 				// @ts-ignore
 				const envDir = branchDirs[ branch ];
 
-				logStep( 3, 'Starting environment' );
+				logAtIndent( 3, 'Starting environment' );
 				await runShellScript( `${ wpEnvPath } start`, envDir );
 
-				logStep( 3, 'Running tests' );
+				logAtIndent( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
 
-				logStep( 3, 'Stopping environment' );
+				logAtIndent( 3, 'Stopping environment' );
 				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
 		}
 	}
 
-	logStep( 0, 'Calculating results' );
+	logAtIndent( 0, 'Calculating results' );
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
 		file.endsWith( RESULTS_FILE_SUFFIX )
@@ -366,7 +368,7 @@ async function runPerformanceTests( branches, options ) {
 
 	// Calculate medians from all rounds.
 	for ( const testSuite of testSuites ) {
-		logStep( 1, 'Test suite:', fAccent( testSuite ) );
+		logAtIndent( 1, 'Test suite:', formats.success( testSuite ) );
 
 		results[ testSuite ] = {};
 		for ( const branch of branches ) {
@@ -378,7 +380,7 @@ async function runPerformanceTests( branches, options ) {
 					)
 				)
 				.map( ( file ) => {
-					logStep( 2, 'Reading from:', fAccent( file ) );
+					logAtIndent( 2, 'Reading from:', formats.success( file ) );
 					return readJSONFile( file );
 				} );
 
@@ -401,10 +403,10 @@ async function runPerformanceTests( branches, options ) {
 			testSuite + RESULTS_FILE_SUFFIX
 		);
 
-		logStep(
+		logAtIndent(
 			2,
 			'Saving curated results to:',
-			fAccent( calculatedResultsPath )
+			formats.success( calculatedResultsPath )
 		);
 		fs.writeFileSync(
 			calculatedResultsPath,
@@ -412,15 +414,15 @@ async function runPerformanceTests( branches, options ) {
 		);
 	}
 
-	logStep( 0, 'Printing results' );
+	logAtIndent( 0, 'Printing results' );
 	log(
-		fWarning(
+		formats.warning(
 			'\nPlease note that client side metrics EXCLUDE the server response time.'
 		)
 	);
 
 	for ( const testSuite of testSuites ) {
-		logStep( 0, fAccent( testSuite ) );
+		logAtIndent( 0, formats.success( testSuite ) );
 
 		// Invert the results so we can display them in a table.
 		/** @type {Record<string, Record<string, string>>} */
