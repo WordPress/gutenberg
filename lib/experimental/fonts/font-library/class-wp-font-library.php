@@ -21,6 +21,7 @@ if ( class_exists( 'WP_Font_Library' ) ) {
 class WP_Font_Library {
 
 	const PHP_7_TTF_MIME_TYPE = PHP_VERSION_ID >= 70333 ? 'application/font-sfnt' : 'application/x-font-ttf';
+	
 	/*
 	* As of PHP 8.1.12, which includes libmagic/file update to version 5.42,
 	* the expected mime type for WOFF files is 'font/woff'.
