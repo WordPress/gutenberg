@@ -83,14 +83,13 @@ function bootstrappedBlockTypes( state = {}, action ) {
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.4.
 				if (
-					serverDefinition.__experimentalBlockHooks === undefined &&
-					blockType.__experimentalBlockHooks
+					serverDefinition.blockHooks === undefined &&
+					blockType.blockHooks
 				) {
 					newDefinition = {
 						...serverDefinition,
 						...newDefinition,
-						__experimentalBlockHooks:
-							blockType.__experimentalBlockHooks,
+						blockHooks: blockType.blockHooks,
 					};
 				}
 			} else {

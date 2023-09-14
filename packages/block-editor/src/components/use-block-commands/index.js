@@ -12,8 +12,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCommandLoader } from '@wordpress/commands';
 import {
 	copy,
-	edit as remove,
-	create as add,
+	trash as remove,
+	plus as add,
 	group,
 	ungroup,
 	moveTo as move,
@@ -230,7 +230,7 @@ const useActionsCommands = () => {
 	if ( canRemove ) {
 		commands.push( {
 			name: 'remove',
-			label: __( 'Remove' ),
+			label: __( 'Delete' ),
 			callback: () => removeBlocks( clientIds, true ),
 			icon: remove,
 		} );
