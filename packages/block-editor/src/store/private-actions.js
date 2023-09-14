@@ -154,6 +154,8 @@ export const privateRemoveBlocks =
 			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
 			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
 			// To avoid a focus loss when removing the last block, assure there is

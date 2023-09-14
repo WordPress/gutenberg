@@ -394,6 +394,8 @@ export const replaceBlocks =
 				return;
 			}
 		}
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
@@ -404,6 +406,8 @@ export const replaceBlocks =
 				initialPosition,
 				meta,
 			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
 		} );
 	};
