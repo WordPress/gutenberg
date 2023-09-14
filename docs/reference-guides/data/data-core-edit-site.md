@@ -312,7 +312,7 @@ _Returns_
 
 ### setHasPageContentFocus
 
-Sets whether or not the editor allows only page content to be edited.
+Sets whether the editor allows only page content to be edited.
 
 _Parameters_
 

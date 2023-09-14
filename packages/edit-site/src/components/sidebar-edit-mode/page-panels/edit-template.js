@@ -9,7 +9,6 @@ import {
 	MenuItem,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
-	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -93,20 +92,23 @@ export default function EditTemplate() {
 							<SwapTemplateButton onClick={ onClose } />
 						</MenuGroup>
 						<ResetDefaultTemplate onClick={ onClose } />
-						<MenuItem
-							onClick={ () => {
-								setPageContentFocusType(
-									pageContentFocusType === 'disableTemplate'
-										? 'hideTemplate'
-										: 'disableTemplate'
-								);
-								onClose();
-							} }
-						>
-							{ pageContentFocusType === 'disableTemplate'
-								? __( 'Hide template' )
-								: __( 'Show template' ) }
-						</MenuItem>
+						<MenuGroup>
+							<MenuItem
+								onClick={ () => {
+									setPageContentFocusType(
+										pageContentFocusType ===
+											'disableTemplate'
+											? 'hideTemplate'
+											: 'disableTemplate'
+									);
+									onClose();
+								} }
+							>
+								{ pageContentFocusType === 'disableTemplate'
+									? __( 'Hide template' )
+									: __( 'Show template' ) }
+							</MenuItem>
+						</MenuGroup>
 					</>
 				) }
 			</DropdownMenu>
