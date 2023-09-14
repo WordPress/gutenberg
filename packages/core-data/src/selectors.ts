@@ -1288,14 +1288,7 @@ export function getUserPatternCategories(
 			patternCategoriesMap.set( userCategory.id, userCategory )
 	);
 	return {
-		patternCategories:
-			state.userPatternCategories?.map(
-				( userCategory: UserPatternCategory ) => ( {
-					...userCategory,
-					label: userCategory.name,
-					name: userCategory.slug,
-				} )
-			) || [],
+		patternCategories: state.userPatternCategories,
 		patternCategoriesMap,
 	};
 }

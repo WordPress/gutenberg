@@ -105,8 +105,10 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
-
-		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+		const nonPatternBlockTypes = blockTypes.filter(
+			( blockType ) => blockType.name !== 'core/block'
+		);
+		let orderedItems = orderBy( nonPatternBlockTypes, 'frecency', 'desc' );
 
 		if ( ! filterValue && prioritizedBlocks.length ) {
 			orderedItems = orderInserterBlockItems(
