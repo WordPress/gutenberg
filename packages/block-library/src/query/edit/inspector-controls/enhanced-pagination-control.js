@@ -15,7 +15,7 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		'Enhanced pagination only works with the blocks bundled with WordPress. If you want to enable it, you have to remove all plugin blocks from the Query Loop.'
+		'Enhanced pagination doesn\'t support plugin blocks yet. If you want to enable it, you have to remove all plugin blocks from the Query Loop.'
 	);
 
 	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
