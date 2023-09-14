@@ -38,7 +38,7 @@ import { unlock } from '../lock-unlock';
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
-	const inferredAlignmentRef = useRef();
+	const initialInferredAlignmentRef = useRef();
 
 	return useMemo( () => {
 		// Exit early if the pattern's blocks haven't loaded yet.
@@ -46,7 +46,7 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 			return {};
 		}
 
-		let alignment = inferredAlignmentRef.current;
+		let alignment = initialInferredAlignmentRef.current;
 
 		// Only track the initial alignment so that temporarily removed
 		// alignments can be reapplied.
@@ -57,7 +57,7 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 			);
 
 			alignment = isConstrained && hasFullAlignment ? 'full' : null;
-			inferredAlignmentRef.current = alignment;
+			initialInferredAlignmentRef.current = alignment;
 		}
 
 		const layout = alignment ? parentLayout : undefined;
