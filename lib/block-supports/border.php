@@ -142,11 +142,11 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  */
 function gutenberg_has_border_feature_support( $block_type, $feature, $default_value = false ) {
 	// Check if all border support features have been opted into via `"__experimentalBorder": true`.
-	if (
-		property_exists( $block_type, 'supports' ) &&
-		( true === _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default_value ) )
-	) {
-		return true;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$block_type_supports_border = $block_type->supports['__experimentalBorder'] ?? $default_value;
+		if ( true === $block_type_supports_border ) {
+			return true;
+		}
 	}
 
 	// Check if the specific feature has been opted into individually
