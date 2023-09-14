@@ -50,7 +50,7 @@ function Tooltip( props: TooltipProps ) {
 	// Compute tooltip's placement:
 	// - give priority to `placement` prop, if defined
 	// - otherwise, compute it from the legacy `position` prop (if defined)
-	// - finally, fallback to the DEFAULT_PLACEMENT.
+	// - finally, fallback to the default placement: 'bottom'
 	let computedPlacement;
 	if ( placement !== undefined ) {
 		computedPlacement = placement;

@@ -42,6 +42,10 @@
 
 -   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#54036](https://github.com/WordPress/gutenberg/pull/54036).
 
+### New Features
+
+-   `Tooltip`: Add `placement` prop to replace deprecated `position`([#54264](https://github.com/WordPress/gutenberg/pull/54264)).
+
 ## 25.7.0 (2023-08-31)
 
 ### Breaking changes

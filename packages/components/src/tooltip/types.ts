@@ -43,6 +43,7 @@ export type TooltipProps = {
 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 	 * Where the tooltip should be positioned relative to its parent.
 	 *
+	 * @deprecated
 	 * @default bottom
 	 */
 	position?: PopoverProps[ 'position' ];

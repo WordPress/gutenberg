@@ -226,7 +226,7 @@ export function UnforwardedButton(
 			</button>
 		);
 
-	// use floating-ui's `placement` instead of legacy `position`
+	// Convert legacy `position` values to be used with the new `placement` prop
 	let computedPlacement;
 	// if `tooltipPosition` is defined, compute value to `placement`
 	if ( tooltipPosition !== undefined ) {
