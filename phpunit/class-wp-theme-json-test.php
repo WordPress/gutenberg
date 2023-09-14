@@ -5208,7 +5208,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'text'       => 'green',
 								'background' => 'red',
 							),
-							'.current-item'  => array(
+							'@currentItem'  => array(
 								'color' => array(
 									'text'       => $expected_text_value,
 									'background' => $expected_background_value,

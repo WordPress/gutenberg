@@ -149,6 +149,9 @@
 		"interactivity": true,
 		"renaming": false
 	},
+	"selectors": {
+		"@currentItem": ".wp-block-navigation .current-item"
+	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }
