@@ -5,11 +5,11 @@ import { SVG, Path } from '@wordpress/primitives';
 
 const sidesLeft = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M5 17H3.5V7H5v10z" style={ { fill: '#1e1e1e' } } />
 		<Path
-			d="M7 20.5h10V19H7v1.5zM19 7v10h1.5V7H19zM7 5h10V3.5H7V5z"
-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
+			d="m8 6.5h8v-1.5h-8zm0 12.5h8v-1.5h-8zm-3-3h1.5v-8h-1.5zm12.5-8v8h1.5v-8z"
+			style={ { fill: '#1e1e1e', opacity: 0.25 } }
 		/>
+		<Path d="m5 16v-8h1.5v8z" style={ { fill: '#1e1e1e' } } />
 	</SVG>
 );
 
