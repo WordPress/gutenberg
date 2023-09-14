@@ -75,9 +75,7 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 										category.label
 									) }
 								>
-									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
-									</span>
+									<Icon icon={ lockSmall } size={ 24 } />
 								</Tooltip>
 							</Flex>
 						}
