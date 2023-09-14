@@ -190,11 +190,6 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 				name="__experimentalSelectedBlockTools"
 				bubblesVirtually
 			/>
-			<Slot
-				className="inline-rich-text-tools-wrapper"
-				name="__experimentalInlineRichTextTools"
-				bubblesVirtually
-			/>
 		</>
 	);
 }
