@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
 ## 1.103.2
 -   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
 
