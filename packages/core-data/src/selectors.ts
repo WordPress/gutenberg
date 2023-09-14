@@ -514,6 +514,7 @@ export const getEntityRecords = ( <
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState =
 		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	console.log( 'state.entities.records?.[ kind ]?.[ name ]', state.entities.records?.[ kind ]?.[ name ] );
 	if ( ! queriedState ) {
 		return null;
 	}
@@ -1270,10 +1271,18 @@ export function getEntityRecordRevisions(
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState = state.entities.records?.[ kind ]?.[ name ]?.revisions;
-	console.log( 'state.entities.records?.[ kind ]?.[ name ]?.revisions', queriedState );
 
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedItems( queriedState, query );
+
+	const queryProps = {
+		order: 'desc',
+		orderby: 'date',
+		...query,
+	};
+
+
+
+	return getQueriedItems( queriedState, queryProps, key );
 }

@@ -680,8 +680,14 @@ export const getEntityRecordRevisions =
 			return;
 		}
 
+		const queryProps = {
+			order: 'desc',
+			orderby: 'date',
+			...query,
+		};
+
 		const response = await apiFetch( {
-			url: addQueryArgs( revisionsURL, query ),
+			url: addQueryArgs( revisionsURL, queryProps ),
 		} );
 
 		const items = response?.map( ( revision ) =>
@@ -698,7 +704,7 @@ export const getEntityRecordRevisions =
 			kind,
 			name,
 			key,
-			query,
+			query: queryProps,
 			items,
 			// count,
 			invalidateCache: false,

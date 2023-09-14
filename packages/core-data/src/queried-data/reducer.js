@@ -53,7 +53,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	// Preallocate array since size is known.
 	const mergedItemIds = new Array( size );
-console.log( 'mergedItemIds, size', mergedItemIds, size );
+
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
 		const isInNextItemsRange =
@@ -218,6 +218,30 @@ export function itemIsComplete( state = {}, action ) {
 	return state;
 }
 
+export function revisionItemIsComplete( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REVISION_ITEMS': {
+
+			return {
+				...state,
+				[ action.key ]: {
+					...state[ action.key ],
+					...action.items.reduce( ( result, item ) => {
+						const itemId = item.id;
+						// Defer to completeness if already assigned. Technically the
+						// data may be outdated if receiving items for a field subset.
+						result[ itemId ] = true;
+
+						return result;
+					}, {} ),
+				},
+			};
+		}
+	}
+
+	return state;
+}
+
 /**
  * Reducer tracking queries state, keyed by stable query key. Each reducer
  * query object includes `itemIds` and `requestingPageByPerPage`.
@@ -298,12 +322,7 @@ const receiveRevisionQueries = compose( [
 	if ( type !== 'RECEIVE_REVISION_ITEMS' ) {
 		return state;
 	}
-console.log( 'getMergedItemIds', state, getMergedItemIds(
-	state || [],
-	action.items.map( ( item ) => item[ key ] ),
-	page,
-	perPage
-) );
+
 	return getMergedItemIds(
 		state || [],
 		action.items.map( ( item ) => item.id ),
@@ -373,6 +392,7 @@ const revisionQueries = ( state = {}, action ) => {
 
 export const revisionsQueriedDataReducer = combineReducers( {
 	items: revisionItems,
+	itemIsComplete: revisionItemIsComplete,
 	queries: revisionQueries,
 } );
 

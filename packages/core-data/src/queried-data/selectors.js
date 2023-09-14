@@ -27,7 +27,7 @@ const queriedItemsCacheByState = new WeakMap();
  *
  * @return {?Array} Query items.
  */
-function getQueriedItemsUncached( state, query ) {
+function getQueriedItemsUncached( state, query, key ) {
 	const { stableKey, page, perPage, include, fields, context } =
 		getQueryParts( query );
 	let itemIds;
@@ -36,10 +36,13 @@ function getQueriedItemsUncached( state, query ) {
 		itemIds = state.queries[ context ][ stableKey ];
 	}
 
+	if ( state.queries?.[ stableKey ] ) {
+		itemIds = state.queries[ stableKey ];
+	}
+
 	if ( ! itemIds ) {
 		return null;
 	}
-
 	const startOffset = perPage === -1 ? 0 : ( page - 1 ) * perPage;
 	const endOffset =
 		perPage === -1
@@ -52,13 +55,12 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
 		// Having a target item ID doesn't guarantee that this object has been queried.
-		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
+		if ( ! state.items?.[ context ]?.hasOwnProperty( itemId ) && ! state.items?.[key]?.hasOwnProperty( itemId ) ) {
 			return null;
 		}
 
-		const item = state.items[ context ][ itemId ];
+		const item = state.items?.[ context ]?.[ itemId ] || state.items?.[key]?.[ itemId ];
 
 		let filteredItem;
 		if ( Array.isArray( fields ) ) {
@@ -76,7 +78,7 @@ function getQueriedItemsUncached( state, query ) {
 		} else {
 			// If expecting a complete item, validate that completeness, or
 			// otherwise abort.
-			if ( ! state.itemIsComplete[ context ]?.[ itemId ] ) {
+			if ( ! state.itemIsComplete[ context ]?.[ itemId ] && ! state.itemIsComplete?.[key]?.[ itemId ] ) {
 				return null;
 			}
 
@@ -102,7 +104,7 @@ function getQueriedItemsUncached( state, query ) {
  *
  * @return {?Array} Query items.
  */
-export const getQueriedItems = createSelector( ( state, query = {} ) => {
+export const getQueriedItems = createSelector( ( state, query = {}, key ) => {
 	let queriedItemsCache = queriedItemsCacheByState.get( state );
 	if ( queriedItemsCache ) {
 		const queriedItems = queriedItemsCache.get( query );
@@ -114,7 +116,7 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 		queriedItemsCacheByState.set( state, queriedItemsCache );
 	}
 
-	const items = getQueriedItemsUncached( state, query );
+	const items = getQueriedItemsUncached( state, query, key );
 	queriedItemsCache.set( query, items );
 	return items;
 } );
