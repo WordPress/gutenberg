@@ -90,6 +90,11 @@ async function prPreviewLink( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const repoHtmlUrl = payload.repository.html_url;
 	const workflowRun = payload.workflow_run;
+
+	if ( ! workflowRun || workflowRun?.event === 'workflow_dispatch' ) {
+		return;
+	}
+
 	const workflowRunId = workflowRun.id;
 	const pullRequestNumber = workflowRun.pull_requests[ 0 ].number;
 	const checkSuiteId = workflowRun.check_suite_id;
@@ -166,3 +171,4 @@ async function prPreviewLink( payload, octokit ) {
 }
 
 module.exports = prPreviewLink;
+module.exports.COMMENT_PLACEHOLDER = COMMENT_PLACEHOLDER;
