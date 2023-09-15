@@ -387,7 +387,10 @@ class WP_Theme_JSON_Gutenberg {
 			'wideSize'     => null,
 			'allowEditing' => null,
 		),
-		'lightbox'                      => null,
+		'lightbox'                      => array(
+			'enabled' => null,
+			'allowEditing' => null,
+		),
 		'position'                      => array(
 			'fixed'  => null,
 			'sticky' => null,

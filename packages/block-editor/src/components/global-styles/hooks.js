@@ -50,7 +50,6 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
-	'lightbox',
 	'lightbox.enabled',
 	'lightbox.allowEditing',
 	'position.fixed',
@@ -118,7 +117,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ??
 				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value !== null && value !== undefined ) {
+			if ( value ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
