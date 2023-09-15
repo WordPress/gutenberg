@@ -189,9 +189,6 @@
 			],
 			"text": true
 		},
-		"lightbox": {
-			"allowEditing": true
-		},
 		"shadow": {
 			"defaultPresets": true,
 			"presets": [
@@ -274,6 +271,11 @@
 			"core/button": {
 				"border": {
 					"radius": true
+				}
+			},
+			"core/image": {
+				"lightbox": {
+					"allowEditing": true
 				}
 			},
 			"core/pullquote": {
