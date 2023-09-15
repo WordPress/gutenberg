@@ -267,7 +267,6 @@ export function BlockPatternsCategoryPanel( {
 				<BlockPatternsSyncFilter
 					patternSyncFilter={ patternSyncFilter }
 					setPatternSyncFilter={ setPatternSyncFilter }
-					test={ 'bob' }
 				/>
 			) }
 			{ ! currentCategoryPatterns.length && (
