@@ -77,8 +77,8 @@ When text input isn’t accepted, an error message can display instructions on h
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { TextareaControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyTextareaControl = () => {
 	const [ text, setText ] = useState( '' );

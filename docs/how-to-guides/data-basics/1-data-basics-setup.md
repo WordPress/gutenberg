@@ -18,7 +18,7 @@ Go ahead and create these files using the following snippets:
 **src/index.js:**
 
 ```js
-import { render } from '@wordpress/element';
+import { render } from 'react';
 
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;

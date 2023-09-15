@@ -27,7 +27,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
  *
  * function MyPluginPrePublishPanel() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPrePublishPanel,
  * 		{
  * 			className: 'my-plugin-pre-publish-panel',

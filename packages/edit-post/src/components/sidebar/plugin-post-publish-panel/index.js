@@ -24,7 +24,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
  * var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
  *
  * function MyPluginPostPublishPanel() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPostPublishPanel,
  * 		{
  * 			className: 'my-plugin-post-publish-panel',

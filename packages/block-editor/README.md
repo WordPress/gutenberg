@@ -15,13 +15,13 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ```js
+import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
 	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );

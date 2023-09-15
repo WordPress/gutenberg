@@ -702,8 +702,8 @@ the server via the `useSelect` hook to use in combination with the dispatch
 action.
 
 ```jsx
+import { useCallback } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {

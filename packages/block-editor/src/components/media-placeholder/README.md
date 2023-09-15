@@ -216,7 +216,7 @@ Replace implementation of the placeholder:
 ```js
 function replaceMediaPlaceholder() {
 	return function () {
-		return wp.element.createElement(
+		return React.createElement(
 			'div',
 			{},
 			'The replacement contents or components.'

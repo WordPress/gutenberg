@@ -27,7 +27,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * @example
  * ```js
  * // Using ES5 syntax
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var __ = wp.i18n.__;
  * var registerPlugin = wp.plugins.registerPlugin;
  * var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;

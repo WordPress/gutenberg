@@ -25,7 +25,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
  *
  * function MyPluginPostStatusInfo() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPostStatusInfo,
  * 		{
  * 			className: 'my-plugin-post-status-info',

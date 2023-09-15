@@ -53,11 +53,11 @@ Radio groups that cannot be selected can either be given a disabled state, or be
 #### Controlled
 
 ```jsx
+import { useState } from 'react';
 import {
 	__experimentalRadio as Radio,
 	__experimentalRadioGroup as RadioGroup,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyControlledRadioRadioGroup = () => {
 	const [ checked, setChecked ] = useState( '25' );
@@ -77,11 +77,11 @@ const MyControlledRadioRadioGroup = () => {
 When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
 
 ```jsx
+import { useState } from 'react';
 import {
 	__experimentalRadio as Radio,
 	__experimentalRadioGroup as RadioGroup,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyUncontrolledRadioRadioGroup = () => {
 	return (
