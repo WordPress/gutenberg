@@ -39,6 +39,7 @@ export function DataTablePageSizeControl() {
 	const table = useDataTableContext();
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Per page:' ) }
 			labelPosition="side"
 			value={ table.getState().pagination.pageSize }
