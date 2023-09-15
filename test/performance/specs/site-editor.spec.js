@@ -1,22 +1,14 @@
+/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * External dependencies
- */
-const path = require( 'path' );
+import { test } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
-const {
-	getTypingEventDurations,
-	getLoadingDurations,
-	disableAutosave,
-	loadBlocksFromHtml,
-} = require( '../utils' );
+import { PerfUtils, Metrics } from '../fixtures';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
@@ -38,6 +30,15 @@ const results = {
 };
 
 test.describe( 'Site Editor Performance', () => {
+	test.use( {
+		perfUtils: async ( { browser, page }, use ) => {
+			await use( new PerfUtils( { browser, page } ) );
+		},
+		metrics: async ( { page }, use ) => {
+			await use( new Metrics( { page } ) );
+		},
+	} );
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
@@ -58,52 +59,42 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftURL = null;
 
-		test( 'Setup the test page', async ( { page, admin } ) => {
-			// Load the large post fixture.
+		test( 'Setup the test page', async ( { page, admin, perfUtils } ) => {
 			await admin.createNewPost( { postType: 'page' } );
-			await loadBlocksFromHtml(
-				page,
-				path.join( process.env.ASSETS_PATH, 'large-post.html' )
-			);
+			await perfUtils.loadBlocksForLargePost();
+			await perfUtils.saveDraft();
 
-			// Save the draft.
-			await page
-				.getByRole( 'button', { name: 'Save draft' } )
-				.click( { timeout: 60_000 } );
-			await expect(
-				page.getByRole( 'button', { name: 'Saved' } )
-			).toBeDisabled();
-
-			// Open the test page in Site Editor.
 			await admin.visitSiteEditor( {
 				postId: new URL( page.url() ).searchParams.get( 'post' ),
 				postType: 'page',
 			} );
 
-			// Get the URL that we will be testing against.
 			draftURL = page.url();
 		} );
 
 		const samples = 10;
 		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			test( `Get the durations (${ i + 1 } of ${ rounds })`, async ( {
+		const iterations = samples + throwaway;
+		for ( let i = 0; i < iterations; i++ ) {
+			test( `Run the test (${ i + 1 } of ${ iterations })`, async ( {
 				page,
+				perfUtils,
+				metrics,
 			} ) => {
-				// Go to the test page.
+				// Go to the test draft.
 				await page.goto( draftURL );
+				const canvas = await perfUtils.getCanvas();
 
-				// Wait for the first block.
-				await page
-					.frameLocator( 'iframe[name="editor-canvas"]' )
-					.locator( '.wp-block' )
-					.first()
-					.waitFor( { timeout: 120_000 } );
+				// Wait for the first block to be visible.
+				await canvas.locator( '.wp-block' ).first().waitFor( {
+					timeout: 120_000,
+				} );
+
+				// Get the durations.
+				const loadingDurations = await metrics.getLoadingDurations();
 
 				// Save the results.
-				if ( i >= throwaway ) {
-					const loadingDurations = await getLoadingDurations( page );
+				if ( i > throwaway ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							results[ metric ].push( duration );
@@ -113,84 +104,84 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 		}
 	} );
+	test.describe( 'Typing', () => {
+		let draftURL = null;
 
-	test( 'Typing', async ( { browser, page, admin, editor } ) => {
-		// Load the large post fixture.
-		await admin.createNewPost( { postType: 'page' } );
-		await disableAutosave( page );
-		await loadBlocksFromHtml(
+		test( 'Setup the test post', async ( {
 			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
+			admin,
+			editor,
+			perfUtils,
+		} ) => {
+			await admin.createNewPost( { postType: 'page' } );
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await perfUtils.saveDraft();
 
-		// Save the draft.
-		await page
-			.getByRole( 'button', { name: 'Save draft' } )
-			// Loading the large post HTML can take some time so we need a higher
-			// timeout value here.
-			.click( { timeout: 60_000 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
+			await admin.visitSiteEditor( {
+				postId: new URL( page.url() ).searchParams.get( 'post' ),
+				postType: 'page',
+			} );
 
-		// Open the test page in Site Editor.
-		await admin.visitSiteEditor( {
-			postId: new URL( page.url() ).searchParams.get( 'post' ),
-			postType: 'page',
+			draftURL = page.url();
 		} );
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
 
-		// Wait for the first paragraph to be ready.
-		const firstParagraph = editor.canvas
-			.getByText( 'Lorem ipsum dolor sit amet' )
-			.first();
-		await firstParagraph.waitFor( { timeout: 120_000 } );
+			// Wait for the loader overlay to disappear. This is necessary
+			// because the overlay is still visible for a while after the editor
+			// canvas is ready, and we don't want it to affect the typing
+			// timings.
+			await page
+				.locator( '.edit-site-canvas-loader' )
+				.waitFor( { state: 'hidden', timeout: 120_000 } );
 
-		// Enter edit mode.
-		await editor.canvas.locator( 'body' ).click();
-		// Second click is needed for the legacy edit mode.
-		await editor.canvas
-			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
-			.click();
+			const canvas = await perfUtils.getCanvas();
 
-		// Append an empty paragraph.
-		// Since `editor.insertBlock( { name: 'core/paragraph' } )` is not
-		// working in page edit mode, we need to _manually_ insert a new
-		// paragraph.
-		await editor.canvas
-			.getByText( 'Quamquam tu hanc copiosiorem etiam soles dicere.' )
-			.last()
-			.click(); // Enters edit mode for the last post's element, which is a list item.
+			// Enter edit mode (second click is needed for the legacy edit mode).
+			await canvas.locator( 'body' ).click();
+			await canvas
+				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
+				.click();
 
-		await page.keyboard.press( 'Enter' ); // Creates a new list item.
-		await page.keyboard.press( 'Enter' ); // Exits the list and creates a new paragraph.
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
 
-		// Start tracing.
-		await browser.startTracing( page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
+			// The first character typed triggers a longer time (isTyping change).
+			// It can impact the stability of the metric, so we exclude it. It
+			// probably deserves a dedicated metric itself, though.
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+
+			// Start tracing.
+			await perfUtils.startTracing();
+
+			// Type the testing sequence into the empty paragraph.
+			await paragraph.type( 'x'.repeat( iterations ), {
+				delay: BROWSER_IDLE_WAIT,
+				// The extended timeout is needed because the typing is very slow
+				// and the `delay` value itself does not extend it.
+				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+			} );
+
+			// Stop tracing.
+			const traceResults = await perfUtils.stopTracing();
+
+			// Get the durations.
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				metrics.getTypingEventDurations( traceResults );
+
+			// Save the results.
+			for ( let i = throwaway; i < iterations; i++ ) {
+				results.type.push(
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+				);
+			}
 		} );
-
-		// The first character typed triggers a longer time (isTyping change).
-		// It can impact the stability of the metric, so we exclude it. It
-		// probably deserves a dedicated metric itself, though.
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-
-		// Type the testing sequence into the empty paragraph.
-		await page.keyboard.type( 'x'.repeat( rounds ), {
-			delay: BROWSER_IDLE_WAIT,
-		} );
-
-		// Stop tracing and save results.
-		const traceBuffer = await browser.stopTracing();
-		const traceResults = JSON.parse( traceBuffer.toString() );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-		for ( let i = throwaway; i < rounds; i++ ) {
-			results.type.push(
-				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-			);
-		}
 	} );
 } );
+
+/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */

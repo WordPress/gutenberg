@@ -1,7 +1,14 @@
+/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test } from '@wordpress/e2e-test-utils-playwright';
+
+/**
+ * Internal dependencies
+ */
+import { Metrics } from '../fixtures';
 
 const results = {
 	timeToFirstByte: [],
@@ -10,7 +17,12 @@ const results = {
 };
 
 test.describe( 'Front End Performance', () => {
-	test.use( { storageState: {} } ); // User will be logged out.
+	test.use( {
+		storageState: {}, // User will be logged out.
+		metrics: async ( { page }, use ) => {
+			await use( new Metrics( { page } ) );
+		},
+	} );
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
@@ -26,51 +38,18 @@ test.describe( 'Front End Performance', () => {
 
 	const samples = 16;
 	const throwaway = 0;
-	const rounds = samples + throwaway;
-	for ( let i = 0; i < rounds; i++ ) {
+	const iterations = samples + throwaway;
+	for ( let i = 0; i < iterations; i++ ) {
 		test( `Measure TTFB, LCP, and LCP-TTFB (${
 			i + 1
-		} of ${ rounds })`, async ( { page } ) => {
+		} of ${ iterations })`, async ( { page, metrics } ) => {
 			// Go to the base URL.
 			// eslint-disable-next-line playwright/no-networkidle
 			await page.goto( '/', { waitUntil: 'networkidle' } );
 
 			// Take the measurements.
-			const [ lcp, ttfb ] = await page.evaluate( () => {
-				return Promise.all( [
-					// Measure the Largest Contentful Paint time.
-					// Based on https://www.checklyhq.com/learn/headless/basics-performance#largest-contentful-paint-api-largest-contentful-paint
-					new Promise( ( resolve ) => {
-						new PerformanceObserver( ( entryList ) => {
-							const entries = entryList.getEntries();
-							// The last entry is the largest contentful paint.
-							const largestPaintEntry = entries.at( -1 );
-
-							resolve( largestPaintEntry.startTime );
-						} ).observe( {
-							type: 'largest-contentful-paint',
-							buffered: true,
-						} );
-					} ),
-					// Measure the Time To First Byte.
-					// Based on https://web.dev/ttfb/#measure-ttfb-in-javascript
-					new Promise( ( resolve ) => {
-						new PerformanceObserver( ( entryList ) => {
-							const [ pageNav ] =
-								entryList.getEntriesByType( 'navigation' );
-
-							resolve( pageNav.responseStart );
-						} ).observe( {
-							type: 'navigation',
-							buffered: true,
-						} );
-					} ),
-				] );
-			} );
-
-			// Ensure the numbers are valid.
-			expect( lcp ).toBeGreaterThan( 0 );
-			expect( ttfb ).toBeGreaterThan( 0 );
+			const ttfb = await metrics.getTimeToFirstByte();
+			const lcp = await metrics.getLargestContentfulPaint();
 
 			// Save the results.
 			if ( i >= throwaway ) {
@@ -81,3 +60,5 @@ test.describe( 'Front End Performance', () => {
 		} );
 	}
 } );
+
+/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
