@@ -80,10 +80,9 @@ function ListboxCircularOptionPicker(
 		actions,
 		options,
 		baseId,
+		className,
 		loop = true,
 		children,
-		'aria-label': ariaLabel,
-		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
 	const rtl = isRTL();
@@ -113,19 +112,19 @@ function ListboxCircularOptionPicker(
 	};
 
 	return (
-		<Composite { ...additionalProps } { ...compositeState }>
+		<div className={ className }>
 			<CircularOptionPickerContext.Provider value={ compositeContext }>
-				<div
-					aria-label={ ariaLabel }
-					aria-labelledby={ ariaLabelledby }
-					role="listbox"
+				<Composite
+					{ ...additionalProps }
+					{ ...compositeState }
+					role={ 'listbox' }
 				>
 					{ options }
-				</div>
+				</Composite>
 				{ children }
 				{ actions }
 			</CircularOptionPickerContext.Provider>
-		</Composite>
+		</div>
 	);
 }
 
