@@ -16,6 +16,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import Warning from '../warning';
 import BlockFallbackWebVersion from '../block-fallback-web-version';
 import { store as blockEditorStore } from '../../store';
+import { MAX_NESTING_DEPTH } from './constants';
 
 const WarningMaxDepthExceeded = ( { clientId } ) => {
 	const [ showDetails, setShowDetails ] = useState( false );
@@ -74,11 +75,5 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 		</TouchableWithoutFeedback>
 	);
 };
-
-// Hermes has a limit for the call stack depth to avoid infinite recursion.
-// When creating a deep nested structure of inner blocks, the editor might exceed
-// this limit and crash. In order to avoid this, we set a maximum depth level where
-// we stop rendering blocks.
-export const MAX_NESTING_DEPTH = 10;
 
 export default WarningMaxDepthExceeded;

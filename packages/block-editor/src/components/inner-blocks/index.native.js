@@ -23,9 +23,8 @@ import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
-import WarningMaxDepthExceeded, {
-	MAX_NESTING_DEPTH,
-} from './warning-max-depth-exceeded';
+import WarningMaxDepthExceeded from './warning-max-depth-exceeded';
+import { MAX_NESTING_DEPTH } from './constants';
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
