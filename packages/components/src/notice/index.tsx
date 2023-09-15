@@ -18,6 +18,7 @@ import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
 import type { SyntheticEvent } from 'react';
 import type { DeprecatedButtonProps } from '../button/types';
+import { VisuallyHidden } from '../visually-hidden';
 
 const noop = () => {};
 
@@ -49,6 +50,21 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 		case 'error':
 		default:
 			return 'assertive';
+	}
+}
+
+function getStatusLabel( status: NoticeProps[ 'status' ] ) {
+	switch ( status ) {
+		case 'warning':
+			return __( 'Warning notice' );
+		case 'info':
+			return __( 'Information notice' );
+
+		case 'error':
+			return __( 'Error notice' );
+		case 'success':
+		default:
+			return __( 'Notice' );
 	}
 }
 
@@ -101,6 +117,7 @@ function Notice( {
 
 	return (
 		<div className={ classes }>
+			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			<div className="components-notice__content">
 				{ children }
 				<div className="components-notice__actions">
@@ -154,9 +171,8 @@ function Notice( {
 				<Button
 					className="components-notice__dismiss"
 					icon={ close }
-					label={ __( 'Dismiss this notice' ) }
+					label={ __( 'Close' ) }
 					onClick={ onDismissNotice }
-					showTooltip={ false }
 				/>
 			) }
 		</div>
