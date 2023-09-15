@@ -51,8 +51,6 @@ type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 	/**
 	 * Whether the control should present as a set of buttons,
 	 * each with its own tab stop.
-	 *
-	 * @default false
 	 */
 	asButtons?: false;
 	/**
