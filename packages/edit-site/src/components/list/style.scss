@@ -165,12 +165,12 @@
 	overflow: hidden;
 	border-radius: 100%;
 	background: $gray-800;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
 
 	img {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: $grid-unit-30;
+		height: $grid-unit-30;
 		object-fit: cover;
 		opacity: 0;
 		transition: opacity 0.1s linear;

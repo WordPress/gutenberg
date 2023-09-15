@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -180,20 +180,16 @@ export default function AddedBy( {
 	postId,
 	showIsCustomizedInfo = true,
 } ) {
-	const { text, icon, imageUrl, isCustomized } = useAddedBy(
+	const { text, imageUrl, isCustomized } = useAddedBy(
 		postType,
 		postId
 	);
 
 	return (
 		<HStack alignment="left">
-			{ imageUrl ? (
+			{ imageUrl ?
 				<AvatarImage imageUrl={ imageUrl } />
-			) : (
-				<div className="edit-site-list-added-by__icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
+			: '' }
 			<span>
 				{ text }
 				{ showIsCustomizedInfo && isCustomized && (
