@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	ButtonGroup,
@@ -17,7 +17,6 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,8 +28,7 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { kebabCase } from '../utils/object';
-import { useBlockSettings } from './utils';
-import { unlock } from '../lock-unlock';
+import { useBlockSettings, useStyleOverride } from './utils';
 
 const layoutBlockSupportKey = 'layout';
 
@@ -381,17 +379,7 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 		layoutClasses
 	);
 
-	const { setStyleOverride, deleteStyleOverride } = unlock(
-		useDispatch( blockEditorStore )
-	);
-
-	useEffect( () => {
-		if ( ! css ) return;
-		setStyleOverride( selector, { css } );
-		return () => {
-			deleteStyleOverride( selector );
-		};
-	}, [ selector, css, setStyleOverride, deleteStyleOverride ] );
+	useStyleOverride( { css } );
 
 	return (
 		<BlockListBlock
@@ -459,17 +447,7 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
 		[ `wp-container-content-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
 	} );
 
-	const { setStyleOverride, deleteStyleOverride } = unlock(
-		useDispatch( blockEditorStore )
-	);
-
-	useEffect( () => {
-		if ( ! css ) return;
-		setStyleOverride( selector, { css } );
-		return () => {
-			deleteStyleOverride( selector );
-		};
-	}, [ selector, css, setStyleOverride, deleteStyleOverride ] );
+	useStyleOverride( { css } );
 
 	return <BlockListBlock { ...props } className={ className } />;
 }

@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +11,8 @@ import { useMemo } from '@wordpress/element';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * Removed falsy values from nested object.
@@ -113,6 +116,19 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	}
 
 	return skipSerialization;
+}
+
+export function useStyleOverride( { id, css } ) {
+	const { setStyleOverride, deleteStyleOverride } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	useEffect( () => {
+		if ( ! css ) return;
+		setStyleOverride( id, { css } );
+		return () => {
+			deleteStyleOverride( id );
+		};
+	}, [ id, css, setStyleOverride, deleteStyleOverride ] );
 }
 
 /**

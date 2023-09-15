@@ -60,7 +60,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GapStyles from './gap-styles';
+import useGapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -535,6 +535,11 @@ function GalleryEdit( props ) {
 		...nativeInnerBlockProps,
 	} );
 
+	useGapStyles( {
+		blockGap: attributes.style?.spacing?.blockGap,
+		clientId,
+	} );
+
 	if ( ! hasImages ) {
 		return (
 			<View { ...innerBlocksProps }>
@@ -653,10 +658,6 @@ function GalleryEdit( props ) {
 							addToGallery={ hasImageIds }
 						/>
 					</BlockControls>
-					<GapStyles
-						blockGap={ attributes.style?.spacing?.blockGap }
-						clientId={ clientId }
-					/>
 				</>
 			) }
 			<Gallery
