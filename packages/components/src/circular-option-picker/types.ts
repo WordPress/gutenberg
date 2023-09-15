@@ -74,10 +74,7 @@ type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 	 );
 
 export type ListboxCircularOptionPickerProps = WithBaseId &
-	Omit<
-		FullListboxCircularOptionPickerProps,
-		'asButtons' | 'actions' | 'options'
-	>;
+	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;
 
 type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 	/**
@@ -90,10 +87,7 @@ type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 };
 
 export type ButtonsCircularOptionPickerProps = WithBaseId &
-	Omit<
-		FullButtonsCircularOptionPickerProps,
-		'asButtons' | 'actions' | 'options'
-	>;
+	Omit< FullButtonsCircularOptionPickerProps, 'asButtons' >;
 
 export type CircularOptionPickerProps =
 	| FullListboxCircularOptionPickerProps

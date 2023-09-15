@@ -76,7 +76,16 @@ import {
 function ListboxCircularOptionPicker(
 	props: ListboxCircularOptionPickerProps
 ) {
-	const { baseId, loop = true, children, ...additionalProps } = props;
+	const {
+		actions,
+		options,
+		baseId,
+		loop = true,
+		children,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		...additionalProps
+	} = props;
 	const rtl = isRTL();
 
 	const compositeState = useCompositeState( { baseId, loop, rtl } );
@@ -104,13 +113,17 @@ function ListboxCircularOptionPicker(
 	};
 
 	return (
-		<Composite
-			{ ...additionalProps }
-			{ ...compositeState }
-			role={ 'listbox' }
-		>
+		<Composite { ...additionalProps } { ...compositeState }>
 			<CircularOptionPickerContext.Provider value={ compositeContext }>
+				<div
+					aria-label={ ariaLabel }
+					aria-labelledby={ ariaLabelledby }
+					role="listbox"
+				>
+					{ options }
+				</div>
 				{ children }
+				{ actions }
 			</CircularOptionPickerContext.Provider>
 		</Composite>
 	);
@@ -119,14 +132,16 @@ function ListboxCircularOptionPicker(
 function ButtonsCircularOptionPicker(
 	props: ButtonsCircularOptionPickerProps
 ) {
-	const { children, baseId, ...additionalProps } = props;
+	const { actions, options, children, baseId, ...additionalProps } = props;
 
 	return (
 		<div { ...additionalProps }>
 			<CircularOptionPickerContext.Provider
 				value={ { isComposite: false, baseId } }
 			>
+				{ options }
 				{ children }
+				{ actions }
 			</CircularOptionPickerContext.Provider>
 		</div>
 	);
@@ -135,8 +150,8 @@ function ButtonsCircularOptionPicker(
 function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	const {
 		asButtons,
-		actions,
-		options,
+		actions: actionsProp,
+		options: optionsProp,
 		children,
 		className,
 		...additionalProps
@@ -152,6 +167,18 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		? ButtonsCircularOptionPicker
 		: ListboxCircularOptionPicker;
 
+	const actions = actionsProp ? (
+		<div className="components-circular-option-picker__custom-clear-wrapper">
+			{ actionsProp }
+		</div>
+	) : undefined;
+
+	const options = (
+		<div className={ 'components-circular-option-picker__swatches' }>
+			{ optionsProp }
+		</div>
+	);
+
 	return (
 		<OptionPickerImplementation
 			{ ...additionalProps }
@@ -160,16 +187,10 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 				'components-circular-option-picker',
 				className
 			) }
+			actions={ actions }
+			options={ options }
 		>
-			<div className={ 'components-circular-option-picker__swatches' }>
-				{ options }
-			</div>
 			{ children }
-			{ actions && (
-				<div className="components-circular-option-picker__custom-clear-wrapper">
-					{ actions }
-				</div>
-			) }
 		</OptionPickerImplementation>
 	);
 }
