@@ -4,7 +4,7 @@
 import {
 	clickMenuItem,
 	insertBlock,
-	insertReusableBlock,
+	insertPattern,
 	createNewPost,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
@@ -19,9 +19,9 @@ import {
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
-const reusableBlockNameInputSelector =
+const patternBlockNameInputSelector =
 	'.patterns-menu-items__convert-modal .components-text-control__input';
-const reusableBlockInspectorNameInputSelector =
+const patternBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
 const syncToggleSelectorChecked =
 	'.patterns-menu-items__convert-modal .components-form-toggle.is-checked';
@@ -60,7 +60,7 @@ const clearAllBlocks = async () => {
 	} );
 };
 
-describe( 'Reusable blocks', () => {
+describe( 'Pattern blocks', () => {
 	afterAll( async () => {
 		await trashAllPosts( 'wp_block' );
 	} );
@@ -74,12 +74,12 @@ describe( 'Reusable blocks', () => {
 		await clearAllBlocks();
 
 		// Insert the reusable block we created above.
-		await insertReusableBlock( 'Greeting block' );
+		await insertPattern( 'Greeting block' );
 
 		// Change the block's title.
 		await openDocumentSettingsSidebar();
 		const nameInput = await page.waitForSelector(
-			reusableBlockInspectorNameInputSelector
+			patternBlockInspectorNameInputSelector
 		);
 		await nameInput.click();
 		await pressKeyWithModifier( 'primary', 'a' );
@@ -108,7 +108,7 @@ describe( 'Reusable blocks', () => {
 		await clearAllBlocks();
 
 		// Insert the reusable block we edited above.
-		await insertReusableBlock( 'Surprised greeting block' );
+		await insertPattern( 'Surprised greeting block' );
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
@@ -170,12 +170,12 @@ describe( 'Reusable blocks', () => {
 		await createNewPost();
 
 		// Step 3. Insert the block created in Step 1.
-		await insertReusableBlock( 'Awesome block' );
+		await insertPattern( 'Awesome block' );
 
 		// Check the title.
 		await openDocumentSettingsSidebar();
 		const title = await page.$eval(
-			reusableBlockInspectorNameInputSelector,
+			patternBlockInspectorNameInputSelector,
 			( element ) => element.value
 		);
 		expect( title ).toBe( 'Awesome block' );
@@ -200,7 +200,7 @@ describe( 'Reusable blocks', () => {
 
 		// Set title.
 		const nameInput = await page.waitForSelector(
-			reusableBlockNameInputSelector
+			patternBlockNameInputSelector
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Multi-selection reusable block' );
@@ -215,7 +215,7 @@ describe( 'Reusable blocks', () => {
 		await clearAllBlocks();
 
 		// Insert the reusable block we edited above.
-		await insertReusableBlock( 'Multi-selection reusable block' );
+		await insertPattern( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
@@ -231,7 +231,7 @@ describe( 'Reusable blocks', () => {
 			'Random reusable block'
 		);
 		await clearAllBlocks();
-		await insertReusableBlock( 'Random reusable block' );
+		await insertPattern( 'Random reusable block' );
 
 		await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
 
@@ -298,8 +298,8 @@ describe( 'Reusable blocks', () => {
 			'Duplicated reusable block'
 		);
 		await clearAllBlocks();
-		await insertReusableBlock( 'Duplicated reusable block' );
-		await insertReusableBlock( 'Duplicated reusable block' );
+		await insertPattern( 'Duplicated reusable block' );
+		await insertPattern( 'Duplicated reusable block' );
 		await saveDraft();
 		await page.reload();
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
@@ -384,7 +384,7 @@ describe( 'Reusable blocks', () => {
 		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Create pattern' );
 		const nameInput = await page.waitForSelector(
-			reusableBlockNameInputSelector
+			patternBlockNameInputSelector
 		);
 		await nameInput.click();
 		await page.keyboard.type( 'Block with styles' );
