@@ -22,11 +22,11 @@ const createBuildSummary = async (
 	let status, previewMsg, artifactMsg;
 	status = previewMsg = artifactMsg = '🚧  Building in progress...';
 	if ( buildStatus === 'success' ) {
-		status = '✅  Build successful!';
-		previewMsg = `🔗 [gutenberg.run/${ pullRequestNumber }](gutenberg.run/${ pullRequestNumber } )`;
-		artifactMsg = `📦 [gutenberg-plugin](${ artifact.url }) - ${ artifact.size } MB`;
+		status = 'Build successful!';
+		previewMsg = `[gutenberg.run/${ pullRequestNumber }](gutenberg.run/${ pullRequestNumber } )`;
+		artifactMsg = `[gutenberg-plugin](${ artifact.url }) - ${ artifact.size } MB`;
 	} else if ( buildStatus === 'failure' ) {
-		status = previewMsg = artifactMsg = '🚫  Build failed!';
+		status = previewMsg = artifactMsg = 'Build failed!';
 	}
 
 	const response = await octokit.rest.markdown.render( {
