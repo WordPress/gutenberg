@@ -10,14 +10,14 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import { filterOutDuplicatesByName } from './utils';
 import {
-	CORE_PATTERN_SOURCES,
-	PATTERNS,
-	SYNC_TYPES,
-	TEMPLATE_PARTS,
-	USER_PATTERNS,
-	filterOutDuplicatesByName,
-} from './utils';
+	PATTERN_CORE_SOURCES,
+	PATTERN_THEME_TYPE,
+	PATTERN_SYNC_STATUSES,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
@@ -50,7 +50,7 @@ const selectTemplatePartsAsPatterns = (
 	const { __experimentalGetDefaultTemplatePartAreas } = select( editorStore );
 	const query = { per_page: -1 };
 	const rawTemplateParts =
-		getEntityRecords( 'postType', TEMPLATE_PARTS, query ) ??
+		getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
 		EMPTY_PATTERN_LIST;
 	const templateParts = rawTemplateParts.map( ( templatePart ) =>
 		templatePartToPattern( templatePart )
@@ -101,7 +101,7 @@ const selectThemePatterns = ( select ) => {
 		...( restBlockPatterns || [] ),
 	]
 		.filter(
-			( pattern ) => ! CORE_PATTERN_SOURCES.includes( pattern.source )
+			( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
 		)
 		.filter( filterOutDuplicatesByName )
 		.filter( ( pattern ) => pattern.inserter !== false )
@@ -159,9 +159,10 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 	} ),
 	id: patternBlock.id,
 	name: patternBlock.slug,
-	syncStatus: patternBlock.wp_pattern_sync_status || SYNC_TYPES.full,
+	syncStatus:
+		patternBlock.wp_pattern_sync_status || PATTERN_SYNC_STATUSES.full,
 	title: patternBlock.title.raw,
-	type: USER_PATTERNS,
+	type: PATTERN_POST_TYPE,
 	patternBlock,
 } );
 
@@ -170,7 +171,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		select( coreStore );
 
 	const query = { per_page: -1 };
-	const records = getEntityRecords( 'postType', USER_PATTERNS, query );
+	const records = getEntityRecords( 'postType', PATTERN_POST_TYPE, query );
 	const categories = getUserPatternCategories();
 
 	let patterns = records
@@ -181,7 +182,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
-		USER_PATTERNS,
+		PATTERN_POST_TYPE,
 		query,
 	] );
 
@@ -208,18 +209,18 @@ export const usePatterns = (
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( categoryType === TEMPLATE_PARTS ) {
+			if ( categoryType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplatePartsAsPatterns( select, {
 					categoryId,
 					search,
 				} );
-			} else if ( categoryType === PATTERNS ) {
+			} else if ( categoryType === PATTERN_THEME_TYPE ) {
 				return selectPatterns( select, {
 					categoryId,
 					search,
 					syncStatus,
 				} );
-			} else if ( categoryType === USER_PATTERNS ) {
+			} else if ( categoryType === PATTERN_POST_TYPE ) {
 				return selectUserPatterns( select, { search, syncStatus } );
 			}
 			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };

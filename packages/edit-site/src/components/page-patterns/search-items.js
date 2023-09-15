@@ -7,7 +7,7 @@ import { noCase } from 'change-case';
 /**
  * Internal dependencies
  */
-import { ALL_PATTERNS_CATEGORY } from './utils';
+import { PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -90,7 +90,7 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
 	const onlyFilterByCategory =
-		config.categoryId !== ALL_PATTERNS_CATEGORY &&
+		config.categoryId !== PATTERN_DEFAULT_CATEGORY &&
 		! normalizedSearchTerms.length;
 	const searchRankConfig = { ...config, onlyFilterByCategory };
 
@@ -139,7 +139,8 @@ function getItemSearchRank( item, searchTerm, config ) {
 	} = config;
 
 	let rank =
-		categoryId === ALL_PATTERNS_CATEGORY || hasCategory( item, categoryId )
+		categoryId === PATTERN_DEFAULT_CATEGORY ||
+		hasCategory( item, categoryId )
 			? 1
 			: 0;
 
