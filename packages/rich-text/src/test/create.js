@@ -22,6 +22,10 @@ describe( 'create', () => {
 			return;
 		}
 
+		if ( ! record._formats ) {
+			record._formats = new Map();
+		}
+
 		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const element = createElement( document, html );
@@ -48,6 +52,9 @@ describe( 'create', () => {
 			html,
 			value: expectedValue,
 		} ) => {
+			if ( ! expectedValue._formats ) {
+				expectedValue._formats = new Map();
+			}
 			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
@@ -70,6 +77,7 @@ describe( 'create', () => {
 
 		expect( value ).toEqual( {
 			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
+			_formats: new Map().set( em, [ 0, 4 ] ).set( strong, [ 2, 4 ] ),
 			replacements: [ , , , , ],
 			text: 'test',
 		} );
