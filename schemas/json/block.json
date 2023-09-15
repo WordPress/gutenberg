@@ -706,6 +706,16 @@
 				}
 			}
 		},
+		"blockHooks": {
+			"description": "Block Hooks allow a block to automatically insert itself next to all instances of a given block type.\n\nSee the Block Hooks documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#block-hooks-optional for more details.",
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"enum": [ "before", "after", "firstChild", "lastChild" ]
+				}
+			},
+			"additionalProperties": false
+		},
 		"editorScript": {
 			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",
 			"oneOf": [
