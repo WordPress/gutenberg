@@ -182,7 +182,7 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggleDescribedBy: DropdownComponentProps[ 'renderToggleDescribedBy' ] = () => (
+	const ToggleDescribedBy = () => (
 		<VisuallyHidden id={ toggleDescriptionId }>
 			{ toggleDescription }
 		</VisuallyHidden>
@@ -191,21 +191,21 @@ const BorderControlDropdown = (
 	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
 		onToggle,
 	} ) => (
-			<Button
-				onClick={ onToggle }
-				variant="tertiary"
-				tooltipPosition={ dropdownPosition }
-				label={ __( 'Border color and style picker' ) }
-				showTooltip={ true }
-				aria-describedby={ toggleDescriptionId }
-			>
-				<span className={ indicatorWrapperClassName }>
-					<ColorIndicator
-						className={ indicatorClassName }
-						colorValue={ color }
-					/>
-				</span>
-			</Button>
+		<Button
+			onClick={ onToggle }
+			variant="tertiary"
+			tooltipPosition={ dropdownPosition }
+			label={ __( 'Border color and style picker' ) }
+			showTooltip={ true }
+			aria-describedby={ toggleDescriptionId }
+		>
+			<span className={ indicatorWrapperClassName }>
+				<ColorIndicator
+					className={ indicatorClassName }
+					colorValue={ color }
+				/>
+			</span>
+		</Button>
 	);
 
 	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
@@ -264,7 +264,7 @@ const BorderControlDropdown = (
 
 	return (
 		<>
-			{ renderToggleDescribedBy() }
+			<ToggleDescribedBy />
 			<Dropdown
 				renderToggle={ renderToggle }
 				renderContent={ renderContent }
