@@ -42,6 +42,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/sync": "file:../sync",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
