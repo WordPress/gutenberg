@@ -100,7 +100,7 @@ function block_core_image_get_lightbox_settings( $block ) {
 		// `gutenberg_get_global_settings` will return the whole `theme.json`
 		// structure in which case we can check if the "lightbox" key is present at
 		// the top-level of the global settings and use its value.
-		if ( ! is_bool( $lightbox_settings ) && isset( $lightbox_settings['lightbox'] )  ) {
+		if ( ! is_bool( $lightbox_settings ) && isset( $lightbox_settings['lightbox'] ) ) {
 			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 		}
 	}
