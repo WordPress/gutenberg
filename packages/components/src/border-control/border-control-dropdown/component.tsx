@@ -182,12 +182,6 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const ToggleDescribedBy = () => (
-		<VisuallyHidden id={ toggleDescriptionId }>
-			{ toggleDescription }
-		</VisuallyHidden>
-	);
-
 	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
 		onToggle,
 	} ) => (
@@ -264,7 +258,9 @@ const BorderControlDropdown = (
 
 	return (
 		<>
-			<ToggleDescribedBy />
+			<VisuallyHidden id={ toggleDescriptionId }>
+				{ toggleDescription }
+			</VisuallyHidden>
 			<Dropdown
 				renderToggle={ renderToggle }
 				renderContent={ renderContent }
