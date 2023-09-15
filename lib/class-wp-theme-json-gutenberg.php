@@ -3742,6 +3742,8 @@ class WP_Theme_JSON_Gutenberg {
 
 				// If the feature is a state selector (e.g. `@currentItem`)
 				// then get the node declarations are nested.
+				// TODO: if we end up dropping the `@` prefix for state selectors
+				// then we can utilise a const of whitelisted state selectors.
 				if ( strpos( $feature, '@' ) === 0 ) {
 					$feature_node = $feature_node[ $feature ];
 				}
