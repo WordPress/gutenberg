@@ -41,13 +41,6 @@ type CommonCircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
-	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
-	 *
-	 * @default false
-	 */
-	asButtons?: boolean;
 };
 
 type WithBaseId = {
@@ -55,6 +48,13 @@ type WithBaseId = {
 };
 
 type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: false;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
 	 * Only used when `asButtons` is not true.
@@ -79,7 +79,15 @@ export type ListboxCircularOptionPickerProps = WithBaseId &
 		'asButtons' | 'actions' | 'options'
 	>;
 
-type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps;
+type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons: true;
+};
 
 export type ButtonsCircularOptionPickerProps = WithBaseId &
 	Omit<
@@ -88,8 +96,8 @@ export type ButtonsCircularOptionPickerProps = WithBaseId &
 	>;
 
 export type CircularOptionPickerProps =
-	| ( { asButtons?: false } & FullListboxCircularOptionPickerProps )
-	| ( { asButtons: true } & FullButtonsCircularOptionPickerProps );
+	| FullListboxCircularOptionPickerProps
+	| FullButtonsCircularOptionPickerProps;
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
