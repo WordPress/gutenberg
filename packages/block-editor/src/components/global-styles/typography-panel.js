@@ -339,17 +339,9 @@ export default function TypographyPanel( {
 	// Writing Mode
 	const hasWritingModeControl = useHasWritingModeControl( settings );
 	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
-	const setWritingMode = ( newValue ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'typography', 'writingMode' ],
-				newValue || undefined
-			)
-		);
-	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
-	const resetWritingMode = () => setWritingMode( undefined );
+	const resetWritingMode = () =>
+		setWritingModeAndTextOrientation( undefined );
 
 	// Text Orientation
 	const hasTextOrientationControl = useHasTextOrientationControl( settings );
