@@ -184,16 +184,6 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 
 ---
-
-### behaviors
-
-Settings related to behaviors.
-
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| lightbox | boolean | false |  |
-
----
 ## Styles
 
 
