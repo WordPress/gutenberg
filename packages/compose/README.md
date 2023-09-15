@@ -484,6 +484,18 @@ const App = () => {
 };
 ```
 
+### useStateWithHistory
+
+useState with undo/redo history.
+
+_Parameters_
+
+-   _initialValue_ `T`: Initial value.
+
+_Returns_
+
+-   Value, setValue, hasUndo, hasRedo, undo, redo.
+
 ### useThrottle
 
 Throttles a function similar to Lodash's `throttle`. A new throttled function will be returned and any scheduled calls cancelled if any of the arguments change, including the function to throttle, so please wrap functions created on render in components in `useCallback`.

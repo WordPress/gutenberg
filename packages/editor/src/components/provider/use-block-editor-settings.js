@@ -95,11 +95,13 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		userCanCreatePages,
 		pageOnFront,
 		postType,
+		userPatternCategories,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML, getCurrentPostType } =
 			select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord } = select( coreStore );
+		const { canUser, getEntityRecord, getUserPatternCategories } =
+			select( coreStore );
 
 		const siteSettings = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )
@@ -118,6 +120,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
 			postType: getCurrentPostType(),
+			userPatternCategories: getUserPatternCategories(),
 		};
 	}, [] );
 
@@ -200,6 +203,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -216,11 +220,13 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+			createPageEntity,
 			userCanCreatePages,
 			pageOnFront,
 		]

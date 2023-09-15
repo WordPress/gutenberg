@@ -37,7 +37,8 @@
 				]
 			},
 			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{ "docs/getting-started/glossary.md": [] },
+			{ "docs/getting-started/faq.md": [] }
 		]
 	},
 	{
@@ -136,7 +137,6 @@
 			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
-					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
 					{ "docs/how-to-guides/themes/theme-json.md": [] },
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
@@ -269,6 +269,9 @@
 					},
 					{ "docs/reference-guides/data/data-core-blocks.md": [] },
 					{
+						"docs/reference-guides/data/data-core-commands.md": []
+					},
+					{
 						"docs/reference-guides/data/data-core-customize-widgets.md": []
 					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
@@ -321,8 +324,6 @@
 					}
 				]
 			},
-			{ "docs/explanations/faq.md": [] },
-			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]
 	},
@@ -383,8 +384,7 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
-					{ "docs/contributors/design/the-block.md": [] },
-					{ "docs/contributors/design/reference.md": [] }
+					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},
 			{
