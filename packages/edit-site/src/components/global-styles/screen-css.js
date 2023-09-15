@@ -17,7 +17,7 @@ const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
 
 function ScreenCSS() {
 	const description = __(
-		'Add your own CSS to customize the appearance and layout of your site. You do not need to include a CSS selector, just add the property and value.'
+		'Add your own CSS to customize the appearance and layout of your site.'
 	);
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,

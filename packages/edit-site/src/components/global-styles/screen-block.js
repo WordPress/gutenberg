@@ -278,7 +278,7 @@ function ScreenBlock( { name, variation } ) {
 						{ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
-								'Add your own CSS to customize the appearance of the %s block.'
+								'Add your own CSS to customize the appearance of the %s block.  You do not need to include a CSS selector, just add the property and value.''
 							),
 							blockType?.title
 						) }
