@@ -430,27 +430,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergEditorSettings() -> GutenbergEditorSettings? {
-        guard ProcessInfo.processInfo.arguments.count >= 3 else {
+        guard isUITesting(), let initialProps = getInitialPropsFromArgs() else {
             return nil
         }
-        
-        let initialProps = ProcessInfo.processInfo.arguments[2]
+        let settings = EditorSettings()
+        settings.rawStyles = initialProps["rawStyles"]
+        settings.rawFeatures = initialProps["rawFeatures"]
 
-        if let data = initialProps.data(using: .utf8) {
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    let settings = EditorSettings()
-
-                    settings.rawStyles = json["rawStyles"] as? String
-                    settings.rawFeatures = json["rawFeatures"] as? String
-                    return settings
-                }
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        
-        return nil
+        return settings
     }
 
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
