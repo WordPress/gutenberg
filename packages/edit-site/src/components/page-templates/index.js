@@ -4,12 +4,11 @@
 import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
+import { useState, useMemo } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -18,10 +17,12 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import AddedBy from '../list/added-by';
+import { default as AddedBy, useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplate from '../add-new-template';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import isTemplateRemovable from '../../utils/is-template-removable';
+import isTemplateRevertable from '../../utils/is-template-revertable';
 import {
 	DataTableRows,
 	DataTableGlobalSearchInput,
@@ -31,8 +32,39 @@ import {
 	DataTableProvider,
 	DataTableActions,
 } from '../datatable';
+import TemplatesBulkActions from './templates-bulk-actions';
+
+function TemplateTitle( props ) {
+	const template = props.row.original;
+	const { isCustomized } = useAddedBy( template.type, template.id );
+	return (
+		<VStack>
+			<Heading as="h3" level={ 5 }>
+				<Link
+					params={ {
+						postId: template.id,
+						postType: template.type,
+						canvas: 'edit',
+					} }
+				>
+					{ decodeEntities( props.getValue() ) }
+				</Link>
+			</Heading>
+			<span>
+				{ isCustomized && (
+					<span className="edit-site-list-added-by__customized-info">
+						{ template.type === 'wp_template'
+							? _x( 'Customized', 'template' )
+							: _x( 'Customized', 'template part' ) }
+					</span>
+				) }
+			</span>
+		</VStack>
+	);
+}
 
 export default function PageTemplates() {
+	const [ bulkActionsAnchor, setBulkActionsAnchor ] = useState();
 	const { records: templates } = useEntityRecords(
 		'postType',
 		TEMPLATE_POST_TYPE,
@@ -48,27 +80,7 @@ export default function PageTemplates() {
 				accessorFn: ( template ) =>
 					template.title?.rendered || template.slug,
 				cell: ( props ) => {
-					const template = props.row.original;
-					return (
-						<VStack>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: template.id,
-										postType: template.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities( props.getValue() ) }
-								</Link>
-							</Heading>
-							{ template.description && (
-								<Text variant="muted">
-									{ decodeEntities( template.description ) }
-								</Text>
-							) }
-						</VStack>
-					);
+					return <TemplateTitle { ...props } />;
 				},
 				maxSize: 400,
 				sortingFn: 'alphanumeric',
@@ -83,6 +95,8 @@ export default function PageTemplates() {
 						<AddedBy
 							postType={ template.type }
 							postId={ template.id }
+							// We need to split the AddedBy component both for design and checks for filters etc..
+							showIsCustomizedInfo={ false }
 						/>
 					);
 				},
@@ -125,6 +139,9 @@ export default function PageTemplates() {
 							initialState: {
 								pagination: { pageSize: 2 },
 							},
+							enableRowSelection: ( { original: template } ) =>
+								isTemplateRemovable( template ) ||
+								isTemplateRevertable( template ),
 						} }
 					>
 						<VStack>
@@ -132,7 +149,13 @@ export default function PageTemplates() {
 								<DataTableGlobalSearchInput />
 								<DataTableActions />
 							</HStack>
-							<DataTableRows className="edit-site-table" />
+							<DataTableRows
+								ref={ setBulkActionsAnchor }
+								className="edit-site-table"
+							/>
+							<TemplatesBulkActions
+								anchor={ bulkActionsAnchor }
+							/>
 							<HStack justify="space-between">
 								<DataTablePaginationTotalItems />
 								<DataTablePaginationNumbers />

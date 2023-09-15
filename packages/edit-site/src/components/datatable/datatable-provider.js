@@ -34,22 +34,37 @@ export default function DataTable( { data, columns, options = {}, children } ) {
 		_columns = [
 			{
 				id: 'select',
-				header: ( { table } ) => (
-					<CheckboxControl
-						checked={ table.getIsAllPageRowsSelected() }
-						onChange={ ( value ) =>
-							table.toggleAllPageRowsSelected( !! value )
-						}
-						aria-label={ __( 'Select all' ) }
-					/>
-				),
-				cell: ( { row } ) => (
-					<CheckboxControl
-						checked={ row.getIsSelected() }
-						onChange={ ( value ) => row.toggleSelected( !! value ) }
-						aria-label={ __( 'Select row' ) }
-					/>
-				),
+				header: ( { table } ) => {
+					const areAllRowsSelected = table.getIsAllPageRowsSelected();
+					const canMultiSelect = table
+						.getRowModel()
+						.rows.some( ( row ) => row.getCanSelect() );
+					return (
+						canMultiSelect && (
+							<CheckboxControl
+								checked={ areAllRowsSelected }
+								indeterminate={
+									! areAllRowsSelected &&
+									table.getIsSomeRowsSelected()
+								}
+								onChange={ ( value ) =>
+									table.toggleAllPageRowsSelected( !! value )
+								}
+								aria-label={ __( 'Select all' ) }
+							/>
+						)
+					);
+				},
+				cell: ( { row } ) =>
+					row.getCanSelect() && (
+						<CheckboxControl
+							checked={ row.getIsSelected() }
+							onChange={ ( value ) =>
+								row.toggleSelected( !! value )
+							}
+							aria-label={ __( 'Select row' ) }
+						/>
+					),
 				enableSorting: false,
 				enableHiding: false,
 			},
