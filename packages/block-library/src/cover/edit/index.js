@@ -4,13 +4,12 @@
 import classnames from 'classnames';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-import { FastAverageColor } from 'fast-average-color';
 
 /**
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -45,6 +44,7 @@ import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
+import { retrieveFastAverageColor, compositeSourceOver } from './color-utils';
 
 extend( [ namesPlugin ] );
 
@@ -67,11 +67,8 @@ function getInnerBlocksTemplate( attributes ) {
  * @return {Promise<string>} average color in hex
  */
 async function computeAverageColor( url ) {
-	function retrieveFastAverageColor() {
-		if ( ! retrieveFastAverageColor.fastAverageColor ) {
-			retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
-		}
-		return retrieveFastAverageColor.fastAverageColor;
+	if ( ! url ) {
+		return DEFAULT_AVERAGE_COLOR;
 	}
 
 	// making the default color rgb for compat with FAC
@@ -97,7 +94,7 @@ async function computeAverageColor( url ) {
 		return color.hex;
 	} catch ( error ) {
 		// If there's an error return the fallback color.
-		return '#FFFFFF';
+		return DEFAULT_AVERAGE_COLOR;
 	}
 }
 
@@ -111,24 +108,6 @@ async function computeAverageColor( url ) {
  * 									 combination composite result is dark
  */
 function computeIsDark( dimRatio, overlayColor, backgroundColor ) {
-	/**
-	 * Performs a Porter Duff composite source over operation on two rgba colors.
-	 *
-	 * @see https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover
-	 *
-	 * @param {import('colord').RgbaColor} source Source color.
-	 * @param {import('colord').RgbaColor} dest   Destination color.
-	 * @return {import('colord').RgbaColor} Composite color.
-	 */
-	function compositeSourceOver( source, dest ) {
-		return {
-			r: source.r * source.a + dest.r * dest.a * ( 1 - source.a ),
-			g: source.g * source.a + dest.g * dest.a * ( 1 - source.a ),
-			b: source.b * source.a + dest.b * dest.a * ( 1 - source.a ),
-			a: source.a + dest.a * ( 1 - source.a ),
-		};
-	}
-
 	const overlay = colord( overlayColor )
 		.alpha( dimRatio / 100 )
 		.toRgb();
@@ -161,6 +140,8 @@ function CoverEdit( {
 	const {
 		contentPosition,
 		id,
+		url: originalUrl,
+		backgroundType: originalBackgroundType,
 		useFeaturedImage,
 		dimRatio,
 		focalPoint,
@@ -192,33 +173,6 @@ function CoverEdit( {
 	);
 	const mediaUrl = media?.source_url;
 
-	// set the is dark attribute based on the overlay
-	// and background color
-	const setIsDark = ( newOverlay, newBackground, newDimRatio = dimRatio ) => {
-		__unstableMarkNextChangeAsNotPersistent();
-		const isDarkSetting = computeIsDark(
-			newDimRatio,
-			newOverlay,
-			newBackground
-		);
-		setAttributes( {
-			isDark: isDarkSetting,
-		} );
-	};
-
-	// set the overlay color based on the average color
-	// of the image background
-	const setOverlayFromAverageColor = async ( newMedia ) => {
-		const newUrl =
-			newMedia?.url && newMedia.type === IMAGE_BACKGROUND_TYPE
-				? newMedia.url
-				: false;
-		__unstableMarkNextChangeAsNotPersistent();
-		const color = await getAverageBackgroundColor( newUrl );
-		setOverlayColor( color );
-		setIsDark( color, color );
-	};
-
 	// instead of destructuring the attributes
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
@@ -226,38 +180,100 @@ function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  attributes.url?.replaceAll( '&amp;', '&' );
+		  originalUrl?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
-		: attributes.backgroundType;
+		: originalBackgroundType;
 
-	let computedAverageColor = null;
-	const getAverageBackgroundColor = async ( newUrl ) => {
-		if ( url === newUrl && computedAverageColor ) {
-			return computedAverageColor;
-		}
-		computedAverageColor = await computeAverageColor( newUrl );
-		return computedAverageColor;
-	};
+	// this is used to not reset the overlay color
+	// from the average color when the user manually
+	// sets the overlay color
+	// howeverm, changing the background image
+	// should reset the overlay color
+	const hasManuallySetOverlayColor = useRef(
+		overlayColor.color !== undefined
+	);
 
-	// Set the overlay color to the average color of th
-	// featured image and and is dark based on that color.
-	const updateFromFeaturedImage = async () => {
-		if ( ! useFeaturedImage ) {
-			return;
-		}
-		await setOverlayFromAverageColor( {
-			url: mediaUrl,
-			type: IMAGE_BACKGROUND_TYPE,
-		} );
-		setIsDark(
-			overlayColor.color,
-			await getAverageBackgroundColor( mediaUrl )
-		);
-	};
+	// this is a ref to the average color
+	// so we don't have to compute it again
+	const computedAverageColor = useRef( null );
+	const getAverageBackgroundColor = useCallback(
+		async ( newUrl ) => {
+			if ( originalUrl === newUrl && computedAverageColor.current ) {
+				return computedAverageColor.current;
+			}
+			computedAverageColor.current = await computeAverageColor( newUrl );
+			return computedAverageColor.current;
+		},
+		[ originalUrl ]
+	);
+
+	// set the is dark attribute based on the overlay
+	// and background color
+	const setIsDark = useCallback(
+		( newOverlay, newBackground, newDimRatio = dimRatio ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			const isDarkSetting = computeIsDark(
+				newDimRatio,
+				newOverlay,
+				newBackground
+			);
+			setAttributes( {
+				isDark: isDarkSetting,
+			} );
+		},
+		[ __unstableMarkNextChangeAsNotPersistent, dimRatio, setAttributes ]
+	);
+
+	// set the overlay color based on the average color
+	// of the image background
+	const setOverlayFromAverageColor = useCallback(
+		async ( newMedia ) => {
+			if ( hasManuallySetOverlayColor.current === true ) {
+				return;
+			}
+			const newUrl =
+				newMedia?.url && newMedia.type === IMAGE_BACKGROUND_TYPE
+					? newMedia.url
+					: false;
+			__unstableMarkNextChangeAsNotPersistent();
+			const color = await getAverageBackgroundColor( newUrl );
+			setOverlayColor( color );
+			setAttributes( { isDark: colord( color ).isDark() } );
+		},
+		[
+			hasManuallySetOverlayColor,
+			__unstableMarkNextChangeAsNotPersistent,
+			getAverageBackgroundColor,
+			setAttributes,
+			setOverlayColor,
+		]
+	);
+
 	// we call this on render since the url is
 	// 'hijacked' by the featured image
-	updateFromFeaturedImage();
+	useEffect( () => {
+		// Set the overlay color to the average color of th
+		// featured image and and is dark based on that color.
+		const updateFromFeaturedImage = async () => {
+			if ( ! useFeaturedImage ) {
+				return;
+			}
+			await setOverlayFromAverageColor( {
+				url: mediaUrl,
+				type: IMAGE_BACKGROUND_TYPE,
+			} );
+		};
+		updateFromFeaturedImage();
+	}, [
+		getAverageBackgroundColor,
+		mediaUrl,
+		overlayColor.color,
+		setOverlayFromAverageColor,
+		useFeaturedImage,
+		originalUrl,
+		originalBackgroundType,
+	] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
@@ -265,10 +281,11 @@ function CoverEdit( {
 
 	const onSelectMedia = async ( newMedia ) => {
 		setMedia( newMedia );
+		hasManuallySetOverlayColor.current = false;
 		await setOverlayFromAverageColor( newMedia );
 	};
 
-	const onClearMedia = async () => {
+	const onClearMedia = () => {
 		setAttributes( {
 			url: undefined,
 			id: undefined,
@@ -278,10 +295,11 @@ function CoverEdit( {
 			isRepeated: undefined,
 			useFeaturedImage: false,
 		} );
-		setIsDark( overlayColor.color, overlayColor.color );
+		setAttributes( { isDark: colord( overlayColor.color ).isDark() } );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
+		hasManuallySetOverlayColor.current = true;
 		setOverlayColor( colorValue );
 		setIsDark( colorValue, await getAverageBackgroundColor( url ) );
 	};
@@ -381,6 +399,7 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
+		hasManuallySetOverlayColor.current = false;
 		setAttributes( {
 			id: undefined,
 			url: undefined,
