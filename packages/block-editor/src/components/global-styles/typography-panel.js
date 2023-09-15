@@ -353,6 +353,9 @@ export default function TypographyPanel( {
 
 	// Text Orientation
 	const hasTextOrientationControl = useHasTextOrientationControl( settings );
+	const textOrientation = decodeValue(
+		inheritedValue?.typography?.textOrientation
+	);
 
 	// Returns the new text orientation and writing mode based on the value from the control.
 	const getTextOrientationAndWritingMode = ( valueFromControl ) => {
@@ -382,6 +385,18 @@ export default function TypographyPanel( {
 				};
 		}
 	};
+
+	function getValuefromWritingModeAndTextOrientation() {
+		if ( writingMode === 'horizontal-tb' ) {
+			return 'horizontal';
+		}
+		if ( writingMode === 'vertical-lr' || writingMode === 'vertical-rl' ) {
+			if ( textOrientation === 'upright' ) {
+				return 'upright';
+			}
+			return 'top-to-bottom';
+		}
+	}
 
 	const setWritingModeAndTextOrientation = useCallback(
 		( newValue ) => {
@@ -583,7 +598,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<WritingModeControl
-						value={ writingMode }
+						value={ getValuefromWritingModeAndTextOrientation() }
 						onChange={ setWritingModeAndTextOrientation }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
