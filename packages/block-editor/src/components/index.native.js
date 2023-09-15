@@ -91,7 +91,6 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
-export { default as BlockFallbackWebVersion } from './block-fallback-web-version';
 
 // State Related Components.
 export { default as BlockEditorProvider } from './provider';
