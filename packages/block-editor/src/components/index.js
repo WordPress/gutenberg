@@ -5,7 +5,6 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
