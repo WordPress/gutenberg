@@ -19,6 +19,8 @@ Pod::Spec.new do |s|
   s.swift_version    = '5.0'
   s.xcconfig         = { 'OTHER_LDFLAGS' => '-lxml2',
                          'HEADER_SEARCH_PATHS' => '/usr/include/libxml2' }
-  s.dependency         'React-Core'
-  s.dependency         'WordPress-Aztec-iOS', '~> 1.19'
+  s.dependency 'React-Core'
+  # Intentionally locked because of how it's integrated.
+  # See https://github.com/WordPress/gutenberg/pull/54453#discussion_r1325582749
+  s.dependency 'WordPress-Aztec-iOS', '1.19.9'
 end
