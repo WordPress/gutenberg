@@ -3,6 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { swatch } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,13 +25,17 @@ function ColorOption( {
 	onChange,
 }: ColorOptionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const labelId = useInstanceId( ColorOption, 'color-list-picker-option' );
+	const idRoot = useInstanceId( ColorOption, 'color-list-picker-option' );
+	const labelId = `${ idRoot }__label`;
+	const contentId = `${ idRoot }__content`;
 
 	return (
 		<>
 			<Button
 				className="components-color-list-picker__swatch-button"
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+				aria-expanded={ isOpen }
+				aria-controls={ contentId }
 			>
 				<HStack justify="flex-start" spacing={ 2 }>
 					{ value ? (
@@ -44,18 +49,25 @@ function ColorOption( {
 					<span id={ labelId }>{ label }</span>
 				</HStack>
 			</Button>
-			{ isOpen && (
-				<ColorPalette
-					aria-labelledby={ labelId }
-					className="components-color-list-picker__color-picker"
-					colors={ colors }
-					value={ value }
-					clearable={ false }
-					onChange={ onChange }
-					disableCustomColors={ disableCustomColors }
-					enableAlpha={ enableAlpha }
-				/>
-			) }
+			<div
+				role="group"
+				id={ contentId }
+				aria-labelledby={ labelId }
+				aria-hidden={ ! isOpen }
+			>
+				{ isOpen && (
+					<ColorPalette
+						aria-label={ __( 'Color options' ) }
+						className="components-color-list-picker__color-picker"
+						colors={ colors }
+						value={ value }
+						clearable={ false }
+						onChange={ onChange }
+						disableCustomColors={ disableCustomColors }
+						enableAlpha={ enableAlpha }
+					/>
+				) }
+			</div>
 		</>
 	);
 }
