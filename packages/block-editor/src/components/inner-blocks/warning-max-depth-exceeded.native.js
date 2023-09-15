@@ -64,7 +64,7 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 					clientId={ clientId }
 					showSheet={ showDetails }
 					onCloseSheet={ () => setShowDetails( false ) }
-					title={ __( 'Block deeply nested' ) }
+					title={ __( 'Deeply nested block' ) }
 					description={ description }
 					customActions={ [
 						{ label: __( 'Ungroup block' ), onPress: onUngroup },
