@@ -143,7 +143,10 @@ export default function DataTableActions( {
 			label={ __( 'Actions' ) }
 			className={ className }
 			trigger={
-				<Button icon={ blockTable }>
+				<Button 
+					variant='tertiary'
+					icon={ blockTable }
+				>
 					{ __( 'View' ) }
 					<Icon icon={ chevronDown } />
 				</Button>
