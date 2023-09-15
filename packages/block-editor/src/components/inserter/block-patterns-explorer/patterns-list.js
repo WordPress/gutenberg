@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -11,7 +11,6 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import BlockPatternsList from '../../block-patterns-list';
-import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
@@ -25,9 +24,23 @@ import {
 	PATTERN_SOURCE_FILTERS,
 } from '../block-patterns-source-filter';
 
-function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
+function PatternsListHeader( {
+	filterValue,
+	filteredBlockPatternsLength,
+	selectedCategory,
+	patternCategories,
+} ) {
 	if ( ! filterValue ) {
 		return null;
+	}
+	let filter = filterValue;
+	if ( selectedCategory !== allPatternsCategory.name ) {
+		const category = patternCategories.find(
+			( patternCategory ) => patternCategory.name === selectedCategory
+		);
+		if ( category ) {
+			filter = `${ filter } - ${ category?.label }`;
+		}
 	}
 	return (
 		<Heading
@@ -43,7 +56,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 					filteredBlockPatternsLength
 				),
 				filteredBlockPatternsLength,
-				filterValue
+				filter
 			) }
 		</Heading>
 	);
@@ -54,8 +67,8 @@ function PatternList( {
 	patternSourceFilter,
 	selectedCategory,
 	patternCategories,
-	patternSyncFilter,
 } ) {
+	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -147,19 +160,24 @@ function PatternList( {
 			className="block-editor-block-patterns-explorer__list"
 			ref={ container }
 		>
-			{ hasItems && (
-				<PatternsListHeader
-					filterValue={
-						searchValue ||
-						PATTERN_SOURCE_FILTERS[ patternSourceFilter ]
-					}
-					filteredBlockPatternsLength={ filteredBlockPatterns.length }
-				/>
-			) }
+			<PatternsListHeader
+				filterValue={
+					searchValue || PATTERN_SOURCE_FILTERS[ patternSourceFilter ]
+				}
+				filteredBlockPatternsLength={ filteredBlockPatterns.length }
+				selectedCategory={ selectedCategory }
+				patternCategories={ patternCategories }
+			/>
+
 			<InserterListbox>
-				{ ! hasItems && <InserterNoResults /> }
 				{ patternSourceFilter === PATTERN_TYPES.user &&
-					! searchValue && <BlockPatternsSyncFilter /> }
+					! searchValue && (
+						<BlockPatternsSyncFilter
+							patternSyncFilter={ patternSyncFilter }
+							setPatternSyncFilter={ setPatternSyncFilter }
+						/>
+					) }
+
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ pagingProps.categoryPatternsAsyncList }

@@ -9,7 +9,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { _x, __, _n, isRTL, sprintf } from '@wordpress/i18n';
-import { useViewportMatch, usePrevious } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -20,7 +20,6 @@ import {
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,7 +38,6 @@ import {
 	BlockPatternsSyncFilter,
 	SYNC_TYPES,
 } from './block-patterns-sync-filter';
-import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
@@ -75,11 +73,7 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	return false;
 }
 
-export function usePatternsCategories(
-	rootClientId,
-	sourceFilter = 'all',
-	syncFilter
-) {
+export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 	const { patterns: allPatterns, allCategories } = usePatternsState(
 		undefined,
 		rootClientId
@@ -91,13 +85,9 @@ export function usePatternsCategories(
 				? allPatterns
 				: allPatterns.filter(
 						( pattern ) =>
-							! isPatternFiltered(
-								pattern,
-								sourceFilter,
-								syncFilter
-							)
+							! isPatternFiltered( pattern, sourceFilter )
 				  ),
-		[ sourceFilter, syncFilter, allPatterns ]
+		[ sourceFilter, allPatterns ]
 	);
 
 	const hasRegisteredCategory = useCallback(
@@ -206,15 +196,11 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-	const patternSyncFilter = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return settings.patternsSyncFilter || 'all';
-	}, [] );
+	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
+
 	const availableCategories = usePatternsCategories(
 		rootClientId,
-		patternFilter,
-		patternSyncFilter
+		patternFilter
 	);
 	const container = useRef();
 	const currentCategoryPatterns = useMemo(
@@ -265,6 +251,7 @@ export function BlockPatternsCategoryPanel( {
 	);
 
 	// Hide block pattern preview on unmount.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
 
 	return (
@@ -277,7 +264,10 @@ export function BlockPatternsCategoryPanel( {
 			</div>
 			<p>{ category.description }</p>
 			{ patternFilter === PATTERN_TYPES.user && (
-				<BlockPatternsSyncFilter />
+				<BlockPatternsSyncFilter
+					patternSyncFilter={ patternSyncFilter }
+					setPatternSyncFilter={ setPatternSyncFilter }
+				/>
 			) }
 			{ ! currentCategoryPatterns.length && (
 				<div>{ __( 'No results found' ) }</div>
@@ -311,30 +301,10 @@ function BlockPatternsTabs( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
-	const patternSyncFilter = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return settings.patternsSyncFilter;
-	}, [] );
-	const previousSyncFilter = usePrevious( patternSyncFilter );
-
-	// If the sync filter changes, we need to select the "All" category to avoid
-	// showing a confusing no results screen.
-	useEffect( () => {
-		if ( patternSyncFilter && patternSyncFilter !== previousSyncFilter ) {
-			onSelectCategory( allPatternsCategory, patternSourceFilter );
-		}
-	}, [
-		patternSyncFilter,
-		previousSyncFilter,
-		onSelectCategory,
-		patternSourceFilter,
-	] );
 
 	const categories = usePatternsCategories(
 		rootClientId,
-		patternSourceFilter,
-		patternSyncFilter
+		patternSourceFilter
 	);
 
 	const initialCategory = selectedCategory || categories[ 0 ];
