@@ -160,6 +160,7 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation_link( $attributes, $content, $block ) {
+
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
@@ -186,16 +187,24 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
 	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+
+	// Determine the logic that maps to the concept of "current item".
+	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation' );
+
+	// TODO - handle converting CSS selector to classname.
+	$current_item_classname = isset( $block_type->selectors['@currentItem'] ) ? str_replace( '.', '', $block_type->selectors['@currentItem'] ) : 'current-menu-item';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
-				( $is_active ? ' current-menu-item' : '' ),
+				( $is_active ? ' ' . $current_item_classname : '' ),
 			'style' => $style_attribute,
 		)
 	);
-	$html               = '<li ' . $wrapper_attributes . '>' .
+
+	$html = '<li ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
