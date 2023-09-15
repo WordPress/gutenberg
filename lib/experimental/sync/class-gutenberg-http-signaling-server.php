@@ -151,20 +151,11 @@ class Gutenberg_HTTP_Signaling_Server {
 		flock( $fd, LOCK_EX );
 		$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd );
 		if ( isset( $subscriber_to_messages[ static::$subscriber_id ] ) && count( $subscriber_to_messages[ static::$subscriber_id ] ) > 0 ) {
-			$messages = array_map( 'wp_json_encode', $subscriber_to_messages[ static::$subscriber_id ] );
+			echo 'id: ' . time() . PHP_EOL;
+			echo 'event: message' . PHP_EOL;
+			echo 'data: ' . wp_json_encode( $subscriber_to_messages[ static::$subscriber_id ] ) . PHP_EOL . PHP_EOL;
 			$subscriber_to_messages[ static::$subscriber_id ] = array();
-			if ( count( $messages ) > 1 ) {
-				$data = implode( '|MULTIPLE|', $messages );
-			} else {
-				$data = $messages[0];
-			}
-			if ( $data ) {
-				echo 'id: ' . time() . PHP_EOL;
-				echo 'event: message' . PHP_EOL;
-				echo 'data: ' . $data . PHP_EOL . PHP_EOL;
-			}
 			static::save_contents_to_file_descriptor( $fd, $subscriber_to_messages );
-
 		} else {
 			echo PHP_EOL;
 		}

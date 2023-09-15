@@ -194,22 +194,18 @@ function setupHttpSignal( httpClient ) {
 		eventSource.onmessage = ( event ) => {
 			httpClient.lastMessageReceived = Date.now();
 			const data = event.data;
-
-			if ( data.includes( '|MULTIPLE|' ) ) {
-				const messages = data.split( '|MULTIPLE|' );
-				messages.forEach( onSingleMessage );
-			} else {
-				onSingleMessage( data );
+			if ( data ) {
+				const messages = JSON.parse( data );
+				if ( Array.isArray( messages ) ) {
+					messages.forEach( onSingleMessage );
+				}
 			}
 		};
 		// @ts-ignore
 		httpClient.ws = eventSource;
 		httpClient.connecting = true;
 		httpClient.connected = false;
-		const onSingleMessage = ( /** @type {string} */ data ) => {
-			const message =
-				typeof data === 'string' ? JSON.parse( data ) : data;
-			//console.log( 'receive', message );
+		const onSingleMessage = ( /** @type {any} */ message ) => {
 			if ( message && message.type === 'pong' ) {
 				clearTimeout( pingTimeout );
 				pingTimeout = setTimeout(
