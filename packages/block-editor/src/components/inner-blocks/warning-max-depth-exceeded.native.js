@@ -14,7 +14,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import Warning from '../warning';
-import BlockFallbackWebVersion from '../block-fallback-web-version';
+import UnsupportedBlockDetails from '../unsupported-block-details';
 import { store as blockEditorStore } from '../../store';
 import { MAX_NESTING_DEPTH } from './constants';
 
@@ -61,7 +61,7 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 						'Block cannot be rendered because it is deeply nested. Tap here for more details.'
 					) }
 				/>
-				<BlockFallbackWebVersion
+				<UnsupportedBlockDetails
 					clientId={ clientId }
 					showSheet={ showDetails }
 					onCloseSheet={ () => setShowDetails( false ) }

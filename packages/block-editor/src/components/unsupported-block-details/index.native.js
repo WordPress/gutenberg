@@ -29,7 +29,7 @@ import { store as blockEditorStore } from '../../store';
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const EMPTY_ARRAY = [];
 
-const BlockFallbackWebVersion = ( {
+const UnsupportedBlockDetails = ( {
 	clientId,
 	showSheet,
 	onCloseSheet,
@@ -204,4 +204,4 @@ const BlockFallbackWebVersion = ( {
 	);
 };
 
-export default BlockFallbackWebVersion;
+export default UnsupportedBlockDetails;
