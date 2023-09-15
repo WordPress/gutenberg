@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { check, reset } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -62,6 +63,8 @@ export default function EditTemplate() {
 		return null;
 	}
 
+	const isTemplateHidden = pageContentFocusType !== 'disableTemplate';
+
 	return (
 		<HStack className="edit-site-summary-field">
 			<Text className="edit-site-summary-field__label">
@@ -94,19 +97,16 @@ export default function EditTemplate() {
 						<ResetDefaultTemplate onClick={ onClose } />
 						<MenuGroup>
 							<MenuItem
+								icon={ isTemplateHidden ? reset : check }
 								onClick={ () => {
 									setPageContentFocusType(
-										pageContentFocusType ===
-											'disableTemplate'
-											? 'hideTemplate'
-											: 'disableTemplate'
+										isTemplateHidden
+											? 'disableTemplate'
+											: 'hideTemplate'
 									);
-									onClose();
 								} }
 							>
-								{ pageContentFocusType === 'disableTemplate'
-									? __( 'Hide template' )
-									: __( 'Show template' ) }
+								{ __( 'Template preview' ) }
 							</MenuItem>
 						</MenuGroup>
 					</>
