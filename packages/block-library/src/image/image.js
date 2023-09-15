@@ -7,7 +7,6 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
-	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -24,7 +23,6 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	useSetting,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -115,7 +113,6 @@ export default function Image( {
 		scale,
 		linkTarget,
 		sizeSlug,
-		lightbox,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -174,7 +171,6 @@ export default function Image( {
 			},
 			[ clientId ]
 		);
-
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -369,14 +365,6 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSetting = useSetting( 'lightbox' );
-
-	const showLightboxToggle =
-		lightboxSetting === true || lightboxSetting?.allowEditing === true;
-
-	const lightboxChecked =
-		lightbox?.enabled || ( ! lightbox && lightboxSetting?.enabled );
-
 	const dimensionsControl = (
 		<DimensionsTool
 			value={ { width, height, scale, aspectRatio } }
@@ -413,7 +401,6 @@ export default function Image( {
 			height: undefined,
 			scale: undefined,
 			aspectRatio: undefined,
-			lightbox: undefined,
 		} );
 	};
 
@@ -538,26 +525,6 @@ export default function Image( {
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
-					{ showLightboxToggle && (
-						<ToolsPanelItem
-							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on Click' ) }
-							onDeselect={ () => {
-								setAttributes( { lightbox: undefined } );
-							} }
-							isShownByDefault={ true }
-						>
-							<ToggleControl
-								label={ __( 'Expand on Click' ) }
-								checked={ lightboxChecked }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										lightbox: { enabled: newValue },
-									} );
-								} }
-							/>
-						</ToolsPanelItem>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">

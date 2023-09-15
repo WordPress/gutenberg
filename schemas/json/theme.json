@@ -296,26 +296,6 @@
 				}
 			}
 		},
-		"settingsPropertiesLightbox": {
-			"type": "object",
-			"additionalProperties": false,
-			"properties": {
-				"lightbox": {
-					"description": "Settings related to the lightbox.",
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"description": "Defines whether the lightbox is enabled or not.",
-							"type": "boolean"
-						},
-						"allowEditing": {
-							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
-							"type": "boolean"
-						}
-					}
-				}
-			}
-		},
 		"settingsPropertiesPosition": {
 			"type": "object",
 			"properties": {
@@ -708,7 +688,6 @@
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
-				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
@@ -729,7 +708,6 @@
 						"color": {},
 						"dimensions": {},
 						"layout": {},
-						"lightbox": {},
 						"position": {},
 						"shadow": {},
 						"spacing": {},
@@ -2199,7 +2177,6 @@
 						"background": {},
 						"color": {},
 						"layout": {},
-						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},

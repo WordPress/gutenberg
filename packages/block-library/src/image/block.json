@@ -33,12 +33,6 @@
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
-		"lightbox": {
-			"type": "object",
-			"enabled": {
-				"type": "boolean"
-			}
-		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
