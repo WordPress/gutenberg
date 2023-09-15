@@ -42,6 +42,8 @@ export default function EnhancedPaginationModal( {
 				aria={ {
 					describedby: modalDescriptionId,
 				} }
+				role="alertdialog"
+				focusOnMount="firstElement"
 				isDismissible={ false }
 				shouldCloseOnEsc={ false }
 				shouldCloseOnClickOutside={ false }
