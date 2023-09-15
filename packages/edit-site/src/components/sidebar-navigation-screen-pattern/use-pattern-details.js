@@ -88,16 +88,21 @@ export default function usePatternDetails( postType, postId ) {
 					? __( 'Not synced' )
 					: __( 'Fully synced' ),
 		} );
+
+		if ( record.wp_pattern_category?.length === 0 ) {
+			details.push( {
+				label: __( 'Categories' ),
+				value: __( 'Uncategorized' ),
+			} );
+		}
 		if ( record.wp_pattern_category?.length > 0 ) {
 			const categories = record.wp_pattern_category
 				.filter( ( category ) => patternCategories.get( category ) )
 				.map( ( category ) => patternCategories.get( category ).label );
+
 			details.push( {
 				label: __( 'Categories' ),
-				value:
-					categories.length > 0
-						? categories.join( ', ' )
-						: __( 'Uncategorized' ),
+				value: categories.length > 0 ? categories.join( ', ' ) : '',
 			} );
 		}
 	}
