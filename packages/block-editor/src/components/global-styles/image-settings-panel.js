@@ -14,9 +14,7 @@ export function useHasImageSettingsPanel( name, settings, userSettings ) {
 	// will NOT be a boolean value or contain the `allowEditing`
 	// property, so we should show the settings panel in those cases.
 	return (
-		( name === 'core/image' &&
-			( settings?.lightbox === true ||
-				settings?.lightbox?.allowEditing ) ) ||
+		( name === 'core/image' && settings?.lightbox?.allowEditing ) ||
 		!! userSettings?.lightbox
 	);
 }
@@ -39,9 +37,7 @@ export default function ImageSettingsPanel( {
 
 	let lightboxChecked = false;
 
-	if ( settings?.lightbox === true ) {
-		lightboxChecked = true;
-	} else if ( settings?.lightbox?.enabled ) {
+	if ( settings?.lightbox?.enabled ) {
 		lightboxChecked = settings.lightbox.enabled;
 	}
 

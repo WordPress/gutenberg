@@ -38,7 +38,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
 	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
 
-		if ( true === $lightbox_settings || ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) ) {
+		if ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) {
 			$lightbox_enabled = true;
 		}
 	}
@@ -100,7 +100,7 @@ function block_core_image_get_lightbox_settings( $block ) {
 		// `gutenberg_get_global_settings` will return the whole `theme.json`
 		// structure in which case we can check if the "lightbox" key is present at
 		// the top-level of the global settings and use its value.
-		if ( ! is_bool( $lightbox_settings ) && isset( $lightbox_settings['lightbox'] ) ) {
+		if ( isset( $lightbox_settings['lightbox'] ) ) {
 			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
 		}
 	}
