@@ -1,0 +1,39 @@
+:root {
+	--wp-theme-color-neutral-bg-surface: #fff;
+	--wp-theme-color-neutral-bg-input: #fff;
+	--wp-theme-color-neutral-text-inverse-strong: #fff;
+	--wp-theme-color-neutral-bg-muted: #f9f9f9;
+	--wp-theme-color-neutral-text-inverse: #f9f9f9;
+	--wp-theme-color-neutral-bg: #f1f1f1;
+	--wp-theme-color-neutral-bg-hover: #e8e8e8;
+	--wp-theme-color-neutral-bg-active: #e0e0e0;
+	--wp-theme-color-neutral-border: #dadada;
+	--wp-theme-color-neutral-border-strong: #cfcfcf;
+	--wp-theme-color-neutral-border-hover: #cfcfcf;
+	--wp-theme-color-neutral-border-strong-hover: #b3b3b3;
+	--wp-theme-color-neutral-bg-strong: #848484;
+	--wp-theme-color-neutral-bg-strong-hover: #727272;
+	--wp-theme-color-neutral-text-muted: #727272;
+	--wp-theme-color-neutral-text: #5b5b5b;
+	--wp-theme-color-neutral-text-strong: #1e1e1e;
+}
+
+.wp-theme-dark {
+	--wp-theme-color-neutral-bg-surface: #161616;
+	--wp-theme-color-neutral-bg-input: #161616;
+	--wp-theme-color-neutral-text-inverse-strong: #161616;
+	--wp-theme-color-neutral-bg-muted: #191919;
+	--wp-theme-color-neutral-text-inverse: #191919;
+	--wp-theme-color-neutral-bg: #252525;
+	--wp-theme-color-neutral-bg-hover: #2c2c2c;
+	--wp-theme-color-neutral-bg-active: #333;
+	--wp-theme-color-neutral-border: #292929;
+	--wp-theme-color-neutral-border-strong: #434343;
+	--wp-theme-color-neutral-border-hover: #434343;
+	--wp-theme-color-neutral-border-strong-hover: #595959;
+	--wp-theme-color-neutral-bg-strong: #656565;
+	--wp-theme-color-neutral-bg-strong-hover: #848484;
+	--wp-theme-color-neutral-text-muted: #848484;
+	--wp-theme-color-neutral-text: #a9a9a9;
+	--wp-theme-color-neutral-text-strong: #ebebeb;
+}
