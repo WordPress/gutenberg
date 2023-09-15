@@ -85,7 +85,7 @@ test.describe( 'Site Editor Performance', () => {
 				await page.goto( draftURL );
 				const canvas = await perfUtils.getCanvas();
 
-				// Wait for the first block to be visible.
+				// Wait for the first block.
 				await canvas.locator( '.wp-block' ).first().waitFor( {
 					timeout: 120_000,
 				} );
