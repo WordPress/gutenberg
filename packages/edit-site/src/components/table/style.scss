@@ -18,17 +18,11 @@
 		padding: 0 $grid-unit-20 $grid-unit-20;
 		color: $gray-700;
 	}
-	td {
-		padding: $grid-unit-20;
-	}
 	td,
 	th {
-		vertical-align: center;
-		&:first-child {
-			padding-left: 0;
-		}
+		padding: $grid-unit-15;
+
 		&:last-child {
-			padding-right: 0;
 			text-align: right;
 		}
 	}

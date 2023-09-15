@@ -128,7 +128,9 @@ export default function PagePages() {
 				cell: ( props ) => {
 					const page = props.row.original;
 					return (
-						<VStack>
+						<VStack
+							spacing={ 1 }
+						>
 							<Heading as="h3" level={ 5 }>
 								<Link
 									params={ {
@@ -213,7 +215,9 @@ export default function PagePages() {
 						meta: { resetQuery: setResetQuery },
 					} }
 				>
-					<VStack>
+					<VStack
+						spacing={ 4 }
+					>
 						<HStack justify="space-between">
 							<DataTableGlobalSearchInput />
 							<ToggleStatusFilter onChange={ setStatus } />
