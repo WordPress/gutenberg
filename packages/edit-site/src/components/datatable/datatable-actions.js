@@ -71,7 +71,7 @@ function DataTablePageSizeMenu() {
 						</>
 					}
 				>
-					{ __( 'Row per page' ) }
+					{ __( 'Rows per page' ) }
 				</DropdownSubMenuTriggerV2>
 			}
 		>
