@@ -4,16 +4,13 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	Flex,
-	Icon,
-	Tooltip,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
-import { file, starFilled, lockSmall } from '@wordpress/icons';
+import { file } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,7 +22,6 @@ import CategoryItem from './category-item';
 import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
-import useMyPatterns from './use-my-patterns';
 import useTemplatePartAreas from './use-template-part-areas';
 
 function TemplatePartGroup( { areas, currentArea, currentType } ) {
@@ -56,7 +52,11 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 	);
 }
 
-function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
+function PatternCategoriesGroup( {
+	categories,
+	currentCategory,
+	currentType,
+} ) {
 	return (
 		<>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
@@ -64,29 +64,14 @@ function ThemePatternsGroup( { categories, currentCategory, currentType } ) {
 					<CategoryItem
 						key={ category.name }
 						count={ category.count }
-						label={
-							<Flex justify="left" align="center" gap={ 0 }>
-								{ category.label }
-								<Tooltip
-									position="top center"
-									text={ sprintf(
-										// translators: %s: The pattern category name.
-										'"%s" patterns cannot be edited.',
-										category.label
-									) }
-								>
-									<span className="edit-site-sidebar-navigation-screen-pattern__lock-icon">
-										<Icon icon={ lockSmall } size={ 24 } />
-									</span>
-								</Tooltip>
-							</Flex>
-						}
+						label={ category.label }
 						icon={ file }
 						id={ category.name }
 						type="pattern"
 						isActive={
 							currentCategory === `${ category.name }` &&
-							currentType === 'pattern'
+							( currentType === 'pattern' ||
+								currentType === 'wp_block' )
 						}
 					/>
 				) ) }
@@ -104,7 +89,6 @@ export default function SidebarNavigationScreenPatterns() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-	const { myPatterns } = useMyPatterns();
 
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
@@ -144,27 +128,8 @@ export default function SidebarNavigationScreenPatterns() {
 									</Item>
 								</ItemGroup>
 							) }
-							<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-								<CategoryItem
-									key={ myPatterns.name }
-									count={
-										! myPatterns.count
-											? '0'
-											: myPatterns.count
-									}
-									label={ myPatterns.label }
-									icon={ starFilled }
-									id={ myPatterns.name }
-									type="wp_block"
-									isActive={
-										currentCategory ===
-											`${ myPatterns.name }` &&
-										currentType === 'wp_block'
-									}
-								/>
-							</ItemGroup>
 							{ hasPatterns && (
-								<ThemePatternsGroup
+								<PatternCategoriesGroup
 									categories={ patternCategories }
 									currentCategory={ currentCategory }
 									currentType={ currentType }

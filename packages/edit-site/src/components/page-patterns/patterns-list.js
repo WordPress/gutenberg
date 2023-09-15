@@ -27,7 +27,7 @@ import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
-import { SYNC_TYPES, USER_PATTERN_CATEGORY, PATTERNS } from './utils';
+import { SYNC_TYPES, PATTERNS } from './utils';
 import Pagination from './pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -155,7 +155,7 @@ export default function PatternsList( { categoryId, type } ) {
 							__nextHasNoMarginBottom
 						/>
 					</FlexBlock>
-					{ categoryId === USER_PATTERN_CATEGORY && (
+					{ type === PATTERNS && (
 						<ToggleGroupControl
 							className="edit-site-patterns__sync-status-filter"
 							hideLabelFromVision

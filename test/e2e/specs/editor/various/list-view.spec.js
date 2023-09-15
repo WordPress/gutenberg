@@ -784,6 +784,10 @@ test.describe( 'List View', () => {
 		).toBeHidden();
 
 		await optionsForFileToggle.click();
+		await expect(
+			optionsForFileMenu,
+			'Pressing Space should also open the menu dropdown'
+		).toBeVisible();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(

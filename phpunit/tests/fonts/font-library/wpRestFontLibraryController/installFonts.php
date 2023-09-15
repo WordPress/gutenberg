@@ -50,7 +50,6 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 			// Compares if the rest of the data is the same.
 			$this->assertEquals( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
 		}
-
 	}
 
 	/**
@@ -416,4 +415,3 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 		);
 	}
 }
-

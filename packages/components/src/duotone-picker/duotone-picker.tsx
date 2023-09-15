@@ -55,6 +55,8 @@ import type { DuotonePickerProps } from './types';
  * ```
  */
 function DuotonePicker( {
+	asButtons,
+	loop,
 	clearable = true,
 	unsetable = true,
 	colorPalette,
@@ -122,18 +124,37 @@ function DuotonePicker( {
 		);
 	} );
 
-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
-	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel };
-	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
 	} else {
-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
 
 	return (
 		<CircularOptionPicker
-			{ ...ariaProps }
+			{ ...metaProps }
 			options={ unsetable ? [ unsetOption, ...options ] : options }
 			actions={
 				!! clearable && (

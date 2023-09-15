@@ -119,9 +119,12 @@ function GridItem( { categoryId, item, ...props } ) {
 		);
 	}
 
-	const itemIcon =
-		templatePartIcons[ categoryId ] ||
-		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
+	let itemIcon;
+	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
+		itemIcon = templatePartIcons[ categoryId ];
+	} else {
+		itemIcon = item.syncStatus === SYNC_TYPES.full ? symbol : undefined;
+	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -184,12 +187,10 @@ function GridItem( { categoryId, item, ...props } ) {
 								'Editing this pattern will also update anywhere it is used'
 							) }
 						>
-							<span>
-								<Icon
-									className="edit-site-patterns__pattern-icon"
-									icon={ itemIcon }
-								/>
-							</span>
+							<Icon
+								className="edit-site-patterns__pattern-icon"
+								icon={ itemIcon }
+							/>
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
@@ -213,9 +214,11 @@ function GridItem( { categoryId, item, ...props } ) {
 								position="top center"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
-								<span className="edit-site-patterns__pattern-lock-icon">
-									<Icon icon={ lockSmall } size={ 24 } />
-								</span>
+								<Icon
+									className="edit-site-patterns__pattern-lock-icon"
+									icon={ lockSmall }
+									size={ 24 }
+								/>
 							</Tooltip>
 						) }
 					</Flex>
@@ -246,11 +249,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								categoryId={ categoryId }
 								item={ item }
 								onClose={ onClose }
-								label={
-									isNonUserPattern
-										? __( 'Copy to My patterns' )
-										: __( 'Duplicate' )
-								}
+								label={ __( 'Duplicate' ) }
 							/>
 							{ isCustomPattern && (
 								<MenuItem
