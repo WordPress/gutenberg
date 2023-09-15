@@ -52,3 +52,9 @@
 		margin-bottom: $grid-unit-30;
 	}
 }
+
+.wp-block-query-enhanced-pagination-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+}

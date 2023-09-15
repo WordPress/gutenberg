@@ -33,7 +33,6 @@ test.describe( 'Preformatted', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'Enter' );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );

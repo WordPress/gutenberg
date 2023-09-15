@@ -55,3 +55,11 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 		return WP_Font_Library::register_font_collection( $config );
 	}
 }
+
+// @core-merge: This code needs to be removed.
+add_action(
+	'enqueue_block_editor_assets',
+	function () {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
+	}
+);
