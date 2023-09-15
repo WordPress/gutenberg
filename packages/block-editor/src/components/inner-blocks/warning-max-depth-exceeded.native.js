@@ -42,7 +42,7 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 
 	/* translators: Warning related to having blocks deeply nested. %d: The deepest nesting level. */
 	const descriptionFormat = __(
-		'Blocks with inner blocks that are nested deeper than %d levels might not be rendered properly in the native version of the editor. For this reason, we recommend flattening the content by ungrouping the block or editing the block using the web editor.'
+		'Blocks nested deeper than %d levels may not render properly in the mobile editor. For this reason, we recommend flattening the content by ungrouping the block or editing the block using the web editor.'
 	);
 	const description = sprintf( descriptionFormat, MAX_NESTING_DEPTH );
 
