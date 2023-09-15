@@ -61,11 +61,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 				Open Modal
 			</Button>
 			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					contentWidth="medium"
-					{ ...args }
-				>
+				<Modal onRequestClose={ closeModal } { ...args }>
 					<p>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 						sed do eiusmod tempor incididunt ut labore et magna
@@ -92,6 +88,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 export const Default: StoryFn< typeof Modal > = Template.bind( {} );
 Default.args = {
 	title: 'Title',
+	style: { maxWidth: '600px' },
 };
 Default.parameters = {
 	docs: {
@@ -100,6 +97,14 @@ Default.parameters = {
 		},
 	},
 };
+
+export const WithcontentWidthSmall: StoryFn< typeof Modal > = Template.bind(
+	{}
+);
+WithcontentWidthSmall.args = {
+	contentWidth: 'small',
+};
+WithcontentWidthSmall.storyName = 'With contentWidth: small';
 
 const LikeButton = () => {
 	const [ isLiked, setIsLiked ] = useState( false );
