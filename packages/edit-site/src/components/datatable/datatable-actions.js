@@ -42,10 +42,8 @@ export function DataTablePageSizeControl() {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
-			hideLabelFromVision
-			label={ __( 'Rows per page:' ) }
 			labelPosition="side"
-			prefix={ <InputControlPrefixWrapper className="edit-site-table__per-page-control-prefix">{ prefix }</InputControlPrefixWrapper> }
+			prefix={ <InputControlPrefixWrapper as={ 'label' } className="edit-site-table__per-page-control-prefix">{ prefix }</InputControlPrefixWrapper> }
 			value={ table.getState().pagination.pageSize }
 			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
 				value: pageSize,
