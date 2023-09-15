@@ -1,13 +1,22 @@
 <?php
+/**
+ * Experiment to enable Command Palette everywhere in WordPress.
+ *
+ * @package gutenberg
+ */
 
 /**
- * Used to enqueue the command palette everywhere in WordPress.
+ * Enqueue the command palette everywhere in WordPress.
+ *
+ * @package gutenberg
  */
-add_action('wp_print_scripts', function () {
-	if (!is_user_logged_in()) {
+function gutenberg_enqueue_commands() {
+	if ( ! is_user_logged_in() ) {
 		return;
 	}
 
-	wp_enqueue_style('wp-commands');
-	wp_enqueue_script('wp-core-commands');
-}, 1);
+	wp_enqueue_style( 'wp-commands' );
+	wp_enqueue_script( 'wp-core-commands' );
+}
+
+add_action( 'wp_print_scripts', 'gutenberg_enqueue_commands', 1 );
