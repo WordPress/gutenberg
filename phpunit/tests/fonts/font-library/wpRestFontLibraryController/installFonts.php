@@ -439,6 +439,11 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 	 * Data provider for test_install_with_duplicate_font_faces
 	 */
 	public function data_install_with_duplicate_font_faces() {
+		$temp_file_path1 = wp_tempnam( 'Piazzola1-' );
+		file_put_contents( $temp_file_path1, 'Mocking file content' );
+		$temp_file_path2 = wp_tempnam( 'Piazzola2-' );
+		file_put_contents( $temp_file_path2, 'Mocking file content' );
+
 		return array(
 			'with duplicate font faces' => array(
 				'font_families'     => array(
@@ -451,17 +456,31 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily'      => 'Piazzolla',
 								'fontStyle'       => 'italic',
 								'fontWeight'      => '400',
-								'src'             => 'http://example.com/fonts/piazzolla_400_italic.ttf',
-								'downloadFromUrl' => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+								'uploadedFile'    => 'files0',
 							),
 							array(
 								'fontFamily'      => 'Piazzolla',
 								'fontStyle'       => 'italic',
 								'fontWeight'      => '400',
-								'src'             => 'http://example.com/fonts/piazzolla_400_italic.woff',
-								'downloadFromUrl' => 'http://example.com/fonts/piazzolla_400_italic.woff',
+								'uploadedFile'    => 'files1',
 							),
 						),
+					),
+				),
+				'files'             => array(
+					'files0' => array(
+						'name'     => 'piazzola1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => $temp_file_path1,
+						'error'    => 0,
+						'size'     => 123,
+					),
+					'files1' => array(
+						'name'     => 'piazzola1.woff',
+						'type'     => 'font/woff',
+						'tmp_name' => $temp_file_path2,
+						'error'    => 0,
+						'size'     => 123,
 					),
 				),
 				'expected_response' => array(
@@ -474,12 +493,11 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily' => 'Piazzolla',
 								'fontStyle'  => 'italic',
 								'fontWeight' => '400',
-								'src'        => 'http://example.com/fonts/piazzolla_400_italic.ttf',
+								'src'        => '/wp-content/fonts/piazzolla_italic_400.ttf',
 							),
 						),
 					),
 				),
-				'files'             => array(),
 			),
 		);
 	}
