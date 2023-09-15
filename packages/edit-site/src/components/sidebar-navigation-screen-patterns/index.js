@@ -70,7 +70,8 @@ function PatternCategoriesGroup( {
 						type="pattern"
 						isActive={
 							currentCategory === `${ category.name }` &&
-							currentType === 'pattern'
+							( currentType === 'pattern' ||
+								currentType === 'wp_block' )
 						}
 					/>
 				) ) }
