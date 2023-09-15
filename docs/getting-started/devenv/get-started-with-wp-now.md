@@ -1,4 +1,4 @@
-# Guide to using wp-now
+# Get started with wp-now
 
 The [@wp-now/wp-now](https://www.npmjs.com/package/@wordpress/env) package (`wp-now`) is a lightweight tool powered by [WordPress Playground](https://developer.wordpress.org/playground/) that streamlines setting up a local WordPress environment.
 

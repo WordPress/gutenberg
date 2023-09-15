@@ -1,4 +1,4 @@
-# Guide to using wp-env
+# Get started with wp-env
 
 The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-env`) lets you set up a local WordPress environment (site) for building and testing plugins and themes, without any additional configuration.
 

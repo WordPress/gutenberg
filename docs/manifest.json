@@ -12,21 +12,27 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "Guide to using wp-env",
-		"slug": "guide-to-using-wp-env",
-		"markdown_source": "../docs/getting-started/devenv/guide-to-using-wp-env.md",
+		"title": "Node.js development tools",
+		"slug": "nodejs-development-tools",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-tools.md",
 		"parent": "devenv"
 	},
 	{
-		"title": "Guide to using wp-now",
-		"slug": "guide-to-using-wp-now",
-		"markdown_source": "../docs/getting-started/devenv/guide-to-using-wp-now.md",
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-now",
+		"slug": "get-started-with-wp-now",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-now.md",
 		"parent": "devenv"
 	},
 	{
