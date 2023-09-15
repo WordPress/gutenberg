@@ -80,28 +80,23 @@ function ListboxCircularOptionPicker(
 	const rtl = isRTL();
 
 	const compositeState = useCompositeState( { baseId, loop, rtl } );
+	const { setBaseId, setLoop, setRTL } = compositeState;
 
 	// These are necessary as `useCompositeState` is sealed after
 	// the first render, so although unlikely to happen, if a state
 	// property should change, we need to process it accordingly.
 
 	useEffect( () => {
-		compositeState.setBaseId( baseId );
-		// Disabling exhaustive-deps check because it expects
-		// `compositeState` to be present, but doing so causes
-		// an infinite loop.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ baseId ] );
+		setBaseId( baseId );
+	}, [ setBaseId, baseId ] );
 
 	useEffect( () => {
-		compositeState.setLoop( !! loop );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ loop ] );
+		setLoop( loop );
+	}, [ setLoop, loop ] );
 
 	useEffect( () => {
-		compositeState.setRTL( rtl );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ rtl ] );
+		setRTL( rtl );
+	}, [ setRTL, rtl ] );
 
 	const compositeContext = {
 		isComposite: true,
