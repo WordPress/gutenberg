@@ -15,7 +15,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useContainsThirdPartyBlocks } from '../utils';
 
 const disableEnhancedPaginationDescription = __(
-	'Third-party blocks are not supported inside a Query Loop block with enhanced pagination enabled. To re-enable it, remove any third-party block and then update it in the Query Loop settings.'
+	'Plugin blocks are not supported yet. For the enhanced pagination to work, remove the plugin block, then re-enable "Enhanced pagination" in the Query Block settings.'
 );
 
 const modalDescriptionId =
@@ -38,7 +38,7 @@ export default function EnhancedPaginationModal( {
 		isOpen && (
 			<Modal
 				title={ __( 'Enhanced pagination will be disabled' ) }
-				className={ 'wp-block-query-enhanced-pagination-modal' }
+				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
 				} }
@@ -46,7 +46,7 @@ export default function EnhancedPaginationModal( {
 				shouldCloseOnEsc={ false }
 				shouldCloseOnClickOutside={ false }
 			>
-				<VStack alignment="right" spacing={ 8 }>
+				<VStack alignment="right" spacing={ 5 }>
 					<span id={ modalDescriptionId }>
 						{ disableEnhancedPaginationDescription }
 					</span>
@@ -56,7 +56,7 @@ export default function EnhancedPaginationModal( {
 							setAttributes( { enhancedPagination: false } );
 						} }
 					>
-						{ __( 'OK, understood' ) }
+						{ __( 'OK' ) }
 					</Button>
 				</VStack>
 			</Modal>

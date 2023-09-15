@@ -68,6 +68,9 @@ function bubbleEvent( event, Constructor, frame ) {
 function useBubbleEvents( iframeDocument ) {
 	return useRefEffect( ( body ) => {
 		const { defaultView } = iframeDocument;
+		if ( ! defaultView ) {
+			return;
+		}
 		const { frameElement } = defaultView;
 		const eventTypes = [ 'dragover', 'mousemove' ];
 		const handlers = {};

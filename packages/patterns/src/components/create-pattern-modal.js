@@ -14,7 +14,7 @@ import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
-export const USER_PATTERN_CATEGORY = 'my-patterns';
+export const ALL_PATTERNS_CATEGORY = 'all-patterns';
 
 export const SYNC_TYPES = {
 	full: undefined,
@@ -25,6 +25,7 @@ export const SYNC_TYPES = {
  * Internal dependencies
  */
 import { store } from '../store';
+import CategorySelector from './category-selector';
 
 export default function CreatePatternModal( {
 	onSuccess,
@@ -34,6 +35,7 @@ export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
 } ) {
 	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
+	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
 	const { createPattern } = useDispatch( store );
 
@@ -44,11 +46,12 @@ export default function CreatePatternModal( {
 				const newPattern = await createPattern(
 					patternTitle,
 					sync,
-					clientIds
+					clientIds,
+					categories
 				);
 				onSuccess( {
 					pattern: newPattern,
-					categoryId: USER_PATTERN_CATEGORY,
+					categoryId: ALL_PATTERNS_CATEGORY,
 				} );
 			} catch ( error ) {
 				createErrorNotice( error.message, {
@@ -58,8 +61,20 @@ export default function CreatePatternModal( {
 				onError();
 			}
 		},
-		[ createPattern, clientIds, onSuccess, createErrorNotice, onError ]
+		[
+			createPattern,
+			clientIds,
+			onSuccess,
+			createErrorNotice,
+			onError,
+			categories,
+		]
 	);
+
+	const handleCategorySelection = ( selectedCategories ) => {
+		setCategories( selectedCategories.map( ( cat ) => cat.id ) );
+	};
+
 	return (
 		<Modal
 			title={ __( 'Create pattern' ) }
@@ -83,8 +98,11 @@ export default function CreatePatternModal( {
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
+						className="patterns-create-modal__name-input"
 					/>
-
+					<CategorySelector
+						onCategorySelection={ handleCategorySelection }
+					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
 						help={ __(
