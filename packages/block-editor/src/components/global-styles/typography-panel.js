@@ -344,7 +344,6 @@ export default function TypographyPanel( {
 		setWritingModeAndTextOrientation( undefined );
 
 	// Text Orientation
-	const hasTextOrientationControl = useHasTextOrientationControl( settings );
 	const textOrientation = decodeValue(
 		inheritedValue?.typography?.textOrientation
 	);
@@ -573,32 +572,14 @@ export default function TypographyPanel( {
 			) }
 			{ hasWritingModeControl && (
 				<ToolsPanelItem
-					className={
-						! hasTextOrientationControl ? 'single-column' : ''
-					}
-					style={
-						hasTextOrientationControl &&
-						( writingMode === 'vertical-lr' ||
-							writingMode === 'vertical-rl' )
-							? { display: 'grid' }
-							: {}
-					}
 					label={ __( 'Text orientation' ) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
-					isShownByDefault={ defaultControls.writingMode }
 					panelId={ panelId }
 				>
 					<WritingModeControl
 						value={ getValuefromWritingModeAndTextOrientation() }
 						onChange={ setWritingModeAndTextOrientation }
-						size="__unstable-large"
-						__nextHasNoMarginBottom
-						style={
-							hasTextOrientationControl
-								? { gridColumn: '1/2' }
-								: {}
-						}
 					/>
 				</ToolsPanelItem>
 			) }
