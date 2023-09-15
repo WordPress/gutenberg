@@ -41,7 +41,7 @@ function SingleOrigin( {
 	gradients,
 	onChange,
 	value,
-	...otherProps
+	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
 		return gradients.map( ( { gradient, name }, index ) => (
@@ -74,7 +74,7 @@ function SingleOrigin( {
 		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ gradientOptions }
-			{ ...otherProps }
+			{ ...additionalProps }
 		/>
 	);
 }
@@ -116,30 +116,51 @@ function MultipleOrigin( {
 
 function Component( props: PickerProps< any > ) {
 	const {
+		asButtons,
+		loop,
 		actions,
 		headingLevel,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
-		...otherProps
+		...additionalProps
 	} = props;
 	const options = isMultipleOriginArray( props.gradients ) ? (
-		<MultipleOrigin headingLevel={ headingLevel } { ...otherProps } />
+		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
 	) : (
-		<SingleOrigin { ...otherProps } />
+		<SingleOrigin { ...additionalProps } />
 	);
 
-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
-	if ( ariaLabel ) {
-		ariaProps = { 'aria-label': ariaLabel };
-	} else if ( ariaLabelledby ) {
-		ariaProps = { 'aria-labelledby': ariaLabelledby };
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
 	} else {
-		ariaProps = { 'aria-label': __( 'Custom gradient picker.' ) };
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
 
 	return (
 		<CircularOptionPicker
-			{ ...ariaProps }
+			{ ...metaProps }
 			actions={ actions }
 			options={ options }
 		/>
@@ -200,6 +221,7 @@ export function GradientPicker( {
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
 	headingLevel = 2,
+	...additionalProps
 }: GradientPickerComponentProps ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
@@ -237,6 +259,7 @@ export function GradientPicker( {
 				) }
 				{ ( gradients.length || clearable ) && (
 					<Component
+						{ ...additionalProps }
 						className={ className }
 						clearGradient={ clearGradient }
 						gradients={ gradients }

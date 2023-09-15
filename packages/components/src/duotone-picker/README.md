@@ -64,6 +64,20 @@ An array of colors for the duotone effect.
 
 Callback which is called when the duotone colors change.
 
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`
+
 ## DuotoneSwatch Props
 
 ### `values`
