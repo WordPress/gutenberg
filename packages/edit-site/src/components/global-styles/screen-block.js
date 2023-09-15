@@ -91,6 +91,7 @@ function ScreenBlock( { name, variation } ) {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const settings = useSettingsForBlockElement( rawSettings, name );
@@ -151,9 +152,9 @@ function ScreenBlock( { name, variation } ) {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 	const onChangeDimensions = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
 		delete updatedStyle.layout;
@@ -161,7 +162,7 @@ function ScreenBlock( { name, variation } ) {
 
 		if ( newStyle.layout !== settings.layout ) {
 			setSettings( {
-				...rawSettings,
+				...userSettings,
 				layout: newStyle.layout,
 			} );
 		}

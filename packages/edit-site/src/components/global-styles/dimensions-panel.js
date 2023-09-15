@@ -33,6 +33,7 @@ export default function DimensionsPanel() {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const [ userSettings ] = useGlobalSetting( '', undefined, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 
@@ -48,9 +49,9 @@ export default function DimensionsPanel() {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 
 	const onChange = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
@@ -58,7 +59,10 @@ export default function DimensionsPanel() {
 		setStyle( updatedStyle );
 
 		if ( newStyle.layout !== settings.layout ) {
-			const updatedSettings = { ...rawSettings, layout: newStyle.layout };
+			const updatedSettings = {
+				...userSettings,
+				layout: newStyle.layout,
+			};
 
 			// Ensure any changes to layout definitions are not persisted.
 			if ( updatedSettings.layout?.definitions ) {
