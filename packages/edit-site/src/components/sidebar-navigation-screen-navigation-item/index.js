@@ -15,7 +15,7 @@ import { pencil } from '@wordpress/icons';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 
@@ -36,15 +36,9 @@ export default function SidebarNavigationScreenNavigationItem() {
 					icon={ pencil }
 				/>
 			}
-			description={
-				postType === 'page'
-					? __(
-							'Pages are static and are not listed by date. Pages do not use tags or categories.'
-					  )
-					: __(
-							'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
-					  )
-			}
+			description={ __(
+				'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
+			) }
 			content={
 				<>
 					{ record?.link ? (

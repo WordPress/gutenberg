@@ -93,7 +93,8 @@ function useToolbarFocus(
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
-	onIndexChange
+	onIndexChange,
+	shouldUseKeyboardFocusShortcut
 ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
@@ -103,8 +104,14 @@ function useToolbarFocus(
 		focusFirstTabbableIn( ref.current );
 	}, [] );
 
+	const focusToolbarViaShortcut = () => {
+		if ( shouldUseKeyboardFocusShortcut ) {
+			focusToolbar();
+		}
+	};
+
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
-	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar );
+	useShortcut( 'core/block-editor/focus-toolbar', focusToolbarViaShortcut );
 
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
@@ -113,16 +120,18 @@ function useToolbarFocus(
 	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
 
 	useEffect( () => {
+		// Store ref so we have access on useEffect cleanup: https://legacy.reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
+		const navigableToolbarRef = ref.current;
 		// If initialIndex is passed, we focus on that toolbar item when the
 		// toolbar gets mounted and initial focus is not forced.
 		// We have to wait for the next browser paint because block controls aren't
 		// rendered right away when the toolbar gets mounted.
 		let raf = 0;
-		if ( initialIndex && ! initialFocusOnMount ) {
+		if ( ! initialFocusOnMount ) {
 			raf = window.requestAnimationFrame( () => {
-				const items = getAllToolbarItemsIn( ref.current );
+				const items = getAllToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
-				if ( items[ index ] && hasFocusWithin( ref.current ) ) {
+				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
 					items[ index ].focus( {
 						// When focusing newly mounted toolbars,
 						// the position of the popover is often not right on the first render
@@ -134,10 +143,10 @@ function useToolbarFocus(
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! ref.current ) return;
+			if ( ! onIndexChange || ! navigableToolbarRef ) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
-			const items = getAllToolbarItemsIn( ref.current );
+			const items = getAllToolbarItemsIn( navigableToolbarRef );
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
@@ -147,6 +156,7 @@ function useToolbarFocus(
 function NavigableToolbar( {
 	children,
 	focusOnMount,
+	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
 	...props
@@ -159,7 +169,8 @@ function NavigableToolbar( {
 		focusOnMount,
 		isAccessibleToolbar,
 		initialIndex,
-		onIndexChange
+		onIndexChange,
+		shouldUseKeyboardFocusShortcut
 	);
 
 	if ( isAccessibleToolbar ) {

@@ -12,10 +12,14 @@ import type { Icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { ButtonAsButtonProps } from '../button/types';
-import type Dropdown from '../dropdown';
+import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 export type CircularOptionPickerProps = {
+	/**
+	 * An ID to apply to the component.
+	 */
+	id?: string;
 	/**
 	 * A CSS class to apply to the wrapper element.
 	 */
@@ -36,7 +40,22 @@ export type CircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
-};
+	/**
+	 * Whether the keyboard interaction should wrap around.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+} & (
+	| {
+			'aria-label': string;
+			'aria-labelledby'?: never;
+	  }
+	| {
+			'aria-label'?: never;
+			'aria-labelledby': string;
+	  }
+ );
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
@@ -44,11 +63,13 @@ export type DropdownLinkActionProps = {
 		'children'
 	>;
 	linkText: string;
-	dropdownProps: Omit<
-		React.ComponentProps< typeof Dropdown >,
-		'className' | 'renderToggle'
-	>;
+	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
 	className?: string;
+};
+
+export type OptionGroupProps = {
+	className?: string;
+	options: ReactNode;
 };
 
 export type OptionProps = Omit<

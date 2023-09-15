@@ -6,173 +6,188 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-import {
-	Dropdown,
 	Button,
 	VisuallyHidden,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
-import { useState, useMemo } from '@wordpress/element';
+import { BlockIcon } from '@wordpress/block-editor';
+import { store as commandsStore } from '@wordpress/commands';
 import {
-	store as blockEditorStore,
-	useBlockDisplayInformation,
-	BlockIcon,
-} from '@wordpress/block-editor';
-import { store as preferencesStore } from '@wordpress/preferences';
+	chevronLeftSmall,
+	chevronRightSmall,
+	page as pageIcon,
+	navigation as navigationIcon,
+	symbol,
+} from '@wordpress/icons';
+import { displayShortcut } from '@wordpress/keycodes';
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import TemplateDetails from '../../template-details';
 import useEditedEntityRecord from '../../use-edited-entity-record';
+import { store as editSiteStore } from '../../../store';
 
-function getBlockDisplayText( block ) {
-	if ( block ) {
-		const blockType = getBlockType( block.name );
-		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
-	}
-	return null;
-}
-
-function useSecondaryText() {
-	const { getBlock } = useSelect( blockEditorStore );
-	const activeEntityBlockId = useSelect(
-		( select ) =>
-			select(
-				blockEditorStore
-			).__experimentalGetActiveBlockIdByBlockNames( [
-				'core/template-part',
-			] ),
-		[]
-	);
-
-	const blockInformation = useBlockDisplayInformation( activeEntityBlockId );
-
-	if ( activeEntityBlockId ) {
-		return {
-			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
-			isActive: true,
-			icon: blockInformation?.icon,
-		};
-	}
-
-	return {};
-}
+const typeLabels = {
+	wp_block: __( 'Editing pattern:' ),
+	wp_navigation: __( 'Editing navigation menu:' ),
+	wp_template: __( 'Editing template:' ),
+	wp_template_part: __( 'Editing template part:' ),
+};
 
 export default function DocumentActions() {
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get(
-				'core/edit-site',
-				'showIconLabels'
-			),
+	const isPage = useSelect(
+		( select ) => select( editSiteStore ).isPage(),
 		[]
 	);
-	const { isLoaded, record, getTitle } = useEditedEntityRecord();
-	const { label, icon } = useSecondaryText();
+	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
+}
 
-	// Use internal state instead of a ref to make sure that the component
-	// re-renders when the popover's anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() => ( {
-			// Use the title wrapper as the popover anchor so that the dropdown is
-			// centered over the whole title area rather than just one part of it.
-			anchor: popoverAnchor,
-			placement: 'bottom',
-		} ),
-		[ popoverAnchor ]
+function PageDocumentActions() {
+	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+		( select ) => {
+			const {
+				hasPageContentFocus: _hasPageContentFocus,
+				getEditedPostContext,
+			} = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const context = getEditedPostContext();
+			const queryArgs = [ 'postType', context.postType, context.postId ];
+			const page = getEditedEntityRecord( ...queryArgs );
+			return {
+				hasPageContentFocus: _hasPageContentFocus(),
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				isFound: !! page,
+				title: page?.title,
+			};
+		},
+		[]
 	);
 
-	// Return a simple loading indicator until we have information to show.
-	if ( ! isLoaded ) {
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+
+	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
+	const prevHasPageContentFocus = useRef( false );
+	useEffect( () => {
+		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
+			setHasEditedTemplate( true );
+		}
+		prevHasPageContentFocus.current = hasPageContentFocus;
+	}, [ hasPageContentFocus ] );
+
+	if ( ! hasResolved ) {
+		return null;
+	}
+
+	if ( ! isFound ) {
 		return (
 			<div className="edit-site-document-actions">
-				{ __( 'Loading…' ) }
+				{ __( 'Document not found' ) }
 			</div>
 		);
 	}
 
-	// Return feedback that the template does not seem to exist.
+	return hasPageContentFocus ? (
+		<BaseDocumentActions
+			className={ classnames( 'is-page', {
+				'is-animated': hasEditedTemplate,
+			} ) }
+			icon={ pageIcon }
+		>
+			{ title }
+		</BaseDocumentActions>
+	) : (
+		<TemplateDocumentActions
+			className="is-animated"
+			onBack={ () => setHasPageContentFocus( true ) }
+		/>
+	);
+}
+
+function TemplateDocumentActions( { className, onBack } ) {
+	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
+
+	if ( ! isLoaded ) {
+		return null;
+	}
+
 	if ( ! record ) {
 		return (
 			<div className="edit-site-document-actions">
-				{ __( 'Template not found' ) }
+				{ __( 'Document not found' ) }
 			</div>
 		);
 	}
 
-	const entityLabel =
-		record.type === 'wp_template_part'
-			? __( 'template part' )
-			: __( 'template' );
+	let typeIcon = icon;
+	if ( record.type === 'wp_navigation' ) {
+		typeIcon = navigationIcon;
+	} else if ( record.type === 'wp_block' ) {
+		typeIcon = symbol;
+	}
 
 	return (
-		<div
-			className={ classnames( 'edit-site-document-actions', {
-				'has-secondary-label': !! label,
+		<BaseDocumentActions
+			className={ classnames( className, {
+				'is-synced-entity':
+					record.wp_pattern_sync_status !== 'unsynced',
 			} ) }
+			icon={ typeIcon }
+			onBack={ onBack }
 		>
-			<div
-				ref={ setPopoverAnchor }
-				className="edit-site-document-actions__title-wrapper"
-			>
-				<Text
-					size="body"
-					className="edit-site-document-actions__title"
-					as="h1"
-				>
-					<VisuallyHidden as="span">
-						{ sprintf(
-							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s: ' ),
-							entityLabel
-						) }
-					</VisuallyHidden>
-					{ getTitle() }
-				</Text>
-				<div className="edit-site-document-actions__secondary-item">
-					<BlockIcon icon={ icon } showColors />
-					<Text size="body">{ label ?? '' }</Text>
-				</div>
+			<VisuallyHidden as="span">
+				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
+			</VisuallyHidden>
+			{ getTitle() }
+		</BaseDocumentActions>
+	);
+}
 
-				<Dropdown
-					popoverProps={ popoverProps }
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							className="edit-site-document-actions__get-info"
-							icon={ chevronDown }
-							aria-expanded={ isOpen }
-							aria-haspopup="true"
-							onClick={ onToggle }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							label={ sprintf(
-								/* translators: %s: the entity to see details about, like "template"*/
-								__( 'Show %s details' ),
-								entityLabel
-							) }
-						>
-							{ showIconLabels && __( 'Details' ) }
-						</Button>
-					) }
-					contentClassName="edit-site-document-actions__info-dropdown"
-					renderContent={ ( { onClose } ) => (
-						<TemplateDetails
-							template={ record }
-							onClose={ onClose }
-						/>
-					) }
-				/>
-			</div>
+function BaseDocumentActions( { className, icon, children, onBack } ) {
+	const { open: openCommandCenter } = useDispatch( commandsStore );
+	return (
+		<div
+			className={ classnames( 'edit-site-document-actions', className ) }
+		>
+			{ onBack && (
+				<Button
+					className="edit-site-document-actions__back"
+					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						onBack();
+					} }
+				>
+					{ __( 'Back' ) }
+				</Button>
+			) }
+			<Button
+				className="edit-site-document-actions__command"
+				onClick={ () => openCommandCenter() }
+			>
+				<HStack
+					className="edit-site-document-actions__title"
+					spacing={ 1 }
+					justify="center"
+				>
+					<BlockIcon icon={ icon } />
+					<Text size="body" as="h1">
+						{ children }
+					</Text>
+				</HStack>
+				<span className="edit-site-document-actions__shortcut">
+					{ displayShortcut.primary( 'k' ) }
+				</span>
+			</Button>
 		</div>
 	);
 }

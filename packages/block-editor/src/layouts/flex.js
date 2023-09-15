@@ -31,6 +31,7 @@ import {
 	BlockVerticalAlignmentControl,
 } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
 const justifyContentMap = {
@@ -121,7 +122,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { orientation = 'horizontal' } = layout;
 
@@ -258,6 +259,10 @@ function FlexLayoutVerticalAlignmentControl( {
 	);
 }
 
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
 function FlexLayoutJustifyContentControl( {
 	layout,
 	onChange,
@@ -282,10 +287,7 @@ function FlexLayoutJustifyContentControl( {
 				allowedControls={ allowedControls }
 				value={ justifyContent }
 				onChange={ onJustificationChange }
-				popoverProps={ {
-					position: 'bottom right',
-					variant: 'toolbar',
-				} }
+				popoverProps={ POPOVER_PROPS }
 			/>
 		);
 	}

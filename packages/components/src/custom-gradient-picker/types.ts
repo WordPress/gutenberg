@@ -48,24 +48,6 @@ export type GradientTypePickerProps = {
 
 export type ControlPoint = { color: string; position: number };
 
-// When dealing with unions of objects, using `Pick` will result
-// in a new type where each desired prop is a union of the values for that prop
-// across all of the original union members. This does not maintain the specific
-// combinations of props present in the original union.
-// To avoid this, the `DistributivePick` type will
-// "distribute" the `Pick` across the union. This allows the `Pick`
-// to act on each member individually, maintaining the relationships between the
-// resulting props.
-// https://stackoverflow.com/questions/57103834/typescript-omit-a-property-from-all-interfaces-in-a-union-but-keep-the-union-s
-type DistributivePick< T, K extends keyof T > = T extends any
-	? Pick< T, K >
-	: never;
-
-export type ColorStopTypeAndValue = DistributivePick<
-	gradientParser.ColorStop,
-	'type' | 'value'
->;
-
 export type CustomGradientBarProps = {
 	background: React.CSSProperties[ 'background' ];
 	hasGradient: boolean;

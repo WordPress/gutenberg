@@ -22,7 +22,11 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 
 		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			$wp_fonts = new WP_Fonts();
+
+			// Initialize.
 			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
+			add_action( 'wp_head', 'wp_print_fonts', 50 );
+			add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
 		}
 
 		return $wp_fonts;
@@ -55,12 +59,6 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 	function wp_register_fonts( array $fonts ) {
 		$registered = array();
 		$wp_fonts   = wp_fonts();
-
-		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( $wp_fonts->is_deprecated_structure( $fonts ) ) {
-			$fonts = $wp_fonts->migrate_deprecated_structure( $fonts );
-		}
-		// BACKPORT NOTE: end of code block.
 
 		foreach ( $fonts as $font_family => $variations ) {
 			$font_family_handle = $wp_fonts->add_font_family( $font_family );
@@ -176,40 +174,56 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
-	 *                                       single item (string), or multiple items (array of strings).
-	 *                                       Default false.
+	 * @param string|string[]|bool $handles Optional. Items to be processed: queue (false),
+	 *                                      for iframed editor assets (true), single item (string),
+	 *                                      or multiple items (array of strings).
+	 *                                      Default false.
 	 * @return array|string[] Array of font handles that have been processed.
 	 *                        An empty array if none were processed.
 	 */
 	function wp_print_fonts( $handles = false ) {
-		global $wp_fonts;
+		$wp_fonts          = wp_fonts();
+		$registered        = $wp_fonts->get_registered_font_families();
+		$in_iframed_editor = true === $handles;
+
+		// Nothing to print, as no fonts are registered.
+		if ( empty( $registered ) ) {
+			return array();
+		}
 
 		if ( empty( $handles ) ) {
+			// Automatically enqueue all user-selected fonts.
+			WP_Fonts_Resolver::enqueue_user_selected_fonts();
 			$handles = false;
+		} elseif ( $in_iframed_editor ) {
+			// Print all registered fonts for the iframed editor.
+			$queue           = $wp_fonts->queue;
+			$done            = $wp_fonts->done;
+			$wp_fonts->done  = array();
+			$wp_fonts->queue = $registered;
+			$handles         = false;
 		}
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
-			if ( ! $handles ) {
-				return array(); // No need to instantiate if nothing is there.
-			}
+		$printed = $wp_fonts->do_items( $handles );
+
+		// Reset the API.
+		if ( $in_iframed_editor ) {
+			$wp_fonts->done  = $done;
+			$wp_fonts->queue = $queue;
 		}
 
-		return wp_fonts()->do_items( $handles );
+		return $printed;
 	}
 }
-
-add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
-add_action( 'wp_head', 'wp_print_fonts', 50 );
 
 /**
  * Add webfonts mime types.
  */
 add_filter(
 	'mime_types',
-	function( $mime_types ) {
+	static function ( $mime_types ) {
 		// Webfonts formats.
 		$mime_types['woff2'] = 'font/woff2';
 		$mime_types['woff']  = 'font/woff';
@@ -219,4 +233,27 @@ add_filter(
 
 		return $mime_types;
 	}
+);
+
+/*
+ * To make sure blocks are registered before any Theme_JSON operations take place, a priority of 21 is used.
+ *
+ * Why 21?
+ * Blocks are registered via the "init" hook with a priority value of `20`, which is dynamically added
+ * during the build. See: tools/webpack/blocks.js.
+ */
+add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
+
+add_filter(
+	'block_editor_settings_all',
+	static function ( $settings ) {
+		ob_start();
+		wp_print_fonts( true );
+		$styles = ob_get_clean();
+
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
+		return $settings;
+	},
+	11
 );

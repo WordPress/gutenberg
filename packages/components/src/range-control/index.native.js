@@ -25,6 +25,7 @@ const RangeControl = memo(
 		max,
 		type,
 		separatorType,
+		disabled,
 		...props
 	} ) => {
 		if ( type === 'stepper' ) {
@@ -36,6 +37,7 @@ const RangeControl = memo(
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
+					disabled={ disabled }
 				/>
 			);
 		}
@@ -61,6 +63,7 @@ const RangeControl = memo(
 				allowReset={ allowReset }
 				defaultValue={ initialSliderValue }
 				separatorType={ separatorType }
+				disabled={ disabled }
 				{ ...props }
 			/>
 		);

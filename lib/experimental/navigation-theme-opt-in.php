@@ -161,7 +161,7 @@ function gutenberg_remove_block_nav_menu_items( $menu_items ) {
 
 	return array_filter(
 		$menu_items,
-		function( $menu_item ) {
+		static function ( $menu_item ) {
 			return 'block' !== $menu_item->type;
 		}
 	);

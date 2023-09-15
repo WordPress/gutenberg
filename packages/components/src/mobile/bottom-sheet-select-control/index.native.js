@@ -22,6 +22,7 @@ const BottomSheetSelectControl = ( {
 	options: items,
 	onChange,
 	value: selectedValue,
+	disabled,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -68,8 +69,9 @@ const BottomSheetSelectControl = ( {
 						__( 'Navigates to select %s' ),
 						label
 					) }
+					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }

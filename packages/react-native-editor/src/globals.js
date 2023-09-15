@@ -11,6 +11,7 @@ import 'react-native-url-polyfill/auto';
  * Babel polyfills
  */
 import 'core-js/features/array/flat-map';
+import 'core-js/proposals/relative-indexing-method';
 
 /**
  * WordPress dependencies

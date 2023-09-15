@@ -9,28 +9,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../../store';
 
-/**
- * Interface for inserter media requests.
- *
- * @typedef {Object} InserterMediaRequest
- * @property {number} per_page How many items to fetch per page.
- * @property {string} search   The search term to use for filtering the results.
- */
-
-/**
- * Interface for inserter media responses. Any media resource should
- * map their response to this interface, in order to create the core
- * WordPress media blocks (image, video, audio).
- *
- * @typedef {Object} InserterMediaItem
- * @property {string}        title        The title of the media item.
- * @property {string}        url          The source url of the media item.
- * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
- * @property {number}        [id]         The WordPress id of the media item.
- * @property {number|string} [sourceId]   The id of the media item from external source.
- * @property {string}        [alt]        The alt text of the media item.
- * @property {string}        [caption]    The caption of the media item.
- */
+/** @typedef {import('./api').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('./api').InserterMediaItem} InserterMediaItem */
 
 /**
  * Fetches media items based on the provided category.

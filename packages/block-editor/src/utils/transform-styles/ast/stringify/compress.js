@@ -69,6 +69,19 @@ Compiler.prototype.media = function ( node ) {
 };
 
 /**
+ * Visit container node.
+ */
+
+Compiler.prototype.container = function ( node ) {
+	return (
+		this.emit( '@container ' + node.container, node.position ) +
+		this.emit( '{' ) +
+		this.mapVisit( node.rules ) +
+		this.emit( '}' )
+	);
+};
+
+/**
  * Visit document node.
  */
 

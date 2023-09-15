@@ -120,9 +120,15 @@ const test = base.extend<
 		await use( page );
 
 		// Clear local storage after each test.
-		await page.evaluate( () => {
-			window.localStorage.clear();
-		} );
+		// This needs to be wrapped with a try/catch because it can fail when
+		// the test is skipped (e.g. via fixme).
+		try {
+			await page.evaluate( () => {
+				window.localStorage.clear();
+			} );
+		} catch ( error ) {
+			// noop.
+		}
 
 		await page.close();
 	},
@@ -135,18 +141,6 @@ const test = base.extend<
 				baseURL: workerInfo.project.use.baseURL,
 				storageStatePath: STORAGE_STATE_PATH,
 			} );
-
-			await Promise.all( [
-				requestUtils.activateTheme( 'twentytwentyone' ),
-				// Disable this test plugin as it's conflicting with some of the tests.
-				// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
-				requestUtils.deactivatePlugin(
-					'gutenberg-test-plugin-disables-the-css-animations'
-				),
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllBlocks(),
-				requestUtils.resetPreferences(),
-			] );
 
 			await use( requestUtils );
 		},

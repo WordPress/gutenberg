@@ -31,7 +31,6 @@ export default function EntityTypeList( {
 	list,
 	unselectedEntities,
 	setUnselectedEntities,
-	closePanel,
 } ) {
 	const count = list.length;
 	const firstRecord = list[ 0 ];
@@ -73,7 +72,6 @@ export default function EntityTypeList( {
 						onChange={ ( value ) =>
 							setUnselectedEntities( record, value )
 						}
-						closePanel={ closePanel }
 					/>
 				);
 			} ) }

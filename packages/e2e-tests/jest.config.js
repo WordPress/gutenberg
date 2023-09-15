@@ -14,10 +14,7 @@ module.exports = {
 		'expect-puppeteer',
 		'puppeteer-testing-library/extend-expect',
 	],
-	testPathIgnorePatterns: [
-		'/node_modules/',
-		'e2e-tests/specs/performance/',
-	],
+	testPathIgnorePatterns: [ '/node_modules/' ],
 	snapshotFormat: {
 		escapeString: false,
 		printBasicPrototype: false,

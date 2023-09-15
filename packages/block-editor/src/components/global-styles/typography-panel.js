@@ -19,8 +19,9 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -32,6 +33,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -43,6 +45,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasWritingMode ||
 		hasTextColumns
 	);
 }
@@ -50,19 +53,22 @@ export function useHasTypographyPanel( settings ) {
 function useHasFontSizeControl( settings ) {
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes =
-		fontSizesPerOrigin?.custom ??
-		fontSizesPerOrigin?.theme ??
-		fontSizesPerOrigin.default;
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
 	return !! fontSizes?.length || ! disableCustomFontSizes;
 }
 
 function useHasFontFamilyControl( settings ) {
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies =
-		fontFamiliesPerOrigin?.custom ??
-		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin?.default;
+	const fontFamilies = []
+		.concat( fontFamiliesPerOrigin?.custom ?? [] )
+		.concat( fontFamiliesPerOrigin?.theme ?? [] )
+		.concat( fontFamiliesPerOrigin?.default ?? [] )
+		.sort( ( a, b ) =>
+			( a?.name || a?.slug ).localeCompare( b?.name || a?.slug )
+		);
 	return !! fontFamilies?.length;
 }
 
@@ -100,8 +106,27 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasWritingModeControl( settings ) {
+	return settings?.typography?.writingMode;
+}
+
 function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
+}
+
+function getUniqueFontSizesBySlug( settings ) {
+	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
+
+	return fontSizes.reduce( ( acc, currentSize ) => {
+		if ( ! acc.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			acc.push( currentSize );
+		}
+		return acc;
+	}, [] );
 }
 
 function TypographyToolsPanel( {
@@ -135,6 +160,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	writingMode: true,
 	textColumns: true,
 };
 
@@ -153,20 +179,22 @@ export default function TypographyPanel( {
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies =
-		fontFamiliesPerOrigin?.custom ??
-		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin?.default;
+	const fontFamilies = []
+		.concat( fontFamiliesPerOrigin?.custom ?? [] )
+		.concat( fontFamiliesPerOrigin?.theme ?? [] )
+		.concat( fontFamiliesPerOrigin?.default ?? [] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'typography', 'fontFamily' ],
-				slug ? `var:preset|font-family|${ slug }` : newValue
+				slug
+					? `var:preset|font-family|${ slug }`
+					: newValue || undefined
 			)
 		);
 	};
@@ -176,11 +204,8 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes =
-		fontSizesPerOrigin?.custom ??
-		fontSizesPerOrigin?.theme ??
-		fontSizesPerOrigin.default;
+	const fontSizes = getUniqueFontSizesBySlug( settings );
+
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
@@ -188,7 +213,11 @@ export default function TypographyPanel( {
 			: newValue;
 
 		onChange(
-			immutableSet( value, [ 'typography', 'fontSize' ], actualValue )
+			setImmutably(
+				value,
+				[ 'typography', 'fontSize' ],
+				actualValue || undefined
+			)
 		);
 	};
 	const hasFontSize = () => !! value?.typography?.fontSize;
@@ -209,8 +238,8 @@ export default function TypographyPanel( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontStyle: newFontStyle,
-				fontWeight: newFontWeight,
+				fontStyle: newFontStyle || undefined,
+				fontWeight: newFontWeight || undefined,
 			},
 		} );
 	};
@@ -225,10 +254,14 @@ export default function TypographyPanel( {
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'lineHeight' ], newValue )
+			setImmutably(
+				value,
+				[ 'typography', 'lineHeight' ],
+				newValue || undefined
+			)
 		);
 	};
-	const hasLineHeight = () => !! value?.typography?.lineHeight;
+	const hasLineHeight = () => value?.typography?.lineHeight !== undefined;
 	const resetLineHeight = () => setLineHeight( undefined );
 
 	// Letter Spacing
@@ -238,7 +271,11 @@ export default function TypographyPanel( {
 	);
 	const setLetterSpacing = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'letterSpacing' ], newValue )
+			setImmutably(
+				value,
+				[ 'typography', 'letterSpacing' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
@@ -249,7 +286,11 @@ export default function TypographyPanel( {
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
 	const setTextColumns = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textColumns' ], newValue )
+			setImmutably(
+				value,
+				[ 'typography', 'textColumns' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextColumns = () => !! value?.typography?.textColumns;
@@ -262,7 +303,11 @@ export default function TypographyPanel( {
 	);
 	const setTextTransform = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textTransform' ], newValue )
+			setImmutably(
+				value,
+				[ 'typography', 'textTransform' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextTransform = () => !! value?.typography?.textTransform;
@@ -275,11 +320,30 @@ export default function TypographyPanel( {
 	);
 	const setTextDecoration = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'typography', 'textDecoration' ], newValue )
+			setImmutably(
+				value,
+				[ 'typography', 'textDecoration' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
+
+	// Text Orientation
+	const hasWritingModeControl = useHasWritingModeControl( settings );
+	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
+	const setWritingMode = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'writingMode' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasWritingMode = () => !! value?.typography?.writingMode;
+	const resetWritingMode = () => setWritingMode( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -424,6 +488,23 @@ export default function TypographyPanel( {
 						onChange={ setTextDecoration }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

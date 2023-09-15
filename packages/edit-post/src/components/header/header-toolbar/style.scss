@@ -1,6 +1,5 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
-	flex-grow: 1;
 	align-items: center;
 	border: none;
 
@@ -82,6 +81,10 @@
 	display: inline-flex;
 	align-items: center;
 	padding-left: $grid-unit-10;
+
+	// Some plugins add buttons here despite best practices.
+	// Push them a bit rightwards to fit the top toolbar.
+	margin-right: $grid-unit-10;
 
 	@include break-small() {
 		padding-left: $grid-unit-30;

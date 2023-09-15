@@ -54,7 +54,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						} }
 						value={ aspect }
 						aspectRatios={ [
-							// All ratios should be mirrored in PostFeaturedImage in @wordpress/block-library
+							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
 								title: __( 'Original' ),
 								aspect: defaultAspect,

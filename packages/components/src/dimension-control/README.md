@@ -9,8 +9,8 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { useState } from 'react';
 import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 export default function MyCustomDimensionControl() {
 	const [ paddingSize, setPaddingSize ] = useState( '' );

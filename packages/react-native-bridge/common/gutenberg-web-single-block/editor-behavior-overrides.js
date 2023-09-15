@@ -77,9 +77,8 @@ if ( isAndroid() ) {
 	manageTextSelectonContextMenu();
 }
 
-const editor = document.querySelector( '#editor' );
-
 function _toggleBlockSelectedClass( isBlockSelected ) {
+	const editor = document.querySelector( '#editor' );
 	if ( isBlockSelected ) {
 		editor.classList.add( 'is-block-selected' );
 	} else {

@@ -15,7 +15,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -175,6 +175,22 @@ function ColorPalette( {
 		}
 	}
 
+	function getColorGradientName( value ) {
+		const fallbackName = sprintf(
+			/* translators: %s: the hex color value */
+			__( 'Unlabeled color. %s' ),
+			value
+		);
+		const foundColorName = isGradientSegment
+			? defaultSettings.gradients?.find(
+					( gradient ) => gradient.gradient === value
+			  )
+			: defaultSettings.allColors?.find(
+					( color ) => color.color === value
+			  );
+		return foundColorName ? foundColorName?.name : fallbackName;
+	}
+
 	function onColorPress( color ) {
 		deselectCustomGradient();
 		performAnimation( color );
@@ -251,6 +267,8 @@ function ColorPalette( {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
+					const colorName = getColorGradientName( color );
+
 					return (
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
@@ -260,6 +278,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
+								accessibilityLabel={ colorName }
 								testID={ color }
 							>
 								<Animated.View

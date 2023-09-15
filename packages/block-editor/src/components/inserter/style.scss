@@ -711,3 +711,31 @@ $block-inserter-tabs-height: 44px;
 		margin: 0;
 	}
 }
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.reusable-blocks-menu-items__rename-hint {
+	align-items: top;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
+	display: flex;
+	flex-direction: row;
+	max-width: 380px;
+}
+
+.reusable-blocks-menu-items__rename-hint-content {
+	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+}
+
+.reusable-blocks-menu-items__rename-hint-dismiss {
+	// The dismiss button has a lot of empty space through its padding.
+	// Apply margin to visually align the icon with the top of the text to its left.
+	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
+}
+
+.components-menu-group .reusable-blocks-menu-items__rename-hint {
+	margin: 0;
+}

@@ -17,6 +17,16 @@ import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../ui/context';
+import { ContextSystemProvider } from '../../ui/context';
+
+const CONTEXT_SYSTEM_VALUE = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+	Dropdown: {
+		variant: 'toolbar',
+	},
+};
 
 function UnforwardedToolbar(
 	{
@@ -40,12 +50,14 @@ function UnforwardedToolbar(
 		className
 	);
 	return (
-		<ToolbarContainer
-			className={ finalClassName }
-			label={ label }
-			ref={ ref }
-			{ ...props }
-		/>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+			<ToolbarContainer
+				className={ finalClassName }
+				label={ label }
+				ref={ ref }
+				{ ...props }
+			/>
+		</ContextSystemProvider>
 	);
 }
 

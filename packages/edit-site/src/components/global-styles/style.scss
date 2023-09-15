@@ -131,7 +131,7 @@
 	.components-v-stack {
 		flex: 1 1 auto;
 
-		.edit-site-global-styles__custom-css-input {
+		.block-editor-global-styles-advanced-panel__custom-css-input {
 			flex: 1 1 auto;
 			display: flex;
 			flex-direction: column;
@@ -143,32 +143,13 @@
 
 				.components-textarea-control__input {
 					flex: 1 1 auto;
+					// CSS input is always LTR regardless of language.
+					/*rtl:ignore*/
+					direction: ltr;
 				}
 			}
 		}
 	}
-}
-
-.edit-site-global-styles__custom-css-input textarea {
-	font-family: $editor_html_font;
-}
-
-.edit-site-global-styles__custom-css-validation-wrapper {
-	position: absolute;
-	bottom: $grid-unit-20;
-	right: $grid-unit * 3;
-}
-
-.edit-site-global-styles__custom-css-validation-icon {
-	fill: $alert-red;
-}
-
-.edit-site-global-styles__custom-css-theme-css {
-	width: 100%;
-	line-break: anywhere;
-	white-space: break-spaces;
-	max-height: 200px;
-	overflow-y: scroll;
 }
 
 .edit-site-global-styles-screen-css-help-link {
@@ -189,45 +170,6 @@
 	flex-direction: column;
 }
 
-.edit-site-global-styles__shadow-panel {
-	width: 230px;
-}
-
-.edit-site-global-styles__shadow-dropdown {
-	display: block;
-	padding: 0;
-
-	> button {
-		width: 100%;
-		padding: $grid-unit-10;
-
-		&.is-open {
-			background-color: $gray-100;
-		}
-	}
-}
-
-// wrapper to clip the shadow beyond 6px
-.edit-site-global-styles__shadow-indicator-wrapper {
-	padding: 6px;
-	overflow: hidden;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-// These styles are similar to the color palette.
-.edit-site-global-styles__shadow-indicator {
-	color: $gray-800;
-	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
-	cursor: pointer;
-	padding: 0;
-
-	height: 24px;
-	width: 24px;
-}
-
 .edit-site-global-styles-screen-root.edit-site-global-styles-screen-root,
 .edit-site-global-styles-screen-style-variations.edit-site-global-styles-screen-style-variations {
 	background: unset;
@@ -236,4 +178,15 @@
 
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
+}
+
+[class][class].edit-site-global-styles-sidebar__revisions-count-badge {
+	align-items: center;
+	background: $gray-800;
+	border-radius: 2px;
+	color: $white;
+	display: inline-flex;
+	justify-content: center;
+	min-height: $icon-size;
+	min-width: $icon-size;
 }

@@ -123,6 +123,10 @@ public class Gutenberg: UIResponder {
         sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
+    public func postHasBeenJustSaved() {
+        sendEvent(.postHasBeenJustSaved)
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
@@ -197,6 +201,14 @@ public class Gutenberg: UIResponder {
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
     }
+    
+    public func onUndoPressed() {
+        bridgeModule.sendEventIfNeeded(.onUndoPressed, body: nil)
+    }
+    
+    public func onRedoPressed() {
+        bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
@@ -250,7 +262,7 @@ extension Gutenberg: RCTBridgeDelegate {
         }
         let monitorQueue = DispatchQueue(label: "org.wordpress.network-path-monitor")
         monitor.start(queue: monitorQueue)
-        semaphore.wait(timeout: .distantFuture)
+        _ = semaphore.wait(timeout: .distantFuture)
         monitor.cancel()
         if isOnCellularNetwork {
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")

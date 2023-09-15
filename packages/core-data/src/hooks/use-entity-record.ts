@@ -19,6 +19,9 @@ export interface EntityRecordResolution< RecordType > {
 	/** The edited entity record */
 	editedRecord: Partial< RecordType >;
 
+	/** The edits to the edited entity record */
+	edits: Partial< RecordType >;
+
 	/** Apply local (in-browser) edits to the edited entity record */
 	edit: ( diff: Partial< RecordType > ) => void;
 
@@ -152,18 +155,18 @@ export default function useEntityRecord< RecordType >(
 
 	const mutations = useMemo(
 		() => ( {
-			edit: ( record ) =>
-				editEntityRecord( kind, name, recordId, record ),
+			edit: ( record, editOptions: any = {} ) =>
+				editEntityRecord( kind, name, recordId, record, editOptions ),
 			save: ( saveOptions: any = {} ) =>
 				saveEditedEntityRecord( kind, name, recordId, {
 					throwOnError: true,
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits } = useSelect(
+	const { editedRecord, hasEdits, edits } = useSelect(
 		( select ) => ( {
 			editedRecord: select( coreStore ).getEditedEntityRecord(
 				kind,
@@ -175,6 +178,11 @@ export default function useEntityRecord< RecordType >(
 				name,
 				recordId
 			),
+			edits: select( coreStore ).getEntityRecordNonTransientEdits(
+				kind,
+				name,
+				recordId
+			),
 		} ),
 		[ kind, name, recordId ]
 	);
@@ -182,7 +190,9 @@ export default function useEntityRecord< RecordType >(
 	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return null;
+				return {
+					data: null,
+				};
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
@@ -193,6 +203,7 @@ export default function useEntityRecord< RecordType >(
 		record,
 		editedRecord,
 		hasEdits,
+		edits,
 		...querySelectRest,
 		...mutations,
 	};

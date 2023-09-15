@@ -131,6 +131,18 @@ _Returns_
 
 -   `Object`: Settings.
 
+### hasPageContentFocus
+
+Whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not focus is on editing page content.
+
 ### isFeatureActive
 
 > **Deprecated**
@@ -173,6 +185,22 @@ _Returns_
 ### isNavigationOpened
 
 > **Deprecated**
+
+### isPage
+
+Whether or not the editor has a page loaded into it.
+
+_Related_
+
+-   setPage
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not the editor has a page loaded into it.
 
 ### isSaveViewOpened
 
@@ -240,6 +268,19 @@ _Parameters_
 -   _options_ `[Object]`:
 -   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
+### setEditedEntity
+
+Action that sets an edited entity.
+
+_Parameters_
+
+-   _postType_ `string`: The entity's post type.
+-   _postId_ `string`: The entity's ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setEditedPostContext
 
 Set's the current block editor context.
@@ -250,7 +291,15 @@ _Parameters_
 
 _Returns_
 
--   `number`: The resolved template ID for the page route.
+-   `Object`: Action object.
+
+### setHasPageContentFocus
+
+Sets whether or not the editor allows only page content to be edited.
+
+_Parameters_
+
+-   _hasPageContentFocus_ `boolean`: True to allow only page content to be edited, false to allow template to be edited.
 
 ### setHomeTemplateId
 
@@ -292,6 +341,18 @@ _Parameters_
 
 -   _isOpen_ `boolean`: If true, opens the save view. If false, closes it. It does not toggle the state, but sets it directly.
 
+### setNavigationMenu
+
+Action that sets a navigation menu.
+
+_Parameters_
+
+-   _navigationMenuId_ `string`: The Navigation Menu Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setNavigationPanelActiveMenu
 
 > **Deprecated**
@@ -304,8 +365,7 @@ _Returns_
 
 ### setPage
 
-Resolves the template for a page and displays both. If no path is given, attempts
-to use the postId to generate a path like `?p=${ postId }`.
+Resolves the template for a page and displays both. If no path is given, attempts to use the postId to generate a path like `?p=${ postId }`.
 
 _Parameters_
 
@@ -347,6 +407,10 @@ _Returns_
 ### switchEditorMode
 
 Undocumented declaration.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleFeature
 

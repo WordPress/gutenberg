@@ -13,23 +13,15 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	useInstanceId,
-	useDebounce,
-	useMergeRefs,
-	useRefEffect,
-} from '@wordpress/compose';
+import { __, _n } from '@wordpress/i18n';
+import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,
 	slice,
 	insert,
 	isCollapsed,
 	getTextContent,
-	// Error expected because `@wordpress/rich-text` is not yet fully typed.
-	// @ts-expect-error
 } from '@wordpress/rich-text';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -56,7 +48,6 @@ export function useAutocomplete( {
 	completers,
 	contentRef,
 }: UseAutocompleteProps ) {
-	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 
@@ -139,28 +130,6 @@ export function useAutocomplete( {
 		setAutocompleterUI( null );
 	}
 
-	function announce( options: Array< KeyedOption > ) {
-		if ( ! debouncedSpeak ) {
-			return;
-		}
-		if ( !! options.length ) {
-			debouncedSpeak(
-				sprintf(
-					/* translators: %d: number of results. */
-					_n(
-						'%d result found, use up and down arrow keys to navigate.',
-						'%d results found, use up and down arrow keys to navigate.',
-						options.length
-					),
-					options.length
-				),
-				'assertive'
-			);
-		} else {
-			debouncedSpeak( __( 'No results.' ), 'assertive' );
-		}
-	}
-
 	/**
 	 * Load options for an autocompleter.
 	 *
@@ -171,7 +140,6 @@ export function useAutocomplete( {
 			options.length === filteredOptions.length ? selectedIndex : 0
 		);
 		setFilteredOptions( options );
-		announce( options );
 	}
 
 	function handleKeyDown( event: KeyboardEvent ) {
@@ -241,6 +209,7 @@ export function useAutocomplete( {
 		if ( isCollapsed( record ) ) {
 			return getTextContent( slice( record, 0 ) );
 		}
+		return '';
 	}, [ record ] );
 
 	useEffect( () => {

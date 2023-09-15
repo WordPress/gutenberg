@@ -26,11 +26,18 @@ export type ComboboxControlProps = Pick<
 		item: ComboboxControlOption;
 	} ) => React.ReactNode;
 	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Show a reset button to clear the input.
 	 *

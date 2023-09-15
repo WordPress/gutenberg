@@ -52,13 +52,6 @@ export const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
-export const showTransparentBackground = ( currentValue?: string ) => {
-	if ( typeof currentValue === 'undefined' ) {
-		return true;
-	}
-	return colord( currentValue ).alpha() === 0;
-};
-
 // The PaletteObject type has a `colors` property (an array of ColorObject),
 // while the ColorObject type has a `color` property (the CSS color value).
 export const isMultiplePaletteObject = (

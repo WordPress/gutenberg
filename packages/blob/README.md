@@ -28,9 +28,7 @@ _Returns_
 
 ### getBlobByURL
 
-Retrieve a file based on a blob URL. The file must have been created by
-`createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
-`undefined`.
+Retrieve a file based on a blob URL. The file must have been created by `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return `undefined`.
 
 _Parameters_
 
@@ -42,9 +40,7 @@ _Returns_
 
 ### getBlobTypeByURL
 
-Retrieve a blob type based on URL. The file must have been created by
-`createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
-`undefined`.
+Retrieve a blob type based on URL. The file must have been created by `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return `undefined`.
 
 _Parameters_
 
@@ -60,7 +56,7 @@ Check whether a url is a blob url.
 
 _Parameters_
 
--   _url_ `string`: The URL.
+-   _url_ `string|undefined`: The URL.
 
 _Returns_
 

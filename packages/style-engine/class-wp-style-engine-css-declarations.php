@@ -18,22 +18,6 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
  */
 class WP_Style_Engine_CSS_Declarations {
 	/**
-	 * An array of valid CSS custom properties.
-	 * CSS custom properties are permitted by safecss_filter_attr()
-	 * since WordPress 6.1. See: https://core.trac.wordpress.org/ticket/56353.
-	 *
-	 * This whitelist exists so that the Gutenberg plugin maintains
-	 * backwards compatibility with versions of WordPress < 6.1.
-	 *
-	 * It does not need to be backported to future versions of WordPress.
-	 *
-	 * @var array
-	 */
-	protected static $valid_custom_declarations = array(
-		'--wp--style--unstable-gallery-gap' => 'gap',
-	);
-
-	/**
 	 * An array of CSS declarations (property => value pairs).
 	 *
 	 * @var array
@@ -140,22 +124,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
 		$filtered_value = wp_strip_all_tags( $value, true );
-
-		/**
-		 * Allows a specific list of CSS custom properties starting with `--wp--`.
-		 *
-		 * CSS custom properties are permitted by safecss_filter_attr()
-		 * since WordPress 6.1. See: https://core.trac.wordpress.org/ticket/56353.
-		 *
-		 * This condition exists so that the Gutenberg plugin maintains
-		 * backwards compatibility with versions of WordPress < 6.1.
-		 *
-		 * It does not need to be backported to future versions of WordPress.
-		 */
-		if ( '' !== $filtered_value && isset( static::$valid_custom_declarations[ $property ] ) ) {
-			return safecss_filter_attr( static::$valid_custom_declarations[ $property ] . ":{$spacer}{$value}" ) ?
-				"{$property}:{$spacer}{$value}" : '';
-		}
 
 		if ( '' !== $filtered_value ) {
 			return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );

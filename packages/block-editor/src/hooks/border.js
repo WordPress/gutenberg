@@ -84,7 +84,7 @@ function styleToAttributes( style ) {
 
 	const borderColorValue = style?.border?.color;
 	const borderColorSlug = borderColorValue?.startsWith( 'var:preset|color|' )
-		? borderColorSlug.substring( 'var:preset|color|'.length )
+		? borderColorValue.substring( 'var:preset|color|'.length )
 		: undefined;
 	const updatedStyle = { ...style };
 	updatedStyle.border = {
@@ -377,18 +377,20 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 			borderBottomColor: borderBottomColor || borderColorValue,
 			borderLeftColor: borderLeftColor || borderColorValue,
 		};
+		const cleanedExtraStyles = cleanEmptyObject( extraStyles ) || {};
 
 		let wrapperProps = props.wrapperProps;
 		wrapperProps = {
 			...props.wrapperProps,
 			style: {
 				...props.wrapperProps?.style,
-				...extraStyles,
+				...cleanedExtraStyles,
 			},
 		};
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	}
+	},
+	'withBorderColorPaletteStyles'
 );
 
 addFilter(

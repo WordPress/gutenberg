@@ -9,21 +9,30 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
 
-function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+function ReadOnlyContent( {
+	layoutClassNames,
+	userCanEdit,
+	postType,
+	postId,
+} ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
@@ -45,19 +54,36 @@ function EditableContent( { context = {} } ) {
 		{ id: postId }
 	);
 
+	const entityRecord = useSelect(
+		( select ) => {
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ postType, postId ]
+	);
+
+	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+
+	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
+
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
+			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);
 	return <div { ...props } />;
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {} } = props;
+	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
+		props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	if ( userCanEdit === undefined ) {
 		return null;
@@ -70,6 +96,7 @@ function Content( props ) {
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent
+			layoutClassNames={ layoutClassNames }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
@@ -83,7 +110,7 @@ function Placeholder( { layoutClassNames } ) {
 		<div { ...blockProps }>
 			<p>
 				{ __(
-					'This is the Post Content block, it will display all the blocks in any single post or page.'
+					'This is the Content block, it will display all the blocks in any single post or page.'
 				) }
 			</p>
 			<p>
@@ -93,7 +120,7 @@ function Placeholder( { layoutClassNames } ) {
 			</p>
 			<p>
 				{ __(
-					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
 				) }
 			</p>
 		</div>
@@ -113,11 +140,9 @@ function RecursionError() {
 
 export default function PostContentEdit( {
 	context,
-	attributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
-	const { layout = {} } = attributes;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
@@ -127,7 +152,10 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
-				<Content context={ context } layout={ layout } />
+				<Content
+					context={ context }
+					layoutClassNames={ layoutClassNames }
+				/>
 			) : (
 				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }

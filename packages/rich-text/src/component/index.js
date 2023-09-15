@@ -28,7 +28,6 @@ export function useRichText( {
 	preserveWhiteSpace,
 	onSelectionChange,
 	onChange,
-	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
 	__unstableDependencies = [],
@@ -51,9 +50,6 @@ export function useRichText( {
 		return create( {
 			element: ref.current,
 			range,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			__unstableIsEditableTree: true,
 			preserveWhiteSpace,
 		} );
@@ -63,9 +59,6 @@ export function useRichText( {
 		apply( {
 			value: newRecord,
 			current: ref.current,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
@@ -80,9 +73,6 @@ export function useRichText( {
 		_value.current = value;
 		record.current = create( {
 			html: value,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			preserveWhiteSpace,
 		} );
 		if ( disableFormats ) {
@@ -99,6 +89,7 @@ export function useRichText( {
 	const hadSelectionUpdate = useRef( false );
 
 	if ( ! record.current ) {
+		hadSelectionUpdate.current = isSelected;
 		setRecordFromProps();
 		// Sometimes formats are added programmatically and we need to make
 		// sure it's persisted to the block store / markup. If these formats
@@ -124,6 +115,7 @@ export function useRichText( {
 			...record.current,
 			start: selectionStart,
 			end: selectionEnd,
+			activeFormats: undefined,
 		};
 	}
 
@@ -147,7 +139,6 @@ export function useRichText( {
 							formats: __unstableBeforeSerialize( newRecord ),
 					  }
 					: newRecord,
-				multilineTag,
 				preserveWhiteSpace,
 			} );
 		}
@@ -177,7 +168,6 @@ export function useRichText( {
 						formats: __unstableBeforeSerialize( newRecord ),
 				  }
 				: newRecord,
-			multilineTag,
 			preserveWhiteSpace,
 		} );
 
@@ -217,7 +207,7 @@ export function useRichText( {
 			ref.current.focus();
 		}
 
-		applyFromProps();
+		applyRecord( record.current );
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
 
@@ -225,13 +215,12 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		useCopyHandler( { record, preserveWhiteSpace } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {
 			createRecord,
 			handleChange,
-			multilineTag,
 		} ),
 		useInputAndSelection( {
 			record,

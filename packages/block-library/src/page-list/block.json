@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/page-list",
 	"title": "Page List",
 	"category": "widgets",
@@ -33,7 +33,6 @@
 		"openSubmenusOnClick"
 	],
 	"supports": {
-		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {

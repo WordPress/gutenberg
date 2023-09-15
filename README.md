@@ -17,7 +17,7 @@ Welcome to the development hub for the WordPress Gutenberg project!
 
 The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without work-arounds like shortcodes or custom HTML.
 
-The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
+The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor, so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
 Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https://make.wordpress.org/core/2020/05/20/ways-to-keep-up-with-full-site-editing-fse/)
 
@@ -31,7 +31,7 @@ Get hands on: check out the [block editor live demo](https://wordpress.org/guten
 
 -   **User Documentation:** See the [WordPress Editor documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) for detailed docs on using the editor as an author creating posts and pages.
 
--   **User Support:** If you have run into an issue, you should check the [Support Forums first](https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm its not a duplicate.
+-   **User Support:** If you have run into an issue, you should check the [Support Forums first](https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm it's not a duplicate.
 
 ### Developing for Gutenberg
 
@@ -41,7 +41,7 @@ Review the [Create a Block tutorial](/docs/getting-started/create-block/README.m
 
 ### Contribute to Gutenberg
 
-Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
+Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers, and we'd love your help building it.
 
 See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute.
 

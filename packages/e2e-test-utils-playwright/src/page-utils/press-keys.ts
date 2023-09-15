@@ -20,11 +20,13 @@ import {
 } from '@wordpress/keycodes';
 
 let clipboardDataHolder: {
-	plainText: string;
-	html: string;
+	'text/plain': string;
+	'text/html': string;
+	'rich-text': string;
 } = {
-	plainText: '',
-	html: '',
+	'text/plain': '',
+	'text/html': '',
+	'rich-text': '',
 };
 
 /**
@@ -38,30 +40,38 @@ let clipboardDataHolder: {
  */
 export function setClipboardData(
 	this: PageUtils,
-	{ plainText = '', html = '' }: typeof clipboardDataHolder
+	{ plainText = '', html = '' }
 ) {
 	clipboardDataHolder = {
-		plainText,
-		html,
+		'text/plain': plainText,
+		'text/html': html,
+		'rich-text': '',
 	};
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	clipboardDataHolder = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
+			const canvasDoc =
+				// @ts-ignore
+				document.activeElement?.contentDocument ?? document;
 			const clipboardDataTransfer = new DataTransfer();
 
 			if ( _type === 'paste' ) {
 				clipboardDataTransfer.setData(
 					'text/plain',
-					_clipboardData.plainText
+					_clipboardData[ 'text/plain' ]
 				);
 				clipboardDataTransfer.setData(
 					'text/html',
-					_clipboardData.html
+					_clipboardData[ 'text/html' ]
+				);
+				clipboardDataTransfer.setData(
+					'rich-text',
+					_clipboardData[ 'rich-text' ]
 				);
 			} else {
-				const selection = window.getSelection()!;
+				const selection = canvasDoc.defaultView.getSelection()!;
 				const plainText = selection.toString();
 				let html = plainText;
 				if ( selection.rangeCount ) {
@@ -70,7 +80,8 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					html = Array.from( fragment.childNodes )
 						.map(
 							( node ) =>
-								( node as Element ).outerHTML ?? node.nodeValue
+								( node as Element ).outerHTML ??
+								( node as Element ).nodeValue
 						)
 						.join( '' );
 				}
@@ -78,7 +89,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 				clipboardDataTransfer.setData( 'text/html', html );
 			}
 
-			document.activeElement?.dispatchEvent(
+			canvasDoc.activeElement?.dispatchEvent(
 				new ClipboardEvent( _type, {
 					bubbles: true,
 					cancelable: true,
@@ -87,8 +98,9 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 			);
 
 			return {
-				plainText: clipboardDataTransfer.getData( 'text/plain' ),
-				html: clipboardDataTransfer.getData( 'text/html' ),
+				'text/plain': clipboardDataTransfer.getData( 'text/plain' ),
+				'text/html': clipboardDataTransfer.getData( 'text/html' ),
+				'rich-text': clipboardDataTransfer.getData( 'rich-text' ),
 			};
 		},
 		[ type, clipboardDataHolder ] as const

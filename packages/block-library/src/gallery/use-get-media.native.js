@@ -14,7 +14,7 @@ const EMPTY_IMAGE_MEDIA = [];
  *
  * @return {Array} An array of media info options for each gallery image.
  */
-export default function useGetMedia( innerBlockImages ) {
+export default function useGetMedia( innerBlockImages = [] ) {
 	return useSelect(
 		( select ) => {
 			const imagesUploading = innerBlockImages.some(

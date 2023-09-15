@@ -1,76 +1,55 @@
-.edit-site-start-template-options__modal.components-modal__frame {
-	// To keep modal dimensions consistent as subsections are navigated, width
-	// and height are used instead of max-(width/height).
-	@include break-small() {
-		width: calc(100% - #{ $grid-unit-20 * 2 });
-		height: calc(100% - #{ $header-height * 2 });
+$actions-height: 92px;
+
+.edit-site-start-template-options__modal {
+	.edit-site-start-template-options__modal__actions {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		height: $actions-height;
+		background-color: $white;
+		margin-left: - $grid-unit-40;
+		margin-right: - $grid-unit-40;
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
+		border-top: 1px solid $gray-300;
+		z-index: z-index(".edit-site-start-template-options__modal__actions");
 	}
-	@include break-medium() {
-		width: 50%;
-	}
-	@include break-large() {
-		height: fit-content;
+
+	.block-editor-block-patterns-list {
+		// Since the actions container is positioned absolutely,
+		// this padding bottom ensures that the content wrapper will properly
+		// detect overflowing content and start showing scrollbars at the right
+		// moment. Without this padding, the content would render under the actions
+		// bar without causing the wrapper to show a scrollbar.
+		padding-bottom: $actions-height;
 	}
 }
 
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
-	display: grid;
-	width: 100%;
-	margin-top: $grid-unit-05;
-	gap: $grid-unit-30;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%/2, max(240px, 100%/10)), 1fr));
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
+
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
-		margin-bottom: 0;
-		width: 100%;
-		aspect-ratio: 3/4;
-
-		.block-editor-block-preview__container {
-			height: 100%;
-			box-shadow: 0 0 0 1px $gray-300;
-		}
-
-		.block-editor-block-preview__content {
-			width: 100%;
-			position: absolute;
-		}
 
 		.block-editor-block-patterns-list__item-title {
 			display: none;
 		}
-
-		&:hover {
-			.block-editor-block-preview__container {
-				box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
-			}
-		}
-
-		&:focus {
-			.block-editor-block-preview__container {
-				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-				// Windows High Contrast mode will show this outline, but not the box-shadow.
-				outline: 2px solid transparent;
-			}
-		}
 	}
 
-	// The start blank pattern is the last and we are selecting it.
-	.block-editor-block-patterns-list__list-item:nth-last-child(2) {
-		.block-editor-block-preview__container {
-			position: absolute;
-			padding: 0;
-			background: #f0f0f0;
-			&::after {
-				width: 100%;
-				top: 50%;
-				margin-top: -1em;
-				content: var(--wp-edit-site-start-template-options-start-blank);
-				text-align: center;
-			}
-		}
-		iframe {
-			display: none;
+	.block-editor-block-patterns-list__item {
+		// Avoid to override the BlockPatternList component
+		// default hover and focus styles.
+		&:not(:focus):not(:hover) .block-editor-block-preview__container {
+			box-shadow: 0 0 0 1px $gray-300;
 		}
 	}
 }

@@ -13,7 +13,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Copy - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -31,7 +31,14 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		// To do: run with iframe.
+		await page.evaluate( () => {
+			window.wp.blocks.registerBlockType( 'test/v2', {
+				apiVersion: '2',
+				title: 'test',
+			} );
+		} );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -59,7 +66,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -78,7 +85,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -88,7 +95,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'First block' );
 		await page.keyboard.press( 'Enter' );
@@ -240,7 +247,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
@@ -252,7 +259,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new block at the top of the document to paste there.
@@ -267,7 +274,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
@@ -280,7 +287,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new block at the top of the document to paste there.
@@ -295,7 +302,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
@@ -307,7 +314,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new block at the top of the document to paste there.
@@ -322,7 +329,7 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
@@ -335,7 +342,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new block at the top of the document to paste there.
@@ -362,7 +369,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new block at the top of the document to paste there.
@@ -389,7 +396,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
+		await editor.canvas.waitForFunction(
 			() => window.getSelection().type === 'Caret'
 		);
 		// Create a new code block to paste there.
@@ -399,8 +406,8 @@ test.describe( 'Copy/cut/paste', () => {
 	} );
 
 	test( 'should paste single line in post title', async ( {
-		page,
 		pageUtils,
+		editor,
 	} ) => {
 		// This test checks whether we are correctly handling single line
 		// pasting in the post title. Previously we were accidentally falling
@@ -413,13 +420,16 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 		// Expect the span to be filtered out.
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toMatchSnapshot();
 	} );
 
 	test( 'should paste single line in post title with existing content', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -430,7 +440,9 @@ test.describe( 'Copy/cut/paste', () => {
 		// Ensure the selection is correct.
 		await page.keyboard.type( 'y' );
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas.evaluate(
+				() => document.activeElement.innerHTML
+			)
 		).toBe( 'axyb' );
 	} );
 

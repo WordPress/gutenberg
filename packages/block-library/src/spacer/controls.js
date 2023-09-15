@@ -81,6 +81,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ false }
+						showSideInLabel={ false }
 					/>
 				</View>
 			) }

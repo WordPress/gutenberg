@@ -110,6 +110,12 @@ exports[`Gallery block rearranges gallery items 1`] = `
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block renders gallery block placeholder correctly if the block doesn't have inner blocks 1`] = `
+"<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block sets caption to gallery 1`] = `
 "<!-- wp:gallery {"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":2000} -->

@@ -12,7 +12,10 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 
@@ -24,6 +27,9 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
+import CreateNewPostLink from './create-new-post-link';
+import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -32,12 +38,12 @@ import {
 	useTaxonomies,
 } from '../../utils';
 
-export default function QueryInspectorControls( {
-	attributes,
-	setQuery,
-	setDisplayLayout,
-} ) {
-	const { query, displayLayout } = attributes;
+const { BlockInfo } = unlock( blockEditorPrivateApis );
+
+export default function QueryInspectorControls( props ) {
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -97,7 +103,7 @@ export default function QueryInspectorControls( {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showColumnsControl = displayLayout?.type === 'flex';
+	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -127,6 +133,9 @@ export default function QueryInspectorControls( {
 
 	return (
 		<>
+			<BlockInfo>
+				<CreateNewPostLink { ...props } />
+			</BlockInfo>
 			{ showSettingsPanel && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
@@ -162,7 +171,9 @@ export default function QueryInspectorControls( {
 									label={ __( 'Columns' ) }
 									value={ displayLayout.columns }
 									onChange={ ( value ) =>
-										setDisplayLayout( { columns: value } )
+										setDisplayLayout( {
+											columns: value,
+										} )
 									}
 									min={ 2 }
 									max={ Math.max( 6, displayLayout.columns ) }
@@ -193,6 +204,11 @@ export default function QueryInspectorControls( {
 								}
 							/>
 						) }
+						<EnhancedPaginationControl
+							enhancedPagination={ enhancedPagination }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
+						/>
 					</PanelBody>
 				</InspectorControls>
 			) }

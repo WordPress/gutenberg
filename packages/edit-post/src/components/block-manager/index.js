@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
-import { SearchControl } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { SearchControl, Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, compose } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -21,6 +21,7 @@ function BlockManager( {
 	hasBlockSupport,
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
+	enableAllBlockTypes,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
@@ -63,6 +64,12 @@ function BlockManager( {
 						),
 						numberOfHiddenBlocks
 					) }
+					<Button
+						variant="link"
+						onClick={ () => enableAllBlockTypes( blockTypes ) }
+					>
+						{ __( 'Reset' ) }
+					</Button>
 				</div>
 			) }
 			<SearchControl
@@ -105,34 +112,47 @@ function BlockManager( {
 	);
 }
 
-export default withSelect( ( select ) => {
-	const {
-		getBlockTypes,
-		getCategories,
-		hasBlockSupport,
-		isMatchingSearchTerm,
-	} = select( blocksStore );
-	const { getHiddenBlockTypes } = select( editPostStore );
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getBlockTypes,
+			getCategories,
+			hasBlockSupport,
+			isMatchingSearchTerm,
+		} = select( blocksStore );
+		const { getHiddenBlockTypes } = select( editPostStore );
 
-	// Some hidden blocks become unregistered
-	// by removing for instance the plugin that registered them, yet
-	// they're still remain as hidden by the user's action.
-	// We consider "hidden", blocks which were hidden and
-	// are still registered.
-	const blockTypes = getBlockTypes();
-	const hiddenBlockTypes = getHiddenBlockTypes().filter( ( hiddenBlock ) => {
-		return blockTypes.some(
-			( registeredBlock ) => registeredBlock.name === hiddenBlock
+		// Some hidden blocks become unregistered
+		// by removing for instance the plugin that registered them, yet
+		// they're still remain as hidden by the user's action.
+		// We consider "hidden", blocks which were hidden and
+		// are still registered.
+		const blockTypes = getBlockTypes();
+		const hiddenBlockTypes = getHiddenBlockTypes().filter(
+			( hiddenBlock ) => {
+				return blockTypes.some(
+					( registeredBlock ) => registeredBlock.name === hiddenBlock
+				);
+			}
 		);
-	} );
-	const numberOfHiddenBlocks =
-		Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		const numberOfHiddenBlocks =
+			Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
-	return {
-		blockTypes,
-		categories: getCategories(),
-		hasBlockSupport,
-		isMatchingSearchTerm,
-		numberOfHiddenBlocks,
-	};
-} )( BlockManager );
+		return {
+			blockTypes,
+			categories: getCategories(),
+			hasBlockSupport,
+			isMatchingSearchTerm,
+			numberOfHiddenBlocks,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { showBlockTypes } = dispatch( editPostStore );
+		return {
+			enableAllBlockTypes: ( blockTypes ) => {
+				const blockNames = blockTypes.map( ( { name } ) => name );
+				showBlockTypes( blockNames );
+			},
+		};
+	} ),
+] )( BlockManager );

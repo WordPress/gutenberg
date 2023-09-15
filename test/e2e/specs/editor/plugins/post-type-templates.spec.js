@@ -35,7 +35,7 @@ test.describe( 'Post type templates', () => {
 
 			// Remove a block from the template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await page.focus( 'role=textbox[name="Add title"i]' );
+			await editor.canvas.focus( 'role=textbox[name="Add title"i]' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
 			await page.click( 'role=button[name="Save draft"i]' );
@@ -64,7 +64,7 @@ test.describe( 'Post type templates', () => {
 		} ) => {
 			// Remove all blocks from the template to verify that they're not
 			// re-added after saving and reloading the editor.
-			await page.fill(
+			await editor.canvas.fill(
 				'role=textbox[name="Add title"i]',
 				'My Empty Book'
 			);
@@ -125,11 +125,11 @@ test.describe( 'Post type templates', () => {
 
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await page.fill(
+			await editor.canvas.fill(
 				'role=textbox[name="Add title"i]',
 				'My Image Format'
 			);
-			await page.focus( 'role=document[name="Block: Image"i]' );
+			await editor.canvas.focus( 'role=document[name="Block: Image"i]' );
 			await page.keyboard.press( 'Backspace' );
 			await page.click( 'role=button[name="Save draft"i]' );
 			await expect(

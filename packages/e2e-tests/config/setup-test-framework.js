@@ -158,6 +158,15 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Ignore framer-motion warnings about reduced motion.
+		if (
+			text.includes(
+				'You have Reduced Motion enabled on your device. Animations may not appear as expected.'
+			)
+		) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of

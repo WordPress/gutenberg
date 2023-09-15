@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { canvas } from './canvas';
+
+/**
  * Clicks the default block appender.
  */
 export async function clickBlockAppender() {
@@ -6,7 +11,7 @@ export async function clickBlockAppender() {
 	await page.evaluate( () =>
 		window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 	);
-	const appender = await page.waitForSelector(
+	const appender = await canvas().waitForSelector(
 		'.block-editor-default-block-appender__content'
 	);
 	await appender.click();

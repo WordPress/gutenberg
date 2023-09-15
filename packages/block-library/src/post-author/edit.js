@@ -93,14 +93,14 @@ function PostAuthorEdit( {
 	};
 
 	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+	const showAuthorControl =
+		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ !! postId &&
-						! isDescendentOfQueryLoop &&
-						authorOptions.length &&
+					{ showAuthorControl &&
 						( ( showCombobox && (
 							<ComboboxControl
 								__nextHasNoMarginBottom

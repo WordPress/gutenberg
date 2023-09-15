@@ -66,7 +66,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/edit-site/toggle-block-settings-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the block settings sidebar.' ),
+			description: __( 'Show or hide the Settings sidebar.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
@@ -129,7 +129,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: `core/edit-site/transform-heading-to-paragraph`,
+			name: 'core/edit-site/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
@@ -148,6 +148,16 @@ function KeyboardShortcutsRegister() {
 					character: `${ level }`,
 				},
 			} );
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle distraction free mode.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '\\',
+			},
 		} );
 	}, [ registerShortcut ] );
 

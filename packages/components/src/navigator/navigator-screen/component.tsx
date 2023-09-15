@@ -3,7 +3,9 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, MotionProps } from 'framer-motion';
+import type { MotionProps } from 'framer-motion';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 import { css } from '@emotion/react';
 
 /**
@@ -24,11 +26,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect, useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
@@ -43,7 +42,7 @@ const animationExitDelay = 0;
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
 type Props = Omit<
 	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	keyof MotionProps
+	Exclude< keyof MotionProps, 'style' | 'children' >
 >;
 
 function UnconnectedNavigatorScreen(
@@ -100,11 +99,13 @@ function UnconnectedNavigatorScreen(
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
 		// - if focus hasn't already been restored for the current location
+		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			locationRef.current.hasRestoredFocus
+			locationRef.current.hasRestoredFocus ||
+			location.skipFocus
 		) {
 			return;
 		}
@@ -143,6 +144,7 @@ function UnconnectedNavigatorScreen(
 		isMatch,
 		location.isBack,
 		location.focusTargetSelector,
+		location.skipFocus,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );

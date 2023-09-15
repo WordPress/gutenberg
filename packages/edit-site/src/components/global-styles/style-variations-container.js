@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -12,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __experimentalGrid as Grid } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -20,16 +19,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-
-function compareVariations( a, b ) {
-	return (
-		fastDeepEqual( a.styles, b.styles ) &&
-		fastDeepEqual( a.settings, b.settings )
-	);
-}
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
+	blockEditorPrivateApis
+);
 
 function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -63,8 +57,18 @@ function Variation( { variation } ) {
 	};
 
 	const isActive = useMemo( () => {
-		return compareVariations( user, variation );
+		return areGlobalStyleConfigsEqual( user, variation );
 	}, [ user, variation ] );
+
+	let label = variation?.title;
+	if ( variation?.description ) {
+		label = sprintf(
+			/* translators: %1$s: variation title. %2$s variation description. */
+			__( '%1$s (%2$s)' ),
+			variation?.title,
+			variation?.description
+		);
+	}
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
@@ -79,7 +83,7 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.title }
+				aria-label={ label }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
@@ -97,13 +101,10 @@ function Variation( { variation } ) {
 }
 
 export default function StyleVariationsContainer() {
-	const { variations } = useSelect( ( select ) => {
-		return {
-			variations:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations() || [],
-		};
+	const variations = useSelect( ( select ) => {
+		return select(
+			coreStore
+		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
 	const withEmptyVariation = useMemo( () => {
@@ -112,25 +113,25 @@ export default function StyleVariationsContainer() {
 				title: __( 'Default' ),
 				settings: {},
 				styles: {},
+				behaviors: {},
 			},
-			...variations.map( ( variation ) => ( {
+			...( variations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
+				behaviors: variation.behaviors ?? {},
 			} ) ),
 		];
 	}, [ variations ] );
 
 	return (
-		<>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ withEmptyVariation?.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } />
-				) ) }
-			</Grid>
-		</>
+		<Grid
+			columns={ 2 }
+			className="edit-site-global-styles-style-variations-container"
+		>
+			{ withEmptyVariation.map( ( variation, index ) => (
+				<Variation key={ index } variation={ variation } />
+			) ) }
+		</Grid>
 	);
 }

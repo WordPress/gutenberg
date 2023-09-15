@@ -17,7 +17,11 @@ import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
-import { activateTheme } from './themes';
+import {
+	activateTheme,
+	getCurrentThemeGlobalStylesPostId,
+	getThemeGlobalStylesRevisions,
+} from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
@@ -188,6 +192,12 @@ class RequestUtils {
 	deleteAllPages: typeof deleteAllPages = deleteAllPages.bind( this );
 	/** @borrows createPage as this.createPage */
 	createPage: typeof createPage = createPage.bind( this );
+	/** @borrows getCurrentThemeGlobalStylesPostId as this.getCurrentThemeGlobalStylesPostId */
+	getCurrentThemeGlobalStylesPostId: typeof getCurrentThemeGlobalStylesPostId =
+		getCurrentThemeGlobalStylesPostId.bind( this );
+	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
+	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
+		getThemeGlobalStylesRevisions.bind( this );
 }
 
 export type { StorageState };

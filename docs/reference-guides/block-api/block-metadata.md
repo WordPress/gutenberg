@@ -1,13 +1,13 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "text",
@@ -150,10 +150,10 @@ This section describes all the properties that can be added to the `block.json` 
 -   Default: `1`
 
 ```json
-{ "apiVersion": 2 }
+{ "apiVersion": 3 }
 ```
 
-The version of the Block API used by the block. The most recent version is `2` and it was introduced in WordPress 5.6.
+The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
 See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
 
@@ -397,7 +397,6 @@ Providing custom selectors allows more fine grained control over which styles
 apply to what block elements, e.g. applying typography styles only to an inner
 heading while colors are still applied on the outer block wrapper etc.
 
-
 See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 
 ```json
@@ -465,7 +464,7 @@ Plugins and Themes can also register [custom block style](/docs/reference-guides
 
 It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
-See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
+See the [Example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 
 ### Variations
 
@@ -497,6 +496,25 @@ Block Variations is the API that allows a block to have similar versions of it, 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
 See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+
+### Block Hooks
+
+-   Type: `object`
+-   Optional
+-   Property: `blockHooks`
+-   Since: `WordPress 6.4.0`
+
+```json
+{
+	"blockHooks": {
+		"my-plugin/banner": "after"
+	}
+}
+```
+
+Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
+
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
 ### Editor Script
 
@@ -601,6 +619,16 @@ PHP file to use when rendering the block type on the server to show on the front
 -   `$attributes` (`array`): The block attributes.
 -   `$content` (`string`): The block default content.
 -   `$block` (`WP_Block`): The block instance.
+
+An example implementation of the `render.php` file defined with `render` could look like:
+
+```php
+<div <?php echo get_block_wrapper_attributes(); ?>>
+	<?php echo esc_html( $attributes['label'] ); ?>
+</div>
+```
+
+_Note: This file loads for every instance of the block type when rendering the page HTML on the server. Accounting for that is essential when declaring functions or classes in the file. The simplest way to avoid the risk of errors is to consume that shared logic from another file._
 
 ## Assets
 

@@ -31,6 +31,8 @@ export default function BlockLockMenuItem( { clientId } ) {
 			<MenuItem
 				icon={ isLocked ? unlock : lockOutline }
 				onClick={ toggleModal }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
 			>
 				{ label }
 			</MenuItem>

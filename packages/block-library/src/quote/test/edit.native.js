@@ -5,12 +5,13 @@ import {
 	addBlock,
 	getBlock,
 	initializeEditor,
+	selectRangeInRichText,
 	setupCoreBlocks,
 	getEditorHtml,
 	fireEvent,
 	within,
 	waitFor,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -49,11 +50,7 @@ describe( 'Quote', () => {
 		// screen.debug();
 		let quoteTextInput =
 			within( quoteBlock ).getByPlaceholderText( 'Start writing…' );
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( quoteTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( quoteTextInput, 'A great statement.' );
 		fireEvent( quoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -63,13 +60,16 @@ describe( 'Quote', () => {
 			within( quoteBlock ).getAllByPlaceholderText(
 				'Start writing…'
 			)[ 1 ];
-		changeAndSelectTextOfRichText( quoteTextInput, 'Again.' );
+		typeInRichText( quoteTextInput, 'Again.' );
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		changeAndSelectTextOfRichText( citationTextInput, 'A person', {
-			selectionStart: 2,
-			selectionEnd: 2,
+		typeInRichText( citationTextInput, 'A person' );
+		fireEvent( citationTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
 		} );
+		selectRangeInRichText( citationTextInput, 2 );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -86,7 +86,11 @@ describe( 'Quote', () => {
 		<!-- wp:paragraph -->
 		<p>Again.</p>
 		<!-- /wp:paragraph --><cite>A <br>person</cite></blockquote>
-		<!-- /wp:quote -->"
+		<!-- /wp:quote -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

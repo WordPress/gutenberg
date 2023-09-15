@@ -114,12 +114,16 @@ async function fetchPRs() {
 	const { items } = await GitHubFetch(
 		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
 	);
-	const PRs = items.map( ( { id, number, title } ) => ( {
+	const PRs = items.map( ( { id, number, title, pull_request, closed_at } ) => ( {
 		id,
 		number,
 		title,
-	} ) );
-	console.log( 'Found the following PRs to cherry-pick: ' );
+		pull_request,
+	} ) )
+		.filter( ( { pull_request } ) => !! pull_request?.merged_at )
+		.sort( ( a, b ) => new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at ) );
+
+	console.log( 'Found the following PRs to cherry-pick (sorted by closed date in ascending order): ' );
 	PRs.forEach( ( { number, title } ) =>
 		console.log( indent( `#${ number } – ${ title }` ) )
 	);

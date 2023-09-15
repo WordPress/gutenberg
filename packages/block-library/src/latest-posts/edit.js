@@ -32,6 +32,7 @@ import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -229,6 +230,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -358,6 +360,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ postLayout === 'grid' && (
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -479,15 +482,22 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.trim()
 								.split( ' ', excerptLength )
 								.join( ' ' ) }
-							{ /* translators: excerpt truncation character, default …  */ }
-							{ __( ' … ' ) }
-							<a
-								href={ post.link }
-								rel="noopener noreferrer"
-								onClick={ showRedirectionPreventedNotice }
-							>
-								{ __( 'Read more' ) }
-							</a>
+							{ createInterpolateElement(
+								/* translators: excerpt truncation character, default …  */
+								__( ' … <a>Read more</a>' ),
+								{
+									a: (
+										// eslint-disable-next-line jsx-a11y/anchor-has-content
+										<a
+											href={ post.link }
+											rel="noopener noreferrer"
+											onClick={
+												showRedirectionPreventedNotice
+											}
+										/>
+									),
+								}
+							) }
 						</>
 					) : (
 						excerpt

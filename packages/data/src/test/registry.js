@@ -734,6 +734,27 @@ describe( 'createRegistry', () => {
 			unsubscribe();
 			expect( listener2 ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		it( 'should support nested batches', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			subscribeWithUnsubscribe( listener );
+
+			registry.batch( () => {} );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				registry.batch( () => {
+					store.dispatch( { type: 'dummy' } );
+					store.dispatch( { type: 'dummy' } );
+				} );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'use', () => {

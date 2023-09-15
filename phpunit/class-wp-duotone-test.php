@@ -45,7 +45,7 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
 	}
 
-	public function data_gutenberg_get_slug_from_attr() {
+	public function data_get_slug_from_attribute() {
 		return array(
 			'pipe-slug'                       => array( 'var:preset|duotone|blue-orange', 'blue-orange' ),
 			'css-var'                         => array( 'var(--wp--preset--duotone--blue-orange)', 'blue-orange' ),
@@ -60,11 +60,11 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_gutenberg_get_slug_from_attr
+	 * @dataProvider data_get_slug_from_attribute
 	 */
-	public function test_gutenberg_get_slug_from_attr( $data_attr, $expected ) {
+	public function test_get_slug_from_attribute( $data_attr, $expected ) {
 
-		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'gutenberg_get_slug_from_attr' );
+		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'get_slug_from_attribute' );
 		$reflection->setAccessible( true );
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );

@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { useContextSystem } from '../../ui/context';
 import { useFlexItem } from '../flex-item';
 import type { FlexBlockProps } from '../types';
 

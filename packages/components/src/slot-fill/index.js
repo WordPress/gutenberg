@@ -2,7 +2,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,7 +13,8 @@ import BubblesVirtuallyFill from './bubbles-virtually/fill';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
-import useSlot from './bubbles-virtually/use-slot';
+import SlotFillContext from './bubbles-virtually/slot-fill-context';
+export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 
 export function Fill( props ) {
@@ -35,6 +36,10 @@ export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
 } );
 
 export function Provider( { children, ...props } ) {
+	const parent = useContext( SlotFillContext );
+	if ( ! parent.isDefault ) {
+		return children;
+	}
 	return (
 		<SlotFillProvider { ...props }>
 			<BubblesVirtuallySlotFillProvider>
@@ -44,13 +49,14 @@ export function Provider( { children, ...props } ) {
 	);
 }
 
-export function createSlotFill( name ) {
-	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
-	FillComponent.displayName = name + 'Fill';
+export function createSlotFill( key ) {
+	const baseName = typeof key === 'symbol' ? key.description : key;
+	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
+	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
-	SlotComponent.displayName = name + 'Slot';
-	SlotComponent.__unstableName = name;
+	const SlotComponent = ( props ) => <Slot name={ key } { ...props } />;
+	SlotComponent.displayName = `${ baseName }Slot`;
+	SlotComponent.__unstableName = key;
 
 	return {
 		Fill: FillComponent,
@@ -58,4 +64,9 @@ export function createSlotFill( name ) {
 	};
 }
 
-export { useSlot };
+export const createPrivateSlotFill = ( name ) => {
+	const privateKey = Symbol( name );
+	const privateSlotFill = createSlotFill( privateKey );
+
+	return { privateKey, ...privateSlotFill };
+};

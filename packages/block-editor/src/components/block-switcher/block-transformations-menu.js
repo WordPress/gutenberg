@@ -14,6 +14,7 @@ import { useState, useMemo } from '@wordpress/element';
  */
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
+import BlockVariationTransformations from './block-variation-transformations';
 
 /**
  * Helper hook to group transformations to display them in a specific order in the UI.
@@ -65,7 +66,9 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 const BlockTransformationsMenu = ( {
 	className,
 	possibleBlockTransformations,
+	possibleBlockVariationTransformations,
 	onSelect,
+	onSelectVariation,
 	blocks,
 } ) => {
 	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
@@ -93,6 +96,15 @@ const BlockTransformationsMenu = ( {
 							blocks,
 							hoveredTransformItemName
 						) }
+					/>
+				) }
+				{ !! possibleBlockVariationTransformations?.length && (
+					<BlockVariationTransformations
+						transformations={
+							possibleBlockVariationTransformations
+						}
+						blocks={ blocks }
+						onSelect={ onSelectVariation }
 					/>
 				) }
 				{ priorityTextTransformations.map( ( item ) => (

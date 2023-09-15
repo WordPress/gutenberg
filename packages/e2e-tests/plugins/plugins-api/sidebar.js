@@ -70,7 +70,7 @@
 				PluginSidebar,
 				{
 					name: 'title-sidebar',
-					title: __( 'Plugin sidebar title' ),
+					title: __( 'Plugin title' ),
 				},
 				el( SidebarContents, {} )
 			),
@@ -79,7 +79,7 @@
 				{
 					target: 'title-sidebar',
 				},
-				__( 'Plugin sidebar more menu title' )
+				__( 'Plugin more menu title' )
 			)
 		);
 	}

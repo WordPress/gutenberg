@@ -22,6 +22,7 @@ import {
 	setNestedValue,
 } from './utils';
 import type * as ET from './entity-types';
+import type { UndoManager } from '@wordpress/undo-manager';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -38,9 +39,11 @@ export interface State {
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
-	undo: UndoState;
+	themeGlobalStyleRevisions: Record< number, Object >;
+	undoManager: UndoManager;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
+	navigationFallbackId: EntityRecordKey;
 }
 
 type EntityRecordKey = string | number;
@@ -69,11 +72,6 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 interface EntityConfig {
 	name: string;
 	kind: string;
-}
-
-interface UndoState extends Array< Object > {
-	flattenedUndo: unknown;
-	offset: number;
 }
 
 interface UserState {
@@ -122,7 +120,7 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *
  * @param      state Data state.
  * @param      query Optional object of query parameters to
- *                   include with request.
+ *                   include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
  * @return Authors list.
  */
 export function getAuthors(
@@ -297,7 +295,7 @@ export interface GetEntityRecord {
  * @param name  Entity name.
  * @param key   Record's key
  * @param query Optional query. If requesting specific
- *              fields, fields must always include the ID.
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
  *
  * @return Record.
  */
@@ -441,7 +439,7 @@ export const getRawEntityRecord = createSelector(
  * @param state State tree
  * @param kind  Entity kind.
  * @param name  Entity name.
- * @param query Optional terms query.
+ * @param query Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
  *
  * @return  Whether entity records have been received.
  */
@@ -492,7 +490,7 @@ export interface GetEntityRecords {
  * @param kind  Entity kind.
  * @param name  Entity name.
  * @param query Optional terms query. If requesting specific
- *              fields, fields must always include the ID.
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
  *
  * @return Records.
  */
@@ -864,42 +862,37 @@ export function getLastEntityDeleteError(
 }
 
 /**
- * Returns the current undo offset for the
- * entity records edits history. The offset
- * represents how many items from the end
- * of the history stack we are at. 0 is the
- * last edit, -1 is the second last, and so on.
- *
- * @param state State tree.
- *
- * @return The current undo offset.
- */
-function getCurrentUndoOffset( state: State ): number {
-	return state.undo.offset;
-}
-
-/**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getUndoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
+	deprecated( "select( 'core' ).getUndoEdit()", {
+		since: '6.3',
+	} );
+	return undefined;
 }
 
 /**
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @deprecated since 6.3
+ *
+ * @param      state State tree.
  *
  * @return The edit.
  */
 export function getRedoEdit( state: State ): Optional< any > {
-	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
+	deprecated( "select( 'core' ).getRedoEdit()", {
+		since: '6.3',
+	} );
+	return undefined;
 }
 
 /**
@@ -911,7 +904,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( getUndoEdit( state ) );
+	return state.undoManager.hasUndo();
 }
 
 /**
@@ -923,7 +916,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( getRedoEdit( state ) );
+	return state.undoManager.hasRedo();
 }
 
 /**
@@ -1137,15 +1130,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  *
  * @return A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	// This unused state argument is listed here for the documentation generating tool (docgen).
-	( state: State ) => [],
-	( state: State ) => [
-		state.undo.length,
-		state.undo.offset,
-		state.undo.flattenedUndo,
-	]
-);
+export function getReferenceByDistinctEdits( state ) {
+	return state.editsReference;
+}
 
 /**
  * Retrieve the frontend template used for a given link.
@@ -1233,4 +1220,24 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+/**
+ * Returns the revisions of the current global styles theme.
+ *
+ * @param state Data state.
+ *
+ * @return The current global styles.
+ */
+export function getCurrentThemeGlobalStylesRevisions(
+	state: State
+): Array< object > | null {
+	const currentGlobalStylesId =
+		__experimentalGetCurrentGlobalStylesId( state );
+
+	if ( ! currentGlobalStylesId ) {
+		return null;
+	}
+
+	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }

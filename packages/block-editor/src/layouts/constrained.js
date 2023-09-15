@@ -25,6 +25,7 @@ import useSetting from '../components/use-setting';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'constrained',
@@ -152,7 +153,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { contentSize, wideSize, justifyContent } = layout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );

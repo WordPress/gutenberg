@@ -17,7 +17,11 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion, __unstableAnimatePresence } from './animation';
+export {
+	__unstableMotion,
+	__unstableAnimatePresence,
+	__unstableMotionContext,
+} from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -90,6 +94,7 @@ export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';
 export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
+export type { IconType } from './icon';
 export { default as IconButton } from './button/deprecated';
 export {
 	ItemGroup as __experimentalItemGroup,
