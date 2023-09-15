@@ -51,6 +51,7 @@ export default function DataTable( { data, columns, options = {}, children } ) {
 									table.toggleAllPageRowsSelected( !! value )
 								}
 								aria-label={ __( 'Select all' ) }
+								__nextHasNoMarginBottom
 							/>
 						)
 					);
@@ -63,6 +64,7 @@ export default function DataTable( { data, columns, options = {}, children } ) {
 								row.toggleSelected( !! value )
 							}
 							aria-label={ __( 'Select row' ) }
+							__nextHasNoMarginBottom
 						/>
 					),
 				enableSorting: false,

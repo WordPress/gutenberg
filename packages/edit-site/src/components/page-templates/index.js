@@ -50,15 +50,13 @@ function TemplateTitle( props ) {
 					{ decodeEntities( props.getValue() ) }
 				</Link>
 			</Heading>
-			<span>
-				{ isCustomized && (
-					<span className="edit-site-list-added-by__customized-info">
-						{ template.type === 'wp_template'
-							? _x( 'Customized', 'template' )
-							: _x( 'Customized', 'template part' ) }
-					</span>
-				) }
-			</span>
+			{ isCustomized && (
+				<span className="edit-site-list-added-by__customized-info">
+					{ template.type === 'wp_template'
+						? _x( 'Customized', 'template' )
+						: _x( 'Customized', 'template part' ) }
+				</span>
+			) }
 		</VStack>
 	);
 }
