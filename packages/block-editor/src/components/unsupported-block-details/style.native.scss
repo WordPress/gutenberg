@@ -1,10 +1,10 @@
-.sheet__container {
+.unsupported-block-details__container {
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-end;
 }
 
-.sheet__icon {
+.unsupported-block-details__icon {
 	size: 36;
 	height: 36;
 	padding-top: 8;
@@ -12,20 +12,20 @@
 	color: $gray;
 }
 
-.sheet__icon--dark {
+.unsupported-block-details__icon--dark {
 	color: $gray-20;
 }
 
-.sheet__text {
+.unsupported-block-details__text {
 	text-align: center;
 	color: $gray-dark;
 }
 
-.sheet__text--dark {
+.unsupported-block-details__text--dark {
 	color: $white;
 }
 
-.sheet__title {
+.unsupported-block-details__title {
 	padding-top: 8;
 	padding-bottom: 12;
 	font-size: 20;
@@ -33,24 +33,24 @@
 	color: $gray-dark;
 }
 
-.sheet__title--dark {
+.unsupported-block-details__title--dark {
 	color: $white;
 }
 
-.sheet__description {
+.unsupported-block-details__description {
 	padding-bottom: 24;
 	font-size: 16;
 	color: $gray-darken-20;
 }
 
-.sheet__description--dark {
+.unsupported-block-details__description--dark {
 	color: $gray-20;
 }
 
-.sheet__action-button {
+.unsupported-block-details__action-button {
 	color: $blue-50;
 }
 
-.sheet__action-button--dark {
+.unsupported-block-details__action-button--dark {
 	color: $blue-30;
 }

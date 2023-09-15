@@ -89,24 +89,24 @@ const UnsupportedBlockDetails = ( {
 
 	// Styles
 	const textStyle = usePreferredColorSchemeStyle(
-		styles.sheet__text,
-		styles[ 'sheet__text--dark' ]
+		styles[ 'unsupported-block-details__text' ],
+		styles[ 'unsupported-block-details__text--dark' ]
 	);
 	const titleStyle = usePreferredColorSchemeStyle(
-		styles.sheet__title,
-		styles[ 'sheet__title--dark' ]
+		styles[ 'unsupported-block-details__title' ],
+		styles[ 'unsupported-block-details__title--dark' ]
 	);
 	const descriptionStyle = usePreferredColorSchemeStyle(
-		styles.sheet__description,
-		styles[ 'sheet__description--dark' ]
+		styles[ 'unsupported-block-details__description' ],
+		styles[ 'unsupported-block-details__description--dark' ]
 	);
 	const iconStyle = usePreferredColorSchemeStyle(
-		styles.sheet__icon,
-		styles[ 'sheet__icon--dark' ]
+		styles[ 'unsupported-block-details__icon' ],
+		styles[ 'unsupported-block-details__icon--dark' ]
 	);
 	const actionButtonStyle = usePreferredColorSchemeStyle(
-		styles[ 'sheet__action-button' ],
-		styles[ 'sheet__action-button--dark' ]
+		styles[ 'unsupported-block-details__action-button' ],
+		styles[ 'unsupported-block-details__action-button--dark' ]
 	);
 
 	const blockTitle =
@@ -172,7 +172,7 @@ const UnsupportedBlockDetails = ( {
 				}
 			} }
 		>
-			<View style={ styles.sheet__container }>
+			<View style={ styles[ 'unsupported-block-details__container' ] }>
 				<Icon
 					icon={ icon || help }
 					color={ iconStyle.color }
