@@ -130,6 +130,13 @@ const UnsupportedBlockDetails = ( {
 		onCloseSheet,
 	] );
 
+	// The description can include extra notes via WP hooks.
+	const descriptionWithNotes = applyFilters(
+		'native.unsupported_block_details_extra_note',
+		description,
+		blockName
+	);
+
 	const webEditorDefaultLabel = applyFilters(
 		'native.unsupported_block_details_web_editor_action',
 		__( 'Edit using web editor' )
@@ -185,11 +192,12 @@ const UnsupportedBlockDetails = ( {
 					size={ iconStyle.size }
 				/>
 				<Text style={ [ textStyle, titleStyle ] }>{ title }</Text>
-				{ isEditableInUnsupportedBlockEditor && description && (
-					<Text style={ [ textStyle, descriptionStyle ] }>
-						{ description }
-					</Text>
-				) }
+				{ isEditableInUnsupportedBlockEditor &&
+					descriptionWithNotes && (
+						<Text style={ [ textStyle, descriptionStyle ] }>
+							{ descriptionWithNotes }
+						</Text>
+					) }
 			</View>
 			{ actions.map( ( { label, onPress }, index ) => (
 				<TextControl
