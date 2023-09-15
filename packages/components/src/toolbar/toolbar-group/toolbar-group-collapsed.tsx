@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
@@ -11,13 +9,21 @@ import { useContext } from '@wordpress/element';
 import DropdownMenu from '../../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
 import ToolbarItem from '../toolbar-item';
+import type { ToolbarGroupCollapsedProps } from './types';
+import type { DropdownMenuProps } from '../../dropdown-menu/types';
 
-function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
+function ToolbarGroupCollapsed( {
+	controls = [],
+	toggleProps,
+	...props
+}: ToolbarGroupCollapsedProps ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
-	const renderDropdownMenu = ( internalToggleProps ) => (
+	const renderDropdownMenu = (
+		internalToggleProps?: DropdownMenuProps[ 'toggleProps' ]
+	) => (
 		<DropdownMenu
 			controls={ controls }
 			toggleProps={ {
