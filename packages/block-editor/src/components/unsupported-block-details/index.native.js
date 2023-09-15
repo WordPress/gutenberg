@@ -14,9 +14,8 @@ import {
 } from '@wordpress/react-native-bridge';
 import { help } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { getBlockType, serialize } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { useCallback, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -24,10 +23,8 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { store as blockEditorStore } from '../../store';
+import useUnsupportedBlockEditor from '../use-unsupported-block-editor';
 
-// Blocks that can't be edited through the Unsupported block editor identified by their name.
-const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const EMPTY_ARRAY = [];
 
 const UnsupportedBlockDetails = ( {
@@ -51,42 +48,7 @@ const UnsupportedBlockDetails = ( {
 		isUnsupportedBlockEditorSupported,
 		canEnableUnsupportedBlockEditor,
 		isEditableInUnsupportedBlockEditor,
-	} = useSelect(
-		( select ) => {
-			const { getBlock, getSettings } = select( blockEditorStore );
-			const { capabilities } = getSettings();
-
-			const block = getBlock( clientId );
-			const blockAttributes = block?.attributes || {};
-
-			const blockDetails = {
-				blockName: block?.name,
-				blockContent: serialize( block ? [ block ] : [] ),
-			};
-
-			// If the block is unsupported, use the `original` attributes to identify the block's name.
-			if ( blockDetails.blockName === 'core/missing' ) {
-				blockDetails.blockName = blockAttributes.originalName;
-				blockDetails.blockContent =
-					blockDetails.blockName === 'core/freeform'
-						? blockAttributes.content
-						: block?.originalContent;
-			}
-
-			return {
-				isUnsupportedBlockEditorSupported:
-					capabilities?.unsupportedBlockEditor === true,
-				canEnableUnsupportedBlockEditor:
-					capabilities?.canEnableUnsupportedBlockEditor === true,
-				isEditableInUnsupportedBlockEditor:
-					! UBE_INCOMPATIBLE_BLOCKS.includes(
-						blockDetails.blockName
-					),
-				...blockDetails,
-			};
-		},
-		[ clientId ]
-	);
+	} = useUnsupportedBlockEditor( clientId );
 
 	// Styles
 	const textStyle = usePreferredColorSchemeStyle(
