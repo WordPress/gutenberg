@@ -20,7 +20,7 @@ If you do not already have a preferred code editor, [Visual Studio Code](https:/
 
 Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript outside of the web browser. While Node.js is not required for all WordPress JavaScript development, it's essential when working with modern JavaScript tools and developing for the Block Editor.
 
-Node.js and its accompanying developer tools allow you to:
+Node.js and its accompanying development tools allow you to:
 
 -   Install and run WordPress packages needed for Block Editor development, such as `wp-scripts`
 -   Setup local WordPress environments with `wp-env` and `wp-now`
@@ -28,11 +28,11 @@ Node.js and its accompanying developer tools allow you to:
 -   Lint, format, and test JavaScript code
 -   Scaffold custom blocks with the `create-block` package
 
-The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) and [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/), that streamline the process and are made possible by Node.js developer tools.
+The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) and [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/), that streamline the process and are made possible by Node.js development tools.
 
 If you are already familiar with `node`, it's recommended that you use the [LTS](https://nodejs.dev/en/about/releases/) (Long Term Support) version, and you will also need Node Package Manager (`npm`), the `npx` script, and Node Version Manager (`nvm`).
 
-To install Node.js developer tools and learn more about each, refer to the links below.
+To install Node.js development tools and learn more about each, refer to the links below.
 
 -   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-tools.md#mac-and-linux-installations)
 -   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-tools.md#windows-or-alternative-installs)
