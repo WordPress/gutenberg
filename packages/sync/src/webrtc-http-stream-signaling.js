@@ -253,26 +253,20 @@ function setupHttpSignal( httpClient ) {
 			httpClient.ws.send = function send(
 				/** @type {string} */ message
 			) {
-				//console.log( 'send', message );
-				const xhttp = new window.XMLHttpRequest();
-				xhttp.onreadystatechange = function () {
-					if ( this.readyState !== 4 ) {
-						return;
-					}
-					if ( this.status !== 200 ) {
+				window
+					.fetch( url, {
+						body: new URLSearchParams( {
+							subscriber_id: subscriberId.toString(),
+							action: 'gutenberg_signaling_server',
+							message,
+						} ),
+						method: 'POST',
+					} )
+					.catch( () => {
 						log(
 							'Error sending to server with message: ' + message
 						);
-					}
-				};
-				xhttp.open( 'POST', url, true );
-				xhttp.send(
-					new URLSearchParams( {
-						subscriber_id: subscriberId.toString(),
-						message,
-						action: 'gutenberg_signaling_server',
-					} )
-				);
+					} );
 			};
 		}
 		eventSource.onerror = () => {
