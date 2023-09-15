@@ -264,9 +264,9 @@
 			"lineHeight": false,
 			"textColumns": false,
 			"textDecoration": true,
+			"textOrientation": false,
 			"textTransform": true,
-			"writingMode": false,
-			"textOrientation": false
+			"writingMode": false
 		},
 		"blocks": {
 			"core/button": {
