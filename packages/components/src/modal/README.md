@@ -225,6 +225,8 @@ This property when set to `true` will render a full screen modal.
 
 If this property is added, it will constrain the `max-width` of the modal's contents, preventing it from growing too wide. This prop only applies when `isFullScreen` is `false`.
 
+-   Required: No
+
 Note: `Modal`'s width can also be controlled by adjusting the width of the modal's contents, or using the `style` prop to set a specific `max-width`.
 
 #### `onRequestClose`: ``
