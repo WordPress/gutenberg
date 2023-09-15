@@ -18,6 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { getBlockType, serialize } from '@wordpress/blocks';
 import { useCallback, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -129,6 +130,11 @@ const UnsupportedBlockDetails = ( {
 		onCloseSheet,
 	] );
 
+	const webEditorDefaultLabel = applyFilters(
+		'native.unsupported_block_details_web_editor_action',
+		__( 'Edit using web editor' )
+	);
+
 	const canUseWebEditor =
 		( isUnsupportedBlockEditorSupported ||
 			canEnableUnsupportedBlockEditor ) &&
@@ -136,7 +142,7 @@ const UnsupportedBlockDetails = ( {
 	const actions = [
 		...[
 			canUseWebEditor && {
-				label: actionButtonLabel || __( 'Edit using web editor' ),
+				label: actionButtonLabel || webEditorDefaultLabel,
 				onPress: requestFallback,
 			},
 		],
