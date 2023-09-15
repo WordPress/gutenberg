@@ -388,7 +388,7 @@ class WP_Theme_JSON_Gutenberg {
 			'allowEditing' => null,
 		),
 		'lightbox'                      => array(
-			'enabled' => null,
+			'enabled'      => null,
 			'allowEditing' => null,
 		),
 		'position'                      => array(
