@@ -66,7 +66,7 @@ const getColorObject = (
 	return colors.find( ( color ) => color.color === colorValue );
 };
 
-const getToggleAriaDescription = (
+const getToggleDescription = (
 	colorValue: CSSProperties[ 'borderColor' ],
 	colorObject: ColorObject | undefined,
 	style: CSSProperties[ 'borderStyle' ],
@@ -165,12 +165,12 @@ const BorderControlDropdown = (
 
 	const { color, style } = border || {};
 	const colorObject = getColorObject( color, colors );
-	const descriptionId = useInstanceId(
+	const toggleDescriptionId = useInstanceId(
 		BorderControlDropdown,
 		'border-control-dropdown'
 	);
 
-	const toggleAriaDescription = getToggleAriaDescription(
+	const toggleDescription = getToggleDescription(
 		color,
 		colorObject,
 		style,
@@ -182,20 +182,22 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
+	const renderToggleDescribedBy: DropdownComponentProps[ 'renderToggleDescribedBy' ] = () => (
+		<VisuallyHidden id={ toggleDescriptionId }>
+			{ toggleDescription }
+		</VisuallyHidden>
+	);
+
 	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
 		onToggle,
 	} ) => (
-		<>
-			<VisuallyHidden id={ descriptionId }>
-				{ toggleAriaDescription }
-			</VisuallyHidden>
 			<Button
 				onClick={ onToggle }
 				variant="tertiary"
 				tooltipPosition={ dropdownPosition }
 				label={ __( 'Border color and style picker' ) }
 				showTooltip={ true }
-				aria-describedby={ descriptionId }
+				aria-describedby={ toggleDescriptionId }
 			>
 				<span className={ indicatorWrapperClassName }>
 					<ColorIndicator
@@ -204,7 +206,6 @@ const BorderControlDropdown = (
 					/>
 				</span>
 			</Button>
-		</>
 	);
 
 	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
@@ -262,15 +263,18 @@ const BorderControlDropdown = (
 	);
 
 	return (
-		<Dropdown
-			renderToggle={ renderToggle }
-			renderContent={ renderContent }
-			popoverProps={ {
-				...__unstablePopoverProps,
-			} }
-			{ ...otherProps }
-			ref={ forwardedRef }
-		/>
+		<>
+			{ renderToggleDescribedBy() }
+			<Dropdown
+				renderToggle={ renderToggle }
+				renderContent={ renderContent }
+				popoverProps={ {
+					...__unstablePopoverProps,
+				} }
+				{ ...otherProps }
+				ref={ forwardedRef }
+			/>
+		</>
 	);
 };
 

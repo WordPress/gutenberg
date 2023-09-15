@@ -13,6 +13,7 @@ type CallbackProps = {
 	isOpen: boolean;
 	onToggle: () => void;
 	onClose: () => void;
+	renderToggleDescribedBy: () => ReactNode;
 };
 
 export type DropdownContentWrapperProps = {
@@ -83,6 +84,12 @@ export type DropdownProps = {
 	 * Its first argument is the same as the renderToggle prop.
 	 */
 	renderContent: ( props: CallbackProps ) => ReactNode;
+
+	/**
+	 * A callback invoked to render the aria description container of the dropdown menu.
+	 */
+	renderToggleDescribedBy: () => ReactNode;
+
 	/**
 	 * A callback invoked to render the Dropdown Toggle Button.
 	 *
