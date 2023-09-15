@@ -179,6 +179,9 @@ function CommandInput( { isOpen, search, setSearch } ) {
 	);
 }
 
+/**
+ * @ignore
+ */
 export function CommandMenu() {
 	const [ search, setSearch ] = useState( '' );
 	const isOpenRef = useRef( false );

@@ -632,9 +632,6 @@ const v6 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,
@@ -830,9 +827,6 @@ const v7 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,

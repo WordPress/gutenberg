@@ -90,9 +90,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"behaviors": {
-			"lightbox": true
-		},
 		"color": {
 			"text": false,
 			"background": false

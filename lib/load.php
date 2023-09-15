@@ -133,8 +133,7 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * keeping Fonts API available for sites that are using it.
  */
 if (
-	( defined( 'FONT_LIBRARY_ENABLE' ) && FONT_LIBRARY_ENABLE ) ||
-	( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE )
+	! defined( 'FONT_LIBRARY_DISABLED' ) || ! FONT_LIBRARY_DISABLED
 ) {
 	// Loads the Font Library.
 	if ( ! class_exists( 'WP_Font_Library' ) ) {
@@ -232,5 +231,4 @@ require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
-require __DIR__ . '/block-supports/behaviors.php';
 require __DIR__ . '/block-supports/background.php';
