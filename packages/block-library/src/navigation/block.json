@@ -150,7 +150,7 @@
 		"renaming": false
 	},
 	"selectors": {
-		"@currentItem": ".current-menu-item"
+		"@currentItem": ".wp-block-navigation .current-menu-item"
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

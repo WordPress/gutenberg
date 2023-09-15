@@ -191,10 +191,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Determine the logic that maps to the concept of "current item".
 	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation' );
-
-	// TODO - handle converting CSS selector to classname.
-	$current_item_classname = isset( $block_type->selectors['@currentItem'] ) ? str_replace( '.', '', $block_type->selectors['@currentItem'] ) : 'current-menu-item';
+	// Must match @currentItem in block.json.
+	$current_item_classname = 'current-menu-item';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
