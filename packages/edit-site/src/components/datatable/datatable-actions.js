@@ -4,6 +4,7 @@
 import {
 	Button,
 	Icon,
+	SelectControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
@@ -32,30 +33,111 @@ const {
 	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
-// TODO: should the selected value should probably be a user setting per list..
 const PAGE_SIZE_VALUES = [ 2, 5, 20, 50 ];
-// TODO: probably remove this component.
-// function DataTablePageSizeControl() {
-// 	const table = useDataTableContext();
-// 	return (
-// 		<SelectControl
-// 			label={ __( 'Entries per page' ) }
-// 			value={ table.getState().pagination.pageSize }
-// 			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
-// 				value: pageSize,
-// 				label: pageSize,
-// 			} ) ) }
-// 			onChange={ ( value ) => table.setPageSize( +value ) }
-// 			style={ { minWidth: '100px' } }
-// 		/>
-// 	);
-// }
 
-export default function DataTableActions( { className } ) {
+export function DataTablePageSizeControl() {
+	const table = useDataTableContext();
+	return (
+		<SelectControl
+			label={ __( 'Per page:' ) }
+			labelPosition="side"
+			value={ table.getState().pagination.pageSize }
+			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
+				value: pageSize,
+				label: pageSize,
+			} ) ) }
+			onChange={ ( value ) => table.setPageSize( +value ) }
+		/>
+	);
+}
+
+// TODO: probably the selected value should be a user setting per list..
+function DataTablePageSizeMenu() {
+	const table = useDataTableContext();
+	const currenPageSize = table.getState().pagination.pageSize;
+	return (
+		<DropdownSubMenuV2
+			trigger={
+				<DropdownSubMenuTriggerV2
+					suffix={
+						<>
+							{ currenPageSize }
+							<Icon icon={ chevronRightSmall } />{ ' ' }
+						</>
+					}
+				>
+					{ __( 'Row per page' ) }
+				</DropdownSubMenuTriggerV2>
+			}
+		>
+			{ PAGE_SIZE_VALUES.map( ( size ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ size }
+						prefix={
+							currenPageSize === size && <Icon icon={ check } />
+						}
+						onSelect={ ( event ) => {
+							// We need to handle this on DropDown component probably..
+							event.preventDefault();
+							table.setPageSize( size );
+						} }
+						// TODO: check about role and a11y.
+						role="menuitemcheckbox"
+					>
+						{ size }
+					</DropdownMenuItemV2>
+				);
+			} ) }
+		</DropdownSubMenuV2>
+	);
+}
+
+function DataTableColumnsVisibilityMenu() {
 	const table = useDataTableContext();
 	const hideableColumns = table
 		.getAllColumns()
 		.filter( ( columnn ) => columnn.getCanHide() );
+	if ( ! hideableColumns?.length ) {
+		return null;
+	}
+	return (
+		<DropdownSubMenuV2
+			trigger={
+				<DropdownSubMenuTriggerV2
+					suffix={ <Icon icon={ chevronRightSmall } /> }
+				>
+					{ __( 'Columns' ) }
+				</DropdownSubMenuTriggerV2>
+			}
+		>
+			{ hideableColumns?.map( ( column, i ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ i }
+						prefix={
+							column.getIsVisible() && <Icon icon={ check } />
+						}
+						onSelect={ ( event ) => {
+							event.preventDefault();
+							column.getToggleVisibilityHandler()( event );
+						} }
+						role="menuitemcheckbox"
+					>
+						{ column.columnDef.header }
+					</DropdownMenuItemV2>
+				);
+			} ) }
+		</DropdownSubMenuV2>
+	);
+}
+
+export default function DataTableActions( {
+	className,
+	// TODO: check if we need something fixed here and use props
+	// or we would need slot and compose components..
+	showColumnsVisibility = true,
+} ) {
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
@@ -68,72 +150,10 @@ export default function DataTableActions( { className } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
-				{ !! hideableColumns?.length && (
-					<>
-						<DropdownSubMenuV2
-							trigger={
-								<DropdownSubMenuTriggerV2
-									suffix={
-										<Icon icon={ chevronRightSmall } />
-									}
-								>
-									{ __( 'Columns' ) }
-								</DropdownSubMenuTriggerV2>
-							}
-						>
-							{ hideableColumns?.map( ( column, i ) => {
-								return (
-									<DropdownMenuItemV2
-										key={ i }
-										prefix={
-											column.getIsVisible() && (
-												<Icon icon={ check } />
-											)
-										}
-										onSelect={ ( event ) => {
-											event.preventDefault();
-											column.getToggleVisibilityHandler()(
-												event
-											);
-										} }
-										role="menuitemcheckbox"
-									>
-										{ column.columnDef.header }
-									</DropdownMenuItemV2>
-								);
-							} ) }
-						</DropdownSubMenuV2>
-					</>
+				{ !! showColumnsVisibility && (
+					<DataTableColumnsVisibilityMenu />
 				) }
-				<DropdownSubMenuV2
-					trigger={
-						<DropdownSubMenuTriggerV2
-							suffix={ <Icon icon={ chevronRightSmall } /> }
-						>
-							{ __( 'Row per page' ) }
-						</DropdownSubMenuTriggerV2>
-					}
-				>
-					{ PAGE_SIZE_VALUES.map( ( size ) => {
-						const isSelected =
-							table.getState().pagination.pageSize === size;
-						return (
-							<DropdownMenuItemV2
-								key={ size }
-								prefix={ isSelected && <Icon icon={ check } /> }
-								onSelect={ ( event ) => {
-									// We need to handle this on DropDown component probably..
-									event.preventDefault();
-									table.setPageSize( size );
-								} }
-								// TODO: check about role and a11y.
-								role="menuitemcheckbox"
-							>
-								{ size }
-							</DropdownMenuItemV2>
-						);
-					} ) }
-				</DropdownSubMenuV2>
+				<DataTablePageSizeMenu />
 			</DropdownMenuGroupV2>
 			{ /* <DropdownMenuGroupV2>
 					Do we need a Reset after all? If yes, what should reset?

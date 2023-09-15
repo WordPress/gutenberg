@@ -27,8 +27,6 @@ import PageActions from '../page-actions';
 import {
 	DataTableRows,
 	DataTableGlobalSearchInput,
-	DataTablePaginationNumbers,
-	DataTablePaginationTotalItems,
 	DataTablePagination,
 	DataTableProvider,
 	DataTableActions,
@@ -227,17 +225,9 @@ export default function PagePages() {
 							isLoading={ isLoading }
 						/>
 						<PagesBulkActions anchor={ bulkActionsAnchor } />
-						<HStack justify="space-between">
-							<DataTablePaginationTotalItems
-								totalItems={ paginationInfo?.totalItems }
-							/>
-							<DataTablePaginationNumbers />
-						</HStack>
-						<HStack justify="flex-start">
-							<DataTablePagination
-								totalItems={ paginationInfo?.totalItems }
-							/>
-						</HStack>
+						<DataTablePagination
+							totalItems={ paginationInfo?.totalItems }
+						/>
 					</VStack>
 				</DataTableProvider>
 			</div>

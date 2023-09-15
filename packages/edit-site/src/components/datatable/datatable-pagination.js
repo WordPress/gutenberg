@@ -5,13 +5,16 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
+import { createInterpolateElement } from '@wordpress/element';
 import { sprintf, __, _x, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useDataTableContext } from './context';
+import { DataTablePageSizeControl } from './datatable-actions';
 
 export function DataTablePaginationTotalItems( {
 	// If passed, use it as it's for controlled pagination.
@@ -29,6 +32,8 @@ export function DataTablePaginationTotalItems( {
 	);
 }
 
+//This function implements a pagination style similar to WP core's `paginate_links`.
+// It's not used currently, but was suggested in some of the designs.
 export function DataTablePaginationNumbers() {
 	const table = useDataTableContext();
 	const totalPages = table.getPageCount();
@@ -93,7 +98,7 @@ export function DataTablePagination( {
 		<HStack
 			expanded={ false }
 			spacing={ 3 }
-			justify="flex-start"
+			justify="space-between"
 			className="edit-site-patterns__grid-pagination"
 		>
 			<Text variant="muted">
@@ -123,16 +128,33 @@ export function DataTablePagination( {
 				>
 					‹
 				</Button>
-			</HStack>
-			<Text variant="muted">
-				{ sprintf(
-					// translators: %1$s: Current page number, %2$s: Total number of pages.
-					_x( '%1$s of %2$s', 'paging' ),
-					currentPage,
-					numPages
-				) }
-			</Text>
-			<HStack expanded={ false } spacing={ 1 }>
+				<HStack justify="flex-start" expanded={ false } spacing={ 1 }>
+					{ createInterpolateElement(
+						sprintf(
+							// translators: %1$s: Current page number, %2$s: Total number of pages.
+							_x( '<CurrenPageControl /> of %2$s', 'paging' ),
+							currentPage,
+							numPages
+						),
+						{
+							CurrenPageControl: (
+								<NumberControl
+									aria-label={ __( 'Current page' ) }
+									min={ 1 }
+									max={ numPages }
+									onChange={ ( value ) => {
+										if ( value > numPages ) return;
+										table.setPageIndex( value - 1 );
+									} }
+									step="1"
+									value={ currentPage }
+									isDragEnabled={ false }
+									spinControls="none"
+								/>
+							),
+						}
+					) }
+				</HStack>
 				<Button
 					variant="tertiary"
 					onClick={ () => table.nextPage() }
@@ -152,6 +174,7 @@ export function DataTablePagination( {
 					»
 				</Button>
 			</HStack>
+			<DataTablePageSizeControl />
 		</HStack>
 	);
 }
