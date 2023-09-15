@@ -11,6 +11,11 @@ import type {
 	DropdownOption,
 } from '../../dropdown-menu/types';
 
+/**
+ * WordPress dependencies
+ */
+import type { Props as IconProps } from '../../icon';
+
 export type ToolbarGroupControls = DropdownOption & {
 	/**
 	 * An optional subscript associated to the control.
@@ -33,37 +38,12 @@ type ToolbarGroupPropsBase = {
 	 * Any other things to render inside the toolbar besides the controls.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * The Dashicon icon slug to be shown for the option.
+	 */
+	icon?: IconProps[ 'icon' ];
 };
-
-// export type ToolbarGroupProps = {
-// 	/**
-// 	 * The controls to render in this toolbar.
-// 	 */
-// 	controls?: ToolbarGroupControls[] | ToolbarGroupControls[][];
-
-// 	/**
-// 	 * Any other things to render inside the toolbar besides the controls.
-// 	 */
-// 	children?: ReactNode;
-
-// 	/**
-// 	 * Class to set on the container div.
-// 	 */
-// 	className?: string;
-
-// 	/**
-// 	 * Turns ToolbarGroup into a dropdown menu.
-// 	 */
-// 	isCollapsed?: boolean;
-
-// 	/**
-// 	 * ARIA label for dropdown menu if is collapsed.
-// 	 */
-// 	title?: string;
-
-// 	// TODO: Looks like this was needed, should the group be sharing other props?
-// 	icon?: string;
-// };
 
 export type ToolbarGroupProps = ToolbarGroupPropsBase &
 	(
@@ -93,18 +73,6 @@ export type ToolbarGroupProps = ToolbarGroupPropsBase &
 				title: string;
 		  }
 	 );
-
-// export type ToolbarGroupCollapsedProps = ToolbarGroupProps & {
-// 	/**
-// 	 * Props to be passed to the drop down.
-// 	 */
-// 	toggleProps?: Record< string, any >;
-
-// 	/**
-// 	 * Props to be passed.
-// 	 */
-// 	props?: any;
-// };
 
 export type ToolbarGroupCollapsedProps = DropdownMenuProps;
 

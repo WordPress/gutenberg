@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
@@ -13,7 +13,7 @@ import type { NavigableMenuProps } from '../navigable-container/types';
 
 export type DropdownOption = {
 	/**
-	 * The Dashicon icon slug to be shown for the option.
+	 * The icon to be shown for the option.
 	 */
 	icon?: IconProps[ 'icon' ];
 	/**
@@ -41,7 +41,7 @@ export type DropdownOption = {
 	/**
 	 * The role to apply to the option's HTML element
 	 */
-	role?: HTMLElement[ 'role' ];
+	role?: HTMLAttributes< HTMLElement >[ 'role' ];
 };
 
 type DropdownCallbackProps = {
@@ -64,7 +64,7 @@ type ToggleProps = Partial<
 
 export type DropdownMenuProps = {
 	/**
-	 * The Dashicon icon slug to be shown in the collapsed menu button.
+	 * The icon to be shown in the collapsed menu button.
 	 *
 	 * @default "menu"
 	 */
