@@ -45,6 +45,12 @@ export function useCompatibilityStyles() {
 					return accumulator;
 				}
 
+				// This is the same stylesheet as wp-edit-block but without
+				// its dependencies, so we don't need to add it.
+				if ( ownerNode.id === 'wp-block-library-editor-css' ) {
+					return accumulator;
+				}
+
 				// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
 				if ( ! ownerNode.id ) {
 					return accumulator;
