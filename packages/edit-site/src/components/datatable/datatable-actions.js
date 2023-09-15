@@ -6,6 +6,7 @@ import {
 	Icon,
 	SelectControl,
 	privateApis as componentsPrivateApis,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import {
 	chevronRightSmall,
@@ -37,11 +38,14 @@ const PAGE_SIZE_VALUES = [ 2, 5, 20, 50 ];
 
 export function DataTablePageSizeControl() {
 	const table = useDataTableContext();
+	const prefix = __( 'Rows per page:' );
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
-			label={ __( 'Per page:' ) }
+			hideLabelFromVision
+			label={ __( 'Rows per page:' ) }
 			labelPosition="side"
+			prefix={ <InputControlPrefixWrapper className="edit-site-table__per-page-control-prefix">{ prefix }</InputControlPrefixWrapper> }
 			value={ table.getState().pagination.pageSize }
 			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
 				value: pageSize,
