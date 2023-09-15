@@ -11,7 +11,7 @@
  *
  * @param  array    $attributes The block attributes.
  * @param  string   $content    The block content.
- * @param  WP_Block $block    The block object.
+ * @param  WP_Block $block      The block object.
  * @return string Returns the block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
@@ -79,7 +79,6 @@ function render_block_core_image( $attributes, $content, $block ) {
  * @return array        Filtered block data.
  */
 function block_core_image_get_lightbox_settings( $block ) {
-  
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
@@ -116,7 +115,6 @@ function block_core_image_get_lightbox_settings( $block ) {
  * @return string                Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
-  
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
 	$aria_label = __( 'Enlarge image', 'gutenberg' );
