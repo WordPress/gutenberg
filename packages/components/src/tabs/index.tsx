@@ -2,75 +2,21 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type {
-	TabListProps,
-	TabPanelProps,
-	TabProps,
-	TabsContextProps,
-	TabsProps,
-} from './types';
-import Button from '../button';
-import warning from '@wordpress/warning';
-
-const TabsContext = createContext< TabsContextProps >( undefined );
-
-/**
- * Tabs is a collection of React components that combine to render an
- * ARIA-compliant TabPanel.
- *
- * Tabs organizes content across different screens, data sets, and interactions.
- * It has two sections: a list of tabs, and the view to show when tabs are chosen.
- *
- * ```jsx
- * import { Tabs } from '@wordpress/components';
- *
- * const onSelect = ( tabName ) => {
- * 	console.log( 'Selecting tab', tabName );
- * };
- *
- * const MyUncontrolledTabs = () => (
- * 		<Tabs onSelect={onSelect} initialTab="tab2">
- * 			<Tabs.TabList >
- * 				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
- * 					Tab 1
- * 				</Tabs.Tab>
- * 				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
- * 					Tab 2
- * 				</Tabs.Tab>
- * 				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
- * 					Tab 3
- * 				</Tabs.Tab>
- * 			</Tabs.TabList>
- * 			<Tabs.TabPanel id={ 'tab1' }>
- * 				<p>Selected tab: Tab 1</p>
- * 			</Tabs.TabPanel>
- * 			<Tabs.TabPanel id={ 'tab2' }>
- * 				<p>Selected tab: Tab 2</p>
- * 			</Tabs.TabPanel>
- * 			<Tabs.TabPanel id={ 'tab3' }>
- * 				<p>Selected tab: Tab 3</p>
- * 			</Tabs.TabPanel>
- * 		</Tabs>
- * 	);
- * ```
- *
- */
+import type { TabsProps } from './types';
+import { TabsContext } from './context';
+import Tab from './tab';
+import TabList from './tablist';
+import TabPanel from './tabpanel';
 
 function Tabs( {
 	activeClass = 'is-active',
@@ -168,85 +114,6 @@ function Tabs( {
 		<TabsContext.Provider value={ { store, instanceId, activeClass } }>
 			{ children }
 		</TabsContext.Provider>
-	);
-}
-
-function TabList( { children, className, style }: TabListProps ) {
-	const context = useContext( TabsContext );
-	if ( ! context ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
-	const { store } = context;
-	return (
-		<Ariakit.TabList
-			style={ style }
-			store={ store }
-			className={ classnames( 'components-tabs__tabs-item', className ) }
-		>
-			{ children }
-		</Ariakit.TabList>
-	);
-}
-
-function Tab( {
-	children,
-	id,
-	className,
-	disabled,
-	icon,
-	title,
-	style,
-}: TabProps ) {
-	const context = useContext( TabsContext );
-	if ( ! context ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
-	const { store, instanceId, activeClass } = context;
-	const instancedTabId = `${ instanceId }-${ id }`;
-	return (
-		<Ariakit.Tab
-			store={ store }
-			id={ instancedTabId }
-			className={ classnames( 'components-tabs__tabs-item', className, {
-				[ activeClass ]: instancedTabId === store.useState().activeId,
-			} ) }
-			style={ style }
-			disabled={ disabled }
-			render={
-				<Button
-					icon={ icon }
-					label={ icon && title }
-					showTooltip={ true }
-				/>
-			}
-		>
-			{ children }
-		</Ariakit.Tab>
-	);
-}
-
-function TabPanel( { children, id, className, style }: TabPanelProps ) {
-	const context = useContext( TabsContext );
-	if ( ! context ) {
-		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
-	const { store, instanceId } = context;
-
-	return (
-		<Ariakit.TabPanel
-			style={ style }
-			store={ store }
-			id={ `${ instanceId }-${ id }-view` }
-			className={ classnames(
-				'components-tabs__tab-content',
-				className
-			) }
-		>
-			{ children }
-		</Ariakit.TabPanel>
 	);
 }
 
