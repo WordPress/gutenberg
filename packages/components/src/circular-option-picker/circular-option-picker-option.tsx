@@ -73,6 +73,12 @@ function UnforwardedOptionAsOption(
 			{ ...compositeState }
 			as={ Button }
 			id={ id }
+			// Ideally we'd let the underlying `Button` component
+			// handle this by passing `isPressed` as a prop.
+			// Unfortunately doing so also sets `aria-pressed` as
+			// an attribute on the element, which is incompatible
+			// with `role="option"`, and there is no way at this
+			// point to override that behaviour.
 			className={ classnames( className, {
 				'is-pressed': isSelected,
 			} ) }
