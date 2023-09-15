@@ -77,18 +77,18 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 /**
- * Checks if WP generated default image size. Size generation is skipped
+ * Checks if WP generated the specified image size. Size generation is skipped
  * when the image is smaller than the said size.
  *
  * @param {Object} image
- * @param {string} defaultSize
+ * @param {string} size
  *
  * @return {boolean} Whether or not it has default image size.
  */
-function hasDefaultSize( image, defaultSize ) {
+function hasSize( image, size ) {
 	return (
-		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
-		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
+		'url' in ( image?.sizes?.[ size ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ size ] ?? {} )
 	);
 }
 
@@ -168,7 +168,16 @@ export function ImageEdit( {
 
 		setTemporaryURL();
 
-		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
+		// Try to use the previous selected image size if its available
+		// otherwise try the default image size or fallback to "full"
+		let newSize = 'full';
+		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
+			newSize = sizeSlug;
+		} else if ( hasSize( media, imageDefaultSize ) ) {
+			newSize = imageDefaultSize;
+		}
+
+		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -182,11 +191,7 @@ export function ImageEdit( {
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				// Fallback to size "full" if there's no default image size.
-				// It means the image is smaller, and the block will use a full-size URL.
-				sizeSlug: hasDefaultSize( media, imageDefaultSize )
-					? imageDefaultSize
-					: 'full',
+				sizeSlug: newSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Resolution"

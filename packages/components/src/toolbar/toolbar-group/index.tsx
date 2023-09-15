@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -17,6 +15,11 @@ import ToolbarButton from '../toolbar-button';
 import ToolbarGroupContainer from './toolbar-group-container';
 import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 import ToolbarContext from '../toolbar-context';
+import type { ToolbarGroupProps, ToolbarGroupControls } from './types';
+
+function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
+	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
+}
 
 /**
  * Renders a collapsible group of controls
@@ -41,12 +44,12 @@ import ToolbarContext from '../toolbar-context';
  * Either `controls` or `children` is required, otherwise this components
  * renders nothing.
  *
- * @param {Object}    props               Component props.
- * @param {Array}     [props.controls]    The controls to render in this toolbar.
- * @param {WPElement} [props.children]    Any other things to render inside the toolbar besides the controls.
- * @param {string}    [props.className]   Class to set on the container div.
- * @param {boolean}   [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
- * @param {string}    [props.title]       ARIA label for dropdown menu if is collapsed.
+ * @param props               Component props.
+ * @param [props.controls]    The controls to render in this toolbar.
+ * @param [props.children]    Any other things to render inside the toolbar besides the controls.
+ * @param [props.className]   Class to set on the container div.
+ * @param [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
+ * @param [props.title]       ARIA label for dropdown menu if is collapsed.
  */
 function ToolbarGroup( {
 	controls = [],
@@ -55,7 +58,7 @@ function ToolbarGroup( {
 	isCollapsed,
 	title,
 	...props
-} ) {
+}: ToolbarGroupProps ) {
 	// It'll contain state if `ToolbarGroup` is being used within
 	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -74,9 +77,11 @@ function ToolbarGroup( {
 	);
 
 	// Normalize controls to nested array of objects (sets of controls)
-	let controlSets = controls;
-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
-		controlSets = [ controlSets ];
+	let controlSets: ToolbarGroupControls[][];
+	if ( isNestedArray( controls ) ) {
+		controlSets = controls;
+	} else {
+		controlSets = [ controls ];
 	}
 
 	if ( isCollapsed ) {
@@ -94,13 +99,13 @@ function ToolbarGroup( {
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
+				controlSet.map( ( control, indexOfControl: number ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
 						containerClassName={
 							indexOfSet > 0 && indexOfControl === 0
 								? 'has-left-divider'
-								: null
+								: undefined
 						}
 						{ ...control }
 					/>

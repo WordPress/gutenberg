@@ -199,43 +199,46 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 </div>
               </div>
               <div
-                aria-label="Custom color picker."
                 class="components-circular-option-picker"
-                id="option-picker-0"
-                role="listbox"
               >
                 <div
-                  class="components-circular-option-picker__swatches"
+                  aria-label="Custom color picker."
+                  id="components-circular-option-picker-0"
+                  role="listbox"
                 >
                   <div
-                    class="components-circular-option-picker__option-group components-circular-option-picker__swatches"
+                    class="components-circular-option-picker__swatches"
                   >
                     <div
-                      class="components-circular-option-picker__option-wrapper"
+                      class="components-circular-option-picker__option-group components-circular-option-picker__swatches"
                     >
-                      <button
-                        aria-label="Color: red"
-                        aria-selected="true"
-                        class="components-button components-circular-option-picker__option is-pressed"
-                        id="option-picker-0-0"
-                        role="option"
-                        style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
-                        tabindex="0"
-                        type="button"
-                      />
-                      <svg
-                        aria-hidden="true"
-                        fill="#000"
-                        focusable="false"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
+                      <div
+                        class="components-circular-option-picker__option-wrapper"
                       >
-                        <path
-                          d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                        <button
+                          aria-label="Color: red"
+                          aria-selected="true"
+                          class="components-button components-circular-option-picker__option is-pressed"
+                          id="components-circular-option-picker-0-0"
+                          role="option"
+                          style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+                          tabindex="0"
+                          type="button"
                         />
-                      </svg>
+                        <svg
+                          aria-hidden="true"
+                          fill="#000"
+                          focusable="false"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>
