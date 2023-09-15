@@ -148,19 +148,19 @@
 	}
 
 	@include break-small() {
-		&.width-small,
-		.width-medium,
-		.width-large {
+		&.has-width-small,
+		.has-width-medium,
+		.has-width-large {
 			width: 100%;
 		}
 
-		&.width-small {
+		&.has-width-small {
 			max-width: 300px;
 		}
-		&.width-medium {
+		&.has-width-medium {
 			max-width: 600px;
 		}
-		&.width-large {
+		&.has-width-large {
 			max-width: 900px;
 		}
 	}

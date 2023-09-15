@@ -98,7 +98,7 @@ function UnforwardedModal(
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
 
-	const contentWidthClass = contentWidth ? `width-${ contentWidth }` : '';
+	const contentWidthClass = contentWidth ? `has-width-${ contentWidth }` : '';
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
