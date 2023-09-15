@@ -20,7 +20,6 @@ import {
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,7 +38,6 @@ import {
 	BlockPatternsSyncFilter,
 	SYNC_TYPES,
 } from './block-patterns-sync-filter';
-import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
@@ -198,11 +196,8 @@ export function BlockPatternsCategoryPanel( {
 		onInsert,
 		rootClientId
 	);
-	const patternSyncFilter = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return settings.patternsSyncFilter || 'all';
-	}, [] );
+	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
+
 	const availableCategories = usePatternsCategories(
 		rootClientId,
 		patternFilter
@@ -256,6 +251,7 @@ export function BlockPatternsCategoryPanel( {
 	);
 
 	// Hide block pattern preview on unmount.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
 
 	return (
@@ -268,7 +264,11 @@ export function BlockPatternsCategoryPanel( {
 			</div>
 			<p>{ category.description }</p>
 			{ patternFilter === PATTERN_TYPES.user && (
-				<BlockPatternsSyncFilter />
+				<BlockPatternsSyncFilter
+					patternSyncFilter={ patternSyncFilter }
+					setPatternSyncFilter={ setPatternSyncFilter }
+					test={ 'bob' }
+				/>
 			) }
 			{ ! currentCategoryPatterns.length && (
 				<div>{ __( 'No results found' ) }</div>

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -67,8 +67,8 @@ function PatternList( {
 	patternSourceFilter,
 	selectedCategory,
 	patternCategories,
-	patternSyncFilter,
 } ) {
+	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -171,7 +171,12 @@ function PatternList( {
 
 			<InserterListbox>
 				{ patternSourceFilter === PATTERN_TYPES.user &&
-					! searchValue && <BlockPatternsSyncFilter /> }
+					! searchValue && (
+						<BlockPatternsSyncFilter
+							patternSyncFilter={ patternSyncFilter }
+							setPatternSyncFilter={ setPatternSyncFilter }
+						/>
+					) }
 
 				{ hasItems && (
 					<BlockPatternsList

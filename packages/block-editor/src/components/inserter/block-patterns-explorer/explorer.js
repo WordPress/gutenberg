@@ -4,7 +4,6 @@
 import { Modal } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,16 +11,11 @@ import { useSelect } from '@wordpress/data';
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
 import { usePatternsCategories } from '../block-patterns-tab';
-import { store as blockEditorStore } from '../../../store';
 
 function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
-	const patternSyncFilter = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return settings.patternsSyncFilter || 'all';
-	}, [] );
+
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
 	);
@@ -47,7 +41,6 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
 				patternSourceFilter={ patternSourceFilter }
-				patternSyncFilter={ patternSyncFilter }
 			/>
 		</div>
 	);
