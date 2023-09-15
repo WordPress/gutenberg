@@ -20,7 +20,7 @@ const createBuildSummary = async (
 	octokit
 ) => {
 	let status, previewMsg, artifactMsg;
-	status = previewMsg = artifactMsg = '🚧  Building in progress...';
+	status = previewMsg = artifactMsg = 'Building in progress...';
 	if ( buildStatus === 'success' ) {
 		status = 'Build successful!';
 		previewMsg = `[gutenberg.run/${ pullRequestNumber }](gutenberg.run/${ pullRequestNumber } )`;
