@@ -64,18 +64,18 @@ class Gutenberg_HTTP_Signaling_Server {
 	public static function do_wp_ajax_action() {
 		static::initialize_paths();
 
-		if ( empty( $_REQUEST ) || empty( $_REQUEST['unique'] ) ) {
+		if ( empty( $_REQUEST ) || empty( $_REQUEST['subscriber_id'] ) ) {
 			die( 'no identifier' );
 		}
-		static::$subscriber_id = $_REQUEST['unique'];
+		static::$subscriber_id = $_REQUEST['subscriber_id'];
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 			static::handle_message_read_request();
 		} else {
-			if ( empty( $_POST ) || empty( $_POST['data'] ) ) {
+			if ( empty( $_POST ) || empty( $_POST['message'] ) ) {
 				die( 'no message' );
 			}
-			$message = json_decode( wp_unslash( $_POST['data'] ), true );
+			$message = json_decode( wp_unslash( $_POST['message'] ), true );
 			if ( ! $message ) {
 				die( 'no message' );
 			}

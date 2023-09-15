@@ -179,11 +179,11 @@ function setupSignalEventHandlers( signalCon, url ) {
 function setupHttpSignal( httpClient ) {
 	if ( httpClient.shouldConnect && httpClient.ws === null ) {
 		// eslint-disable-next-line no-restricted-syntax
-		const unique = Math.floor( 100000 + Math.random() * 900000 );
+		const subscriberId = Math.floor( 100000 + Math.random() * 900000 );
 		const url = httpClient.url;
 		const eventSource = new window.EventSource(
 			addQueryArgs( url, {
-				unique,
+				subscriber_id: subscriberId,
 				action: 'gutenberg_signaling_server',
 			} )
 		);
@@ -270,11 +270,13 @@ function setupHttpSignal( httpClient ) {
 					}
 				};
 				xhttp.open( 'POST', url, true );
-				const dataToSend = new URLSearchParams();
-				dataToSend.set( 'unique', unique.toString() );
-				dataToSend.set( 'data', message );
-				dataToSend.set( 'action', 'gutenberg_signaling_server' );
-				xhttp.send( dataToSend );
+				xhttp.send(
+					new URLSearchParams( {
+						subscriber_id: subscriberId.toString(),
+						message,
+						action: 'gutenberg_signaling_server',
+					} )
+				);
 			};
 		}
 		eventSource.onerror = () => {
