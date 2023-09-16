@@ -10,6 +10,7 @@ import { __experimentalUseNavigator as useNavigator } from '@wordpress/component
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const config = {
 	wp_template: {
@@ -32,15 +33,23 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 		params: { postType },
 	} = useNavigator();
 
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
+	const { isTemplatePartsMode, didAccessPatternsPage } = useSelect(
+		( select ) => {
+			return {
+				isTemplatePartsMode:
+					!! select( editSiteStore ).getSettings()
+						.supportsTemplatePartsMode,
+				didAccessPatternsPage: unlock(
+					select( editSiteStore )
+				).didAccessPatternsPage(),
+			};
+		},
+		[]
+	);
 
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
+			isRoot={ isTemplatePartsMode && ! didAccessPatternsPage }
 			title={ config[ postType ].title }
 			description={ config[ postType ].description }
 			backPath={ config[ postType ].backPath }

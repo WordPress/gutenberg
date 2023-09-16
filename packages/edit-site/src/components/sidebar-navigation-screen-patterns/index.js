@@ -10,6 +10,8 @@ import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { file } from '@wordpress/icons';
 
 /**
@@ -23,6 +25,8 @@ import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
+import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function TemplatePartGroup( { areas, currentArea, currentType } ) {
 	return (
@@ -81,6 +85,8 @@ function PatternCategoriesGroup( {
 }
 
 export default function SidebarNavigationScreenPatterns() {
+	const { setDidAccessPatternsPage } = unlock( useDispatch( editSiteStore ) );
+	setDidAccessPatternsPage( true );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || DEFAULT_CATEGORY;
@@ -89,7 +95,14 @@ export default function SidebarNavigationScreenPatterns() {
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+		return !! settings.supportsTemplatePartsMode;
+	}, [] );
 	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
@@ -100,14 +113,17 @@ export default function SidebarNavigationScreenPatterns() {
 			>
 				{ __( 'Manage all of my patterns' ) }
 			</SidebarNavigationItem>
-			<SidebarNavigationItem withChevron { ...templatePartsLink }>
-				{ __( 'Manage all template parts' ) }
-			</SidebarNavigationItem>
+			{ ( isBlockBasedTheme || isTemplatePartsMode ) && (
+				<SidebarNavigationItem withChevron { ...templatePartsLink }>
+					{ __( 'Manage all template parts' ) }
+				</SidebarNavigationItem>
+			) }
 		</ItemGroup>
 	) : undefined;
 
 	return (
 		<SidebarNavigationScreen
+			isRoot={ ! isBlockBasedTheme }
 			title={ __( 'Patterns' ) }
 			description={ __(
 				'Manage what patterns are available when editing the site.'

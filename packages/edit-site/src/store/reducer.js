@@ -177,6 +177,23 @@ export function hasPageContentFocus( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer used to track whether the Patterns page was accessed or not.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+function didAccessPatternsPage( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_DID_ACCESS_PATTERNS_PAGE':
+			return action.didAccessPatternsPage;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -187,4 +204,5 @@ export default combineReducers( {
 	canvasMode,
 	editorCanvasContainerView,
 	hasPageContentFocus,
+	didAccessPatternsPage,
 } );

@@ -49,3 +49,18 @@ export const setEditorCanvasContainerView =
 			view,
 		} );
 	};
+
+/**
+ * Action that set the Patterns page has been accessed.
+ *
+ * @param {boolean} didAccessPatternsPage whether the Patterns page
+ *                                        was accessed or not.
+ */
+export const setDidAccessPatternsPage =
+	( didAccessPatternsPage ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'SET_DID_ACCESS_PATTERNS_PAGE',
+			didAccessPatternsPage,
+		} );
+	};

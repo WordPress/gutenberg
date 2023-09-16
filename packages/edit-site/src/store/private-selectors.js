@@ -19,3 +19,14 @@ export function getCanvasMode( state ) {
 export function getEditorCanvasContainerView( state ) {
 	return state.editorCanvasContainerView;
 }
+
+/**
+ * Returns whether the Patterns page was accessed or not.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Whether the Patterns page was accessed or not.
+ */
+export function didAccessPatternsPage( state ) {
+	return state.didAccessPatternsPage;
+}
