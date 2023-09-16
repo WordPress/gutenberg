@@ -91,8 +91,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		composeCommand.push( '-T' );
 	}
 
-	// Note: we use /bin/bash instead of /bin/sh because the latter does not use $PATH correctly.
-	composeCommand.push( container, '/bin/bash', '-c', ...command );
+	composeCommand.push( container, ...command );
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
