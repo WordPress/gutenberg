@@ -375,7 +375,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +394,22 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch.ensureDefaultBlock();
 	};
 
 /**
@@ -1034,6 +1040,7 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1044,6 +1051,41 @@ export const mergeBlocks =
 				dispatch.selectBlock(
 					blockWithSameType.innerBlocks[ 0 ].clientId
 				);
+
+				// Attempt to merge the next block if it's the same type and
+				// same attributes. This is useful when merging a paragraph into
+				// a list, and the next block is also a list. If we don't merge,
+				// it looks like one list, but it's actually two lists. The same
+				// applies to other blocks such as a group with the same
+				// attributes.
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientIdA );
+
+				if (
+					nextBlockClientId &&
+					select.getBlockName( clientIdA ) ===
+						select.getBlockName( nextBlockClientId )
+				) {
+					const rootAttributes =
+						select.getBlockAttributes( clientIdA );
+					const previousRootAttributes =
+						select.getBlockAttributes( nextBlockClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						dispatch.moveBlocksToPosition(
+							select.getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							clientIdA
+						);
+						dispatch.removeBlock( nextBlockClientId, false );
+					}
+				}
 			} );
 			return;
 		}

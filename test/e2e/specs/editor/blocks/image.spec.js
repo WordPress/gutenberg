@@ -730,7 +730,12 @@ test.describe( 'Image', () => {
 	} );
 } );
 
-test.describe( 'Image - interactivity', () => {
+// Skipping these tests for now as we plan
+// to update them to use the new lightbox syntax
+// once it's merged -- see the following PRs
+// https://github.com/WordPress/gutenberg/pull/53851
+// https://github.com/WordPress/gutenberg/pull/54071
+test.describe.skip( 'Image - interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
@@ -912,104 +917,6 @@ test.describe( 'Image - interactivity', () => {
 				);
 
 				expect( keysPresent ).toBe( true );
-
-				const closeButton = lightbox.getByRole( 'button', {
-					name: 'Close',
-				} );
-				await closeButton.click();
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeHidden();
-			} );
-
-			test( 'fade animation', async ( {
-				editor,
-				page,
-				imageBlockUtils,
-			} ) => {
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename ),
-					{ timeout: 10_000 }
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
-				await page
-					.getByRole( 'combobox', { name: 'Behaviors' } )
-					.selectOption( 'lightbox' );
-				await page
-					.getByRole( 'combobox', { name: 'Animation' } )
-					.selectOption( 'fade' );
-
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-
-				// getByRole() doesn't work for the image here for
-				// some reason, so let's use locators instead
-				const contentFigure = page.locator( '.entry-content figure' );
-				const contentImage = page.locator(
-					'.entry-content figure img'
-				);
-
-				const wpContext = await contentFigure.getAttribute(
-					'data-wp-context'
-				);
-
-				const imageUploadedSrc =
-					JSON.parse( wpContext ).core.image.imageUploadedSrc;
-
-				const contentImageCurrentSrc = await contentImage.evaluate(
-					( img ) => img.currentSrc
-				);
-
-				const lightbox = page.locator( '.wp-lightbox-overlay' );
-				await expect( lightbox ).toBeHidden();
-				const responsiveImage = lightbox.locator(
-					'.responsive-image img'
-				);
-				const enlargedImage = lightbox.locator( '.enlarged-image img' );
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute( 'src', '' );
-
-				await page
-					.getByRole( 'button', { name: 'Enlarge image' } )
-					.click();
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeVisible();
 
 				const closeButton = lightbox.getByRole( 'button', {
 					name: 'Close',
