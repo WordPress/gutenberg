@@ -1,4 +1,11 @@
 .font-library-modal {
+	&.is-full-screen {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
 	.components-modal__header {
 		border-bottom: none;
 	}
