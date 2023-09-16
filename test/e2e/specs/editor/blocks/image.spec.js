@@ -459,9 +459,10 @@ test.describe( 'Image', () => {
 					attributes: { url },
 				},
 			] = blocks;
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -492,9 +493,10 @@ test.describe( 'Image', () => {
 				},
 			] = blocks;
 			expect( url ).not.toBe( firstUrl );
-			expect(
-				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
-			).toBe( url );
+			await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+				'src',
+				url
+			);
 			expect(
 				new URL( url ).host,
 				'should be updated to the media library'
@@ -728,7 +730,12 @@ test.describe( 'Image', () => {
 	} );
 } );
 
-test.describe( 'Image - interactivity', () => {
+// Skipping these tests for now as we plan
+// to update them to use the new lightbox syntax
+// once it's merged -- see the following PRs
+// https://github.com/WordPress/gutenberg/pull/53851
+// https://github.com/WordPress/gutenberg/pull/54071
+test.describe.skip( 'Image - interactivity', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
@@ -885,135 +892,41 @@ test.describe( 'Image - interactivity', () => {
 
 				await expect( lightbox ).toBeVisible();
 
-				const document = page.getByRole( 'document' );
-				const lightboxStyleCheck = await document.evaluate( ( doc ) => {
-					// We don't have access to the getPropertyValue() method
-					// on the CSSStyleDeclaration returned form getComputedStyle()
-					// in the Playwright outer context, so we need to evaluate it here
-					// in the browser context here.
-					const documentStyles = window.getComputedStyle( doc );
-					const lightboxStyleVars = [
-						'--lightbox-scale-width',
-						'--lightbox-scale-height',
-						'--lightbox-image-max-width',
-						'--lightbox-image-max-height',
-						'--lightbox-initial-left-position',
-						'--lightbox-initial-top-position',
-					];
-					const lightboxStyleErrors = [];
-					lightboxStyleVars.forEach( ( styleVar ) => {
-						if ( ! documentStyles.getPropertyValue( styleVar ) ) {
-							lightboxStyleErrors.push( styleVar );
-						}
-					} );
-
-					return lightboxStyleErrors.length > 0
-						? lightboxStyleErrors
-						: true;
+				// Use page.evaluate to get the content of the style tag
+				const styleTagContent = await page.evaluate( () => {
+					const styleTag = document.querySelector(
+						'style#wp-lightbox-styles'
+					);
+					return styleTag ? styleTag.textContent : '';
 				} );
-				expect( lightboxStyleCheck ).toBe( true );
+
+				// Define the keys you want to check for
+				const keysToCheck = [
+					'--wp--lightbox-initial-top-position',
+					'--wp--lightbox-initial-left-position',
+					'--wp--lightbox-container-width',
+					'--wp--lightbox-container-height',
+					'--wp--lightbox-image-width',
+					'--wp--lightbox-image-height',
+					'--wp--lightbox-scale',
+				];
+
+				// Check if all the keys are present in the style tag's content
+				const keysPresent = keysToCheck.every( ( key ) =>
+					styleTagContent.includes( key )
+				);
+
+				expect( keysPresent ).toBe( true );
 
 				const closeButton = lightbox.getByRole( 'button', {
 					name: 'Close',
 				} );
 				await closeButton.click();
 
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeHidden();
-			} );
-
-			test( 'fade animation', async ( {
-				editor,
-				page,
-				imageBlockUtils,
-			} ) => {
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename ),
-					{ timeout: 10_000 }
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
-				await page
-					.getByRole( 'combobox', { name: 'Behaviors' } )
-					.selectOption( 'lightbox' );
-				await page
-					.getByRole( 'combobox', { name: 'Animation' } )
-					.selectOption( 'fade' );
-
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-
-				// getByRole() doesn't work for the image here for
-				// some reason, so let's use locators instead
-				const contentFigure = page.locator( '.entry-content figure' );
-				const contentImage = page.locator(
-					'.entry-content figure img'
-				);
-
-				const wpContext = await contentFigure.getAttribute(
-					'data-wp-context'
-				);
-
-				const imageUploadedSrc =
-					JSON.parse( wpContext ).core.image.imageUploadedSrc;
-
-				const contentImageCurrentSrc = await contentImage.evaluate(
-					( img ) => img.currentSrc
-				);
-
-				const lightbox = page.locator( '.wp-lightbox-overlay' );
-				await expect( lightbox ).toBeHidden();
-				const responsiveImage = lightbox.locator(
-					'.responsive-image img'
-				);
-				const enlargedImage = lightbox.locator( '.enlarged-image img' );
-
 				await expect( responsiveImage ).toHaveAttribute(
 					'src',
 					contentImageCurrentSrc
 				);
-				await expect( enlargedImage ).toHaveAttribute( 'src', '' );
-
-				await page
-					.getByRole( 'button', { name: 'Enlarge image' } )
-					.click();
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeVisible();
-
-				const closeButton = lightbox.getByRole( 'button', {
-					name: 'Close',
-				} );
-				await closeButton.click();
-
-				await expect( responsiveImage ).toHaveAttribute( 'src', '' );
 				await expect( enlargedImage ).toHaveAttribute(
 					'src',
 					imageUploadedSrc
@@ -1178,7 +1091,7 @@ test.describe( 'Image - interactivity', () => {
 					page.getByRole( 'combobox', {
 						name: 'Animation',
 					} )
-				).not.toBeVisible();
+				).toBeHidden();
 			} );
 			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
 				page,
@@ -1211,7 +1124,7 @@ test.describe( 'Image - interactivity', () => {
 					page.getByRole( 'combobox', {
 						name: 'Animation',
 					} )
-				).not.toBeVisible();
+				).toBeHidden();
 			} );
 		} );
 
@@ -1362,7 +1275,7 @@ test.describe( 'Image - interactivity', () => {
 
 		await page.getByRole( 'button', { name: 'Close' } ).click();
 
-		await expect( responsiveImage ).toHaveAttribute( 'src', '' );
+		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
 		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );

@@ -10,8 +10,40 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
+## 1.103.1
+-   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
+
+## 1.103.0
+-   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
+-   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
+-   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
+-   [*] Fix horizontal rule style extensions [#53917]
+-   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
+
+## 1.102.1
+- [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.102.0
 -   [*] Display custom color value in mobile Cover Block color picker [#51414]
--   [**] Display outline around selected Social Link block [#51414]
+-   [**] Display outline around selected Social Link block [#53377]
+-   [**] Fixes font customization not getting updated on iOS [#53391]
+
+## 1.101.2
+-  [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.101.1
+-   [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
 
 ## 1.101.0
 -   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]

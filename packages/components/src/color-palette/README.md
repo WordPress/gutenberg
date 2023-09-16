@@ -84,3 +84,17 @@ Currently active value.
 Callback called when a color is selected.
 
 -   Required: Yes
+
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`

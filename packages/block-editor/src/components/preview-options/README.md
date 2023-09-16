@@ -82,6 +82,13 @@ Used to set the device type that will be used to display the preview inside the 
 -   Type: `func`
 -   Required: yes
 
+#### children
+
+A function that returns nodes to be rendered within the dropdown.
+
+-   Type: `Function`
+-   Required: No
+
 ## Related components
 
 Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.

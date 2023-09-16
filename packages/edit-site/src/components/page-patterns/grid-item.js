@@ -27,7 +27,7 @@ import {
 	footer,
 	symbolFilled as uncategorized,
 	symbol,
-	moreHorizontal,
+	moreVertical,
 	lockSmall,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -119,9 +119,12 @@ function GridItem( { categoryId, item, ...props } ) {
 		);
 	}
 
-	const itemIcon =
-		templatePartIcons[ categoryId ] ||
-		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
+	let itemIcon;
+	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
+		itemIcon = templatePartIcons[ categoryId ];
+	} else {
+		itemIcon = item.syncStatus === SYNC_TYPES.full ? symbol : undefined;
+	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -154,7 +157,8 @@ function GridItem( { categoryId, item, ...props } ) {
 						: undefined
 				}
 			>
-				{ isEmpty && __( 'Empty pattern' ) }
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
@@ -183,12 +187,10 @@ function GridItem( { categoryId, item, ...props } ) {
 								'Editing this pattern will also update anywhere it is used'
 							) }
 						>
-							<span>
-								<Icon
-									className="edit-site-patterns__pattern-icon"
-									icon={ itemIcon }
-								/>
-							</span>
+							<Icon
+								className="edit-site-patterns__pattern-icon"
+								icon={ itemIcon }
+							/>
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
@@ -212,21 +214,22 @@ function GridItem( { categoryId, item, ...props } ) {
 								position="top center"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
-								<span className="edit-site-patterns__pattern-lock-icon">
-									<Icon icon={ lockSmall } size={ 24 } />
-								</span>
+								<Icon
+									className="edit-site-patterns__pattern-lock-icon"
+									icon={ lockSmall }
+									size={ 24 }
+								/>
 							</Tooltip>
 						) }
 					</Flex>
 				</HStack>
 				<DropdownMenu
-					icon={ moreHorizontal }
+					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					className="edit-site-patterns__dropdown"
 					popoverProps={ { placement: 'bottom-end' } }
 					toggleProps={ {
 						className: 'edit-site-patterns__button',
-						isSmall: true,
 						describedBy: sprintf(
 							/* translators: %s: pattern name */
 							__( 'Action menu for %s pattern' ),
@@ -246,14 +249,11 @@ function GridItem( { categoryId, item, ...props } ) {
 								categoryId={ categoryId }
 								item={ item }
 								onClose={ onClose }
-								label={
-									isNonUserPattern
-										? __( 'Copy to My patterns' )
-										: __( 'Duplicate' )
-								}
+								label={ __( 'Duplicate' ) }
 							/>
 							{ isCustomPattern && (
 								<MenuItem
+									isDestructive={ ! hasThemeFile }
 									onClick={ () =>
 										setIsDeleteDialogOpen( true )
 									}

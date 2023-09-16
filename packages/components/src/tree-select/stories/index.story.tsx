@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import TreeSelect from '../';
 
-const meta: ComponentMeta< typeof TreeSelect > = {
+const meta: Meta< typeof TreeSelect > = {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
 	argTypes: {
@@ -27,13 +27,13 @@ const meta: ComponentMeta< typeof TreeSelect > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
 export default meta;
 
-const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
+const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 	const [ selection, setSelection ] =
 		useState< ComponentProps< typeof TreeSelect >[ 'selectedId' ] >();
 

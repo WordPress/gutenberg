@@ -132,7 +132,7 @@ test.describe( 'List View', () => {
 		// make the inner blocks appear.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
-			.getByRole( 'button', { name: /Color: /i } )
+			.getByRole( 'option', { name: /Color: /i } )
 			.first()
 			.click();
 
@@ -431,7 +431,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should delete blocks using keyboard', async ( {
+	test( 'should duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -474,6 +474,22 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
+		await pageUtils.pressKeys( 'primaryShift+d' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Duplicating a block should retain selection on existing block, move focus to duplicated block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: true },
+				{ name: 'core/file', focused: true },
+			] );
+
+		// Move focus to the first file block, and then delete it.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Delete' );
 		await expect
 			.poll(
@@ -483,6 +499,7 @@ test.describe( 'List View', () => {
 			.toMatchObject( [
 				{ name: 'core/group' },
 				{ name: 'core/columns', selected: true, focused: true },
+				{ name: 'core/file' },
 			] );
 
 		// Expand the current column.
@@ -504,6 +521,7 @@ test.describe( 'List View', () => {
 						{ name: 'core/column', focused: true },
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		await page.keyboard.press( 'Delete' );
@@ -525,6 +543,7 @@ test.describe( 'List View', () => {
 						},
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		// Expand the current column.
@@ -555,6 +574,7 @@ test.describe( 'List View', () => {
 						},
 					],
 				},
+				{ name: 'core/file' },
 			] );
 
 		// Move focus and select the first block.
@@ -573,14 +593,17 @@ test.describe( 'List View', () => {
 					selected: true,
 					focused: true,
 				},
+				{ name: 'core/file' },
 			] );
 
+		// Delete remaining blocks.
 		// Keyboard shortcut should also work.
+		await pageUtils.pressKeys( 'access+z' );
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
 			.poll(
 				listViewUtils.getBlocksWithA11yAttributes,
-				'Deleting the only block left will create a default block and focus/select it'
+				'Deleting the only blocks left will create a default block and focus/select it'
 			)
 			.toMatchObject( [
 				{
@@ -643,6 +666,19 @@ test.describe( 'List View', () => {
 					{ name: 'core/file', selected: false, focused: true },
 				] );
 		}
+
+		// Deselect blocks via Escape key.
+		await page.keyboard.press( 'Escape' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Pressing Escape should deselect blocks'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: false, focused: true },
+			] );
 	} );
 
 	test( 'block settings dropdown menu', async ( {
@@ -748,6 +784,10 @@ test.describe( 'List View', () => {
 		).toBeHidden();
 
 		await optionsForFileToggle.click();
+		await expect(
+			optionsForFileMenu,
+			'Pressing Space should also open the menu dropdown'
+		).toBeVisible();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(

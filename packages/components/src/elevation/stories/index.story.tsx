@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import { Elevation } from '..';
 
-const meta: ComponentMeta< typeof Elevation > = {
+const meta: Meta< typeof Elevation > = {
 	component: Elevation,
 	title: 'Components (Experimental)/Elevation',
 	argTypes: {
@@ -19,12 +19,12 @@ const meta: ComponentMeta< typeof Elevation > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof Elevation > = ( args ) => {
+const Template: StoryFn< typeof Elevation > = ( args ) => {
 	return (
 		<div
 			style={ {
@@ -38,7 +38,7 @@ const Template: ComponentStory< typeof Elevation > = ( args ) => {
 	);
 };
 
-const InteractiveTemplate: ComponentStory< typeof Elevation > = ( args ) => {
+const InteractiveTemplate: StoryFn< typeof Elevation > = ( args ) => {
 	return (
 		<button
 			style={ {
@@ -55,7 +55,7 @@ const InteractiveTemplate: ComponentStory< typeof Elevation > = ( args ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Elevation > = Template.bind( {} );
+export const Default: StoryFn< typeof Elevation > = Template.bind( {} );
 Default.args = {
 	value: 5,
 };
@@ -64,7 +64,7 @@ Default.args = {
  * Enable the `isInteractive` prop to automatically generate values
  * for the hover/active/focus states.
  */
-export const WithInteractive: ComponentStory< typeof Elevation > =
+export const WithInteractive: StoryFn< typeof Elevation > =
 	InteractiveTemplate.bind( {} );
 WithInteractive.args = {
 	...Default.args,
@@ -75,7 +75,7 @@ WithInteractive.args = {
  * You can also provide custom values for the hover/active/focus states
  * instead of using the `isInteractive` prop.
  */
-export const WithCustomInteractive: ComponentStory< typeof Elevation > =
+export const WithCustomInteractive: StoryFn< typeof Elevation > =
 	InteractiveTemplate.bind( {} );
 WithCustomInteractive.args = {
 	...Default.args,

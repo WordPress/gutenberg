@@ -254,7 +254,10 @@ function SandBox( {
 
 		return () => {
 			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
-			defaultView?.addEventListener( 'message', checkMessageForResize );
+			defaultView?.removeEventListener(
+				'message',
+				checkMessageForResize
+			);
 		};
 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378

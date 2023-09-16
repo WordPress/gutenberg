@@ -43,7 +43,7 @@ export const Indicator = styled.div< {
 	top: 0;
 	height: 100%;
 	border-radius: ${ CONFIG.radiusBlockUi };
-	background-color: var( --wp-components-color-accent, ${ COLORS.ui.theme } );
+	background-color: ${ COLORS.theme.accent };
 
 	${ ( { isIndeterminate, value } ) =>
 		isIndeterminate
@@ -54,7 +54,10 @@ export const Indicator = styled.div< {
 					animationName: animateProgressBar,
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 			  } )
-			: css( { width: `${ value }%` } ) };
+			: css( {
+					width: `${ value }%`,
+					transition: 'width 0.4s ease-in-out',
+			  } ) };
 `;
 
 export const ProgressElement = styled.progress`

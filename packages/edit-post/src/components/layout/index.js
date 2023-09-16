@@ -19,10 +19,11 @@ import {
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	useBlockCommands,
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock, Popover } from '@wordpress/components';
+import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -32,7 +33,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -71,7 +72,59 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+function useEditorStyles() {
+	const { hasThemeStyleSupport, editorSettings } = useSelect(
+		( select ) => ( {
+			hasThemeStyleSupport:
+				select( editPostStore ).isFeatureActive( 'themeStyles' ),
+			editorSettings: select( editorStore ).getEditorSettings(),
+		} ),
+		[]
+	);
+
+	// Compute the default styles.
+	return useMemo( () => {
+		const presetStyles =
+			editorSettings.styles?.filter(
+				( style ) =>
+					style.__unstableType && style.__unstableType !== 'theme'
+			) ?? [];
+
+		const defaultEditorStyles = [
+			...editorSettings.defaultEditorStyles,
+			...presetStyles,
+		];
+
+		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
+		const hasThemeStyles =
+			hasThemeStyleSupport &&
+			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+
+		// If theme styles are not present or displayed, ensure that
+		// base layout styles are still present in the editor.
+		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
+			defaultEditorStyles.push( {
+				css: getLayoutStyles( {
+					style: {},
+					selector: 'body',
+					hasBlockGapSupport: false,
+					hasFallbackGapSupport: true,
+					fallbackGapValue: '0.5em',
+				} ),
+			} );
+		}
+
+		return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+	}, [
+		editorSettings.defaultEditorStyles,
+		editorSettings.disableLayoutStyles,
+		editorSettings.styles,
+		hasThemeStyleSupport,
+	] );
+}
+
 function Layout() {
+	useBlockCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -95,45 +148,10 @@ function Layout() {
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
-		styles,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { isFeatureActive } = select( editPostStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
-		const hasThemeStyles = isFeatureActive( 'themeStyles' );
-
-		const themeStyles = [];
-		const presetStyles = [];
-		editorSettings.styles?.forEach( ( style ) => {
-			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
-				themeStyles.push( style );
-			} else {
-				presetStyles.push( style );
-			}
-		} );
-
-		const defaultEditorStyles = [
-			...editorSettings.defaultEditorStyles,
-			...presetStyles,
-		];
-
-		// If theme styles are not present or displayed, ensure that
-		// base layout styles are still present in the editor.
-		if (
-			! editorSettings.disableLayoutStyles &&
-			! ( hasThemeStyles && themeStyles.length )
-		) {
-			defaultEditorStyles.push( {
-				css: getLayoutStyles( {
-					style: {},
-					selector: 'body',
-					hasBlockGapSupport: false,
-					hasFallbackGapSupport: true,
-					fallbackGapValue: '0.5em',
-				} ),
-			} );
-		}
 
 		return {
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
@@ -166,12 +184,10 @@ function Layout() {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			styles:
-				hasThemeStyles && themeStyles.length
-					? editorSettings.styles
-					: defaultEditorStyles,
 		};
 	}, [] );
+
+	const styles = useEditorStyles();
 
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -204,11 +220,17 @@ function Layout() {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// We need to add the show-icon-labels class to the body element so it is applied to modals.
+	if ( showIconLabels ) {
+		document.body.classList.add( 'show-icon-labels' );
+	} else {
+		document.body.classList.remove( 'show-icon-labels' );
+	}
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
 		'is-distraction-free': isDistractionFree && isLargeViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
@@ -250,7 +272,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
-			<SettingsSidebar />
+
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
@@ -341,8 +363,8 @@ function Layout() {
 			<WelcomeGuide />
 			<PostSyncStatusModal />
 			<StartPageOptions />
-			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
+			<SettingsSidebar />
 		</>
 	);
 }

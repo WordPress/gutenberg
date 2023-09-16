@@ -22,7 +22,7 @@ import {
 	setNestedValue,
 } from './utils';
 import type * as ET from './entity-types';
-import { getUndoEdits, getRedoEdits } from './private-selectors';
+import type { UndoManager } from '@wordpress/undo-manager';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -40,10 +40,11 @@ export interface State {
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
-	undo: UndoState;
+	undoManager: UndoManager;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
+	userPatternCategories: Array< UserPatternCategory >;
 }
 
 type EntityRecordKey = string | number;
@@ -74,23 +75,22 @@ interface EntityConfig {
 	kind: string;
 }
 
-export interface UndoEdit {
-	name: string;
-	kind: string;
-	recordId: string;
-	from: any;
-	to: any;
-}
-
-interface UndoState {
-	list: Array< UndoEdit[] >;
-	offset: number;
-	cache: UndoEdit[];
-}
-
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
+}
+
+interface UserPatternCategory {
+	id: number;
+	name: string;
+	label: string;
+	slug: string;
+	description: string;
+}
+
+export interface UserPatternCategories {
+	patternCategories: Array< UserPatternCategory >;
+	patternCategoriesMap: Map< number, UserPatternCategory >;
 }
 
 type Optional< T > = T | undefined;
@@ -876,21 +876,6 @@ export function getLastEntityDeleteError(
 }
 
 /**
- * Returns the current undo offset for the
- * entity records edits history. The offset
- * represents how many items from the end
- * of the history stack we are at. 0 is the
- * last edit, -1 is the second last, and so on.
- *
- * @param state State tree.
- *
- * @return The current undo offset.
- */
-function getCurrentUndoOffset( state: State ): number {
-	return state.undo.offset;
-}
-
-/**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
@@ -904,9 +889,7 @@ export function getUndoEdit( state: State ): Optional< any > {
 	deprecated( "select( 'core' ).getUndoEdit()", {
 		since: '6.3',
 	} );
-	return state.undo.list[
-		state.undo.list.length - 2 + getCurrentUndoOffset( state )
-	]?.[ 0 ];
+	return undefined;
 }
 
 /**
@@ -923,9 +906,7 @@ export function getRedoEdit( state: State ): Optional< any > {
 	deprecated( "select( 'core' ).getRedoEdit()", {
 		since: '6.3',
 	} );
-	return state.undo.list[
-		state.undo.list.length + getCurrentUndoOffset( state )
-	]?.[ 0 ];
+	return undefined;
 }
 
 /**
@@ -937,7 +918,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( getUndoEdits( state ) );
+	return state.undoManager.hasUndo();
 }
 
 /**
@@ -949,7 +930,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( getRedoEdits( state ) );
+	return state.undoManager.hasRedo();
 }
 
 /**
@@ -1163,11 +1144,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  *
  * @return A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	// This unused state argument is listed here for the documentation generating tool (docgen).
-	( state: State ) => [],
-	( state: State ) => [ state.undo.list.length, state.undo.offset ]
-);
+export function getReferenceByDistinctEdits( state ) {
+	return state.editsReference;
+}
 
 /**
  * Retrieve the frontend template used for a given link.
@@ -1255,6 +1234,28 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+/**
+ * Retrieve the registered user pattern categories.
+ *
+ * @param state Data state.
+ *
+ * @return User patterns category array and map keyed by id.
+ */
+
+export function getUserPatternCategories(
+	state: State
+): UserPatternCategories {
+	const patternCategoriesMap = new Map< number, UserPatternCategory >();
+	state.userPatternCategories?.forEach(
+		( userCategory: UserPatternCategory ) =>
+			patternCategoriesMap.set( userCategory.id, userCategory )
+	);
+	return {
+		patternCategories: state.userPatternCategories,
+		patternCategoriesMap,
+	};
 }
 
 /**

@@ -49,7 +49,7 @@ export default function SidebarNavigationScreenTemplates() {
 		<SidebarNavigationScreen
 			title={ __( 'Templates' ) }
 			description={ __(
-				'Express the layout of your site with templates'
+				'Express the layout of your site with templates.'
 			) }
 			actions={
 				canCreate && (
@@ -63,7 +63,7 @@ export default function SidebarNavigationScreenTemplates() {
 			}
 			content={
 				<>
-					{ isLoading && __( 'Loading templates' ) }
+					{ isLoading && __( 'Loading templates…' ) }
 					{ ! isLoading && (
 						<ItemGroup>
 							{ ! templates?.length && (

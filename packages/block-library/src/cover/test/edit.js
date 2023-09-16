@@ -47,7 +47,7 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
 
 async function createAndSelectBlock() {
 	await userEvent.click(
-		screen.getByRole( 'button', {
+		screen.getByRole( 'option', {
 			name: 'Color: Black',
 		} )
 	);
@@ -72,7 +72,7 @@ describe( 'Cover block', () => {
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
 			const { container } = await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( colorPicker );
@@ -96,7 +96,7 @@ describe( 'Cover block', () => {
 			await setup();
 
 			await userEvent.click(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'option', {
 					name: 'Color: Black',
 				} )
 			);
@@ -389,7 +389,7 @@ describe( 'Cover block', () => {
 	describe( 'isDark settings', () => {
 		test( 'should toggle is-light class if background changed from light to dark', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( colorPicker );
@@ -405,7 +405,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 			await userEvent.click( screen.getByText( 'Overlay' ) );
-			const popupColorPicker = screen.getByRole( 'button', {
+			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( popupColorPicker );
@@ -413,7 +413,7 @@ describe( 'Cover block', () => {
 		} );
 		test( 'should remove is-light class if overlay color is removed', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( colorPicker );
@@ -428,7 +428,7 @@ describe( 'Cover block', () => {
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			// The default color is black, so clicking the black color option will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.
-			const popupColorPicker = screen.getByRole( 'button', {
+			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( popupColorPicker );

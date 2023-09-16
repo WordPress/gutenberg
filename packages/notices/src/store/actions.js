@@ -11,7 +11,6 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                               browser navigation.
  * @property {?Function} onClick Optional function to invoke when action is
  *                               triggered by user.
- *
  */
 
 let uniqueId = 0;

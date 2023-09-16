@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcuts from '..';
 
-const meta: ComponentMeta< typeof KeyboardShortcuts > = {
+const meta: Meta< typeof KeyboardShortcuts > = {
 	component: KeyboardShortcuts,
 	title: 'Components/KeyboardShortcuts',
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof KeyboardShortcuts > = ( props ) => (
+const Template: StoryFn< typeof KeyboardShortcuts > = ( props ) => (
 	<KeyboardShortcuts { ...props } />
 );
 
