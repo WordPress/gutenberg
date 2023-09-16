@@ -11,9 +11,6 @@ const em = { type: 'em' };
 const strong = { type: 'strong' };
 const img = { type: 'img', attributes: { src: '' } };
 const a = { type: 'a', attributes: { href: '#' } };
-const svg = { type: 'svg' };
-const path = { type: 'path', attributes: { d: 'M0,0 v2 h4' } };
-const use = { type: 'use', attributes: { 'xlink:href': '#a', href: '#a' } };
 
 export const spec = [
 	{
@@ -570,49 +567,6 @@ export const spec = [
 					type: 'img',
 				},
 			],
-			text: '\ufffc',
-		},
-	},
-	{
-		description: 'should handle SVG',
-		html: '<svg><path d="M0,0 v2 h4"/></svg>',
-		NS_URI: 'http://www.w3.org/2000/svg',
-		selectTarget: ( body ) => body.querySelector( 'path' ),
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 0,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 0 ],
-		record: {
-			start: 0,
-			end: 0,
-			formats: [ [ svg ] ],
-			replacements: [ path ],
-			text: '\ufffc',
-		},
-	},
-	{
-		description: 'should handle xlink',
-		html: '<svg><use xlink:href="#a" href="#a"/></svg>',
-		NS_URI: 'http://www.w3.org/1999/xlink',
-		selectTarget: ( body ) =>
-			body.querySelector( 'use' ).getAttributeNode( 'xlink:href' ),
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 0,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 0 ],
-		record: {
-			start: 0,
-			end: 0,
-			formats: [ [ svg ] ],
-			replacements: [ use ],
 			text: '\ufffc',
 		},
 	},

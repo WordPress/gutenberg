@@ -8,9 +8,6 @@ import { isRangeEqual } from './is-range-equal';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
-const NS_SVG = 'http://www.w3.org/2000/svg';
-const NS_XLINK = 'http://www.w3.org/1999/xlink';
-
 /**
  * Creates a path as an array of indices from the given root node to the given
  * node.
@@ -71,26 +68,11 @@ function append( element, child ) {
 	const { type, attributes } = child;
 
 	if ( type ) {
-		let addAttribute;
-		const isSVGTag = type === 'svg';
-		const isSVGContext = element.namespaceURI === NS_SVG;
-		if ( isSVGTag || isSVGContext ) {
-			child = element.ownerDocument.createElementNS( NS_SVG, type );
-			// Disables editing at top-level SVG elements.
-			if ( isSVGTag && ! isSVGContext ) {
-				child.setAttribute( 'contentEditable', false );
-			}
-			addAttribute = ( key, value ) => {
-				if ( key === 'xlink:href' )
-					child.setAttributeNS( NS_XLINK, key, value );
-				else child.setAttribute( key, value );
-			};
-		} else {
-			child = element.ownerDocument.createElement( type );
-			addAttribute = child.setAttribute.bind( child );
-		}
+		const namespaceURI = child.namespace || element.namespaceURI;
+		child = element.ownerDocument.createElementNS( namespaceURI, type );
+
 		for ( const key in attributes ) {
-			addAttribute( key, attributes[ key ] );
+			child.setAttribute( key, attributes[ key ] );
 		}
 	}
 
