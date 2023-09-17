@@ -253,7 +253,7 @@ function FontLibraryProvider( { children } ) {
 	const deactivateFontFamily = ( font ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts = fontFamilies[ font.source ] || [];
+		const initialCustomFonts = fontFamilies?.[ font.source ] ?? [];
 		const newCustomFonts = initialCustomFonts.filter(
 			( f ) => f.slug !== font.slug
 		);
@@ -266,7 +266,7 @@ function FontLibraryProvider( { children } ) {
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
 		// Merge the existing custom fonts with the new fonts.
 		const newCustomFonts = mergeFontFamilies(
-			fontFamilies.custom,
+			fontFamilies?.custom,
 			fontsToAdd
 		);
 		// Activate the fonts by set the new custom fonts array.
@@ -290,7 +290,7 @@ function FontLibraryProvider( { children } ) {
 	const toggleActivateFont = ( font, face ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialFonts = fontFamilies[ font.source ] || [];
+		const initialFonts = fontFamilies?.[ font.source ] ?? [];
 		// Toggles the received font family or font face
 		const newFonts = toggleFont( font, face, initialFonts );
 		// Updates the font families activated in global settings:
