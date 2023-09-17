@@ -78,7 +78,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				size,
 				value: selectedValue,
 				setValue,
-			} as ToggleGroupControlContextProps ),
+			} ) as ToggleGroupControlContextProps,
 		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
 	);
 

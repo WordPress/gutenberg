@@ -10,7 +10,7 @@ const UNITED_VALUE_REGEX =
  */
 export function parseCSSUnitValue(
 	toParse: string
-): [ number | undefined, string | undefined ] {
+): [ number | undefined , string | undefined  ] {
 	const value = toParse.trim();
 
 	const matched = value.match( UNITED_VALUE_REGEX );

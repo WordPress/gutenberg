@@ -82,7 +82,9 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		default: css`
 			height: 100%;
 			border: 1px solid transparent;
-			transition: box-shadow 0.1s linear, border 0.1s linear;
+			transition:
+				box-shadow 0.1s linear,
+				border 0.1s linear;
 
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 

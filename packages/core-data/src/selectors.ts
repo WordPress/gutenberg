@@ -278,7 +278,7 @@ export interface GetEntityRecord {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -290,7 +290,7 @@ export interface GetEntityRecord {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -317,7 +317,7 @@ export const getEntityRecord = createSelector(
 	( <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -381,7 +381,7 @@ export const getEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	EntityRecord extends ET.EntityRecord< any >
+	EntityRecord extends ET.EntityRecord< any >,
 >( state: State, kind: string, name: string, key: EntityRecordKey ) {
 	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
@@ -478,7 +478,7 @@ export interface GetEntityRecords {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -489,7 +489,7 @@ export interface GetEntityRecords {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -511,7 +511,7 @@ export interface GetEntityRecords {
 export const getEntityRecords = ( <
 	EntityRecord extends
 		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >
+		| Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,

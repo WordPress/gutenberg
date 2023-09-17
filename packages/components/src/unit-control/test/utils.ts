@@ -246,9 +246,9 @@ describe( 'UnitControl utils', () => {
 
 	describe( 'parseQuantityAndUnitFromRawValue', () => {
 		const cases: [
-			number | string | undefined,
-			number | undefined,
-			string | undefined
+			number | string | undefined ,
+			number | undefined ,
+			string | undefined ,
 		][] = [
 			// Test undefined.
 			[ undefined, undefined, undefined ],

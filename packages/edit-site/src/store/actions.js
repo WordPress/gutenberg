@@ -285,7 +285,7 @@ export const setPage =
 						.getEntityRecords( 'postType', 'wp_template', {
 							per_page: -1,
 						} )
-				 )?.find( ( { slug } ) => slug === currentTemplateSlug );
+				)?.find( ( { slug } ) => slug === currentTemplateSlug );
 				if ( currentTemplate ) {
 					template = currentTemplate;
 				} else {

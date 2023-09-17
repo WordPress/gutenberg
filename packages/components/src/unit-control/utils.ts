@@ -141,7 +141,7 @@ export function getParsedQuantityAndUnit(
 	rawValue?: string | number,
 	fallbackUnit?: string,
 	allowedUnits?: WPUnitControlUnit[]
-): [ number | undefined, string | undefined ] {
+): [ number | undefined , string | undefined  ] {
 	const initialValue = fallbackUnit
 		? `${ rawValue ?? '' }${ fallbackUnit }`
 		: rawValue;
@@ -177,7 +177,7 @@ export function hasUnits(
 export function parseQuantityAndUnitFromRawValue(
 	rawValue?: string | number,
 	allowedUnits: WPUnitControlUnit[] = ALL_CSS_UNITS
-): [ number | undefined, string | undefined ] {
+): [ number | undefined , string | undefined  ] {
 	let trimmedValue;
 	let quantityToReturn;
 
@@ -223,7 +223,7 @@ export function getValidParsedQuantityAndUnit(
 	allowedUnits?: WPUnitControlUnit[],
 	fallbackQuantity?: number,
 	fallbackUnit?: string
-): [ number | undefined, string | undefined ] {
+): [ number | undefined , string | undefined  ] {
 	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
 		rawValue,
 		allowedUnits
