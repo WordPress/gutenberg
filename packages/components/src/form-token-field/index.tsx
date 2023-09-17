@@ -73,7 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
-		__experimentalAddOnBlur = false,
+		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
 		props,
 		'wp.components.FormTokenField'
@@ -168,7 +168,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
-			if ( __experimentalAddOnBlur ) {
+			if ( tokenizeOnBlur ) {
 				addCurrentToken( true );
 			}
 		} else {
