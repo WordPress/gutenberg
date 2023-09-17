@@ -222,7 +222,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
-			userPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
