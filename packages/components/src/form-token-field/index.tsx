@@ -73,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
+		__experimentalAddOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
 		props,
 		'wp.components.FormTokenField'
@@ -167,6 +168,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
+			if ( __experimentalAddOnBlur ) {
+				addCurrentToken( true );
+			}
 		} else {
 			// Reset to initial state
 			setIncompleteTokenValue( '' );
@@ -406,7 +410,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addCurrentToken() {
+	function addCurrentToken( isOnBlur = false ) {
 		let preventDefault = false;
 		const selectedSuggestion = getSelectedSuggestion();
 
@@ -414,7 +418,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
 		} else if ( inputHasValidValue() ) {
-			addNewToken( incompleteTokenValue );
+			addNewToken( incompleteTokenValue, isOnBlur );
 			preventDefault = true;
 		}
 
@@ -438,7 +442,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addNewToken( token: string ) {
+	function addNewToken( token: string, isOnBlur: boolean = false ) {
 		if ( ! __experimentalValidateInput( token ) ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
 			return;
@@ -451,7 +455,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive ) {
+		if ( isActive && ! isOnBlur ) {
 			focus();
 		}
 	}
