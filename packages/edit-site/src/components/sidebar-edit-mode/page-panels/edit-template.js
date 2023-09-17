@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { check, reset } from '@wordpress/icons';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -97,7 +97,7 @@ export default function EditTemplate() {
 						<ResetDefaultTemplate onClick={ onClose } />
 						<MenuGroup>
 							<MenuItem
-								icon={ isTemplateHidden ? reset : check }
+								icon={ ! isTemplateHidden ? check : undefined }
 								onClick={ () => {
 									setPageContentFocusType(
 										isTemplateHidden
