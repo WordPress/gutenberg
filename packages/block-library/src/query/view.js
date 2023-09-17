@@ -18,6 +18,33 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
+const getVisibility = ( element ) => {
+	const { innerWidth, innerHeight } = window;
+	const rect = element.getBoundingClientRect();
+
+	// Completely outside.
+	if (
+		rect.x > innerWidth ||
+		rect.x + rect.width < 0 ||
+		rect.y > innerHeight ||
+		rect.y + rect.height < 0
+	) {
+		return 'none';
+	}
+
+	// Completely inside.
+	if (
+		rect.x + rect.width <= innerWidth &&
+		rect.x >= 0 &&
+		rect.y + rect.height <= innerHeight &&
+		rect.y >= 0
+	) {
+		return 'total';
+	}
+
+	return 'partial';
+};
+
 store( {
 	selectors: {
 		core: {
@@ -64,11 +91,24 @@ store( {
 						context.core.query.animation = 'finish';
 
 						// Focus the first anchor of the Query block.
-						document
-							.querySelector(
-								`[data-wp-navigation-id=${ id }] a[href]`
-							)
-							?.focus();
+						const firstAnchor = document.querySelector(
+							`[data-wp-navigation-id=${ id }] a[href]`
+						);
+						if ( firstAnchor ) {
+							firstAnchor.focus( { preventScroll: true } );
+							const visibility = getVisibility( firstAnchor );
+							if ( visibility !== 'total' ) {
+								const block =
+									visibility === 'none'
+										? 'center'
+										: 'nearest';
+
+								firstAnchor.scrollIntoView( {
+									behavior: 'smooth',
+									block,
+								} );
+							}
+						}
 					}
 				},
 				prefetch: async ( { ref } ) => {
