@@ -14,7 +14,7 @@
 -   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
 -   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
 -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
--   `FormTokenField`: Add `__experimentalAddOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus.
+-   `FormTokenField`: Add `__experimentalAddOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#53976](https://github.com/WordPress/gutenberg/pull/53976)).
 
 ### Bug Fix
 
