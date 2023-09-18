@@ -84,9 +84,9 @@ export const Stop = ( props ) => createElement( 'stop', props );
 
 export const SVG = forwardRef(
 	/**
-	 * @param {SVGProps}                           props isPressed indicates whether the SVG should appear as pressed.
-	 *                                                   Other props will be passed through to svg component.
-	 * @param {import('react').Ref<SVGSVGElement>} ref   The forwarded ref to the SVG element.
+	 * @param {SVGProps}                                    props isPressed indicates whether the SVG should appear as pressed.
+	 *                                                            Other props will be passed through to svg component.
+	 * @param {import('react').ForwardedRef<SVGSVGElement>} ref   The forwarded ref to the SVG element.
 	 *
 	 * @return {JSX.Element} Stop component
 	 */
