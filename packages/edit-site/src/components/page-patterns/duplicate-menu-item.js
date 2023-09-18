@@ -13,9 +13,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import {
 	TEMPLATE_PART_POST_TYPE,
-	PATTERN_THEME_TYPE,
-	PATTERN_SYNC_STATUSES,
-	PATTERN_POST_TYPE,
+	PATTERN_TYPES,
+	PATTERN_SYNC_TYPES,
 } from '../../utils/constants';
 import {
 	useExistingTemplateParts,
@@ -28,12 +27,12 @@ import usePatternCategories from '../sidebar-navigation-screen-patterns/use-patt
 const { useHistory } = unlock( routerPrivateApis );
 
 function getPatternMeta( item ) {
-	if ( item.type === PATTERN_THEME_TYPE ) {
-		return { wp_pattern_sync_status: PATTERN_SYNC_STATUSES.unsynced };
+	if ( item.type === PATTERN_TYPES.theme ) {
+		return { wp_pattern_sync_status: PATTERN_SYNC_TYPES.unsynced };
 	}
 
 	const syncStatus = item.patternBlock.wp_pattern_sync_status;
-	const isUnsynced = syncStatus === PATTERN_SYNC_STATUSES.unsynced;
+	const isUnsynced = syncStatus === PATTERN_SYNC_TYPES.unsynced;
 
 	return {
 		...item.patternBlock.meta,
@@ -153,7 +152,7 @@ export default function DuplicateMenuItem( {
 
 	async function createPattern() {
 		try {
-			const isThemePattern = item.type === PATTERN_THEME_TYPE;
+			const isThemePattern = item.type === PATTERN_TYPES.theme;
 			const title = sprintf(
 				/* translators: %s: Existing pattern title */
 				__( '%s (Copy)' ),
@@ -189,9 +188,9 @@ export default function DuplicateMenuItem( {
 			);
 
 			history.push( {
-				categoryType: PATTERN_THEME_TYPE,
+				categoryType: PATTERN_TYPES.theme,
 				categoryId,
-				postType: PATTERN_POST_TYPE,
+				postType: PATTERN_TYPES.user,
 				postId: result?.id,
 			} );
 

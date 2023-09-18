@@ -13,10 +13,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { filterOutDuplicatesByName } from './utils';
 import {
 	PATTERN_CORE_SOURCES,
-	PATTERN_THEME_TYPE,
-	PATTERN_SYNC_STATUSES,
+	PATTERN_TYPES,
+	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
@@ -108,7 +107,7 @@ const selectThemePatterns = ( select ) => {
 		.map( ( pattern ) => ( {
 			...pattern,
 			keywords: pattern.keywords || [],
-			type: 'pattern',
+			type: PATTERN_TYPES.theme,
 			blocks: parse( pattern.content, {
 				__unstableSkipMigrationLogs: true,
 			} ),
@@ -159,10 +158,9 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 	} ),
 	id: patternBlock.id,
 	name: patternBlock.slug,
-	syncStatus:
-		patternBlock.wp_pattern_sync_status || PATTERN_SYNC_STATUSES.full,
+	syncStatus: patternBlock.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 	title: patternBlock.title.raw,
-	type: PATTERN_POST_TYPE,
+	type: PATTERN_TYPES.user,
 	patternBlock,
 } );
 
@@ -171,7 +169,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		select( coreStore );
 
 	const query = { per_page: -1 };
-	const records = getEntityRecords( 'postType', PATTERN_POST_TYPE, query );
+	const records = getEntityRecords( 'postType', PATTERN_TYPES.user, query );
 	const categories = getUserPatternCategories();
 
 	let patterns = records
@@ -182,7 +180,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
-		PATTERN_POST_TYPE,
+		PATTERN_TYPES.user,
 		query,
 	] );
 
@@ -214,13 +212,13 @@ export const usePatterns = (
 					categoryId,
 					search,
 				} );
-			} else if ( categoryType === PATTERN_THEME_TYPE ) {
+			} else if ( categoryType === PATTERN_TYPES.theme ) {
 				return selectPatterns( select, {
 					categoryId,
 					search,
 					syncStatus,
 				} );
-			} else if ( categoryType === PATTERN_POST_TYPE ) {
+			} else if ( categoryType === PATTERN_TYPES.user ) {
 				return selectUserPatterns( select, { search, syncStatus } );
 			}
 			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };

@@ -39,10 +39,9 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
 import {
-	PATTERN_THEME_TYPE,
+	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	PATTERN_SYNC_STATUSES,
+	PATTERN_SYNC_TYPES,
 } from '../../utils/constants';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
@@ -59,8 +58,8 @@ function GridItem( { categoryId, item, ...props } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const isUserPattern = item.type === PATTERN_POST_TYPE;
-	const isNonUserPattern = item.type === PATTERN_THEME_TYPE;
+	const isUserPattern = item.type === PATTERN_TYPES.user;
+	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 
 	const { onClick } = useLink( {
@@ -129,7 +128,7 @@ function GridItem( { categoryId, item, ...props } ) {
 		itemIcon = templatePartIcons[ categoryId ];
 	} else {
 		itemIcon =
-			item.syncStatus === PATTERN_SYNC_STATUSES.full ? symbol : undefined;
+			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
@@ -150,10 +149,10 @@ function GridItem( { categoryId, item, ...props } ) {
 				id={ `edit-site-patterns-${ item.name }` }
 				{ ...props }
 				onClick={
-					item.type !== PATTERN_THEME_TYPE ? onClick : undefined
+					item.type !== PATTERN_TYPES.theme ? onClick : undefined
 				}
 				aria-disabled={
-					item.type !== PATTERN_THEME_TYPE ? 'false' : 'true'
+					item.type !== PATTERN_TYPES.theme ? 'false' : 'true'
 				}
 				aria-label={ item.title }
 				aria-describedby={
@@ -204,7 +203,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
-						{ item.type === PATTERN_THEME_TYPE ? (
+						{ item.type === PATTERN_TYPES.theme ? (
 							item.title
 						) : (
 							<Heading level={ 5 }>
@@ -219,7 +218,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								</Button>
 							</Heading>
 						) }
-						{ item.type === PATTERN_THEME_TYPE && (
+						{ item.type === PATTERN_TYPES.theme && (
 							<Tooltip
 								position="top center"
 								text={ __( 'This pattern cannot be edited.' ) }

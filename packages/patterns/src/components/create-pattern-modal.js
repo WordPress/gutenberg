@@ -14,12 +14,10 @@ import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
-export const PATTERN_DEFAULT_CATEGORY = 'all-patterns';
-
-export const PATTERN_SYNC_STATUSES = {
-	full: undefined,
-	unsynced: 'unsynced',
-};
+/**
+ * Internal dependencies
+ */
+import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
 
 /**
  * Internal dependencies
@@ -34,7 +32,7 @@ export default function CreatePatternModal( {
 	onClose,
 	className = 'patterns-menu-items__convert-modal',
 } ) {
-	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_STATUSES.full );
+	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
 	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
 	const { createPattern } = useDispatch( store );
@@ -108,12 +106,12 @@ export default function CreatePatternModal( {
 						help={ __(
 							'Editing the pattern will update it anywhere it is used.'
 						) }
-						checked={ ! syncType }
+						checked={ syncType === PATTERN_SYNC_TYPES.full }
 						onChange={ () => {
 							setSyncType(
-								syncType === PATTERN_SYNC_STATUSES.full
-									? PATTERN_SYNC_STATUSES.unsynced
-									: PATTERN_SYNC_STATUSES.full
+								syncType === PATTERN_SYNC_TYPES.full
+									? PATTERN_SYNC_TYPES.unsynced
+									: PATTERN_SYNC_TYPES.full
 							);
 						} }
 					/>

@@ -10,10 +10,7 @@ import { __ } from '@wordpress/i18n';
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
-import {
-	PATTERN_POST_TYPE,
-	PATTERN_DEFAULT_CATEGORY,
-} from '../../utils/constants';
+import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
@@ -23,7 +20,7 @@ export default function usePatternCategories() {
 	} );
 	const themePatterns = useThemePatterns();
 	const { patterns: userPatterns, categories: userPatternCategories } =
-		usePatterns( PATTERN_POST_TYPE );
+		usePatterns( PATTERN_TYPES.user );
 
 	const patternCategories = useMemo( () => {
 		const categoryMap = {};

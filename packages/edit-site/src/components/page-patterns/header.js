@@ -13,10 +13,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import {
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_THEME_TYPE,
-} from '../../utils/constants';
+import { TEMPLATE_PART_POST_TYPE, PATTERN_TYPES } from '../../utils/constants';
 
 export default function PatternsHeader( {
 	categoryId,
@@ -38,7 +35,7 @@ export default function PatternsHeader( {
 		);
 		title = templatePartArea?.label;
 		description = templatePartArea?.description;
-	} else if ( type === PATTERN_THEME_TYPE ) {
+	} else if ( type === PATTERN_TYPES.theme ) {
 		const patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
 		);
