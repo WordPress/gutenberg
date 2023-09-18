@@ -5,7 +5,7 @@ import type { WordPressComponentProps } from '../ui/context';
 import { useContextSystem } from '../ui/context';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../ui/utils/font-size';
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG } from '../utils';
 import type { HeadingProps } from './types';
 
 export function useHeading(
@@ -31,7 +31,7 @@ export function useHeading(
 	}
 
 	const textProps = useText( {
-		color: COLORS.gray[ 900 ],
+		color: 'var(--wp-theme-color-neutral-text-strong)',
 		size: getHeadingFontSize( level ),
 		isBlock: true,
 		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],

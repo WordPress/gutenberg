@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
+import { ThemeProvider } from '@wordpress/theme';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -34,14 +35,16 @@ export default function App() {
 	}
 
 	return (
-		<SlotFillProvider>
-			<GlobalStylesProvider>
-				<UnsavedChangesWarning />
-				<RouterProvider>
-					<Layout />
-					<PluginArea onError={ onPluginAreaError } />
-				</RouterProvider>
-			</GlobalStylesProvider>
-		</SlotFillProvider>
+		<ThemeProvider isDark className="edit-site-theme">
+			<SlotFillProvider>
+				<GlobalStylesProvider>
+					<UnsavedChangesWarning />
+					<RouterProvider>
+						<Layout />
+						<PluginArea onError={ onPluginAreaError } />
+					</RouterProvider>
+				</GlobalStylesProvider>
+			</SlotFillProvider>
+		</ThemeProvider>
 	);
 }

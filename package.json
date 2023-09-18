@@ -85,6 +85,7 @@
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/style-engine": "file:packages/style-engine",
 		"@wordpress/sync": "file:packages/sync",
+		"@wordpress/theme": "file:packages/theme",
 		"@wordpress/token-list": "file:packages/token-list",
 		"@wordpress/undo-manager": "file:packages/undo-manager",
 		"@wordpress/url": "file:packages/url",

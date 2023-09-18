@@ -9,7 +9,7 @@
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			background: $gray-800;
+			background: var(--wp-theme-color-neutral-bg-hover);
 		}
 		.block-editor-list-view-block__menu {
 			margin-left: -$grid-unit-10;
@@ -31,7 +31,7 @@
 
 			&:hover,
 			&:focus {
-				color: $white;
+				color: var(--wp-theme-color-neutral-text-hover);
 
 				.block-editor-list-view-block__menu-cell {
 					opacity: 1;
@@ -59,7 +59,7 @@
 			background: transparent;
 
 			&:hover {
-				background: $gray-800;
+				background: var(--wp-theme-color-neutral-bg-hover);
 			}
 		}
 	}
@@ -81,11 +81,12 @@
 	}
 
 	.components-button {
-		color: $gray-600;
+		color: var(--wp-theme-color-neutral-text);
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: $white;
+			color: var(--wp-theme-color-neutral-text-hover);
+			background-color: var(--wp-theme-color-neutral-bg-hover);
 		}
 	}
 }

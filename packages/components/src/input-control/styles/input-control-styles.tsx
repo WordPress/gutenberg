@@ -44,8 +44,8 @@ export const Root = styled( Flex )< RootProps >`
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
 	const backgroundColor = disabled
-		? COLORS.ui.backgroundDisabled
-		: COLORS.ui.background;
+		? 'var(--wp-theme-color-neutral-bg-disabled)'
+		: 'var(--wp-theme-color-neutral-bg-input)';
 
 	return css( { backgroundColor } );
 };
@@ -211,7 +211,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: var( --wp-theme-color-neutral-text-strong );
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -268,7 +268,9 @@ const backdropFocusedStyles = ( {
 	disabled,
 	isFocused,
 }: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+	let borderColor = isFocused
+		? 'var(--wp-theme-color-neutral-border-strong-hover)'
+		: 'var(--wp-theme-color-neutral-border-strong)';
 
 	let boxShadow;
 	let outline;
@@ -282,7 +284,7 @@ const backdropFocusedStyles = ( {
 	}
 
 	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
+		borderColor = 'var(--wp-theme-color-neutral-border-disabled)';
 	}
 
 	return css( {

@@ -16,7 +16,7 @@
 	box-sizing: border-box;
 	padding: 6px 12px;
 	border-radius: $radius-block-ui;
-	color: $components-color-foreground;
+	color: var(--wp-theme-color-neutral-text);
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;

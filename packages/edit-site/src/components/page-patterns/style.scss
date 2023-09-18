@@ -1,5 +1,5 @@
 .edit-site-patterns {
-	border-left: 1px solid $gray-800;
+	border-left: 1px solid var(--wp-theme-color-neutral-border);
 	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
@@ -11,14 +11,6 @@
 		@include break-medium {
 			width: auto;
 		}
-	}
-
-	.components-text {
-		color: $gray-600;
-	}
-
-	.components-heading {
-		color: $gray-200;
 	}
 
 	@include break-medium {
@@ -35,22 +27,10 @@
 	.edit-site-patterns__search {
 		input[type="search"] {
 			height: $button-size-next-default-40px;
-			background: $gray-800;
-			color: $gray-200;
-
-			&:focus {
-				background: $gray-800;
-			}
-		}
-
-		svg {
-			fill: $gray-600;
 		}
 	}
 
 	.edit-site-patterns__sync-status-filter {
-		background: $gray-800;
-		border: none;
 		height: $button-size-next-default-40px;
 		min-width: max-content;
 		width: 100%;
@@ -59,13 +39,6 @@
 		@include break-medium {
 			width: 300px;
 		}
-	}
-	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
-		color: $gray-600;
-	}
-	.edit-site-patterns__sync-status-filter-option:active {
-		background: $gray-700;
-		color: $gray-100;
 	}
 
 	.edit-site-patterns__grid-pagination {
@@ -98,7 +71,7 @@
 .edit-site-patterns__header {
 	position: sticky;
 	top: 0;
-	background: $gray-900;
+	background: var(--wp-theme-color-neutral-bg-muted);
 	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
 	z-index: z-index(".edit-site-patterns__header");
 }
@@ -192,16 +165,9 @@
 }
 
 .edit-site-patterns__pattern-title {
-	color: $gray-200;
-
 	.is-link {
 		text-decoration: none;
-		color: $gray-200;
-
-		&:hover,
-		&:focus {
-			color: $white;
-		}
+		color: var(--wp-theme-color-neutral-text-strong);
 	}
 
 	.edit-site-patterns__pattern-icon {

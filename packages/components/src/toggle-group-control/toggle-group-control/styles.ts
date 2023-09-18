@@ -17,7 +17,7 @@ export const toggleGroupControl = ( {
 }: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
-	background: ${ COLORS.ui.background };
+	background: var( --wp-theme-color-neutral-bg-input );
 	border: 1px solid transparent;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
@@ -31,14 +31,14 @@ export const toggleGroupControl = ( {
 
 const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 	const enclosingBorder = css`
-		border-color: ${ COLORS.ui.border };
+		border-color: var( --wp-theme-color-neutral-border-strong );
 	`;
 
 	return css`
 		${ isBlock && enclosingBorder }
 
 		&:hover {
-			border-color: ${ COLORS.ui.borderHover };
+			border-color: var( --wp-theme-color-neutral-border-strong-hover );
 		}
 
 		&:focus-within {
