@@ -109,6 +109,8 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 			)
 		) {
 			setIsListViewOpened( false );
+			// When no block is selected and the sidebar is closed,
+			// focus should be returned to the list view toggle button.
 			if ( ! hasBlocksSelected ) {
 				listViewToggleElement?.focus();
 			}

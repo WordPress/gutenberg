@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -24,7 +27,11 @@ import { unlock } from '../../lock-unlock';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-export default function ListViewSidebar() {
+export default function ListViewSidebar( { listViewToggleElement } ) {
+	const hasBlocksSelected = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
+		[]
+	);
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	// This hook handles focus when the sidebar first renders.
@@ -33,11 +40,19 @@ export default function ListViewSidebar() {
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			setIsListViewOpened( false );
-		}
-	}
+	const closeOnEscape = useCallback(
+		( event ) => {
+			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+				event.preventDefault();
+				setIsListViewOpened( false );
+
+				if ( ! hasBlocksSelected ) {
+					listViewToggleElement?.focus();
+				}
+			}
+		},
+		[ hasBlocksSelected, listViewToggleElement, setIsListViewOpened ]
+	);
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
@@ -68,8 +83,7 @@ export default function ListViewSidebar() {
 		listViewFocusArea.focus();
 	}
 
-	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut( 'core/edit-site/toggle-list-view', () => {
+	const handleToggleListViewShortcut = useCallback( () => {
 		// If the sidebar has focus, it is safe to close.
 		if (
 			sidebarRef.current.contains(
@@ -77,11 +91,23 @@ export default function ListViewSidebar() {
 			)
 		) {
 			setIsListViewOpened( false );
-			// If the list view or close button does not have focus, focus should be moved to it.
+			// When no block is selected and the sidebar is closed,
+			// focus should be returned to the list view toggle button.
+			if ( ! hasBlocksSelected ) {
+				listViewToggleElement?.focus();
+			}
 		} else {
+			// If the list view or close button does not have focus, focus should be moved to it.
 			handleSidebarFocus();
 		}
-	} );
+	}, [ hasBlocksSelected, listViewToggleElement, setIsListViewOpened ] );
+
+	// This only fires when the sidebar is open because of the conditional rendering.
+	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
+	useShortcut(
+		'core/edit-site/toggle-list-view',
+		handleToggleListViewShortcut
+	);
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
