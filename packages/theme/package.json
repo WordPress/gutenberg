@@ -18,17 +18,17 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"files": [
+		"index.js",
+		"style.scss"
+	],
 	"main": "index.js",
-	"style": "build/style.scss",
+	"style": "style.scss",
 	"dependencies": {
 		"@wordpress/element": "file:../element",
 		"colord": "^2.7.0"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "node builders/css-properties-from-theme > build/style.scss"
 	}
 }
