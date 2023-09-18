@@ -96,7 +96,7 @@ test.describe( 'Cover', () => {
 			await coverBlockUtils.getBackgroundColorAndOpacity(
 				coverBlock.locator( 'span[aria-hidden="true"]' )
 			);
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
+		expect( backgroundDimColor ).toBe( 'rgb(255, 255, 255)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
 	} );
 
