@@ -121,4 +121,4 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 				'aria-labelledby'?: string;
 				'aria-label'?: never;
 		  }
-	 );
+	);

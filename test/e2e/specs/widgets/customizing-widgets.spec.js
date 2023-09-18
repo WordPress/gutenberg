@@ -352,9 +352,8 @@ test.describe( 'Widgets Customizer', () => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
-		const legacyWidgetBlock = await widgetsCustomizerPage.addBlock(
-			'Legacy Widget'
-		);
+		const legacyWidgetBlock =
+			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
 			.locator(
 				'role=combobox[name="Select a legacy widget to display:"i]'
@@ -401,9 +400,8 @@ test.describe( 'Widgets Customizer', () => {
 		await page.click( 'role=menuitem[name=/Delete/]' );
 
 		// Add it back again using the variant.
-		const testWidgetBlock = await widgetsCustomizerPage.addBlock(
-			'Test Widget'
-		);
+		const testWidgetBlock =
+			await widgetsCustomizerPage.addBlock( 'Test Widget' );
 
 		titleInput = testWidgetBlock.locator( 'role=textbox[name="Title:"i]' );
 

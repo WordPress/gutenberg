@@ -198,10 +198,9 @@ async function updatePackages( config ) {
 	);
 	const changelogFilesPublicPackages = changelogFiles.filter(
 		( changelogPath ) => {
-			const pkg = require( path.join(
-				path.dirname( changelogPath ),
-				'package.json'
-			) );
+			const pkg = require(
+				path.join( path.dirname( changelogPath ), 'package.json' )
+			);
 			return pkg.private !== true;
 		}
 	);

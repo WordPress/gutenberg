@@ -27,23 +27,23 @@ import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
-import { SYNC_TYPES, PATTERNS } from './utils';
+import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../../utils/constants';
 import Pagination from './pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SYNC_FILTERS = {
 	all: __( 'All' ),
-	[ SYNC_TYPES.full ]: __( 'Synced' ),
-	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
+	[ PATTERN_SYNC_TYPES.full ]: __( 'Synced' ),
+	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Standard' ),
 };
 
 const SYNC_DESCRIPTIONS = {
 	all: '',
-	[ SYNC_TYPES.full ]: __(
+	[ PATTERN_SYNC_TYPES.full ]: __(
 		'Patterns that are kept in sync across the site.'
 	),
-	[ SYNC_TYPES.unsynced ]: __(
+	[ PATTERN_SYNC_TYPES.unsynced ]: __(
 		'Patterns that can be changed freely without affecting the site.'
 	),
 };
@@ -64,7 +64,7 @@ export default function PatternsList( { categoryId, type } ) {
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
 
 	const isUncategorizedThemePatterns =
-		type === PATTERNS && categoryId === 'uncategorized';
+		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
 
 	const { patterns, isResolving } = usePatterns(
 		type,
@@ -155,7 +155,7 @@ export default function PatternsList( { categoryId, type } ) {
 							__nextHasNoMarginBottom
 						/>
 					</FlexBlock>
-					{ type === PATTERNS && (
+					{ type === PATTERN_TYPES.theme && (
 						<ToggleGroupControl
 							className="edit-site-patterns__sync-status-filter"
 							hideLabelFromVision

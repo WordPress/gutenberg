@@ -61,6 +61,7 @@
 				"textTransform": true
 			}
 		},
+		"__unstablePasteTextInline": true,
 		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-heading-editor",
