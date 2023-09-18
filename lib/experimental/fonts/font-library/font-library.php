@@ -22,7 +22,8 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
-		'public'       => true,
+		'public'       => false,
+		'_builtin'     => true,
 		'label'        => 'Font Library',
 		'show_in_rest' => true,
 	);
