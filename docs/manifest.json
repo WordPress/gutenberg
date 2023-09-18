@@ -18,9 +18,9 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Node.js development tools",
-		"slug": "nodejs-development-tools",
-		"markdown_source": "../docs/getting-started/devenv/nodejs-development-tools.md",
+		"title": "Node development environment",
+		"slug": "node-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/node-development-environment.md",
 		"parent": "devenv"
 	},
 	{
