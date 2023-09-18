@@ -191,7 +191,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				>
 					{ itemIcon && ! isNonUserPattern && (
 						<Tooltip
-							position="top center"
+							placement="top"
 							text={ __(
 								'Editing this pattern will also update anywhere it is used'
 							) }
@@ -220,7 +220,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						) }
 						{ item.type === PATTERN_TYPES.theme && (
 							<Tooltip
-								position="top center"
+								placement="top"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
 								<Icon
