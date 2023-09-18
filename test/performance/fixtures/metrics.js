@@ -64,8 +64,7 @@ export class Metrics {
 					paintTimings.find(
 						( { name } ) => name === 'first-contentful-paint'
 					).startTime - responseEnd,
-				// This is evaluated right after Playwright found the block selector.
-				firstBlock: performance.now() - responseEnd,
+				timeSinceResponseEnd: performance.now() - responseEnd,
 			};
 		} );
 	}

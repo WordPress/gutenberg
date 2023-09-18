@@ -81,7 +81,11 @@ test.describe( 'Post Editor Performance', () => {
 				if ( i > throwaway ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
-							results[ metric ].push( duration );
+							if ( metric === 'timeSinceResponseEnd' ) {
+								results.firstBlock.push( duration );
+							} else {
+								results[ metric ].push( duration );
+							}
 						}
 					);
 				}
