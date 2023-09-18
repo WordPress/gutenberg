@@ -56,7 +56,6 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
-// @core-merge: This code needs to be removed.
 add_action(
 	'enqueue_block_editor_assets',
 	function () {
