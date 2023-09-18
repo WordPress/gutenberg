@@ -80,7 +80,7 @@ function register_block_core_post_terms() {
 	foreach ( $taxonomies as $taxonomy ) {
 		// Skip the `wp_pattern_category` taxonomy as this should not be an
 		// available variation for the `core/post-terms` block.
-		if ('wp_pattern_category' === $taxonomy->name) {
+		if ( 'wp_pattern_category' === $taxonomy->name ) {
 			continue;
 		}
 		$variation = array(
