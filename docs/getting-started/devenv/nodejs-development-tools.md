@@ -1,15 +1,15 @@
 # Node.js development tools
 
-When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment. Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript outside of the web browser.
+When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment. Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript code from the terminal (also known as a command-line interface, CLI, or shell)
 
-Installing `node` will automatically include Node Package Manager (`npm`) which includes the script `npx`, two tools you will frequently use in block and plugin development.
+Installing `node` will automatically include the Node Package Manager (`npm`) and the Node Package eXecute (`npx`), two tools you will frequently use in block and plugin development.
 
-Node Package Manager (`npm`) serves multiple purposes, including dependency management and script execution. It's the recommended package manager and is extensively featured in all documentation.
+Node Package Manager ([`npm`](https://docs.npmjs.com/cli/v10/commands/npm)) serves multiple purposes, including dependency management and script execution. It's the recommended package manager and is extensively featured in all documentation.
 
-The `npx` script is used to run commands from packages without installing them globally and is commonly used when scaffolding blocks with the [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
+The Node Package eXecute ([`npx`](https://docs.npmjs.com/cli/v10/commands/npx)) tool is used to run commands from packages without installing them globally and is commonly used when scaffolding blocks with the [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
 
 
-## Mac and Linux installations
+## Node.js installation on Mac and Linux (with `nvm`)
 
 For Mac and Linux, it's recommended that you use [Node Version Manager](https://github.com/nvm-sh/nvm) (`nvm`). This allows you to install and manage specific versions of `node`, which are installed locally in your home directory, avoiding any global permission issues.
 
@@ -22,14 +22,14 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
 
 2. Quit and restart the terminal.
-3. Run `nvm install lts` in the terminal to install the latest [LTS](https://nodejs.dev/en/about/releases/) (Long Term Support) version of Node.js.
+3. Run `nvm install --lts` in the terminal to install the latest [LTS](https://nodejs.dev/en/about/releases/) (Long Term Support) version of Node.js.
 4. Run `node -v` and `npm -v` in the terminal to verify the installed `node` and `npm` versions.
 
 If needed, you can also install specific versions of `node`. For example, install version 18 by running `nvm install 18`, and switch between different versions by running `nvm use [version-number]`. See the `nvm` [usage guide](https://github.com/nvm-sh/nvm#usage) for more details.
 
 Some projects, like Gutenberg, include an [`.nvmrc`](https://github.com/WordPress/gutenberg/blob/trunk/.nvmrc) file which specifies the version of `node` that should be used. In this case, running `nvm use` will automatically select the correct version. If the version is not yet installed, you will get an error that tells you what version needs to be added. Run `nvm install [version-number]` followed by `nvm use`.
 
-## Windows or alternative installs
+## Node.js installation on Windows and others
 
 You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux. 
 
