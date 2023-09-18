@@ -10,8 +10,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { CopyButton } from './styles';
-import { Text } from '../text';
-import { Tooltip } from '../ui/tooltip';
+import Tooltip from '../tooltip';
 
 import type { ColorCopyButtonProps } from './types';
 
@@ -56,20 +55,17 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 
 	return (
 		<Tooltip
-			content={
-				<Text color="white">
-					{ copiedColor === color.toHex()
-						? __( 'Copied!' )
-						: __( 'Copy' ) }
-				</Text>
+			delay={ 0 }
+			hideOnClick={ false }
+			text={
+				copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' )
 			}
-			placement="bottom"
 		>
 			<CopyButton
-				isSmall
 				ref={ copyRef }
 				icon={ copy }
 				showTooltip={ false }
+				size="small"
 			/>
 		</Tooltip>
 	);

@@ -73,7 +73,6 @@ function Tooltip( props: TooltipProps ) {
 	return (
 		<>
 			<Ariakit.TooltipAnchor
-				onBlur={ tooltipStore.hide }
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
