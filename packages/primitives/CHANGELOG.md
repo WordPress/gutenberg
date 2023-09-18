@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `<SVG>` now forwards ref to the underlying `<svg>` element ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
 ## 3.39.0 (2023-08-31)
 
 ## 3.38.0 (2023-08-16)
