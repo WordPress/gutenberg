@@ -36,5 +36,5 @@ export type SandBoxProps = {
 	 *
 	 * @default 0
 	 */
-	tabIndex?: number;
+	tabIndex?: HTMLElement[ 'tabIndex' ];
 };

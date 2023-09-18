@@ -42,6 +42,20 @@ type GradientPickerBaseProps = {
 	 * @default 2
 	 */
 	headingLevel?: HeadingSize;
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
 } & (
 	| {
 			/**

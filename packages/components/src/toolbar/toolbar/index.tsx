@@ -42,7 +42,15 @@ function UnforwardedToolbar(
 			alternative: 'ToolbarGroup component',
 			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
 		} );
-		return <ToolbarGroup { ...props } className={ className } />;
+		// Extracting title from `props` because `ToolbarGroup` doesn't accept it.
+		const { title: _title, ...restProps } = props;
+		return (
+			<ToolbarGroup
+				isCollapsed={ false }
+				{ ...restProps }
+				className={ className }
+			/>
+		);
 	}
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(

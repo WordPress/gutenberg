@@ -39,6 +39,20 @@ export type DuotonePickerProps = {
 	 * Callback which is called when the duotone colors change.
 	 */
 	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
 } & (
 	| {
 			/**
