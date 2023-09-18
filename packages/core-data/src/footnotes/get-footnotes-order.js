@@ -12,21 +12,19 @@ const cache = new WeakMap();
 
 function getBlockFootnotesOrder( block ) {
 	if ( ! cache.has( block ) ) {
-		const order = getRichTextValuesCached( block ).reduce(
-			( acc, value ) => {
-				if ( value.indexOf( 'data-fn' ) !== -1 ) {
-					create( { html: value } ).replacements.forEach(
-						( { type, attributes } ) => {
-							if ( type === 'core/footnote' ) {
-								acc.push( attributes[ 'data-fn' ] );
-							}
-						}
-					);
+		const order = [];
+		for ( const value of getRichTextValuesCached( block ) ) {
+			if ( ! value.includes( 'data-fn="' ) ) {
+				continue;
+			}
+
+			for ( const { type, attributes } of create( { html: value } )
+				.replacements ) {
+				if ( type === 'core/footnote' ) {
+					order.push( attributes[ 'data-fn' ] );
 				}
-				return acc;
-			},
-			[]
-		);
+			}
+		}
 		cache.set( block, order );
 	}
 

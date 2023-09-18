@@ -57,22 +57,22 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			if ( value.indexOf( 'data-fn' ) === -1 ) {
+			if ( value.indexOf( 'data-fn="' ) === -1 ) {
 				continue;
 			}
 
 			const richTextValue = create( { html: value } );
 
-			richTextValue.replacements.forEach( ( replacement ) => {
-				if ( replacement.type !== 'core/footnote' ) return;
-
-				const id = replacement.attributes[ 'data-fn' ];
-				const index = newOrder.indexOf( id );
-
-				replacement.innerHTML = `<a href="#${ id }" id="${ id }-link">${
-					index + 1
-				}</a>`;
-			} );
+			for ( const replacement of richTextValue.replacements ) {
+				if ( replacement.type === 'core/footnote' ) {
+					const id = replacement.attributes[ 'data-fn' ];
+					const index = newOrder.indexOf( id );
+					// See https://github.com/WordPress/gutenberg/blob/6db51a6ee92db6c3324a875135656861bbd9e55d/packages/block-library/src/footnotes/format.js#L108.
+					replacement.innerHTML = `<a href="#${ id }" id="${ id }-link">${
+						index + 1
+					}</a>`;
+				}
+			}
 
 			attributes[ key ] = toHTMLString( { value: richTextValue } );
 		}
