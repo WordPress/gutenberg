@@ -93,7 +93,6 @@ function ScreenBlock( { name, variation } ) {
 	} );
 	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
-	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
 
