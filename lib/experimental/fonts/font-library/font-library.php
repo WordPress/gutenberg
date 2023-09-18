@@ -56,6 +56,15 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_register_fixed_font' ) ) {
+	function wp_register_fixed_font( $font ) {
+		return WP_Font_Library::register_fixed_font( $font );
+	}
+}
+
+add_filter( 'wp_theme_json_data_theme', array ( 'WP_Font_Library', 'add_fixed_fonts_to_theme_json' ) );
+
+
 // @core-merge: This code needs to be removed.
 add_action(
 	'enqueue_block_editor_assets',

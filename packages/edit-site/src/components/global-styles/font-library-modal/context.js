@@ -80,13 +80,20 @@ function FontLibraryProvider( { children } ) {
 	// Save font families to the global styles post in the database.
 	const saveFontFamilies = () => {
 		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
-			'settings.typography.fontFamilies',
+			'settings.typography.fontFamilies.theme',
+			'settings.typography.fontFamilies.custom',
 		] );
 	};
 
 	// Library Fonts
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
+
+	const baseDefaultFonts = fontFamilies?.default
+		? fontFamilies.default
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'default' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
 
 	const baseThemeFonts = baseFontFamilies?.theme
 		? baseFontFamilies.theme
@@ -318,6 +325,7 @@ function FontLibraryProvider( { children } ) {
 			value={ {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
+				baseDefaultFonts,
 				themeFonts,
 				baseThemeFonts,
 				customFonts,

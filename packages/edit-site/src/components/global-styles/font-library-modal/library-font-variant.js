@@ -3,14 +3,11 @@
  */
 import { useContext } from '@wordpress/element';
 import { CheckboxControl, Flex } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import { getFontFaceVariantName } from './utils';
 
 /**
  * Internal dependencies
  */
+import { getFontFaceVariantName } from './utils';
 import { FontLibraryContext } from './context';
 import FontFaceDemo from './font-demo';
 
@@ -36,16 +33,19 @@ function LibraryFontVariant( { face, font } ) {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
+	const checked = font.source === 'default' ? true : isIstalled;
 
 	return (
 		<div className="font-library-modal__library-font-variant">
 			<Flex justify="space-between" align="center" gap="1rem">
 				<FontFaceDemo fontFace={ face } text={ displayName } />
-				<CheckboxControl
-					checked={ isIstalled }
-					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
-				/>
+				{ font.source !== 'default' && ( 
+					<CheckboxControl
+						checked={ checked }
+						onChange={ handleToggleActivation }
+						__nextHasNoMarginBottom={ true }
+					/>
+				) }
 			</Flex>
 		</div>
 	);

@@ -30,7 +30,7 @@ function LibraryFontCard( { font, ...props } ) {
 	return (
 		<FontCard
 			font={ font }
-			variantsText={ variantsText }
+			variantsText={ font.source !== 'default' ? variantsText : '' }
 			actionHandler={ <Icon icon={ chevronRight } /> }
 			{ ...props }
 		/>
