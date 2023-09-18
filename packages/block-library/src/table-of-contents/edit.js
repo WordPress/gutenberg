@@ -15,12 +15,12 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { renderToString } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -51,15 +51,24 @@ export default function TableOfContentsEdit( {
 } ) {
 	useObserveHeadings( clientId );
 
-	const instanceId = useInstanceId( TableOfContentsEdit );
-	const instanceIdDesc = sprintf(
-		'table-of-contents-edit-%d-desc',
-		instanceId
+	const instanceId = useInstanceId(
+		TableOfContentsEdit,
+		'table-of-contents'
 	);
 
-	const blockProps = useBlockProps( {
-		'aria-describedby': instanceIdDesc,
-	} );
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Remove previous warning if any, to show one at a time per block.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -130,7 +139,7 @@ export default function TableOfContentsEdit( {
 	if ( headings.length === 0 ) {
 		return (
 			<>
-				<div { ...blockProps }>
+				<div { ...useBlockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
@@ -146,16 +155,14 @@ export default function TableOfContentsEdit( {
 
 	return (
 		<>
-			<nav { ...blockProps }>
+			<nav { ...useBlockProps }>
 				<ol>
 					<TableOfContentsList
 						nestedHeadingList={ headingTree }
 						disableLinkActivation={ true }
+						onClick={ showRedirectionPreventedNotice }
 					/>
 				</ol>
-				<VisuallyHidden id={ instanceIdDesc }>
-					{ __( 'Table of Contents links disabled in editor.' ) }
-				</VisuallyHidden>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

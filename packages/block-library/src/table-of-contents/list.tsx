@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { MouseEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import type { WPElement } from '@wordpress/element';
@@ -13,10 +18,19 @@ const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
 export default function TableOfContentsList( {
 	nestedHeadingList,
 	disableLinkActivation,
+	onClick,
 }: {
 	nestedHeadingList: NestedHeadingData[];
 	disableLinkActivation?: boolean;
+	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
 } ): WPElement {
+	// Handle onClick callback.
+	const handleOnClick = ( event: MouseEvent< HTMLAnchorElement > ) => {
+		if ( 'function' === typeof onClick ) {
+			onClick( event );
+		}
+	};
+
 	return (
 		<>
 			{ nestedHeadingList.map( ( node, index ) => {
@@ -28,9 +42,7 @@ export default function TableOfContentsList( {
 						href={ link }
 						aria-disabled={ disableLinkActivation || undefined }
 						onClick={
-							disableLinkActivation
-								? ( event ) => event?.preventDefault()
-								: undefined
+							disableLinkActivation ? handleOnClick : undefined
 						}
 						onContextMenu={
 							disableLinkActivation
