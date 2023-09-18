@@ -176,7 +176,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 			rimraf( source.path ),
 			fs.promises.readdir( tempDir ),
 		] )
-	 )[ 2 ];
+	)[ 2 ];
 
 	/**
 	 * The plugin container is the extracted directory which is the direct parent

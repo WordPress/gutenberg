@@ -140,9 +140,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		requestUtils,
 		linkControl,
 	} ) => {
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the
@@ -213,9 +212,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		const firstResult = await linkControl.getNthSearchResult( 0 );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText = await linkControl.getSearchResultText(
-			firstResult
-		);
+		const firstResultText =
+			await linkControl.getSearchResultText( firstResult );
 
 		// Create the link.
 		await firstResult.click();
@@ -454,9 +452,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		// inserted block even if the block had been deselected and then reselected.
 		// See: https://github.com/WordPress/gutenberg/issues/50601
 
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the

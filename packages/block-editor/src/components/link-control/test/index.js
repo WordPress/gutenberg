@@ -1218,9 +1218,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Resolve the `createSuggestion` promise.
 			resolver();
 
-			const currentLink = await screen.findByLabelText(
-				'Currently selected'
-			);
+			const currentLink =
+				await screen.findByLabelText( 'Currently selected' );
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
