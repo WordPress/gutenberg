@@ -8,7 +8,3 @@ export const defaultTheme = {
 	//shadows: {...},
 	colors: generateColors( {} ),
 };
-
-module.exports = {
-	defaultTheme,
-};

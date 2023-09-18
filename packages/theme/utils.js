@@ -18,7 +18,3 @@ export const themeToCss = ( theme ) => {
 		.map( ( [ key, value ] ) => `--wp-theme-${ key }: ${ value };` )
 		.join( '\n' );
 };
-
-module.exports = {
-	themeToCss,
-};
