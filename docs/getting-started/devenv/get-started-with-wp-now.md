@@ -29,7 +29,7 @@ wp-now start
 
 After the script runs, your default web browser will automatically open the new local site, and you'll be logged in with the username `admin` and the password `password`.
 
-<div class="callout-tip">
+<div class="callout callout-tip">
     If you encounter any errors when running <code>wp-now start</code>, make sure that you are using at least <code>node</code> v18, or v20 if you are using the Blueprint feature.
 </div>
 
