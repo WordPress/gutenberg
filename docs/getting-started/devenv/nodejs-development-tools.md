@@ -11,7 +11,7 @@ The Node Package eXecute ([`npx`](https://docs.npmjs.com/cli/v10/commands/npx)) 
 
 ## Node.js installation on Mac and Linux (with `nvm`)
 
-For Mac and Linux, it's recommended that you use [Node Version Manager](https://github.com/nvm-sh/nvm) (`nvm`). This allows you to install and manage specific versions of `node`, which are installed locally in your home directory, avoiding any global permission issues.
+It's recommended that you use [Node Version Manager](https://github.com/nvm-sh/nvm) (`nvm`) to install Node.js. This allows you to install and manage specific versions of `node`, which are installed locally in your home directory, avoiding any global permission issues.
 
 Here are the quick instructions for installing `node` using `nvm`. See the [complete installation guide](https://github.com/nvm-sh/nvm#installing-and-updating) for more details.
 
