@@ -13,7 +13,7 @@ import { unlock } from '../lock-unlock';
 
 const { useStyleOverride } = unlock( blockEditorPrivateApis );
 
-export default function useGapStyles( { blockGap, clientId } ) {
+export default function GapStyles( { blockGap, clientId } ) {
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	const fallbackValue = `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
