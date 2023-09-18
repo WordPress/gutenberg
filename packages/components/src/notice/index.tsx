@@ -16,7 +16,6 @@ import { close } from '@wordpress/icons';
  */
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
-import type { SyntheticEvent } from 'react';
 import type { DeprecatedButtonProps } from '../button/types';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -108,8 +107,7 @@ function Notice( {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event: SyntheticEvent ) => {
-		event?.preventDefault?.();
+	const onDismissNotice = () => {
 		onDismiss();
 		onRemove();
 	};
