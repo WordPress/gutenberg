@@ -12,7 +12,7 @@ The simplest approach is to rely on the `useStateWithHistory` hook provided by t
 
 First, make sure you add the `@wordpress/compose` package to your dependencies, then use the hook like so:
 
-```js
+```jsx
 import { useStateWithHistory } from '@wordpress/compose';
 import { createRoot, createElement, useState } from "@wordpress/element";
 import {
@@ -36,18 +36,12 @@ function Editor() {
             }
         >
             <div className="undo-redo-toolbar">
-                <Button
-                    onClick={ undo }
-                    disabled={ ! hasUndo }
-                    icon={ undoIcon }
-                    label="Undo"
-                />
-                <Button
-                    onClick={ redo }
-                    disabled={ ! hasRedo }
-                    icon={ redoIcon }
-                    label="Redo"
-                />
+                <button onClick={ undo } disabled={ ! hasUndo }>
+                    Undo
+                </button>
+                <button onClick={ redo } disabled={ ! hasRedo }>
+                    Redo
+                </button>
             </div>
             <BlockCanvas />
         </BlockEditorProvider>
