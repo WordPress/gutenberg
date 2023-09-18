@@ -127,18 +127,6 @@ export default function useSiteEditorSettings() {
 		}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
 
-	const { baseURL } = useSelect( ( select ) => {
-		const { getEntityRecord, canUser } = select( coreStore );
-
-		const siteSettings = canUser( 'read', 'settings' )
-			? getEntityRecord( 'root', 'site' )
-			: undefined;
-
-		return {
-			baseURL: siteSettings?.url,
-		};
-	}, [] );
-
 	const blockPatterns = useMemo(
 		() =>
 			[
@@ -186,7 +174,6 @@ export default function useSiteEditorSettings() {
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
-			baseURL,
 		};
 	}, [
 		storedSettings,
@@ -195,6 +182,5 @@ export default function useSiteEditorSettings() {
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		baseURL,
 	] );
 }

@@ -13,7 +13,7 @@ import {
 	file,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 
 const ICONS_MAP = {
 	post: postList,
@@ -51,10 +51,12 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	shouldShowType = false,
-	baseURL = '',
 } ) => {
-	// Remove the base URL from the suggestion URL to display it in a more compact way.
-	const suggestionURL = suggestion?.url.replace( baseURL, '' );
+	// Remove the baseURL from any suggestion that is not a manually entered URL.
+	// This is to reduce visual noise in the search results.
+	const suggestionURL = isURL
+		? suggestion?.url
+		: '/' + getPath( suggestion?.url ) + '/';
 
 	const info = isURL
 		? __( 'Press ENTER to add this link' )

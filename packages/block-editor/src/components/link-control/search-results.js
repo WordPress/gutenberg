@@ -3,7 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden, MenuGroup } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * External dependencies
@@ -16,7 +15,6 @@ import classnames from 'classnames';
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
-import { store as blockEditorStore } from '../../store';
 
 export default function LinkControlSearchResults( {
 	instanceId,
@@ -65,11 +63,6 @@ export default function LinkControlSearchResults( {
 			{ labelText }
 		</VisuallyHidden>
 	);
-
-	const baseURL = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.baseURL;
-	}, [] );
 
 	return (
 		<div className="block-editor-link-control__search-results-wrapper">
@@ -130,7 +123,6 @@ export default function LinkControlSearchResults( {
 								searchTerm={ currentInputValue }
 								shouldShowType={ shouldShowSuggestionsTypes }
 								isFrontPage={ suggestion?.isFrontPage }
-								baseURL={ baseURL }
 							/>
 						);
 					} ) }
