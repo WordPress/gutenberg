@@ -26,6 +26,7 @@ export * from './medium';
 export * from './patreon';
 export * from './pinterest';
 export * from './pocket';
+export * from './pocketcasts';
 export * from './reddit';
 export * from './skype';
 export * from './snapchat';

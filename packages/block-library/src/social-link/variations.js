@@ -30,6 +30,7 @@ import {
 	PatreonIcon,
 	PinterestIcon,
 	PocketIcon,
+	PocketcastsIcon,
 	RedditIcon,
 	SkypeIcon,
 	SnapchatIcon,
@@ -226,6 +227,12 @@ const variations = [
 		attributes: { service: 'pocket' },
 		title: 'Pocket',
 		icon: PocketIcon,
+	},
+	{
+		name: 'pocketcasts',
+		attributes: { service: 'pocketcasts' },
+		title: 'Pocketcasts',
+		icon: PocketcastsIcon,
 	},
 	{
 		name: 'reddit',
