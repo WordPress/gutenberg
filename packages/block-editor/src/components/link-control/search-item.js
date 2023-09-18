@@ -14,11 +14,6 @@ import {
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
-import { useSelect } from '@wordpress/data';
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
 
 const ICONS_MAP = {
 	post: postList,
@@ -56,12 +51,8 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	shouldShowType = false,
+	baseURL = '',
 } ) => {
-	const baseURL = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.baseURL;
-	}, [] );
-
 	// Remove the base URL from the suggestion URL to display it in a more compact way.
 	const suggestionURL = suggestion?.url.replace( baseURL, '' );
 
