@@ -195,6 +195,7 @@
 		"eslint-plugin-import": "2.25.2",
 		"eslint-plugin-jest": "27.2.3",
 		"eslint-plugin-jest-dom": "5.0.2",
+		"eslint-plugin-prettier": "5.0.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"eslint-plugin-storybook": "0.6.13",
 		"eslint-plugin-testing-library": "5.7.2",
