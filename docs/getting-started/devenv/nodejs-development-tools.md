@@ -1,6 +1,6 @@
 # Node.js development tools
 
-When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment. Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript code from the terminal (also known as a command-line interface, CLI, or shell)
+When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment (see [Block Development Environment](README.md)). Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript code from the terminal (also known as a command-line interface, CLI, or shell)
 
 Installing `node` will automatically include the Node Package Manager (`npm`) and the Node Package eXecute (`npx`), two tools you will frequently use in block and plugin development.
 
@@ -13,7 +13,7 @@ The Node Package eXecute ([`npx`](https://docs.npmjs.com/cli/v10/commands/npx)) 
 
 It's recommended that you use [Node Version Manager](https://github.com/nvm-sh/nvm) (`nvm`) to install Node.js. This allows you to install and manage specific versions of `node`, which are installed locally in your home directory, avoiding any global permission issues.
 
-Here are the quick instructions for installing `node` using `nvm`. See the [complete installation guide](https://github.com/nvm-sh/nvm#installing-and-updating) for more details.
+Here are the quick instructions for installing `node` using `nvm` and set the recommended Node version for block development. See the [complete installation guide](https://github.com/nvm-sh/nvm#installing-and-updating) for more details.
 
 1. Open the terminal and run the following to install `nvm`. On macOS, the required developer tools are not installed by default. Install them if prompted.
 

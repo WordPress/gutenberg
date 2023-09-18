@@ -32,7 +32,7 @@ The list goes on. While modern JavaScript development can be challenging, WordPr
 
 **The recommended Node.js version for block development is [Active LTS](https://nodejs.dev/en/about/releases/) (Long Term Support)**. However, there are times when you  need to to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 
-To install Node.js development tools and learn more about each, refer to the links below.
+To be able to use the [Node.js tools and packages provided by WordPress](https://github.com/WordPress/gutenberg/tree/trunk/packages) for block development you'll need to set a proper Node.js runtime environment in your machine. To learn more about how to do this, refer to the links below.
 
 -   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-tools.md#mac-and-linux-installations)
 -   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-tools.md#windows-or-alternative-installs)
