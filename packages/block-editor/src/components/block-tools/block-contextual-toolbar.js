@@ -94,7 +94,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	 */
 	useLayoutEffect( () => {
 		// don't do anything if not fixed toolbar
-		if ( ! isFixed || ! blockType ) {
+		if ( ! isFixed ) {
 			return;
 		}
 
@@ -103,6 +103,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		);
 
 		if ( ! blockToolbar ) {
+			return;
+		}
+
+		if ( ! blockType ) {
+			blockToolbar.style.width = 'initial';
 			return;
 		}
 
