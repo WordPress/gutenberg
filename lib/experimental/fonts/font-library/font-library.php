@@ -62,3 +62,12 @@ add_action(
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
 	}
 );
+
+$default_font_collection = array (
+    'id'             => 'google-fonts',
+    'name'           => 'Google Fonts',
+    'description'    => 'Google Fonts collection.',
+    'data_json_file' => path_join( __DIR__, 'google-fonts.json' ),
+);
+
+wp_register_font_collection ( $default_font_collection );
