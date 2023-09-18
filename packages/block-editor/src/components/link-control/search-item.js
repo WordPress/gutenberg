@@ -52,7 +52,7 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	shouldShowType = false,
 } ) => {
-	// Remove the baseURL from any suggestion that is not a manually entered URL.
+	// Remove the site URL from any suggestion that is not a manually entered URL.
 	// This is to reduce visual noise in the search results.
 	const suggestionURL = isURL
 		? suggestion?.url
