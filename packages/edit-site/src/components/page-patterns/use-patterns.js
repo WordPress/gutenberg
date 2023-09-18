@@ -170,11 +170,14 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 
 	const query = { per_page: -1 };
 	const records = getEntityRecords( 'postType', PATTERN_TYPES.user, query );
-	const categories = getUserPatternCategories();
-
+	const userPatternCategories = getUserPatternCategories();
+	const categories = new Map();
+	userPatternCategories?.forEach( ( userCategory ) =>
+		categories.set( userCategory.id, userCategory )
+	);
 	let patterns = records
 		? records.map( ( record ) =>
-				patternBlockToPattern( record, categories.patternCategoriesMap )
+				patternBlockToPattern( record, categories )
 		  )
 		: EMPTY_PATTERN_LIST;
 
@@ -197,7 +200,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		hasCategory: () => true,
 	} );
 
-	return { patterns, isResolving, categories: categories.patternCategories };
+	return { patterns, isResolving, categories: userPatternCategories };
 };
 
 export const usePatterns = (
