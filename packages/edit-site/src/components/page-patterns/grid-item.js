@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { BlockPreview } from '@wordpress/block-editor';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -41,12 +44,16 @@ import DuplicateMenuItem from './duplicate-menu-item';
 import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS, SYNC_TYPES } from './utils';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 
 function GridItem( { categoryId, item, ...props } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const { __experimentalDeleteReusableBlock } =
@@ -135,6 +142,10 @@ function GridItem( { categoryId, item, ...props } ) {
 				item.title
 		  );
 
+	const additionalStyles = ! backgroundColor
+		? [ { css: 'body { background: #fff; }' } ]
+		: undefined;
+
 	return (
 		<li className={ patternClassNames }>
 			<button
@@ -159,7 +170,12 @@ function GridItem( { categoryId, item, ...props } ) {
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+				{ ! isEmpty && (
+					<BlockPreview
+						blocks={ item.blocks }
+						additionalStyles={ additionalStyles }
+					/>
+				) }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
 				<div
