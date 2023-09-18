@@ -78,11 +78,19 @@ function register_block_core_post_terms() {
 
 	// Create and register the eligible taxonomies variations.
 	foreach ( $taxonomies as $taxonomy ) {
+		// Skip the `wp_pattern_category` taxonomy as this should not be an
+		// available variation for the `core/post-terms` block.
+		if ( 'wp_pattern_category' === $taxonomy->name ) {
+			continue;
+		}
 		$variation = array(
 			'name'        => $taxonomy->name,
 			'title'       => $taxonomy->label,
-			/* translators: %s: taxonomy's label */
-			'description' => sprintf( __( 'Display the assigned taxonomy: %s' ), $taxonomy->label ),
+			'description' => sprintf(
+				/* translators: %s: taxonomy's label */
+				__( 'Display a list of assigned terms from the taxonomy: %s' ),
+				$taxonomy->label
+			),
 			'attributes'  => array(
 				'term' => $taxonomy->name,
 			),

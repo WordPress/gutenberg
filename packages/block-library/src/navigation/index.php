@@ -105,7 +105,7 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
 			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
-		};
+		}
 		// Add directives to the submenu.
 		if ( $w->next_tag(
 			array(
@@ -120,7 +120,7 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 		block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
 	}
 	return $w->get_updated_html();
-};
+}
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -263,7 +263,7 @@ function block_core_navigation_render_submenu_icon() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		static function( $block ) {
+		static function ( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -393,7 +393,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
 
-	$nav_menu_name = '';
+	$nav_menu_name = $attributes['ariaLabel'] ?? '';
 
 	/**
 	 * Deprecated:
@@ -904,7 +904,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);

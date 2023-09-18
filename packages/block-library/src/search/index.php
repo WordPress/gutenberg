@@ -182,7 +182,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 			data-wp-on--keydown="actions.core.search.handleSearchKeydown"
 			data-wp-on--focusout="actions.core.search.handleSearchFocusout"
 		';
-	};
+	}
 
 	return sprintf(
 		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',

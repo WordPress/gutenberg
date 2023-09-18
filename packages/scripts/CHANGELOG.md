@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-### Enhancement
+### Enhancements
 
 -   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
+-   The bundled `wp-prettier` dependency has been upgraded from `2.8.5` to `3.0.3` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
 
 ### Bug Fix
 

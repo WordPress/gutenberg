@@ -70,9 +70,9 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'get_callback' => function( $object ) {
-					if ( ! empty( $object['wp_id'] ) ) {
-						$post = get_post( $object['wp_id'] );
+				'get_callback' => function ( $template_object ) {
+					if ( ! empty( $template_object['wp_id'] ) ) {
+						$post = get_post( $template_object['wp_id'] );
 						if ( $post && isset( $post->post_modified ) ) {
 							return mysql_to_rfc3339( $post->post_modified );
 						}
@@ -84,19 +84,6 @@ if ( ! function_exists( 'add_modified_wp_template_schema' ) ) {
 	}
 }
 add_filter( 'rest_api_init', 'add_modified_wp_template_schema' );
-
-// If the Block Hooks experiment is enabled, we load the block patterns
-// controller in lib/experimental/rest-api.php instead.
-if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-hooks' ) ) {
-	/**
-	 * Registers the block patterns REST API routes.
-	 */
-	function gutenberg_register_rest_block_patterns() {
-		$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_3();
-		$block_patterns->register_routes();
-	}
-	add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-}
 
 /**
  * Registers the Navigation Fallbacks REST API routes.
