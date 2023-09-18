@@ -59,7 +59,6 @@ function getStatusLabel( status: NoticeProps[ 'status' ] ) {
 			return __( 'Warning notice' );
 		case 'info':
 			return __( 'Information notice' );
-
 		case 'error':
 			return __( 'Error notice' );
 		case 'success':
