@@ -6,12 +6,12 @@
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
-			"lightbox": {
-				"enabled": true
-			},
 			"id": 8,
 			"sizeSlug": "large",
-			"linkDestination": "none"
+			"linkDestination": "none",
+			"lightbox": {
+				"enabled": true
+			}
 		},
 		"innerBlocks": []
 	}
