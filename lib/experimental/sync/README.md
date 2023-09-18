@@ -25,7 +25,7 @@ To subscribe to a set of topics, a client must send a POST request with the foll
 ```js
 
 await (
-	await fetch( 'http://localhost:7888/site-wp-dev/wp-admin/admin-ajax.php', {
+	await fetch( window.wp.ajax.settings.url, {
 		body: new URLSearchParams( {
 			subscriber_id: '1',
 			action: 'gutenberg_signaling_server',
@@ -58,7 +58,7 @@ To publish a message in a specific topic, a client must send a POST request with
 ```js
 
 await (
-	await fetch( 'http://localhost:7888/site-wp-dev/wp-admin/admin-ajax.php', {
+	await fetch( window.wp.ajax.settings.url, {
 		body: new URLSearchParams( {
 			subscriber_id: '1',
 			action: 'gutenberg_signaling_server',
@@ -92,7 +92,7 @@ To unsubscribe from a set of topics, a client must send a POST request with the 
 
 ```js
 await (
-	await fetch( 'http://localhost:7888/site-wp-dev/wp-admin/admin-ajax.php', {
+	await fetch( window.wp.ajax.settings.url, {
 		body: new URLSearchParams( {
 			subscriber_id: '1',
 			action: 'gutenberg_signaling_server',
@@ -123,7 +123,7 @@ To send a ping, the client should send a message with the following parameters:
 
 ```js
 await (
-	await fetch( 'http://localhost:7888/site-wp-dev/wp-admin/admin-ajax.php', {
+	await fetch( window.wp.ajax.settings.url, {
 		body: new URLSearchParams( {
 			subscriber_id: '1',
 			action: 'gutenberg_signaling_server',
