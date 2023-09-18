@@ -34,8 +34,8 @@ The list goes on. While modern JavaScript development can be challenging, WordPr
 
 To be able to use the Node.js tools and [packages provided by WordPress](https://github.com/WordPress/gutenberg/tree/trunk/packages) for block development, you'll need to set a proper Node.js runtime environment on your machine.. To learn more about how to do this, refer to the links below.
 
--   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/node-development-environment.md#node-js-installation-on-mac-and-linux-with-nvm)
--   [Install Node.js for Windows](/docs/getting-started/devenv/node-development-environment.md#node-js-installation-on-windows-and-others)
+-   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-mac-and-linux-with-nvm)
+-   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-windows-and-others)
 
 ## Local WordPress environment
 
