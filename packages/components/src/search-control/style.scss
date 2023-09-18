@@ -36,6 +36,10 @@
 			-webkit-appearance: none;
 		}
 	}
+
+	&.is-next-40px-default-size input[type="search"].components-search-control__input {
+		height: $grid-unit-50;
+	}
 }
 
 .components-search-control__icon {

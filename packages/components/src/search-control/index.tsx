@@ -23,6 +23,7 @@ import type { ForwardedRef } from 'react';
 function UnforwardedSearchControl(
 	{
 		__nextHasNoMarginBottom,
+		__next40pxDefaultSize = false,
 		className,
 		onChange,
 		onKeyDown,
@@ -44,6 +45,7 @@ function UnforwardedSearchControl(
 		if ( onClose ) {
 			return (
 				<Button
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					icon={ closeSmall }
 					label={ __( 'Close search' ) }
 					onClick={ onClose }
@@ -54,6 +56,7 @@ function UnforwardedSearchControl(
 		if ( !! value ) {
 			return (
 				<Button
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					icon={ closeSmall }
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
@@ -74,7 +77,9 @@ function UnforwardedSearchControl(
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
-			className={ classnames( className, 'components-search-control' ) }
+			className={ classnames( className, 'components-search-control', {
+				'is-next-40px-default-size': __next40pxDefaultSize,
+			} ) }
 		>
 			<div className="components-search-control__input-wrapper">
 				<input

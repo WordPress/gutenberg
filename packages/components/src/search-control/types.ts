@@ -40,4 +40,10 @@ export type SearchControlProps = Pick<
 	 * The current value of the input.
 	 */
 	value?: string;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
