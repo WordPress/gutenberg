@@ -32,7 +32,7 @@ type PlacementToAnimationOriginTuple = [
 ];
 type PlacementToInitialTranslationTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
-	'translateY' | 'translateX' ,
+	'translateY' | 'translateX',
 	CSSProperties[ 'translate' ],
 ];
 
