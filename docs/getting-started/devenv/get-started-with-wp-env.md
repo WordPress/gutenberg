@@ -2,7 +2,7 @@
 
 The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-env`) lets you set up a local WordPress environment (site) for building and testing plugins and themes, without any additional configuration.
 
-Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#install-nodejs-development-tools) if you have not already done so.
+Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so.
 
 ## Quick start
  
