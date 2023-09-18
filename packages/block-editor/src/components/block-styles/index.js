@@ -71,6 +71,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 					return (
 						<Button
+							__next40pxDefaultSize
 							className={ classnames(
 								'block-editor-block-styles__item',
 								{
@@ -81,6 +82,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 							key={ style.name }
 							variant="secondary"
 							label={ buttonText }
+							showTooltip={ false }
 							onMouseEnter={ () => styleItemHandler( style ) }
 							onFocus={ () => styleItemHandler( style ) }
 							onMouseLeave={ () => styleItemHandler( null ) }
