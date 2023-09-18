@@ -89,6 +89,7 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
+	// Filter patterns by category: the default category indicates that all patterns will be shown.
 	const onlyFilterByCategory =
 		config.categoryId !== PATTERN_DEFAULT_CATEGORY &&
 		! normalizedSearchTerms.length;

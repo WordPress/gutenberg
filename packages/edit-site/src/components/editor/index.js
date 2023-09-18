@@ -44,7 +44,7 @@ import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
-import { POST_TYPE_LABELS } from '../../utils/constants';
+import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
@@ -165,7 +165,8 @@ export default function Editor( { isLoading } ) {
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			POST_TYPE_LABELS[ editedPostType ] ?? POST_TYPE_LABELS.wp_template
+			POST_TYPE_LABELS[ editedPostType ] ??
+				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
 
