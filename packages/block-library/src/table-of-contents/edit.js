@@ -51,6 +51,7 @@ export default function TableOfContentsEdit( {
 } ) {
 	useObserveHeadings( clientId );
 
+	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
 		TableOfContentsEdit,
 		'table-of-contents'
@@ -139,7 +140,7 @@ export default function TableOfContentsEdit( {
 	if ( headings.length === 0 ) {
 		return (
 			<>
-				<div { ...useBlockProps }>
+				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
@@ -155,7 +156,7 @@ export default function TableOfContentsEdit( {
 
 	return (
 		<>
-			<nav { ...useBlockProps }>
+			<nav { ...blockProps }>
 				<ol>
 					<TableOfContentsList
 						nestedHeadingList={ headingTree }
