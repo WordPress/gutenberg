@@ -160,7 +160,7 @@ function ScreenBlock( { name, variation } ) {
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
+		if ( newStyle.layout !== userSettings.layout ) {
 			setSettings( {
 				...userSettings,
 				layout: newStyle.layout,

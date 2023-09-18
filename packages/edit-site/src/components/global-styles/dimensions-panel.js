@@ -58,7 +58,7 @@ export default function DimensionsPanel() {
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
+		if ( newStyle.layout !== userSettings.layout ) {
 			const updatedSettings = {
 				...userSettings,
 				layout: newStyle.layout,
