@@ -7,6 +7,7 @@ import {
 	Button,
 	Flex,
 	FlexItem,
+	Icon,
 } from '@wordpress/components';
 
 /**
@@ -14,8 +15,9 @@ import {
  */
 import FontDemo from './font-demo';
 import { getPreviewStyle } from './utils';
+import { chevronRight } from '@wordpress/icons';
 
-function FontCard( { font, onClick, actionHandler, variantsText } ) {
+function FontCard( { font, onClick, variantsText } ) {
 	const fakeFontFace = {
 		fontStyle: 'normal',
 		fontWeight: '400',
@@ -60,7 +62,9 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 									_n( 'variant', 'variants', variantsCount ) }
 						</Text>
 					</FlexItem>
-					<FlexItem>{ !! actionHandler && actionHandler }</FlexItem>
+					<FlexItem>
+						<Icon icon={ chevronRight } />
+					</FlexItem>
 				</Flex>
 			</Flex>
 		</Button>
