@@ -41,7 +41,6 @@ export type TooltipProps = {
 	 *
 	 * Specify y- and x-axis as a space-separated string. Supports `"top"`,
 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
-	 * Where the tooltip should be positioned relative to its parent.
 	 *
 	 * @deprecated
 	 * @default bottom
