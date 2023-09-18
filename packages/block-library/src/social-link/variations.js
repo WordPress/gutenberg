@@ -18,6 +18,7 @@ import {
 	FoursquareIcon,
 	GoodreadsIcon,
 	GoogleIcon,
+	GooglepodcastsIcon,
 	GitHubIcon,
 	InstagramIcon,
 	LastfmIcon,
@@ -152,6 +153,12 @@ const variations = [
 		attributes: { service: 'google' },
 		title: 'Google',
 		icon: GoogleIcon,
+	},
+	{
+		name: 'googlepodcasts',
+		attributes: { service: 'googlepodcasts' },
+		title: 'Google Podcasts',
+		icon: GooglepodcastsIcon,
 	},
 	{
 		name: 'github',

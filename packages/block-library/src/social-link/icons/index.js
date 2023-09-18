@@ -14,6 +14,7 @@ export * from './flickr';
 export * from './foursquare';
 export * from './goodreads';
 export * from './google';
+export * from './googlepodcasts';
 export * from './github';
 export * from './instagram';
 export * from './lastfm';
