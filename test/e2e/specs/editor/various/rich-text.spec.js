@@ -656,11 +656,7 @@ test.describe( 'RichText', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: '1' },
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: '2' },
+						attributes: { content: '1<br>2' },
 					},
 				],
 			},
