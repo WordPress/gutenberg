@@ -530,9 +530,11 @@ class WP_Font_Family {
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
 		$new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
-		$intersecting   = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
+		if ( isset( $post_font_data['fontFace'] ) && ! empty( $post_font_data['fontFace'] ) ) {
+			$intersecting = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
+		}
 
-		if ( ! empty( $intersecting ) ) {
+		if ( isset( $intersecting ) && ! empty( $intersecting ) ) {
 			$serialized_font_faces   = array_map( 'serialize', $new_data['fontFace'] );
 			$serialized_intersecting = array_map( 'serialize', $intersecting );
 
