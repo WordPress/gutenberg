@@ -101,8 +101,7 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 		}
 	}
 
-	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut( 'core/edit-post/toggle-list-view', () => {
+	const handleToggleListViewShortcut = useCallback( () => {
 		// If the sidebar has focus, it is safe to close.
 		if (
 			sidebarRef.current.contains(
@@ -110,12 +109,21 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 			)
 		) {
 			setIsListViewOpened( false );
-			// TODO: Should we set focus here on the list view button toggle, too?
+			if ( ! hasBlocksSelected ) {
+				listViewToggleElement?.focus();
+			}
 		} else {
 			// If the list view or outline does not have focus, focus should be moved to it.
 			handleSidebarFocus( tab );
 		}
-	} );
+	}, [ hasBlocksSelected, listViewToggleElement, setIsListViewOpened, tab ] );
+
+	// This only fires when the sidebar is open because of the conditional rendering.
+	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
+	useShortcut(
+		'core/edit-post/toggle-list-view',
+		handleToggleListViewShortcut
+	);
 
 	/**
 	 * Render tab content for a given tab name.
