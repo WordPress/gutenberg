@@ -40,6 +40,11 @@
 	&.is-next-40px-default-size input[type="search"].components-search-control__input {
 		height: $grid-unit-50;
 	}
+
+	&.is-size-compact input[type="search"].components-search-control__input {
+		height: $grid-unit-40;
+	}
+
 }
 
 .components-search-control__icon {
