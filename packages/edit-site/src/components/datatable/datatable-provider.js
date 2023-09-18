@@ -69,6 +69,8 @@ export default function DataTable( { data, columns, options = {}, children } ) {
 					),
 				enableSorting: false,
 				enableHiding: false,
+				width: 35,
+				maxWidth: 35,
 			},
 			...columns,
 		];

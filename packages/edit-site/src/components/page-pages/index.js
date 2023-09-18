@@ -128,9 +128,7 @@ export default function PagePages() {
 				cell: ( props ) => {
 					const page = props.row.original;
 					return (
-						<VStack
-							spacing={ 1 }
-						>
+						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
 								<Link
 									params={ {
@@ -145,11 +143,9 @@ export default function PagePages() {
 						</VStack>
 					);
 				},
-				maxSize: 400,
+				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
-				// TODO: check about footers..
-				// footer: ( props ) => props.column.id,
 			},
 			{
 				header: __( 'Author' ),
@@ -215,9 +211,7 @@ export default function PagePages() {
 						meta: { resetQuery: setResetQuery },
 					} }
 				>
-					<VStack
-						spacing={ 4 }
-					>
+					<VStack spacing={ 4 }>
 						<HStack justify="space-between">
 							<DataTableGlobalSearchInput />
 							<ToggleStatusFilter onChange={ setStatus } />

@@ -43,7 +43,14 @@ export function DataTablePageSizeControl() {
 		<SelectControl
 			__nextHasNoMarginBottom
 			labelPosition="side"
-			prefix={ <InputControlPrefixWrapper as={ 'label' } className="edit-site-table__per-page-control-prefix">{ prefix }</InputControlPrefixWrapper> }
+			prefix={
+				<InputControlPrefixWrapper
+					as={ 'label' }
+					className="edit-site-table__per-page-control-prefix"
+				>
+					{ prefix }
+				</InputControlPrefixWrapper>
+			}
 			value={ table.getState().pagination.pageSize }
 			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
 				value: pageSize,
@@ -114,10 +121,10 @@ function DataTableColumnsVisibilityMenu() {
 				</DropdownSubMenuTriggerV2>
 			}
 		>
-			{ hideableColumns?.map( ( column, i ) => {
+			{ hideableColumns?.map( ( column ) => {
 				return (
 					<DropdownMenuItemV2
-						key={ i }
+						key={ column.id }
 						prefix={
 							column.getIsVisible() && <Icon icon={ check } />
 						}
@@ -135,6 +142,16 @@ function DataTableColumnsVisibilityMenu() {
 	);
 }
 
+// function ResetControl( { onSelect } ) {
+// 	return (
+// 		<DropdownMenuGroupV2>
+// 			<DropdownMenuItemV2 onSelect={ onSelect }>
+// 				{ __( 'Reset' ) }
+// 			</DropdownMenuItemV2>
+// 		</DropdownMenuGroupV2>
+// 	);
+// }
+
 export default function DataTableActions( {
 	className,
 	// TODO: check if we need something fixed here and use props
@@ -146,10 +163,7 @@ export default function DataTableActions( {
 			label={ __( 'Actions' ) }
 			className={ className }
 			trigger={
-				<Button 
-					variant='tertiary'
-					icon={ blockTable }
-				>
+				<Button variant="tertiary" icon={ blockTable }>
 					{ __( 'View' ) }
 					<Icon icon={ chevronDown } />
 				</Button>
@@ -161,15 +175,6 @@ export default function DataTableActions( {
 				) }
 				<DataTablePageSizeMenu />
 			</DropdownMenuGroupV2>
-			{ /* <DropdownMenuGroupV2>
-					Do we need a Reset after all? If yes, what should reset?
-					TODO: disable or not render if nothing to reset..
-					<DropdownMenuItemV2
-						onSelect={ () => table.resetColumnVisibility() }
-					>
-						{ __( 'Reset' ) }
-					</DropdownMenuItemV2>
-				</DropdownMenuGroupV2> */ }
 		</DropdownMenuV2>
 	);
 }

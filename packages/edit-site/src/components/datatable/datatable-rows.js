@@ -51,6 +51,14 @@ function DataTableRows(
 									<th
 										key={ header.id }
 										colSpan={ header.colSpan }
+										style={ {
+											width:
+												header.column.columnDef.width ||
+												undefined,
+											maxWidth:
+												header.column.columnDef
+													.maxWidth || undefined,
+										} }
 									>
 										{ header.isPlaceholder ? null : (
 											// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
@@ -92,9 +100,12 @@ function DataTableRows(
 									<td
 										key={ cell.id }
 										style={ {
-											maxWidth:
-												cell.column.columnDef.maxSize ||
+											width:
+												cell.column.columnDef.width ||
 												undefined,
+											maxWidth:
+												cell.column.columnDef
+													.maxWidth || undefined,
 										} }
 									>
 										{ flexRender(
