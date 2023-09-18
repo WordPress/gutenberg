@@ -7,6 +7,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import { PATTERN_SYNC_TYPES } from '../constants';
+
+/**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
  *
  * @param {string}             title      Pattern title.
@@ -18,7 +23,7 @@ export const createPattern =
 	( title, syncType, clientIds, categories ) =>
 	async ( { registry, dispatch } ) => {
 		const meta =
-			syncType === 'unsynced'
+			syncType === PATTERN_SYNC_TYPES.unsynced
 				? {
 						wp_pattern_sync_status: syncType,
 				  }
