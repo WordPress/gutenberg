@@ -105,3 +105,4 @@ export const SVG = forwardRef(
 		return <svg { ...appliedProps } ref={ ref } />;
 	}
 );
+SVG.displayName = 'SVG';
