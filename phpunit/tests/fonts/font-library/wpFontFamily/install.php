@@ -277,8 +277,8 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	 */
 	public function data_should_not_install_duplicate_fontfaces() {
 		return array(
-			'single unique font face' => array(
-				'font_data' => array(
+			'single unique font face'    => array(
+				'font_data'  => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
 					'fontFamily' => 'Inter',
@@ -316,7 +316,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				'expected'   => array( 'inter_italic_900.ttf' ),
 			),
 			'multiple unique font faces' => array(
-				'font_data' => array(
+				'font_data'  => array(
 					'name'       => 'Lato',
 					'slug'       => 'lato',
 					'fontFamily' => 'Lato',
@@ -341,7 +341,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 						),
 					),
 				),
-				'files_data'  => array(
+				'files_data' => array(
 					'files0' => array(
 						'name'     => 'lato1.ttf',
 						'type'     => 'font/ttf',
@@ -364,13 +364,13 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 						'size'     => 123,
 					),
 				),
-				'expected'    => array( 'lato_normal_400.ttf', 'lato_normal_500.ttf' ),
+				'expected'   => array( 'lato_normal_400.ttf', 'lato_normal_500.ttf' ),
 			),
 		);
 	}
 
-	public function test_should_overwrite_fontface_with_different_extension(){
-		$font_data_initial = array(
+	public function test_should_overwrite_fontface_with_different_extension() {
+		$font_data_initial    = array(
 			'name'       => 'Inter',
 			'slug'       => 'inter',
 			'fontFamily' => 'Inter',
@@ -386,10 +386,10 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 					'fontStyle'    => 'italic',
 					'fontWeight'   => '900',
 					'uploadedFile' => 'files1',
-				)
+				),
 			),
 		);
-		$files_data_initial = array(
+		$files_data_initial   = array(
 			'files0' => array(
 				'name'     => 'inter1.ttf',
 				'type'     => 'font/woff',
@@ -405,7 +405,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				'size'     => 123,
 			),
 		);
-		$font_data_overwrite = array(
+		$font_data_overwrite  = array(
 			'name'       => 'Inter',
 			'slug'       => 'inter',
 			'fontFamily' => 'Inter',
@@ -450,7 +450,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 		foreach ( $files_data_overwrite as $file ) {
 			file_put_contents( $file['tmp_name'], 'Mocking file content' );
 		}
-		
+
 		$font = new WP_Font_Family( $font_data_initial );
 		$font->install( $files_data_initial );
 
