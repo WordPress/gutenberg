@@ -18,12 +18,14 @@ function getBlockFootnotesOrder( block ) {
 				continue;
 			}
 
-			for ( const { type, attributes } of create( { html: value } )
-				.replacements ) {
-				if ( type === 'core/footnote' ) {
-					order.push( attributes[ 'data-fn' ] );
+			// replacements is a sparse array, use forEach to skip empty slots.
+			create( { html: value } ).replacements.forEach(
+				( { type, attributes } ) => {
+					if ( type === 'core/footnote' ) {
+						order.push( attributes[ 'data-fn' ] );
+					}
 				}
-			}
+			);
 		}
 		cache.set( block, order );
 	}

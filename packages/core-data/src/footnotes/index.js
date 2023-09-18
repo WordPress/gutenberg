@@ -63,16 +63,20 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 			const richTextValue = create( { html: value } );
 
-			for ( const replacement of richTextValue.replacements ) {
+			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
 					const id = replacement.attributes[ 'data-fn' ];
 					const index = newOrder.indexOf( id );
-					// See https://github.com/WordPress/gutenberg/blob/6db51a6ee92db6c3324a875135656861bbd9e55d/packages/block-library/src/footnotes/format.js#L108.
-					replacement.innerHTML = `<a href="#${ id }" id="${ id }-link">${
-						index + 1
-					}</a>`;
+					// The innerHTML contains the count wrapped in a link.
+					const countValue = create( {
+						html: replacement.innerHTML,
+					} );
+					countValue.text = String( index + 1 );
+					replacement.innerHTML = toHTMLString( {
+						value: countValue,
+					} );
 				}
-			}
+			} );
 
 			attributes[ key ] = toHTMLString( { value: richTextValue } );
 		}
