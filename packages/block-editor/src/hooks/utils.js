@@ -123,7 +123,7 @@ export function useStyleOverride( { id, css } ) {
 		useDispatch( blockEditorStore )
 	);
 	useEffect( () => {
-		if ( ! css ) return;
+		if ( ! id || ! css ) return;
 		setStyleOverride( id, { css } );
 		return () => {
 			deleteStyleOverride( id );
