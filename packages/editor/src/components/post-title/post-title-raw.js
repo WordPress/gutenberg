@@ -6,30 +6,27 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { TextareaControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
-import PostTitleRich from './post-title-rich';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 
-function PostTitle( _, forwardedRef ) {
+function PostTitleRaw( _, forwardedRef ) {
 	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
 			getSettings();
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
 			placeholder: titlePlaceholder,
 			hasFixedToolbar: _hasFixedToolbar,
 		};
@@ -37,12 +34,19 @@ function PostTitle( _, forwardedRef ) {
 
 	const [ isSelected, setIsSelected ] = useState( false );
 
-	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
-
 	const { title, setTitle: onUpdate } = usePostTitle();
+	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
 
 	function onChange( value ) {
 		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
+	}
+
+	function onSelect() {
+		setIsSelected( true );
+	}
+
+	function onUnselect() {
+		setIsSelected( false );
 	}
 
 	// The wp-block className is important for editor styles.
@@ -50,22 +54,28 @@ function PostTitle( _, forwardedRef ) {
 	const className = classnames( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'is-raw-text': true,
 	} );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
 
 	return (
-		<PostTitleRich
+		<TextareaControl
 			ref={ focusRef }
-			title={ title }
+			value={ title }
 			onChange={ onChange }
-			onUpdate={ onUpdate }
+			onFocus={ onSelect }
+			onBlur={ onUnselect }
+			label={ placeholder }
 			className={ className }
 			placeholder={ decodedPlaceholder }
-			setIsSelected={ setIsSelected }
+			hideLabelFromVision={ true }
+			autoComplete="off"
+			dir="auto"
+			__nextHasNoMarginBottom
 		/>
 	);
 }
 
-export default forwardRef( PostTitle );
+export default forwardRef( PostTitleRaw );
