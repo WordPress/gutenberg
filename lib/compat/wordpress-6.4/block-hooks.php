@@ -158,14 +158,28 @@ function gutenberg_insert_hooked_block( $inserted_block, $relative_position, $an
 				array_unshift( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
 				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_unshift( $block['innerContent'], null );
+				// location) to that array after HTML content for the inner blocks wrapper.
+				$chunk_index = 0;
+				for ( $index = $chunk_index; $index < count( $block['innerContent'] ); $index++ ) {
+					if ( is_null( $block['innerContent'][ $index ] ) ) {
+						$chunk_index = $index;
+						break;
+					}
+				}
+				array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
 			} elseif ( 'last_child' === $relative_position ) {
 				array_push( $block['innerBlocks'], $inserted_block );
 				// Since WP_Block::render() iterates over `inner_content` (rather than `inner_blocks`)
-				// when rendering blocks, we also need to prepend a value (`null`, to mark a block
-				// location) to that array.
-				array_push( $block['innerContent'], null );
+				// when rendering blocks, we also need to correctly append a value (`null`, to mark a block
+				// location) to that array before the remaining HTML content for the inner blocks wrapper.
+				$chunk_index = count( $block['innerContent'] );
+				for ( $index = count( $block['innerContent'] ); $index > 0; $index-- ) {
+					if ( is_null( $block['innerContent'][ $index - 1 ] ) ) {
+						$chunk_index = $index;
+						break;
+					}
+				}
+				array_splice( $block['innerContent'], $chunk_index, 0, array( null ) );
 			}
 			return $block;
 		}

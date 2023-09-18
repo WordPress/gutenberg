@@ -526,9 +526,8 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'More options'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'More options' );
 		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
@@ -536,9 +535,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 
 		await clickIfClickable(
@@ -548,9 +546,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
