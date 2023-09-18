@@ -257,7 +257,6 @@ export { default as sidesTop } from './library/sides-top';
 export { default as sidesVertical } from './library/sides-vertical';
 export { default as textColor } from './library/text-color';
 export { default as textHorizontalRTL } from './library/text-horizontal-rtl';
-export { default as textMixed } from './library/text-mixed';
 export { default as textUpright } from './library/text-upright';
 export { default as textVertical } from './library/text-vertical';
 export { default as textVerticalRTL } from './library/text-vertical-rtl';
