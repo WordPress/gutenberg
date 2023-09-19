@@ -97,6 +97,7 @@ require __DIR__ . '/compat/wordpress-6.4/blocks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/commands.php';
@@ -201,6 +202,7 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';

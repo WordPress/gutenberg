@@ -130,6 +130,17 @@ Settings related to layout.
 
 ---
 
+### lightbox
+
+Settings related to the lightbox.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| enabled | boolean |  |  |
+| allowEditing | boolean |  |  |
+
+---
+
 ### position
 
 Settings related to position.

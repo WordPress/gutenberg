@@ -69,7 +69,7 @@ type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 				'aria-label'?: never;
 				'aria-labelledby': string;
 		  }
-	 );
+	);
 
 export type ListboxCircularOptionPickerProps = WithBaseId &
 	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;

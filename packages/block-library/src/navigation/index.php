@@ -393,7 +393,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
 
-	$nav_menu_name = '';
+	$nav_menu_name = $attributes['ariaLabel'] ?? '';
 
 	/**
 	 * Deprecated:
@@ -529,7 +529,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Manually add block support text decoration as CSS class.
-	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
+	$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
@@ -810,6 +810,23 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_navigation_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-navigation-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-navigation-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-navigation-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_navigation_ensure_interactivity_dependency' );
 
 /**
  * Turns menu item data into a nested array of parsed blocks

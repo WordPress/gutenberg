@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo } from '@wordpress/element';
+import { Platform, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -182,14 +182,19 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
 	 * @return {Object} the post type object that was created.
 	 */
-	const createPageEntity = ( options ) => {
-		if ( ! userCanCreatePages ) {
-			return Promise.reject( {
-				message: __( 'You do not have permission to create Pages.' ),
-			} );
-		}
-		return saveEntityRecord( 'postType', 'page', options );
-	};
+	const createPageEntity = useCallback(
+		( options ) => {
+			if ( ! userCanCreatePages ) {
+				return Promise.reject( {
+					message: __(
+						'You do not have permission to create Pages.'
+					),
+				} );
+			}
+			return saveEntityRecord( 'postType', 'page', options );
+		},
+		[ saveEntityRecord, userCanCreatePages ]
+	);
 
 	return useMemo(
 		() => ( {
