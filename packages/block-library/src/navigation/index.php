@@ -529,7 +529,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Manually add block support text decoration as CSS class.
-	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
+	$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
