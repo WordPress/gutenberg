@@ -5,7 +5,10 @@ import type { Page } from '@playwright/test';
 import * as lighthouse from 'lighthouse/core/index.cjs';
 
 export class Lighthouse {
-	constructor( public readonly page: Page, public readonly port: number ) {
+	constructor(
+		public readonly page: Page,
+		public readonly port: number
+	) {
 		this.page = page;
 		this.port = port;
 	}
