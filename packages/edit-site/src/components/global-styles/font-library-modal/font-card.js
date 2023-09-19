@@ -14,7 +14,7 @@ import {
  * Internal dependencies
  */
 import FontDemo from './font-demo';
-import { getPreviewStyle } from './utils';
+import { getFamilyPreviewStyle } from './utils/preview-styles';
 import { chevronRight } from '@wordpress/icons';
 
 function FontCard( { font, onClick, variantsText } ) {
@@ -33,7 +33,7 @@ function FontCard( { font, onClick, variantsText } ) {
 			  ) || font.fontFace[ 0 ]
 			: fakeFontFace;
 
-	const demoStyle = getPreviewStyle( font );
+	const demoStyle = getFamilyPreviewStyle( font );
 
 	const variantsCount = font.fontFace?.length || 1;
 
