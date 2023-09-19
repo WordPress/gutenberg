@@ -58,7 +58,12 @@ export const isBlockSubtreeDisabled = createSelector(
 			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
 		);
 	},
-	( state ) => [ state.blockEditingModes, state.blocks.parents ]
+	( state ) => [
+		state.blocks.parents,
+		state.blocks.order,
+		state.blockEditingModes,
+		state.blockListSettings,
+	]
 );
 
 /**
