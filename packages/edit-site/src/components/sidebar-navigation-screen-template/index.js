@@ -14,8 +14,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
@@ -92,7 +90,6 @@ export default function SidebarNavigationScreenTemplate() {
 	const {
 		params: { postType, postId },
 	} = navigator;
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { title, content, description, footer } = useTemplateDetails(
 		postType,
 		postId
@@ -110,12 +107,6 @@ export default function SidebarNavigationScreenTemplate() {
 						onRemove={ () => {
 							navigator.goTo( `/${ postType }/all` );
 						} }
-					/>
-					<SidebarButton
-						isPressed
-						onClick={ () => setCanvasMode( 'edit' ) }
-						label={ __( 'Close sidebar & edit' ) }
-						icon={ isRTL() ? drawerRight : drawerLeft }
 					/>
 				</>
 			}

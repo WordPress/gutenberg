@@ -22,6 +22,7 @@ import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
+import { unlock } from '../../lock-unlock';
 
 export default function TemplateActions( {
 	postType,
@@ -82,6 +83,8 @@ export default function TemplateActions( {
 		}
 	}
 
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
 	return (
 		<DropdownMenu
 			icon={ moreVertical }
@@ -91,6 +94,16 @@ export default function TemplateActions( {
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
+					{
+						<MenuItem
+							onClick={ () => {
+								setCanvasMode( 'edit' );
+								onClose();
+							} }
+						>
+							{ __( 'Edit' ) }
+						</MenuItem>
+					}
 					{ isRemovable && (
 						<>
 							<RenameMenuItem
