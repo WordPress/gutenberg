@@ -2,13 +2,21 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
+import * as getPort from 'get-port';
 
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils } from './index';
+import {
+	Admin,
+	Editor,
+	PageUtils,
+	RequestUtils,
+	Metrics,
+	Lighthouse,
+} from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -103,9 +111,12 @@ const test = base.extend<
 		editor: Editor;
 		pageUtils: PageUtils;
 		snapshotConfig: void;
+		metrics: Metrics;
+		lighthouse: Lighthouse;
 	},
 	{
 		requestUtils: RequestUtils;
+		lighthousePort: number;
 	}
 >( {
 	admin: async ( { page, pageUtils }, use ) => {
@@ -146,6 +157,30 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
+	// Spins up a new browser for use by the Lighthouse fixture
+	// so that Lighthouse can connect to the debugging port.
+	// As a worker-scoped fixture, this will only launch 1
+	// instance for the whole test worker, so multiple tests
+	// will share the same instance with the same port.
+	lighthousePort: [
+		async ( {}, use ) => {
+			const port = await getPort();
+			const browser = await chromium.launch( {
+				args: [ `--remote-debugging-port=${ port }` ],
+			} );
+
+			await use( port );
+
+			await browser.close();
+		},
+		{ scope: 'worker' },
+	],
+	lighthouse: async ( { page, lighthousePort }, use ) => {
+		await use( new Lighthouse( page, lighthousePort ) );
+	},
+	metrics: async ( { page }, use ) => {
+		await use( new Metrics( page ) );
+	},
 } );
 
 export { test, expect };
