@@ -42,6 +42,20 @@
 			display: block;
 		}
 	}
+
+	.block-editor-block-contextual-toolbar.is-fixed {
+		position: fixed;
+		top: $admin-bar-height-big + $header-height + 1px; // +1px to avoid overlap with the header border
+		left: 0;
+		width: 100%;
+
+		@include break-medium() {
+			width: auto;
+			position: static;
+			// remove the border
+			border: none;
+		}
+	}
 }
 
 .edit-post-header__center {
