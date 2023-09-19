@@ -218,22 +218,20 @@ function CoverEdit( {
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
+		const averageBackgroundColor = await getAverageBackgroundColor( url );
 		setOverlayColor( colorValue );
 		setAttributes( {
 			userOverlayColor: true,
 		} );
-		setIsDark( colorValue, await getAverageBackgroundColor( url ) );
+		setIsDark( colorValue, averageBackgroundColor );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
+		const averageBackgroundColor = await getAverageBackgroundColor( url );
 		setAttributes( {
 			dimRatio: newDimRatio,
 		} );
-		setIsDark(
-			overlayColor.color,
-			await getAverageBackgroundColor( url ),
-			newDimRatio
-		);
+		setIsDark( overlayColor.color, averageBackgroundColor, newDimRatio );
 	};
 
 	const onUploadError = ( message ) => {
@@ -320,6 +318,7 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
+		const averageBackgroundColor = await getAverageBackgroundColor( url );
 		setAttributes( {
 			id: undefined,
 			url: undefined,
@@ -329,7 +328,7 @@ function CoverEdit( {
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
 		} );
-		setIsDark( overlayColor.color, await getAverageBackgroundColor( url ) );
+		setIsDark( overlayColor.color, averageBackgroundColor );
 	};
 
 	const blockControls = (
