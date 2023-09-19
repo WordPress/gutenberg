@@ -103,7 +103,6 @@ export const getAverageBackgroundColor = memoize( async ( url ) => {
  */
 export function compositeIsDark( dimRatio, overlayColor, backgroundColor ) {
 	// Opacity doesn't matter if you're overlaying the same color on top of itself.
-	// And if we're missing a background color, we can't do the composite.
 	if ( overlayColor === backgroundColor ) {
 		return colord( overlayColor ).isDark();
 	}
