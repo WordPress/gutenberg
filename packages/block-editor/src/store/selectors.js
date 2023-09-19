@@ -2297,7 +2297,7 @@ function getUserPatterns( state ) {
 	const userPatternCategories =
 		state?.settings?.__experimentalUserPatternCategories ?? [];
 	const categories = new Map();
-	userPatternCategories?.forEach( ( userCategory ) =>
+	userPatternCategories?forEach( ( userCategory ) =>
 		categories.set( userCategory.id, userCategory )
 	);
 	return userPatterns.map( ( userPattern ) => {
