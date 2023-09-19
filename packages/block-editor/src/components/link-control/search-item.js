@@ -14,6 +14,7 @@ import {
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
+import { compose } from '@wordpress/compose';
 
 const ICONS_MAP = {
 	post: postList,
@@ -44,6 +45,38 @@ function SearchItemIcon( { isURL, suggestion } ) {
 	return null;
 }
 
+/**
+ * Adds a leading slash to a url if it doesn't already have one.
+ * @param {string} url the url to add a leading slash to.
+ * @return {string} the url with a leading slash.
+ */
+function addLeadingSlash( url ) {
+	return url.replace( /^\/?/, '/' );
+}
+
+const partialRight =
+	( fn, ...partialArgs ) =>
+	( ...args ) =>
+		fn( ...args, ...partialArgs );
+
+/**
+ * Prepares a URL for display in the UI.
+ * - decodes the URL.
+ * - filters it (removes protocol, www, etc.).
+ * - truncates it if necessary.
+ * - adds a leading slash.
+ * @param {string} url the url.
+ * @return {string} the processed url to display.
+ */
+function getURLForDisplay( url ) {
+	return compose(
+		addLeadingSlash,
+		partialRight( filterURLForDisplay, 24 ),
+		getPath,
+		safeDecodeURI
+	)( url );
+}
+
 export const LinkControlSearchItem = ( {
 	itemProps,
 	suggestion,
@@ -52,15 +85,9 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	shouldShowType = false,
 } ) => {
-	const decodedURL = safeDecodeURI( suggestion?.url );
-
-	// Remove the site URL from any suggestion URL.
-	// This is to reduce visual noise in the search results.
-	const suggestionURL = '/' + getPath( decodedURL );
-
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
-		: filterURLForDisplay( suggestionURL, 24 );
+		: getURLForDisplay( suggestion?.url );
 
 	return (
 		<MenuItem
