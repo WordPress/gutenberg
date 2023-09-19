@@ -177,10 +177,13 @@ function CoverEdit( {
 			setOverlayColor( newOverlayColor );
 		}
 
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+
 		setAttributes( {
 			...mediaAttributes,
+			dimRatio: newDimRatio,
 			isDark: compositeIsDark(
-				dimRatio,
+				newDimRatio,
 				newOverlayColor,
 				averageBackgroundColor
 			),
