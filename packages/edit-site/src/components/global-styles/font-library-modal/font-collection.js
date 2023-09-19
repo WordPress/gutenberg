@@ -28,20 +28,44 @@ import filterFonts from './utils/filter-fonts';
 import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
+import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
 	name: __( 'All' ),
 };
-
 function FontCollection( { id } ) {
+	const requiresPermission = id === 'google-fonts';
+
+	const getGoogleFontsPermissionFromStorage = () => {
+		return (
+			localStorage.getItem(
+				'wp-font-library-google-fonts-permission'
+			) === 'true'
+		);
+	};
+
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
+	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
+		requiresPermission && ! getGoogleFontsPermissionFromStorage()
+	);
 	const { collections, getFontCollection } = useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
 	);
+
+	useEffect( () => {
+		const handleStorage = () => {
+			setRenderConfirmDialog(
+				requiresPermission && ! getGoogleFontsPermissionFromStorage()
+			);
+		};
+		handleStorage();
+		window.addEventListener( 'storage', handleStorage );
+		return () => window.removeEventListener( 'storage', handleStorage );
+	}, [ id, requiresPermission ] );
 
 	useEffect( () => {
 		getFontCollection( id );
@@ -112,9 +136,18 @@ function FontCollection( { id } ) {
 				)
 			}
 		>
-			{ ! selectedCollection.data && <Spinner /> }
+			{ renderConfirmDialog && (
+				<>
+					<Spacer margin={ 8 } />
+					<GoogleFontsConfirmDialog />
+				</>
+			) }
 
-			{ ! selectedFont && (
+			{ ! renderConfirmDialog && ! selectedCollection.data && (
+				<Spinner />
+			) }
+
+			{ ! renderConfirmDialog && ! selectedFont && (
 				<Flex>
 					<FlexItem>
 						<InputControl
@@ -155,9 +188,11 @@ function FontCollection( { id } ) {
 
 			<Spacer margin={ 4 } />
 
-			{ ! selectedCollection?.data?.fontFamilies && <Spinner /> }
+			{ ! renderConfirmDialog &&
+				! selectedCollection?.data?.fontFamilies && <Spinner /> }
 
-			{ !! selectedCollection?.data?.fontFamilies?.length &&
+			{ ! renderConfirmDialog &&
+				!! selectedCollection?.data?.fontFamilies?.length &&
 				! fonts.length && (
 					<Text>
 						{ __(
@@ -166,7 +201,7 @@ function FontCollection( { id } ) {
 					</Text>
 				) }
 
-			{ selectedFont && (
+			{ ! renderConfirmDialog && selectedFont && (
 				<CollectionFontDetails
 					font={ selectedFont }
 					handleToggleVariant={ handleToggleVariant }
@@ -174,7 +209,7 @@ function FontCollection( { id } ) {
 				/>
 			) }
 
-			{ ! selectedFont && (
+			{ ! renderConfirmDialog && ! selectedFont && (
 				<FontsGrid>
 					{ fonts.map( ( font ) => (
 						<FontCard
