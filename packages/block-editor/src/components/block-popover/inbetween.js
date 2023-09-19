@@ -81,10 +81,10 @@ function BlockPopoverInbetween( {
 			return undefined;
 		}
 
-		const { ownerDocument } = previousElement || nextElement;
+		const contextElement = previousElement || nextElement;
 
 		return {
-			ownerDocument,
+			contextElement,
 			getBoundingClientRect() {
 				const previousRect = previousElement
 					? previousElement.getBoundingClientRect()
@@ -106,16 +106,7 @@ function BlockPopoverInbetween( {
 						nextRect && previousRect
 							? nextRect.top - previousRect.bottom
 							: 0;
-
-					if ( isRTL() ) {
-						// vertical, rtl
-						left = previousRect
-							? previousRect.right
-							: nextRect.right;
-					} else {
-						// vertical, ltr
-						left = previousRect ? previousRect.left : nextRect.left;
-					}
+					left = previousRect ? previousRect.left : nextRect.left;
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
 					height = previousRect
@@ -124,9 +115,7 @@ function BlockPopoverInbetween( {
 
 					if ( isRTL() ) {
 						// non vertical, rtl
-						left = previousRect
-							? previousRect.left
-							: nextRect.right;
+						left = nextRect ? nextRect.right : previousRect.left;
 						width =
 							previousRect && nextRect
 								? previousRect.left - nextRect.right
@@ -226,7 +215,8 @@ function BlockPopoverInbetween( {
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.
 			key={ nextClientId + '--' + rootClientId }

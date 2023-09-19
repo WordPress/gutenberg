@@ -100,6 +100,11 @@ export function useClipboardHandler() {
 
 	return useRefEffect( ( node ) => {
 		function handler( event ) {
+			if ( event.defaultPrevented ) {
+				// This was likely already handled in rich-text/use-paste-handler.js.
+				return;
+			}
+
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 
 			if ( selectedBlockClientIds.length === 0 ) {
@@ -127,7 +132,6 @@ export function useClipboardHandler() {
 				return;
 			}
 
-			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
@@ -194,13 +198,10 @@ export function useClipboardHandler() {
 				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
+					event.target.ownerDocument.activeElement.contentEditable = false;
 					__unstableDeleteSelection();
 				}
 			} else if ( event.type === 'paste' ) {
-				if ( eventDefaultPrevented ) {
-					// This was likely already handled in rich-text/use-paste-handler.js.
-					return;
-				}
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,

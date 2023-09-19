@@ -12,8 +12,9 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { CommandMenu } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -21,17 +22,20 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
+import useCommonCommands from './hooks/commands/use-common-commands';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	useCommands();
+	useCommonCommands();
 	const {
 		hasFixedToolbar,
 		focusMode,
 		isDistractionFree,
 		hasInlineToolbar,
-		hasThemeStyles,
 		post,
 		preferredStyleVariations,
 		hiddenBlockTypes,
@@ -43,7 +47,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		( select ) => {
 			const {
 				isFeatureActive,
-				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
@@ -72,13 +75,10 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
-				hasFixedToolbar:
-					isFeatureActive( 'fixedToolbar' ) ||
-					__experimentalGetPreviewDeviceType() !== 'Desktop',
+				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
 					'preferredStyleVariations'
@@ -150,48 +150,28 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 	] );
 
-	const styles = useMemo( () => {
-		const themeStyles = [];
-		const presetStyles = [];
-		settings.styles?.forEach( ( style ) => {
-			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
-				themeStyles.push( style );
-			} else {
-				presetStyles.push( style );
-			}
-		} );
-		const defaultEditorStyles = [
-			...settings.defaultEditorStyles,
-			...presetStyles,
-		];
-		return hasThemeStyles && themeStyles.length
-			? settings.styles
-			: defaultEditorStyles;
-	}, [ settings, hasThemeStyles ] );
-
 	if ( ! post ) {
 		return null;
 	}
 
 	return (
-		<ShortcutProvider>
-			<SlotFillProvider>
-				<ExperimentalEditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					__unstableTemplate={ isTemplateMode ? template : undefined }
-					{ ...props }
-				>
-					<ErrorBoundary>
-						<EditorInitialization postId={ postId } />
-						<Layout styles={ styles } />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</ExperimentalEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<SlotFillProvider>
+			<ExperimentalEditorProvider
+				settings={ editorSettings }
+				post={ post }
+				initialEdits={ initialEdits }
+				useSubRegistry={ false }
+				__unstableTemplate={ isTemplateMode ? template : undefined }
+				{ ...props }
+			>
+				<ErrorBoundary>
+					<CommandMenu />
+					<EditorInitialization postId={ postId } />
+					<Layout />
+				</ErrorBoundary>
+				<PostLockedModal />
+			</ExperimentalEditorProvider>
+		</SlotFillProvider>
 	);
 }
 

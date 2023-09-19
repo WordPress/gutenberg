@@ -8,6 +8,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -30,6 +31,11 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
+	deprecated( 'wp.blockEditor.__experimentalImageSizeControl', {
+		since: '6.3',
+		alternative:
+			'wp.blockEditor.privateApis.DimensionsTool and wp.blockEditor.privateApis.ResolutionTool',
+	} );
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
@@ -38,17 +44,16 @@ export default function ImageSizeControl( {
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
 					__nextHasNoMarginBottom
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
 					help={ imageSizeHelp }
+					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (
 				<div className="block-editor-image-size-control">
-					<p>{ __( 'Image dimensions' ) }</p>
-
 					<HStack align="baseline" spacing="3">
 						<NumberControl
 							className="block-editor-image-size-control__width"
@@ -58,6 +63,7 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'width', value )
 							}
+							size="__unstable-large"
 						/>
 						<NumberControl
 							className="block-editor-image-size-control__height"
@@ -67,6 +73,7 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )
 							}
+							size="__unstable-large"
 						/>
 					</HStack>
 					<HStack>

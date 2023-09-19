@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
@@ -33,6 +33,12 @@
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
@@ -64,10 +70,16 @@
 			"__experimentalRole": "content"
 		},
 		"width": {
-			"type": "number"
+			"type": "string"
 		},
 		"height": {
-			"type": "number"
+			"type": "string"
+		},
+		"aspectRatio": {
+			"type": "string"
+		},
+		"scale": {
+			"type": "string"
 		},
 		"sizeSlug": {
 			"type": "string"
@@ -85,21 +97,28 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": "img, .components-placeholder",
 			"text": false,
 			"background": false
+		},
+		"filter": {
+			"duotone": true
 		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
 				"width": true
 			}
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder",
+		"filter": {
+			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}
 	},
 	"styles": [
@@ -111,5 +130,6 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image"
+	"style": "wp-block-image",
+	"viewScript": "file:./view.min.js"
 }

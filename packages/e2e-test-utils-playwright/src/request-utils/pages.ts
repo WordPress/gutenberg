@@ -14,13 +14,13 @@ const PAGE_STATUS = [
 
 export type Page = {
 	id: number;
-	status: typeof PAGE_STATUS[ number ];
+	status: ( typeof PAGE_STATUS )[ number ];
 };
 
 export type CreatePagePayload = {
 	title?: string;
 	content?: string;
-	status: typeof PAGE_STATUS[ number ];
+	status: ( typeof PAGE_STATUS )[ number ];
 	date?: string;
 	date_gmt?: string;
 };
@@ -39,7 +39,7 @@ export async function deletePage( this: RequestUtils, id: number ) {
 /**
  * Delete all pages using REST API.
  *
- * @param {RequestUtils} this
+ * @param this
  */
 export async function deleteAllPages( this: RequestUtils ) {
 	// List all pages.

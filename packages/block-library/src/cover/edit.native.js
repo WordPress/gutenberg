@@ -6,6 +6,7 @@ import {
 	TouchableWithoutFeedback,
 	InteractionManager,
 	AccessibilityInfo,
+	Text,
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
@@ -364,6 +365,19 @@ const Cover = ( {
 		} );
 	}, [] );
 
+	const selectedColorText = getStylesFromColorScheme(
+		styles.selectedColorText,
+		styles.selectedColorTextDark
+	);
+
+	const bottomLabelText = customOverlayColor ? (
+		<Text style={ selectedColorText }>
+			{ customOverlayColor.toUpperCase() }
+		</Text>
+	) : (
+		__( 'Select a color' )
+	);
+
 	const colorPickerControls = (
 		<InspectorControls>
 			<BottomSheetConsumer>
@@ -393,7 +407,7 @@ const Cover = ( {
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
-						bottomLabelText={ __( 'Select a color' ) }
+						bottomLabelText={ bottomLabelText }
 					/>
 				) }
 			</BottomSheetConsumer>

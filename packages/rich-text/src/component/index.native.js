@@ -40,10 +40,9 @@ import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
 import { getTextContent } from '../get-text-content';
-import { isEmpty, isEmptyLine } from '../is-empty';
+import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
-import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import { getFormatColors } from '../get-format-colors';
@@ -62,6 +61,35 @@ const flatColorPalettes = memize( ( colorsPalettes ) => [
 	...( colorsPalettes?.custom || [] ),
 	...( colorsPalettes?.default || [] ),
 ] );
+
+const getSelectionColor = memize(
+	(
+		currentSelectionColor,
+		defaultSelectionColor,
+		baseGlobalStyles,
+		isBlockBasedTheme
+	) => {
+		let selectionColor = defaultSelectionColor;
+		if ( currentSelectionColor ) {
+			selectionColor = currentSelectionColor;
+		}
+
+		if ( isBlockBasedTheme ) {
+			const colordTextColor = colord( selectionColor );
+			const colordBackgroundColor = colord(
+				baseGlobalStyles?.color?.background
+			);
+			const isColordTextReadable = colordTextColor.isReadable(
+				colordBackgroundColor
+			);
+			if ( ! isColordTextReadable ) {
+				selectionColor = baseGlobalStyles?.color?.text;
+			}
+		}
+
+		return selectionColor;
+	}
+);
 
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
@@ -205,7 +233,7 @@ export class RichText extends Component {
 
 	valueToFormat( value ) {
 		// Remove the outer root tags.
-		return this.removeRootTagsProduceByAztec(
+		return this.removeRootTagsProducedByAztec(
 			toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
@@ -272,30 +300,27 @@ export class RichText extends Component {
 	 * Cleans up any root tags produced by aztec.
 	 * TODO: This should be removed on a later version when aztec doesn't return the top tag of the text being edited
 	 */
-	removeRootTagsProduceByAztec( html ) {
+	removeRootTagsProducedByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
-		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
-		if ( this.props.rootTagsToEliminate ) {
-			this.props.rootTagsToEliminate.forEach( ( element ) => {
-				result = this.removeRootTag( element, result );
-			} );
-		}
 
 		if ( this.props.tagsToEliminate ) {
 			this.props.tagsToEliminate.forEach( ( element ) => {
 				result = this.removeTag( element, result );
 			} );
 		}
+
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
 	}
+
 	removeTag( tag, html ) {
 		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
@@ -312,7 +337,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
@@ -327,7 +352,7 @@ export class RichText extends Component {
 	}
 
 	onTextUpdate( event ) {
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		let formattedContent = contentWithoutRootTag;
@@ -410,7 +435,7 @@ export class RichText extends Component {
 		}
 		const isReverse = keyCode === BACKSPACE;
 
-		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+		const { onDelete } = this.props;
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
@@ -424,24 +449,6 @@ export class RichText extends Component {
 			this.onFormatChange( newValue );
 			event.preventDefault();
 			return;
-		}
-
-		if ( multilineTag ) {
-			if (
-				isReverse &&
-				value.start === 0 &&
-				value.end === 0 &&
-				isEmptyLine( value )
-			) {
-				newValue = removeLineSeparator( value, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( value, isReverse );
-			}
-			if ( newValue ) {
-				this.onFormatChange( newValue );
-				event.preventDefault();
-				return;
-			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
@@ -652,7 +659,7 @@ export class RichText extends Component {
 		const realEnd = Math.max( start, end );
 
 		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
+		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		if (
@@ -1052,6 +1059,41 @@ export class RichText extends Component {
 			: defaultColor;
 	}
 
+	getPlaceholderTextColor() {
+		const {
+			baseGlobalStyles,
+			getStylesFromColorScheme,
+			placeholderTextColor,
+			style,
+		} = this.props;
+
+		// Default placeholder text color.
+		const placeholderStyle = getStylesFromColorScheme(
+			styles.richTextPlaceholder,
+			styles.richTextPlaceholderDark
+		);
+		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		// Custom 63% opacity for theme and inherited colors.
+		const placeholderOpacity = 'A1';
+
+		// Determine inherited placeholder color if available.
+		const inheritPlaceholderColor = style?.placeholderColor
+			? `${ style.placeholderColor }${ placeholderOpacity }`
+			: undefined;
+
+		// If using block-based themes, derive the placeholder color from global styles.
+		const globalStylesPlaceholderColor = baseGlobalStyles?.color?.text
+			? `${ baseGlobalStyles.color.text }${ placeholderOpacity }`
+			: undefined;
+
+		return (
+			inheritPlaceholderColor ??
+			placeholderTextColor ??
+			globalStylesPlaceholderColor ??
+			defaultPlaceholderTextColor
+		);
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1078,12 +1120,6 @@ export class RichText extends Component {
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
-		const placeholderStyle = getStylesFromColorScheme(
-			styles.richTextPlaceholder,
-			styles.richTextPlaceholderDark
-		);
-
-		const { color: defaultPlaceholderTextColor } = placeholderStyle;
 		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
@@ -1157,6 +1193,17 @@ export class RichText extends Component {
 			},
 		];
 
+		const defaultSelectionColor = getStylesFromColorScheme(
+			styles[ 'rich-text-selection' ],
+			styles[ 'rich-text-selection--dark' ]
+		).color;
+		const selectionColor = getSelectionColor(
+			this.props.selectionColor,
+			defaultSelectionColor,
+			baseGlobalStyles,
+			this.getIsBlockBasedTheme()
+		);
+
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
 
@@ -1200,12 +1247,7 @@ export class RichText extends Component {
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={
-						style?.placeholderColor ||
-						this.props.placeholderTextColor ||
-						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
-						defaultPlaceholderTextColor
-					}
+					placeholderTextColor={ this.getPlaceholderTextColor() }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }
@@ -1221,9 +1263,6 @@ export class RichText extends Component {
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
-					onCaretVerticalPositionChange={
-						this.props.onCaretVerticalPositionChange
-					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
 					color={
@@ -1244,7 +1283,7 @@ export class RichText extends Component {
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }
 					id={ this.props.id }
-					selectionColor={ this.props.selectionColor }
+					selectionColor={ selectionColor }
 					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (

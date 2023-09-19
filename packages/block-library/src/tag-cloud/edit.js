@@ -113,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post counts' ) }
 					checked={ showTagCounts }
 					onChange={ () =>
@@ -121,6 +122,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				/>
 				<RangeControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Number of tags' ) }
 					value={ numberOfTags }
 					onChange={ ( value ) =>

@@ -91,7 +91,6 @@ function AngleCircle( {
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
 			className="components-angle-picker-control__angle-circle"
-			style={ isDragging ? { cursor: 'grabbing' } : undefined }
 			{ ...props }
 		>
 			<CircleIndicatorWrapper

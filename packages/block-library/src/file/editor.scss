@@ -35,6 +35,10 @@
 
 	a {
 		min-width: 1em;
+
+		&:not(.wp-block-file__button) {
+			display: inline-block;
+		}
 	}
 
 	.wp-block-file__button-richtext-wrapper {

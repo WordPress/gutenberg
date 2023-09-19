@@ -77,19 +77,24 @@ const MyPanel = () => (
 
 ##### Props
 
-###### className
+###### `header`: `string`
 
-The class that will be added with `components-panel`. If no `className` is passed only `components-panel__body` and `is-opened` is used.
+The text that will be rendered as the title of the panel. Text will be rendered inside an
+`<h2>` tag.
 
--   Type: `String`
 -   Required: No
 
-###### header
+###### `className`: `string`
 
-Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
+The CSS class to apply to the wrapper element.
 
--   Type: `String`
 -   Required: No
+
+###### `children`: `React.ReactNode`
+
+The content to display within the panel row.
+
+-   Required: Yes
 
 ---
 
@@ -99,63 +104,66 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
 
 ##### Props
 
-###### title
+###### `title`: `string`
 
-Title of the `PanelBody`. This shows even when it is closed.
+Title text. It shows even when the component is closed.
 
--   Type: `String`
 -   Required: No
 
-###### opened
+###### `opened`: `boolean`
 
-If opened is true then the `Panel` will remain open regardless of the `initialOpen` prop and the panel will be prevented from being closed.
+When set to `true`, the component will remain open regardless of the `initialOpen` prop and the
+panel will be prevented from being closed.
 
--   Type: `Boolean`
 -   Required: No
 
-###### className
+###### `className`: `string`
 
-The class that will be added with `components-panel__body`, if the panel is currently open, the `is-opened` class will also be passed to the classes of the wrapper div. If no `className` is passed then only `components-panel__body` and `is-opened` is used.
+The CSS class to apply to the wrapper element.
 
--   Type: `String`
 -   Required: No
 
-###### icon
+###### `icon`: `JSX.Element`
 
-An icon to be shown next to the `PanelBody` title.
+An icon to be shown next to the title.
 
--   Type: `String`
 -   Required: No
 
-###### onToggle
+###### `onToggle`: `( next: boolean ) => void;`
 
-A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
+A function that is called any time the component is toggled from its closed state to its
+opened state, or vice versa.
 
--   Type: `function`
 -   Required: No
+-   Default: `noop`
 
-###### initialOpen
+###### `initialOpen`: `boolean`
 
 Whether or not the panel will start open.
 
--   Type: `Boolean`
 -   Required: No
--   Default: true
+-   Default: `true`
 
-###### children
+###### `children`: `| React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode )`
 
-The rendered children. If the children is a `Function`, it will be called with an object with the `opened` property and return its value.
+The content to display in the `PanelBody`. If a function is provided for this prop, it will receive an object with the `opened` prop as an argument.
 
--   Type: `React.ReactNode | Function`
 -   Required: No
 
-###### buttonProps
+###### `buttonProps`: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
 
-Props that are passed to the `Button` component in the `PanelBodyTitle` within the panel body.
+Props that are passed to the `Button` component in title within the `PanelBody`.
 
--   Type: `Object`
 -   Required: No
 -   Default: `{}`
+
+###### `scrollAfterOpen`: `boolean`
+
+Scrolls the content into view when visible. This improves the UX when multiple `PanelBody`
+components are stacked in a scrollable container.
+
+-   Required: No
+-   Default: `true`
 
 ---
 
@@ -165,11 +173,16 @@ Props that are passed to the `Button` component in the `PanelBodyTitle` within t
 
 ##### Props
 
-###### className
+###### `className`: `string`
 
-The class that will be added with `components-panel__row`. to the classes of the wrapper div. If no `className` is passed only `components-panel__row` is used.
+The CSS class to apply to the wrapper element.
 
--   Type: `String`
+-   Required: No
+
+###### `children`: `React.ReactNode`
+
+The content to display within the panel row.
+
 -   Required: No
 
 ##### Ref
@@ -186,11 +199,16 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
 
 ##### Props
 
-###### label
+###### `label`: `string`
 
 The text that will be rendered as the title of the `Panel`. Will be rendered in an `<h2>` tag.
 
--   Type: `String`
+-   Required: No
+
+###### `children`: `React.ReactNode`
+
+The content to display within the panel row.
+
 -   Required: No
 
 ## Related components

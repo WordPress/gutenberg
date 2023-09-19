@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -52,7 +52,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 					return (
 						<Button
 							key={ widthValue }
-							isSmall
+							size="small"
 							variant={
 								widthValue === selectedWidth
 									? 'primary'
@@ -78,8 +78,19 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const { textAlign, linkTarget, placeholder, rel, style, text, url, width } =
-		attributes;
+	const {
+		tagName,
+		textAlign,
+		linkTarget,
+		placeholder,
+		rel,
+		style,
+		text,
+		url,
+		width,
+	} = attributes;
+
+	const TagName = tagName || 'a';
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -128,6 +139,7 @@ function ButtonEdit( props ) {
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
 	const opensInNewTab = linkTarget === '_blank';
+	const isLinkTag = 'a' === TagName;
 
 	function startEditing( event ) {
 		event.preventDefault();
@@ -148,6 +160,13 @@ function ButtonEdit( props ) {
 			setIsEditingURL( false );
 		}
 	}, [ isSelected ] );
+
+	// Memoize link value to avoid overriding the LinkControl's internal state.
+	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
+	const linkValue = useMemo(
+		() => ( { url, opensInNewTab } ),
+		[ url, opensInNewTab ]
+	);
 
 	return (
 		<>
@@ -202,7 +221,7 @@ function ButtonEdit( props ) {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				{ ! isURLSet && (
+				{ ! isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -211,7 +230,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && (
+				{ isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -222,7 +241,7 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-			{ isSelected && ( isEditingURL || isURLSet ) && (
+			{ isLinkTag && isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
 					placement="bottom"
 					onClose={ () => {
@@ -235,8 +254,7 @@ function ButtonEdit( props ) {
 					shift
 				>
 					<LinkControl
-						className="wp-block-navigation-link__inline-link-input"
-						value={ { url, opensInNewTab } }
+						value={ linkValue }
 						onChange={ ( {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
@@ -262,12 +280,16 @@ function ButtonEdit( props ) {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<TextControl
-					__nextHasNoMarginBottom
-					label={ __( 'Link rel' ) }
-					value={ rel || '' }
-					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }
-				/>
+				{ isLinkTag && (
+					<TextControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link rel' ) }
+						value={ rel || '' }
+						onChange={ ( newRel ) =>
+							setAttributes( { rel: newRel } )
+						}
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);

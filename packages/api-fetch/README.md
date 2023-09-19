@@ -14,15 +14,29 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
+### GET
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-// GET
 apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
+```
 
-// POST
+### GET with Query Args
+```js
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+
+const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
+
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
+	console.log( posts );
+} );
+```
+
+### POST
+```js
 apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
@@ -52,7 +66,7 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
 ### Aborting a request
 

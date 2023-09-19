@@ -17,6 +17,16 @@ import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../ui/context';
+import { ContextSystemProvider } from '../../ui/context';
+
+const CONTEXT_SYSTEM_VALUE = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+	Dropdown: {
+		variant: 'toolbar',
+	},
+};
 
 function UnforwardedToolbar(
 	{
@@ -32,7 +42,15 @@ function UnforwardedToolbar(
 			alternative: 'ToolbarGroup component',
 			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
 		} );
-		return <ToolbarGroup { ...props } className={ className } />;
+		// Extracting title from `props` because `ToolbarGroup` doesn't accept it.
+		const { title: _title, ...restProps } = props;
+		return (
+			<ToolbarGroup
+				isCollapsed={ false }
+				{ ...restProps }
+				className={ className }
+			/>
+		);
 	}
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(
@@ -40,12 +58,14 @@ function UnforwardedToolbar(
 		className
 	);
 	return (
-		<ToolbarContainer
-			className={ finalClassName }
-			label={ label }
-			ref={ ref }
-			{ ...props }
-		/>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+			<ToolbarContainer
+				className={ finalClassName }
+				label={ label }
+				ref={ ref }
+				{ ...props }
+			/>
+		</ContextSystemProvider>
 	);
 }
 

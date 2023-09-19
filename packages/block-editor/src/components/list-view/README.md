@@ -2,6 +2,8 @@
 
 The ListView component provides an overview of the hierarchical structure of all blocks in the editor. The blocks are presented vertically one below the other.
 
+By providing the `rootClientId` prop you can restrict the blocks that are shown to only children of the block with that client id.
+
 Blocks that have child blocks (such as group or column blocks) are presented with the parent at the top and the nested children below.
 
 In addition to presenting the structure of the blocks in the editor, the ListView component lets users navigate to each block by clicking on its line in the hierarchy tree. Multiple blocks at the same level of nesting can be selected by holding down the `SHIFT` key and clicking blocks within the list.

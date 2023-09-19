@@ -8,9 +8,12 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
+import type { TreeSelectProps, Tree, Truthy } from './types';
 
-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): NonNullable< TreeSelectProps[ 'options' ] > {
 	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
@@ -24,7 +27,6 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
 /**
  * TreeSelect component is used to generate select input fields.
  *
- * @example
  * ```jsx
  * import { TreeSelect } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

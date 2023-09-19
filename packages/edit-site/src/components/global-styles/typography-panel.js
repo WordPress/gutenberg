@@ -2,48 +2,45 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
-import { useSupportedStyles } from './hooks';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,
 	useGlobalSetting,
-	overrideSettingsWithSupports,
+	useSettingsForBlockElement,
 	TypographyPanel: StylesTypographyPanel,
 } = unlock( blockEditorPrivateApis );
 
-export default function TypographyPanel( {
-	name,
-	element,
-	headingLevel,
-	variation = '',
-} ) {
+export default function TypographyPanel( { element, headingLevel } ) {
 	let prefixParts = [];
 	if ( element === 'heading' ) {
 		prefixParts = prefixParts.concat( [ 'elements', headingLevel ] );
 	} else if ( element && element !== 'text' ) {
 		prefixParts = prefixParts.concat( [ 'elements', element ] );
 	}
-	if ( variation ) {
-		prefixParts = [ 'variations', variation ].concat( prefixParts );
-	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+	const [ style ] = useGlobalStyle( prefix, undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ rawSettings ] = useGlobalSetting( '', name );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle(
+		prefix,
+		undefined,
+		'all',
+		{
+			shouldDecodeEncode: false,
+		}
+	);
+	const [ rawSettings ] = useGlobalSetting( '' );
 	const usedElement = element === 'heading' ? headingLevel : element;
-	const supports = useSupportedStyles( name, usedElement );
-	const settings = useMemo(
-		() => overrideSettingsWithSupports( rawSettings, supports ),
-		[ rawSettings, supports ]
+	const settings = useSettingsForBlockElement(
+		rawSettings,
+		undefined,
+		usedElement
 	);
 
 	return (

@@ -24,6 +24,7 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ButtonProps, DeprecatedButtonProps } from './types';
+import { positionToPlacement } from '../popover/utils';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
@@ -33,10 +34,17 @@ function useDeprecatedProps( {
 	isSecondary,
 	isTertiary,
 	isLink,
+	isSmall,
+	size,
 	variant,
 	...otherProps
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
+	let computedSize = size;
 	let computedVariant = variant;
+
+	if ( isSmall ) {
+		computedSize ??= 'small';
+	}
 
 	if ( isPrimary ) {
 		computedVariant ??= 'primary';
@@ -66,6 +74,7 @@ function useDeprecatedProps( {
 
 	return {
 		...otherProps,
+		size: computedSize,
 		variant: computedVariant,
 	};
 }
@@ -75,7 +84,7 @@ export function UnforwardedButton(
 	ref: ForwardedRef< any >
 ) {
 	const {
-		isSmall,
+		__next40pxDefaultSize,
 		isPressed,
 		isBusy,
 		isDestructive,
@@ -89,6 +98,7 @@ export function UnforwardedButton(
 		shortcut,
 		label,
 		children,
+		size = 'default',
 		text,
 		variant,
 		__experimentalIsFocusable: isFocusable,
@@ -115,9 +125,11 @@ export function UnforwardedButton(
 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
 	const classes = classnames( 'components-button', className, {
+		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
-		'is-small': isSmall,
+		'is-small': size === 'small',
+		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
 		'is-pressed': isPressed,
 		'is-busy': isBusy,
@@ -214,6 +226,13 @@ export function UnforwardedButton(
 			</button>
 		);
 
+	// Convert legacy `position` values to be used with the new `placement` prop
+	let computedPlacement;
+	// if `tooltipPosition` is defined, compute value to `placement`
+	if ( tooltipPosition !== undefined ) {
+		computedPlacement = positionToPlacement( tooltipPosition );
+	}
+
 	if ( ! shouldShowTooltip ) {
 		return (
 			<>
@@ -237,7 +256,7 @@ export function UnforwardedButton(
 						: label
 				}
 				shortcut={ shortcut }
-				position={ tooltipPosition }
+				placement={ computedPlacement }
 			>
 				{ element }
 			</Tooltip>

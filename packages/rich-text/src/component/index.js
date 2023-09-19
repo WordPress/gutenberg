@@ -17,6 +17,7 @@ import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
 import { useInputAndSelection } from './use-input-and-selection';
+import { useSelectionChangeCompat } from './use-selection-change-compat';
 import { useDelete } from './use-delete';
 
 export function useRichText( {
@@ -27,7 +28,6 @@ export function useRichText( {
 	preserveWhiteSpace,
 	onSelectionChange,
 	onChange,
-	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
 	__unstableDependencies = [],
@@ -50,9 +50,6 @@ export function useRichText( {
 		return create( {
 			element: ref.current,
 			range,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			__unstableIsEditableTree: true,
 			preserveWhiteSpace,
 		} );
@@ -62,9 +59,6 @@ export function useRichText( {
 		apply( {
 			value: newRecord,
 			current: ref.current,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
@@ -79,9 +73,6 @@ export function useRichText( {
 		_value.current = value;
 		record.current = create( {
 			html: value,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			preserveWhiteSpace,
 		} );
 		if ( disableFormats ) {
@@ -98,6 +89,7 @@ export function useRichText( {
 	const hadSelectionUpdate = useRef( false );
 
 	if ( ! record.current ) {
+		hadSelectionUpdate.current = isSelected;
 		setRecordFromProps();
 		// Sometimes formats are added programmatically and we need to make
 		// sure it's persisted to the block store / markup. If these formats
@@ -123,6 +115,7 @@ export function useRichText( {
 			...record.current,
 			start: selectionStart,
 			end: selectionEnd,
+			activeFormats: undefined,
 		};
 	}
 
@@ -146,7 +139,6 @@ export function useRichText( {
 							formats: __unstableBeforeSerialize( newRecord ),
 					  }
 					: newRecord,
-				multilineTag,
 				preserveWhiteSpace,
 			} );
 		}
@@ -176,7 +168,6 @@ export function useRichText( {
 						formats: __unstableBeforeSerialize( newRecord ),
 				  }
 				: newRecord,
-			multilineTag,
 			preserveWhiteSpace,
 		} );
 
@@ -216,7 +207,7 @@ export function useRichText( {
 			ref.current.focus();
 		}
 
-		applyFromProps();
+		applyRecord( record.current );
 		hadSelectionUpdate.current = false;
 	}, [ hadSelectionUpdate.current ] );
 
@@ -224,13 +215,12 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		useCopyHandler( { record, preserveWhiteSpace } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {
 			createRecord,
 			handleChange,
-			multilineTag,
 		} ),
 		useInputAndSelection( {
 			record,
@@ -240,6 +230,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
+		useSelectionChangeCompat(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
@@ -248,6 +239,12 @@ export function useRichText( {
 
 	return {
 		value: record.current,
+		// A function to get the most recent value so event handlers in
+		// useRichText implementations have access to it. For example when
+		// listening to input events, we internally update the state, but this
+		// state is not yet available to the input event handler because React
+		// may re-render asynchronously.
+		getValue: () => record.current,
 		onChange: handleChange,
 		ref: mergedRefs,
 	};

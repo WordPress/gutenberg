@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, getByText } from '@testing-library/react';
 import type { CSSProperties } from 'react';
 
 /**
@@ -12,23 +12,28 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
+import {
+	computePopoverPosition,
+	positionToPlacement,
+	placementToMotionAnimationProps,
+} from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
-	NonNullable< PopoverProps[ 'placement' ] >
+	NonNullable< PopoverProps[ 'placement' ] >,
 ];
 type PlacementToAnimationOriginTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	number,
-	number
+	number,
 ];
 type PlacementToInitialTranslationTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	'translateY' | 'translateX',
-	CSSProperties[ 'translate' ]
+	CSSProperties[ 'translate' ],
 ];
 
 // There's no matching `placement` for 'middle center' positions,
@@ -107,6 +112,20 @@ describe( 'Popover', () => {
 					expect( screen.getByRole( 'tooltip' ) ).toBeVisible()
 				);
 			} );
+
+			it( 'should render inline regardless of slot name', async () => {
+				const { container } = render(
+					<Popover inline __unstableSlotName="Popover">
+						Hello
+					</Popover>
+				);
+
+				await waitFor( () =>
+					// We want to explicitly check if it's within the container.
+					// eslint-disable-next-line testing-library/prefer-screen-queries
+					expect( getByText( container, 'Hello' ) ).toBeVisible()
+				);
+			} );
 		} );
 
 		describe( 'anchor', () => {
@@ -138,9 +157,12 @@ describe( 'Popover', () => {
 		} );
 
 		describe( 'focus behavior', () => {
-			it( 'should focus the popover by default when opened', async () => {
+			it( 'should focus the popover container when opened', async () => {
 				render(
-					<Popover data-testid="popover-element">
+					<Popover
+						focusOnMount={ true }
+						data-testid="popover-element"
+					>
 						Popover content
 					</Popover>
 				);
@@ -165,6 +187,19 @@ describe( 'Popover', () => {
 
 				expect( document.body ).toHaveFocus();
 			} );
+		} );
+	} );
+
+	describe( 'Slot outside iframe', () => {
+		it( 'should support cross-document rendering', async () => {
+			render(
+				<PopoverInsideIframeRenderedInExternalSlot>
+					<span>content</span>
+				</PopoverInsideIframeRenderedInExternalSlot>
+			);
+			await waitFor( async () =>
+				expect( screen.getByText( 'content' ) ).toBeVisible()
+			);
 		} );
 	} );
 
@@ -244,5 +279,22 @@ describe( 'Popover', () => {
 				}
 			);
 		} );
+	} );
+
+	describe( 'computePopoverPosition', () => {
+		it.each( [
+			[ 14, 14 ], // valid integers shouldn't be changes
+			[ 14.02, 14 ], // floating numbers are parsed to integers
+			[ 0, 0 ], // zero remains zero
+			[ null, undefined ],
+			[ NaN, undefined ],
+		] )(
+			'converts `%s` to `%s`',
+			( inputCoordinate, expectedCoordinated ) => {
+				expect( computePopoverPosition( inputCoordinate ) ).toEqual(
+					expectedCoordinated
+				);
+			}
+		);
 	} );
 } );

@@ -29,7 +29,7 @@ function findSelection( blocks ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
 			].replace( START_OF_SELECTED_AREA, '' );
-			return blocks[ i ].clientId;
+			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
 		}
 
 		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
@@ -38,6 +38,8 @@ function findSelection( blocks ) {
 			return nestedSelection;
 		}
 	}
+
+	return [];
 }
 
 export function useInputRules( props ) {
@@ -49,12 +51,15 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace, selectionChange } = propsRef.current;
+			const { getValue, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
 			}
 
+			// We must use getValue() here because value may be update
+			// asynchronously.
+			const value = getValue();
 			const { start, text } = value;
 			const characterBefore = text.slice( start - 1, start );
 
@@ -83,15 +88,17 @@ export function useInputRules( props ) {
 			} );
 			const block = transformation.transform( content );
 
-			selectionChange( findSelection( [ block ] ) );
+			selectionChange( ...findSelection( [ block ] ) );
 			onReplace( [ block ] );
 			__unstableMarkAutomaticChange();
+
+			return true;
 		}
 
 		function onInput( event ) {
 			const { inputType, type } = event;
 			const {
-				value,
+				getValue,
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
@@ -103,9 +110,10 @@ export function useInputRules( props ) {
 			}
 
 			if ( __unstableAllowPrefixTransformations && inputRule ) {
-				inputRule();
+				if ( inputRule() ) return;
 			}
 
+			const value = getValue();
 			const transformed = formatTypes.reduce(
 				( accumlator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {

@@ -35,6 +35,7 @@ export {
 
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
+export { hasSplitBorders as __experimentalHasSplitBorders } from './border-box-control/utils';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';
@@ -93,7 +94,6 @@ export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
-export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';

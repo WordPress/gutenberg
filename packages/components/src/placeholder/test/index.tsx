@@ -35,7 +35,7 @@ const testIcon = (
 
 const Placeholder = (
 	props: Omit<
-		WordPressComponentProps< PlaceholderProps< unknown >, 'div', false >,
+		WordPressComponentProps< PlaceholderProps, 'div', false >,
 		'ref'
 	>
 ) => <BasePlaceholder data-testid="placeholder" { ...props } />;

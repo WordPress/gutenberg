@@ -25,7 +25,9 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
  *
  * @return Higher-order component.
  */
-function ifCondition< Props >( predicate: ( props: Props ) => boolean ) {
+function ifCondition< Props extends {} >(
+	predicate: ( props: Props ) => boolean
+) {
 	return createHigherOrderComponent(
 		( WrappedComponent: ComponentType< Props > ) => ( props: Props ) => {
 			if ( ! predicate( props ) ) {

@@ -11,6 +11,7 @@ import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
 import SelectControl from '../select-control';
+import { VStack } from '../v-stack';
 import type {
 	QueryControlsProps,
 	QueryControlsWithMultipleCategorySelectionProps,
@@ -75,7 +76,7 @@ export function QueryControls( {
 	...props
 }: QueryControlsProps ) {
 	return (
-		<>
+		<VStack spacing="4" className="components-query-controls">
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
@@ -142,6 +143,7 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
+							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -175,6 +177,7 @@ export function QueryControls( {
 				onNumberOfItemsChange && (
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }
@@ -185,7 +188,7 @@ export function QueryControls( {
 					/>
 				),
 			] }
-		</>
+		</VStack>
 	);
 }
 

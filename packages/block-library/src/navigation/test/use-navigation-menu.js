@@ -36,16 +36,28 @@ function resolveRecords( registry, menus ) {
 	dispatch.startResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.finishResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
-		per_page: -1,
+		per_page: 100,
 		status: [ 'publish', 'draft' ],
+		order: 'desc',
+		orderby: 'date',
 	} );
 }
 

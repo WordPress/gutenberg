@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -26,11 +21,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const post = select( editorStore ).getCurrentPost();
 		return {
-			hasStickyAction: get(
-				post,
-				[ '_links', 'wp:action-sticky' ],
-				false
-			),
+			hasStickyAction: post._links?.[ 'wp:action-sticky' ] ?? false,
 			postType: select( editorStore ).getCurrentPostType(),
 		};
 	} ),

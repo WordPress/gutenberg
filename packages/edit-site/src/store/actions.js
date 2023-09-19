@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -12,6 +12,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -140,13 +141,20 @@ export const removeTemplate =
 				throw lastError;
 			}
 
+			// Depending on how the entity was retrieved it's title might be
+			// an object or simple string.
+			const templateTitle =
+				typeof template.title === 'string'
+					? template.title
+					: template.title?.rendered;
+
 			registry.dispatch( noticesStore ).createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					template.title.rendered
+					decodeEntities( templateTitle )
 				),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
 			);
 		} catch ( error ) {
 			const errorMessage =
@@ -176,6 +184,37 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
+ * Action that sets a navigation menu.
+ *
+ * @param {string} navigationMenuId The Navigation Menu Post ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationMenu( navigationMenuId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType: 'wp_navigation',
+		id: navigationMenuId,
+	};
+}
+
+/**
+ * Action that sets an edited entity.
+ *
+ * @param {string} postType The entity's post type.
+ * @param {string} postId   The entity's ID.
+ *
+ * @return {Object} Action object.
+ */
+export function setEditedEntity( postType, postId ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
+	};
+}
+
+/**
  * @deprecated
  */
 export function setHomeTemplateId() {
@@ -194,7 +233,7 @@ export function setHomeTemplateId() {
  *
  * @param {Object} context The context object.
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setEditedPostContext( context ) {
 	return {
@@ -218,21 +257,47 @@ export function setEditedPostContext( context ) {
 export const setPage =
 	( page ) =>
 	async ( { dispatch, registry } ) => {
-		if ( ! page.path && page.context?.postId ) {
-			const entity = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord(
-					'postType',
-					page.context.postType || 'post',
-					page.context.postId
-				);
-			// If the entity is undefined for some reason, path will resolve to "/"
-			page.path = getPathAndQueryString( entity?.link );
-		}
+		let template;
+		const getDefaultTemplate = async ( slug ) =>
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/templates/lookup', {
+					slug: `page-${ slug }`,
+				} ),
+			} );
 
-		const template = await registry
-			.resolveSelect( coreStore )
-			.__experimentalGetTemplateForLink( page.path );
+		if ( page.path ) {
+			template = await registry
+				.resolveSelect( coreStore )
+				.__experimentalGetTemplateForLink( page.path );
+		} else {
+			const editedEntity = await registry
+				.resolveSelect( coreStore )
+				.getEditedEntityRecord(
+					'postType',
+					page.context?.postType || 'post',
+					page.context?.postId
+				);
+			const currentTemplateSlug = editedEntity?.template;
+			if ( currentTemplateSlug ) {
+				const currentTemplate = (
+					await registry
+						.resolveSelect( coreStore )
+						.getEntityRecords( 'postType', 'wp_template', {
+							per_page: -1,
+						} )
+				)?.find( ( { slug } ) => slug === currentTemplateSlug );
+				if ( currentTemplate ) {
+					template = currentTemplate;
+				} else {
+					// If a page has a `template` set and is not included in the list
+					// of the current theme's templates, query for current theme's default template.
+					template = await getDefaultTemplate( editedEntity?.link );
+				}
+			} else {
+				// Page's `template` is empty, that indicates we need to use the default template for the page.
+				template = await getDefaultTemplate( editedEntity?.link );
+			}
+		}
 
 		if ( ! template ) {
 			return;
@@ -334,12 +399,20 @@ export function updateSettings( settings ) {
  * @param {boolean} isOpen If true, opens the list view. If false, closes it.
  *                         It does not toggle the state, but sets it directly.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( isDistractionFree && isOpen ) {
+			dispatch.toggleDistractionFree();
+		}
+		dispatch( {
+			type: 'SET_IS_LIST_VIEW_OPENED',
+			isOpen,
+		} );
 	};
-}
 
 /**
  * Sets whether the save view panel should be open.
@@ -365,6 +438,8 @@ export function setIsSaveViewOpened( isOpen ) {
 export const revertTemplate =
 	( template, { allowUndo = true } = {} ) =>
 	async ( { registry } ) => {
+		const noticeId = 'edit-site-template-reverted';
+		registry.dispatch( noticesStore ).removeNotice( noticeId );
 		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
@@ -466,6 +541,7 @@ export const revertTemplate =
 					.dispatch( noticesStore )
 					.createSuccessNotice( __( 'Template reverted.' ), {
 						type: 'snackbar',
+						id: noticeId,
 						actions: [
 							{
 								label: __( 'Undo' ),
@@ -473,10 +549,6 @@ export const revertTemplate =
 							},
 						],
 					} );
-			} else {
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ) );
 			}
 		} catch ( error ) {
 			const errorMessage =
@@ -495,7 +567,13 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( isDistractionFree ) {
+			dispatch.toggleDistractionFree();
+		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editSiteStoreName, name );
@@ -514,7 +592,7 @@ export const closeGeneralSidebar =
 
 export const switchEditorMode =
 	( mode ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
 		registry
 			.dispatch( 'core/preferences' )
 			.set( 'core/edit-site', 'editorMode', mode );
@@ -527,6 +605,74 @@ export const switchEditorMode =
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core/edit-site', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
+	};
+
+/**
+ * Sets whether or not the editor allows only page content to be edited.
+ *
+ * @param {boolean} hasPageContentFocus True to allow only page content to be
+ *                                      edited, false to allow template to be
+ *                                      edited.
+ */
+export const setHasPageContentFocus =
+	( hasPageContentFocus ) =>
+	( { dispatch, registry } ) => {
+		if ( hasPageContentFocus ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+		dispatch( {
+			type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+			hasPageContentFocus,
+		} );
+	};
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-site', 'distractionFree' );
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core/edit-site', 'fixedToolbar', false );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+				dispatch.closeGeneralSidebar();
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set(
+					'core/edit-site',
+					'distractionFree',
+					! isDistractionFree
+				);
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/edit-site/distraction-free-mode/notice',
+						type: 'snackbar',
+					}
+				);
+		} );
 	};

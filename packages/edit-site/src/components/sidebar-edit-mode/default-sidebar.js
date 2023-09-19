@@ -35,6 +35,7 @@ export default function DefaultSidebar( {
 				scope="core/edit-site"
 				identifier={ identifier }
 				title={ title }
+				smallScreenTitle={ title }
 				icon={ icon }
 				closeLabel={ closeLabel }
 				header={ header }

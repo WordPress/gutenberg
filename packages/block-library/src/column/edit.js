@@ -104,6 +104,7 @@ function ColumnEdit( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
+					controls={ [ 'top', 'center', 'bottom', 'stretch' ] }
 				/>
 			</BlockControls>
 			<InspectorControls>

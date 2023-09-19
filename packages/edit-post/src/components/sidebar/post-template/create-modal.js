@@ -116,7 +116,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 						placeholder={ DEFAULT_TITLE }
 						disabled={ isBusy }
 						help={ __(
-							'Describe the template, e.g. "Post with sidebar". Custom templates can be applied to any post or page.'
+							'Describe the template, e.g. "Post with sidebar". A custom template can be manually applied to any post or page.'
 						) }
 					/>
 					<HStack justify="right">

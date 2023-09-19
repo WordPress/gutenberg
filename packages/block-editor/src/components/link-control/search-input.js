@@ -46,7 +46,7 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery = {},
 			withURLSuggestion = true,
 			createSuggestionButtonText,
-			useLabel = false,
+			hideLabelFromVision = false,
 		},
 		ref
 	) => {
@@ -120,14 +120,16 @@ const LinkControlSearchInput = forwardRef(
 		};
 
 		const inputClasses = classnames( className, {
-			'has-no-label': ! useLabel,
+			// 'has-no-label': ! hideLabelFromVision,
 		} );
 
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
+					disableSuggestions={ currentLink?.url === value }
 					__nextHasNoMarginBottom
-					label={ useLabel ? 'URL' : undefined }
+					label={ __( 'Link' ) }
+					hideLabelFromVision={ hideLabelFromVision }
 					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }

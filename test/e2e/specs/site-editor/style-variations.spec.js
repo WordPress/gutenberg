@@ -86,13 +86,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
@@ -127,13 +127,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
@@ -174,15 +174,15 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Color palettes"i]' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Foreground"i]' )
+			page.locator( 'role=option[name="Color: Foreground"i]' )
 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Background"i]' )
+			page.locator( 'role=option[name="Color: Background"i]' )
 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Awesome pink"i]' )
+			page.locator( 'role=option[name="Color: Awesome pink"i]' )
 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
 	} );
 
@@ -217,17 +217,7 @@ class SiteEditorStyleVariations {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async browseStyles() {
-		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.page.click( 'role=button[name="Browse styles"i]' );
 	}

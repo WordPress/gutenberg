@@ -9,11 +9,16 @@ const { writeFile } = require( 'fs' ).promises;
 
 builder( {
 	modules: [ 'es', 'web' ],
-	// core-js is extremely conservative in which polyfills to include.
-	// Knowing about tiny browser implementation bugs that anyone rarely cares about,
-	// we prevent some features from having the full polyfill included.
-	// @see https://github.com/WordPress/gutenberg/pull/31279
-	exclude: [ 'es.promise' ],
+	exclude: [
+		// core-js is extremely conservative in which polyfills to include.
+		// Since we don't care about the tiny browser implementation bugs behind its decision
+		// to polyfill these features, we forcefully prevent them from being included.
+		// @see https://github.com/WordPress/gutenberg/pull/31279
+		'es.promise',
+		// This is an IE-only feature which we don't use, and don't want to polyfill.
+		// @see https://github.com/WordPress/gutenberg/pull/49234
+		'web.immediate',
+	],
 	targets: require( '@wordpress/browserslist-config' ),
 	filename: './build/polyfill.js',
 } )

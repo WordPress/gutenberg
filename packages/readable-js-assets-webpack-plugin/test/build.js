@@ -3,12 +3,10 @@
  */
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).sync;
+const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const path = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
-
-jest.useRealTimers();
 
 describe( 'ReadableJsAssetsWebpackPlugin', () => {
 	const outputDirectory = path.join( __dirname, 'build' );

@@ -4,8 +4,6 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useRealTimers();
-
 describe( 'controls', () => {
 	let registry;
 

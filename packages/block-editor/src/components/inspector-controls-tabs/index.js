@@ -26,7 +26,6 @@ export default function InspectorControlsTabs( {
 	const initialTabName = ! useIsListViewTabDisabled( blockName )
 		? TAB_LIST_VIEW.name
 		: undefined;
-
 	return (
 		<TabPanel
 			className="block-editor-block-inspector__tabs"

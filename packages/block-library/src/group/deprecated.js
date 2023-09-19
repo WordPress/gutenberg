@@ -50,7 +50,8 @@ const deprecated = [
 				default: 'div',
 			},
 			templateLock: {
-				type: 'string',
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
 			},
 		},
 		supports: {
@@ -100,7 +101,7 @@ const deprecated = [
 					fontSize: true,
 				},
 			},
-			__experimentalLayout: true,
+			layout: true,
 		},
 		save( { attributes: { tagName: Tag } } ) {
 			return (
@@ -135,7 +136,8 @@ const deprecated = [
 				default: 'div',
 			},
 			templateLock: {
-				type: 'string',
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
 			},
 		},
 		supports: {

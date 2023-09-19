@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, Component } from '@wordpress/element';
@@ -19,6 +14,7 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
+import { kebabCase } from '../../utils/object';
 
 /**
  * Capitalizes the first letter in a string.
@@ -40,8 +36,9 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) =>
-			<WrappedComponent { ...props } colors={ colorsArray } />,
+		( WrappedComponent ) => ( props ) => (
+			<WrappedComponent { ...props } colors={ colorsArray } />
+		),
 		'withCustomColorPalette'
 	);
 

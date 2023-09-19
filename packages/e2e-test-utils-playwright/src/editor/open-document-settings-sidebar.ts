@@ -7,7 +7,7 @@ import type { Editor } from './index';
  * Clicks on the button in the header which opens Document Settings sidebar when
  * it is closed.
  *
- * @param {Editor} this
+ * @param this
  */
 export async function openDocumentSettingsSidebar( this: Editor ) {
 	const toggleButton = this.page
@@ -24,7 +24,7 @@ export async function openDocumentSettingsSidebar( this: Editor ) {
 		await toggleButton.click();
 		await this.page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Close settings' } )
+			.getByRole( 'button', { name: 'Close Settings' } )
 			.waitFor();
 	}
 }

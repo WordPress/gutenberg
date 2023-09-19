@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -12,6 +7,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
+import { useEffect, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +19,7 @@ export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
+	resetAllFilter,
 } ) {
 	if ( __experimentalGroup ) {
 		deprecated(
@@ -39,7 +36,7 @@ export default function InspectorControlsFill( {
 	const isDisplayed = useDisplayBlockControls();
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
+		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
 	if ( ! isDisplayed ) {
@@ -50,18 +47,55 @@ export default function InspectorControlsFill( {
 		<StyleProvider document={ document }>
 			<Fill>
 				{ ( fillProps ) => {
-					// Children passed to InspectorControlsFill will not have
-					// access to any React Context whose Provider is part of
-					// the InspectorControlsSlot tree. So we re-create the
-					// Provider in this subtree.
-					const value = ! isEmpty( fillProps ) ? fillProps : null;
 					return (
-						<ToolsPanelContext.Provider value={ value }>
-							{ children }
-						</ToolsPanelContext.Provider>
+						<ToolsPanelInspectorControl
+							fillProps={ fillProps }
+							children={ children }
+							resetAllFilter={ resetAllFilter }
+						/>
 					);
 				} }
 			</Fill>
 		</StyleProvider>
+	);
+}
+
+function RegisterResetAll( { resetAllFilter, children } ) {
+	const { registerResetAllFilter, deregisterResetAllFilter } =
+		useContext( ToolsPanelContext );
+	useEffect( () => {
+		if (
+			resetAllFilter &&
+			registerResetAllFilter &&
+			deregisterResetAllFilter
+		) {
+			registerResetAllFilter( resetAllFilter );
+			return () => {
+				deregisterResetAllFilter( resetAllFilter );
+			};
+		}
+	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	return children;
+}
+
+function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
+	// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
+	// that should wrap the fill markup.
+	const { forwardedContext = [] } = fillProps;
+
+	// Children passed to InspectorControlsFill will not have
+	// access to any React Context whose Provider is part of
+	// the InspectorControlsSlot tree. So we re-create the
+	// Provider in this subtree.
+	const innerMarkup = (
+		<RegisterResetAll resetAllFilter={ resetAllFilter }>
+			{ children }
+		</RegisterResetAll>
+	);
+	return forwardedContext.reduce(
+		( inner, [ Provider, props ] ) => (
+			<Provider { ...props }>{ inner }</Provider>
+		),
+		innerMarkup
 	);
 }

@@ -1,42 +1,37 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-600;
-	border-width: $border-width-tab;
+	// 6px right padding to align with + button
+	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
+	border: none;
+	min-height: $grid-unit-50;
+	border-radius: $radius-block-ui;
 
 	&:hover,
 	&:focus,
 	&[aria-current] {
-		color: $white;
+		color: $gray-200;
 		background: $gray-800;
-		border-width: $border-width-tab;
+
+		.edit-site-sidebar-navigation-item__drilldown-indicator {
+			fill: $gray-200;
+		}
 	}
 
 	&[aria-current] {
 		background: var(--wp-admin-theme-color);
-	}
-}
-
-.edit-site-sidebar-navigation-screen__content .edit-site-navigation-inspector .components-button {
-	color: $gray-600;
-	&:hover,
-	&:focus,
-	&[aria-current] {
 		color: $white;
 	}
-}
 
-.edit-site-sidebar-navigation-screen__content .edit-site-navigation-inspector .offcanvas-editor-list-view-leaf {
-	&:hover,
-	&:focus,
-	&[aria-current] {
-		background: $gray-800;
+	.edit-site-sidebar-navigation-item__drilldown-indicator {
+		fill: $gray-600;
 	}
-	.block-editor-list-view-block__menu {
-		margin-left: -$grid-unit-10;
+
+	&.with-suffix {
+		padding-right: $grid-unit-20;
 	}
 }
 
 .edit-site-sidebar-navigation-screen__content .block-editor-list-view-block-select-button {
 	cursor: grab;
-	width: calc(100% - #{ $border-width-focus });
 	padding: $grid-unit-10;
 }

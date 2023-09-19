@@ -9,9 +9,9 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -37,12 +37,12 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
+	getCoverIsDark,
 } from '../shared';
-import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
-import ResizableCover from './resizable-cover';
+import ResizableCoverPopover from './resizable-cover-popover';
 
 extend( [ namesPlugin ] );
 
@@ -104,6 +104,8 @@ function CoverEdit( {
 		postId
 	);
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const media = useSelect(
 		( select ) =>
 			featuredImage &&
@@ -111,6 +113,26 @@ function CoverEdit( {
 		[ featuredImage ]
 	);
 	const mediaUrl = media?.source_url;
+
+	useEffect( () => {
+		async function setIsDark() {
+			__unstableMarkNextChangeAsNotPersistent();
+			const isDarkSetting = await getCoverIsDark(
+				mediaUrl,
+				dimRatio,
+				overlayColor.color
+			);
+			setAttributes( {
+				isDark: isDarkSetting,
+			} );
+		}
+		if ( useFeaturedImage ) {
+			setIsDark();
+		}
+		// We only ever want to run this effect if the mediaUrl changes.
+		// All other changes to the isDark state are handled in the appropriate event handlers.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -124,27 +146,77 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
+	const setMedia = attributesFromMedia( setAttributes, dimRatio );
+
+	const onSelectMedia = async ( newMedia ) => {
+		// Only pass the url to getCoverIsDark if the media is an image as video is not handled.
+		const newUrl = newMedia?.type === 'image' ? newMedia.url : undefined;
+		const isDarkSetting = await getCoverIsDark(
+			newUrl,
+			dimRatio,
+			overlayColor.color
+		);
+		setMedia( newMedia, isDarkSetting );
+	};
+
+	const onClearMedia = async () => {
+		const isDarkSetting = await getCoverIsDark(
+			undefined,
+			dimRatio,
+			overlayColor.color
+		);
+		setAttributes( {
+			url: undefined,
+			id: undefined,
+			backgroundType: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: false,
+			isDark: isDarkSetting,
+		} );
+	};
+
+	const onSetOverlayColor = async ( colorValue ) => {
+		const isDarkSetting = await getCoverIsDark( url, dimRatio, colorValue );
+		setOverlayColor( colorValue );
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: isDarkSetting,
+		} );
+	};
+
+	const onUpdateDimRatio = async ( newDimRatio ) => {
+		const isDarkSetting = await getCoverIsDark(
+			url,
+			newDimRatio,
+			overlayColor.color
+		);
+
+		setAttributes( {
+			dimRatio: newDimRatio,
+			isDark: isDarkSetting,
+		} );
+	};
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
-
-	useEffect( () => {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
-	}, [ isCoverDark ] );
-
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const [ resizeListener, { height, width } ] = useResizeObserver();
+	const resizableBoxDimensions = useMemo( () => {
+		return {
+			height: minHeightUnit === 'px' ? minHeight : 'auto',
+			width: 'auto',
+		};
+	}, [ minHeight, minHeightUnit ] );
 
 	const minHeightWithUnit =
 		minHeight && minHeightUnit
@@ -212,7 +284,10 @@ function CoverEdit( {
 		overlayColor,
 	};
 
-	const toggleUseFeaturedImage = () => {
+	const toggleUseFeaturedImage = async () => {
+		const isDarkSetting = await ( useFeaturedImage
+			? getCoverIsDark( undefined, dimRatio, overlayColor.color )
+			: getCoverIsDark( mediaUrl, dimRatio, overlayColor.color ) );
 		setAttributes( {
 			id: undefined,
 			url: undefined,
@@ -221,6 +296,7 @@ function CoverEdit( {
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
+			isDark: isDarkSetting,
 		} );
 	};
 
@@ -239,57 +315,70 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			clientId={ clientId }
-			setOverlayColor={ setOverlayColor }
+			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			updateDimRatio={ onUpdateDimRatio }
+			onClearMedia={ onClearMedia }
 		/>
 	);
+
+	const resizableCoverProps = {
+		className: 'block-library-cover__resize-container',
+		clientId,
+		height,
+		minHeight: minHeightWithUnit,
+		onResizeStart: () => {
+			setAttributes( { minHeightUnit: 'px' } );
+			toggleSelection( false );
+		},
+		onResize: ( value ) => {
+			setAttributes( { minHeight: value } );
+		},
+		onResizeStop: ( newMinHeight ) => {
+			toggleSelection( true );
+			setAttributes( { minHeight: newMinHeight } );
+		},
+		showHandle: true,
+		size: resizableBoxDimensions,
+		width,
+	};
 
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ blockControls }
 				{ inspectorControls }
+				{ isSelected && (
+					<ResizableCoverPopover { ...resizableCoverProps } />
+				) }
 				<TagName
 					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
 						blockProps.className
 					) }
+					style={ {
+						...blockProps.style,
+						minHeight: minHeightWithUnit || undefined,
+					} }
 				>
+					{ resizeListener }
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
 						onError={ onUploadError }
-						style={ {
-							minHeight: minHeightWithUnit || undefined,
-						} }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
 								disableCustomColors={ true }
 								value={ overlayColor.color }
-								onChange={ setOverlayColor }
+								onChange={ onSetOverlayColor }
 								clearable={ false }
 							/>
 						</div>
 					</CoverPlaceholder>
-					<ResizableCover
-						className="block-library-cover__resize-container"
-						onResizeStart={ () => {
-							setAttributes( { minHeightUnit: 'px' } );
-							toggleSelection( false );
-						} }
-						onResize={ ( value ) => {
-							setAttributes( { minHeight: value } );
-						} }
-						onResizeStop={ ( newMinHeight ) => {
-							toggleSelection( true );
-							setAttributes( { minHeight: newMinHeight } );
-						} }
-						showHandle={ isSelected }
-					/>
 				</TagName>
 			</>
 		);
@@ -318,22 +407,7 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
-				<ResizableCover
-					className="block-library-cover__resize-container"
-					onResizeStart={ () => {
-						setAttributes( { minHeightUnit: 'px' } );
-						toggleSelection( false );
-					} }
-					onResize={ ( value ) => {
-						setAttributes( { minHeight: value } );
-					} }
-					onResizeStop={ ( newMinHeight ) => {
-						toggleSelection( true );
-						setAttributes( { minHeight: newMinHeight } );
-					} }
-					showHandle={ isSelected }
-				/>
-
+				{ resizeListener }
 				{ ( ! useFeaturedImage || url ) && (
 					<span
 						aria-hidden="true"
@@ -404,6 +478,9 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
+			{ isSelected && (
+				<ResizableCoverPopover { ...resizableCoverProps } />
+			) }
 		</>
 	);
 }

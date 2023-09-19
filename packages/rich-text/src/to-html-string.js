@@ -14,24 +14,21 @@ import {
 
 import { toTree } from './to-tree';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
- * Create an HTML string from a Rich Text value. If a `multilineTag` is
- * provided, text separated by a line separator will be wrapped in it.
+ * Create an HTML string from a Rich Text value.
  *
  * @param {Object}        $1                      Named argements.
  * @param {RichTextValue} $1.value                Rich text value.
- * @param {string}        [$1.multilineTag]       Multiline tag.
  * @param {boolean}       [$1.preserveWhiteSpace] Whether or not to use newline
  *                                                characters for line breaks.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, multilineTag, preserveWhiteSpace } ) {
+export function toHTMLString( { value, preserveWhiteSpace } ) {
 	const tree = toTree( {
 		value,
-		multilineTag,
 		preserveWhiteSpace,
 		createEmpty,
 		append,

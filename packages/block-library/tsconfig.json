@@ -26,9 +26,12 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
-		{ "path": "../url" }
+		{ "path": "../rich-text" },
+		{ "path": "../url" },
+		{ "path": "../wordcount" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }

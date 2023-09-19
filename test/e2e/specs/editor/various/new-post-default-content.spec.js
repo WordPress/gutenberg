@@ -27,7 +27,7 @@ test.describe( 'new editor filtered state', () => {
 
 		// Assert they match what the plugin set.
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
 		).toHaveText( 'My default title' );
 		await expect
 			.poll( editor.getEditedPostContent )

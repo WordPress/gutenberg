@@ -1,5 +1,6 @@
 # Documentation
-/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy
+/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy @ndiego
+/packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
 /schemas/json                                   @ajlende
@@ -54,17 +55,19 @@
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/docs/tool                                      @ajitbohra @ndiego
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @ryanwelcher
 /packages/create-block-tutorial-template        @gziolo @ryanwelcher
-/packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
@@ -74,19 +77,20 @@
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726
+/test/e2e                                       @kevin940726 @Mamaduka
+/test/php/gutenberg-coding-standards			@anton-vlasenko
 
 # UI Components
 /packages/components                            @ajitbohra
 /packages/compose                               @ajitbohra
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
+/packages/nux                                   @ajitbohra @peterwilsoncc
 /packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons
@@ -117,9 +121,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @fluiddot
-/packages/rich-text                             @ellatrix @fluiddot
-/packages/block-editor/src/components/rich-text @ellatrix @fluiddot
+/packages/format-library                        @ellatrix @fluiddot @dcalhoun
+/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
 
 # Project Management
 /.github
@@ -127,10 +131,11 @@
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @noahtallen
+/packages/env                                   @noahtallen @ObliviousHarmony @t-hamano
 
 # PHP
 /lib                                            @spacedmonkey
+/lib/compat/*/html-api                          @dmsnell
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux

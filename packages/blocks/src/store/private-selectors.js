@@ -2,12 +2,12 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { getBlockType } from './selectors';
+import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
 
 const ROOT_BLOCK_SUPPORTS = [
@@ -15,7 +15,9 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -72,6 +74,11 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
+		// Text columns is only available for blocks.
+		if ( support === 'textColumns' && ! name ) {
+			return false;
+		}
+
 		return true;
 	} );
 }
@@ -99,15 +106,7 @@ export const getSupportedStyles = createSelector(
 
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-		// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
-		if (
-			blockType?.supports?.spacing?.blockGap &&
-			blockType?.supports?.spacing?.__experimentalSkipSerialization !==
-				true &&
-			! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
-				( spacingType ) => spacingType === 'blockGap'
-			)
-		) {
+		if ( blockType?.supports?.spacing?.blockGap ) {
 			supportKeys.push( 'blockGap' );
 		}
 
@@ -128,7 +127,7 @@ export const getSupportedStyles = createSelector(
 				if (
 					STYLE_PROPERTY[ styleName ].support[ 0 ] in
 						blockType.supports &&
-					get(
+					getValueFromObjectPath(
 						blockType.supports,
 						STYLE_PROPERTY[ styleName ].support
 					) !== false
@@ -139,7 +138,7 @@ export const getSupportedStyles = createSelector(
 			}
 
 			if (
-				get(
+				getValueFromObjectPath(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support,
 					false
@@ -153,3 +152,27 @@ export const getSupportedStyles = createSelector(
 	},
 	( state, name ) => [ state.blockTypes[ name ] ]
 );
+
+/**
+ * Returns the bootstrapped block type metadata for a give block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block name.
+ *
+ * @return {Object} Bootstrapped block type metadata for a block.
+ */
+export function getBootstrappedBlockType( state, name ) {
+	return state.bootstrappedBlockTypes[ name ];
+}
+
+/**
+ * Returns all the unprocessed (before applying the `registerBlockType` filter)
+ * block type settings as passed during block registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block type settings for all blocks.
+ */
+export function getUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}

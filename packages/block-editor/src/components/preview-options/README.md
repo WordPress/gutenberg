@@ -28,23 +28,24 @@ const MyPreviewOptions = () => (
 		className="edit-post-post-preview-dropdown"
 		deviceType={ deviceType }
 		setDeviceType={ setPreviewDeviceType }
-	>
-		<MenuGroup>
-			<div className="edit-post-header-preview__grouping-external">
-				<PostPreviewButton
-					className={ 'edit-post-header-preview__button-external' }
-					role="menuitem"
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-					textContent={
-						<>
-							{ __( 'Preview in new tab' ) }
-							<Icon icon={ external } />
-						</>
-					}
-				/>
-			</div>
-		</MenuGroup>
+	> { ( { onClose } ) => (
+			<MenuGroup>
+				<div className="edit-post-header-preview__grouping-external">
+					<PostPreviewButton
+						className="edit-post-header-preview__button-external"
+						role="menuitem"
+						forceIsAutosaveable={ hasActiveMetaboxes }
+						textContent={
+							<>
+								{ __( 'Preview in new tab' ) }
+								<Icon icon={ external } />
+							</>
+						}
+						onPreview={ onClose }
+					/>
+				</div>
+			</MenuGroup>
+		) }
 	</PreviewOptions>
 );
 ```
@@ -80,6 +81,13 @@ Used to set the device type that will be used to display the preview inside the 
 
 -   Type: `func`
 -   Required: yes
+
+#### children
+
+A function that returns nodes to be rendered within the dropdown.
+
+-   Type: `Function`
+-   Required: No
 
 ## Related components
 

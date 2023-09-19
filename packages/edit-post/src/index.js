@@ -11,7 +11,10 @@ import { createRoot } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { registerLegacyWidgetBlock } from '@wordpress/widgets';
+import {
+	registerLegacyWidgetBlock,
+	registerWidgetGroupBlock,
+} from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -59,15 +62,20 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
-	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+	// If `distractionFree` mode is enabled, the block list view should not be open.
+	if (
+		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+	) {
 		dispatch( editPostStore ).setIsListViewOpened( true );
 	}
 
 	registerCoreBlocks();
 	registerLegacyWidgetBlock( { inserter: false } );
+	registerWidgetGroupBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
@@ -89,6 +97,34 @@ export function initializeEditor(
 				blockType.name === 'core/template-part'
 			) {
 				return false;
+			}
+			return canInsert;
+		}
+	);
+
+	/*
+	 * Prevent adding post content block (except in query block) in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removePostContentFromInserter',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlockParentsByBlockName }
+		) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/post-content'
+			) {
+				return (
+					getBlockParentsByBlockName( rootClientId, 'core/query' )
+						.length > 0
+				);
 			}
 			return canInsert;
 		}

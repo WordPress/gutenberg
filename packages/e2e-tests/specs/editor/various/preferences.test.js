@@ -46,7 +46,7 @@ describe( 'preferences', () => {
 
 		// Dismiss.
 		await page.click(
-			'.edit-post-sidebar__panel-tabs [aria-label="Close settings"]'
+			'.edit-post-sidebar__panel-tabs [aria-label="Close Settings"]'
 		);
 		expect( await getActiveSidebarTabText() ).toBe( null );
 

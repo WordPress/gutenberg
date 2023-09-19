@@ -4,7 +4,6 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -18,25 +17,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
-
-const config = {
-	wp_template: {
-		labels: {
-			title: __( 'Templates' ),
-			loading: __( 'Loading templates' ),
-			notFound: __( 'No templates found' ),
-			manage: __( 'Manage all templates' ),
-		},
-	},
-	wp_template_part: {
-		labels: {
-			title: __( 'Template parts' ),
-			loading: __( 'Loading template parts' ),
-			notFound: __( 'No template parts found' ),
-			manage: __( 'Manage all template parts' ),
-		},
-	},
-};
+import SidebarButton from '../sidebar-button';
 
 const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -47,52 +28,53 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 };
 
 export default function SidebarNavigationScreenTemplates() {
-	const {
-		params: { postType },
-	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		postType,
+		'wp_template',
 		{
 			per_page: -1,
 		}
 	);
 
-	const browseAllLink = useLink( {
-		path: '/' + postType + '/all',
-	} );
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
+	const browseAllLink = useLink( { path: '/wp_template/all' } );
+	const canCreate = ! isMobileViewport;
 	return (
 		<SidebarNavigationScreen
-			title={ config[ postType ].labels.title }
+			title={ __( 'Templates' ) }
+			description={ __(
+				'Express the layout of your site with templates.'
+			) }
 			actions={
-				! isMobileViewport && (
+				canCreate && (
 					<AddNewTemplate
-						templateType={ postType }
+						templateType={ 'wp_template' }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
 			}
 			content={
 				<>
-					{ isLoading && config[ postType ].labels.loading }
+					{ isLoading && __( 'Loading templates…' ) }
 					{ ! isLoading && (
 						<ItemGroup>
 							{ ! templates?.length && (
-								<Item>
-									{ config[ postType ].labels.notFound }
-								</Item>
+								<Item>{ __( 'No templates found' ) }</Item>
 							) }
-							{ ( templates ?? [] ).map( ( template ) => (
+							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
-									postType={ postType }
+									postType={ 'wp_template' }
 									postId={ template.id }
 									key={ template.id }
+									withChevron
 								>
 									{ decodeEntities(
 										template.title?.rendered ||
@@ -100,18 +82,16 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-								/>
-							) }
 						</ItemGroup>
 					) }
 				</>
+			}
+			footer={
+				! isMobileViewport && (
+					<SidebarNavigationItem withChevron { ...browseAllLink }>
+						{ __( 'Manage all templates' ) }
+					</SidebarNavigationItem>
+				)
 			}
 		/>
 	);

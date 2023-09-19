@@ -3,6 +3,7 @@
 	box-sizing: border-box;
 	video {
 		width: 100%;
+		vertical-align: middle;
 	}
 
 	@supports (position: sticky) {

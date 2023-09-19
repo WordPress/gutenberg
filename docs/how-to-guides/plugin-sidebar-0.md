@@ -380,3 +380,31 @@ Functions used in this guide:
 You now have a custom sidebar that you can use to update `post_meta` content.
 
 A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/plugin-sidebar) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+
+### Note
+
+If you have enabled Custom Fields in the 'Panels' page of the Editor 'Preferences' (via the three dots in top right), a field with the same name as the TextControl, in this case `sidebar_plugin_meta_block_field`, will also appear in the custom fields panel at the bottom of the editor window. These two fields have access to the same meta property.
+
+![Text Control and Custom Field](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-text-control-custom-field.png)
+
+On saving the post the value in the TextControl will be saved first and the value in the custom field will be saved second, so that is the one that ends up persisting in the database. So if you change the value in the TextControl it is still the one in the custom field that ends up getting saved.
+
+This problem does not exist if Custom Fields is not enabled.
+
+If you need to have Custom Fields enabled and also have post meta in the sidebar there are two possible solutions:
+
+1. Precede the name of the meta field with an underscore, so the name in the above example would be `_sidebar_plugin_meta_block_field`. This indicates that the post meta should be treated as private so it will not be visible in the Custom Fields section of a post. With this solution an error will be generated when you save the post unless you add an `auth_callback` property to the `args` array passed to `register_post_meta` with a function that ultimately returns `true`.  See the `args` documentation in the [post_meta](https://developer.wordpress.org/reference/functions/register_meta/#parameters) page for more info.
+2. In the TextControl's `onChange` function, target the Value field textarea and set the value there to be the same as the value in the TextControl meta field. The value will then be identical in both places and so you can be assured that if the value is changed in the TextControl then it will still be saved to the database.
+
+```js
+return el( TextControl, {
+  label: 'Meta Block Field',
+  value: metaFieldValue,
+  onChange: function ( content ) {
+    editPost( {
+      meta: { sidebar_plugin_meta_block_field: content }
+    })
+    document.querySelector( {the-value-textarea} ).innerHTML = content;
+  },
+} );
+```

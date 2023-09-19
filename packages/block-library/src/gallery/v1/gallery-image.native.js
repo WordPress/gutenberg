@@ -7,7 +7,6 @@ import {
 	ScrollView,
 	TouchableWithoutFeedback,
 } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -334,7 +333,7 @@ class GalleryImage extends Component {
 	accessibilityLabelImageContainer() {
 		const { caption, 'aria-label': ariaLabel } = this.props;
 
-		return isEmpty( caption )
+		return ! caption
 			? ariaLabel
 			: ariaLabel +
 					'. ' +
