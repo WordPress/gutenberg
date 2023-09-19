@@ -1,11 +1,25 @@
 /**
  * External dependencies
  */
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
 import { FastAverageColor } from 'fast-average-color';
+
+/**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * @typedef {import('colord').RgbaColor} RgbaColor
  */
+
+extend( [ namesPlugin ] );
+
+/**
+ * Fallback color when the average color can't be computed.
+ */
+export const DEFAULT_AVERAGE_COLOR = '#FFFFFF';
 
 /**
  * Performs a Porter Duff composite source over operation on two rgba colors.
@@ -36,4 +50,72 @@ export function retrieveFastAverageColor() {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
+}
+
+/**
+ * Computes the average color of an image.
+ *
+ * @param {string} url The url of the image.
+ *
+ * @return {Promise<string>} Promise of an average color as a hex string.
+ */
+export async function computeAverageColor( url ) {
+	if ( ! url ) {
+		return DEFAULT_AVERAGE_COLOR;
+	}
+
+	// making the default color rgb for compat with FAC
+	const { r, g, b, a } = colord( DEFAULT_AVERAGE_COLOR ).toRgb();
+
+	try {
+		const imgCrossOrigin = applyFilters(
+			'media.crossOrigin',
+			undefined,
+			url
+		);
+		const color = await retrieveFastAverageColor().getColorAsync( url, {
+			// The default color is white, which is the color
+			// that is returned if there's an error.
+			// colord returns alpga 0-1, FAC needs 0-255
+			defaultColor: [ r, g, b, a * 255 ],
+			// Errors that come up don't reject the promise,
+			// so error logging has to be silenced
+			// with this option.
+			silent: process.env.NODE_ENV === 'production',
+			crossOrigin: imgCrossOrigin,
+		} );
+		return color.hex;
+	} catch ( error ) {
+		// If there's an error return the fallback color.
+		return DEFAULT_AVERAGE_COLOR;
+	}
+}
+
+/**
+ * Computes if the color combination of the overlay and background color is dark.
+ *
+ * @param {number} dimRatio        Opacity of the overlay.
+ * @param {string} overlayColor    CSS color string for the overlay.
+ * @param {string} backgroundColor CSS color string for the background.
+ *
+ * @return {boolean} true if the color combination composite result is dark.
+ */
+export function compositeIsDark( dimRatio, overlayColor, backgroundColor ) {
+	const overlay = colord( overlayColor )
+		.alpha( dimRatio / 100 )
+		.toRgb();
+	const background = colord( backgroundColor ).toRgb();
+	const composite = compositeSourceOver( overlay, background );
+	return colord( composite ).isDark();
+}
+
+/**
+ * Computes if the color is dark.
+ *
+ * @param {string} color Color to check.
+ *
+ * @return {boolean} true if the color is dark.
+ */
+export function colorIsDark( color ) {
+	return colord( color ).isDark();
 }

@@ -2,8 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { colord, extend } from 'colord';
-import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -25,7 +23,6 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -34,7 +31,6 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	DEFAULT_AVERAGE_COLOR,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -44,9 +40,11 @@ import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
-import { retrieveFastAverageColor, compositeSourceOver } from './color-utils';
-
-extend( [ namesPlugin ] );
+import {
+	computeAverageColor,
+	compositeIsDark,
+	colorIsDark,
+} from './color-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -59,63 +57,6 @@ function getInnerBlocksTemplate( attributes ) {
 			},
 		],
 	];
-}
-
-/**
- * Computes the average color of an image.
- *
- * @param {string} url The url of the image.
- *
- * @return {Promise<string>} Promise of an average color as a hex string.
- */
-async function computeAverageColor( url ) {
-	if ( ! url ) {
-		return DEFAULT_AVERAGE_COLOR;
-	}
-
-	// making the default color rgb for compat with FAC
-	const { r, g, b, a } = colord( DEFAULT_AVERAGE_COLOR ).toRgb();
-
-	try {
-		const imgCrossOrigin = applyFilters(
-			'media.crossOrigin',
-			undefined,
-			url
-		);
-		const color = await retrieveFastAverageColor().getColorAsync( url, {
-			// The default color is white, which is the color
-			// that is returned if there's an error.
-			// colord returns alpga 0-1, FAC needs 0-255
-			defaultColor: [ r, g, b, a * 255 ],
-			// Errors that come up don't reject the promise,
-			// so error logging has to be silenced
-			// with this option.
-			silent: process.env.NODE_ENV === 'production',
-			crossOrigin: imgCrossOrigin,
-		} );
-		return color.hex;
-	} catch ( error ) {
-		// If there's an error return the fallback color.
-		return DEFAULT_AVERAGE_COLOR;
-	}
-}
-
-/**
- * Computes if the color combination of the overlay and background color is dark.
- *
- * @param {number} dimRatio        Opacity of the overlay.
- * @param {string} overlayColor    CSS color string for the overlay.
- * @param {string} backgroundColor CSS color string for the background.
- *
- * @return {boolean} true if the color combination composite result is dark.
- */
-function computeIsDark( dimRatio, overlayColor, backgroundColor ) {
-	const overlay = colord( overlayColor )
-		.alpha( dimRatio / 100 )
-		.toRgb();
-	const background = colord( backgroundColor ).toRgb();
-	const composite = compositeSourceOver( overlay, background );
-	return colord( composite ).isDark();
 }
 
 /**
@@ -207,7 +148,7 @@ function CoverEdit( {
 	const setIsDark = useCallback(
 		( newOverlay, newBackground, newDimRatio = dimRatio ) => {
 			__unstableMarkNextChangeAsNotPersistent();
-			const isDarkSetting = computeIsDark(
+			const isDarkSetting = compositeIsDark(
 				newDimRatio,
 				newOverlay,
 				newBackground
@@ -233,7 +174,7 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			const color = await getAverageBackgroundColor( newUrl );
 			setOverlayColor( color );
-			setAttributes( { isDark: colord( color ).isDark() } );
+			setAttributes( { isDark: colorIsDark( color ) } );
 		},
 		[
 			userOverlayColor,
@@ -289,7 +230,7 @@ function CoverEdit( {
 			useFeaturedImage: false,
 			userOverlayColor: false,
 		} );
-		setAttributes( { isDark: colord( overlayColor.color ).isDark() } );
+		setAttributes( { isDark: colorIsDark( overlayColor.color ) } );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
