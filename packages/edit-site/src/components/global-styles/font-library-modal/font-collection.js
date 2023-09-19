@@ -11,6 +11,7 @@ import {
 	Icon,
 	FlexItem,
 	Flex,
+	Button,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -93,11 +94,23 @@ function FontCollection( { id } ) {
 
 	const fontToInstallOutline = getFontsOutline( fontsToInstall );
 
+	const resetFontsToInstall = () => {
+		setFontsToInstall( [] );
+	};
+
 	return (
 		<TabLayout
 			title={ selectedCollection.name }
 			description={ selectedCollection.description }
 			handleBack={ !! selectedFont && handleUnselectFont }
+			footer={
+				fontsToInstall.length > 0 && (
+					<Footer
+						fontsToInstall={ fontsToInstall }
+						resetFontsToInstall={ resetFontsToInstall }
+					/>
+				)
+			}
 		>
 			{ ! selectedCollection.data && <Spinner /> }
 
@@ -175,6 +188,28 @@ function FontCollection( { id } ) {
 				</FontsGrid>
 			) }
 		</TabLayout>
+	);
+}
+
+function Footer( { fontsToInstall, resetFontsToInstall } ) {
+	const { installFonts, isInstalling } = useContext( FontLibraryContext );
+
+	const handleInstall = async () => {
+		await installFonts( fontsToInstall );
+		resetFontsToInstall();
+	};
+
+	return (
+		<Flex justify="flex-end">
+			<Button
+				variant="primary"
+				onClick={ handleInstall }
+				isBusy={ isInstalling }
+				disabled={ isInstalling }
+			>
+				{ __( 'Install' ) }
+			</Button>
+		</Flex>
 	);
 }
 

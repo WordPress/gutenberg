@@ -41,7 +41,7 @@ function TabLayout( { title, description, handleBack, children, footer } ) {
 					</VStack>
 				</header>
 				<main>{ children }</main>
-				<footer>{ footer }</footer>
+				{ footer && <footer>{ footer }</footer> }
 			</VStack>
 		</div>
 	);
