@@ -22,6 +22,10 @@ import {
 	DropdownSubMenu as DropdownSubMenuV2,
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
+import {
+	DropdownMenu as DropdownMenuV2Ariakit,
+	DropdownMenuItem as DropdownMenuItemV2Ariakit,
+} from './dropdown-menu-v2-ariakit';
 import { ComponentsContext } from './ui/context/context-system-provider';
 import Theme from './theme';
 
@@ -49,4 +53,6 @@ lock( privateApis, {
 	DropdownSubMenuTriggerV2,
 	ProgressBar,
 	Theme,
+	DropdownMenuV2Ariakit,
+	DropdownMenuItemV2Ariakit,
 } );
