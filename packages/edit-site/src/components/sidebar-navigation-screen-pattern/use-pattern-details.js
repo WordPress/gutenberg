@@ -10,6 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,20 +36,24 @@ export default function usePatternDetails( postType, postId ) {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-	const { currentTheme, patternCategories } = useSelect( ( select ) => {
+	const { currentTheme, userPatternCategories } = useSelect( ( select ) => {
 		const { getCurrentTheme, getUserPatternCategories } =
 			select( coreStore );
-		const userPatternCategories = getUserPatternCategories();
+
+		return {
+			currentTheme: getCurrentTheme(),
+			userPatternCategories: getUserPatternCategories(),
+		};
+	}, [] );
+
+	const patternCategories = useMemo( () => {
 		const categories = new Map();
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
 
-		return {
-			currentTheme: getCurrentTheme(),
-			patternCategories: categories,
-		};
-	}, [] );
+		return categories;
+	}, [ userPatternCategories ] );
 
 	const addedBy = useAddedBy( postType, postId );
 	const isAddedByActiveTheme =
