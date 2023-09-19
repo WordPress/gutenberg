@@ -154,6 +154,7 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 		tagName: TagName = 'div',
+		userOverlayColor,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -184,15 +185,6 @@ function CoverEdit( {
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
-
-	// this is used to not reset the overlay color
-	// from the average color when the user manually
-	// sets the overlay color
-	// howeverm, changing the background image
-	// should reset the overlay color
-	const hasManuallySetOverlayColor = useRef(
-		overlayColor.color !== undefined
-	);
 
 	// this is a ref to the average color
 	// so we don't have to compute it again
@@ -229,7 +221,7 @@ function CoverEdit( {
 	// of the image background
 	const setOverlayFromAverageColor = useCallback(
 		async ( newMedia ) => {
-			if ( hasManuallySetOverlayColor.current === true ) {
+			if ( userOverlayColor ) {
 				return;
 			}
 			const newUrl =
@@ -242,7 +234,7 @@ function CoverEdit( {
 			setAttributes( { isDark: colord( color ).isDark() } );
 		},
 		[
-			hasManuallySetOverlayColor,
+			userOverlayColor,
 			__unstableMarkNextChangeAsNotPersistent,
 			getAverageBackgroundColor,
 			setAttributes,
@@ -281,7 +273,6 @@ function CoverEdit( {
 
 	const onSelectMedia = async ( newMedia ) => {
 		setMedia( newMedia );
-		hasManuallySetOverlayColor.current = false;
 		await setOverlayFromAverageColor( newMedia );
 	};
 
@@ -294,13 +285,16 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: false,
+			userOverlayColor: false,
 		} );
 		setAttributes( { isDark: colord( overlayColor.color ).isDark() } );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
-		hasManuallySetOverlayColor.current = true;
 		setOverlayColor( colorValue );
+		setAttributes( {
+			userOverlayColor: true,
+		} );
 		setIsDark( colorValue, await getAverageBackgroundColor( url ) );
 	};
 
@@ -399,7 +393,6 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
-		hasManuallySetOverlayColor.current = false;
 		setAttributes( {
 			id: undefined,
 			url: undefined,
