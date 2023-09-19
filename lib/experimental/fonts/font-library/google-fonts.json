@@ -55705,10 +55705,10 @@
 		}
 	],
 	"categories": [
-		"sans-serif",
-		"display",
-		"serif",
-		"handwriting",
-		"monospace"
+		{ "id": "sans-serif", "name": "Sans Serif" },
+		{ "id": "serif", "name": "Serif" },
+		{ "id": "display", "name": "Display" },
+		{ "id": "handwriting", "name": "Handwriting" },
+		{ "id": "monospace", "name": "Monospace" }
 	]
 }
