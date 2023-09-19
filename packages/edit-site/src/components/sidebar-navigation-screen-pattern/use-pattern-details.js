@@ -38,10 +38,15 @@ export default function usePatternDetails( postType, postId ) {
 	const { currentTheme, patternCategories } = useSelect( ( select ) => {
 		const { getCurrentTheme, getUserPatternCategories } =
 			select( coreStore );
+		const userPatternCategories = getUserPatternCategories();
+		const categories = new Map();
+		userPatternCategories.forEach( ( userCategory ) =>
+			categories.set( userCategory.id, userCategory )
+		);
 
 		return {
 			currentTheme: getCurrentTheme(),
-			patternCategories: getUserPatternCategories().patternCategoriesMap,
+			patternCategories: categories,
 		};
 	}, [] );
 

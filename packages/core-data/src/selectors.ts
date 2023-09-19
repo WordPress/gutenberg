@@ -80,17 +80,12 @@ interface UserState {
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
 
-interface UserPatternCategory {
+export interface UserPatternCategory {
 	id: number;
 	name: string;
 	label: string;
 	slug: string;
 	description: string;
-}
-
-export interface UserPatternCategories {
-	patternCategories: Array< UserPatternCategory >;
-	patternCategoriesMap: Map< number, UserPatternCategory >;
 }
 
 type Optional< T > = T | undefined;
@@ -1241,21 +1236,13 @@ export function getBlockPatternCategories( state: State ): Array< any > {
  *
  * @param state Data state.
  *
- * @return User patterns category array and map keyed by id.
+ * @return User patterns category array.
  */
 
 export function getUserPatternCategories(
 	state: State
-): UserPatternCategories {
-	const patternCategoriesMap = new Map< number, UserPatternCategory >();
-	state.userPatternCategories?.forEach(
-		( userCategory: UserPatternCategory ) =>
-			patternCategoriesMap.set( userCategory.id, userCategory )
-	);
-	return {
-		patternCategories: state.userPatternCategories,
-		patternCategoriesMap,
-	};
+): Array< UserPatternCategory > {
+	return state.userPatternCategories;
 }
 
 /**
