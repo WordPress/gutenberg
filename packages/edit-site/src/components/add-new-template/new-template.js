@@ -45,6 +45,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+/**
+ * Internal dependencies
+ */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
@@ -190,7 +195,7 @@ export default function NewTemplate( {
 			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
 				'postType',
-				'wp_template',
+				TEMPLATE_POST_TYPE,
 				{
 					description,
 					// Slugs need to be strings, so this is for template `404`

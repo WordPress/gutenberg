@@ -35,10 +35,16 @@ export default function usePatternDetails( postType, postId ) {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-	const currentTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme(),
-		[]
-	);
+	const { currentTheme, userPatternCategories } = useSelect( ( select ) => {
+		const { getCurrentTheme, getUserPatternCategories } =
+			select( coreStore );
+
+		return {
+			currentTheme: getCurrentTheme(),
+			userPatternCategories: getUserPatternCategories(),
+		};
+	}, [] );
+
 	const addedBy = useAddedBy( postType, postId );
 	const isAddedByActiveTheme =
 		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
@@ -46,11 +52,18 @@ export default function usePatternDetails( postType, postId ) {
 	let description = getDescription();
 
 	if ( ! description && addedBy.text ) {
-		description = sprintf(
-			// translators: %s: pattern title e.g: "Header".
-			__( 'This is the %s pattern.' ),
-			getTitle()
-		);
+		description =
+			postType === 'wp_block'
+				? sprintf(
+						// translators: %s: pattern title e.g: "Header".
+						__( 'This is the %s pattern.' ),
+						getTitle()
+				  )
+				: sprintf(
+						// translators: %s: template part title e.g: "Header".
+						__( 'This is the %s template part.' ),
+						getTitle()
+				  );
 	}
 
 	if ( ! description && postType === 'wp_block' && record?.title ) {
@@ -61,10 +74,8 @@ export default function usePatternDetails( postType, postId ) {
 		);
 	}
 
-	const footer = !! record?.modified ? (
-		<SidebarNavigationScreenDetailsFooter
-			lastModifiedDateTime={ record.modified }
-		/>
+	const footer = record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter record={ record } />
 	) : null;
 
 	const details = [];
@@ -77,6 +88,28 @@ export default function usePatternDetails( postType, postId ) {
 					? __( 'Not synced' )
 					: __( 'Fully synced' ),
 		} );
+
+		if ( record.wp_pattern_category?.length === 0 ) {
+			details.push( {
+				label: __( 'Categories' ),
+				value: __( 'Uncategorized' ),
+			} );
+		}
+		if ( record.wp_pattern_category?.length > 0 ) {
+			const patternCategories = new Map();
+			userPatternCategories.forEach( ( userCategory ) =>
+				patternCategories.set( userCategory.id, userCategory )
+			);
+
+			const categories = record.wp_pattern_category
+				.filter( ( category ) => patternCategories.get( category ) )
+				.map( ( category ) => patternCategories.get( category ).label );
+
+			details.push( {
+				label: __( 'Categories' ),
+				value: categories.length > 0 ? categories.join( ', ' ) : '',
+			} );
+		}
 	}
 
 	if ( postType === 'wp_template_part' ) {

@@ -106,7 +106,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		$post_id              = get_the_ID();
 		$post_type            = get_post_type();
-		$filter_block_context = static function( $context ) use ( $post_id, $post_type ) {
+		$filter_block_context = static function ( $context ) use ( $post_id, $post_type ) {
 			$context['postType'] = $post_type;
 			$context['postId']   = $post_id;
 			return $context;

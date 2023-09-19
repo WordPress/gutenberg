@@ -2,9 +2,13 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { LayoutGroup } from 'framer-motion';
+
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
@@ -21,8 +25,6 @@ import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
-const noop = () => {};
-
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
@@ -36,18 +38,21 @@ function UnconnectedToggleGroupControl(
 		label,
 		hideLabelFromVision = false,
 		help,
-		onChange = noop,
+		onChange,
 		size = 'default',
 		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { isBlock, isDeselectable, size } ),
+				styles.toggleGroupControl( { isBlock, isDeselectable, size } ),
 				isBlock && styles.block,
 				className
 			),
@@ -70,7 +75,6 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				children={ children }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
@@ -78,7 +82,9 @@ function UnconnectedToggleGroupControl(
 				ref={ forwardedRef }
 				size={ size }
 				value={ value }
-			/>
+			>
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+			</MainControl>
 		</BaseControl>
 	);
 }

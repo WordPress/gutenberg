@@ -24,6 +24,7 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ButtonProps, DeprecatedButtonProps } from './types';
+import { positionToPlacement } from '../popover/utils';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
@@ -225,6 +226,13 @@ export function UnforwardedButton(
 			</button>
 		);
 
+	// Convert legacy `position` values to be used with the new `placement` prop
+	let computedPlacement;
+	// if `tooltipPosition` is defined, compute value to `placement`
+	if ( tooltipPosition !== undefined ) {
+		computedPlacement = positionToPlacement( tooltipPosition );
+	}
+
 	if ( ! shouldShowTooltip ) {
 		return (
 			<>
@@ -248,7 +256,7 @@ export function UnforwardedButton(
 						: label
 				}
 				shortcut={ shortcut }
-				position={ tooltipPosition }
+				placement={ computedPlacement }
 			>
 				{ element }
 			</Tooltip>

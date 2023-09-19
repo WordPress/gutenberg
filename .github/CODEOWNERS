@@ -135,6 +135,7 @@
 
 # PHP
 /lib                                            @spacedmonkey
+/lib/compat/*/html-api                          @dmsnell
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux

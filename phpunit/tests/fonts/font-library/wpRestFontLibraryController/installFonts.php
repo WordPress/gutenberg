@@ -50,7 +50,6 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 			// Compares if the rest of the data is the same.
 			$this->assertEquals( $expected_font, $installed_font, 'The endpoint answer is not as expected.' );
 		}
-
 	}
 
 	/**
@@ -107,7 +106,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily' => 'Piazzolla',
 								'fontStyle'  => 'normal',
 								'fontWeight' => '400',
-								'src'        => '/wp-content/uploads/fonts/piazzolla_normal_400.ttf',
+								'src'        => '/wp-content/fonts/piazzolla_normal_400.ttf',
 							),
 						),
 					),
@@ -120,7 +119,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily' => 'Montserrat',
 								'fontStyle'  => 'normal',
 								'fontWeight' => '100',
-								'src'        => '/wp-content/uploads/fonts/montserrat_normal_100.ttf',
+								'src'        => '/wp-content/fonts/montserrat_normal_100.ttf',
 							),
 						),
 					),
@@ -261,7 +260,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily' => 'Piazzolla',
 								'fontStyle'  => 'normal',
 								'fontWeight' => '400',
-								'src'        => '/wp-content/uploads/fonts/piazzolla_normal_400.ttf',
+								'src'        => '/wp-content/fonts/piazzolla_normal_400.ttf',
 							),
 						),
 					),
@@ -274,7 +273,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 								'fontFamily' => 'Montserrat',
 								'fontStyle'  => 'normal',
 								'fontWeight' => '100',
-								'src'        => '/wp-content/uploads/fonts/montserrat_normal_100.ttf',
+								'src'        => '/wp-content/fonts/montserrat_normal_100.ttf',
 							),
 						),
 					),
@@ -416,4 +415,3 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 		);
 	}
 }
-

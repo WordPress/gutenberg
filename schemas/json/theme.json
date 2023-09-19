@@ -7,29 +7,6 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
-		"behaviorsBlocksPropertiesComplete": {
-			"type": "object",
-			"properties": {
-				"lightbox": {
-					"description": "Settings related to the lightbox behavior.",
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"description": "Allow users to enable the lightbox behavior.",
-							"type": "boolean",
-							"default": false
-						},
-						"animation": {
-							"description": "Set lightbox animation. Possible values: `fade`, `zoom`, `''` (empty string).",
-							"type": "string",
-							"enum": [ "fade", "zoom", "" ]
-						}
-					},
-					"additionalProperties": false
-				}
-			},
-			"additionalProperties": false
-		},
 		"refComplete": {
 			"type": "object",
 			"properties": {
@@ -43,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -260,6 +237,23 @@
 				}
 			}
 		},
+		"settingsPropertiesBackground": {
+			"type": "object",
+			"properties": {
+				"background": {
+					"description": "Settings related to background.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesDimensions": {
 			"type": "object",
 			"properties": {
@@ -296,6 +290,26 @@
 							"description": "Disable the layout UI controls.",
 							"type": "boolean",
 							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"properties": {
+				"lightbox": {
+					"description": "Settings related to the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether the lightbox is enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
+							"type": "boolean"
 						}
 					},
 					"additionalProperties": false
@@ -685,32 +699,16 @@
 				}
 			}
 		},
-		"settingsPropertiesBehaviors": {
-			"type": "object",
-			"properties": {
-				"behaviors": {
-					"description": "Settings related to behaviors.",
-					"type": "object",
-					"properties": {
-						"lightbox": {
-							"description": "Allow users to enable/disable lightbox.",
-							"type": "boolean",
-							"default": false
-						}
-					},
-					"additionalProperties": false
-				}
-			}
-		},
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
-				{ "$ref": "#/definitions/settingsPropertiesBehaviors" },
+				{ "$ref": "#/definitions/settingsPropertiesBackground" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
@@ -726,11 +724,12 @@
 				{
 					"properties": {
 						"appearanceTools": {},
-						"behaviors": {},
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
 						"layout": {},
+						"lightbox": {},
 						"position": {},
 						"shadow": {},
 						"spacing": {},
@@ -2184,21 +2183,6 @@
 			"type": "string",
 			"description": "Description of the global styles variation."
 		},
-		"behaviors": {
-			"description": "A list of blocks that have behaviors. This setting controls the display of the Behaviors UI in the block editor.",
-			"type": "object",
-			"properties": {
-				"blocks": {
-					"type": "object",
-					"properties": {
-						"core/image": {
-							"$ref": "#/definitions/behaviorsBlocksPropertiesComplete"
-						}
-					},
-					"additionalProperties": false
-				}
-			}
-		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
@@ -2212,8 +2196,10 @@
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
+						"background": {},
 						"color": {},
 						"layout": {},
+						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},

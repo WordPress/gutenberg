@@ -15,6 +15,7 @@ import { plusCircle } from '@wordpress/icons';
  */
 import Button from '..';
 import Tooltip from '../../tooltip';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -236,9 +237,13 @@ describe( 'Button', () => {
 			await user.tab();
 
 			expect( screen.getByText( 'Label' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					label="Label"
@@ -255,6 +260,16 @@ describe( 'Button', () => {
 					description: 'Description text',
 				} )
 			).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'tooltip', {
+					name: 'Description text',
+				} )
+			).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should allow tooltip disable', async () => {
@@ -293,6 +308,8 @@ describe( 'Button', () => {
 			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should not show the tooltip when icon and children defined', async () => {
@@ -327,6 +344,8 @@ describe( 'Button', () => {
 			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 	} );
 

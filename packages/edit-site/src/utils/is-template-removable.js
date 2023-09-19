@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { TEMPLATE_CUSTOM_SOURCE } from './constants';
+
+/**
  * Check if a template is removable.
  *
  * @param {Object} template The template entity to check.
@@ -9,5 +14,7 @@ export default function isTemplateRemovable( template ) {
 		return false;
 	}
 
-	return template.source === 'custom' && ! template.has_theme_file;
+	return (
+		template.source === TEMPLATE_CUSTOM_SOURCE && ! template.has_theme_file
+	);
 }
