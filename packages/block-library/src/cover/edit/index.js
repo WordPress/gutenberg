@@ -117,18 +117,6 @@ function CoverEdit( {
 	);
 	const mediaUrl = media?.source_url;
 
-	// instead of destructuring the attributes
-	// we define the url and background type
-	// depending on the value of the useFeaturedImage flag
-	// to preview in edit the dynamic featured image
-	const url = useFeaturedImage
-		? mediaUrl
-		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  originalUrl?.replaceAll( '&amp;', '&' );
-	const backgroundType = useFeaturedImage
-		? IMAGE_BACKGROUND_TYPE
-		: originalBackgroundType;
-
 	// User can change the featured image outside of the block, but we still
 	// need to update the block when that happens. This effect should only
 	// run when the featured image changes in that case. All other cases are
@@ -162,6 +150,18 @@ function CoverEdit( {
 		// Disable reason: Update the block only when the featured image changes.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ mediaUrl ] );
+
+	// instead of destructuring the attributes
+	// we define the url and background type
+	// depending on the value of the useFeaturedImage flag
+	// to preview in edit the dynamic featured image
+	const url = useFeaturedImage
+		? mediaUrl
+		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
+		  originalUrl?.replaceAll( '&amp;', '&' );
+	const backgroundType = useFeaturedImage
+		? IMAGE_BACKGROUND_TYPE
+		: originalBackgroundType;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
