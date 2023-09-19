@@ -60,7 +60,7 @@ export function retrieveFastAverageColor() {
  *
  * @return {Promise<string>} Promise of an average color as a hex string.
  */
-export const getAverageBackgroundColor = memoize( async ( url ) => {
+export const getMediaColor = memoize( async ( url ) => {
 	if ( ! url ) {
 		return DEFAULT_AVERAGE_COLOR;
 	}

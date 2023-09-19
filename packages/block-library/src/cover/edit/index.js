@@ -41,7 +41,7 @@ import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
 import {
-	getAverageBackgroundColor,
+	getMediaColor,
 	compositeIsDark,
 	DEFAULT_AVERAGE_COLOR,
 } from './color-utils';
@@ -127,9 +127,7 @@ function CoverEdit( {
 				return;
 			}
 
-			const averageBackgroundColor = await getAverageBackgroundColor(
-				mediaUrl
-			);
+			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
 			let newOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
@@ -169,7 +167,7 @@ function CoverEdit( {
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
 
-		const averageBackgroundColor = await getAverageBackgroundColor(
+		const averageBackgroundColor = await getMediaColor(
 			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
 		);
 
@@ -211,7 +209,7 @@ function CoverEdit( {
 	};
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
-		const averageBackgroundColor = await getAverageBackgroundColor( url );
+		const averageBackgroundColor = await getMediaColor( url );
 		setOverlayColor( newOverlayColor );
 		setAttributes( {
 			userOverlayColor: true,
@@ -224,7 +222,7 @@ function CoverEdit( {
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
-		const averageBackgroundColor = await getAverageBackgroundColor( url );
+		const averageBackgroundColor = await getMediaColor( url );
 		setAttributes( {
 			dimRatio: newDimRatio,
 			isDark: compositeIsDark(
@@ -323,9 +321,7 @@ function CoverEdit( {
 
 		let newIsDark = isDark;
 		if ( newUseFeaturedImage ) {
-			const averageBackgroundColor = await getAverageBackgroundColor(
-				mediaUrl
-			);
+			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
 			let newOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
