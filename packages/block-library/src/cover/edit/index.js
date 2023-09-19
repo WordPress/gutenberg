@@ -179,10 +179,12 @@ function CoverEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const setMedia = attributesFromMedia( setAttributes, dimRatio );
 
 	const onSelectMedia = async ( newMedia ) => {
-		setMedia( newMedia );
+		const mediaAttributes = attributesFromMedia( newMedia );
+		setAttributes( {
+			...mediaAttributes,
+		} );
 		await setOverlayFromAverageColor( newMedia );
 	};
 
