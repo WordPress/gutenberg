@@ -10,7 +10,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,15 +44,6 @@ export default function usePatternDetails( postType, postId ) {
 			userPatternCategories: getUserPatternCategories(),
 		};
 	}, [] );
-
-	const patternCategories = useMemo( () => {
-		const categories = new Map();
-		userPatternCategories.forEach( ( userCategory ) =>
-			categories.set( userCategory.id, userCategory )
-		);
-
-		return categories;
-	}, [ userPatternCategories ] );
 
 	const addedBy = useAddedBy( postType, postId );
 	const isAddedByActiveTheme =
@@ -106,6 +96,11 @@ export default function usePatternDetails( postType, postId ) {
 			} );
 		}
 		if ( record.wp_pattern_category?.length > 0 ) {
+			const patternCategories = new Map();
+			userPatternCategories.forEach( ( userCategory ) =>
+				patternCategories.set( userCategory.id, userCategory )
+			);
+
 			const categories = record.wp_pattern_category
 				.filter( ( category ) => patternCategories.get( category ) )
 				.map( ( category ) => patternCategories.get( category ).label );
