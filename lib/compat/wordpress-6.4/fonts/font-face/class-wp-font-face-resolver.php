@@ -56,8 +56,8 @@ class WP_Font_Face_Resolver {
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $definition ) {
 
-				// Skip if font-family "name" is not defined.
-				if ( empty( $definition['name'] ) ) {
+				// Skip if font-family "slug" is not defined.
+				if ( empty( $definition['slug'] ) ) {
 					continue;
 				}
 
@@ -66,13 +66,13 @@ class WP_Font_Face_Resolver {
 					continue;
 				}
 
-				$font_family = $definition['name'];
+				$font_family = $definition['slug'];
 
 				// Prepare the fonts array structure for this font-family.
 				if ( ! array_key_exists( $font_family, $fonts ) ) {
 					$fonts[ $font_family ] = array();
 				}
-
+				
 				$fonts[ $font_family ] = static::convert_font_face_properties( $definition['fontFace'], $font_family );
 			}
 		}
