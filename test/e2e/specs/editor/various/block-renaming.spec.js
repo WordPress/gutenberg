@@ -58,11 +58,13 @@ test.describe( 'Block Renaming', () => {
 				name: 'Rename',
 			} );
 
-			// Check focus is transferred into modal.
-			await expect( renameModal ).toBeFocused();
-
 			// Check the Modal is perceivable.
 			await expect( renameModal ).toBeVisible();
+
+			const nameInput = renameModal.getByLabel( 'Block name' );
+
+			// Check focus is transferred into the input within the Modal.
+			await expect( nameInput ).toBeFocused();
 
 			const saveButton = renameModal.getByRole( 'button', {
 				name: 'Save',
@@ -70,8 +72,6 @@ test.describe( 'Block Renaming', () => {
 			} );
 
 			await expect( saveButton ).toBeDisabled();
-
-			const nameInput = renameModal.getByLabel( 'Block name' );
 
 			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
 
