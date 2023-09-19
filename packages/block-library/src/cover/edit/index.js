@@ -213,8 +213,8 @@ function CoverEdit( {
 			isRepeated: undefined,
 			useFeaturedImage: false,
 			userOverlayColor: false,
+			isDark: colorIsDark( overlayColor.color ),
 		} );
-		setAttributes( { isDark: colorIsDark( overlayColor.color ) } );
 	};
 
 	const onSetOverlayColor = async ( colorValue ) => {
