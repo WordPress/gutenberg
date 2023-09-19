@@ -322,25 +322,29 @@ function CoverEdit( {
 	const toggleUseFeaturedImage = async () => {
 		const newUseFeaturedImage = ! useFeaturedImage;
 
-		let newOverlayColor = overlayColor.color;
+		const averageBackgroundColor = newUseFeaturedImage
+			? await getMediaColor( mediaUrl )
+			: DEFAULT_AVERAGE_COLOR;
+
+		const newOverlayColor = ! userOverlayColor
+			? averageBackgroundColor
+			: overlayColor.color;
+
 		if ( ! userOverlayColor ) {
 			if ( newUseFeaturedImage ) {
-				newOverlayColor = averageBackgroundColor;
 				setOverlayColor( newOverlayColor );
 			} else {
 				setOverlayColor( undefined );
 			}
 		}
 
-		let newIsDark = isDark;
-		if ( newUseFeaturedImage ) {
-			const averageBackgroundColor = await getMediaColor( mediaUrl );
-			newIsDark = compositeIsDark(
-				dimRatio,
-				newOverlayColor,
-				averageBackgroundColor
-			);
-		}
+		const newIsDark = newUseFeaturedImage
+			? compositeIsDark(
+					dimRatio,
+					newOverlayColor,
+					averageBackgroundColor
+			  )
+			: isDark;
 
 		setAttributes( {
 			id: undefined,
