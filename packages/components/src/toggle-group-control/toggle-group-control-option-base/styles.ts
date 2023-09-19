@@ -38,7 +38,7 @@ export const buttonView = ( {
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-theme-color-neutral-text );
 	fill: currentColor;
 	cursor: pointer;
 	display: flex;
@@ -64,7 +64,7 @@ export const buttonView = ( {
 	}
 
 	&:active {
-		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+		background: var( --wp-theme-color-neutral-bg-strong );
 	}
 
 	${ isDeselectable && deselectable }
@@ -73,7 +73,7 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: ${ COLORS.white };
+	color: var( --wp-theme-color-neutral-text-inverse );
 
 	&:active {
 		background: transparent;
@@ -114,7 +114,7 @@ const isIconStyles = ( {
 };
 
 export const backdropView = css`
-	background: ${ COLORS.gray[ 900 ] };
+	background: var( --wp-theme-color-neutral-bg-inverse );
 	border-radius: ${ CONFIG.controlBorderRadius };
 	position: absolute;
 	inset: 0;

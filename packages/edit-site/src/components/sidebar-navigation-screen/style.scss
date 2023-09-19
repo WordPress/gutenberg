@@ -23,10 +23,6 @@
 		margin-right: -$grid-unit-20;
 	}
 
-	.components-text {
-		color: $gray-400;
-	}
-
 	.components-heading {
 		margin-bottom: $grid-unit-10;
 	}
@@ -34,11 +30,7 @@
 
 .edit-site-sidebar-navigation-screen__meta {
 	margin: 0 0 $grid-unit-20 0;
-	color: $gray-400;
 	margin-left: $grid-unit-20;
-	.components-text {
-		color: $gray-400;
-	}
 }
 
 .edit-site-sidebar-navigation-screen__page-link {
@@ -58,7 +50,7 @@
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;
-	background: $gray-900;
+	background: var(--wp-theme-color-neutral-bg-muted);
 	padding-top: $grid-unit-60 + $header-height;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
@@ -78,7 +70,7 @@
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
 	.edit-site-global-styles-variations_item-preview {
-		border: $gray-900 $border-width solid;
+		border: var(--wp-theme-) $border-width solid;
 	}
 	.edit-site-global-styles-variations_item.is-active .edit-site-global-styles-variations_item-preview {
 		border: $gray-100 $border-width solid;
@@ -95,15 +87,15 @@
 .edit-site-sidebar-navigation-screen__footer {
 	position: sticky;
 	bottom: 0;
-	background-color: $gray-900;
+	background-color: var(--wp-theme-color-neutral-bg-muted);
 	gap: 0;
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
-	border-top: 1px solid $gray-800;
+	border-top: 1px solid var(--wp-theme-color-neutral-border);
 }
 
 .edit-site-sidebar__notice {
-	background: $gray-800;
+	background: var(--wp-theme-color-neutral-bg-muted);
 	color: $gray-300;
 	margin: $grid-unit-30 0;
 	&.is-dismissible {
@@ -124,22 +116,4 @@
  */
 .edit-site-sidebar-navigation-screen__input-control {
 	width: 100%;
-	.components-input-control__container {
-		background: $gray-800;
-
-		.components-button {
-			color: $gray-200 !important;
-		}
-	}
-	.components-input-control__input {
-		color: $gray-200 !important;
-		background: $gray-800 !important;
-		border-radius: $radius-block-ui;
-	}
-	.components-input-control__backdrop {
-		border: 4px !important;
-	}
-	.components-base-control__help {
-		color: $gray-600;
-	}
 }

@@ -16,7 +16,7 @@
 	box-sizing: border-box;
 	padding: 6px 12px;
 	border-radius: $radius-block-ui;
-	color: $components-color-foreground;
+	color: var(--wp-theme-color-neutral-text);
 
 	&.is-next-40px-default-size {
 		height: $button-size-next-default-40px;
@@ -48,8 +48,8 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: var(--wp-theme-color-primary-bg-strong);
+		color: var(--wp-theme-color-primary-text-inverse-strong);
 		text-decoration: none;
 		text-shadow: none;
 
@@ -57,8 +57,7 @@
 		outline: 1px solid transparent;
 
 		&:hover:not(:disabled) {
-			background: $components-color-accent-darker-10;
-			color: $components-color-accent-inverted;
+			background: var(--wp-theme-color-primary-bg-strong-hover);
 		}
 
 		&:active:not(:disabled) {

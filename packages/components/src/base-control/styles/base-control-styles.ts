@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
+import { baseLabelTypography, boxSizingReset, font } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 export const Wrapper = styled.div`
@@ -64,7 +64,7 @@ export const StyledHelp = styled.p`
 	margin-bottom: 0;
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ COLORS.gray[ 700 ] };
+	color: var( --wp-theme-color-neutral-text-muted );
 
 	${ deprecatedMarginHelp }
 `;

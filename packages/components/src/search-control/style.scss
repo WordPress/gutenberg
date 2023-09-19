@@ -3,9 +3,10 @@
 
 	input[type="search"].components-search-control__input {
 		@include input-control;
+		color: var(--wp-theme-color-neutral-text-strong);
 		display: block;
 		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		background: $gray-100;
+		background: var(--wp-theme-color-neutral-bg);
 		border: none;
 		width: 100%;
 		height: $grid-unit-60;
@@ -21,12 +22,12 @@
 		}
 
 		&:focus {
-			background: $white;
+			background: var(--wp-theme-color-neutral-bg-input);
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
 		&::placeholder {
-			color: $gray-700;
+			color: var(--wp-theme-color-neutral-text-muted);
 		}
 
 		&::-webkit-search-decoration,
@@ -49,6 +50,7 @@
 	justify-content: center;
 
 	> svg {
+		fill: var(--wp-theme-color-neutral-text);
 		margin: $grid-unit-10 0;
 	}
 }

@@ -1,5 +1,5 @@
 .edit-site-page {
-	color: $gray-800;
+	color: var(--wp-theme-color-neutral-text);
 	background: $white;
 	flex-grow: 1;
 	overflow: hidden;
@@ -14,20 +14,14 @@
 .edit-site-page-header {
 	padding: 0 $grid-unit-40;
 	min-height: $header-height;
-	border-bottom: 1px solid $gray-100;
+	border-bottom: 1px solid var(--wp-theme-color-neutral-border);
 	background: $white;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".edit-site-page-header");
-	.components-text {
-		color: $gray-800;
-	}
-	.components-heading {
-		color: $gray-900;
-	}
 	.edit-site-page-header__sub-title {
 		margin-top: $grid-unit-10;
-		color: $gray-700;
+		color: var(--wp-theme-color-neutral-text);
 	}
 }
 

@@ -6,7 +6,6 @@
 	}
 
 	.edit-site-sidebar-navigation-details-screen-panel__heading {
-		color: $gray-400;
 		text-transform: uppercase;
 		font-weight: 500;
 		font-size: 11px;
@@ -16,11 +15,11 @@
 }
 
 .edit-site-sidebar-navigation-details-screen-panel__label.edit-site-sidebar-navigation-details-screen-panel__label {
-	color: $gray-600;
+	color: var(--wp-theme-color-neutral-text-muted);
 	width: 100px;
 	flex-shrink: 0;
 }
 
 .edit-site-sidebar-navigation-details-screen-panel__value.edit-site-sidebar-navigation-details-screen-panel__value {
-	color: $gray-200;
+	color: var(--wp-theme-color-neutral-text);
 }
