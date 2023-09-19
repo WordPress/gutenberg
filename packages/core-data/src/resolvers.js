@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
@@ -620,15 +619,6 @@ export const getBlockPatternCategories =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 	};
 
-const mapPatternCategories = createSelector(
-	( patternCategories ) =>
-		patternCategories?.map( ( userCategory ) => ( {
-			...userCategory,
-			label: userCategory.name,
-			name: userCategory.slug,
-		} ) ) || []
-);
-
 export const getUserPatternCategories =
 	() =>
 	async ( { dispatch, resolveSelect } ) => {
@@ -641,9 +631,16 @@ export const getUserPatternCategories =
 			}
 		);
 
+		const mappedPatternCategories =
+			patternCategories?.map( ( userCategory ) => ( {
+				...userCategory,
+				label: userCategory.name,
+				name: userCategory.slug,
+			} ) ) || [];
+
 		dispatch( {
 			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
-			patternCategories: mapPatternCategories( patternCategories ),
+			patternCategories: mappedPatternCategories,
 		} );
 	};
 

@@ -246,7 +246,7 @@ const selectUserPatterns = createSelector(
 			categories: userPatternCategories,
 		};
 	},
-	( select, { search, syncStatus } = {} ) => [
+	( select ) => [
 		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
 			per_page: -1,
 		} ),
@@ -256,8 +256,6 @@ const selectUserPatterns = createSelector(
 			{ per_page: -1 },
 		] ),
 		select( coreStore ).getUserPatternCategories(),
-		search,
-		syncStatus,
 	]
 );
 
