@@ -70,6 +70,21 @@ $header-toolbar-min-width: 335px;
 	}
 }
 
+.edit-site-header-edit-mode .block-editor-block-contextual-toolbar.is-fixed {
+	position: fixed;
+	top: $header-height; // +1px to avoid overlap with the header border
+	left: 0;
+	width: 100%;
+
+	@include break-medium() {
+		width: auto;
+		position: relative;
+		top: 0;
+		// remove the border
+		border: none;
+	}
+}
+
 /**
  * Buttons on the right side
  */
