@@ -80,26 +80,21 @@ const renderRegions = ( page ) => {
 
 // Variable to store the current navigation.
 let navigatingTo = '';
-// Variable to store the current timeout ID.
-let timeoutId = NaN;
 
 // Navigate to a new page.
 export const navigate = async ( href, options = {} ) => {
-	navigatingTo = href;
-	clearTimeout( timeoutId );
-
 	const url = cleanUrl( href );
+	navigatingTo = href;
 	prefetch( url, options );
 
-	const pagePromise = pages.get( url );
-	const timeoutPromise = new Promise( ( r ) => {
-		timeoutId = setTimeout( r, options.timeout ?? 10000 );
-	} ).then( () => {
-		window.location.assign( href );
-		throw new Error( 'timeout' );
-	} );
+	// Create a promise that resolves when the specified timeout ends. The
+	// timeout value is 10 seconds by default.
+	const { timeout = 10000 } = options;
+	const timeoutPromise = new Promise( ( resolve ) =>
+		setTimeout( () => resolve( false ), timeout )
+	);
 
-	const page = await Promise.race( [ pagePromise, timeoutPromise ] );
+	const page = await Promise.race( [ pages.get( url ), timeoutPromise ] );
 
 	// Once the page is fetched, the destination URL could have changed (e.g.,
 	// by clicking another link in the meantime). If so, bail out, and let the
