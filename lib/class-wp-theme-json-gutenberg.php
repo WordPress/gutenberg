@@ -819,8 +819,13 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']           = static::VALID_SETTINGS;
 		$schema['settings']['blocks'] = $schema_settings_blocks;
 
+
 		// For settings.typography.fontFamilies, make the $schema have all indexes present in the $input.
 		if ( isset( $input['settings']['typography']['fontFamilies'] ) ) {
+			// Do not handle the cases where the sanitization is called before font families are merged, since it will be handled again later.
+			if ( isset( $input['settings']['typography']['fontFamilies']['theme']) || isset( $input['settings']['typography']['fontFamilies']['custom'] ) ) {
+				return $output;
+			}
 			foreach ( $input['settings']['typography']['fontFamilies'] as $font_family_key => $value ) {
 				$schema['settings']['typography']['fontFamilies'][ $font_family_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0];
 				// Do the same for fontFace.
