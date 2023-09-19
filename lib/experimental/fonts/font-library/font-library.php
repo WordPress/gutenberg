@@ -63,11 +63,11 @@ add_action(
 	}
 );
 
-$default_font_collection = array (
-    'id'             => 'google-fonts',
-    'name'           => 'Google Fonts',
-    'description'    => 'Google Fonts collection.',
-    'data_json_file' => path_join( __DIR__, 'google-fonts.json' ),
+$default_font_collection = array(
+	'id'             => 'google-fonts',
+	'name'           => 'Google Fonts',
+	'description'    => 'Google Fonts collection.',
+	'data_json_file' => path_join( __DIR__, 'google-fonts.json' ),
 );
 
-wp_register_font_collection ( $default_font_collection );
+wp_register_font_collection( $default_font_collection );
