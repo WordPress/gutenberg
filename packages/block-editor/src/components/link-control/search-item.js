@@ -52,13 +52,15 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	shouldShowType = false,
 } ) => {
+	const decodedURL = safeDecodeURI( suggestion?.url );
+
 	// Remove the site URL from any suggestion URL.
 	// This is to reduce visual noise in the search results.
-	const suggestionURL = '/' + getPath( suggestion?.url );
+	const suggestionURL = '/' + getPath( decodedURL );
 
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
-		: filterURLForDisplay( safeDecodeURI( suggestionURL ), 24 );
+		: filterURLForDisplay( suggestionURL, 24 );
 
 	return (
 		<MenuItem
