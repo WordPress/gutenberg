@@ -73,7 +73,7 @@ class WP_Font_Face_Resolver {
 					$fonts[ $font_family ] = array();
 				}
 				
-				$fonts[ $font_family ] = static::convert_font_face_properties( $definition['fontFace'], $font_family );
+				$fonts[ $font_family ] = static::convert_font_face_properties( $definition['fontFace'] );
 			}
 		}
 
@@ -86,15 +86,14 @@ class WP_Font_Face_Resolver {
 	 * @since 6.4.0
 	 *
 	 * @param array  $font_face_definition The font-face definitions to convert.
-	 * @param string $font_family_property The value to store in the font-face font-family property.
 	 * @return array Converted font-face properties.
 	 */
-	private static function convert_font_face_properties( array $font_face_definition, $font_family_property ) {
+	private static function convert_font_face_properties( array $font_face_definition ) {
 		$converted_font_faces = array();
 
 		foreach ( $font_face_definition as $font_face ) {
 			// Add the font-family property to the font-face.
-			$font_face['font-family'] = $font_family_property;
+			$font_face['font-family'] = $font_face['fontFamily'];
 
 			// Converts the "file:./" src placeholder into a theme font file URI.
 			if ( ! empty( $font_face['src'] ) ) {
