@@ -31,8 +31,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				userPatternCategories:
-					__experimentalUserPatternCategories?.patternCategories,
+				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},

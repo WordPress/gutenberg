@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
 ## 9.32.0 (2023-08-31)
 
 ### Bug Fix

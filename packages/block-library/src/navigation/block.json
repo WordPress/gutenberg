@@ -91,6 +91,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"ariaLabel": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
