@@ -397,26 +397,10 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		$breadcrumbs  = $query['breadcrumbs'];
 		$match_offset = isset( $query['match_offset'] ) ? (int) $query['match_offset'] : 1;
 
-		$crumb  = end( $breadcrumbs );
-		$target = strtoupper( $crumb );
 		while ( $match_offset > 0 && $this->step() ) {
-			if ( $target !== $this->get_tag() ) {
-				continue;
+			if ( $this->matches_breadcrumbs( $breadcrumbs ) && 0 === --$match_offset ) {
+				return true;
 			}
-
-			// Look up the stack to see if the breadcrumbs match.
-			foreach ( $this->state->stack_of_open_elements->walk_up() as $node ) {
-				if ( strtoupper( $crumb ) !== $node->node_name ) {
-					break;
-				}
-
-				$crumb = prev( $breadcrumbs );
-				if ( false === $crumb && 0 === --$match_offset && ! $this->is_tag_closer() ) {
-					return true;
-				}
-			}
-
-			$crumb = end( $breadcrumbs );
 		}
 
 		return false;
@@ -441,15 +425,27 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	 *     false === $processor->matches_breadcrumbs( array( 'span', 'img' ) );
 	 *     true  === $processor->matches_breadcrumbs( array( 'span', '*', 'img' ) );
 	 *
+	 * @since 6.4.0
+	 *
 	 * @param string[] $breadcrumbs list of HTML tag names representing nested structure.
 	 * @return bool Whether the currently-matched tag is found at the given nested structure.
 	 */
 	public function matches_breadcrumbs( $breadcrumbs ) {
-		if ( ! $this->get_tag() || 0 === count( $breadcrumbs ) ) {
+		if ( ! $this->get_tag() ) {
 			return false;
 		}
 
+		// Everything matches when there are zero constraints.
+		if ( 0 === count( $breadcrumbs ) ) {
+			return true;
+		}
+
+		// Start at the last crumb.
 		$crumb_at = count( $breadcrumbs ) - 1;
+
+		if ( $this->get_tag() !== strtoupper( $breadcrumbs[ $crumb_at ] ) ) {
+			return false;
+		}
 
 		foreach ( $this->state->stack_of_open_elements->walk_up() as $node ) {
 			$crumb = strtoupper( $breadcrumbs[ $crumb_at ] );
