@@ -8,7 +8,7 @@
 /**
  * Modifies the static `core/query` block on the server.
  *
- * @since X.X.X
+ * @since 6.4.0
  *
  * @param array  $attributes Block attributes.
  * @param string $content    Block default content.
@@ -90,6 +90,23 @@ function render_block_core_query( $attributes, $content, $block ) {
 
 	return $content;
 }
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_query_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-query-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-query-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-query-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_query_ensure_interactivity_dependency' );
 
 /**
  * Registers the `core/query` block on the server.
