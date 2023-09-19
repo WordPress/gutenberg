@@ -44,11 +44,6 @@ export default function TableOfContentsList( {
 						onClick={
 							disableLinkActivation ? handleOnClick : undefined
 						}
-						onContextMenu={
-							disableLinkActivation
-								? ( event ) => event?.preventDefault()
-								: undefined
-						}
 					>
 						{ content }
 					</a>
@@ -63,6 +58,10 @@ export default function TableOfContentsList( {
 							<ol>
 								<TableOfContentsList
 									nestedHeadingList={ node.children }
+									disableLinkActivation={
+										disableLinkActivation
+									}
+									onClick={ handleOnClick }
 								/>
 							</ol>
 						) : null }
