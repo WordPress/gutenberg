@@ -49,6 +49,7 @@ function FontCard( { font, onClick, variantsText } ) {
 		>
 			<Flex justify="space-between" wrap={ false }>
 				<FontDemo
+					customPreviewUrl={ font.preview }
 					fontFace={ displayFontFace }
 					text={ font.name }
 					style={ demoStyle }
