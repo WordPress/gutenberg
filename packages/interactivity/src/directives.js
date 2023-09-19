@@ -217,7 +217,12 @@ export default () => {
 					const result = evaluate( path, {
 						context: contextValue,
 					} );
-					element.props[ attribute ] = result;
+					if ( result !== null && result !== undefined ) {
+						element.ref.current?.setAttribute( attribute, result );
+					} else {
+						element.ref?.current?.removeAttribute( attribute );
+					}
+					// element.props[ attribute ] = result;
 
 					// This seems necessary because Preact doesn't change the attributes
 					// on the hydration, so we have to do it manually. It doesn't need
@@ -241,13 +246,12 @@ export default () => {
 							attribute !== 'download' &&
 							attribute !== 'rowSpan' &&
 							attribute !== 'colSpan' &&
-							attribute in el
+							el.getAttribute( attribute )
 						) {
 							try {
-								el[ attribute ] =
-									result === null || result === undefined
-										? ''
-										: result;
+								if ( result === null || result === undefined ) {
+									el[ attribute ] = result;
+								}
 								return;
 							} catch ( err ) {}
 						}
