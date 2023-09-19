@@ -95,8 +95,8 @@
 }
 
 .edit-site-sidebar__notice {
-	background: var(--wp-theme-color-neutral-bg-muted);
-	color: $gray-300;
+	background: var(--wp-theme-color-neutral-bg);
+	color: var(--wp-theme-color-neutral-text);
 	margin: $grid-unit-30 0;
 	&.is-dismissible {
 		padding-right: $grid-unit-10;
