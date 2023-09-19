@@ -10,12 +10,15 @@
 	flex-direction: column;
 }
 
-.edit-post-editor__document-overview-panel {
+.edit-post-editor__document-overview-panel__resizable-box {
 	@include break-medium() {
 		// Same width as the Inserter.
 		// @see packages/block-editor/src/components/inserter/style.scss
 		width: 350px;
 	}
+}
+
+.edit-post-editor__document-overview-panel {
 
 	.edit-post-editor__document-overview-panel__close-button {
 		position: absolute;
