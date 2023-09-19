@@ -101,4 +101,108 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_
 			),
 		);
 	}
+
+	/**
+	 * @dataProvider data_should_get_font_family_name
+	 *
+	 * @param array  $fonts         Fonts to test.
+	 * @param string $expected_name Expected font-family name.
+	 */
+	public function test_should_get_font_family_name( $fonts, $expected_name ) {
+		switch_theme( static::FONTS_THEME );
+
+		$replace_fonts = static function ( $theme_json_data ) use ( $fonts ) {
+			$data = $theme_json_data->get_data();
+
+			// Replace typography.fontFamilies.
+			$data['settings']['typography']['fontFamilies']['theme'] = $fonts;
+
+			return new WP_Theme_JSON_Data_Gutenberg( $data );
+		};
+		add_filter( 'wp_theme_json_data_theme', $replace_fonts );
+		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		remove_filter( 'wp_theme_json_data_theme', $replace_fonts );
+
+		$this->assertArrayHasKey( $expected_name, $fonts );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_get_font_family_name() {
+		$font_face = array(
+			array(
+				'fontFamily'  => 'DM Sans',
+				'fontStretch' => 'normal',
+				'fontStyle'   => 'normal',
+				'fontWeight'  => '400',
+				'src'         => array(
+					'file:./assets/fonts/dm-sans/DMSans-Regular.woff2',
+				),
+			),
+			array(
+				'fontFamily'  => 'DM Sans',
+				'fontStretch' => 'normal',
+				'fontStyle'   => 'italic',
+				'fontWeight'  => '400',
+				'src'         => array(
+					'file:./assets/fonts/dm-sans/DMSans-Regular-Italic.woff2',
+				),
+			),
+			array(
+				'fontFamily'  => 'DM Sans',
+				'fontStretch' => 'normal',
+				'fontStyle'   => 'italic',
+				'fontWeight'  => '700',
+				'src'         => array(
+					'file:./assets/fonts/dm-sans/DMSans-Bold.woff2',
+				),
+			),
+			array(
+				'fontFamily'  => 'DM Sans',
+				'fontStretch' => 'normal',
+				'fontStyle'   => 'italic',
+				'fontWeight'  => '700',
+				'src'         => array(
+					'file:./assets/fonts/dm-sans/DMSans-Bold-Italic.woff2',
+				),
+			),
+		);
+
+		return array(
+			'name declared'                   => array(
+				'fonts'         => array(
+					array(
+						'fontFamily' => 'DM Sans',
+						'name'       => 'DM Sans',
+						'slug'       => 'dm-sans',
+						'fontFace'   => $font_face,
+					),
+				),
+				'expected_name' => 'DM Sans',
+			),
+			'name not declared'               => array(
+				'fonts'         => array(
+					array(
+						'fontFamily' => 'DM Sans',
+						'slug'       => 'dm-sans',
+						'fontFace'   => $font_face,
+					),
+				),
+				'expected_name' => 'DM Sans',
+			),
+			'fontFamily comma-separated list' => array(
+				'fonts'         => array(
+					array(
+						'fontFamily' => 'DM Sans, sans-serif',
+						'slug'       => 'dm-sans',
+						'fontFace'   => $font_face,
+					),
+				),
+				'expected_name' => 'DM Sans',
+			),
+		);
+	}
 }
