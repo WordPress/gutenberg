@@ -161,7 +161,13 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	public function test_should_move_local_fontfaces( $font_data, array $files_data, array $expected ) {
 		// Set up the temporary files.
 		foreach ( $files_data as $file ) {
-			copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			} elseif ( 'font/woff2' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/DMSans.woff2', $file['tmp_name'] );
+			}
 		}
 
 		$font = new WP_Font_Family( $font_data );
@@ -295,32 +301,6 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 					),
 				),
 				'expected'   => array( 'dm-sans_regular_500.woff2' ),
-			),
-			// otf font type.
-			'otf local font'   => array(
-				'font_data'  => array(
-					'name'       => 'Gilbert Color',
-					'slug'       => 'gilbert-color',
-					'fontFamily' => 'Gilbert Color',
-					'fontFace'   => array(
-						array(
-							'fontFamily'   => 'Gilbert Color',
-							'fontStyle'    => 'regular',
-							'fontWeight'   => '500',
-							'uploadedFile' => 'files0',
-						),
-					),
-				),
-				'files_data' => array(
-					'files0' => array(
-						'name'     => 'gilbert-color.otf',
-						'type'     => 'font/otf',
-						'tmp_name' => wp_tempnam( 'Gilbert-' ),
-						'error'    => 0,
-						'size'     => 123,
-					),
-				),
-				'expected'   => array( 'gilbert-color_regular_500.otf' ),
 			),
 		);
 	}

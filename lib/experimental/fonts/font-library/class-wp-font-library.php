@@ -20,19 +20,13 @@ if ( class_exists( 'WP_Font_Library' ) ) {
  */
 class WP_Font_Library {
 
-	const PHP_7_TTF_MIME_TYPE = PHP_VERSION_ID >= 70333 ? 'application/font-sfnt' : 'application/x-font-ttf';
+	const PHP_7_TTF_MIME_TYPE = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
 
-	/*
-	* As of PHP 8.1.12, which includes libmagic/file update to version 5.42,
-	* the expected mime type for WOFF files is 'font/woff'.
-	*
-	* See https://github.com/php/php-src/issues/8805.
-	*/
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
-		'ttf'   => PHP_VERSION_ID >= 80000 ? 'font/sfnt' : self::PHP_7_TTF_MIME_TYPE,
-		'woff'  => PHP_VERSION_ID >= 80000 ? 'font/woff' : 'application/font-woff',
-		'woff2' => PHP_VERSION_ID >= 80000 ? 'font/woff2' : 'application/font-woff2',
+		'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : self::PHP_7_TTF_MIME_TYPE,
+		'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
+		'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',
 	);
 
 	/**
