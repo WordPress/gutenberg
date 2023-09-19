@@ -8,7 +8,7 @@ import namesPlugin from 'colord/plugins/names';
 extend( [ namesPlugin, a11yPlugin ] );
 
 const LIGHT_VALUES = [ 100, 98, 95, 92, 89, 87, 83, 73, 55, 48, 39, 13 ];
-const DARK_VALUES = [ 1, 11, 16, 19, 22, 18, 29, 38, 43, 55, 69, 93 ];
+const DARK_VALUES = [ 1, 11, 16, 19, 22, 18, 29, 38, 43, 73, 80, 93 ];
 export const PRIMARY_DEFAULT = '#3858e9';
 
 // map showing which lightness in scale each use case should use
