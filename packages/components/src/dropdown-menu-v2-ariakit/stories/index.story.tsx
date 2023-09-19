@@ -7,12 +7,14 @@ import type { Meta, StoryFn } from '@storybook/react';
  * WordPress dependencies
  */
 import { menu } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { DropdownMenu, DropdownMenuItem } from '..';
 import Icon from '../../icon';
+import Modal from '../../modal';
 
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2 ariakit',
@@ -69,4 +71,39 @@ Default.args = {
 			</DropdownMenu>
 		</>
 	),
+};
+
+export const WithModal: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ isModalOpen, setModalOpen ] = useState( false );
+	return (
+		<>
+			<DropdownMenu { ...props }>
+				<DropdownMenuItem onClick={ () => setModalOpen( true ) }>
+					Open modal
+				</DropdownMenuItem>
+				<DropdownMenuItem>Redo</DropdownMenuItem>
+				<DropdownMenu trigger="Find">
+					<DropdownMenuItem>Search the Web...</DropdownMenuItem>
+					<DropdownMenuItem>Find...</DropdownMenuItem>
+					<DropdownMenuItem>Find Next</DropdownMenuItem>
+					<DropdownMenuItem>Find Previous</DropdownMenuItem>
+				</DropdownMenu>
+				<DropdownMenu trigger="Speech">
+					<DropdownMenuItem>Start Speaking</DropdownMenuItem>
+					<DropdownMenuItem disabled>Stop Speaking</DropdownMenuItem>
+				</DropdownMenu>
+			</DropdownMenu>
+			{ isModalOpen && (
+				<Modal onRequestClose={ () => setModalOpen( false ) }>
+					Yo!
+					<button onClick={ () => setModalOpen( false ) }>
+						Close
+					</button>
+				</Modal>
+			) }
+		</>
+	);
+};
+WithModal.args = {
+	trigger: <Icon icon={ menu } size={ 24 } />,
 };
