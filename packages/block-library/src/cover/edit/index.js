@@ -190,6 +190,10 @@ function CoverEdit( {
 	};
 
 	const onClearMedia = () => {
+		if ( ! userOverlayColor ) {
+			setOverlayColor( undefined );
+		}
+
 		setAttributes( {
 			url: undefined,
 			id: undefined,
@@ -198,7 +202,6 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: false,
-			userOverlayColor: false,
 			isDark: compositeIsDark(
 				dimRatio,
 				overlayColor.color,
