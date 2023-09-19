@@ -81,7 +81,9 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && ( ( isset( $color_support['text'] ) && $color_support['text'] ) || ! isset( $color_support['text'] ) ) );
+	$has_text_colors_support       = true === $color_support ||
+		( isset( $color_support['text'] ) && $color_support['text'] ) ||
+		( is_array( $color_support ) && ! isset( $color_support['text'] ) );
 	$has_background_colors_support = true === $color_support ||
 		( isset( $color_support['background'] ) && $color_support['background'] ) ||
 		( is_array( $color_support ) && ! isset( $color_support['background'] ) );
