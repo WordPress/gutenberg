@@ -41,7 +41,7 @@ import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
 import {
-	computeAverageColor,
+	getAverageBackgroundColor,
 	compositeIsDark,
 	colorIsDark,
 } from './color-utils';
@@ -129,20 +129,6 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
 
-	// this is a ref to the average color
-	// so we don't have to compute it again
-	const computedAverageColor = useRef( null );
-	const getAverageBackgroundColor = useCallback(
-		async ( newUrl ) => {
-			if ( originalUrl === newUrl && computedAverageColor.current ) {
-				return computedAverageColor.current;
-			}
-			computedAverageColor.current = await computeAverageColor( newUrl );
-			return computedAverageColor.current;
-		},
-		[ originalUrl ]
-	);
-
 	// set the is dark attribute based on the overlay
 	// and background color
 	const setIsDark = useCallback(
@@ -179,7 +165,6 @@ function CoverEdit( {
 		[
 			userOverlayColor,
 			__unstableMarkNextChangeAsNotPersistent,
-			getAverageBackgroundColor,
 			setAttributes,
 			setOverlayColor,
 		]
@@ -201,7 +186,6 @@ function CoverEdit( {
 		};
 		updateFromFeaturedImage();
 	}, [
-		getAverageBackgroundColor,
 		mediaUrl,
 		overlayColor.color,
 		setOverlayFromAverageColor,

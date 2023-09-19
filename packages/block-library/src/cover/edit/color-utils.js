@@ -4,6 +4,7 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import { FastAverageColor } from 'fast-average-color';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -59,7 +60,7 @@ export function retrieveFastAverageColor() {
  *
  * @return {Promise<string>} Promise of an average color as a hex string.
  */
-export async function computeAverageColor( url ) {
+export const getAverageBackgroundColor = memoize( async ( url ) => {
 	if ( ! url ) {
 		return DEFAULT_AVERAGE_COLOR;
 	}
@@ -89,7 +90,7 @@ export async function computeAverageColor( url ) {
 		// If there's an error return the fallback color.
 		return DEFAULT_AVERAGE_COLOR;
 	}
-}
+} );
 
 /**
  * Computes if the color combination of the overlay and background color is dark.
