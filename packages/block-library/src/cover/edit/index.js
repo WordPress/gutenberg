@@ -63,8 +63,10 @@ function getInnerBlocksTemplate( attributes ) {
 
 /**
  * Computes the average color of an image.
- * @param {string} url
- * @return {Promise<string>} average color in hex
+ *
+ * @param {string} url The url of the image.
+ *
+ * @return {Promise<string>} Promise of an average color as a hex string.
  */
 async function computeAverageColor( url ) {
 	if ( ! url ) {
@@ -99,13 +101,13 @@ async function computeAverageColor( url ) {
 }
 
 /**
- * Computes if the color combination of the overlay
- * and background color is dark.
- * @param {number} dimRatio
- * @param {string} overlayColor
- * @param {string} backgroundColor
- * @return {boolean} isDark true if the color
- * 									 combination composite result is dark
+ * Computes if the color combination of the overlay and background color is dark.
+ *
+ * @param {number} dimRatio        Opacity of the overlay.
+ * @param {string} overlayColor    CSS color string for the overlay.
+ * @param {string} backgroundColor CSS color string for the background.
+ *
+ * @return {boolean} true if the color combination composite result is dark.
  */
 function computeIsDark( dimRatio, overlayColor, backgroundColor ) {
 	const overlay = colord( overlayColor )
