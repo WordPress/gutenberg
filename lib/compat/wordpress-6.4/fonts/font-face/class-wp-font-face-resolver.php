@@ -72,7 +72,7 @@ class WP_Font_Face_Resolver {
 				if ( ! array_key_exists( $font_family, $fonts ) ) {
 					$fonts[ $font_family ] = array();
 				}
-				
+
 				$fonts[ $font_family ] = static::convert_font_face_properties( $definition['fontFace'] );
 			}
 		}
@@ -85,7 +85,7 @@ class WP_Font_Face_Resolver {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param array  $font_face_definition The font-face definitions to convert.
+	 * @param array $font_face_definition The font-face definitions to convert.
 	 * @return array Converted font-face properties.
 	 */
 	private static function convert_font_face_properties( array $font_face_definition ) {
