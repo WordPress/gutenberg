@@ -34,6 +34,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function CreateTemplatePartModal( {
 	closeModal,
@@ -73,7 +74,7 @@ export default function CreateTemplatePartModal( {
 
 			const templatePart = await saveEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				{
 					slug: cleanSlug,
 					title: uniqueTitle,
