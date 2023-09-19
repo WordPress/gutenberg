@@ -51,6 +51,10 @@ function SearchItemIcon( { isURL, suggestion } ) {
  * @return {string} the url with a leading slash.
  */
 function addLeadingSlash( url ) {
+	const trimmedURL = url?.trim();
+
+	if ( ! trimmedURL?.length ) return url;
+
 	return url?.replace( /^\/?/, '/' );
 }
 
@@ -58,6 +62,10 @@ const partialRight =
 	( fn, ...partialArgs ) =>
 	( ...args ) =>
 		fn( ...args, ...partialArgs );
+
+const defaultTo = ( d ) => ( v ) => {
+	return v === null || v === undefined || v !== v ? d : v;
+};
 
 /**
  * Prepares a URL for display in the UI.
@@ -68,10 +76,13 @@ const partialRight =
  * @param {string} url the url.
  * @return {string} the processed url to display.
  */
-function getURLForDisplay( url = '' ) {
+function getURLForDisplay( url ) {
+	if ( ! url ) return url;
+
 	return compose(
 		addLeadingSlash,
 		partialRight( filterURLForDisplay, 24 ),
+		defaultTo( '' ),
 		getPath,
 		safeDecodeURI
 	)( url );
@@ -87,7 +98,7 @@ export const LinkControlSearchItem = ( {
 } ) => {
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
-		: getURLForDisplay( suggestion?.url );
+		: getURLForDisplay( suggestion.url );
 
 	return (
 		<MenuItem
