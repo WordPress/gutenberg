@@ -42,7 +42,7 @@
 		"customOverlayColor": {
 			"type": "string"
 		},
-		"userOverlayColor": {
+		"isUserOverlayColor": {
 			"type": "boolean"
 		},
 		"backgroundType": {

@@ -97,7 +97,7 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 		tagName: TagName = 'div',
-		userOverlayColor,
+		isUserOverlayColor,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -130,7 +130,7 @@ function CoverEdit( {
 			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
 			let newOverlayColor = overlayColor.color;
-			if ( ! userOverlayColor ) {
+			if ( ! isUserOverlayColor ) {
 				newOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
 				setOverlayColor( newOverlayColor );
@@ -172,7 +172,7 @@ function CoverEdit( {
 		);
 
 		let newOverlayColor = overlayColor.color;
-		if ( ! userOverlayColor ) {
+		if ( ! isUserOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
 		}
@@ -191,7 +191,7 @@ function CoverEdit( {
 	};
 
 	const onClearMedia = () => {
-		if ( ! userOverlayColor ) {
+		if ( ! isUserOverlayColor ) {
 			setOverlayColor( undefined );
 		}
 
@@ -215,7 +215,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 		setOverlayColor( newOverlayColor );
 		setAttributes( {
-			userOverlayColor: true,
+			isUserOverlayColor: true,
 			isDark: compositeIsDark(
 				dimRatio,
 				newOverlayColor,
@@ -326,11 +326,11 @@ function CoverEdit( {
 			? await getMediaColor( mediaUrl )
 			: DEFAULT_AVERAGE_COLOR;
 
-		const newOverlayColor = ! userOverlayColor
+		const newOverlayColor = ! isUserOverlayColor
 			? averageBackgroundColor
 			: overlayColor.color;
 
-		if ( ! userOverlayColor ) {
+		if ( ! isUserOverlayColor ) {
 			if ( newUseFeaturedImage ) {
 				setOverlayColor( newOverlayColor );
 			} else {
