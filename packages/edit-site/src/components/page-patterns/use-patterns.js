@@ -172,7 +172,7 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 	const records = getEntityRecords( 'postType', PATTERN_TYPES.user, query );
 	const userPatternCategories = getUserPatternCategories();
 	const categories = new Map();
-	userPatternCategories?.forEach( ( userCategory ) =>
+	userPatternCategories.forEach( ( userCategory ) =>
 		categories.set( userCategory.id, userCategory )
 	);
 	let patterns = records
