@@ -11,13 +11,16 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
+import ReplaceTemplateButton from './replace-template-button';
 
 export default function Actions( { template } ) {
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
+	// TODO - update this condition so that we also show the dropdown when there are other template options.
 	if ( ! isRevertable ) {
 		return null;
 	}
+
 	return (
 		<DropdownMenu
 			icon={ moreVertical }
@@ -38,6 +41,7 @@ export default function Actions( { template } ) {
 					>
 						{ __( 'Clear customizations' ) }
 					</MenuItem>
+					<ReplaceTemplateButton onClick={ onClose } />
 				</MenuGroup>
 			) }
 		</DropdownMenu>
