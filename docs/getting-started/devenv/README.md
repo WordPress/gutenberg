@@ -7,7 +7,7 @@ To contribute to the Gutenberg project itself, refer to the additional documenta
 A block development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential requirements are:
 
 1.  [Code editor](#code-editor)
-2.  [Node.js development tools](#nodejs-development-tools)
+2.  [Node.js development tools](#node-js-development-tools)
 3.  [Local WordPress environment (site)](#local-wordpress-environment)
 
 ## Code editor
