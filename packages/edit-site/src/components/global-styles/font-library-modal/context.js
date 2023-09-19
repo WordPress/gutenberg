@@ -57,7 +57,7 @@ function FontLibraryProvider( { children } ) {
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	const refreshLibrary = () => {
-		setRefreshKey( ( prevKey ) => prevKey + 1 );
+		setRefreshKey( Date.now() );
 	};
 
 	const {
