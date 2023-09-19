@@ -713,10 +713,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			tabindex="-1"
 		';
 		$responsive_dialog_directives    = '
-			data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
-			aria-modal="false"
+			data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
 			data-wp-bind--role="selectors.core.navigation.roleAttribute"
-			role=""
 			data-wp-effect="effects.core.navigation.focusFirstElement"
 		';
 		$close_button_directives         = '
