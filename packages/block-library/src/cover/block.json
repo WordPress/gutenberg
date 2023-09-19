@@ -43,8 +43,7 @@
 			"type": "string"
 		},
 		"userOverlayColor": {
-			"type": "boolean",
-			"default": false
+			"type": "boolean"
 		},
 		"backgroundType": {
 			"type": "string",
