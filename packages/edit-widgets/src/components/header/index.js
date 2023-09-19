@@ -3,7 +3,12 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem, VisuallyHidden } from '@wordpress/components';
+import {
+	Button,
+	Slot,
+	ToolbarItem,
+	VisuallyHidden,
+} from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
@@ -103,48 +108,58 @@ function Header( { setListViewToggleElement } ) {
 							{ __( 'Widgets' ) }
 						</VisuallyHidden>
 					) }
-					<NavigableToolbar
-						className="edit-widgets-header-toolbar"
-						aria-label={ __( 'Document tools' ) }
-						shouldUseKeyboardFocusShortcut={
-							! blockToolbarCanBeFocused
-						}
+					<div
+						role="menubar"
+						className="edit-widgets-header__menubar"
 					>
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-widgets-header-toolbar__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ ( event ) => {
-								event.preventDefault();
-							} }
-							onClick={ handleClick }
-							icon={ plus }
-							/* translators: button label text should, if possible, be under 16
-					characters. */
-							label={ _x(
-								'Toggle block inserter',
-								'Generic label for block inserter button'
+						<NavigableToolbar
+							className="edit-widgets-header-toolbar"
+							aria-label={ __( 'Document tools' ) }
+							shouldUseKeyboardFocusShortcut={
+								! blockToolbarCanBeFocused
+							}
+						>
+							<ToolbarItem
+								ref={ inserterButton }
+								as={ Button }
+								className="edit-widgets-header-toolbar__inserter-toggle"
+								variant="primary"
+								isPressed={ isInserterOpen }
+								onMouseDown={ ( event ) => {
+									event.preventDefault();
+								} }
+								onClick={ handleClick }
+								icon={ plus }
+								/* translators: button label text should, if possible, be under 16
+						characters. */
+								label={ _x(
+									'Toggle block inserter',
+									'Generic label for block inserter button'
+								) }
+							/>
+							{ isMediumViewport && (
+								<>
+									<UndoButton />
+									<RedoButton />
+									<ToolbarItem
+										as={ Button }
+										className="edit-widgets-header-toolbar__list-view-toggle"
+										icon={ listView }
+										isPressed={ isListViewOpen }
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'List View' ) }
+										onClick={ toggleListView }
+										ref={ setListViewToggleElement }
+									/>
+								</>
 							) }
+						</NavigableToolbar>
+						<Slot
+							className="selected-block-toolbar-wrapper"
+							name="__experimentalSelectedBlockTools"
+							bubblesVirtually
 						/>
-						{ isMediumViewport && (
-							<>
-								<UndoButton />
-								<RedoButton />
-								<ToolbarItem
-									as={ Button }
-									className="edit-widgets-header-toolbar__list-view-toggle"
-									icon={ listView }
-									isPressed={ isListViewOpen }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									ref={ setListViewToggleElement }
-								/>
-							</>
-						) }
-					</NavigableToolbar>
+					</div>
 				</div>
 				<div className="edit-widgets-header__actions">
 					<SaveButton />

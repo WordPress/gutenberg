@@ -86,3 +86,24 @@
 		}
 	}
 }
+
+.edit-widgets-header__menubar {
+	display: flex;
+	flex-grow: 1;
+	align-items: center;
+	flex-wrap: nowrap;
+}
+
+.edit-widgets-header__menubar .block-editor-block-contextual-toolbar.is-fixed {
+	position: fixed;
+	top: $admin-bar-height-big + $header-height + 1px; // +1px to avoid overlap with the header border
+	left: 0;
+	width: 100%;
+
+	@include break-medium() {
+		width: auto;
+		position: static;
+		// remove the border
+		border: none;
+	}
+}
