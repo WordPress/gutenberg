@@ -394,9 +394,8 @@ test.describe( 'Draggable block', () => {
 		);
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const rowBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Row',
@@ -434,9 +433,8 @@ test.describe( 'Draggable block', () => {
 		}
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const columnAppender = editor.canvas
 				.getByRole( 'document', {

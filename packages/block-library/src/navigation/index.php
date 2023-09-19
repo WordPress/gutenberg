@@ -393,7 +393,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
 
-	$nav_menu_name = '';
+	$nav_menu_name = $attributes['ariaLabel'] ?? '';
 
 	/**
 	 * Deprecated:

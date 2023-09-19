@@ -44,7 +44,7 @@ store( {
 							context.core.query.message =
 								context.core.query.loadingText;
 							context.core.query.animation = 'start';
-						}, 300 );
+						}, 400 );
 
 						await navigate( ref.href );
 

@@ -116,9 +116,7 @@ _Usage_
 ```ts
 type Props = { foo: string };
 const Component = ( props: Props ) => <div>{ props.foo }</div>;
-const ConditionalComponent = ifCondition(
-	( props: Props ) => props.foo.length !== 0
-)( Component );
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
 <ConditionalComponent foo="" />; // => null
 <ConditionalComponent foo="bar" />; // => <div>bar</div>;
 ```
@@ -483,6 +481,18 @@ const App = () => {
 	);
 };
 ```
+
+### useStateWithHistory
+
+useState with undo/redo history.
+
+_Parameters_
+
+-   _initialValue_ `T`: Initial value.
+
+_Returns_
+
+-   Value, setValue, hasUndo, hasRedo, undo, redo.
 
 ### useThrottle
 

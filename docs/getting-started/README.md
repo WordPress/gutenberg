@@ -15,6 +15,17 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 [Create a Block Tutorial](/docs/getting-started/create-block/README.md) - Learn how to create your first block for the WordPress block editor.
 
+## Learn WordPress Courses
+
+At [Learn WordPress](https://learn.wordpress.org/), you can find [tutorials](https://learn.wordpress.org/tutorials/), [courses](https://learn.wordpress.org/courses/), and [online workshops](https://learn.wordpress.org/online-workshops/) to learn more about developing for the Block Editor. Here is a selection of current offerings.
+
+-   [Intro to Block Development: Build Your First Custom Block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)
+-   [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/)
+-   [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/)
+-   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/)
+-   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/)
+-   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/)
+
 ## Ways to Stay Informed
 
 New features and changes are important to keep up to date on as the Gutenberg project continues. Each person will have their own unique needs in keeping up with a project of this scale. What follows is more of a catalogue of ways to keep up rather than a recommendation for how to do so. 
@@ -50,4 +61,4 @@ Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs]
 -   [Glossary](/docs/getting-started/glossary.md)
 -   [Frequently Asked Questions](/docs/getting-started/faq.md)
 -   [Project History](/docs/explanations/history.md)
--   [Outreach](/docs/getting-started/outreach.md)
+-   [Gutenberg related Make posts](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/)

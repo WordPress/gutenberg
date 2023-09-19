@@ -38,7 +38,11 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
  */
 import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
-import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS, SYNC_TYPES } from './utils';
+import {
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_SYNC_TYPES,
+} from '../../utils/constants';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 
@@ -54,9 +58,9 @@ function GridItem( { categoryId, item, ...props } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const isUserPattern = item.type === USER_PATTERNS;
-	const isNonUserPattern = item.type === PATTERNS;
-	const isTemplatePart = item.type === TEMPLATE_PARTS;
+	const isUserPattern = item.type === PATTERN_TYPES.user;
+	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -119,9 +123,13 @@ function GridItem( { categoryId, item, ...props } ) {
 		);
 	}
 
-	const itemIcon =
-		templatePartIcons[ categoryId ] ||
-		( item.syncStatus === SYNC_TYPES.full ? symbol : undefined );
+	let itemIcon;
+	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
+		itemIcon = templatePartIcons[ categoryId ];
+	} else {
+		itemIcon =
+			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
+	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
 	const confirmPrompt = hasThemeFile
@@ -140,8 +148,12 @@ function GridItem( { categoryId, item, ...props } ) {
 				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
 				{ ...props }
-				onClick={ item.type !== PATTERNS ? onClick : undefined }
-				aria-disabled={ item.type !== PATTERNS ? 'false' : 'true' }
+				onClick={
+					item.type !== PATTERN_TYPES.theme ? onClick : undefined
+				}
+				aria-disabled={
+					item.type !== PATTERN_TYPES.theme ? 'false' : 'true'
+				}
 				aria-label={ item.title }
 				aria-describedby={
 					ariaDescriptions.length
@@ -179,21 +191,19 @@ function GridItem( { categoryId, item, ...props } ) {
 				>
 					{ itemIcon && ! isNonUserPattern && (
 						<Tooltip
-							position="top center"
+							placement="top"
 							text={ __(
 								'Editing this pattern will also update anywhere it is used'
 							) }
 						>
-							<span>
-								<Icon
-									className="edit-site-patterns__pattern-icon"
-									icon={ itemIcon }
-								/>
-							</span>
+							<Icon
+								className="edit-site-patterns__pattern-icon"
+								icon={ itemIcon }
+							/>
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
-						{ item.type === PATTERNS ? (
+						{ item.type === PATTERN_TYPES.theme ? (
 							item.title
 						) : (
 							<Heading level={ 5 }>
@@ -208,14 +218,16 @@ function GridItem( { categoryId, item, ...props } ) {
 								</Button>
 							</Heading>
 						) }
-						{ item.type === PATTERNS && (
+						{ item.type === PATTERN_TYPES.theme && (
 							<Tooltip
-								position="top center"
+								placement="top"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
-								<span className="edit-site-patterns__pattern-lock-icon">
-									<Icon icon={ lockSmall } size={ 24 } />
-								</span>
+								<Icon
+									className="edit-site-patterns__pattern-lock-icon"
+									icon={ lockSmall }
+									size={ 24 }
+								/>
 							</Tooltip>
 						) }
 					</Flex>
@@ -246,11 +258,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								categoryId={ categoryId }
 								item={ item }
 								onClose={ onClose }
-								label={
-									isNonUserPattern
-										? __( 'Copy to My patterns' )
-										: __( 'Duplicate' )
-								}
+								label={ __( 'Duplicate' ) }
 							/>
 							{ isCustomPattern && (
 								<MenuItem
