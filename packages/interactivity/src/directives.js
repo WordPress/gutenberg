@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { useContext, useMemo, useEffect, useRef } from 'preact/hooks';
+import {
+	useContext,
+	useMemo,
+	useEffect,
+	useRef,
+	useLayoutEffect,
+} from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -217,12 +223,18 @@ export default () => {
 					const result = evaluate( path, {
 						context: contextValue,
 					} );
-					if ( result !== null && result !== undefined ) {
-						element.ref.current?.setAttribute( attribute, result );
-					} else {
-						element.ref?.current?.removeAttribute( attribute );
-					}
-					// element.props[ attribute ] = result;
+					element.props[ attribute ] = result;
+					// Preact doesn't handle the `role` attribute properly, as it doesn't remove it when `null`.
+					// We need this workaround until the following issue is solved:
+					// https://github.com/preactjs/preact/issues/4136
+					useLayoutEffect( () => {
+						if (
+							attribute === 'role' &&
+							( result === null || result === undefined )
+						) {
+							element.ref.current.removeAttribute( attribute );
+						}
+					}, [ attribute, result ] );
 
 					// This seems necessary because Preact doesn't change the attributes
 					// on the hydration, so we have to do it manually. It doesn't need
@@ -246,12 +258,14 @@ export default () => {
 							attribute !== 'download' &&
 							attribute !== 'rowSpan' &&
 							attribute !== 'colSpan' &&
-							el.getAttribute( attribute )
+							attribute !== 'role' &&
+							attribute in el
 						) {
 							try {
-								if ( result === null || result === undefined ) {
-									el[ attribute ] = result;
-								}
+								el[ attribute ] =
+									result === null || result === undefined
+										? ''
+										: result;
 								return;
 							} catch ( err ) {}
 						}
