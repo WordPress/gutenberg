@@ -28,7 +28,7 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+import { TEMPLATE_PART_AREA_GENERAL } from '../../utils/constants';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,

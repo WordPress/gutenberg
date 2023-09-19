@@ -16,6 +16,7 @@ export const NAVIGATION_POST_TYPE = 'wp_navigation';
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const TEMPLATE_CUSTOM_SOURCE = 'custom';
+export const TEMPLATE_PART_AREA_GENERAL = 'uncategorized';
 
 // Patterns.
 export const {
