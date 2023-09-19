@@ -61,7 +61,12 @@ class WP_Font_Face_Resolver {
 					continue;
 				}
 
-				$font_family_name = static::get_font_family_name( $definition );
+				// Skip if "fontFamily" is not defined.
+				if ( empty( $definition['fontFamily'] ) ) {
+					continue;
+				}
+
+				$font_family_name = static::maybe_parse_name_from_comma_separated_list( $definition['fontFamily'] );
 
 				// Skip if no font family is defined.
 				if ( empty( $font_family_name ) ) {
@@ -78,27 +83,6 @@ class WP_Font_Face_Resolver {
 		}
 
 		return $fonts;
-	}
-
-	/**
-	 * Get the font-family name.
-	 *
-	 * @since 6.4.0
-	 *
-	 * @param array $definition The font-family definition.
-	 * @return string Font family name.
-	 */
-	private static function get_font_family_name( $definition ) {
-		if ( ! empty( $definition['name'] ) ) {
-			return $definition['name'];
-		}
-
-		// If the `'name'` setting was not defined, check the `fontFamily` setting.
-		if ( ! empty( $definition['fontFamily'] ) ) {
-			return static::maybe_parse_name_from_comma_separated_list( $definition['fontFamily'] );
-		}
-
-		return '';
 	}
 
 	/**
