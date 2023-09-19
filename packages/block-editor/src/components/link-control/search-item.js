@@ -51,7 +51,7 @@ function SearchItemIcon( { isURL, suggestion } ) {
  * @return {string} the url with a leading slash.
  */
 function addLeadingSlash( url ) {
-	return url.replace( /^\/?/, '/' );
+	return url?.replace( /^\/?/, '/' );
 }
 
 const partialRight =
@@ -68,7 +68,7 @@ const partialRight =
  * @param {string} url the url.
  * @return {string} the processed url to display.
  */
-function getURLForDisplay( url ) {
+function getURLForDisplay( url = '' ) {
 	return compose(
 		addLeadingSlash,
 		partialRight( filterURLForDisplay, 24 ),

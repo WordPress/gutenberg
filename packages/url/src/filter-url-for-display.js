@@ -13,6 +13,8 @@
  * @return {string} Displayed URL.
  */
 export function filterURLForDisplay( url, maxLength = null ) {
+	if ( ! url ) return url;
+
 	// Remove protocol and www prefixes.
 	let filteredURL = url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
 
