@@ -40,7 +40,7 @@ export default function usePatternDetails( postType, postId ) {
 			select( coreStore );
 		const userPatternCategories = getUserPatternCategories();
 		const categories = new Map();
-		userPatternCategories?.forEach( ( userCategory ) =>
+		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
 
