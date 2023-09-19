@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
 /**
@@ -24,7 +25,8 @@ export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	DropdownMenuItemProps
 >( function DropdownMenuItem( props, ref ) {
-	return <StyledAriakitMenuItem ref={ ref } { ...props } />;
+	const store = Ariakit.useMenuContext();
+	return <StyledAriakitMenuItem ref={ ref } store={ store } { ...props } />;
 } );
 
 export interface DropdownMenuProps extends Ariakit.MenuButtonProps {

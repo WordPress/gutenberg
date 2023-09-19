@@ -6,7 +6,11 @@ import {
 	serialize,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	// DropdownMenu, MenuGroup, MenuItem
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import {
@@ -34,6 +38,10 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
+const { DropdownMenuV2Ariakit, DropdownMenuItemV2Ariakit } = unlock(
+	componentsPrivateApis
+);
+
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
@@ -44,7 +52,11 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
 	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+	return (
+		<DropdownMenuItemV2Ariakit ref={ ref }>
+			{ copyMenuItemLabel }
+		</DropdownMenuItemV2Ariakit>
+	);
 }
 
 export function BlockSettingsDropdown( {
@@ -234,153 +246,28 @@ export function BlockSettingsDropdown( {
 				onMoveTo,
 				blocks,
 			} ) => (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Options' ) }
-					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
-					open={ open }
-					onToggle={ onToggle }
-					noIcons
-					menuProps={ {
-						/**
-						 * @param {KeyboardEvent} event
-						 */
-						onKeyDown( event ) {
-							if ( event.defaultPrevented ) return;
-
-							if (
-								isMatch( 'core/block-editor/remove', event ) &&
-								canRemove
-							) {
-								event.preventDefault();
-								updateSelectionAfterRemove( onRemove() );
-							} else if (
-								isMatch(
-									'core/block-editor/duplicate',
-									event
-								) &&
-								canDuplicate
-							) {
-								event.preventDefault();
-								updateSelectionAfterDuplicate( onDuplicate() );
-							} else if (
-								isMatch(
-									'core/block-editor/insert-after',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								setOpenedBlockSettingsMenu( undefined );
-								onInsertAfter();
-							} else if (
-								isMatch(
-									'core/block-editor/insert-before',
-									event
-								) &&
-								canInsertDefaultBlock
-							) {
-								event.preventDefault();
-								setOpenedBlockSettingsMenu( undefined );
-								onInsertBefore();
-							}
-						},
-					} }
-					{ ...props }
+				<DropdownMenuV2Ariakit
+					trigger={ <Icon icon={ moreVertical } /> }
 				>
-					{ ( { onClose } ) => (
+					<DropdownMenuItemV2Ariakit>
+						Hello Brooke
+					</DropdownMenuItemV2Ariakit>
+					{ canCopyStyles && (
 						<>
-							<MenuGroup>
-								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
-								/>
-								{ ! parentBlockIsSelected &&
-									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
-											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
-									) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-								/>
-								{ canDuplicate && (
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onDuplicate,
-											updateSelectionAfterDuplicate
-										) }
-										shortcut={ shortcuts.duplicate }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
-								) }
-								{ canInsertDefaultBlock && (
-									<>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertBefore
-											) }
-											shortcut={ shortcuts.insertBefore }
-										>
-											{ __( 'Add before' ) }
-										</MenuItem>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertAfter
-											) }
-											shortcut={ shortcuts.insertAfter }
-										>
-											{ __( 'Add after' ) }
-										</MenuItem>
-									</>
-								) }
-							</MenuGroup>
-							{ canCopyStyles && (
-								<MenuGroup>
-									<CopyMenuItem
-										blocks={ blocks }
-										onCopy={ onCopy }
-										label={ __( 'Copy styles' ) }
-									/>
-									<MenuItem onClick={ onPasteStyles }>
-										{ __( 'Paste styles' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
+							<CopyMenuItem
+								blocks={ blocks }
+								onCopy={ onCopy }
+								label={ __( 'Copy styles' ) }
+							/>
+							<DropdownMenuItemV2Ariakit
+								onClick={ onPasteStyles }
+							>
+								{ __( 'Paste styles' ) }
+							</DropdownMenuItemV2Ariakit>
+
 							<BlockSettingsMenuControls.Slot
 								fillProps={ {
-									onClose,
+									// onClose,
 									canMove,
 									onMoveTo,
 									onlyBlock,
@@ -392,28 +279,202 @@ export function BlockSettingsDropdown( {
 									__unstableDisplayLocation
 								}
 							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
-							{ canRemove && (
-								<MenuGroup>
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onRemove,
-											updateSelectionAfterRemove
-										) }
-										shortcut={ shortcuts.remove }
-									>
-										{ removeBlockLabel }
-									</MenuItem>
-								</MenuGroup>
-							) }
+
+							<DropdownMenuItemV2Ariakit
+								render={
+									<a
+										href="https://theverge.com"
+										target="_blank"
+										rel="noreferrer"
+									/>
+								}
+								hideOnClick={ false }
+							>
+								{ __( 'I am a link' ) }
+							</DropdownMenuItemV2Ariakit>
 						</>
 					) }
-				</DropdownMenu>
+				</DropdownMenuV2Ariakit>
+				// <DropdownMenu
+				// 	icon={ moreVertical }
+				// 	label={ __( 'Options' ) }
+				// 	className="block-editor-block-settings-menu"
+				// 	popoverProps={ POPOVER_PROPS }
+				// 	open={ open }
+				// 	onToggle={ onToggle }
+				// 	noIcons
+				// 	menuProps={ {
+				// 		/**
+				// 		 * @param {KeyboardEvent} event
+				// 		 */
+				// 		onKeyDown( event ) {
+				// 			if ( event.defaultPrevented ) return;
+
+				// 			if (
+				// 				isMatch( 'core/block-editor/remove', event ) &&
+				// 				canRemove
+				// 			) {
+				// 				event.preventDefault();
+				// 				updateSelectionAfterRemove( onRemove() );
+				// 			} else if (
+				// 				isMatch(
+				// 					'core/block-editor/duplicate',
+				// 					event
+				// 				) &&
+				// 				canDuplicate
+				// 			) {
+				// 				event.preventDefault();
+				// 				updateSelectionAfterDuplicate( onDuplicate() );
+				// 			} else if (
+				// 				isMatch(
+				// 					'core/block-editor/insert-after',
+				// 					event
+				// 				) &&
+				// 				canInsertDefaultBlock
+				// 			) {
+				// 				event.preventDefault();
+				// 				setOpenedBlockSettingsMenu( undefined );
+				// 				onInsertAfter();
+				// 			} else if (
+				// 				isMatch(
+				// 					'core/block-editor/insert-before',
+				// 					event
+				// 				) &&
+				// 				canInsertDefaultBlock
+				// 			) {
+				// 				event.preventDefault();
+				// 				setOpenedBlockSettingsMenu( undefined );
+				// 				onInsertBefore();
+				// 			}
+				// 		},
+				// 	} }
+				// 	{ ...props }
+				// >
+				// 	{ ( { onClose } ) => (
+				// 		<>
+				// 			<MenuGroup>
+				// 				<__unstableBlockSettingsMenuFirstItem.Slot
+				// 					fillProps={ { onClose } }
+				// 				/>
+				// 				{ ! parentBlockIsSelected &&
+				// 					!! firstParentClientId && (
+				// 						<MenuItem
+				// 							{ ...showParentOutlineGestures }
+				// 							ref={ selectParentButtonRef }
+				// 							icon={
+				// 								<BlockIcon
+				// 									icon={
+				// 										parentBlockType.icon
+				// 									}
+				// 								/>
+				// 							}
+				// 							onClick={ () =>
+				// 								selectBlock(
+				// 									firstParentClientId
+				// 								)
+				// 							}
+				// 						>
+				// 							{ sprintf(
+				// 								/* translators: %s: Name of the block's parent. */
+				// 								__(
+				// 									'Select parent block (%s)'
+				// 								),
+				// 								parentBlockType.title
+				// 							) }
+				// 						</MenuItem>
+				// 					) }
+				// 				{ count === 1 && (
+				// 					<BlockHTMLConvertButton
+				// 						clientId={ firstBlockClientId }
+				// 					/>
+				// 				) }
+				// 				<CopyMenuItem
+				// 					blocks={ blocks }
+				// 					onCopy={ onCopy }
+				// 				/>
+				// 				{ canDuplicate && (
+				// 					<MenuItem
+				// 						onClick={ pipe(
+				// 							onClose,
+				// 							onDuplicate,
+				// 							updateSelectionAfterDuplicate
+				// 						) }
+				// 						shortcut={ shortcuts.duplicate }
+				// 					>
+				// 						{ __( 'Duplicate' ) }
+				// 					</MenuItem>
+				// 				) }
+				// 				{ canInsertDefaultBlock && (
+				// 					<>
+				// 						<MenuItem
+				// 							onClick={ pipe(
+				// 								onClose,
+				// 								onInsertBefore
+				// 							) }
+				// 							shortcut={ shortcuts.insertBefore }
+				// 						>
+				// 							{ __( 'Add before' ) }
+				// 						</MenuItem>
+				// 						<MenuItem
+				// 							onClick={ pipe(
+				// 								onClose,
+				// 								onInsertAfter
+				// 							) }
+				// 							shortcut={ shortcuts.insertAfter }
+				// 						>
+				// 							{ __( 'Add after' ) }
+				// 						</MenuItem>
+				// 					</>
+				// 				) }
+				// 			</MenuGroup>
+				// 			{ canCopyStyles && (
+				// 				<MenuGroup>
+				// 					<CopyMenuItem
+				// 						blocks={ blocks }
+				// 						onCopy={ onCopy }
+				// 						label={ __( 'Copy styles' ) }
+				// 					/>
+				// 					<MenuItem onClick={ onPasteStyles }>
+				// 						{ __( 'Paste styles' ) }
+				// 					</MenuItem>
+				// 				</MenuGroup>
+				// 			) }
+				// 			<BlockSettingsMenuControls.Slot
+				// 				fillProps={ {
+				// 					onClose,
+				// 					canMove,
+				// 					onMoveTo,
+				// 					onlyBlock,
+				// 					count,
+				// 					firstBlockClientId,
+				// 				} }
+				// 				clientIds={ clientIds }
+				// 				__unstableDisplayLocation={
+				// 					__unstableDisplayLocation
+				// 				}
+				// 			/>
+				// 			{ typeof children === 'function'
+				// 				? children( { onClose } )
+				// 				: Children.map( ( child ) =>
+				// 						cloneElement( child, { onClose } )
+				// 				  ) }
+				// 			{ canRemove && (
+				// 				<MenuGroup>
+				// 					<MenuItem
+				// 						onClick={ pipe(
+				// 							onClose,
+				// 							onRemove,
+				// 							updateSelectionAfterRemove
+				// 						) }
+				// 						shortcut={ shortcuts.remove }
+				// 					>
+				// 						{ removeBlockLabel }
+				// 					</MenuItem>
+				// 				</MenuGroup>
+				// 			) }
+				// 		</>
+				// 	) }
+				// </DropdownMenu>
 			) }
 		</BlockActions>
 	);

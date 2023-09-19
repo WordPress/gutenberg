@@ -72,8 +72,8 @@ const BlockSettingsMenuControlsSlot = ( {
 				}
 
 				return (
-					<MenuGroup>
-						{ showConvertToGroupButton && (
+					<>
+						{ /* { showConvertToGroupButton && (
 							<ConvertToGroupButton
 								{ ...convertToGroupButtonProps }
 								onClose={ fillProps?.onClose }
@@ -83,9 +83,9 @@ const BlockSettingsMenuControlsSlot = ( {
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
-						) }
+						) } */ }
 						{ fills }
-						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
+						{ /* { fillProps?.canMove && ! fillProps?.onlyBlock && (
 							<MenuItem
 								onClick={ pipe(
 									fillProps?.onClose,
@@ -100,8 +100,8 @@ const BlockSettingsMenuControlsSlot = ( {
 								clientId={ fillProps?.firstBlockClientId }
 								onToggle={ fillProps?.onClose }
 							/>
-						) }
-					</MenuGroup>
+						) } */ }
+					</>
 				);
 			} }
 		</Slot>

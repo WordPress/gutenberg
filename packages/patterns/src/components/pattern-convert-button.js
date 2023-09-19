@@ -9,8 +9,8 @@ import {
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
-import { MenuItem } from '@wordpress/components';
-import { symbol } from '@wordpress/icons';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+// import { symbol } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -22,6 +22,8 @@ import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
 import { PATTERN_SYNC_TYPES } from '../constants';
+
+const { DropdownMenuItemV2Ariakit } = unlock( componentsPrivateApis );
 
 /**
  * Menu control to convert block(s) to a pattern block.
@@ -127,14 +129,17 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	};
 	return (
 		<>
-			<MenuItem
-				icon={ symbol }
-				onClick={ () => setIsModalOpen( true ) }
+			<DropdownMenuItemV2Ariakit
+				// icon={ symbol }
+				onClick={ ( event ) => {
+					setIsModalOpen( true );
+					event.preventDefault();
+				} }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			>
 				{ __( 'Create pattern' ) }
-			</MenuItem>
+			</DropdownMenuItemV2Ariakit>
 			{ isModalOpen && (
 				<CreatePatternModal
 					content={ getContent }

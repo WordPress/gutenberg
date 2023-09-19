@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
  */
 import { menu } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +17,7 @@ import { useState } from '@wordpress/element';
 import { DropdownMenu, DropdownMenuItem } from '..';
 import Icon from '../../icon';
 import Modal from '../../modal';
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2 ariakit',
@@ -73,7 +76,9 @@ Default.args = {
 	),
 };
 
-export const WithModal: StoryFn< typeof DropdownMenu > = ( props ) => {
+export const WithModalAsSiblingOfMenu: StoryFn< typeof DropdownMenu > = (
+	props
+) => {
 	const [ isModalOpen, setModalOpen ] = useState( false );
 	return (
 		<>
@@ -81,21 +86,10 @@ export const WithModal: StoryFn< typeof DropdownMenu > = ( props ) => {
 				<DropdownMenuItem onClick={ () => setModalOpen( true ) }>
 					Open modal
 				</DropdownMenuItem>
-				<DropdownMenuItem>Redo</DropdownMenuItem>
-				<DropdownMenu trigger="Find">
-					<DropdownMenuItem>Search the Web...</DropdownMenuItem>
-					<DropdownMenuItem>Find...</DropdownMenuItem>
-					<DropdownMenuItem>Find Next</DropdownMenuItem>
-					<DropdownMenuItem>Find Previous</DropdownMenuItem>
-				</DropdownMenu>
-				<DropdownMenu trigger="Speech">
-					<DropdownMenuItem>Start Speaking</DropdownMenuItem>
-					<DropdownMenuItem disabled>Stop Speaking</DropdownMenuItem>
-				</DropdownMenu>
 			</DropdownMenu>
 			{ isModalOpen && (
 				<Modal onRequestClose={ () => setModalOpen( false ) }>
-					Yo!
+					Modal&apos;s contents
 					<button onClick={ () => setModalOpen( false ) }>
 						Close
 					</button>
@@ -104,6 +98,94 @@ export const WithModal: StoryFn< typeof DropdownMenu > = ( props ) => {
 		</>
 	);
 };
-WithModal.args = {
+WithModalAsSiblingOfMenu.args = {
+	trigger: <Icon icon={ menu } size={ 24 } />,
+};
+
+export const WithModalAsSiblingOfMenuItem: StoryFn< typeof DropdownMenu > = (
+	props
+) => {
+	const [ isModalOpen, setModalOpen ] = useState( false );
+	return (
+		<DropdownMenu { ...props }>
+			<DropdownMenuItem onClick={ () => setModalOpen( true ) }>
+				Open modal
+			</DropdownMenuItem>
+			{ isModalOpen && (
+				<Modal onRequestClose={ () => setModalOpen( false ) }>
+					Yo!
+					<button onClick={ () => setModalOpen( false ) }>
+						Modal&apos;s contents
+					</button>
+				</Modal>
+			) }
+		</DropdownMenu>
+	);
+};
+WithModalAsSiblingOfMenuItem.args = {
+	trigger: <Icon icon={ menu } size={ 24 } />,
+};
+
+const ExampleSlotFill = createSlotFill( 'Example' );
+
+const Slot = () => {
+	const ariakitMenuStore = Ariakit.useMenuContext();
+
+	// Forwarding the content of the slot so that it can be used by the fill
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ Ariakit.MenuProvider, { store: ariakitMenuStore } ],
+			],
+		} ),
+		[ ariakitMenuStore ]
+	);
+
+	return <ExampleSlotFill.Slot fillProps={ fillProps } bubblesVirtually />;
+};
+
+type ForwardedContextTuple< P = {} > = [
+	React.ComponentType< React.PropsWithChildren< P > >,
+	P,
+];
+
+const Fill = ( { children }: { children: React.ReactNode } ) => {
+	const innerMarkup = <>{ children }</>;
+
+	return (
+		<ExampleSlotFill.Fill>
+			{ ( fillProps: { forwardedContext?: ForwardedContextTuple[] } ) => {
+				const { forwardedContext = [] } = fillProps;
+
+				return forwardedContext.reduce(
+					( inner: JSX.Element, [ Provider, props ] ) => (
+						<Provider { ...props }>{ inner }</Provider>
+					),
+					innerMarkup
+				);
+			} }
+		</ExampleSlotFill.Fill>
+	);
+};
+
+export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
+	props
+) => {
+	return (
+		<SlotFillProvider>
+			<DropdownMenu { ...props }>
+				<DropdownMenuItem>Item</DropdownMenuItem>
+				<Slot />
+			</DropdownMenu>
+
+			<Fill>
+				<DropdownMenuItem hideOnClick={ false }>
+					Item from fill
+				</DropdownMenuItem>
+			</Fill>
+		</SlotFillProvider>
+	);
+};
+AddItemsViaSlotFill.args = {
 	trigger: <Icon icon={ menu } size={ 24 } />,
 };
