@@ -71,7 +71,7 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: var( --wp-theme-color-neutral-text-inverse );
+	color: var( --wp-theme-color-neutral-text-strong );
 
 	&:active {
 		background: transparent;
@@ -111,7 +111,7 @@ const isIconStyles = ( {
 };
 
 export const backdropView = css`
-	background: var( --wp-theme-color-neutral-bg-inverse );
+	background: var( --wp-theme-color-neutral-bg-active );
 	border-radius: ${ CONFIG.controlBorderRadius };
 	position: absolute;
 	inset: 0;
