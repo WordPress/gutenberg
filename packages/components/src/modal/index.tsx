@@ -53,18 +53,16 @@ let openModalCount = 0;
  * @return Element the first tabbable element in the Modal contents (or any tabbable element if none are found in content).
  */
 function getFirstTabbableElement( tabbables: Element[] ) {
-	// Attempt to locate tabbable outside of the header portion of the Modal.
-	const firstContentTabbable = tabbables.find( ( tabbable ) => {
-		return tabbable.closest( '.components-modal__header' ) === null;
-	} );
-
-	if ( firstContentTabbable ) {
-		return firstContentTabbable;
-	}
-
-	// Fallback to the first tabbable element anywhere within the Modal.
-	// Likely the `Close` button.
-	return tabbables[ 0 ];
+	return (
+		// Attempt to locate tabbable outside of the header portion of the Modal.
+		tabbables.find(
+			( tabbable ) =>
+				tabbable.closest( `.${ MODAL_HEADER_CLASSNAME }` ) === null
+		) ??
+		// Fallback to the first tabbable element anywhere within the Modal.
+		// Likely the `Close` button.
+		tabbables[ 0 ]
+	);
 }
 
 function UnforwardedModal(
