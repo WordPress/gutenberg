@@ -143,18 +143,18 @@ function CoverEdit( {
 				mediaUrl
 			);
 
-			let nextOverlayColor = overlayColor.color;
+			let newOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
-				nextOverlayColor = averageBackgroundColor;
+				newOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
-				setOverlayColor( nextOverlayColor );
+				setOverlayColor( newOverlayColor );
 			}
 
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				isDark: compositeIsDark(
 					dimRatio,
-					nextOverlayColor,
+					newOverlayColor,
 					averageBackgroundColor
 				),
 			} );
@@ -173,17 +173,17 @@ function CoverEdit( {
 			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
 		);
 
-		let nextOverlayColor = overlayColor.color;
+		let newOverlayColor = overlayColor.color;
 		if ( ! userOverlayColor ) {
-			nextOverlayColor = averageBackgroundColor;
-			setOverlayColor( nextOverlayColor );
+			newOverlayColor = averageBackgroundColor;
+			setOverlayColor( newOverlayColor );
 		}
 
 		setAttributes( {
 			...mediaAttributes,
 			isDark: compositeIsDark(
 				dimRatio,
-				nextOverlayColor,
+				newOverlayColor,
 				averageBackgroundColor
 			),
 		} );
@@ -207,14 +207,14 @@ function CoverEdit( {
 		} );
 	};
 
-	const onSetOverlayColor = async ( colorValue ) => {
+	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getAverageBackgroundColor( url );
-		setOverlayColor( colorValue );
+		setOverlayColor( newOverlayColor );
 		setAttributes( {
 			userOverlayColor: true,
 			isDark: compositeIsDark(
 				dimRatio,
-				colorValue,
+				newOverlayColor,
 				averageBackgroundColor
 			),
 		} );
@@ -316,23 +316,23 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
-		const nextUseFeaturedImage = ! useFeaturedImage;
+		const newUseFeaturedImage = ! useFeaturedImage;
 
-		let nextIsDark = isDark;
-		if ( nextUseFeaturedImage ) {
+		let newIsDark = isDark;
+		if ( newUseFeaturedImage ) {
 			const averageBackgroundColor = await getAverageBackgroundColor(
 				mediaUrl
 			);
 
-			let nextOverlayColor = overlayColor.color;
+			let newOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
-				nextOverlayColor = averageBackgroundColor;
-				setOverlayColor( nextOverlayColor );
+				newOverlayColor = averageBackgroundColor;
+				setOverlayColor( newOverlayColor );
 			}
 
-			nextIsDark = compositeIsDark(
+			newIsDark = compositeIsDark(
 				dimRatio,
-				nextOverlayColor,
+				newOverlayColor,
 				averageBackgroundColor
 			);
 		}
@@ -340,12 +340,12 @@ function CoverEdit( {
 		setAttributes( {
 			id: undefined,
 			url: undefined,
-			useFeaturedImage: nextUseFeaturedImage,
+			useFeaturedImage: newUseFeaturedImage,
 			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
-			isDark: nextIsDark,
+			isDark: newIsDark,
 		} );
 	};
 
