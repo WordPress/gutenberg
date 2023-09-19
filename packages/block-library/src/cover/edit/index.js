@@ -129,23 +129,6 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
 
-	// set the is dark attribute based on the overlay
-	// and background color
-	const setIsDark = useCallback(
-		( newOverlay, newBackground, newDimRatio = dimRatio ) => {
-			__unstableMarkNextChangeAsNotPersistent();
-			const isDarkSetting = compositeIsDark(
-				newDimRatio,
-				newOverlay,
-				newBackground
-			);
-			setAttributes( {
-				isDark: isDarkSetting,
-			} );
-		},
-		[ __unstableMarkNextChangeAsNotPersistent, dimRatio, setAttributes ]
-	);
-
 	// set the overlay color based on the average color
 	// of the image background
 	const setOverlayFromAverageColor = useCallback(
@@ -222,16 +205,24 @@ function CoverEdit( {
 		setOverlayColor( colorValue );
 		setAttributes( {
 			userOverlayColor: true,
+			isDark: compositeIsDark(
+				dimRatio,
+				colorValue,
+				averageBackgroundColor
+			),
 		} );
-		setIsDark( colorValue, averageBackgroundColor );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		const averageBackgroundColor = await getAverageBackgroundColor( url );
 		setAttributes( {
 			dimRatio: newDimRatio,
+			isDark: compositeIsDark(
+				newDimRatio,
+				overlayColor.color,
+				averageBackgroundColor
+			),
 		} );
-		setIsDark( overlayColor.color, averageBackgroundColor, newDimRatio );
 	};
 
 	const onUploadError = ( message ) => {
@@ -327,8 +318,12 @@ function CoverEdit( {
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
+			isDark: compositeIsDark(
+				dimRatio,
+				overlayColor.color,
+				averageBackgroundColor
+			),
 		} );
-		setIsDark( overlayColor.color, averageBackgroundColor );
 	};
 
 	const blockControls = (
