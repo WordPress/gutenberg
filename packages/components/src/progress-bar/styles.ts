@@ -26,7 +26,8 @@ export const Track = styled.div`
 	overflow: hidden;
 	width: 100%;
 	max-width: 160px;
-	height: ${ CONFIG.borderWidthFocus };
+	height: ${ CONFIG.borderWidth };
+	height: calc( ${ CONFIG.borderWidth } * 2 );
 	background-color: var(
 		--wp-components-color-gray-300,
 		${ COLORS.gray[ 300 ] }
