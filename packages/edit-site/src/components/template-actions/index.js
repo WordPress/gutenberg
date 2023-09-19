@@ -43,10 +43,6 @@ export default function TemplateActions( {
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
-	if ( ! isRemovable && ! isRevertable ) {
-		return null;
-	}
-
 	async function revertAndSaveTemplate() {
 		try {
 			await revertTemplate( template, { allowUndo: false } );
