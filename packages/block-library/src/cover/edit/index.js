@@ -322,16 +322,19 @@ function CoverEdit( {
 	const toggleUseFeaturedImage = async () => {
 		const newUseFeaturedImage = ! useFeaturedImage;
 
+		let newOverlayColor = overlayColor.color;
+		if ( ! userOverlayColor ) {
+			if ( newUseFeaturedImage ) {
+				newOverlayColor = averageBackgroundColor;
+				setOverlayColor( newOverlayColor );
+			} else {
+				setOverlayColor( undefined );
+			}
+		}
+
 		let newIsDark = isDark;
 		if ( newUseFeaturedImage ) {
 			const averageBackgroundColor = await getMediaColor( mediaUrl );
-
-			let newOverlayColor = overlayColor.color;
-			if ( ! userOverlayColor ) {
-				newOverlayColor = averageBackgroundColor;
-				setOverlayColor( newOverlayColor );
-			}
-
 			newIsDark = compositeIsDark(
 				dimRatio,
 				newOverlayColor,
