@@ -45,9 +45,8 @@ export function getLastInsertedBlocksClientIds( state ) {
 export const isBlockSubtreeDisabled = createSelector(
 	( state, clientId ) => {
 		const isChildSubtreeDisabled = ( childClientId ) => {
-			const mode = state.blockEditingModes.get( childClientId );
 			return (
-				( mode === undefined || mode === 'disabled' ) &&
+				getBlockEditingMode( state, childClientId ) === 'disabled' &&
 				getBlockOrder( state, childClientId ).every(
 					isChildSubtreeDisabled
 				)
