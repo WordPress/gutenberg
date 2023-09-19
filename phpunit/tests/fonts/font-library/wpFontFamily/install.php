@@ -180,7 +180,8 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	 */
 	public function data_should_move_local_fontfaces() {
 		return array(
-			'1 local font'  => array(
+			// ttf font type.
+			'1 local font'     => array(
 				'font_data'  => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
@@ -205,7 +206,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				),
 				'expected'   => array( 'inter_italic_900.ttf' ),
 			),
-			'2 local fonts' => array(
+			'2 local fonts'    => array(
 				'font_data'  => array(
 					'name'       => 'Lato',
 					'slug'       => 'lato',
@@ -242,6 +243,84 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 					),
 				),
 				'expected'   => array( 'lato_normal_400.ttf', 'lato_normal_500.ttf' ),
+			),
+			// woff font type.
+			'woff local font'  => array(
+				'font_data'  => array(
+					'name'       => 'Cooper Hewitt',
+					'slug'       => 'cooper-hewitt',
+					'fontFamily' => 'Cooper Hewitt',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Cooper Hewitt',
+							'fontStyle'    => 'italic',
+							'fontWeight'   => '900',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'cooper-hewitt.woff',
+						'type'     => 'font/woff',
+						'tmp_name' => wp_tempnam( 'Cooper-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'cooper-hewitt_italic_900.woff' ),
+			),
+			// woff2 font type.
+			'woff2 local font' => array(
+				'font_data'  => array(
+					'name'       => 'DM Sans',
+					'slug'       => 'dm-sans',
+					'fontFamily' => 'DM Sans',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'DM Sans',
+							'fontStyle'    => 'regular',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'DMSans.woff2',
+						'type'     => 'font/woff2',
+						'tmp_name' => wp_tempnam( 'DMSans-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'dm-sans_regular_500.woff2' ),
+			),
+			// otf font type.
+			'otf local font'   => array(
+				'font_data'  => array(
+					'name'       => 'Gilbert Color',
+					'slug'       => 'gilbert-color',
+					'fontFamily' => 'Gilbert Color',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Gilbert Color',
+							'fontStyle'    => 'regular',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'gilbert-color.otf',
+						'type'     => 'font/otf',
+						'tmp_name' => wp_tempnam( 'Gilbert-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'gilbert-color_regular_500.otf' ),
 			),
 		);
 	}
