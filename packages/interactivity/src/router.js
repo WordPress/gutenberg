@@ -89,9 +89,8 @@ export const navigate = async ( href, options = {} ) => {
 
 	// Create a promise that resolves when the specified timeout ends. The
 	// timeout value is 10 seconds by default.
-	const { timeout = 10000 } = options;
 	const timeoutPromise = new Promise( ( resolve ) =>
-		setTimeout( () => resolve( false ), timeout )
+		setTimeout( resolve, options.timeout ?? 10000 )
 	);
 
 	const page = await Promise.race( [ pages.get( url ), timeoutPromise ] );
@@ -110,6 +109,7 @@ export const navigate = async ( href, options = {} ) => {
 		);
 	} else {
 		window.location.assign( href );
+		await new Promise( () => {} );
 	}
 };
 
