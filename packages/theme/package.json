@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/theme",
 	"version": "1.0.0",
-	"description": "A collection of takens that make up a WordPress theme.",
+	"description": "A collection of tokens that make up a WordPress theme.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

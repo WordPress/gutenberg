@@ -48,8 +48,8 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: var(--wp-theme-color-primary-bg-strong);
+		color: var(--wp-theme-color-primary-text-inverse-strong);
 		text-decoration: none;
 		text-shadow: none;
 
@@ -57,8 +57,7 @@
 		outline: 1px solid transparent;
 
 		&:hover:not(:disabled) {
-			background: $components-color-accent-darker-10;
-			color: $components-color-accent-inverted;
+			background: var(--wp-theme-color-primary-bg-strong-hover);
 		}
 
 		&:active:not(:disabled) {

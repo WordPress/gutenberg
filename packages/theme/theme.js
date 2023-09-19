@@ -5,6 +5,12 @@ import { generateColors } from './color';
 
 // // theme object
 export const defaultTheme = {
-	//shadows: {...},
+	// shadows: {...},
+	// spacing: { ... },
+	// borderRadius: { ... },
+	// fonts: { ... },
+	// fontSizes: { ... },
+	// fontWeights: { ... },
+	// lineHeights: { ... },
 	colors: generateColors( {} ),
 };

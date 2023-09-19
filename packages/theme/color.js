@@ -45,6 +45,7 @@ const COLOR_MAP = {
 			default: 6,
 			hover: 7,
 		},
+		muted: 4,
 		hover: 6,
 	},
 };
@@ -83,13 +84,33 @@ const generateNeutralColors = ( {
 
 const generatePrimaryColors = ( {
 	color = PRIMARY_DEFAULT,
+	bg,
 	isDark = false,
 } ) => {
 	const base = colord( color ).toHsl();
 	const lightValues = isDark ? DARK_VALUES : LIGHT_VALUES;
 
-	const colors = lightValues.map( ( value ) =>
-		colord( { ...base, l: value } ).toHex()
+	// if the color given has enough contrast agains the background, use that as the solid background colour and adjust the surrounding scale to proportionally move with it
+	const length = lightValues.length;
+	// Calculate the difference between the new value and the old value
+	const diff = base.l - lightValues[ 8 ];
+	// Calculate the weight for adjusting values. Closer to base colour should adjust more.
+	const weight = ( index ) => 1 - Math.abs( 8 - index ) / ( length - 1 );
+	// Adjust all values in the array based on their weight
+	let adjustedArray = [ ...lightValues ];
+	if ( colord( bg ).isReadable( base ) ) {
+		adjustedArray = lightValues.map( ( value, index ) => {
+			const adjustment = diff * weight( index );
+			return index === 8 ? base.l : value + adjustment;
+		} );
+	}
+
+	// convert colours to hex and set min and max lightness values
+	const colors = adjustedArray.map( ( value ) =>
+		colord( {
+			...base,
+			l: Math.min( Math.max( parseInt( value ), 0 ), 100 ),
+		} ).toHex()
 	);
 
 	return mapColors( colors, COLOR_MAP );
