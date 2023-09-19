@@ -3,6 +3,10 @@
  */
 import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
+export type DistributiveOmit< T, K extends keyof any > = T extends any
+	? Omit< T, K >
+	: never;
+
 export type SlotKey = string | symbol;
 
 export type FillProps = any;
@@ -28,6 +32,7 @@ export type SlotComponentProps =
 			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
 			 */
 			bubblesVirtually: true;
+			children?: never;
 	  } )
 	| ( SlotPropBase & {
 			/**

@@ -23,6 +23,7 @@ import type { WordPressComponentProps } from '../ui/context';
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
 import type {
+	DistributiveOmit,
 	FillComponentProps,
 	SlotComponentProps,
 	SlotFillProviderProps,
@@ -74,9 +75,9 @@ export function createSlotFill( key: SlotKey ) {
 	);
 	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = ( props: Omit< SlotComponentProps, 'name' > ) => (
-		<Slot name={ key } { ...props } />
-	);
+	const SlotComponent = (
+		props: DistributiveOmit< SlotComponentProps, 'name' >
+	) => <Slot name={ key } { ...props } />;
 	SlotComponent.displayName = `${ baseName }Slot`;
 	SlotComponent.__unstableName = key;
 
