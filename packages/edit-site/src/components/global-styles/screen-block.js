@@ -297,8 +297,8 @@ function ScreenBlock( { name, variation } ) {
 			{ hasImageSettingsPanel && (
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
-					userSettings={ userSettings }
-					settings={ settings }
+					value={ userSettings }
+					inheritedValue={ settings }
 				/>
 			) }
 

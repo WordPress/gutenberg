@@ -21,8 +21,8 @@ export function useHasImageSettingsPanel( name, settings, userSettings ) {
 
 export default function ImageSettingsPanel( {
 	onChange,
-	userSettings,
-	settings,
+	value,
+	inheritedValue,
 	panelId,
 } ) {
 	const resetLightbox = () => {
@@ -37,8 +37,8 @@ export default function ImageSettingsPanel( {
 
 	let lightboxChecked = false;
 
-	if ( settings?.lightbox?.enabled ) {
-		lightboxChecked = settings.lightbox.enabled;
+	if ( inheritedValue?.lightbox?.enabled ) {
+		lightboxChecked = inheritedValue.lightbox.enabled;
 	}
 
 	return (
@@ -53,7 +53,7 @@ export default function ImageSettingsPanel( {
 					// contains the core/theme values for the lightbox and we want to show the
 					// "RESET" button ONLY when the user has explicitly set a value in the
 					// Global Styles.
-					hasValue={ () => !! userSettings?.lightbox }
+					hasValue={ () => !! value?.lightbox }
 					label={ __( 'Expand on Click' ) }
 					onDeselect={ resetLightbox }
 					isShownByDefault={ true }
