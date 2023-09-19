@@ -48,15 +48,21 @@ export default function DefaultBlockEditorProvider( { children } ) {
 		'postType',
 		templateType
 	);
-	const pageGhostBlocks = usePageContentBlocks( blocks );
-	const isTemplateHidden = pageContentFocusType === 'hideTemplate';
-
+	const isPageContentFocused = pageContentFocusType === 'hideTemplate';
+	const pageContentBlock = usePageContentBlocks(
+		blocks,
+		isPageContentFocused
+	);
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
-			value={ isTemplateHidden ? pageGhostBlocks : blocks }
-			onInput={ isTemplateHidden ? noop : onInput }
-			onChange={ isTemplateHidden ? noop : onChange }
+			value={
+				isPageContentFocused && pageContentBlock.length
+					? pageContentBlock
+					: blocks
+			}
+			onInput={ isPageContentFocused ? noop : onInput }
+			onChange={ isPageContentFocused ? noop : onChange }
 			useSubRegistry={ false }
 		>
 			{ children }
@@ -64,21 +70,29 @@ export default function DefaultBlockEditorProvider( { children } ) {
 	);
 }
 
+const identity = ( x ) => x;
+const DISALLOWED_BLOCK_TYPES = [ 'core/query' ];
 /**
- * Helper method to iterate through all blocks, recursing into inner blocks.
- * Returns a flattened object.
+ * Helper method to iterate through all blocks, recursing into allowed inner blocks.
+ * Returns a flattened object of transformed blocks.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param {Array}    blocks    Blocks to flatten.
+ * @param {Function} transform Transforming function to be applied to each block. If transform returns `undefined`, the block is skipped.
  *
  * @return {Array} Flattened object.
  */
-function flattenBlocks( blocks ) {
+function flattenBlocks( blocks, transform = identity ) {
 	const result = [];
-
-	blocks.forEach( ( block ) => {
-		result.push( block );
-		result.push( ...flattenBlocks( block.innerBlocks ) );
-	} );
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( DISALLOWED_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
+			continue;
+		}
+		const transformedBlock = transform( blocks[ i ] );
+		if ( transformedBlock ) {
+			result.push( transformedBlock );
+		}
+		result.push( ...flattenBlocks( blocks[ i ].innerBlocks, transform ) );
+	}
 
 	return result;
 }
@@ -87,13 +101,14 @@ function flattenBlocks( blocks ) {
  * Returns a memoized array of blocks that contain only page content blocks,
  * surrounded by a group block to mimic the post editor.
  *
- * @param {Array} blocks Block list.
+ * @param {Array}   blocks               Block list.
+ * @param {boolean} isPageContentFocused Whether the page content has focus. If `true` return page content blocks. Default `false`.
  *
- * @return {Array} Flattened object.
+ * @return {Array} Page content blocks.
  */
-function usePageContentBlocks( blocks ) {
+function usePageContentBlocks( blocks, isPageContentFocused = false ) {
 	return useMemo( () => {
-		if ( ! blocks || ! blocks.length ) {
+		if ( ! isPageContentFocused || ! blocks || ! blocks.length ) {
 			return [];
 		}
 		return [
@@ -109,10 +124,12 @@ function usePageContentBlocks( blocks ) {
 						},
 					},
 				},
-				flattenBlocks( blocks ).filter( ( block ) =>
-					PAGE_CONTENT_BLOCK_TYPES.includes( block.name )
-				)
+				flattenBlocks( blocks, ( block ) => {
+					if ( PAGE_CONTENT_BLOCK_TYPES.includes( block.name ) ) {
+						return createBlock( block.name );
+					}
+				} )
 			),
 		];
-	}, [ blocks ] );
+	}, [ blocks, isPageContentFocused ] );
 }
