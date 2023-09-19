@@ -68,7 +68,7 @@ export default function SidebarNavigationScreen( {
 			>
 				<HStack
 					spacing={ 4 }
-					alignment="flex-start"
+					alignment="center"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && (
@@ -102,7 +102,7 @@ export default function SidebarNavigationScreen( {
 						className="edit-site-sidebar-navigation-screen__title"
 						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
-						size={ 20 }
+						size={ 16 }
 					>
 						{ ! isPreviewingTheme()
 							? title
@@ -113,9 +113,12 @@ export default function SidebarNavigationScreen( {
 							  ) }
 					</Heading>
 					{ actions && (
-						<div className="edit-site-sidebar-navigation-screen__actions">
+						<HStack 
+							className="edit-site-sidebar-navigation-screen__actions"
+							expanded={ false }
+						>
 							{ actions }
-						</div>
+						</HStack>
 					) }
 				</HStack>
 				{ meta && (

@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { isRTL, __, _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { drawerLeft, drawerRight } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
 	Icon,
+	Button,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 /**
@@ -14,6 +14,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
@@ -90,6 +92,7 @@ export default function SidebarNavigationScreenTemplate() {
 	const {
 		params: { postType, postId },
 	} = navigator;
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { title, content, description, footer } = useTemplateDetails(
 		postType,
 		postId
@@ -108,6 +111,14 @@ export default function SidebarNavigationScreenTemplate() {
 							navigator.goTo( `/${ postType }/all` );
 						} }
 					/>
+					<Button
+						size='small'
+						onClick={ () => setCanvasMode( 'edit' ) }
+						variant='primary'
+						className='edit-site-sidebar-navigation-screen-template__edit-button'
+					>
+						{ __( 'Edit' ) }
+					</Button>
 				</>
 			}
 			description={ description }
