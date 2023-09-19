@@ -116,6 +116,113 @@ describe( 'Modal', () => {
 		expect( opener ).toHaveFocus();
 	} );
 
+	it( 'should request closing of any non nested modal when opened', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = jest.fn();
+
+		const DismissAdjacent = () => {
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<>
+					<Modal onRequestClose={ onRequestClose }>
+						<button onClick={ () => setIsShown( true ) }>💥</button>
+					</Modal>
+					{ isShown && (
+						<Modal onRequestClose={ () => setIsShown( false ) }>
+							<p>Adjacent modal content</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+		render( <DismissAdjacent /> );
+
+		await user.click( screen.getByRole( 'button', { name: '💥' } ) );
+		expect( onRequestClose ).toHaveBeenCalled();
+	} );
+
+	it( 'should support nested modals', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = jest.fn();
+
+		const NestSupport = () => {
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<>
+					<Modal onRequestClose={ onRequestClose }>
+						<button onClick={ () => setIsShown( true ) }>🪆</button>
+						{ isShown && (
+							<Modal onRequestClose={ () => setIsShown( false ) }>
+								<p>Nested modal content</p>
+							</Modal>
+						) }
+					</Modal>
+				</>
+			);
+		};
+		render( <NestSupport /> );
+
+		await user.click( screen.getByRole( 'button', { name: '🪆' } ) );
+		expect( onRequestClose ).not.toHaveBeenCalled();
+	} );
+
+	// TODO enable once nested modals hide outer modals.
+	it.skip( 'should accessibly hide and show siblings including outer modals', async () => {
+		const user = userEvent.setup();
+
+		const AriaDemo = () => {
+			const [ isOuterShown, setIsOuterShown ] = useState( false );
+			const [ isInnerShown, setIsInnerShown ] = useState( false );
+			return (
+				<>
+					<button onClick={ () => setIsOuterShown( true ) }>
+						Start
+					</button>
+					{ isOuterShown && (
+						<Modal
+							onRequestClose={ () => setIsOuterShown( false ) }
+						>
+							<button onClick={ () => setIsInnerShown( true ) }>
+								Nest
+							</button>
+							{ isInnerShown && (
+								<Modal
+									onRequestClose={ () =>
+										setIsInnerShown( false )
+									}
+								>
+									<p>Nested modal content</p>
+								</Modal>
+							) }
+						</Modal>
+					) }
+				</>
+			);
+		};
+		const { container } = render( <AriaDemo /> );
+
+		// Opens outer modal > hides container.
+		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+
+		// Disable reason: No semantic query can reach the overlay.
+		// eslint-disable-next-line testing-library/no-node-access
+		const outer = screen.getByRole( 'dialog' ).parentElement!;
+
+		// Opens inner modal > hides outer modal.
+		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );
+		expect( outer ).toHaveAttribute( 'aria-hidden', 'true' );
+
+		// Closes inner modal > Unhides outer modal and container stays hidden.
+		await user.keyboard( '[Escape]' );
+		expect( outer ).not.toHaveAttribute( 'aria-hidden' );
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+
+		// Closes outer modal > Unhides container.
+		await user.keyboard( '[Escape]' );
+		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+	} );
+
 	it( 'should render `headerActions` React nodes', async () => {
 		render(
 			<Modal
