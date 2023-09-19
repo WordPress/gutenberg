@@ -2,7 +2,7 @@
 
 The [@wp-now/wp-now](https://www.npmjs.com/package/@wordpress/env) package (`wp-now`) is a lightweight tool powered by [WordPress Playground](https://developer.wordpress.org/playground/) that streamlines setting up a local WordPress environment.
 
-Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#nodejs-development-tools) if you have not already done so. It's recommended that you use the latest version of `node`. `wp-now` requires at least `node` v18 and v20 if you intend to use its [Blueprints](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now#using-blueprints) feature. 
+Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so. It's recommended that you use the latest version of `node`. `wp-now` requires at least `node` v18 and v20 if you intend to use its [Blueprints](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now#using-blueprints) feature. 
 
 ## Quick start
  
