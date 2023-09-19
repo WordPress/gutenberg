@@ -45,8 +45,7 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 		case 'warning':
 		case 'info':
 			return 'polite';
-
-		case 'error':
+		// The default will also catch the 'error' status.
 		default:
 			return 'assertive';
 	}
@@ -60,7 +59,7 @@ function getStatusLabel( status: NoticeProps[ 'status' ] ) {
 			return __( 'Information notice' );
 		case 'error':
 			return __( 'Error notice' );
-		case 'success':
+		// The default will also catch the 'success' status.
 		default:
 			return __( 'Notice' );
 	}
