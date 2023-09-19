@@ -14,7 +14,7 @@ import {
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
-import { compose } from '@wordpress/compose';
+import { pipe } from '@wordpress/compose';
 
 const ICONS_MAP = {
 	post: postList,
@@ -79,12 +79,12 @@ const defaultTo = ( d ) => ( v ) => {
 function getURLForDisplay( url ) {
 	if ( ! url ) return url;
 
-	return compose(
-		addLeadingSlash,
-		partialRight( filterURLForDisplay, 24 ),
-		defaultTo( '' ),
+	return pipe(
+		safeDecodeURI,
 		getPath,
-		safeDecodeURI
+		defaultTo( '' ),
+		partialRight( filterURLForDisplay, 24 ),
+		addLeadingSlash
 	)( url );
 }
 
