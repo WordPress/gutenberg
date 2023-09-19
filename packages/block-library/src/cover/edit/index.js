@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -129,63 +129,64 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
 
-	// set the overlay color based on the average color
-	// of the image background
-	const setOverlayFromAverageColor = useCallback(
-		async ( newMedia ) => {
-			if ( userOverlayColor ) {
-				return;
-			}
-			const newUrl =
-				newMedia?.url && newMedia.type === IMAGE_BACKGROUND_TYPE
-					? newMedia.url
-					: false;
-			__unstableMarkNextChangeAsNotPersistent();
-			const color = await getAverageBackgroundColor( newUrl );
-			setOverlayColor( color );
-			setAttributes( { isDark: colorIsDark( color ) } );
-		},
-		[
-			userOverlayColor,
-			__unstableMarkNextChangeAsNotPersistent,
-			setAttributes,
-			setOverlayColor,
-		]
-	);
-
-	// we call this on render since the url is
-	// 'hijacked' by the featured image
+	// User can change the featured image outside of the block, but we still
+	// need to update the block when that happens. This effect should only
+	// run when the featured image changes in that case. All other cases are
+	// handled in their respective callbacks.
 	useEffect( () => {
-		// Set the overlay color to the average color of th
-		// featured image and and is dark based on that color.
-		const updateFromFeaturedImage = async () => {
+		( async () => {
 			if ( ! useFeaturedImage ) {
 				return;
 			}
-			await setOverlayFromAverageColor( {
-				url: mediaUrl,
-				type: IMAGE_BACKGROUND_TYPE,
+
+			const averageBackgroundColor = await getAverageBackgroundColor(
+				mediaUrl
+			);
+
+			if ( ! userOverlayColor ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				setOverlayColor( averageBackgroundColor );
+			}
+
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				isDark: userOverlayColor
+					? compositeIsDark(
+							dimRatio,
+							overlayColor.color,
+							averageBackgroundColor
+					  )
+					: colorIsDark( averageBackgroundColor ),
 			} );
-		};
-		updateFromFeaturedImage();
-	}, [
-		mediaUrl,
-		overlayColor.color,
-		setOverlayFromAverageColor,
-		useFeaturedImage,
-		originalUrl,
-		originalBackgroundType,
-	] );
+		} )();
+		// Disable reason: Update the block only when the featured image changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ mediaUrl ] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
+
+		const averageBackgroundColor = await getAverageBackgroundColor(
+			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
+		);
+
+		if ( ! userOverlayColor ) {
+			setOverlayColor( averageBackgroundColor );
+		}
+
 		setAttributes( {
 			...mediaAttributes,
+			isDark: userOverlayColor
+				? compositeIsDark(
+						dimRatio,
+						overlayColor.color,
+						averageBackgroundColor
+				  )
+				: colorIsDark( averageBackgroundColor ),
 		} );
-		await setOverlayFromAverageColor( newMedia );
 	};
 
 	const onClearMedia = () => {
@@ -311,20 +312,36 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
-		const averageBackgroundColor = await getAverageBackgroundColor( url );
+		const nextUseFeaturedImage = ! useFeaturedImage;
+
+		let nextIsDark = isDark;
+		if ( nextUseFeaturedImage ) {
+			const averageBackgroundColor = await getAverageBackgroundColor(
+				mediaUrl
+			);
+
+			if ( ! userOverlayColor ) {
+				setOverlayColor( averageBackgroundColor );
+			}
+
+			nextIsDark = userOverlayColor
+				? compositeIsDark(
+						dimRatio,
+						overlayColor.color,
+						averageBackgroundColor
+				  )
+				: colorIsDark( averageBackgroundColor );
+		}
+
 		setAttributes( {
 			id: undefined,
 			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
+			useFeaturedImage: nextUseFeaturedImage,
 			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
-			isDark: compositeIsDark(
-				dimRatio,
-				overlayColor.color,
-				averageBackgroundColor
-			),
+			isDark: nextIsDark,
 		} );
 	};
 
