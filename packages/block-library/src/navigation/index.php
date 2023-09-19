@@ -812,6 +812,23 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
 /**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_navigation_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-navigation-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-navigation-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-navigation-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_navigation_ensure_interactivity_dependency' );
+
+/**
  * Turns menu item data into a nested array of parsed blocks
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
