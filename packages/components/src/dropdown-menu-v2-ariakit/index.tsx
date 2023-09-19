@@ -56,7 +56,11 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 					{ trigger }
 					<Ariakit.MenuButtonArrow />
 				</Ariakit.MenuButton>
-				<StyledAriakitMenu gutter={ 8 } shift={ menu.parent ? -9 : 0 }>
+				<StyledAriakitMenu
+					gutter={ 8 }
+					shift={ menu.parent ? -9 : 0 }
+					modal
+				>
 					{ children }
 				</StyledAriakitMenu>
 			</Ariakit.MenuProvider>
