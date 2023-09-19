@@ -24,6 +24,9 @@ import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
+import CollectionFontDetails from './collection-font-details';
+import { toggleFont } from './utils/toggleFont';
+import { getFontsOutline } from './utils/fonts-outline';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -31,6 +34,8 @@ const DEFAULT_CATEGORY = {
 };
 
 function FontCollection( { id } ) {
+	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
 	const { collections, getFontCollection } = useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
@@ -41,6 +46,10 @@ function FontCollection( { id } ) {
 		getFontCollection( id );
 		resetFilters();
 	}, [ id, getFontCollection ] );
+
+	useEffect( () => {
+		setSelectedFont( null );
+	}, [ id ] );
 
 	const collectionFonts = useMemo(
 		() => selectedCollection?.data?.fontFamilies ?? [],
@@ -73,49 +82,63 @@ function FontCollection( { id } ) {
 		setFilters( { ...filters, search: '' } );
 	};
 
+	const handleUnselectFont = () => {
+		setSelectedFont( null );
+	};
+
+	const handleToggleVariant = ( font, face ) => {
+		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
+		setFontsToInstall( newFontsToInstall );
+	};
+
+	const fontToInstallOutline = getFontsOutline( fontsToInstall );
+
 	return (
 		<TabLayout
 			title={ selectedCollection.name }
 			description={ selectedCollection.description }
+			handleBack={ !! selectedFont && handleUnselectFont }
 		>
 			{ ! selectedCollection.data && <Spinner /> }
 
-			<Flex>
-				<FlexItem>
-					<InputControl
-						value={ filters.search }
-						placeholder={ __( 'Font name…' ) }
-						label={ __( 'Search' ) }
-						onChange={ debouncedUpdateSearchInput }
-						prefix={ <Icon icon={ search } /> }
-						suffix={
-							filters?.search ? (
-								<Icon
-									icon={ closeSmall }
-									onClick={ resetSearch }
-								/>
-							) : null
-						}
-					/>
-				</FlexItem>
-				<FlexItem>
-					<SelectControl
-						label={ __( 'Category' ) }
-						value={ filters.category }
-						onChange={ handleCategoryFilter }
-					>
-						{ categories &&
-							categories.map( ( category ) => (
-								<option
-									value={ category.id }
-									key={ category.id }
-								>
-									{ category.name }
-								</option>
-							) ) }
-					</SelectControl>
-				</FlexItem>
-			</Flex>
+			{ ! selectedFont && (
+				<Flex>
+					<FlexItem>
+						<InputControl
+							value={ filters.search }
+							placeholder={ __( 'Font name…' ) }
+							label={ __( 'Search' ) }
+							onChange={ debouncedUpdateSearchInput }
+							prefix={ <Icon icon={ search } /> }
+							suffix={
+								filters?.search ? (
+									<Icon
+										icon={ closeSmall }
+										onClick={ resetSearch }
+									/>
+								) : null
+							}
+						/>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							label={ __( 'Category' ) }
+							value={ filters.category }
+							onChange={ handleCategoryFilter }
+						>
+							{ categories &&
+								categories.map( ( category ) => (
+									<option
+										value={ category.id }
+										key={ category.id }
+									>
+										{ category.name }
+									</option>
+								) ) }
+						</SelectControl>
+					</FlexItem>
+				</Flex>
+			) }
 
 			<Spacer margin={ 4 } />
 
@@ -130,15 +153,27 @@ function FontCollection( { id } ) {
 					</Text>
 				) }
 
-			<FontsGrid>
-				{ fonts.map( ( font ) => (
-					<FontCard
-						key={ font.slug }
-						font={ font }
-						onClick={ () => {} }
-					/>
-				) ) }
-			</FontsGrid>
+			{ selectedFont && (
+				<CollectionFontDetails
+					font={ selectedFont }
+					handleToggleVariant={ handleToggleVariant }
+					fontToInstallOutline={ fontToInstallOutline }
+				/>
+			) }
+
+			{ ! selectedFont && (
+				<FontsGrid>
+					{ fonts.map( ( font ) => (
+						<FontCard
+							key={ font.slug }
+							font={ font }
+							onClick={ () => {
+								setSelectedFont( font );
+							} }
+						/>
+					) ) }
+				</FontsGrid>
+			) }
 		</TabLayout>
 	);
 }

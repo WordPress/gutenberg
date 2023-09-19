@@ -1,0 +1,57 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	__experimentalVStack as VStack,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import CollectionFontVariant from './collection-font-variant';
+import { isFontFontFaceInOutline } from './utils/fonts-outline';
+
+function CollectionFontDetails( {
+	font,
+	handleToggleVariant,
+	fontToInstallOutline,
+} ) {
+	const fontFaces =
+		font.fontFace && font.fontFace.length
+			? font.fontFace.sort( ( a, b ) =>
+					a.fontWeight > b.fontWeight ? 1 : -1
+			  )
+			: [
+					{
+						fontFamily: font.fontFamily,
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+			  ];
+
+	return (
+		<>
+			<Spacer margin={ 4 } />
+			<VStack spacing={ 0 }>
+				<Spacer margin={ 8 } />
+				{ fontFaces.map( ( face, i ) => (
+					<CollectionFontVariant
+						font={ font }
+						face={ face }
+						key={ `face${ i }` }
+						handleToggleVariant={ handleToggleVariant }
+						selected={ isFontFontFaceInOutline(
+							font.slug,
+							face,
+							fontToInstallOutline
+						) }
+					/>
+				) ) }
+			</VStack>
+			<Spacer margin={ 8 } />
+		</>
+	);
+}
+
+export default CollectionFontDetails;
