@@ -283,7 +283,7 @@ function SandBox( {
 		<iframe
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			title={ title }
-			tabIndex={ tabIndex || undefined }
+			tabIndex={ tabIndex }
 			className="components-sandbox"
 			sandbox="allow-scripts allow-same-origin allow-presentation"
 			onFocus={ onFocus }
