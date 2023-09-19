@@ -169,9 +169,8 @@ describe( 'when an image is attached', () => {
 			/>
 		);
 		fireEvent.press( screen.getByLabelText( 'Edit image' ) );
-		const [ clearMediaButton ] = await screen.findAllByText(
-			'Clear Media'
-		);
+		const [ clearMediaButton ] =
+			await screen.findAllByText( 'Clear Media' );
 		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -191,9 +190,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await screen.findByText(
-			'Fixed background'
-		);
+		const fixedBackgroundButton =
+			await screen.findByText( 'Fixed background' );
 		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -210,9 +208,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
 			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
@@ -239,9 +236,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -268,9 +264,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -360,9 +355,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -399,9 +393,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -455,9 +448,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -511,9 +503,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.

@@ -1059,6 +1059,41 @@ export class RichText extends Component {
 			: defaultColor;
 	}
 
+	getPlaceholderTextColor() {
+		const {
+			baseGlobalStyles,
+			getStylesFromColorScheme,
+			placeholderTextColor,
+			style,
+		} = this.props;
+
+		// Default placeholder text color.
+		const placeholderStyle = getStylesFromColorScheme(
+			styles.richTextPlaceholder,
+			styles.richTextPlaceholderDark
+		);
+		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		// Custom 63% opacity for theme and inherited colors.
+		const placeholderOpacity = 'A1';
+
+		// Determine inherited placeholder color if available.
+		const inheritPlaceholderColor = style?.placeholderColor
+			? `${ style.placeholderColor }${ placeholderOpacity }`
+			: undefined;
+
+		// If using block-based themes, derive the placeholder color from global styles.
+		const globalStylesPlaceholderColor = baseGlobalStyles?.color?.text
+			? `${ baseGlobalStyles.color.text }${ placeholderOpacity }`
+			: undefined;
+
+		return (
+			inheritPlaceholderColor ??
+			placeholderTextColor ??
+			globalStylesPlaceholderColor ??
+			defaultPlaceholderTextColor
+		);
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1085,12 +1120,6 @@ export class RichText extends Component {
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
-		const placeholderStyle = getStylesFromColorScheme(
-			styles.richTextPlaceholder,
-			styles.richTextPlaceholderDark
-		);
-
-		const { color: defaultPlaceholderTextColor } = placeholderStyle;
 		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
@@ -1218,12 +1247,7 @@ export class RichText extends Component {
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={
-						style?.placeholderColor ||
-						this.props.placeholderTextColor ||
-						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
-						defaultPlaceholderTextColor
-					}
+					placeholderTextColor={ this.getPlaceholderTextColor() }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }

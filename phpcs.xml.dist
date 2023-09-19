@@ -10,15 +10,20 @@
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
-	<rule ref="WordPress.WP.I18n"/>
-	<config name="text_domain" value="gutenberg,default"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="gutenberg"/>
+				<element value="default"/>
+			</property>
+		</properties>
+	</rule>
 
 	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
 		<properties>
 			<property name="allowUnusedParametersBeforeUsed" value="true"/>
 		</properties>
 	</rule>
-	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
 		<properties>
@@ -48,6 +53,7 @@
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
 	<exclude-pattern>node_modules/*</exclude-pattern>
+	<exclude-pattern>build/*</exclude-pattern>
 
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>./vendor/*</exclude-pattern>
@@ -64,6 +70,7 @@
 	</rule>
 	<rule ref="Squiz.Commenting.FileComment.Missing">
 		<exclude-pattern>phpunit/*</exclude-pattern>
+		<exclude-pattern>test/gutenberg-test-themes/*</exclude-pattern>
 		<exclude-pattern>**/*.min.asset.php</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.ClassComment.Missing">
@@ -90,20 +97,14 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 
-	<!-- Ignore snake case error in parser -->
-	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Ignore empty files in tests/gutenberg-test-themes -->
+	<rule ref="Internal.NoCodeFound">
+		<exclude-pattern>./test/gutenberg-test-themes/*</exclude-pattern>
 	</rule>
 
 	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->

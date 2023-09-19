@@ -242,6 +242,8 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					label="Label"
@@ -258,6 +260,16 @@ describe( 'Button', () => {
 					description: 'Description text',
 				} )
 			).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'tooltip', {
+					name: 'Description text',
+				} )
+			).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should allow tooltip disable', async () => {

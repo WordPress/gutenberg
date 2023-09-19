@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
@@ -13,7 +13,7 @@ import type { NavigableMenuProps } from '../navigable-container/types';
 
 export type DropdownOption = {
 	/**
-	 * The Dashicon icon slug to be shown for the option.
+	 * The icon to be shown for the option.
 	 */
 	icon?: IconProps[ 'icon' ];
 	/**
@@ -29,7 +29,7 @@ export type DropdownOption = {
 	/**
 	 * A callback function to invoke when the option is selected.
 	 */
-	onClick?: () => void;
+	onClick?: ( event?: React.MouseEvent ) => void;
 	/**
 	 * Whether or not the control is currently active.
 	 */
@@ -41,7 +41,7 @@ export type DropdownOption = {
 	/**
 	 * The role to apply to the option's HTML element
 	 */
-	role?: HTMLElement[ 'role' ];
+	role?: HTMLAttributes< HTMLElement >[ 'role' ];
 };
 
 type DropdownCallbackProps = {
@@ -50,7 +50,7 @@ type DropdownCallbackProps = {
 	onClose: () => void;
 };
 
-// Manually including `as` prop because `WordPressComponentProps` polymorhpism
+// Manually including `as` prop because `WordPressComponentProps` polymorphism
 // creates a union that is too large for TypeScript to handle.
 type ToggleProps = Partial<
 	Omit<
@@ -59,11 +59,12 @@ type ToggleProps = Partial<
 	>
 > & {
 	as?: React.ElementType | keyof JSX.IntrinsicElements;
+	'data-toolbar-item'?: boolean;
 };
 
 export type DropdownMenuProps = {
 	/**
-	 * The Dashicon icon slug to be shown in the collapsed menu button.
+	 * The icon to be shown in the collapsed menu button.
 	 *
 	 * @default "menu"
 	 */
