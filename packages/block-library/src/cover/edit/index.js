@@ -43,7 +43,7 @@ import ResizableCoverPopover from './resizable-cover-popover';
 import {
 	getAverageBackgroundColor,
 	compositeIsDark,
-	colorIsDark,
+	DEFAULT_AVERAGE_COLOR,
 } from './color-utils';
 
 function getInnerBlocksTemplate( attributes ) {
@@ -143,20 +143,20 @@ function CoverEdit( {
 				mediaUrl
 			);
 
+			let nextOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
+				nextOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
-				setOverlayColor( averageBackgroundColor );
+				setOverlayColor( nextOverlayColor );
 			}
 
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				isDark: userOverlayColor
-					? compositeIsDark(
-							dimRatio,
-							overlayColor.color,
-							averageBackgroundColor
-					  )
-					: colorIsDark( averageBackgroundColor ),
+				isDark: compositeIsDark(
+					dimRatio,
+					nextOverlayColor,
+					averageBackgroundColor
+				),
 			} );
 		} )();
 		// Disable reason: Update the block only when the featured image changes.
@@ -173,19 +173,19 @@ function CoverEdit( {
 			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
 		);
 
+		let nextOverlayColor = overlayColor.color;
 		if ( ! userOverlayColor ) {
-			setOverlayColor( averageBackgroundColor );
+			nextOverlayColor = averageBackgroundColor;
+			setOverlayColor( nextOverlayColor );
 		}
 
 		setAttributes( {
 			...mediaAttributes,
-			isDark: userOverlayColor
-				? compositeIsDark(
-						dimRatio,
-						overlayColor.color,
-						averageBackgroundColor
-				  )
-				: colorIsDark( averageBackgroundColor ),
+			isDark: compositeIsDark(
+				dimRatio,
+				nextOverlayColor,
+				averageBackgroundColor
+			),
 		} );
 	};
 
@@ -199,7 +199,11 @@ function CoverEdit( {
 			isRepeated: undefined,
 			useFeaturedImage: false,
 			userOverlayColor: false,
-			isDark: colorIsDark( overlayColor.color ),
+			isDark: compositeIsDark(
+				dimRatio,
+				overlayColor.color,
+				DEFAULT_AVERAGE_COLOR
+			),
 		} );
 	};
 
@@ -320,17 +324,17 @@ function CoverEdit( {
 				mediaUrl
 			);
 
+			let nextOverlayColor = overlayColor.color;
 			if ( ! userOverlayColor ) {
-				setOverlayColor( averageBackgroundColor );
+				nextOverlayColor = averageBackgroundColor;
+				setOverlayColor( nextOverlayColor );
 			}
 
-			nextIsDark = userOverlayColor
-				? compositeIsDark(
-						dimRatio,
-						overlayColor.color,
-						averageBackgroundColor
-				  )
-				: colorIsDark( averageBackgroundColor );
+			nextIsDark = compositeIsDark(
+				dimRatio,
+				nextOverlayColor,
+				averageBackgroundColor
+			);
 		}
 
 		setAttributes( {

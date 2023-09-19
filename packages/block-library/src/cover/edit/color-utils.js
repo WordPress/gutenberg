@@ -102,21 +102,15 @@ export const getAverageBackgroundColor = memoize( async ( url ) => {
  * @return {boolean} true if the color combination composite result is dark.
  */
 export function compositeIsDark( dimRatio, overlayColor, backgroundColor ) {
+	// Opacity doesn't matter if you're overlaying the same color on top of itself.
+	// And if we're missing a background color, we can't do the composite.
+	if ( overlayColor === backgroundColor ) {
+		return colord( overlayColor ).isDark();
+	}
 	const overlay = colord( overlayColor )
 		.alpha( dimRatio / 100 )
 		.toRgb();
 	const background = colord( backgroundColor ).toRgb();
 	const composite = compositeSourceOver( overlay, background );
 	return colord( composite ).isDark();
-}
-
-/**
- * Computes if the color is dark.
- *
- * @param {string} color Color to check.
- *
- * @return {boolean} true if the color is dark.
- */
-export function colorIsDark( color ) {
-	return colord( color ).isDark();
 }
