@@ -270,7 +270,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 ## Footnotes
 
- ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+Display footnotes added to the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
 
 -	**Name:** core/footnotes
 -	**Category:** text
