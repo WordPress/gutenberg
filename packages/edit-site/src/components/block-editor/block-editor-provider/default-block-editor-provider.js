@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
@@ -47,13 +44,11 @@ export default function DefaultBlockEditorProvider( { children } ) {
 		};
 	}, [] );
 
-	const pageGhostBlocks = usePageGhostBlocks();
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
-
+	const pageGhostBlocks = usePageContentBlocks( blocks );
 	const isTemplateHidden = pageContentFocusType === 'hideTemplate';
 
 	return (
@@ -69,18 +64,38 @@ export default function DefaultBlockEditorProvider( { children } ) {
 	);
 }
 
-function usePageGhostBlocks() {
-	const pageContentBlockNames = useSelect( ( select ) => {
-		const { __experimentalGetGlobalBlocksByName, getBlockNamesByClientId } =
-			select( blockEditorStore );
-		// Show only the content blocks that appear in the page's template, and
-		// in the same order that they appear in the template.
-		return getBlockNamesByClientId(
-			__experimentalGetGlobalBlocksByName( PAGE_CONTENT_BLOCK_TYPES )
-		);
-	}, [] );
+/**
+ * Helper method to iterate through all blocks, recursing into inner blocks.
+ * Returns a flattened object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Array} Flattened object.
+ */
+function flattenBlocks( blocks ) {
+	const result = [];
 
-	const ghostBlocks = useMemo( () => {
+	blocks.forEach( ( block ) => {
+		result.push( block );
+		result.push( ...flattenBlocks( block.innerBlocks ) );
+	} );
+
+	return result;
+}
+
+/**
+ * Returns a memoized array of blocks that contain only page content blocks,
+ * surrounded by a group block to mimic the post editor.
+ *
+ * @param {Array} blocks Block list.
+ *
+ * @return {Array} Flattened object.
+ */
+function usePageContentBlocks( blocks ) {
+	return useMemo( () => {
+		if ( ! blocks || ! blocks.length ) {
+			return [];
+		}
 		return [
 			createBlock(
 				'core/group',
@@ -89,15 +104,15 @@ function usePageGhostBlocks() {
 					style: {
 						spacing: {
 							margin: {
-								top: '4em', // Mimicks the post editor.
+								top: '4em', // Mimics the post editor.
 							},
 						},
 					},
 				},
-				pageContentBlockNames.map( ( name ) => createBlock( name ) )
+				flattenBlocks( blocks ).filter( ( block ) =>
+					PAGE_CONTENT_BLOCK_TYPES.includes( block.name )
+				)
 			),
 		];
-	}, [ pageContentBlockNames ] );
-
-	return ghostBlocks;
+	}, [ blocks ] );
 }
