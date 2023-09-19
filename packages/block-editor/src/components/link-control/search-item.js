@@ -52,11 +52,9 @@ export const LinkControlSearchItem = ( {
 	isURL = false,
 	shouldShowType = false,
 } ) => {
-	// Remove the site URL from any suggestion that is not a manually entered URL.
+	// Remove the site URL from any suggestion URL.
 	// This is to reduce visual noise in the search results.
-	const suggestionURL = isURL
-		? suggestion?.url
-		: '/' + getPath( suggestion?.url ) + '/';
+	const suggestionURL = '/' + getPath( suggestion?.url );
 
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
