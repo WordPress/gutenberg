@@ -423,6 +423,50 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Indicates if the currently-matched tag matches the given breadcrumbs.
+	 *
+	 * A "*" represents a single tag wildcard, where any tag matches, but not no tags.
+	 *
+	 * At some point this function _may_ support a `**` syntax for matching any number
+	 * of unspecified tags in the breadcrumb stack. This has been intentionally left
+	 * out, however, to keep this function simple and to avoid introducing backtracking,
+	 * which could open up surprising performance breakdowns.
+	 *
+	 * Example:
+	 *
+	 *     $processor = WP_HTML_Processor::createFragment( '<div><span><figure><img></figure></span></div>' );
+	 *     $processor->next_tag( 'img' );
+	 *     true  === $processor->matches_breadcrumbs( array( 'figure', 'img' ) );
+	 *     true  === $processor->matches_breadcrumbs( array( 'span', 'figure', 'img' ) );
+	 *     false === $processor->matches_breadcrumbs( array( 'span', 'img' ) );
+	 *     true  === $processor->matches_breadcrumbs( array( 'span', '*', 'img' ) );
+	 *
+	 * @param string[] $breadcrumbs list of HTML tag names representing nested structure.
+	 * @return bool Whether the currently-matched tag is found at the given nested structure.
+	 */
+	public function matches_breadcrumbs( $breadcrumbs ) {
+		if ( ! $this->get_tag() || 0 === count( $breadcrumbs ) ) {
+			return false;
+		}
+
+		$crumb_at = count( $breadcrumbs ) - 1;
+
+		foreach ( $this->state->stack_of_open_elements->walk_up() as $node ) {
+			$crumb = strtoupper( $breadcrumbs[ $crumb_at ] );
+
+			if ( '*' !== $crumb && $node->node_name !== $crumb ) {
+				return false;
+			}
+
+			if ( --$crumb_at < 0 ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Steps through the HTML document and stop at the next tag, if any.
 	 *
 	 * @since 6.4.0
