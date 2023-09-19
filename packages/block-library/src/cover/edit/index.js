@@ -44,6 +44,7 @@ import {
 	getMediaColor,
 	compositeIsDark,
 	DEFAULT_AVERAGE_COLOR,
+	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 
 function getInnerBlocksTemplate( attributes ) {
@@ -191,9 +192,17 @@ function CoverEdit( {
 	};
 
 	const onClearMedia = () => {
+		let newOverlayColor = overlayColor.color;
 		if ( ! isUserOverlayColor ) {
+			newOverlayColor = DEFAULT_OVERLAY_COLOR;
 			setOverlayColor( undefined );
 		}
+
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			DEFAULT_AVERAGE_COLOR
+		);
 
 		setAttributes( {
 			url: undefined,
@@ -203,11 +212,7 @@ function CoverEdit( {
 			hasParallax: undefined,
 			isRepeated: undefined,
 			useFeaturedImage: false,
-			isDark: compositeIsDark(
-				dimRatio,
-				overlayColor.color,
-				DEFAULT_AVERAGE_COLOR
-			),
+			isDark: newIsDark,
 		} );
 	};
 

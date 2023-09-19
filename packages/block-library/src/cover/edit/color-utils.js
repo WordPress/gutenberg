@@ -23,6 +23,11 @@ extend( [ namesPlugin ] );
 export const DEFAULT_AVERAGE_COLOR = '#FFFFFF';
 
 /**
+ * Default dim color specified in style.css.
+ */
+export const DEFAULT_OVERLAY_COLOR = '#000';
+
+/**
  * Performs a Porter Duff composite source over operation on two rgba colors.
  *
  * @see {@link https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover}
