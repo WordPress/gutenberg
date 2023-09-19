@@ -88,7 +88,7 @@ const fetchLinkSuggestions = async (
 		type = undefined,
 		subtype = undefined,
 		page = undefined,
-		perPage = isInitialSuggestions ? 3 : 20,
+		perPage = 20,
 	} = searchOptions;
 
 	const { disablePostFormats = false } = settings;
@@ -96,7 +96,7 @@ const fetchLinkSuggestions = async (
 	/** @type {Promise<WPLinkSearchResult>[]} */
 	const queries = [];
 
-	if ( ! type || type === 'post' ) {
+	if ( isInitialSuggestions ) {
 		queries.push(
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
@@ -104,7 +104,7 @@ const fetchLinkSuggestions = async (
 					page,
 					per_page: perPage,
 					type: 'post',
-					subtype,
+					subtype: 'page',
 				} ),
 			} )
 				.then( ( results ) => {
@@ -117,73 +117,96 @@ const fetchLinkSuggestions = async (
 				} )
 				.catch( () => [] ) // Fail by returning no results.
 		);
-	}
-
-	if ( ! type || type === 'term' ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'term',
-					subtype,
-				} ),
-			} )
-				.then( ( results ) => {
-					return results.map( ( result ) => {
-						return {
-							...result,
-							meta: { kind: 'taxonomy', subtype },
-						};
-					} );
+	} else {
+		if ( ! type || type === 'post' ) {
+			queries.push(
+				apiFetch( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'post',
+						subtype,
+					} ),
 				} )
-				.catch( () => [] ) // Fail by returning no results.
-		);
-	}
+					.then( ( results ) => {
+						return results.map( ( result ) => {
+							return {
+								...result,
+								meta: { kind: 'post-type', subtype },
+							};
+						} );
+					} )
+					.catch( () => [] ) // Fail by returning no results.
+			);
+		}
 
-	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'post-format',
-					subtype,
-				} ),
-			} )
-				.then( ( results ) => {
-					return results.map( ( result ) => {
-						return {
-							...result,
-							meta: { kind: 'taxonomy', subtype },
-						};
-					} );
+		if ( ! type || type === 'term' ) {
+			queries.push(
+				apiFetch( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'term',
+						subtype,
+					} ),
 				} )
-				.catch( () => [] ) // Fail by returning no results.
-		);
-	}
+					.then( ( results ) => {
+						return results.map( ( result ) => {
+							return {
+								...result,
+								meta: { kind: 'taxonomy', subtype },
+							};
+						} );
+					} )
+					.catch( () => [] ) // Fail by returning no results.
+			);
+		}
 
-	if ( ! type || type === 'attachment' ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/media', {
-					search,
-					page,
-					per_page: perPage,
-				} ),
-			} )
-				.then( ( results ) => {
-					return results.map( ( result ) => {
-						return {
-							...result,
-							meta: { kind: 'media' },
-						};
-					} );
+		if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+			queries.push(
+				apiFetch( {
+					path: addQueryArgs( '/wp/v2/search', {
+						search,
+						page,
+						per_page: perPage,
+						type: 'post-format',
+						subtype,
+					} ),
 				} )
-				.catch( () => [] ) // Fail by returning no results.
-		);
+					.then( ( results ) => {
+						return results.map( ( result ) => {
+							return {
+								...result,
+								meta: { kind: 'taxonomy', subtype },
+							};
+						} );
+					} )
+					.catch( () => [] ) // Fail by returning no results.
+			);
+		}
+
+		if ( ! type || type === 'attachment' ) {
+			queries.push(
+				apiFetch( {
+					path: addQueryArgs( '/wp/v2/media', {
+						search,
+						page,
+						per_page: perPage,
+					} ),
+				} )
+					.then( ( results ) => {
+						return results.map( ( result ) => {
+							return {
+								...result,
+								meta: { kind: 'media' },
+							};
+						} );
+					} )
+					.catch( () => [] ) // Fail by returning no results.
+			);
+		}
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
