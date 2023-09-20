@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext } from '@wordpress/element';
+import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -14,12 +14,21 @@ export interface PluginContext {
 	icon: null | WPPlugin[ 'icon' ];
 }
 
-const { Consumer, Provider } = createContext< PluginContext >( {
+const Context = createContext< PluginContext >( {
 	name: null,
 	icon: null,
 } );
 
-export { Provider as PluginContextProvider };
+export const PluginContextProvider = Context.Provider;
+
+/**
+ * A hook that returns the plugin context.
+ *
+ * @return {PluginContext} Plugin context
+ */
+export function usePluginContext() {
+	return useContext( Context );
+}
 
 /**
  * A Higher Order Component used to inject Plugin context to the
@@ -39,13 +48,13 @@ export const withPluginContext = (
 ) =>
 	createHigherOrderComponent( ( OriginalComponent ) => {
 		return ( props ) => (
-			<Consumer>
+			<Context.Consumer>
 				{ ( context ) => (
 					<OriginalComponent
 						{ ...props }
 						{ ...mapContextToProps( context, props ) }
 					/>
 				) }
-			</Consumer>
+			</Context.Consumer>
 		);
 	}, 'withPluginContext' );

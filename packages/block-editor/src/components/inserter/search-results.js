@@ -38,6 +38,7 @@ function InserterSearchResults( {
 	filterValue,
 	onSelect,
 	onHover,
+	onHoverPattern,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -80,7 +81,7 @@ function InserterSearchResults( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -104,8 +105,10 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
-
-		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+		const nonPatternBlockTypes = blockTypes.filter(
+			( blockType ) => blockType.name !== 'core/block'
+		);
+		let orderedItems = orderBy( nonPatternBlockTypes, 'frecency', 'desc' );
 
 		if ( ! filterValue && prioritizedBlocks.length ) {
 			orderedItems = orderInserterBlockItems(
@@ -188,8 +191,8 @@ function InserterSearchResults( {
 				<BlockPatternsList
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
-					onClickPattern={ onSelectBlockPattern }
-					onHover={ onHover }
+					onClickPattern={ onClickPattern }
+					onHover={ onHoverPattern }
 					isDraggable={ isDraggable }
 				/>
 			</div>

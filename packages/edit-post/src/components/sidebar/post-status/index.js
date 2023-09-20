@@ -58,6 +58,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 								marginTop: '16px',
 							} }
 							spacing={ 4 }
+							wrap
 						>
 							<PostSwitchToDraftButton />
 							<PostTrash />

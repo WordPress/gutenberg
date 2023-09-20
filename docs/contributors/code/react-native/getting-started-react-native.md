@@ -28,6 +28,7 @@ Note that the commands described here should be run in the top-level directory o
 ```sh
 nvm install
 npm ci
+npm run native preios
 ```
 
 ## Run
@@ -89,7 +90,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 Use the following command to run the test suite:
 
 ```sh
-npm run native test
+npm run test:native
 ```
 
 It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
@@ -97,7 +98,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 To run the tests with debugger support, start it with the following CLI command:
 
 ```sh
-npm run native test:debug
+npm run test:native:debug
 ```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
@@ -132,7 +133,7 @@ To run a single test instead of the entire suite, use `npm run native device-tes
 npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
-Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [Appium Inspector](https://github.com/appium/appium-inspector/) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block.
+Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. If so, you can manually start the Appium server via `npm run native appium:start`, and (optionally) comment out related code in the `beforeAll` and `afterAll` block.
 
 For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](/packages/react-native-editor/__device-tests__/README.md) and our [contributing guide](/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).
 

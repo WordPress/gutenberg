@@ -76,7 +76,7 @@ test.describe( 'Classic', () => {
 		const createGallery = page.getByRole( 'button', {
 			name: 'Create a new gallery',
 		} );
-		await expect( createGallery ).not.toBeDisabled();
+		await expect( createGallery ).toBeEnabled();
 		await createGallery.click();
 		await page.click( 'role=button[name="Insert gallery"i]' );
 

@@ -52,7 +52,7 @@ import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
-	MIN_WIDTH_UNIT,
+	isPercentageUnit,
 } from './utils.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
@@ -97,8 +97,8 @@ export default function SearchEdit( {
 	);
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( ! insertedInNavigationBlock ) return;
+
+	if ( insertedInNavigationBlock ) {
 		// This side-effect should not create an undo level.
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
@@ -106,7 +106,8 @@ export default function SearchEdit( {
 			buttonUseIcon: true,
 			buttonPosition: 'button-inside',
 		} );
-	}, [ insertedInNavigationBlock ] );
+	}
+
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
 
@@ -404,7 +405,13 @@ export default function SearchEdit( {
 					>
 						<UnitControl
 							id={ unitControlInputId }
-							min={ `${ MIN_WIDTH }${ MIN_WIDTH_UNIT }` }
+							min={
+								isPercentageUnit( widthUnit ) ? 0 : MIN_WIDTH
+							}
+							max={
+								isPercentageUnit( widthUnit ) ? 100 : undefined
+							}
+							step={ 1 }
 							onChange={ ( newWidth ) => {
 								const filteredWidth =
 									widthUnit === '%' &&

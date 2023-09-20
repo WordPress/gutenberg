@@ -23,9 +23,18 @@ class Gutenberg_Navigation_Fallback {
 	 */
 	public static function get_fallback() {
 
+		/**
+		 * Filters whether or not a fallback should be created.
+		 *
+		 * @since 6.3.0
+		 *
+		 * @param bool Whether or not to create a fallback.
+		 */
+		$should_create_fallback = apply_filters( 'gutenberg_navigation_should_create_fallback', true );
+
 		$fallback = static::get_most_recently_published_navigation();
 
-		if ( $fallback ) {
+		if ( $fallback || ! $should_create_fallback ) {
 			return $fallback;
 		}
 
@@ -145,7 +154,7 @@ class Gutenberg_Navigation_Fallback {
 	private static function get_most_recently_created_nav_menu( $classic_nav_menus ) {
 		usort(
 			$classic_nav_menus,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);

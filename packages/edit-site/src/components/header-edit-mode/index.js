@@ -45,6 +45,7 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -66,6 +67,7 @@ export default function HeaderEditMode() {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -83,6 +85,8 @@ export default function HeaderEditMode() {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
 
+		const { get: getPreference } = select( preferencesStore );
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			templateType: postType,
@@ -94,16 +98,20 @@ export default function HeaderEditMode() {
 			isVisualMode: getEditorMode() === 'visual',
 			blockEditorMode: __unstableGetEditorMode(),
 			homeUrl: getUnstableBase()?.home,
-			showIconLabels: select( preferencesStore ).get(
-				'core/edit-site',
+			showIconLabels: getPreference(
+				editSiteStore.name,
 				'showIconLabels'
 			),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+			isDistractionFree: getPreference(
+				editSiteStore.name,
 				'distractionFree'
+			),
+			hasFixedToolbar: getPreference(
+				editSiteStore.name,
+				'fixedToolbar'
 			),
 		};
 	}, [] );
@@ -149,8 +157,7 @@ export default function HeaderEditMode() {
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const isFocusMode =
-		templateType === 'wp_template_part' || templateType === 'wp_navigation';
+	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
@@ -209,18 +216,23 @@ export default function HeaderEditMode() {
 									showIconLabels ? shortLabel : longLabel
 								}
 								showTooltip={ ! showIconLabels }
+								aria-expanded={ isInserterOpen }
 							/>
 						) }
 						{ isLargeViewport && (
 							<>
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									disabled={ ! isVisualMode }
-								/>
+								{ ! hasFixedToolbar && (
+									<ToolbarItem
+										as={ ToolSelector }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+										disabled={ ! isVisualMode }
+									/>
+								) }
 								<ToolbarItem
 									as={ UndoButton }
 									showTooltip={ ! showIconLabels }
@@ -254,10 +266,12 @@ export default function HeaderEditMode() {
 												? 'tertiary'
 												: undefined
 										}
+										aria-expanded={ isListViewOpen }
 									/>
 								) }
 								{ isZoomedOutViewExperimentEnabled &&
-									! isDistractionFree && (
+									! isDistractionFree &&
+									! hasFixedToolbar && (
 										<ToolbarItem
 											as={ Button }
 											className="edit-site-header-edit-mode__zoom-out-view-toggle"
@@ -267,7 +281,7 @@ export default function HeaderEditMode() {
 											label={ __( 'Zoom-out View' ) }
 											onClick={ () => {
 												setPreviewDeviceType(
-													'desktop'
+													'Desktop'
 												);
 												__unstableSetEditorMode(
 													isZoomedOutView
@@ -299,23 +313,27 @@ export default function HeaderEditMode() {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					{ ! isFocusMode && hasDefaultEditorCanvasView && (
-						<div
-							className={ classnames(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
+					<div
+						className={ classnames(
+							'edit-site-header-edit-mode__preview-options',
+							{ 'is-zoomed-out': isZoomedOutView }
+						) }
+					>
+						<PreviewOptions
+							deviceType={ deviceType }
+							setDeviceType={ setPreviewDeviceType }
+							label={ __( 'View' ) }
+							isEnabled={
+								! isFocusMode && hasDefaultEditorCanvasView
+							}
 						>
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
-								label={ __( 'View' ) }
-							>
+							{ ( { onClose } ) => (
 								<MenuGroup>
 									<MenuItem
 										href={ homeUrl }
 										target="_blank"
 										icon={ external }
+										onClick={ onClose }
 									>
 										{ __( 'View site' ) }
 										<VisuallyHidden as="span">
@@ -326,9 +344,9 @@ export default function HeaderEditMode() {
 										</VisuallyHidden>
 									</MenuItem>
 								</MenuGroup>
-							</PreviewOptions>
-						</div>
-					) }
+							) }
+						</PreviewOptions>
+					</div>
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />

@@ -43,7 +43,19 @@ exports[`Block Mover Picker moving blocks moves blocks up and down 1`] = `
 `;
 
 exports[`Block Mover Picker should render without crashing and match snapshot 1`] = `
-[
+<View
+  style={
+    [
+      {
+        "height": 44,
+      },
+      {
+        "borderLeftWidth": 0.5,
+      },
+      undefined,
+    ]
+  }
+>
   <View>
     <View
       accessibilityHint="Double tap to move the block to the left"
@@ -51,7 +63,19 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
       accessibilityRole="button"
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": false,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
         }
       }
       accessible={true}
@@ -99,7 +123,6 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
           }
         >
           <Svg
-            colorScheme="light"
             height={24}
             style={{}}
             viewBox="0 0 24 24"
@@ -111,7 +134,7 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
         </View>
       </View>
     </View>
-  </View>,
+  </View>
   <View>
     <View
       accessibilityHint="Double tap to move the block to the right"
@@ -119,7 +142,19 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
       accessibilityRole="button"
       accessibilityState={
         {
+          "busy": undefined,
+          "checked": undefined,
           "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
         }
       }
       accessible={true}
@@ -167,7 +202,6 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
           }
         >
           <Svg
-            colorScheme="light"
             height={24}
             style={{}}
             viewBox="0 0 24 24"
@@ -179,6 +213,6 @@ exports[`Block Mover Picker should render without crashing and match snapshot 1`
         </View>
       </View>
     </View>
-  </View>,
-]
+  </View>
+</View>
 `;

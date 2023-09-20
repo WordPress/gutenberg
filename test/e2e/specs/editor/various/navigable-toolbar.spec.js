@@ -45,4 +45,19 @@ test.describe( 'Block Toolbar', () => {
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 	} );
+
+	test( 'should focus with Shift+Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'a' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block Tools' } )
+				.getByRole( 'button', { name: 'Paragraph' } )
+		).toBeFocused();
+	} );
 } );

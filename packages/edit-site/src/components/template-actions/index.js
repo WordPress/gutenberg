@@ -3,10 +3,17 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -52,7 +59,7 @@ export default function TemplateActions( {
 				sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" reverted.' ),
-					template.title.rendered
+					decodeEntities( template.title.rendered )
 				),
 				{
 					type: 'snackbar',
@@ -60,10 +67,16 @@ export default function TemplateActions( {
 				}
 			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				template.type === 'wp_template'
+					? __( 'An error occurred while reverting the template.' )
+					: __(
+							'An error occurred while reverting the template part.'
+					  );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while reverting the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -84,17 +97,14 @@ export default function TemplateActions( {
 								template={ template }
 								onClose={ onClose }
 							/>
-							<MenuItem
-								isDestructive
-								isTertiary
-								onClick={ () => {
+							<DeleteMenuItem
+								onRemove={ () => {
 									removeTemplate( template );
 									onRemove?.();
 									onClose();
 								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
+								title={ template.title.rendered }
+							/>
 						</>
 					) }
 					{ isRevertable && (
@@ -113,5 +123,28 @@ export default function TemplateActions( {
 				</MenuGroup>
 			) }
 		</DropdownMenu>
+	);
+}
+
+function DeleteMenuItem( { onRemove, title } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	return (
+		<>
+			<MenuItem isDestructive onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Delete' ) }
+			</MenuItem>
+			<ConfirmDialog
+				isOpen={ isModalOpen }
+				onConfirm={ onRemove }
+				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Delete' ) }
+			>
+				{ sprintf(
+					// translators: %s: The template or template part's title.
+					__( 'Are you sure you want to delete "%s"?' ),
+					decodeEntities( title )
+				) }
+			</ConfirmDialog>
+		</>
 	);
 }

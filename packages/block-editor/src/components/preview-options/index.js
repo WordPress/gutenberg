@@ -33,6 +33,7 @@ export default function PreviewOptions( {
 	const toggleProps = {
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
+		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
 	};
 	const menuProps = {
@@ -53,8 +54,9 @@ export default function PreviewOptions( {
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 			label={ label || __( 'Preview' ) }
+			disableOpenOnArrowDown={ ! isEnabled }
 		>
-			{ () => (
+			{ ( renderProps ) => (
 				<>
 					<MenuGroup>
 						<MenuItem
@@ -79,7 +81,7 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ children }
+					{ children?.( renderProps ) }
 				</>
 			) }
 		</DropdownMenu>

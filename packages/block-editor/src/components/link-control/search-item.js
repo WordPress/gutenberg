@@ -54,7 +54,7 @@ export const LinkControlSearchItem = ( {
 } ) => {
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
-		: filterURLForDisplay( safeDecodeURI( suggestion?.url ) );
+		: filterURLForDisplay( safeDecodeURI( suggestion?.url ), 24 );
 
 	return (
 		<MenuItem

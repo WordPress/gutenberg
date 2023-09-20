@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { NavigableRegion } from '@wordpress/interface';
+import { EditorSnackbars } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,14 +26,17 @@ export default function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
-			{ ! hideTitleFromUI && title && (
-				<Header
-					title={ title }
-					subTitle={ subTitle }
-					actions={ actions }
-				/>
-			) }
-			<div className="edit-site-page-content">{ children }</div>
+			<div className="edit-site-page-content">
+				{ ! hideTitleFromUI && title && (
+					<Header
+						title={ title }
+						subTitle={ subTitle }
+						actions={ actions }
+					/>
+				) }
+				{ children }
+			</div>
+			<EditorSnackbars />
 		</NavigableRegion>
 	);
 }

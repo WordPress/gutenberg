@@ -313,7 +313,7 @@ _Parameters_
 
 _Returns_
 
--   `Object | null`: The current global styles.
+-   `Array< object > | null`: The current global styles.
 
 ### getCurrentUser
 
@@ -506,18 +506,6 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
-
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
@@ -560,7 +548,7 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 
@@ -591,6 +579,18 @@ _Parameters_
 _Returns_
 
 -   `Optional< any >`: The edit.
+
+### getUserPatternCategories
+
+Retrieve the registered user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 

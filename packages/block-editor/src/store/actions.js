@@ -12,6 +12,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -28,7 +29,6 @@ import {
 } from '../utils/selection';
 import {
 	__experimentalUpdateSettings,
-	ensureDefaultBlock,
 	privateRemoveBlocks,
 } from './private-actions';
 
@@ -375,7 +375,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +394,22 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch( ensureDefaultBlock() );
 	};
 
 /**
@@ -949,36 +955,30 @@ export const __unstableSplitSelection =
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
 
-		dispatch.replaceBlocks(
-			select.getSelectedBlockClientIds(),
-			[
-				{
-					// Preserve the original client ID.
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						[ selectionA.attributeKey ]: toHTMLString( {
-							value: valueA,
-							...mapRichTextSettings( attributeDefinitionA ),
-						} ),
-					},
+		dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+			{
+				// Preserve the original client ID.
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					[ selectionA.attributeKey ]: toHTMLString( {
+						value: valueA,
+						...mapRichTextSettings( attributeDefinitionA ),
+					} ),
 				},
-				createBlock( getDefaultBlockName() ),
-				{
-					// Preserve the original client ID.
-					...blockB,
-					attributes: {
-						...blockB.attributes,
-						[ selectionB.attributeKey ]: toHTMLString( {
-							value: valueB,
-							...mapRichTextSettings( attributeDefinitionB ),
-						} ),
-					},
+			},
+			{
+				// Preserve the original client ID.
+				...blockB,
+				attributes: {
+					...blockB.attributes,
+					[ selectionB.attributeKey ]: toHTMLString( {
+						value: valueB,
+						...mapRichTextSettings( attributeDefinitionB ),
+					} ),
 				},
-			],
-			1, // If we don't pass the `indexToSelect` it will default to the last block.
-			select.getSelectedBlocksInitialCaretPosition()
-		);
+			},
+		] );
 	};
 
 /**
@@ -1013,9 +1013,17 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
+		if (
+			! blockAType.merge &&
+			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
+
 		const blockB = select.getBlock( clientIdB );
 
-		if ( blockAType && ! blockAType.merge ) {
+		if ( ! blockAType.merge ) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1032,6 +1040,7 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1042,6 +1051,41 @@ export const mergeBlocks =
 				dispatch.selectBlock(
 					blockWithSameType.innerBlocks[ 0 ].clientId
 				);
+
+				// Attempt to merge the next block if it's the same type and
+				// same attributes. This is useful when merging a paragraph into
+				// a list, and the next block is also a list. If we don't merge,
+				// it looks like one list, but it's actually two lists. The same
+				// applies to other blocks such as a group with the same
+				// attributes.
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientIdA );
+
+				if (
+					nextBlockClientId &&
+					select.getBlockName( clientIdA ) ===
+						select.getBlockName( nextBlockClientId )
+				) {
+					const rootAttributes =
+						select.getBlockAttributes( clientIdA );
+					const previousRootAttributes =
+						select.getBlockAttributes( nextBlockClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						dispatch.moveBlocksToPosition(
+							select.getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							clientIdA
+						);
+						dispatch.removeBlock( nextBlockClientId, false );
+					}
+				}
 			} );
 			return;
 		}
@@ -1390,7 +1434,9 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return __experimentalUpdateSettings( settings, true );
+	return __experimentalUpdateSettings( settings, {
+		stripExperimentalSettings: true,
+	} );
 }
 
 /**
@@ -1815,7 +1861,6 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
  *                                                                                                   This is used to avoid making a request to the external resource when the user
- *
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -1883,3 +1928,42 @@ export const registerInserterMediaCategory =
 			},
 		} );
 	};
+
+/**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * Sets the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
+ *                                    `'contentOnly'`, or `'default'`.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockEditingMode( clientId = '', mode ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		clientId,
+		mode,
+	};
+}
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string} clientId The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
+export function unsetBlockEditingMode( clientId = '' ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
+		clientId,
+	};
+}

@@ -29,7 +29,19 @@ export async function createNewPost( {
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'post-new.php', query );
-	await this.page.waitForSelector( '.edit-post-layout' );
+
+	// Wait for both iframed and non-iframed canvas and resolve once the
+	// currently available one is ready. To make this work, we need an inner
+	// legacy canvas selector that is unavailable directly when the canvas is
+	// iframed.
+	await Promise.any( [
+		this.page.locator( '.wp-block-post-content' ).waitFor(),
+		this.page
+			.frameLocator( '[name=editor-canvas]' )
+			.locator( 'body > *' )
+			.first()
+			.waitFor(),
+	] );
 
 	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data

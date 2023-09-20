@@ -34,13 +34,18 @@ import {
 	page,
 	plus,
 	pin,
-	postList,
+	verse,
 	search,
 	tag,
 } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 /**
  * Internal dependencies
@@ -78,7 +83,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	home: postList,
+	home: verse,
 	single: pin,
 	page,
 	archive,
@@ -190,7 +195,7 @@ export default function NewTemplate( {
 			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
 				'postType',
-				'wp_template',
+				TEMPLATE_POST_TYPE,
 				{
 					description,
 					// Slugs need to be strings, so this is for template `404`

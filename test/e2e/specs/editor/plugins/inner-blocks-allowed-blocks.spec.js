@@ -6,13 +6,13 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
@@ -140,6 +140,18 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
 			'Gallery',
+			'Video',
+		] );
+
+		await blockListBox.getByRole( 'option', { name: 'Gallery' } ).click();
+
+		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await blockAppender.click();
+
+		// It should display a different allowed block list.
+		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
+			'Gallery',
+			'List',
 			'Video',
 		] );
 	} );

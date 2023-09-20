@@ -10,6 +10,7 @@ import {
 	headingLevel6,
 	paragraph,
 } from '@wordpress/icons';
+import { Icon } from '@wordpress/components';
 
 /** @typedef {import('@wordpress/element').WPComponent} WPComponent */
 
@@ -39,5 +40,9 @@ const LEVEL_TO_PATH = {
  * @return {?WPComponent} The icon.
  */
 export default function HeadingLevelIcon( { level } ) {
-	return LEVEL_TO_PATH[ level ] ?? null;
+	if ( LEVEL_TO_PATH[ level ] ) {
+		return <Icon icon={ LEVEL_TO_PATH[ level ] } />;
+	}
+
+	return null;
 }

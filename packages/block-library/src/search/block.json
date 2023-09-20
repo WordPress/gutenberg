@@ -62,6 +62,7 @@
 				"text": true
 			}
 		},
+		"interactivity": true,
 		"typography": {
 			"__experimentalSkipSerialization": true,
 			"__experimentalSelector": ".wp-block-search__label, .wp-block-search__input, .wp-block-search__button",
@@ -90,6 +91,7 @@
 		},
 		"html": false
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"
 }

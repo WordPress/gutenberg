@@ -196,18 +196,18 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
+		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Vivid red"i]' );
+		await page.click( 'role=option[name="Color: Vivid red"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -238,8 +238,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"},\"elements\":{\"link\":{\"color\":{\"text\":\"#ff0000\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background has-link-color wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -261,7 +261,7 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
-		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
+		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();

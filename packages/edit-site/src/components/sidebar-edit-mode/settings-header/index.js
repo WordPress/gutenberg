@@ -18,6 +18,12 @@ import { STORE_NAME } from '../../../store/constants';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { store as editSiteStore } from '../../../store';
 
+const entityLabels = {
+	wp_navigation: __( 'Navigation' ),
+	wp_block: __( 'Pattern' ),
+	wp_template: __( 'Template' ),
+};
+
 const SettingsHeader = ( { sidebarName } ) => {
 	const { hasPageContentFocus, entityType } = useSelect( ( select ) => {
 		const { getEditedPostType, hasPageContentFocus: _hasPageContentFocus } =
@@ -29,8 +35,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		};
 	} );
 
-	const entityLabel =
-		entityType === 'wp_navigation' ? __( 'Navigation' ) : __( 'Template' );
+	const entityLabel = entityLabels[ entityType ] || entityLabels.wp_template;
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openTemplateSettings = () =>

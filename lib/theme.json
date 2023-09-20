@@ -1,15 +1,5 @@
 {
 	"version": 2,
-	"behaviors": {
-		"blocks": {
-			"core/image": {
-				"lightbox": {
-					"enabled": false,
-					"animation": ""
-				}
-			}
-		}
-	},
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
@@ -274,12 +264,18 @@
 			"lineHeight": false,
 			"textColumns": false,
 			"textDecoration": true,
-			"textTransform": true
+			"textTransform": true,
+			"writingMode": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
 					"radius": true
+				}
+			},
+			"core/image": {
+				"lightbox": {
+					"allowEditing": true
 				}
 			},
 			"core/pullquote": {
@@ -288,11 +284,6 @@
 					"radius": true,
 					"style": true,
 					"width": true
-				}
-			},
-			"core/image": {
-				"behaviors": {
-					"lightbox": true
 				}
 			}
 		}

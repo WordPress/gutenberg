@@ -1,68 +1,73 @@
-window.addEventListener( 'DOMContentLoaded', () => {
-	const hiddenClass = 'wp-block-search__searchfield-hidden';
+/**
+ * WordPress dependencies
+ */
+import { store as wpStore } from '@wordpress/interactivity';
 
-	Array.from(
-		document.getElementsByClassName(
-			'wp-block-search__button-behavior-expand'
-		)
-	).forEach( ( block ) => {
-		const searchField = block.querySelector( '.wp-block-search__input' );
-		const searchButton = block.querySelector( '.wp-block-search__button' );
-		const searchLabel = block.querySelector( '.wp-block-search__label' );
-		const ariaLabel = searchButton.getAttribute( 'aria-label' );
-		const id = searchField.getAttribute( 'id' );
-
-		const toggleSearchField = ( showSearchField ) => {
-			if ( showSearchField ) {
-				searchField.removeAttribute( 'aria-hidden' );
-				searchField.removeAttribute( 'tabindex' );
-				searchButton.removeAttribute( 'aria-expanded' );
-				searchButton.removeAttribute( 'aria-controls' );
-				searchButton.setAttribute( 'type', 'submit' );
-				searchButton.setAttribute( 'aria-label', 'Submit Search' );
-
-				return block.classList.remove( hiddenClass );
-			}
-
-			searchButton.removeAttribute( 'type' );
-			searchField.setAttribute( 'aria-hidden', 'true' );
-			searchField.setAttribute( 'tabindex', '-1' );
-			searchButton.setAttribute( 'aria-expanded', 'false' );
-			searchButton.setAttribute( 'aria-controls', id );
-			searchButton.setAttribute( 'aria-label', ariaLabel );
-			return block.classList.add( hiddenClass );
-		};
-
-		const hideSearchField = ( e ) => {
-			if ( ! e.target.closest( '.wp-block-search' ) ) {
-				return toggleSearchField( false );
-			}
-
-			if ( e.key === 'Escape' ) {
-				searchButton.focus();
-				return toggleSearchField( false );
-			}
-		};
-
-		const handleButtonClick = ( e ) => {
-			if ( block.classList.contains( hiddenClass ) ) {
-				e.preventDefault();
-				searchField.focus();
-				toggleSearchField( true );
-			}
-		};
-
-		searchButton.removeAttribute( 'type' );
-		searchField.addEventListener( 'keydown', ( e ) => {
-			hideSearchField( e );
-		} );
-		searchButton.addEventListener( 'click', handleButtonClick );
-		searchButton.addEventListener( 'keydown', ( e ) => {
-			hideSearchField( e );
-		} );
-		if ( searchLabel ) {
-			searchLabel.addEventListener( 'click', handleButtonClick );
-		}
-		document.body.addEventListener( 'click', hideSearchField );
-	} );
+wpStore( {
+	selectors: {
+		core: {
+			search: {
+				ariaLabel: ( { context } ) => {
+					const { ariaLabelCollapsed, ariaLabelExpanded } =
+						context.core.search;
+					return context.core.search.isSearchInputVisible
+						? ariaLabelExpanded
+						: ariaLabelCollapsed;
+				},
+				ariaControls: ( { context } ) => {
+					return context.core.search.isSearchInputVisible
+						? null
+						: context.core.search.inputId;
+				},
+				type: ( { context } ) => {
+					return context.core.search.isSearchInputVisible
+						? 'submit'
+						: 'button';
+				},
+				tabindex: ( { context } ) => {
+					return context.core.search.isSearchInputVisible
+						? '0'
+						: '-1';
+				},
+			},
+		},
+	},
+	actions: {
+		core: {
+			search: {
+				openSearchInput: ( { context, event, ref } ) => {
+					if ( ! context.core.search.isSearchInputVisible ) {
+						event.preventDefault();
+						context.core.search.isSearchInputVisible = true;
+						ref.parentElement.querySelector( 'input' ).focus();
+					}
+				},
+				closeSearchInput: ( { context } ) => {
+					context.core.search.isSearchInputVisible = false;
+				},
+				handleSearchKeydown: ( store ) => {
+					const { actions, event, ref } = store;
+					// If Escape close the menu.
+					if ( event?.key === 'Escape' ) {
+						actions.core.search.closeSearchInput( store );
+						ref.querySelector( 'button' ).focus();
+					}
+				},
+				handleSearchFocusout: ( store ) => {
+					const { actions, event, ref } = store;
+					// If focus is outside search form, and in the document, close menu
+					// event.target === The element losing focus
+					// event.relatedTarget === The element receiving focus (if any)
+					// When focusout is outside the document,
+					// `window.document.activeElement` doesn't change.
+					if (
+						! ref.contains( event.relatedTarget ) &&
+						event.target !== window.document.activeElement
+					) {
+						actions.core.search.closeSearchInput( store );
+					}
+				},
+			},
+		},
+	},
 } );

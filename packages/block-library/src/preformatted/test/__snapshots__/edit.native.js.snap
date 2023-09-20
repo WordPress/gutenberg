@@ -39,6 +39,7 @@ exports[`Preformatted should match snapshot when content is empty 1`] = `
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
+      selectionColor="black"
       triggerKeyCodes={[]}
       value=""
     />
@@ -85,6 +86,7 @@ exports[`Preformatted should match snapshot when content is not empty 1`] = `
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
+      selectionColor="black"
       triggerKeyCodes={[]}
       value="<pre>Hello World!</pre>"
     />

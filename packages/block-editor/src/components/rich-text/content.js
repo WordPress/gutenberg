@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
-import {
-	children as childrenSource,
-	getSaveElement,
-	__unstableGetBlockProps as getBlockProps,
-} from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -42,44 +38,3 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 
 	return content;
 };
-
-Content.__unstableIsRichTextContent = {};
-
-function findContent( blocks, richTextValues = [] ) {
-	if ( ! Array.isArray( blocks ) ) {
-		blocks = [ blocks ];
-	}
-
-	for ( const block of blocks ) {
-		if (
-			block?.type?.__unstableIsRichTextContent ===
-			Content.__unstableIsRichTextContent
-		) {
-			richTextValues.push( block.props.value );
-			continue;
-		}
-
-		if ( block?.props?.children ) {
-			findContent( block.props.children, richTextValues );
-		}
-	}
-
-	return richTextValues;
-}
-
-function _getSaveElement( { name, attributes, innerBlocks } ) {
-	return getSaveElement(
-		name,
-		attributes,
-		innerBlocks.map( _getSaveElement )
-	);
-}
-
-export function getRichTextValues( blocks = [] ) {
-	getBlockProps.skipFilters = true;
-	const values = findContent(
-		( Array.isArray( blocks ) ? blocks : [ blocks ] ).map( _getSaveElement )
-	);
-	getBlockProps.skipFilters = false;
-	return values;
-}

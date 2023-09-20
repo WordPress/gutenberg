@@ -5,25 +5,31 @@ import {
 	PreferencesModal,
 	PreferencesModalTabs,
 	PreferencesModalSection,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import EnableFeature from './enable-feature';
-import { store as siteEditorStore } from '../../store';
+import { store as editSiteStore } from '../../store';
 
-export default function EditSitePreferencesModal( {
-	isModalActive,
-	toggleModal,
-} ) {
+export const PREFERENCES_MODAL_NAME = 'edit-site/preferences';
+
+export default function EditSitePreferencesModal() {
+	const isModalActive = useSelect( ( select ) =>
+		select( interfaceStore ).isModalActive( PREFERENCES_MODAL_NAME )
+	);
+	const { closeModal, openModal } = useDispatch( interfaceStore );
+	const toggleModal = () =>
+		isModalActive ? closeModal() : openModal( PREFERENCES_MODAL_NAME );
 	const registry = useRegistry();
 	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( siteEditorStore );
+		useDispatch( editSiteStore );
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const toggleDistractionFree = () => {

@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
@@ -28,12 +29,12 @@ const colorsAndGradientKeys = [
 
 const TAB_COLOR = {
 	name: 'color',
-	title: 'Solid',
+	title: __( 'Solid' ),
 	value: 'color',
 };
 const TAB_GRADIENT = {
 	name: 'gradient',
-	title: 'Gradient',
+	title: __( 'Gradient' ),
 	value: 'gradient',
 };
 

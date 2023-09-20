@@ -26,7 +26,6 @@ import { select, dispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-import '@wordpress/jest-console';
 
 /**
  * Internal dependencies
@@ -442,7 +441,7 @@ describe( 'Image Block', () => {
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 
-		fireEvent.press( screen.getByText( 'ADD IMAGE' ) );
+		fireEvent.press( screen.getByText( 'Add image' ) );
 		fireEvent.press( screen.getByText( 'WordPress Media Library' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":${ IMAGE.id },"sizeSlug":"large","linkDestination":"none"} -->

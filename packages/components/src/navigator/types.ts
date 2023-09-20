@@ -14,7 +14,10 @@ export type NavigateOptions = {
 	focusTargetSelector?: string;
 	isBack?: boolean;
 	skipFocus?: boolean;
+	replace?: boolean;
 };
+
+export type NavigateToParentOptions = Omit< NavigateOptions, 'isBack' >;
 
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
@@ -28,7 +31,7 @@ export type Navigator = {
 	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
-	goToParent: () => void;
+	goToParent: ( options?: NavigateToParentOptions ) => void;
 };
 
 export type NavigatorContext = Navigator & {

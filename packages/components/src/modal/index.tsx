@@ -66,6 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
@@ -170,6 +171,34 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
+	let pressTarget: EventTarget | null = null;
+	const overlayPressHandlers: {
+		onPointerDown: React.PointerEventHandler< HTMLDivElement >;
+		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+	} = {
+		onPointerDown: ( event ) => {
+			if ( event.isPrimary && event.target === event.currentTarget ) {
+				pressTarget = event.target;
+				// Avoids loss of focus yet also leaves `useFocusOutside`
+				// practically useless with its only potential trigger being
+				// programmatic focus movement. TODO opt for either removing
+				// the hook or enhancing it such that this isn't needed.
+				event.preventDefault();
+			}
+		},
+		// Closes the modal with two exceptions. 1. Opening the context menu on
+		// the overlay. 2. Pressing on the overlay then dragging the pointer
+		// over the modal and releasing. Due to the modal being a child of the
+		// overlay, such a gesture is a `click` on the overlay and cannot be
+		// excepted by a `click` handler. Thus the tactic of handling
+		// `pointerup` and comparing its target to that of the `pointerdown`.
+		onPointerUp: ( { target, button } ) => {
+			const isSameTarget = target === pressTarget;
+			pressTarget = null;
+			if ( button === 0 && isSameTarget ) onRequestClose();
+		},
+	};
+
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -179,6 +208,7 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
+			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
@@ -241,6 +271,7 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ headerActions }
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }

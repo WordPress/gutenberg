@@ -35,6 +35,7 @@ import {
 	SoundCloudIcon,
 	SpotifyIcon,
 	TelegramIcon,
+	ThreadsIcon,
 	TiktokIcon,
 	TumblrIcon,
 	TwitchIcon,
@@ -254,6 +255,12 @@ const variations = [
 		attributes: { service: 'telegram' },
 		title: 'Telegram',
 		icon: TelegramIcon,
+	},
+	{
+		name: 'threads',
+		attributes: { service: 'threads' },
+		title: 'Threads',
+		icon: ThreadsIcon,
 	},
 	{
 		name: 'tiktok',

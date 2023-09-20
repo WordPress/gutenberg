@@ -20,11 +20,13 @@ import {
 } from '@wordpress/keycodes';
 
 let clipboardDataHolder: {
-	plainText: string;
-	html: string;
+	'text/plain': string;
+	'text/html': string;
+	'rich-text': string;
 } = {
-	plainText: '',
-	html: '',
+	'text/plain': '',
+	'text/html': '',
+	'rich-text': '',
 };
 
 /**
@@ -38,11 +40,12 @@ let clipboardDataHolder: {
  */
 export function setClipboardData(
 	this: PageUtils,
-	{ plainText = '', html = '' }: typeof clipboardDataHolder
+	{ plainText = '', html = '' }
 ) {
 	clipboardDataHolder = {
-		plainText,
-		html,
+		'text/plain': plainText,
+		'text/html': html,
+		'rich-text': '',
 	};
 }
 
@@ -57,11 +60,15 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 			if ( _type === 'paste' ) {
 				clipboardDataTransfer.setData(
 					'text/plain',
-					_clipboardData.plainText
+					_clipboardData[ 'text/plain' ]
 				);
 				clipboardDataTransfer.setData(
 					'text/html',
-					_clipboardData.html
+					_clipboardData[ 'text/html' ]
+				);
+				clipboardDataTransfer.setData(
+					'rich-text',
+					_clipboardData[ 'rich-text' ]
 				);
 			} else {
 				const selection = canvasDoc.defaultView.getSelection()!;
@@ -91,8 +98,9 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 			);
 
 			return {
-				plainText: clipboardDataTransfer.getData( 'text/plain' ),
-				html: clipboardDataTransfer.getData( 'text/html' ),
+				'text/plain': clipboardDataTransfer.getData( 'text/plain' ),
+				'text/html': clipboardDataTransfer.getData( 'text/html' ),
+				'rich-text': clipboardDataTransfer.getData( 'rich-text' ),
 			};
 		},
 		[ type, clipboardDataHolder ] as const

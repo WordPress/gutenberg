@@ -27,7 +27,6 @@ test.describe( 'Deprecated Node Matcher', () => {
 		page,
 		editor,
 	} ) => {
-		// await insertBlock( 'Deprecated Node Matcher' );
 		await editor.insertBlock( { name: 'core/deprecated-node-matcher' } );
 		await page.keyboard.type( 'test' );
 		await page.keyboard.press( 'Enter' );
@@ -39,7 +38,6 @@ test.describe( 'Deprecated Node Matcher', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// await insertBlock( 'Deprecated Children Matcher' );
 		await editor.insertBlock( {
 			name: 'core/deprecated-children-matcher',
 		} );

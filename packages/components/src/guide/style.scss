@@ -29,7 +29,7 @@
 
 			&:hover {
 				svg {
-					fill: #fff;
+					fill: $white;
 				}
 			}
 		}
@@ -57,7 +57,7 @@
 	&__footer {
 		align-content: center;
 		display: flex;
-		height: 30px;
+		height: $button-size;
 		justify-content: center;
 		margin: 0 0 $grid-unit-30 0;
 		padding: 0 $grid-unit-40;
@@ -78,6 +78,11 @@
 			height: 30px;
 			min-width: 20px;
 			margin: -6px 0;
+			color: $gray-200;
+		}
+
+		li[aria-current="step"] .components-button {
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color));
 		}
 	}
 }
@@ -85,7 +90,6 @@
 .components-modal__frame.components-guide {
 	border: none;
 	min-width: 312px;
-	height: 80vh;
 	max-height: 575px;
 
 	@media ( max-width: $break-small ) {
@@ -98,34 +102,14 @@
 	&.components-guide__back-button,
 	&.components-guide__forward-button,
 	&.components-guide__finish-button {
-		height: 30px;
 		position: absolute;
-	}
-
-	&.components-guide__back-button,
-	&.components-guide__forward-button {
-		font-size: $default-font-size;
-		padding: 4px 2px;
-
-		&.has-text svg {
-			margin: 0;
-		}
-
-		&:hover {
-			text-decoration: underline;
-		}
 	}
 
 	&.components-guide__back-button {
 		left: $grid-unit-40;
 	}
 
-	&.components-guide__forward-button {
-		right: $grid-unit-40;
-		color: #1386bf;
-		font-weight: bold;
-	}
-
+	&.components-guide__forward-button,
 	&.components-guide__finish-button {
 		right: $grid-unit-40;
 	}

@@ -22,7 +22,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -77,7 +77,7 @@ function FiltersToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Filters' ) }
+			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 		>

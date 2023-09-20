@@ -18,12 +18,11 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-	$stylesheet       = get_stylesheet();
 
 	if (
 		isset( $attributes['slug'] ) &&
 		isset( $attributes['theme'] ) &&
-		$stylesheet === $attributes['theme']
+		get_stylesheet() === $attributes['theme']
 	) {
 		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
@@ -64,23 +63,15 @@ function render_block_core_template_part( $attributes ) {
 			 */
 			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
 		} else {
+			$template_part_file_path = '';
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
 			if ( 0 === validate_file( $attributes['slug'] ) ) {
-				$themes   = array( $stylesheet );
-				$template = get_template();
-				if ( $stylesheet !== $template ) {
-					$themes[] = $template;
-				}
+				$block_template = get_block_file_template( $template_part_id, 'wp_template_part' );
 
-				foreach ( $themes as $theme ) {
-					$theme_folders           = get_block_theme_folders( $theme );
-					$template_part_file_path = get_theme_file_path( '/' . $theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
-					if ( file_exists( $template_part_file_path ) ) {
-						$content = (string) file_get_contents( $template_part_file_path );
-						$content = '' !== $content ? _inject_theme_attribute_in_block_template_content( $content ) : '';
-						break;
-					}
+				$content = $block_template->content;
+				if ( isset( $block_template->area ) ) {
+					$area = $block_template->area;
 				}
 			}
 
@@ -256,7 +247,7 @@ function build_template_part_block_instance_variations() {
 				'area'  => $template_part->area,
 			),
 			'scope'       => array( 'inserter' ),
-			'icon'        => $icon_by_area[ $template_part->area ],
+			'icon'        => isset( $icon_by_area[ $template_part->area ] ) ? $icon_by_area[ $template_part->area ] : null,
 			'example'     => array(
 				'attributes' => array(
 					'slug'  => $template_part->slug,

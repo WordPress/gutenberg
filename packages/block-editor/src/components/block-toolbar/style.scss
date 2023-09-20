@@ -252,6 +252,16 @@
 		flex-shrink: 1;
 	}
 
+	@include break-medium() {
+		.block-editor-block-contextual-toolbar.is-fixed {
+			.components-toolbar,
+			.components-toolbar-group {
+				flex-shrink: 0;
+			}
+		}
+	}
+
+
 	.block-editor-rich-text__inline-format-toolbar-group {
 		.components-button + .components-button {
 			margin-left: 6px;

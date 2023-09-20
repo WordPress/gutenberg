@@ -40,5 +40,7 @@ RCT_EXTERN_METHOD(requestContactCustomerSupport)
 RCT_EXTERN_METHOD(requestGotoCustomerSupportOptions)
 RCT_EXTERN_METHOD(sendEventToHost:(NSString)eventName properties:(NSDictionary *)properties)
 RCT_EXTERN_METHOD(generateHapticFeedback)
+RCT_EXTERN_METHOD(toggleUndoButton:(BOOL)isDisabled)
+RCT_EXTERN_METHOD(toggleRedoButton:(BOOL)isDisabled)
 
 @end

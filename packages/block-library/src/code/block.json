@@ -10,7 +10,8 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-			"selector": "code"
+			"selector": "code",
+			"__unstablePreserveWhiteSpace": true
 		}
 	},
 	"supports": {
@@ -31,7 +32,11 @@
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,

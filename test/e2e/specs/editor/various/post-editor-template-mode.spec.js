@@ -151,7 +151,7 @@ class PostEditorTemplateMode {
 
 		await expect(
 			this.editorTopBar.getByRole( 'heading[level=1]' )
-		).toHaveText( 'Editing template: Singular' );
+		).toHaveText( 'Editing template: Single Entries' );
 	}
 
 	async createPostAndSaveDraft() {
@@ -207,6 +207,7 @@ class PostEditorTemplateMode {
 		// Without this, the editor will move focus to body while still typing.
 		// And the save states will not be counted as dirty.
 		// There is likely a bug in the code, waiting for the snackbar above should be enough.
+		// eslint-disable-next-line playwright/no-networkidle
 		await this.page.waitForLoadState( 'networkidle' );
 	}
 

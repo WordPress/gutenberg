@@ -489,7 +489,11 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 
 	const ref = useDropZone( {
 		dropZoneElement,
-		onDrop: onBlockDrop,
+		onDrop( event ) {
+			if ( target ) {
+				onBlockDrop( event );
+			}
+		},
 		onDragLeave() {
 			throttled.cancel();
 			setTarget( null );

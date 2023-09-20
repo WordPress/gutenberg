@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
-	alignmentHelpers,
 	useGlobalStyles,
 } from '@wordpress/components';
 import {
@@ -36,9 +35,7 @@ import { compose, ifCondition, pure } from '@wordpress/compose';
 import BlockEdit from '../block-edit';
 import BlockDraggable from '../block-draggable';
 import BlockInvalidWarning from './block-invalid-warning';
-import BlockMobileToolbar from '../block-mobile-toolbar';
 import BlockOutline from './block-outline';
-import styles from './block.scss';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useSetting from '../use-setting';
@@ -63,27 +60,21 @@ function getWrapperProps( value, getWrapperPropsFunction ) {
 
 function BlockWrapper( {
 	accessibilityLabel,
-	align,
-	blockWidth,
+	blockCategory,
 	children,
 	clientId,
 	draggingClientId,
 	draggingEnabled,
+	hasInnerBlocks,
 	isDescendentBlockSelected,
-	isParentSelected,
+	isRootList,
 	isSelected,
-	isStackedHorizontally,
 	isTouchable,
 	marginHorizontal,
 	marginVertical,
-	onDeleteBlock,
+	name,
 	onFocus,
 } ) {
-	const { width: screenWidth } = useWindowDimensions();
-	const anchorNodeRef = useRef();
-	const { isFullWidth } = alignmentHelpers;
-	const isScreenWidthEqual = blockWidth === screenWidth;
-	const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
 	const blockWrapperStyles = { flex: 1 };
 	const blockWrapperStyle = [
 		blockWrapperStyles,
@@ -104,9 +95,11 @@ function BlockWrapper( {
 			style={ blockWrapperStyle }
 		>
 			<BlockOutline
+				blockCategory={ blockCategory }
+				hasInnerBlocks={ hasInnerBlocks }
+				isRootList={ isRootList }
 				isSelected={ isSelected }
-				isParentSelected={ isParentSelected }
-				screenWidth={ screenWidth }
+				name={ name }
 			/>
 			<BlockDraggable
 				clientId={ clientId }
@@ -116,19 +109,6 @@ function BlockWrapper( {
 			>
 				{ children }
 			</BlockDraggable>
-			<View style={ styles.neutralToolbar } ref={ anchorNodeRef }>
-				{ isSelected && (
-					<BlockMobileToolbar
-						anchorNodeRef={ anchorNodeRef.current }
-						blockWidth={ blockWidth }
-						clientId={ clientId }
-						draggingClientId={ draggingClientId }
-						isFullWidth={ isFullWidthToolbar }
-						isStackedHorizontally={ isStackedHorizontally }
-						onDelete={ onDeleteBlock }
-					/>
-				) }
-			</View>
 		</Pressable>
 	);
 }
@@ -159,9 +139,11 @@ function BlockListBlock( {
 } ) {
 	const {
 		baseGlobalStyles,
+		blockCategory,
 		blockType,
 		draggingClientId,
 		draggingEnabled,
+		hasInnerBlocks,
 		isDescendantOfParentSelected,
 		isDescendentBlockSelected,
 		isParentSelected,
@@ -178,6 +160,7 @@ function BlockListBlock( {
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
+			const currentBlockCategory = currentBlockType?.category;
 			const blockOrder = getBlockIndex( clientId );
 			const descendentBlockSelected = hasSelectedInnerBlock(
 				clientId,
@@ -194,13 +177,15 @@ function BlockListBlock( {
 			const selectedParents = clientId ? parents : [];
 			const descendantOfParentSelected =
 				selectedParents.includes( rootClientId );
-			const hasInnerBlocks = getBlockCount( clientId ) > 0;
+			const blockHasInnerBlocks = getBlockCount( clientId ) > 0;
 
 			// For blocks with inner blocks, we only enable the dragging in the nested
 			// blocks if any of them are selected. This way we prevent the long-press
 			// gesture from being disabled for elements within the block UI.
 			const isDraggingEnabled =
-				! hasInnerBlocks || isSelected || ! descendentBlockSelected;
+				! blockHasInnerBlocks ||
+				isSelected ||
+				! descendentBlockSelected;
 			// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
 			// will be the top in the hierarchy.
 			const currentDraggingClientId =
@@ -211,9 +196,11 @@ function BlockListBlock( {
 
 			return {
 				baseGlobalStyles: globalStylesBaseStyles,
+				blockCategory: currentBlockCategory,
 				blockType: currentBlockType,
 				draggingClientId: currentDraggingClientId,
 				draggingEnabled: isDraggingEnabled,
+				hasInnerBlocks: blockHasInnerBlocks,
 				isDescendantOfParentSelected: descendantOfParentSelected,
 				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
@@ -295,7 +282,6 @@ function BlockListBlock( {
 		),
 	] );
 
-	const { align } = attributes;
 	const isFocused = isSelected || isDescendentBlockSelected;
 	const isTouchable =
 		isSelected ||
@@ -312,20 +298,20 @@ function BlockListBlock( {
 	return (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
-			align={ align }
-			blockWidth={ blockWidth }
+			blockCategory={ blockCategory }
 			clientId={ clientId }
 			draggingClientId={ draggingClientId }
 			draggingEnabled={ draggingEnabled }
-			isFocused={ isFocused }
+			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
-			isParentSelected={ isParentSelected }
+			isFocused={ isFocused }
+			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
 			marginHorizontal={ marginHorizontal }
 			marginVertical={ marginVertical }
-			onDeleteBlock={ onDeleteBlock }
+			name={ name }
 			onFocus={ onFocus }
 		>
 			{ () =>

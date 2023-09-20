@@ -102,7 +102,6 @@ export class PostPublishButton extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			hasPublishAction,
 			isBeingScheduled,
 			isOpen,
@@ -124,7 +123,6 @@ export class PostPublishButton extends Component {
 
 		const isButtonDisabled =
 			( isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				isPostSavingLocked ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
@@ -133,7 +131,6 @@ export class PostPublishButton extends Component {
 		const isToggleDisabled =
 			( isPublished ||
 				isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
@@ -187,7 +184,6 @@ export class PostPublishButton extends Component {
 			: __( 'Publish' );
 		const buttonChildren = (
 			<PublishButtonLabel
-				forceIsSaving={ forceIsSaving }
 				hasNonPostEntityChanges={ hasNonPostEntityChanges }
 			/>
 		);
@@ -231,10 +227,9 @@ export default compose( [
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
-		const _isAutoSaving = isAutosavingPost();
 		return {
-			isSaving: isSavingPost() || _isAutoSaving,
-			isAutoSaving: _isAutoSaving,
+			isSaving: isSavingPost(),
+			isAutoSaving: isAutosavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),

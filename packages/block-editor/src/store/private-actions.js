@@ -3,11 +3,6 @@
  */
 import { Platform } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { blockTypePromptMessages } from '../components/block-removal-warning-modal';
-
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -28,13 +23,15 @@ const privateSettings = [
  * Action that updates the block editor settings and
  * conditionally preserves the experimental ones.
  *
- * @param {Object}  settings                  Updated settings
- * @param {boolean} stripExperimentalSettings Whether to strip experimental settings.
+ * @param {Object}  settings                          Updated settings
+ * @param {Object}  options                           Options object.
+ * @param {boolean} options.stripExperimentalSettings Whether to strip experimental settings.
+ * @param {boolean} options.reset                     Whether to reset the settings.
  * @return {Object} Action object
  */
 export function __experimentalUpdateSettings(
 	settings,
-	stripExperimentalSettings = false
+	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
 	let cleanSettings = settings;
 	// There are no plugins in the mobile apps, so there is no
@@ -50,6 +47,7 @@ export function __experimentalUpdateSettings(
 	return {
 		type: 'UPDATE_SETTINGS',
 		settings: cleanSettings,
+		reset,
 	};
 }
 
@@ -76,45 +74,6 @@ export function showBlockInterface() {
 }
 
 /**
- * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
- */
-
-/**
- * Sets the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string}           clientId The block client ID, or `''` for the root container.
- * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
- *                                    `'contentOnly'`, or `'default'`.
- *
- * @return {Object} Action object.
- */
-export function setBlockEditingMode( clientId = '', mode ) {
-	return {
-		type: 'SET_BLOCK_EDITING_MODE',
-		clientId,
-		mode,
-	};
-}
-
-/**
- * Clears the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string} clientId The block client ID, or `''` for the root container.
- *
- * @return {Object} Action object.
- */
-export function unsetBlockEditingMode( clientId = '' ) {
-	return {
-		type: 'UNSET_BLOCK_EDITING_MODE',
-		clientId,
-	};
-}
-
-/**
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
@@ -133,7 +92,7 @@ export function unsetBlockEditingMode( clientId = '' ) {
  */
 export const privateRemoveBlocks =
 	( clientIds, selectPrevious = true, forceRemove = false ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
 		}
@@ -155,35 +114,22 @@ export const privateRemoveBlocks =
 		// confirmation that they intended to remove such block(s). However,
 		// the editor instance is responsible for presenting those confirmation
 		// prompts to the user. Any instance opting into removal prompts must
-		// register using `toggleRemovalPromptSupport()`.
+		// register using `setBlockRemovalRules()`.
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
-		if (
-			! forceRemove &&
-			// FIXME: Without this existence check, the unit tests for
-			// `__experimentalDeleteReusableBlock` in
-			// `packages/reusable-blocks/src/store/test/actions.js` fail due to
-			// the fact that the `registry` object passed to the thunk actions
-			// doesn't include this private action. This needs to be
-			// investigated to understand whether it's a real smell or if it's
-			// because not all store code has been updated to accommodate
-			// private selectors.
-			select.isRemovalPromptSupported &&
-			select.isRemovalPromptSupported()
-		) {
+		const rules = ! forceRemove && select.getBlockRemovalRules();
+		if ( rules ) {
 			const blockNamesForPrompt = new Set();
 
 			// Given a list of client IDs of blocks that the user intended to
 			// remove, perform a tree search (BFS) to find all block names
 			// corresponding to "important" blocks, i.e. blocks that require a
 			// removal prompt.
-			//
-			// @see blockTypePromptMessages
 			const queue = [ ...clientIds ];
 			while ( queue.length ) {
 				const clientId = queue.shift();
 				const blockName = select.getBlockName( clientId );
-				if ( blockTypePromptMessages[ blockName ] ) {
+				if ( rules[ blockName ] ) {
 					blockNamesForPrompt.add( blockName );
 				}
 				const innerBlocks = select.getBlockOrder( clientId );
@@ -194,7 +140,7 @@ export const privateRemoveBlocks =
 			// skip any other steps (thus postponing actual removal).
 			if ( blockNamesForPrompt.size ) {
 				dispatch(
-					displayRemovalPrompt(
+					displayBlockRemovalPrompt(
 						clientIds,
 						selectPrevious,
 						Array.from( blockNamesForPrompt )
@@ -208,11 +154,14 @@ export const privateRemoveBlocks =
 			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch( ensureDefaultBlock() );
+		} );
 	};
 
 /**
@@ -246,7 +195,7 @@ export const ensureDefaultBlock =
  * Returns an action object used in signalling that a block removal prompt must
  * be displayed.
  *
- * Contrast with `toggleRemovalPromptSupport`.
+ * Contrast with `setBlockRemovalRules`.
  *
  * @param {string|string[]} clientIds           Client IDs of blocks to remove.
  * @param {boolean}         selectPrevious      True if the previous block
@@ -254,16 +203,19 @@ export const ensureDefaultBlock =
  *                                              (if no previous block exists)
  *                                              should be selected
  *                                              when a block is removed.
- * @param {string[]}        blockNamesForPrompt Names of blocks requiring user
+ * @param {string[]}        blockNamesForPrompt Names of the blocks that
+ *                                              triggered the need for
+ *                                              confirmation before removal.
+ *
  * @return {Object} Action object.
  */
-export function displayRemovalPrompt(
+function displayBlockRemovalPrompt(
 	clientIds,
 	selectPrevious,
 	blockNamesForPrompt
 ) {
 	return {
-		type: 'DISPLAY_REMOVAL_PROMPT',
+		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
 		blockNamesForPrompt,
@@ -277,24 +229,64 @@ export function displayRemovalPrompt(
  *
  * @return {Object} Action object.
  */
-export function clearRemovalPrompt() {
+export function clearBlockRemovalPrompt() {
 	return {
-		type: 'CLEAR_REMOVAL_PROMPT',
+		type: 'CLEAR_BLOCK_REMOVAL_PROMPT',
 	};
 }
 
 /**
- * Returns an action object used in signalling that a removal prompt display
- * mechanism is available or unavailable in the current editor.
+ * Returns an action object used to set up any rules that a block editor may
+ * provide in order to prevent a user from accidentally removing certain
+ * blocks. These rules are then used to display a confirmation prompt to the
+ * user. For instance, in the Site Editor, the Query Loop block is important
+ * enough to warrant such confirmation.
  *
- * Contrast with `displayRemovalPrompt`.
+ * IMPORTANT: Registering rules implicitly signals to the `privateRemoveBlocks`
+ * action that the editor will be responsible for displaying block removal
+ * prompts and confirming deletions. This action is meant to be used by
+ * component `BlockRemovalWarningModal` only.
  *
- * @param {boolean} status Whether a prompt display mechanism exists.
+ * The data is a record whose keys are block types (e.g. 'core/query') and
+ * whose values are the explanation to be shown to users (e.g. 'Query Loop
+ * displays a list of posts or pages.').
+ *
+ * Contrast with `displayBlockRemovalPrompt`.
+ *
+ * @param {Record<string,string>|false} rules Block removal rules.
  * @return {Object} Action object.
  */
-export function toggleRemovalPromptSupport( status = true ) {
+export function setBlockRemovalRules( rules = false ) {
 	return {
-		type: 'TOGGLE_REMOVAL_PROMPT_SUPPORT',
-		status,
+		type: 'SET_BLOCK_REMOVAL_RULES',
+		rules,
+	};
+}
+
+/**
+ * Sets the client ID of the block settings menu that is currently open.
+ *
+ * @param {?string} clientId The block client ID.
+ * @return {Object} Action object.
+ */
+export function setOpenedBlockSettingsMenu( clientId ) {
+	return {
+		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+		clientId,
+	};
+}
+
+export function setStyleOverride( id, style ) {
+	return {
+		type: 'SET_STYLE_OVERRIDE',
+		id,
+		style,
+	};
+}
+
+export function deleteStyleOverride( id ) {
+	return {
+		type: 'DELETE_STYLE_OVERRIDE',
+		id,
 	};
 }

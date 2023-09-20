@@ -5,6 +5,7 @@ import {
 	addBlock,
 	getBlock,
 	initializeEditor,
+	selectRangeInRichText,
 	setupCoreBlocks,
 	getEditorHtml,
 	fireEvent,
@@ -62,10 +63,13 @@ describe( 'Quote', () => {
 		typeInRichText( quoteTextInput, 'Again.' );
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		typeInRichText( citationTextInput, 'A person', {
-			finalSelectionStart: 2,
-			finalSelectionEnd: 2,
+		typeInRichText( citationTextInput, 'A person' );
+		fireEvent( citationTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
 		} );
+		selectRangeInRichText( citationTextInput, 2 );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -82,7 +86,11 @@ describe( 'Quote', () => {
 		<!-- wp:paragraph -->
 		<p>Again.</p>
 		<!-- /wp:paragraph --><cite>A <br>person</cite></blockquote>
-		<!-- /wp:quote -->"
+		<!-- /wp:quote -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

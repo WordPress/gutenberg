@@ -22,16 +22,25 @@ const BlockDraggable = ( {
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
-			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
-				select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
+			const {
+				canMoveBlocks,
+				getBlockRootClientId,
+				getBlockName,
+				getBlockAttributes,
+			} = select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const blockName = getBlockName( clientIds[ 0 ] );
+			const variation = getActiveBlockVariation(
+				blockName,
+				getBlockAttributes( clientIds[ 0 ] )
+			);
 
 			return {
 				srcRootClientId: rootClientId,
 				isDraggable: canMoveBlocks( clientIds, rootClientId ),
-				icon: getBlockType( blockName )?.icon,
+				icon: variation?.icon || getBlockType( blockName )?.icon,
 			};
 		},
 		[ clientIds ]

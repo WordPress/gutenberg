@@ -179,4 +179,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestGotoCustomerSupportOptions();
 
     void sendEventToHost(String eventName, ReadableMap properties);
+
+    void toggleUndoButton(boolean isDisabled);
+
+    void toggleRedoButton(boolean isDisabled);
 }

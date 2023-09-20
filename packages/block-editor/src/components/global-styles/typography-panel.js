@@ -19,6 +19,7 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 
@@ -32,6 +33,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -43,6 +45,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasWritingMode ||
 		hasTextColumns
 	);
 }
@@ -103,8 +106,27 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasWritingModeControl( settings ) {
+	return settings?.typography?.writingMode;
+}
+
 function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
+}
+
+function getUniqueFontSizesBySlug( settings ) {
+	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
+	const fontSizes = []
+		.concat( fontSizesPerOrigin?.custom ?? [] )
+		.concat( fontSizesPerOrigin?.theme ?? [] )
+		.concat( fontSizesPerOrigin.default ?? [] );
+
+	return fontSizes.reduce( ( acc, currentSize ) => {
+		if ( ! acc.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			acc.push( currentSize );
+		}
+		return acc;
+	}, [] );
 }
 
 function TypographyToolsPanel( {
@@ -138,6 +160,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	writingMode: true,
 	textColumns: true,
 };
 
@@ -181,11 +204,8 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
+	const fontSizes = getUniqueFontSizesBySlug( settings );
+
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
@@ -309,6 +329,21 @@ export default function TypographyPanel( {
 	};
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
+
+	// Text Orientation
+	const hasWritingModeControl = useHasWritingModeControl( settings );
+	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
+	const setWritingMode = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'writingMode' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasWritingMode = () => !! value?.typography?.writingMode;
+	const resetWritingMode = () => setWritingMode( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -453,6 +488,23 @@ export default function TypographyPanel( {
 						onChange={ setTextDecoration }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

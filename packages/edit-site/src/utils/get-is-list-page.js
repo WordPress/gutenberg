@@ -15,9 +15,10 @@ export default function getIsListPage(
 ) {
 	return (
 		path === '/wp_template/all' ||
-		( path === '/library' &&
-			// Don't treat "/library" without categoryType and categoryId as a list page
-			// in mobile because the sidebar covers the whole page.
+		path === '/wp_template_part/all' ||
+		( path === '/patterns' &&
+			// Don't treat "/patterns" without categoryType and categoryId as a
+			// list page in mobile because the sidebar covers the whole page.
 			( ! isMobileViewport || ( !! categoryType && !! categoryId ) ) )
 	);
 }

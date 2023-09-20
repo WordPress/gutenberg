@@ -54,7 +54,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.ui.theme };
+			color: ${ COLORS.theme.accent };
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;
@@ -82,7 +82,9 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		default: css`
 			height: 100%;
 			border: 1px solid transparent;
-			transition: box-shadow 0.1s linear, border 0.1s linear;
+			transition:
+				box-shadow 0.1s linear,
+				border 0.1s linear;
 
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 

@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { BlockIcon, RichText, useBlockProps } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
+import { Placeholder } from '@wordpress/components';
+import { formatListNumbered as icon } from '@wordpress/icons';
 
 export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const [ meta, updateMeta ] = useEntityProp(
@@ -12,10 +15,52 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		postId
 	);
 	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
+	const blockProps = useBlockProps();
+
+	if ( postType !== 'post' && postType !== 'page' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ icon } /> }
+					label={ __( 'Footnotes' ) }
+					instructions={ __(
+						'Footnotes are not supported here. Add this block to post or page content.'
+					) }
+				/>
+			</div>
+		);
+	}
+
+	if ( ! footnotes.length ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ icon } /> }
+					label={ __( 'Footnotes' ) }
+					instructions={ __(
+						'Footnotes found in blocks within this document will be displayed here.'
+					) }
+				/>
+			</div>
+		);
+	}
+
 	return (
-		<ol { ...useBlockProps() }>
+		<ol { ...blockProps }>
 			{ footnotes.map( ( { id, content } ) => (
-				<li key={ id }>
+				/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
+				<li
+					key={ id }
+					onMouseDown={ ( event ) => {
+						// When clicking on the list item (not on descendants),
+						// focus the rich text element since it's only 1px wide when
+						// empty.
+						if ( event.target === event.currentTarget ) {
+							event.target.firstElementChild.focus();
+							event.preventDefault();
+						}
+					} }
+				>
 					<RichText
 						id={ id }
 						tagName="span"

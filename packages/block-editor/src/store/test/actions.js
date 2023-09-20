@@ -54,6 +54,8 @@ const {
 	updateSettings,
 	validateBlocksToTemplate,
 	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
 } = actions;
 
 describe( 'actions', () => {
@@ -216,8 +218,10 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlock( 'chicken', block )( { select, dispatch } );
+			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -281,8 +285,13 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
+			replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -314,6 +323,8 @@ describe( 'actions', () => {
 				getBlockCount: () => 1,
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -321,7 +332,7 @@ describe( 'actions', () => {
 				null,
 				null,
 				meta
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -618,12 +629,14 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => undefined,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
+			const registry = createRegistry();
 
-			removeBlocks( clientIds )( { select, dispatch } );
+			removeBlocks( clientIds )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -728,12 +741,13 @@ describe( 'actions', () => {
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
-
-			removeBlock( clientId )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlock( clientId )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -746,18 +760,23 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', () => {
+		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', async () => {
 			const clientId = 'myclientid';
 
 			const select = {
 				getBlockRootClientId: () => null,
 				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
 
-			removeBlocks( [ clientId ], false )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlocks(
+				[ clientId ],
+				false
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
 
@@ -1314,6 +1333,32 @@ describe( 'actions', () => {
 						{ ...category, isExternalResource: true },
 					],
 				},
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
 		} );
 	} );

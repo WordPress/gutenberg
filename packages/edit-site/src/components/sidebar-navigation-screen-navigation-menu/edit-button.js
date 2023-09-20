@@ -2,23 +2,20 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { unlock } from '../../lock-unlock';
+import { useLink } from '../routes/link';
 
-export default function EditButton() {
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
+export default function EditButton( { postId } ) {
+	const linkInfo = useLink( {
+		postId,
+		postType: 'wp_navigation',
+		canvas: 'edit',
+	} );
 	return (
-		<SidebarButton
-			onClick={ () => setCanvasMode( 'edit' ) }
-			label={ __( 'Edit' ) }
-			icon={ pencil }
-		/>
+		<SidebarButton { ...linkInfo } label={ __( 'Edit' ) } icon={ pencil } />
 	);
 }
