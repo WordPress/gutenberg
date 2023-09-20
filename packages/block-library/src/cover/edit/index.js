@@ -362,8 +362,9 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
 		const newIsDark = compositeIsDark(
-			dimRatio,
+			newDimRatio,
 			newOverlayColor,
 			averageBackgroundColor
 		);
@@ -372,7 +373,7 @@ function CoverEdit( {
 			id: undefined,
 			url: undefined,
 			useFeaturedImage: newUseFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			dimRatio: newDimRatio,
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
