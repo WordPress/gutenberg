@@ -16,51 +16,20 @@ import { useState } from '@wordpress/element';
 import Tabs from '..';
 import type { TabsProps } from '../types';
 import cleanupTooltip from '../../tooltip/test/utils';
+import type { IconType } from '../../icon';
 
-const UncontrolledTabs = ( props?: Omit< TabsProps, 'children' | 'tabs' > ) => {
-	return (
-		<Tabs { ...props }>
-			<Tabs.TabList>
-				{ TABS.map( ( tab ) => (
-					<Tabs.Tab
-						key={ tab.id }
-						id={ tab.id }
-						title={ tab.title }
-						className={ tab.tab.className }
-					>
-						{ tab.title }
-					</Tabs.Tab>
-				) ) }
-			</Tabs.TabList>
-			{ TABS.map( ( tab ) => (
-				<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-					{ tab.content }
-				</Tabs.TabPanel>
-			) ) }
-		</Tabs>
-	);
+type Tab = {
+	id: string;
+	title: string;
+	content: React.ReactNode;
+	tab: {
+		className?: string;
+		icon?: IconType;
+		disabled?: boolean;
+	};
 };
 
-const ControlledTabs = ( props: TabsProps ) => {
-	const [ selectedTabId, setSelectedTabId ] = useState<
-		string | undefined | null
-	>( props?.selectedTabId );
-
-	return (
-		<Tabs
-			{ ...props }
-			selectedTabId={ selectedTabId }
-			onSelect={ ( selectedId ) => {
-				setSelectedTabId( selectedId );
-				props?.onSelect?.( selectedId );
-			} }
-		>
-			{ props.children }
-		</Tabs>
-	);
-};
-
-const TABS = [
+const TABS: Tab[] = [
 	{
 		id: 'alpha',
 		title: 'Alpha',
@@ -81,7 +50,7 @@ const TABS = [
 	},
 ];
 
-const TABS_WITH_DELTA = [
+const TABS_WITH_DELTA: Tab[] = [
 	...TABS,
 	{
 		id: 'delta',
@@ -90,6 +59,83 @@ const TABS_WITH_DELTA = [
 		tab: { className: 'delta-class', icon: media },
 	},
 ];
+
+const UncontrolledTabs = ( {
+	tabs,
+	showTabIcons = false,
+	...props
+}: Omit< TabsProps, 'children' > & {
+	tabs: Tab[];
+	showTabIcons?: boolean;
+} ) => {
+	return (
+		<Tabs { ...props }>
+			<Tabs.TabList>
+				{ tabs.map( ( tabObj ) => (
+					<Tabs.Tab
+						key={ tabObj.id }
+						id={ tabObj.id }
+						title={ tabObj.title }
+						className={ tabObj.tab.className }
+						disabled={ tabObj.tab.disabled }
+						icon={ showTabIcons ? tabObj.tab.icon : undefined }
+					>
+						{ showTabIcons ? null : tabObj.title }
+					</Tabs.Tab>
+				) ) }
+			</Tabs.TabList>
+			{ tabs.map( ( tabObj ) => (
+				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
+					{ tabObj.content }
+				</Tabs.TabPanel>
+			) ) }
+		</Tabs>
+	);
+};
+
+const ControlledTabs = ( {
+	tabs,
+	showTabIcons = false,
+	...props
+}: Omit< TabsProps, 'children' > & {
+	tabs: Tab[];
+	showTabIcons?: boolean;
+} ) => {
+	const [ selectedTabId, setSelectedTabId ] = useState<
+		string | undefined | null
+	>( props.selectedTabId );
+
+	return (
+		<Tabs
+			{ ...props }
+			selectedTabId={ selectedTabId }
+			onSelect={ ( selectedId ) => {
+				setSelectedTabId( selectedId );
+				props.onSelect?.( selectedId );
+			} }
+		>
+			<Tabs.TabList>
+				{ tabs.map( ( tabObj ) => (
+					<Tabs.Tab
+						key={ tabObj.id }
+						id={ tabObj.id }
+						title={ tabObj.title }
+						className={ tabObj.tab.className }
+						disabled={ tabObj.tab.disabled }
+						icon={ showTabIcons ? tabObj.tab.icon : undefined }
+					>
+						{ showTabIcons ? null : tabObj.title }
+					</Tabs.Tab>
+				) ) }
+			</Tabs.TabList>
+			{ tabs.map( ( tabObj ) => (
+				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
+					{ tabObj.content }
+				</Tabs.TabPanel>
+			) ) }
+		</Tabs>
+	);
+};
 
 const getSelectedTab = async () =>
 	await screen.findByRole( 'tab', { selected: true } );
@@ -114,7 +160,7 @@ describe( 'Tabs', () => {
 
 	describe( 'Accessibility and semantics', () => {
 		it( 'should use the correct aria attributes', async () => {
-			render( <UncontrolledTabs /> );
+			render( <UncontrolledTabs tabs={ TABS } /> );
 
 			const tabList = screen.getByRole( 'tablist' );
 			const allTabs = screen.getAllByRole( 'tab' );
@@ -144,26 +190,7 @@ describe( 'Tabs', () => {
 		it( 'should display a tooltip when hovering tabs provided with an icon', async () => {
 			const user = userEvent.setup();
 
-			render(
-				<Tabs>
-					<Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								className={ tab.tab.className }
-								icon={ tab.tab.icon }
-							></Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-					{ TABS.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</Tabs>
-			);
+			render( <UncontrolledTabs tabs={ TABS } showTabIcons /> );
 			const allTabs = screen.getAllByRole( 'tab' );
 
 			for ( let i = 0; i < allTabs.length; i++ ) {
@@ -189,24 +216,11 @@ describe( 'Tabs', () => {
 			const mockOnSelect = jest.fn();
 
 			render(
-				<Tabs onSelect={ mockOnSelect }>
-					<Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								className={ tab.tab.className }
-								icon={ tab.tab.icon }
-							/>
-						) ) }
-					</Tabs.TabList>
-					{ TABS.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</Tabs>
+				<UncontrolledTabs
+					tabs={ TABS }
+					showTabIcons
+					onSelect={ mockOnSelect }
+				/>
 			);
 
 			expect( await getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
@@ -252,9 +266,10 @@ describe( 'Tabs', () => {
 			await cleanupTooltip( user );
 		} );
 	} );
+
 	describe( 'Tab Attributes', () => {
 		it( "should apply the tab's `className` to the tab button", async () => {
-			render( <UncontrolledTabs /> );
+			render( <UncontrolledTabs tabs={ TABS } /> );
 
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -271,7 +286,9 @@ describe( 'Tabs', () => {
 			const user = userEvent.setup();
 			const activeClass = 'my-active-tab';
 
-			render( <UncontrolledTabs activeClass={ activeClass } /> );
+			render(
+				<UncontrolledTabs tabs={ TABS } activeClass={ activeClass } />
+			);
 
 			// Make sure that only the selected tab has the active class
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -301,7 +318,9 @@ describe( 'Tabs', () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
-			render( <UncontrolledTabs onSelect={ mockOnSelect } /> );
+			render(
+				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+			);
 
 			// Alpha is the initially selected tab
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -333,7 +352,9 @@ describe( 'Tabs', () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
-			render( <UncontrolledTabs onSelect={ mockOnSelect } /> );
+			render(
+				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+			);
 
 			// onSelect gets called on the initial render.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
@@ -365,7 +386,9 @@ describe( 'Tabs', () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
-			render( <UncontrolledTabs onSelect={ mockOnSelect } /> );
+			render(
+				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+			);
 
 			// onSelect gets called on the initial render.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
@@ -398,7 +421,7 @@ describe( 'Tabs', () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
-				<UncontrolledTabs onSelect={ mockOnSelect } />
+				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 			);
 
 			// onSelect gets called on the initial render.
@@ -428,6 +451,7 @@ describe( 'Tabs', () => {
 			// left/right arrow keys are replaced by up/down arrow keys.
 			rerender(
 				<UncontrolledTabs
+					tabs={ TABS }
 					onSelect={ mockOnSelect }
 					orientation="vertical"
 				/>
@@ -479,28 +503,23 @@ describe( 'Tabs', () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
+			const TABS_WITH_DELTA_DISABLED = TABS_WITH_DELTA.map( ( tabObj ) =>
+				tabObj.id === 'delta'
+					? {
+							...tabObj,
+							tab: {
+								...tabObj.tab,
+								disabled: true,
+							},
+					  }
+					: tabObj
+			);
+
 			render(
-				<Tabs onSelect={ mockOnSelect }>
-					<Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								className={ tab.tab.className }
-								// Disable delta
-								disabled={ tab.id === 'delta' }
-							>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-					{ TABS_WITH_DELTA.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</Tabs>
+				<UncontrolledTabs
+					tabs={ TABS_WITH_DELTA_DISABLED }
+					onSelect={ mockOnSelect }
+				/>
 			);
 
 			// onSelect gets called on the initial render.
@@ -546,7 +565,7 @@ describe( 'Tabs', () => {
 		it( 'should not focus the next tab when the Tab key is pressed', async () => {
 			const user = userEvent.setup();
 
-			render( <UncontrolledTabs /> );
+			render( <UncontrolledTabs tabs={ TABS } /> );
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
@@ -569,6 +588,7 @@ describe( 'Tabs', () => {
 
 			render(
 				<UncontrolledTabs
+					tabs={ TABS }
 					onSelect={ mockOnSelect }
 					selectOnMove={ false }
 				/>
@@ -614,7 +634,7 @@ describe( 'Tabs', () => {
 	describe( 'Uncontrolled mode', () => {
 		describe( 'Without `initialTabId` prop', () => {
 			it( 'should render first tab', async () => {
-				render( <UncontrolledTabs /> );
+				render( <UncontrolledTabs tabs={ TABS } /> );
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect(
@@ -623,61 +643,31 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should fall back to first enabled tab if the active tab is removed', async () => {
 				const { rerender } = render(
-					<Tabs>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } />
 				);
 
-				rerender(
-					<Tabs>
-						<Tabs.TabList>
-							{ /* Remove alpha */ }
-							{ TABS.slice( 1 ).map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.slice( 1 ).map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
-				);
+				// Remove first item from `TABS` array
+				rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 		} );
+
 		describe( 'With `initialTabId`', () => {
 			it( 'should render the tab set by `initialTabId` prop', async () => {
-				render( <UncontrolledTabs initialTabId="beta" /> );
+				render(
+					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
+				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
 			it( 'should not select a tab when `initialTabId` does not match any known tab', () => {
-				render( <UncontrolledTabs initialTabId="does-not-exist" /> );
+				render(
+					<UncontrolledTabs
+						tabs={ TABS }
+						initialTabId="does-not-exist"
+					/>
+				);
 
 				// No tab should be selected i.e. it doesn't fall back to first tab.
 				expect(
@@ -691,10 +681,12 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should not change tabs when initialTabId is changed', async () => {
 				const { rerender } = render(
-					<UncontrolledTabs initialTabId="beta" />
+					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
 				);
 
-				rerender( <UncontrolledTabs initialTabId="alpha" /> );
+				rerender(
+					<UncontrolledTabs tabs={ TABS } initialTabId="alpha" />
+				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
@@ -704,25 +696,11 @@ describe( 'Tabs', () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
-					<Tabs initialTabId="gamma" onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS }
+						initialTabId="gamma"
+						onSelect={ mockOnSelect }
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
@@ -734,26 +712,11 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				rerender(
-					<Tabs initialTabId="gamma" onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ /* Remove alpha */ }
-							{ TABS.slice( 1 ).map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.slice( 1 ).map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS.slice( 1 ) }
+						initialTabId="gamma"
+						onSelect={ mockOnSelect }
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
@@ -761,50 +724,17 @@ describe( 'Tabs', () => {
 
 			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
 				const { rerender } = render(
-					<Tabs initialTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } initialTabId="gamma" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
+				// Remove gamma
 				rerender(
-					<Tabs initialTabId="gamma">
-						<Tabs.TabList>
-							{ /* Remove gamma */ }
-							{ TABS.slice( 0, 2 ).map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.slice( 0, 2 ).map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS.slice( 0, 2 ) }
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
@@ -820,25 +750,7 @@ describe( 'Tabs', () => {
 
 			it( 'waits for the tab with the `initialTabId` to be present in the `tabs` array before selecting it', async () => {
 				const { rerender } = render(
-					<Tabs initialTabId="delta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } initialTabId="delta" />
 				);
 
 				// There should be no selected tab yet.
@@ -847,57 +759,39 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 
 				rerender(
-					<Tabs initialTabId="delta">
-						<Tabs.TabList>
-							{ TABS_WITH_DELTA.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS_WITH_DELTA }
+						initialTabId="delta"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Delta' );
 			} );
 		} );
+
 		describe( 'Disabled tab', () => {
 			it( 'should disable the tab when `disabled` is `true`', async () => {
 				const user = userEvent.setup();
 				const mockOnSelect = jest.fn();
 
+				const TABS_WITH_DELTA_DISABLED = TABS_WITH_DELTA.map(
+					( tabObj ) =>
+						tabObj.id === 'delta'
+							? {
+									...tabObj,
+									tab: {
+										...tabObj.tab,
+										disabled: true,
+									},
+							  }
+							: tabObj
+				);
+
 				render(
-					<Tabs onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS_WITH_DELTA.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable delta
-									disabled={ tab.id === 'delta' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS_WITH_DELTA_DISABLED }
+						onSelect={ mockOnSelect }
+					/>
 				);
 
 				expect(
@@ -906,36 +800,40 @@ describe( 'Tabs', () => {
 
 				// onSelect gets called on the initial render.
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				// onSelect should not be called since the disabled tab is
 				// highlighted, but not selected.
+				await user.keyboard( '[Tab]' );
 				await user.keyboard( '[ArrowLeft]' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+				// Delta (which is disabled) has focus
+				await waitFor( () =>
+					expect(
+						screen.getByRole( 'tab', { name: 'Delta' } )
+					).toHaveFocus()
+				);
+
+				// Alpha retains the selection, even if it's not focused.
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			} );
 
 			it( 'should select first enabled tab when the initial tab is disabled', async () => {
+				const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'alpha'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
 				const { rerender } = render(
-					<Tabs>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable alpha
-									disabled={ tab.id === 'alpha' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
 				);
 
 				// As alpha (first tab) is disabled,
@@ -943,27 +841,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Re-enable all tabs
-				rerender(
-					<Tabs>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
-				);
+				rerender( <UncontrolledTabs tabs={ TABS } /> );
 
 				// Even if the initial tab becomes enabled again, the selected
 				// tab doesn't change.
@@ -971,27 +849,22 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should select first enabled tab when the tab associated to `initialTabId` is disabled', async () => {
+				const TABS_ONLY_BETA_ENABLED = TABS.map( ( tabObj ) =>
+					tabObj.id !== 'gamma'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
 				const { rerender } = render(
-					<Tabs initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									disabled={ tab.id !== 'gamma' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS_ONLY_BETA_ENABLED }
+						initialTabId="beta"
+					/>
 				);
 
 				// As alpha (first tab), and beta (the initial tab), are both
@@ -1000,25 +873,7 @@ describe( 'Tabs', () => {
 
 				// Re-enable all tabs
 				rerender(
-					<Tabs initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
 				);
 
 				// Even if the initial tab becomes enabled again, the selected tab doesn't
@@ -1029,53 +884,31 @@ describe( 'Tabs', () => {
 			it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 				const { rerender } = render(
-					<Tabs onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
+				const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'alpha'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
+				// Disable alpha
 				rerender(
-					<Tabs onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable alpha
-									disabled={ tab.id === 'alpha' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS_WITH_ALPHA_DISABLED }
+						onSelect={ mockOnSelect }
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
@@ -1084,25 +917,7 @@ describe( 'Tabs', () => {
 
 				// Re-enable all tabs
 				rerender(
-					<Tabs onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
@@ -1114,51 +929,34 @@ describe( 'Tabs', () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = render(
-					<Tabs initialTabId="gamma" onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS }
+						onSelect={ mockOnSelect }
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
+				const TABS_WITH_GAMMA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'gamma'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
+				// Disable gamma
 				rerender(
-					<Tabs initialTabId="gamma" onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable gamma
-									disabled={ tab.id === 'gamma' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS_WITH_GAMMA_DISABLED }
+						onSelect={ mockOnSelect }
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -1167,25 +965,11 @@ describe( 'Tabs', () => {
 
 				// Re-enable all tabs
 				rerender(
-					<Tabs initialTabId="gamma" onSelect={ mockOnSelect }>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<UncontrolledTabs
+						tabs={ TABS }
+						onSelect={ mockOnSelect }
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -1197,25 +981,10 @@ describe( 'Tabs', () => {
 	describe( 'Controlled mode', () => {
 		it( 'should not render any tab if `selectedTabId` does not match any known tab', () => {
 			render(
-				<ControlledTabs selectedTabId="does-not-exist">
-					<Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								className={ tab.tab.className }
-							>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-					{ TABS_WITH_DELTA.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</ControlledTabs>
+				<ControlledTabs
+					tabs={ TABS_WITH_DELTA }
+					selectedTabId="does-not-exist"
+				/>
 			);
 
 			// No tab should be selected i.e. it doesn't fall back to first tab.
@@ -1226,27 +995,24 @@ describe( 'Tabs', () => {
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 		it( 'should not render any tab if `selectedTabId` refers to an disabled tab', async () => {
+			const TABS_WITH_DELTA_WITH_BETA_DISABLED = TABS_WITH_DELTA.map(
+				( tabObj ) =>
+					tabObj.id === 'beta'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+			);
+
 			render(
-				<ControlledTabs selectedTabId="beta">
-					<Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.id }
-								id={ tab.id }
-								title={ tab.title }
-								className={ tab.tab.className }
-								disabled={ tab.id === 'beta' }
-							>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-					{ TABS_WITH_DELTA.map( ( tab ) => (
-						<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-							{ tab.content }
-						</Tabs.TabPanel>
-					) ) }
-				</ControlledTabs>
+				<ControlledTabs
+					tabs={ TABS_WITH_DELTA_WITH_BETA_DISABLED }
+					selectedTabId="beta"
+				/>
 			);
 
 			// No tab should be selected i.e. it doesn't fall back to first tab.
@@ -1260,27 +1026,7 @@ describe( 'Tabs', () => {
 		} );
 		describe( 'Without `initialTabId` prop', () => {
 			it( 'should render the tab specified by the `specifiedTabId` prop', async () => {
-				render(
-					<ControlledTabs selectedTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
-				);
+				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 				expect(
@@ -1289,52 +1035,14 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should not render any tab if the active tab is removed', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
+				// Remove
 				rerender(
-					<ControlledTabs>
-						<Tabs.TabList>
-							{ /* Remove beta */ }
-							{ TABS.filter( ( tab ) => tab.id !== 'beta' ).map(
-								( tab ) => (
-									<Tabs.Tab
-										key={ tab.id }
-										id={ tab.id }
-										title={ tab.title }
-										className={ tab.tab.className }
-									>
-										{ tab.title }
-									</Tabs.Tab>
-								)
-							) }
-						</Tabs.TabList>
-						{ TABS.filter( ( tab ) => tab.id !== 'beta' ).map(
-							( tab ) => (
-								<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-									{ tab.content }
-								</Tabs.TabPanel>
-							)
-						) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
+					/>
 				);
 
 				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
@@ -1352,25 +1060,11 @@ describe( 'Tabs', () => {
 		describe( 'With `initialTabId`', () => {
 			it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
 				render(
-					<ControlledTabs selectedTabId="gamma" initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="gamma"
+						initialTabId="beta"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
@@ -1378,27 +1072,10 @@ describe( 'Tabs', () => {
 			it( 'should render the specified `selectedTabId` when `initialTabId` does not match any known tab', async () => {
 				render(
 					<ControlledTabs
+						tabs={ TABS }
 						selectedTabId="beta"
 						initialTabId="does-not-exist"
-					>
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					/>
 				);
 
 				// No tab should be selected i.e. it doesn't fall back to first tab.
@@ -1406,101 +1083,41 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should not change tabs when initialTabId is changed', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="gamma" initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="gamma"
+						initialTabId="beta"
+					/>
 				);
 
 				rerender(
-					<ControlledTabs selectedTabId="gamma" initialTabId="alpha">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="gamma"
+						initialTabId="alpha"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 			it( 'should not render any tab if the currently active tab is removed', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="beta" initialTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="beta"
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
+				// Remove beta
 				rerender(
-					<ControlledTabs selectedTabId="beta" initialTabId="gamma">
-						<Tabs.TabList>
-							{ /* Remove beta */ }
-							{ TABS.filter( ( tab ) => tab.id !== 'beta' ).map(
-								( tab ) => (
-									<Tabs.Tab
-										key={ tab.id }
-										id={ tab.id }
-										title={ tab.title }
-										className={ tab.tab.className }
-									>
-										{ tab.title }
-									</Tabs.Tab>
-								)
-							) }
-						</Tabs.TabList>
-						{ TABS.filter( ( tab ) => tab.id !== 'beta' ).map(
-							( tab ) => (
-								<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-									{ tab.content }
-								</Tabs.TabPanel>
-							)
-						) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
+						selectedTabId="beta"
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
@@ -1515,50 +1132,22 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="gamma" initialTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="gamma"
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
+				// Remove gamma
 				rerender(
-					<Tabs selectedTabId="gamma" initialTabId="gamma">
-						<Tabs.TabList>
-							{ /* Remove gamma */ }
-							{ TABS.slice( 0, 2 ).map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+					<ControlledTabs
+						tabs={ TABS.slice( 0, 2 ) }
+						selectedTabId="gamma"
+						initialTabId="gamma"
+					/>
 				);
 
 				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
@@ -1573,50 +1162,23 @@ describe( 'Tabs', () => {
 			} );
 			it( 'does not select `initialTabId` if it becomes available after the initial render', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="beta" initialTabId="delta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="beta"
+						initialTabId="delta"
+					/>
 				);
 
 				// The controlled tab, Beta, should be selected.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
+				// Re-render with the tab associated to `initialTabId` available.
 				rerender(
-					<ControlledTabs selectedTabId="beta" initialTabId="delta">
-						<Tabs.TabList>
-							{ TABS_WITH_DELTA.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS_WITH_DELTA.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS_WITH_DELTA }
+						selectedTabId="beta"
+						initialTabId="delta"
+					/>
 				);
 
 				// Beta should remain selected, even after the `initialTabId` of Delta becomes available.
@@ -1625,52 +1187,35 @@ describe( 'Tabs', () => {
 		} );
 		describe( 'Disabled tab', () => {
 			it( 'should render the specified `selectedTabId` (not the first enabled tab) when the tab associated to `initialTabId` is disabled', async () => {
+				const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'beta'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="gamma" initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									disabled={ tab.id === 'beta' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS_WITH_BETA_DISABLED }
+						selectedTabId="gamma"
+						initialTabId="beta"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Re-enable all tabs
 				rerender(
-					<ControlledTabs initialTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						selectedTabId="gamma"
+						initialTabId="beta"
+					/>
 				);
 
 				// Even if the initial tab becomes enabled again, the selected tab doesn't
@@ -1679,51 +1224,28 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should not render any tab when the selected tab becomes disabled', async () => {
 				const { rerender } = render(
-					<ControlledTabs selectedTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
+				const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'beta'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
 				rerender(
-					<ControlledTabs selectedTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable beta
-									disabled={ tab.id === 'beta' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS_WITH_BETA_DISABLED }
+						selectedTabId="beta"
+					/>
 				);
 				// No tab should be selected i.e. it doesn't fall back to first tab.
 				// `waitFor` is needed here to prevent testing library from
@@ -1740,25 +1262,7 @@ describe( 'Tabs', () => {
 
 				// re-enable all tabs
 				rerender(
-					<ControlledTabs selectedTabId="beta">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
 				// If the previously selected tab is reenabled, it should not
@@ -1773,51 +1277,33 @@ describe( 'Tabs', () => {
 			} );
 			it( 'should not render any tab when the tab associated to `initialTabId` becomes disabled while being the active tab', async () => {
 				const { rerender } = render(
-					<ControlledTabs initialTabId="gamma" selectedTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						initialTabId="gamma"
+						selectedTabId="gamma"
+					/>
 				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
+				const TABS_WITH_GAMMA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'gamma'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
 				rerender(
-					<ControlledTabs initialTabId="gamma" selectedTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-									// Disable gamma
-									disabled={ tab.id === 'gamma' }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS_WITH_GAMMA_DISABLED }
+						initialTabId="gamma"
+						selectedTabId="gamma"
+					/>
 				);
 
 				// No tab should be selected i.e. it doesn't fall back to first tab.
@@ -1835,25 +1321,11 @@ describe( 'Tabs', () => {
 
 				// re-enable all tabs
 				rerender(
-					<ControlledTabs initialTabId="gamma" selectedTabId="gamma">
-						<Tabs.TabList>
-							{ TABS.map( ( tab ) => (
-								<Tabs.Tab
-									key={ tab.id }
-									id={ tab.id }
-									title={ tab.title }
-									className={ tab.tab.className }
-								>
-									{ tab.title }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ TABS.map( ( tab ) => (
-							<Tabs.TabPanel key={ tab.id } id={ tab.id }>
-								{ tab.content }
-							</Tabs.TabPanel>
-						) ) }
-					</ControlledTabs>
+					<ControlledTabs
+						tabs={ TABS }
+						initialTabId="gamma"
+						selectedTabId="gamma"
+					/>
 				);
 
 				// If the previously selected tab is reenabled, it should not
