@@ -2,11 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { PanelRow, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
 import { navigation, symbol } from '@wordpress/icons';
 
 /**
@@ -64,12 +63,7 @@ export default function TemplatePanel() {
 			>
 				<TemplateAreas />
 			</SidebarCard>
-			<PanelRow
-				header={ __( 'Editing history' ) }
-				className="edit-site-template-revisions"
-			>
-				<LastRevision />
-			</PanelRow>
+			<LastRevision />
 			{ postType === 'wp_block' && <PatternCategories post={ record } /> }
 		</PanelBody>
 	);
