@@ -50,27 +50,49 @@ const mapping = {
 };
 
 describe( 'buildLinkValueFromData', () => {
-	it( 'build a valid link value from supplied data mapping', () => {
-		const data = {
-			href: 'https://www.google.com',
-			postType: 'post',
-			id: 123,
-			linkTarget: '_blank',
-			linkRel: 'nofollow noopenner sponsored',
-			keyToIgnore: 'valueToIgnore',
-		};
+	it.each( [
+		[
+			{
+				href: 'https://www.google.com',
+				postType: 'post',
+				id: 123,
+				linkTarget: '_blank',
+				linkRel: 'nofollow noopenner sponsored',
+				keyToIgnore: 'valueToIgnore',
+			},
+			{
+				url: 'https://www.google.com',
+				type: 'post',
+				id: 123,
+				opensInNewTab: true,
+				noFollow: true,
+				sponsored: true,
+			},
+		],
+		[
+			{
+				href: 'https://www.google.com',
+				postType: 'post',
+				id: 123,
+				linkRel: 'sponsored neyfollow',
+			},
+			{
+				url: 'https://www.google.com',
+				type: 'post',
+				id: 123,
+				opensInNewTab: false,
+				noFollow: false,
+				sponsored: true,
+			},
+		],
+	] )(
+		'build a valid link value from supplied data mapping',
+		( data, expected ) => {
+			const linkValue = buildLinkValueFromData( data, mapping );
 
-		const linkValue = buildLinkValueFromData( data, mapping );
-
-		expect( linkValue ).toEqual( {
-			url: 'https://www.google.com',
-			type: 'post',
-			id: 123,
-			opensInNewTab: true,
-			noFollow: true,
-			sponsored: true,
-		} );
-	} );
+			expect( linkValue ).toEqual( expected );
+		}
+	);
 } );
 
 describe( 'buildDataFromLinkValue', () => {
