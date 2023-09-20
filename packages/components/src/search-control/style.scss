@@ -4,7 +4,7 @@
 	input[type="search"].components-search-control__input {
 		@include input-control;
 		display: block;
-		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
+		padding: 0 $grid-unit-60 0 $grid-unit-20;
 		background: $gray-100;
 		border: none;
 		width: 100%;
@@ -36,21 +36,28 @@
 			-webkit-appearance: none;
 		}
 	}
+
+	&.is-next-40px-default-size input[type="search"].components-search-control__input {
+		height: $grid-unit-50;
+	}
+
+	&.is-size-compact input[type="search"].components-search-control__input {
+		height: $grid-unit-40;
+	}
+
 }
 
 .components-search-control__icon {
 	position: absolute;
-	top: 0;
-	width: $icon-size;
 	right: ( $grid-unit-60 - $icon-size ) * 0.5;
-	bottom: 0;
+	top: 50%;
+	transform: translateY(-50%);
+
 	display: flex;
 	align-items: center;
 	justify-content: center;
 
-	> svg {
-		margin: $grid-unit-10 0;
-	}
+	width: $icon-size;
 }
 
 .components-search-control__input-wrapper {

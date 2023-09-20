@@ -10,56 +10,60 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-export const USER_PATTERN_CATEGORY = 'my-patterns';
-
-export const SYNC_TYPES = {
-	full: undefined,
-	unsynced: 'unsynced',
-};
 
 /**
  * Internal dependencies
  */
-import { store } from '../store';
+import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
+
+/**
+ * Internal dependencies
+ */
+import { store as patternsStore } from '../store';
+import CategorySelector from './category-selector';
+import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
 	onSuccess,
 	onError,
-	clientIds,
+	content,
 	onClose,
 	className = 'patterns-menu-items__convert-modal',
 } ) {
-	const [ syncType, setSyncType ] = useState( SYNC_TYPES.full );
+	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
+	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
-	const { createPattern } = useDispatch( store );
+	const { createPattern } = unlock( useDispatch( patternsStore ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const onCreate = useCallback(
-		async function ( patternTitle, sync ) {
-			try {
-				const newPattern = await createPattern(
-					patternTitle,
-					sync,
-					clientIds
-				);
-				onSuccess( {
-					pattern: newPattern,
-					categoryId: USER_PATTERN_CATEGORY,
-				} );
-			} catch ( error ) {
-				createErrorNotice( error.message, {
-					type: 'snackbar',
-					id: 'convert-to-pattern-error',
-				} );
-				onError();
-			}
-		},
-		[ createPattern, clientIds, onSuccess, createErrorNotice, onError ]
-	);
+	async function onCreate( patternTitle, sync ) {
+		try {
+			const newPattern = await createPattern(
+				patternTitle,
+				sync,
+				typeof content === 'function' ? content() : content,
+				categories
+			);
+			onSuccess( {
+				pattern: newPattern,
+				categoryId: PATTERN_DEFAULT_CATEGORY,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: 'convert-to-pattern-error',
+			} );
+			onError();
+		}
+	}
+
+	const handleCategorySelection = ( selectedCategories ) => {
+		setCategories( selectedCategories.map( ( cat ) => cat.id ) );
+	};
+
 	return (
 		<Modal
 			title={ __( 'Create pattern' ) }
@@ -83,19 +87,22 @@ export default function CreatePatternModal( {
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
+						className="patterns-create-modal__name-input"
 					/>
-
+					<CategorySelector
+						onCategorySelection={ handleCategorySelection }
+					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
 						help={ __(
 							'Editing the pattern will update it anywhere it is used.'
 						) }
-						checked={ ! syncType }
+						checked={ syncType === PATTERN_SYNC_TYPES.full }
 						onChange={ () => {
 							setSyncType(
-								syncType === SYNC_TYPES.full
-									? SYNC_TYPES.unsynced
-									: SYNC_TYPES.full
+								syncType === PATTERN_SYNC_TYPES.full
+									? PATTERN_SYNC_TYPES.unsynced
+									: PATTERN_SYNC_TYPES.full
 							);
 						} }
 					/>

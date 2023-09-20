@@ -55,7 +55,7 @@ function onInstall() {
 lazyImport( 'fbjs@^1.0.0', {
 	localPath: './lib/shallowEqual',
 	onInstall,
-} ).then(/* ... */);
+} ).then( /* ... */ );
 ```
 
 Note that `lazyImport` can throw an error when offline and unable to install the dependency using NPM. You may want to anticipate this and provide remediation steps for a failed install, such as logging a warning messsage:

@@ -458,7 +458,6 @@ _Parameters_
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
 -   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
--   _options.disableFilters_ `[boolean]`: Whether or not to filter non semantic content.
 
 _Returns_
 

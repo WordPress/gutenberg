@@ -40,9 +40,8 @@ test.describe( 'Cover', () => {
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
-		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
-			coverBlock
-		);
+		const [ blackRGB ] =
+			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
