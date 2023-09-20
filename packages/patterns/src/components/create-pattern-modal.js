@@ -36,16 +36,18 @@ export default function CreatePatternModal( {
 	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
 	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
+	const [ categorySaving, setCategorySaving ] = useState();
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	async function onCreate( patternTitle, sync ) {
+
+	async function addPattern( patternTitle, sync, patternCategories ) {
 		try {
 			const newPattern = await createPattern(
 				patternTitle,
 				sync,
 				typeof content === 'function' ? content() : content,
-				categories
+				patternCategories
 			);
 			onSuccess( {
 				pattern: newPattern,
@@ -58,6 +60,21 @@ export default function CreatePatternModal( {
 			} );
 			onError();
 		}
+	}
+
+	function onCreate( patternTitle, sync ) {
+		// Check that any onBlur save of the categories is completed
+		// before creating the pattern and closing the modal.
+		if ( categorySaving ) {
+			return categorySaving.then( ( newTerms ) => {
+				addPattern(
+					patternTitle,
+					sync,
+					newTerms.map( ( cat ) => cat.id )
+				);
+			} );
+		}
+		addPattern( patternTitle, sync, categories );
 	}
 
 	const handleCategorySelection = ( selectedCategories ) => {
@@ -91,6 +108,7 @@ export default function CreatePatternModal( {
 					/>
 					<CategorySelector
 						onCategorySelection={ handleCategorySelection }
+						setCategorySaving={ setCategorySaving }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }

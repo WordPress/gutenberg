@@ -29,7 +29,10 @@ const DEFAULT_QUERY = {
 };
 const slug = 'wp_pattern_category';
 
-export default function CategorySelector( { onCategorySelection } ) {
+export default function CategorySelector( {
+	onCategorySelection,
+	setCategorySaving,
+} ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
@@ -92,13 +95,21 @@ export default function CategorySelector( { onCategorySelection } ) {
 
 		setValues( uniqueTerms );
 
-		Promise.all(
-			uniqueTerms.map( ( termName ) =>
-				findOrCreateTerm( { name: termName } )
-			)
-		).then( ( newTerms ) => {
-			onCategorySelection( newTerms );
+		// If the user clicks the create pattern modal button directly after entering
+		// a category we need to return a promise so the pattern doesn't save before
+		// the save of the categories is completed.
+		const categorySaving = new Promise( function ( resolve ) {
+			Promise.all(
+				uniqueTerms.map( ( termName ) =>
+					findOrCreateTerm( { name: termName } )
+				)
+			).then( ( newTerms ) => {
+				setCategorySaving();
+				onCategorySelection( newTerms );
+				resolve( newTerms );
+			} );
 		} );
+		setCategorySaving( categorySaving );
 	}
 
 	return (
