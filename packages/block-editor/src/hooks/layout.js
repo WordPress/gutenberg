@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -17,6 +17,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useId } from '@wordpress/element';
 
 /**
  * Internal dependencies

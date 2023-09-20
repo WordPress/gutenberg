@@ -12,9 +12,9 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useMemo, Platform } from '@wordpress/element';
+import { useMemo, Platform, useId } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -361,7 +361,7 @@ export const withPositionStyles = createHigherOrderComponent(
 		const allowPositionStyles =
 			hasPositionBlockSupport && ! isPositionDisabled;
 
-		const id = useInstanceId( BlockListBlock );
+		const id = useId();
 
 		// Higher specificity to override defaults in editor UI.
 		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;

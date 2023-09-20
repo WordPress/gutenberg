@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useId } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
@@ -400,7 +400,7 @@ const elementTypes = [
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+		const blockElementsContainerIdentifier = `wp-elements-${ useId(
 			BlockListBlock
 		) }`;
 
