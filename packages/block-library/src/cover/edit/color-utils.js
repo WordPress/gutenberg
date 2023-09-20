@@ -101,7 +101,7 @@ export const getMediaColor = memoize( async ( url ) => {
 /**
  * Computes if the color combination of the overlay and background color is dark.
  *
- * @param {number} dimRatio        Opacity of the overlay.
+ * @param {number} dimRatio        Opacity of the overlay between 0 and 100.
  * @param {string} overlayColor    CSS color string for the overlay.
  * @param {string} backgroundColor CSS color string for the background.
  *
