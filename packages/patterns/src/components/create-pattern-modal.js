@@ -62,17 +62,17 @@ export default function CreatePatternModal( {
 		}
 	}
 
-	function onCreate( patternTitle, sync ) {
+	async function onCreate( patternTitle, sync ) {
 		// Check that any onBlur save of the categories is completed
 		// before creating the pattern and closing the modal.
 		if ( categorySaving ) {
-			return categorySaving.then( ( newTerms ) => {
-				addPattern(
-					patternTitle,
-					sync,
-					newTerms.map( ( cat ) => cat.id )
-				);
-			} );
+			const newTerms = await categorySaving;
+			addPattern(
+				patternTitle,
+				sync,
+				newTerms.map( ( cat ) => cat.id )
+			);
+			return;
 		}
 		addPattern( patternTitle, sync, categories );
 	}
