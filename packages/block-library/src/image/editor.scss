@@ -100,8 +100,8 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block[data-align="center"],
 .wp-block[data-align="right"] {
 	> .wp-block-image {
-		display: table;
-
+		display: flex;
+		float: none!important;
 		> figcaption {
 			display: table-caption;
 			caption-side: bottom;
@@ -114,6 +114,7 @@ figure.wp-block-image:not(.wp-block) {
 	margin-left: 0;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
+	justify-content: flex-start;
 }
 
 .wp-block[data-align="right"] > .wp-block-image {
@@ -121,6 +122,7 @@ figure.wp-block-image:not(.wp-block) {
 	margin-right: 0;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
+	justify-content: flex-end;
 }
 
 .wp-block[data-align="center"] > .wp-block-image {
