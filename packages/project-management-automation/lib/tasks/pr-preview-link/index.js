@@ -6,7 +6,7 @@
 const debug = require( '../../debug' );
 
 /** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
-/** @typedef {any} WorkflowRunEvent */
+/** @typedef {import('@octokit/webhooks-types').WorkflowRunEvent} WorkflowRunEvent */
 
 /**
  * Identifier used to find existing comment.
