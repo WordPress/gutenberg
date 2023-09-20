@@ -360,13 +360,11 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
-		const newIsDark = newUseFeaturedImage
-			? compositeIsDark(
-					dimRatio,
-					newOverlayColor,
-					averageBackgroundColor
-			  )
-			: isDark;
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
 
 		setAttributes( {
 			id: undefined,
