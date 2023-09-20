@@ -263,6 +263,7 @@ export default function PatternCategories( { post } ) {
 					removed: termRemovedLabel,
 					remove: removeTermLabel,
 				} }
+				tokenizeOnBlur
 			/>
 		</PanelRow>
 	);

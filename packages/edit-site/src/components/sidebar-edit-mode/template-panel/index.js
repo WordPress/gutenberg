@@ -17,6 +17,7 @@ import TemplateAreas from './template-areas';
 import LastRevision from './last-revision';
 import SidebarCard from '../sidebar-card';
 import PatternCategories from './pattern-categories';
+import { PATTERN_TYPES } from '../../../utils/constants';
 
 const CARD_ICONS = {
 	wp_block: symbol,
@@ -64,7 +65,9 @@ export default function TemplatePanel() {
 				<TemplateAreas />
 			</SidebarCard>
 			<LastRevision />
-			{ postType === 'wp_block' && <PatternCategories post={ record } /> }
+			{ postType === PATTERN_TYPES.user && (
+				<PatternCategories post={ record } />
+			) }
 		</PanelBody>
 	);
 }
