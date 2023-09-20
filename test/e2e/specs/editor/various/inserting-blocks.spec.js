@@ -155,8 +155,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		await expect( insertingBlocksUtils.indicator ).not.toBeVisible();
-		await expect( insertingBlocksUtils.draggableChip ).not.toBeVisible();
+		await expect( insertingBlocksUtils.indicator ).toBeHidden();
+		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
 		await page.mouse.up();
 
@@ -294,8 +294,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		await expect( insertingBlocksUtils.indicator ).not.toBeVisible();
-		await expect( insertingBlocksUtils.draggableChip ).not.toBeVisible();
+		await expect( insertingBlocksUtils.indicator ).toBeHidden();
+		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
 		await page.mouse.up();
 

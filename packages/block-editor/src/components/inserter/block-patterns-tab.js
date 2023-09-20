@@ -74,7 +74,7 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 }
 
 export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
-	const { patterns: allPatterns, allCategories } = usePatternsState(
+	const [ patterns, allCategories ] = usePatternsState(
 		undefined,
 		rootClientId
 	);
@@ -82,12 +82,12 @@ export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 	const filteredPatterns = useMemo(
 		() =>
 			sourceFilter === 'all'
-				? allPatterns
-				: allPatterns.filter(
+				? patterns
+				: patterns.filter(
 						( pattern ) =>
 							! isPatternFiltered( pattern, sourceFilter )
 				  ),
-		[ sourceFilter, allPatterns ]
+		[ sourceFilter, patterns ]
 	);
 
 	const hasRegisteredCategory = useCallback(
@@ -192,7 +192,7 @@ export function BlockPatternsCategoryPanel( {
 	showTitlesAsTooltip,
 	patternFilter,
 } ) {
-	const { patterns: allPatterns, onClickPattern } = usePatternsState(
+	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
