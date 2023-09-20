@@ -24,6 +24,10 @@ interface TraceEvent {
 	};
 }
 
+interface Trace {
+	traceEvents: TraceEvent[];
+}
+
 interface LoadingDurations {
 	serverResponse: number;
 	firstPaint: number;
@@ -40,7 +44,7 @@ type MetricsConstructorProps = {
 export class Metrics {
 	browser: Browser;
 	page: Page;
-	trace: { traceEvents: TraceEvent[] };
+	trace: Trace;
 
 	constructor( { page }: MetricsConstructorProps ) {
 		this.page = page;
