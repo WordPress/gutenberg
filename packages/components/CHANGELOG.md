@@ -18,6 +18,7 @@
 -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
 -   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
 -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+- `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fix
 
