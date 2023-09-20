@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Retrieves a list of specific blocks from a given tree of blocks.
@@ -51,6 +54,7 @@ function getBlocksOfTypeFromBlocks( targetBlockType, blocks ) {
 
 export default function useNavigationMenuContent( postType, postId ) {
 	const { record } = useEditedEntityRecord( postType, postId );
+	const selectedCoreStore = useSelect( coreStore );
 
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
@@ -73,9 +77,23 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
-	const navigationMenuIds = navigationBlocks?.map(
-		( block ) => block.attributes.ref
-	);
+	const { getNavigationFallbackId } = unlock( selectedCoreStore );
+	const navigationMenuIds = navigationBlocks?.map( ( block ) => {
+		// There are three different states the block can be in:
+		// 1. The bloch is synced which means it had a ref attribute:
+		if ( block.attributes.ref ) {
+			return block.attributes.ref;
+		}
+
+		// 2. The block has defined inner blocks:
+		if ( block.innerBlocks.length > 0 ) {
+			return null;
+		}
+
+		// 3. The block has no inner blocks and no ref attribute, in which case
+		//	we use the fallback navigation menu id:
+		return getNavigationFallbackId();
+	} );
 
 	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
 	// Also, filter out undefined values, as blocks don't have an id when initially added.
