@@ -3,7 +3,6 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { pencil } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
 	Icon,
@@ -114,8 +113,10 @@ export default function SidebarNavigationScreenTemplate() {
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }
 						label={ __( 'Edit' ) }
-						icon={ pencil }
-					/>
+						className="edit-site-sidebar-button--primary"
+					>
+						{ __( 'Edit' ) }
+					</SidebarButton>
 				</>
 			}
 			description={ description }

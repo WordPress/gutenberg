@@ -1,4 +1,5 @@
-.edit-site-sidebar-button {
+.edit-site-sidebar-button,
+.edit-site-sidebar-button--primary {
 	color: $gray-200;
 	flex-shrink: 0;
 
@@ -20,5 +21,19 @@
 	&:not([aria-disabled="true"]):active,
 	&[aria-expanded="true"] {
 		color: $gray-100;
+	}
+}
+
+.edit-site-sidebar-button--primary {
+	background: $gray-800;
+	color: $gray-100;
+
+	&:hover,
+	&:focus-visible,
+	&:focus,
+	&:not([aria-disabled="true"]):active,
+	&[aria-expanded="true"] {
+		background: $gray-700;
+		color: $white;
 	}
 }
