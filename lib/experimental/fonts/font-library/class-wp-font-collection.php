@@ -89,7 +89,7 @@ class WP_Font_Collection {
 			if ( empty( $data ) ) {
 				return new WP_Error( 'font_collection_read_error', __( 'Error reading the Font Collection data JSON file contents.', 'gutenberg' ) );
 			}
-		// If the src is a file path, read the data from the file.
+			// If the src is a file path, read the data from the file.
 		} else {
 			if ( ! file_exists( $this->config['src'] ) ) {
 				return new WP_Error( 'font_collection_read_error', __( 'Font Collection data JSON file does not exist.', 'gutenberg' ) );

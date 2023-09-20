@@ -92,5 +92,4 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 500, $response->get_status() );
 	}
-
 }
