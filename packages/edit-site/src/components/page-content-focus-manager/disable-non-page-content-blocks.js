@@ -9,7 +9,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../utils/constants';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
@@ -43,8 +43,7 @@ const withDisableNonPageContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const isDescendentOfQueryLoop = props.context.queryId !== undefined;
 		const isPageContent =
-			PAGE_CONTENT_BLOCK_TYPES.includes( props.name ) &&
-			! isDescendentOfQueryLoop;
+			PAGE_CONTENT_BLOCK_TYPES[ props.name ] && ! isDescendentOfQueryLoop;
 		const mode = isPageContent ? 'contentOnly' : undefined;
 		useBlockEditingMode( mode );
 		return <BlockEdit { ...props } />;
