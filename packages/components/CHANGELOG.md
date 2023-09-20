@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.8.0 (2023-09-20)
+
 ### Enhancements
 
 -   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
