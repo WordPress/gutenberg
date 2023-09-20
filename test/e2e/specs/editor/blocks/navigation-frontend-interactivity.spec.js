@@ -289,7 +289,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		} ) => {
 			await page.goto( '/' );
 			const submenuButton = page.getByRole( 'button', {
-				name: 'Parent Page',
+				name: 'Parent',
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Subpage',

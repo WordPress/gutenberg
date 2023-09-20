@@ -10,14 +10,13 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import { filterOutDuplicatesByName } from './utils';
 import {
-	CORE_PATTERN_SOURCES,
-	PATTERNS,
-	SYNC_TYPES,
-	TEMPLATE_PARTS,
-	USER_PATTERNS,
-	filterOutDuplicatesByName,
-} from './utils';
+	PATTERN_CORE_SOURCES,
+	PATTERN_TYPES,
+	PATTERN_SYNC_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
 import { store as editSiteStore } from '../../store';
@@ -50,7 +49,7 @@ const selectTemplatePartsAsPatterns = (
 	const { __experimentalGetDefaultTemplatePartAreas } = select( editorStore );
 	const query = { per_page: -1 };
 	const rawTemplateParts =
-		getEntityRecords( 'postType', TEMPLATE_PARTS, query ) ??
+		getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
 		EMPTY_PATTERN_LIST;
 	const templateParts = rawTemplateParts.map( ( templatePart ) =>
 		templatePartToPattern( templatePart )
@@ -87,7 +86,7 @@ const selectTemplatePartsAsPatterns = (
 	return { patterns, isResolving };
 };
 
-const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
+const selectThemePatterns = ( select ) => {
 	const { getSettings } = unlock( select( editSiteStore ) );
 	const settings = getSettings();
 	const blockPatterns =
@@ -96,23 +95,40 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 
 	const restBlockPatterns = select( coreStore ).getBlockPatterns();
 
-	let patterns = [
+	const patterns = [
 		...( blockPatterns || [] ),
 		...( restBlockPatterns || [] ),
 	]
 		.filter(
-			( pattern ) => ! CORE_PATTERN_SOURCES.includes( pattern.source )
+			( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
 		)
 		.filter( filterOutDuplicatesByName )
 		.filter( ( pattern ) => pattern.inserter !== false )
 		.map( ( pattern ) => ( {
 			...pattern,
 			keywords: pattern.keywords || [],
-			type: 'pattern',
+			type: PATTERN_TYPES.theme,
 			blocks: parse( pattern.content, {
 				__unstableSkipMigrationLogs: true,
 			} ),
 		} ) );
+
+	return { patterns, isResolving: false };
+};
+const selectPatterns = (
+	select,
+	{ categoryId, search = '', syncStatus } = {}
+) => {
+	const { patterns: themePatterns } = selectThemePatterns( select );
+	const { patterns: userPatterns } = selectUserPatterns( select );
+
+	let patterns = [ ...( themePatterns || [] ), ...( userPatterns || [] ) ];
+
+	if ( syncStatus ) {
+		patterns = patterns.filter(
+			( pattern ) => pattern.syncStatus === syncStatus
+		);
+	}
 
 	if ( categoryId ) {
 		patterns = searchItems( patterns, search, {
@@ -125,35 +141,49 @@ const selectThemePatterns = ( select, { categoryId, search = '' } = {} ) => {
 			hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
 		} );
 	}
-
 	return { patterns, isResolving: false };
 };
 
-const reusableBlockToPattern = ( reusableBlock ) => ( {
-	blocks: parse( reusableBlock.content.raw, {
+const patternBlockToPattern = ( patternBlock, categories ) => ( {
+	blocks: parse( patternBlock.content.raw, {
 		__unstableSkipMigrationLogs: true,
 	} ),
-	categories: reusableBlock.wp_pattern,
-	id: reusableBlock.id,
-	name: reusableBlock.slug,
-	syncStatus: reusableBlock.wp_pattern_sync_status || SYNC_TYPES.full,
-	title: reusableBlock.title.raw,
-	type: reusableBlock.type,
-	reusableBlock,
+	...( patternBlock.wp_pattern_category.length > 0 && {
+		categories: patternBlock.wp_pattern_category.map(
+			( patternCategoryId ) =>
+				categories && categories.get( patternCategoryId )
+					? categories.get( patternCategoryId ).slug
+					: patternCategoryId
+		),
+	} ),
+	id: patternBlock.id,
+	name: patternBlock.slug,
+	syncStatus: patternBlock.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
+	title: patternBlock.title.raw,
+	type: PATTERN_TYPES.user,
+	patternBlock,
 } );
 
 const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
-	const { getEntityRecords, getIsResolving } = select( coreStore );
+	const { getEntityRecords, getIsResolving, getUserPatternCategories } =
+		select( coreStore );
 
 	const query = { per_page: -1 };
-	const records = getEntityRecords( 'postType', USER_PATTERNS, query );
-
+	const records = getEntityRecords( 'postType', PATTERN_TYPES.user, query );
+	const userPatternCategories = getUserPatternCategories();
+	const categories = new Map();
+	userPatternCategories.forEach( ( userCategory ) =>
+		categories.set( userCategory.id, userCategory )
+	);
 	let patterns = records
-		? records.map( ( record ) => reusableBlockToPattern( record ) )
+		? records.map( ( record ) =>
+				patternBlockToPattern( record, categories )
+		  )
 		: EMPTY_PATTERN_LIST;
+
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
-		USER_PATTERNS,
+		PATTERN_TYPES.user,
 		query,
 	] );
 
@@ -170,24 +200,28 @@ const selectUserPatterns = ( select, { search = '', syncStatus } = {} ) => {
 		hasCategory: () => true,
 	} );
 
-	return { patterns, isResolving };
+	return { patterns, isResolving, categories: userPatternCategories };
 };
 
 export const usePatterns = (
 	categoryType,
 	categoryId,
-	{ search = '', syncStatus }
+	{ search = '', syncStatus } = {}
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( categoryType === TEMPLATE_PARTS ) {
+			if ( categoryType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplatePartsAsPatterns( select, {
 					categoryId,
 					search,
 				} );
-			} else if ( categoryType === PATTERNS ) {
-				return selectThemePatterns( select, { categoryId, search } );
-			} else if ( categoryType === USER_PATTERNS ) {
+			} else if ( categoryType === PATTERN_TYPES.theme ) {
+				return selectPatterns( select, {
+					categoryId,
+					search,
+					syncStatus,
+				} );
+			} else if ( categoryType === PATTERN_TYPES.user ) {
 				return selectUserPatterns( select, { search, syncStatus } );
 			}
 			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };

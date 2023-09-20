@@ -4,6 +4,12 @@
 import { Button, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { default as BlockPatternsSourceFilter } from '../block-patterns-source-filter';
+import { allPatternsCategory } from '../block-patterns-tab';
+
 function PatternCategoriesList( {
 	selectedCategory,
 	patternCategories,
@@ -31,14 +37,14 @@ function PatternCategoriesList( {
 	);
 }
 
-function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
+function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__search';
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
 				__nextHasNoMarginBottom
-				onChange={ setFilterValue }
-				value={ filterValue }
+				onChange={ setSearchValue }
+				value={ searchValue }
 				label={ __( 'Search for patterns' ) }
 				placeholder={ __( 'Search' ) }
 			/>
@@ -50,17 +56,26 @@ function PatternExplorerSidebar( {
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
-	filterValue,
-	setFilterValue,
+	patternSourceFilter,
+	setPatternSourceFilter,
+	searchValue,
+	setSearchValue,
 } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__sidebar';
 	return (
 		<div className={ baseClassName }>
 			<PatternsExplorerSearch
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				searchValue={ searchValue }
+				setSearchValue={ setSearchValue }
 			/>
-			{ ! filterValue && (
+			<BlockPatternsSourceFilter
+				value={ patternSourceFilter }
+				onChange={ ( value ) => {
+					setPatternSourceFilter( value );
+					onClickCategory( allPatternsCategory.name );
+				} }
+			/>
+			{ ! searchValue && (
 				<PatternCategoriesList
 					selectedCategory={ selectedCategory }
 					patternCategories={ patternCategories }

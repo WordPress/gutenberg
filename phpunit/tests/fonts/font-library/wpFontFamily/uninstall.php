@@ -72,7 +72,7 @@ class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 	public function test_should_uninstall( $font_data, array $files_data ) {
 		// Set up.
 		foreach ( $files_data as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
 		}
 		$font = new WP_Font_Family( $font_data );
 		$font->install( $files_data );
@@ -103,7 +103,7 @@ class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 
 		// Set up the font family to be uninstalled.
 		foreach ( $files_data as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
 		}
 		$font = new WP_Font_Family( $font_data );
 		$font->install( $files_data );
@@ -112,7 +112,7 @@ class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 
 		// Check that the files were uninstalled.
 		foreach ( $files_to_uninstall as $font_file ) {
-			$font_file = static::$fonts_dir . $font_file;
+			$font_file = path_join( static::$fonts_dir, $font_file );
 			$this->assertFileDoesNotExist( $font_file, "Font file [{$font_file}] should not exists in the uploads/fonts/ directory after uninstalling" );
 		}
 		// Check that the Merriweather file was not uninstalled.

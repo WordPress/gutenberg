@@ -548,7 +548,7 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 
@@ -579,6 +579,18 @@ _Parameters_
 _Returns_
 
 -   `Optional< any >`: The edit.
+
+### getUserPatternCategories
+
+Retrieve the registered user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 

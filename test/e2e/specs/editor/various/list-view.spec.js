@@ -132,7 +132,7 @@ test.describe( 'List View', () => {
 		// make the inner blocks appear.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
-			.getByRole( 'button', { name: /Color: /i } )
+			.getByRole( 'option', { name: /Color: /i } )
 			.first()
 			.click();
 
@@ -331,7 +331,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 
 		// List View should be closed.
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -352,7 +352,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -377,7 +377,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 	} );
 
 	test( 'should place focus on the currently selected block in the canvas', async ( {
@@ -431,7 +431,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should duplicate and delete blocks using keyboard', async ( {
+	test( 'should duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -666,6 +666,19 @@ test.describe( 'List View', () => {
 					{ name: 'core/file', selected: false, focused: true },
 				] );
 		}
+
+		// Deselect blocks via Escape key.
+		await page.keyboard.press( 'Escape' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Pressing Escape should deselect blocks'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: false, focused: true },
+			] );
 	} );
 
 	test( 'block settings dropdown menu', async ( {
@@ -771,6 +784,10 @@ test.describe( 'List View', () => {
 		).toBeHidden();
 
 		await optionsForFileToggle.click();
+		await expect(
+			optionsForFileMenu,
+			'Pressing Space should also open the menu dropdown'
+		).toBeVisible();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(

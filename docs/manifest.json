@@ -12,15 +12,27 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-now",
+		"slug": "get-started-with-wp-now",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-now.md",
 		"parent": "devenv"
 	},
 	{
@@ -78,9 +90,15 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/getting-started/glossary.md",
+		"parent": "getting-started"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/getting-started/faq.md",
 		"parent": "getting-started"
 	},
 	{
@@ -322,12 +340,6 @@
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
 	},
 	{
 		"title": "Global Settings & Styles (theme.json)",
@@ -1914,6 +1926,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
@@ -1977,6 +1995,12 @@
 		"title": "Block Types Data",
 		"slug": "data-core-blocks",
 		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Commands Data",
+		"slug": "data-core-commands",
+		"markdown_source": "../docs/reference-guides/data/data-core-commands.md",
 		"parent": "data"
 	},
 	{
@@ -2136,18 +2160,6 @@
 		"parent": "user-interface"
 	},
 	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/explanations/faq.md",
-		"parent": "explanations"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/explanations/glossary.md",
-		"parent": "explanations"
-	},
-	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/explanations/history.md",
@@ -2289,12 +2301,6 @@
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
 		"markdown_source": "../docs/contributors/design/the-block.md",
-		"parent": "design"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/design/reference.md",
 		"parent": "design"
 	},
 	{

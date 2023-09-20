@@ -481,11 +481,9 @@ test.describe( 'List (@firefox)', () => {
 
 <!-- wp:list-item -->
 <li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- /wp:list-item -->
 
-<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -735,13 +733,6 @@ test.describe( 'List (@firefox)', () => {
 	} );
 
 	test( 'should indent and outdent level 2', async ( { editor, page } ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );

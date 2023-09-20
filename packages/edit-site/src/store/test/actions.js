@@ -235,7 +235,6 @@ describe( 'actions', () => {
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core/edit-site', 'distractionFree', true );
-
 			registry
 				.dispatch( editSiteStore )
 				.openGeneralSidebar( 'edit-site/global-styles' );

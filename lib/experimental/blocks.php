@@ -5,27 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * Checks whether the experimental Interactivity API should be used for a block.
- *
- * Note: This function is located here instead of in interactivity-api/blocks.php because it has to be available earler.
- *
- * @param string $block_name Block name.
- * @return bool Whether Interactivity API is used for block.
- */
-function gutenberg_should_block_use_interactivity_api( $block_name ) {
-
-	/**
-	 * Filters whether the experimental Interactivity API should be used for a block.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param bool   $enabled    Whether Interactivity API is used for block.
-	 * @param string $block_name Block name.
-	 */
-	return (bool) apply_filters( 'gutenberg_should_block_use_interactivity_api', true, $block_name );
-}
-
 if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
 	 * Enqueues a frontend script for a specific block.
@@ -63,7 +42,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 *                        is to ensure the content exists.
 		 * @return string Block content.
 		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+		$callback = static function ( $content, $block ) use ( $args, $block_name ) {
 
 			// Sanity check.
 			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
@@ -162,7 +141,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		}
 
 		// Get all the attributes that have a connection.
-		$connected_attributes = _wp_array_get( $block['attrs'], array( 'connections', 'attributes' ), false );
+		$connected_attributes = $block['attrs']['connections']['attributes'] ?? false;
 		if ( ! $connected_attributes ) {
 			return $block_content;
 		}
@@ -206,7 +185,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			);
 			if ( ! $found ) {
 				return $block_content;
-			};
+			}
 			$tag_name     = $tags->get_tag();
 			$markup       = "<$tag_name>$custom_value</$tag_name>";
 			$updated_tags = new WP_HTML_Tag_Processor( $markup );
