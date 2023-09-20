@@ -306,6 +306,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
+### buildDataFromLinkValue
+
+Undocumented declaration.
+
+### buildLinkValueFromData
+
+Undocumented declaration.
+
 ### ButtonBlockAppender
 
 _Related_

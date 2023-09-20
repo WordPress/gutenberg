@@ -71,6 +71,10 @@ export { default as __experimentalLinkControl } from './link-control';
 export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
+export {
+	buildLinkValueFromData,
+	buildDataFromLinkValue,
+} from './link-control/link-value-transforms';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
 export { default as MediaReplaceFlow } from './media-replace-flow';
