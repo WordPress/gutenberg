@@ -176,6 +176,9 @@ function CoverEdit( {
 		if ( ! isUserOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
 		}
 
 		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
@@ -196,6 +199,9 @@ function CoverEdit( {
 		if ( ! isUserOverlayColor ) {
 			newOverlayColor = DEFAULT_OVERLAY_COLOR;
 			setOverlayColor( undefined );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
 		}
 
 		const newIsDark = compositeIsDark(
@@ -219,6 +225,10 @@ function CoverEdit( {
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
 		setOverlayColor( newOverlayColor );
+
+		// Make undo revert the next setAttributes and the previous setOverlayColor.
+		__unstableMarkNextChangeAsNotPersistent();
+
 		setAttributes( {
 			isUserOverlayColor: true,
 			isDark: compositeIsDark(
@@ -341,6 +351,9 @@ function CoverEdit( {
 			} else {
 				setOverlayColor( undefined );
 			}
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
 		}
 
 		const newIsDark = newUseFeaturedImage
