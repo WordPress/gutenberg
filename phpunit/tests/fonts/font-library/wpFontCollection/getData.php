@@ -12,6 +12,42 @@
  */
 class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 
+	public function set_up() {
+		parent::set_up();
+
+		// Mock the wp_remote_request() function
+		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
+	}
+
+	public function tear_down() {
+		// Remove the mock to not affect other tests
+		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
+
+		parent::tear_down();
+	}
+
+	public function mock_request( $preempt, $args, $url ) {
+		// Check if it's the URL you want to mock
+		if ( 'https://localhost/fonts/mock-font-collection.json' === $url ) {
+
+			// Mock the response body
+			$mock_collection_data = array(
+				'fontFamilies' => 'mock',
+				'categories'   => 'mock',
+			);
+
+			return array(
+				'body'     => json_encode( $mock_collection_data ),
+				'response' => array(
+					'code' => 200,
+				),
+			);
+		}
+
+		// For any other URL, return false which ensures the request is made as usual (or you can return other mock data)
+		return false;
+	}
+
 	/**
 	 * @dataProvider data_should_get_data
 	 *
@@ -19,6 +55,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	 * @param array $expected_data Expected data.
 	 */
 	public function test_should_get_data( $config, $expected_data ) {
+		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 		$collection = new WP_Font_Collection( $config );
 		$this->assertSame( $expected_data, $collection->get_data() );
 	}
@@ -33,7 +70,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
 
 		return array(
-			'with a src' => array(
+			'with a file' => array(
 				'config'        => array(
 					'id'          => 'my-collection',
 					'name'        => 'My Collection',
@@ -45,6 +82,23 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'data'        => array( 'this is mock data' => true ),
+				),
+			),
+			'with a url'  => array(
+				'config'        => array(
+					'id'          => 'my-collection-with-url',
+					'name'        => 'My Collection with URL',
+					'description' => 'My collection description',
+					'src'         => 'https://localhost/fonts/mock-font-collection.json',
+				),
+				'expected_data' => array(
+					'id'          => 'my-collection-with-url',
+					'name'        => 'My Collection with URL',
+					'description' => 'My collection description',
+					'data'        => array(
+						'fontFamilies' => 'mock',
+						'categories'   => 'mock',
+					),
 				),
 			),
 		);
