@@ -21,6 +21,13 @@
 		data-wp-text="state.router.status"
 	>undefined</output>
 
+	<button
+		data-wp-on--click="actions.router.toggleTimeout"
+		data-testid="toggle timeout"
+	>
+		Timeout <span data-wp-text="state.router.timeout">NaN</span>
+	</button>
+
 	<?php
 	if ( isset( $attributes['links'] ) ) {
 		foreach ( $attributes['links'] as $key => $link ) {

@@ -2,6 +2,10 @@
 /**
  * Behaviors block support flag.
  *
+ * This file will NOT be backported to Core. It exists to provide a
+ * migration path for theme.json files that used the deprecated "behaviors".
+ * This file will be removed from Gutenberg in version 17.0.0.
+ *
  * @package gutenberg
  */
 
@@ -37,13 +41,23 @@ function gutenberg_register_behaviors_support( $block_type ) {
 
 /**
  * Add the directives and layout needed for the lightbox behavior.
- * This functions shouldn't be in this file. It should be moved to a package (or somewhere else), where all the behaviors logic is defined.
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
  * @return string                Filtered block content.
  */
 function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
+
+	// We've deprecated the lightbox implementation via behaviors.
+	// While we may continue to explore behaviors in the future, the lightbox
+	// logic seems very specific to the image and will likely never be a part
+	// of behaviors, even in the future. With that in mind, we've rewritten the lightbox
+	// to be a feature of the image block and will also soon remove the block_supports.
+	// *Note: This logic for generating the lightbox markup has been duplicated and moved
+	// to the image block's index.php.*
+	// See https://github.com/WordPress/gutenberg/issues/53403.
+	_deprecated_function( 'gutenberg_render_behaviors_support_lightbox', 'Gutenberg 17.0.0', '' );
+
 	$link_destination = isset( $block['attrs']['linkDestination'] ) ? $block['attrs']['linkDestination'] : 'none';
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {

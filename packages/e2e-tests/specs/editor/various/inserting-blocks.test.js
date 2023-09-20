@@ -259,7 +259,7 @@ describe( 'Inserting blocks', () => {
 
 		const headingButton = (
 			await page.$x( `//button//span[contains(text(), 'Heading')]` )
-		 )[ 0 ];
+		)[ 0 ];
 		// Hover over the block should show the blue line indicator.
 		await headingButton.hover();
 
@@ -354,7 +354,7 @@ describe( 'Inserting blocks', () => {
 		await openGlobalBlockInserter();
 		const paragraphButton = (
 			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
-		 )[ 0 ];
+		)[ 0 ];
 		await paragraphButton.hover();
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',

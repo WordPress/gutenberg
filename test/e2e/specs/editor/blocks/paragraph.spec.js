@@ -78,9 +78,8 @@ test.describe( 'Paragraph', () => {
 				testImageName
 			);
 
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			await dragOver(
 				editor.canvas.locator( '[data-type="core/paragraph"]' )

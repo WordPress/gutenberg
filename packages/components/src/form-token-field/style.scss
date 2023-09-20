@@ -157,21 +157,21 @@
 .components-form-token-field__suggestions-list {
 	flex: 1 0 100%;
 	min-width: 100%;
-	max-height: 9em;
+	max-height: $grid-unit-80 * 2;
 	overflow-y: auto;
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $components-color-border;
+	box-shadow: inset 0 $border-width 0 0 $gray-600; // Matches the border color of the input.
 	margin: 0;
-	padding: 0;
 }
 
 .components-form-token-field__suggestion {
-	color: $gray-700;
+	color: $gray-900;
 	display: block;
 	font-size: $default-font-size;
-	padding: 4px 8px;
+	padding: $grid-unit-10 $grid-unit-15;
+	min-height: $button-size-compact;
 	margin: 0;
 	cursor: pointer;
 
@@ -179,8 +179,4 @@
 		background: $components-color-accent;
 		color: $white;
 	}
-}
-
-.components-form-token-field__suggestion-match {
-	text-decoration: underline;
 }

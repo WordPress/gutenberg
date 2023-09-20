@@ -7,17 +7,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import { PATTERN_SYNC_TYPES } from '../constants';
+
+/**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
  *
- * @param {string}             title     Pattern title.
- * @param {'full'|'unsynced'}  syncType  They way block is synced, 'full' or 'unsynced'.
- * @param {string[]|undefined} clientIds Optional client IDs of blocks to convert to pattern.
+ * @param {string}             title      Pattern title.
+ * @param {'full'|'unsynced'}  syncType   They way block is synced, 'full' or 'unsynced'.
+ * @param {string[]|undefined} clientIds  Optional client IDs of blocks to convert to pattern.
+ * @param {number[]|undefined} categories Ids of any selected categories.
  */
-export const __experimentalCreatePattern =
-	( title, syncType, clientIds ) =>
+export const createPattern =
+	( title, syncType, clientIds, categories ) =>
 	async ( { registry, dispatch } ) => {
 		const meta =
-			syncType === 'unsynced'
+			syncType === PATTERN_SYNC_TYPES.unsynced
 				? {
 						wp_pattern_sync_status: syncType,
 				  }
@@ -34,6 +40,7 @@ export const __experimentalCreatePattern =
 				: undefined,
 			status: 'publish',
 			meta,
+			wp_pattern_category: categories,
 		};
 
 		const updatedRecord = await registry
@@ -50,7 +57,7 @@ export const __experimentalCreatePattern =
 		registry
 			.dispatch( blockEditorStore )
 			.replaceBlocks( clientIds, newBlock );
-		dispatch.__experimentalSetEditingPattern( newBlock.clientId, true );
+		dispatch.setEditingPattern( newBlock.clientId, true );
 		return updatedRecord;
 	};
 
@@ -59,7 +66,7 @@ export const __experimentalCreatePattern =
  *
  * @param {string} clientId The client ID of the block to attach.
  */
-export const __experimentalConvertSyncedPatternToStatic =
+export const convertSyncedPatternToStatic =
 	( clientId ) =>
 	( { registry } ) => {
 		const oldBlock = registry
@@ -90,7 +97,7 @@ export const __experimentalConvertSyncedPatternToStatic =
  * @param {boolean} isEditing Whether the block should be in editing state.
  * @return {Object} Action descriptor.
  */
-export function __experimentalSetEditingPattern( clientId, isEditing ) {
+export function setEditingPattern( clientId, isEditing ) {
 	return {
 		type: 'SET_EDITING_PATTERN',
 		clientId,

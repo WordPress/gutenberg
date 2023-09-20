@@ -8,6 +8,7 @@ import {
 	Button,
 	DropZone,
 	FlexItem,
+	MenuItem,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
@@ -236,7 +237,13 @@ function BackgroundImagePanelItem( props ) {
 							/>
 						}
 						variant="secondary"
-					/>
+					>
+						<MenuItem
+							onClick={ () => resetBackgroundImage( props ) }
+						>
+							{ __( 'Reset ' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				) }
 				{ ! url && (
 					<MediaUploadCheck>

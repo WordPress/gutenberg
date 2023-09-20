@@ -22,7 +22,8 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
-		'public'       => true,
+		'public'       => false,
+		'_builtin'     => true,  /* internal use only. don't use this when registering your own post type. */
 		'label'        => 'Font Library',
 		'show_in_rest' => true,
 	);
@@ -55,3 +56,11 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 		return WP_Font_Library::register_font_collection( $config );
 	}
 }
+
+// @core-merge: This code needs to be removed.
+add_action(
+	'enqueue_block_editor_assets',
+	function () {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
+	}
+);

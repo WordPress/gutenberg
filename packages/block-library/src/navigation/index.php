@@ -104,7 +104,8 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 		) ) {
 			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
 			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
-		};
+			// The `aria-expanded` attribute for SSR is already added in the submenu block.
+		}
 		// Add directives to the submenu.
 		if ( $w->next_tag(
 			array(
@@ -119,7 +120,7 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 		block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
 	}
 	return $w->get_updated_html();
-};
+}
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -262,7 +263,7 @@ function block_core_navigation_render_submenu_icon() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		static function( $block ) {
+		static function ( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -392,7 +393,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// a fallback (i.e. the block has no menu associated with it).
 	$is_fallback = false;
 
-	$nav_menu_name = '';
+	$nav_menu_name = $attributes['ariaLabel'] ?? '';
 
 	/**
 	 * Deprecated:
@@ -528,7 +529,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Manually add block support text decoration as CSS class.
-	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
+	$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
@@ -713,7 +714,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		';
 		$responsive_dialog_directives    = '
 			data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
+			aria-modal="false"
 			data-wp-bind--role="selectors.core.navigation.roleAttribute"
+			role=""
 			data-wp-effect="effects.core.navigation.focusFirstElement"
 		';
 		$close_button_directives         = '
@@ -809,6 +812,23 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
 /**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_navigation_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-navigation-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-navigation-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-navigation-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_navigation_ensure_interactivity_dependency' );
+
+/**
  * Turns menu item data into a nested array of parsed blocks
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
@@ -901,7 +921,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);
