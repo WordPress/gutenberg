@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
+import { unlock } from '../../../lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-page-panels-edit-template__dropdown',
@@ -26,28 +28,40 @@ const POPOVER_PROPS = {
 };
 
 export default function EditTemplate() {
-	const { hasResolved, template } = useSelect( ( select ) => {
-		const { getEditedPostContext, getEditedPostType, getEditedPostId } =
-			select( editSiteStore );
-		const { getEditedEntityRecord, hasFinishedResolution } =
-			select( coreStore );
-		const _context = getEditedPostContext();
-		const queryArgs = [
-			'postType',
-			getEditedPostType(),
-			getEditedPostId(),
-		];
-		return {
-			context: _context,
-			hasResolved: hasFinishedResolution(
-				'getEditedEntityRecord',
-				queryArgs
-			),
-			template: getEditedEntityRecord( ...queryArgs ),
-		};
-	}, [] );
+	const { hasResolved, template, isTemplateHidden } = useSelect(
+		( select ) => {
+			const { getEditedPostContext, getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getCanvasMode, getPageContentFocusType } = unlock(
+				select( editSiteStore )
+			);
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const _context = getEditedPostContext();
+			const queryArgs = [
+				'postType',
+				getEditedPostType(),
+				getEditedPostId(),
+			];
+			return {
+				context: _context,
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				template: getEditedEntityRecord( ...queryArgs ),
+				isTemplateHidden:
+					getCanvasMode() === 'edit' &&
+					getPageContentFocusType() === 'hideTemplate',
+			};
+		},
+		[]
+	);
 
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	// Disable reason: `useDispatch` can't be called conditionally.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { setPageContentFocusType } = unlock( useDispatch( editSiteStore ) );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -83,6 +97,20 @@ export default function EditTemplate() {
 							<SwapTemplateButton onClick={ onClose } />
 						</MenuGroup>
 						<ResetDefaultTemplate onClick={ onClose } />
+						<MenuGroup>
+							<MenuItem
+								icon={ ! isTemplateHidden ? check : undefined }
+								onClick={ () => {
+									setPageContentFocusType(
+										isTemplateHidden
+											? 'disableTemplate'
+											: 'hideTemplate'
+									);
+								} }
+							>
+								{ __( 'Template preview' ) }
+							</MenuItem>
+						</MenuGroup>
 					</>
 				) }
 			</DropdownMenu>
