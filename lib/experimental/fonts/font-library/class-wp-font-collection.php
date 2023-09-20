@@ -82,7 +82,7 @@ class WP_Font_Collection {
 			return new WP_Error( 'font_collection_file_error', __( 'Font Collection data JSON file does not exist.', 'gutenberg' ) );
 		}
 
-		$data = file_get_contents( $this->config['data_json_file'] );
+		$data = wp_json_file_decode( $this->config['data_json_file'], array( 'associative' => true ) );
 		if ( empty( $data ) ) {
 			return new WP_Error( 'font_collection_read_error', __( 'Error reading the Font Collection data JSON file contents.', 'gutenberg' ) );
 		}

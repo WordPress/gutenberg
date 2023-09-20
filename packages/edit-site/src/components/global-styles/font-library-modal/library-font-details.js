@@ -10,13 +10,12 @@ import {
  * Internal dependencies
  */
 import LibraryFontVariant from './library-font-variant';
+import { sortFontFaces } from './utils/sort-font-faces';
 
 function LibraryFontDetails( { font } ) {
 	const fontFaces =
 		font.fontFace && font.fontFace.length
-			? font.fontFace.sort( ( a, b ) =>
-					a.fontWeight > b.fontWeight ? 1 : -1
-			  )
+			? sortFontFaces( font.fontFace )
 			: [
 					{
 						fontFamily: font.fontFamily,

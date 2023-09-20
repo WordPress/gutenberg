@@ -315,7 +315,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	public function test_should_not_install_duplicate_fontfaces( $font_data, array $files_data, array $expected ) {
 		// Set up the temporary files.
 		foreach ( $files_data as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
 		}
 
 		$font = new WP_Font_Family( $font_data );
@@ -504,10 +504,18 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 
 		// Set up the temporary files.
 		foreach ( $files_data_initial as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			}
 		}
 		foreach ( $files_data_overwrite as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			}
 		}
 
 		$font = new WP_Font_Family( $font_data_initial );

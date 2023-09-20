@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { parse, serialize, createBlock } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -14,14 +14,14 @@ import { PATTERN_SYNC_TYPES } from '../constants';
 /**
  * Returns a generator converting one or more static blocks into a pattern, or creating a new empty pattern.
  *
- * @param {string}             title      Pattern title.
- * @param {'full'|'unsynced'}  syncType   They way block is synced, 'full' or 'unsynced'.
- * @param {string[]|undefined} clientIds  Optional client IDs of blocks to convert to pattern.
- * @param {number[]|undefined} categories Ids of any selected categories.
+ * @param {string}             title        Pattern title.
+ * @param {'full'|'unsynced'}  syncType     They way block is synced, 'full' or 'unsynced'.
+ * @param {string|undefined}   [content]    Optional serialized content of blocks to convert to pattern.
+ * @param {number[]|undefined} [categories] Ids of any selected categories.
  */
 export const createPattern =
-	( title, syncType, clientIds, categories ) =>
-	async ( { registry, dispatch } ) => {
+	( title, syncType, content, categories ) =>
+	async ( { registry } ) => {
 		const meta =
 			syncType === PATTERN_SYNC_TYPES.unsynced
 				? {
@@ -31,13 +31,7 @@ export const createPattern =
 
 		const reusableBlock = {
 			title,
-			content: clientIds
-				? serialize(
-						registry
-							.select( blockEditorStore )
-							.getBlocksByClientId( clientIds )
-				  )
-				: undefined,
+			content,
 			status: 'publish',
 			meta,
 			wp_pattern_category: categories,
@@ -47,18 +41,45 @@ export const createPattern =
 			.dispatch( coreStore )
 			.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
 
-		if ( syncType === 'unsynced' || ! clientIds ) {
-			return updatedRecord;
+		return updatedRecord;
+	};
+
+/**
+ * Create a pattern from a JSON file.
+ * @param {File}               file         The JSON file instance of the pattern.
+ * @param {number[]|undefined} [categories] Ids of any selected categories.
+ */
+export const createPatternFromFile =
+	( file, categories ) =>
+	async ( { dispatch } ) => {
+		const fileContent = await file.text();
+		/** @type {import('./types').PatternJSON} */
+		let parsedContent;
+		try {
+			parsedContent = JSON.parse( fileContent );
+		} catch ( e ) {
+			throw new Error( 'Invalid JSON file' );
+		}
+		if (
+			parsedContent.__file !== 'wp_block' ||
+			! parsedContent.title ||
+			! parsedContent.content ||
+			typeof parsedContent.title !== 'string' ||
+			typeof parsedContent.content !== 'string' ||
+			( parsedContent.syncStatus &&
+				typeof parsedContent.syncStatus !== 'string' )
+		) {
+			throw new Error( 'Invalid Pattern JSON file' );
 		}
 
-		const newBlock = createBlock( 'core/block', {
-			ref: updatedRecord.id,
-		} );
-		registry
-			.dispatch( blockEditorStore )
-			.replaceBlocks( clientIds, newBlock );
-		dispatch.setEditingPattern( newBlock.clientId, true );
-		return updatedRecord;
+		const pattern = await dispatch.createPattern(
+			parsedContent.title,
+			parsedContent.syncStatus,
+			parsedContent.content,
+			categories
+		);
+
+		return pattern;
 	};
 
 /**

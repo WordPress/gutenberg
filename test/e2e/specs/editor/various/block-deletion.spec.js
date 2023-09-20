@@ -377,7 +377,7 @@ test.describe( 'Block deletion', () => {
 		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Ensure that the block appender button is visible.
 		await expect(
