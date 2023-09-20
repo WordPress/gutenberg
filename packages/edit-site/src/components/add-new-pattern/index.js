@@ -20,12 +20,14 @@ import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModal } = unlock( editPatternsPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
+	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
@@ -128,6 +130,18 @@ export default function AddNewPattern() {
 					if ( ! file ) return;
 					try {
 						const pattern = await createPatternFromFile( file );
+
+						// Navigate to the All patterns category for the newly created pattern.
+						if (
+							params.categoryType !== PATTERN_TYPES.theme ||
+							params.categoryId !== PATTERN_DEFAULT_CATEGORY
+						) {
+							history.push( {
+								path: `/patterns`,
+								categoryType: PATTERN_TYPES.theme,
+								categoryId: PATTERN_DEFAULT_CATEGORY,
+							} );
+						}
 
 						createSuccessNotice(
 							sprintf(
