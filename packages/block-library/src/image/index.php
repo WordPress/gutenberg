@@ -272,7 +272,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             aria-modal="false"
             data-wp-effect="effects.core.image.initLightbox"
             data-wp-on--keydown="actions.core.image.handleKeydown"
-            data-wp-on--mousewheel="actions.core.image.hideLightbox"
+            data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--click="actions.core.image.hideLightbox"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">

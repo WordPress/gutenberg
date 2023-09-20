@@ -35,7 +35,7 @@ let scrollCallback;
 // behavior. In the future, we may be able to use CSS or overflow: hidden
 // instead to not rely on JavaScript, but this seems to be the best approach
 // for now that provides the best visual experience.
-function handleScroll( event, context, actions ) {
+function handleScroll( context, actions, event ) {
 	event.preventDefault();
 	window.scrollTo(
 		context.core.image.lastScrollLeft,
