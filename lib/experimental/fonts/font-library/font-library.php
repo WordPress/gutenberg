@@ -65,7 +65,7 @@ add_action(
 
 $default_font_collection = array(
 	'id'             => 'default-font-collection',
-	'name'           => 'Default Font Collection',
+	'name'           => 'Google Fonts',
 	'description'    => __( 'Add from Google Fonts. Fonts are copied to and served from your site.' ),
 	'data_json_file' => path_join( __DIR__, 'default-font-collection.json' ),
 );
