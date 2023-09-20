@@ -6,7 +6,6 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,18 +31,11 @@ const Template: StoryFn< typeof TimePicker > = ( {
 	onChange,
 	...args
 } ) => {
-	const [ time, setTime ] = useState( currentTime );
-	useEffect( () => {
-		setTime( currentTime );
-	}, [ currentTime ] );
 	return (
 		<TimePicker
-			{ ...args }
-			currentTime={ time }
-			onChange={ ( newTime ) => {
-				setTime( newTime );
-				onChange?.( newTime );
-			} }
+				{...args}
+				currentTime={ new Date() }
+				onChange={ ( date ) => console.log("logging here: ", date) }
 		/>
 	);
 };

@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * External dependencies
  */
@@ -127,11 +128,15 @@ export function TimePicker( {
 		method: 'hours' | 'minutes' | 'date' | 'year'
 	) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
-			if ( ! ( event.target instanceof HTMLInputElement ) ) {
+			const iWin = document?.querySelector('[name="editor-canvas"]')?.contentWindow;
+			console.log( iWin );
+			console.log( event.target.constructor.toString() );
+			console.log( HTMLInputElement.toString() );
+			if ( ! ( event.target instanceof iWin.HTMLInputElement ) ) {
 				return;
 			}
 
-			if ( ! event.target.validity.valid ) {
+			if ( ! event.target?.validity.valid ) {
 				return;
 			}
 

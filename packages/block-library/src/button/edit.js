@@ -15,6 +15,7 @@ import {
 	TextControl,
 	ToolbarButton,
 	Popover,
+	TimePicker,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -170,6 +171,10 @@ function ButtonEdit( props ) {
 
 	return (
 		<>
+			<TimePicker
+				currentDate={ new Date() }
+				onChange={ ( date ) => console.log("logging here: ", date) }
+			/>
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
