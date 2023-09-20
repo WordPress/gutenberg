@@ -20,19 +20,26 @@ import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplatePart from './add-new-template-part';
 
-export default function PageTemplateParts() {
-	const { records: templateParts } = useEntityRecords(
-		'postType',
-		'wp_template_part',
-		{
-			per_page: -1,
-		}
-	);
+/**
+ * @typedef {Object} RichContent
+ * @property {string}             rendered    The rendered content.
+ * @property {string}             raw         The raw content.
+ *
+ * @typedef {Object} TemplatePart
+ * @property {string}             id          The ID of the template.
+ * @property {'wp_template_part'} type        The type of the template.
+ * @property {RichContent}        title       The name of the template.
+ * @property {string}             description The description of the template.
+ * @property {string}             slug        The slug of the template.
+ */
 
-	const columns = [
-		{
-			header: __( 'Template Part' ),
-			cell: ( templatePart ) => (
+const columns = [
+	{
+		accessor: ( row ) => decodeEntities( row.title?.rendered || row.slug ),
+		id: 'title',
+		header: __( 'Template Part' ),
+		cell: ( { value, row: templatePart } ) => {
+			return (
 				<VStack>
 					<Heading as="h3" level={ 5 }>
 						<Link
@@ -42,35 +49,45 @@ export default function PageTemplateParts() {
 							} }
 							state={ { backPath: '/wp_template_part/all' } }
 						>
-							{ decodeEntities(
-								templatePart.title?.rendered ||
-									templatePart.slug
-							) }
+							{ value }
 						</Link>
 					</Heading>
 				</VStack>
-			),
-			maxWidth: 400,
+			);
 		},
+		maxWidth: 400,
+	},
+	{
+		id: 'added-by',
+		header: __( 'Added by' ),
+		cell: ( { row: templatePart } ) => (
+			<AddedBy
+				postType={ templatePart.type }
+				postId={ templatePart.id }
+			/>
+		),
+	},
+	{
+		id: 'actions',
+		header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+		cell: ( { row: templatePart } ) => (
+			<TemplateActions
+				postType={ templatePart.type }
+				postId={ templatePart.id }
+			/>
+		),
+	},
+];
+
+export default function PageTemplateParts() {
+	/** @type {{records: TemplatePart[] | null}} */
+	const { records: templateParts } = useEntityRecords(
+		'postType',
+		'wp_template_part',
 		{
-			header: __( 'Added by' ),
-			cell: ( templatePart ) => (
-				<AddedBy
-					postType={ templatePart.type }
-					postId={ templatePart.id }
-				/>
-			),
-		},
-		{
-			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-			cell: ( templatePart ) => (
-				<TemplateActions
-					postType={ templatePart.type }
-					postId={ templatePart.id }
-				/>
-			),
-		},
-	];
+			per_page: -1,
+		}
+	);
 
 	return (
 		<Page
@@ -78,7 +95,7 @@ export default function PageTemplateParts() {
 			actions={ <AddNewTemplatePart /> }
 		>
 			{ templateParts && (
-				<Table data={ templateParts } columns={ columns } />
+				<Table data={ templateParts } columns={ columns } rowId="id" />
 			) }
 		</Page>
 	);
