@@ -58,7 +58,7 @@ class WP_Font_Face_Resolver {
 
 				// // Skip if font-family "name" is not defined.
 				// if ( empty( $definition['name'] ) ) {
-				// 	continue;
+				// continue;
 				// }
 
 				// Skip if "fontFace" is not defined, meaning there are no variations.
