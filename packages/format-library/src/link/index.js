@@ -130,6 +130,7 @@ export const link = {
 		url: 'href',
 		type: 'data-type',
 		id: 'data-id',
+		_id: 'id',
 		target: 'target',
 		rel: 'rel',
 	},

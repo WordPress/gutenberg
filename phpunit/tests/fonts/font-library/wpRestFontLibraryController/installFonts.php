@@ -40,10 +40,13 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 			if ( isset( $installed_font['fontFace'] ) || isset( $expected_font['fontFace'] ) ) {
 				for ( $face_index = 0; $face_index < count( $installed_font['fontFace'] ); $face_index++ ) {
 					// Checks that the font asset were created correctly.
-					$this->assertStringEndsWith( $expected_font['fontFace'][ $face_index ]['src'], $installed_font['fontFace'][ $face_index ]['src'], 'The src of the fonts were not updated as expected.' );
+					if ( isset( $installed_font['fontFace'][ $face_index ]['src'] ) ) {
+						$this->assertStringEndsWith( $expected_font['fontFace'][ $face_index ]['src'], $installed_font['fontFace'][ $face_index ]['src'], 'The src of the fonts were not updated as expected.' );
+					}
 					// Removes the src from the response to compare the rest of the data.
 					unset( $installed_font['fontFace'][ $face_index ]['src'] );
 					unset( $expected_font['fontFace'][ $face_index ]['src'] );
+					unset( $installed_font['fontFace'][ $face_index ]['uploadedFile'] );
 				}
 			}
 

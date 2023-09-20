@@ -79,7 +79,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return { patterns, allCategories, onClickPattern };
+	return [ patterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

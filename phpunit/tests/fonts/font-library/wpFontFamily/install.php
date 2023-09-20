@@ -161,7 +161,13 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	public function test_should_move_local_fontfaces( $font_data, array $files_data, array $expected ) {
 		// Set up the temporary files.
 		foreach ( $files_data as $file ) {
-			file_put_contents( $file['tmp_name'], 'Mocking file content' );
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			} elseif ( 'font/woff2' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/DMSans.woff2', $file['tmp_name'] );
+			}
 		}
 
 		$font = new WP_Font_Family( $font_data );
@@ -180,7 +186,8 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 	 */
 	public function data_should_move_local_fontfaces() {
 		return array(
-			'1 local font'  => array(
+			// ttf font type.
+			'1 local font'     => array(
 				'font_data'  => array(
 					'name'       => 'Inter',
 					'slug'       => 'inter',
@@ -205,7 +212,7 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				),
 				'expected'   => array( 'inter_italic_900.ttf' ),
 			),
-			'2 local fonts' => array(
+			'2 local fonts'    => array(
 				'font_data'  => array(
 					'name'       => 'Lato',
 					'slug'       => 'lato',
@@ -243,6 +250,285 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				),
 				'expected'   => array( 'lato_normal_400.ttf', 'lato_normal_500.ttf' ),
 			),
+			// woff font type.
+			'woff local font'  => array(
+				'font_data'  => array(
+					'name'       => 'Cooper Hewitt',
+					'slug'       => 'cooper-hewitt',
+					'fontFamily' => 'Cooper Hewitt',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Cooper Hewitt',
+							'fontStyle'    => 'italic',
+							'fontWeight'   => '900',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'cooper-hewitt.woff',
+						'type'     => 'font/woff',
+						'tmp_name' => wp_tempnam( 'Cooper-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'cooper-hewitt_italic_900.woff' ),
+			),
+			// woff2 font type.
+			'woff2 local font' => array(
+				'font_data'  => array(
+					'name'       => 'DM Sans',
+					'slug'       => 'dm-sans',
+					'fontFamily' => 'DM Sans',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'DM Sans',
+							'fontStyle'    => 'regular',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'DMSans.woff2',
+						'type'     => 'font/woff2',
+						'tmp_name' => wp_tempnam( 'DMSans-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'dm-sans_regular_500.woff2' ),
+			),
 		);
+	}
+
+	/**
+	 * @dataProvider data_should_not_install_duplicate_fontfaces
+	 *
+	 * @param array $font_data  Font family data in theme.json format.
+	 * @param array $files_data Files data in $_FILES format.
+	 * @param array $expected   Expected font filename(s).
+	 */
+	public function test_should_not_install_duplicate_fontfaces( $font_data, array $files_data, array $expected ) {
+		// Set up the temporary files.
+		foreach ( $files_data as $file ) {
+			copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+		}
+
+		$font = new WP_Font_Family( $font_data );
+		$font->install( $files_data );
+
+		$this->assertCount( count( $expected ), $this->files_in_dir( static::$fonts_dir ), 'Font directory should contain the same number of files as expected' );
+
+		foreach ( $expected as $font_file ) {
+			$font_file = path_join( static::$fonts_dir, $font_file );
+			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the fonts/ directory after installing" );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_should_not_install_duplicate_fontfaces() {
+		return array(
+			'single unique font face'    => array(
+				'font_data'  => array(
+					'name'       => 'Inter',
+					'slug'       => 'inter',
+					'fontFamily' => 'Inter',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Inter',
+							'fontStyle'    => 'italic',
+							'fontWeight'   => '900',
+							'uploadedFile' => 'files0',
+						),
+						array(
+							'fontFamily'   => 'Inter',
+							'fontStyle'    => 'italic',
+							'fontWeight'   => '900',
+							'uploadedFile' => 'files1',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'inter1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => wp_tempnam( 'Inter-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+					'files1' => array(
+						'name'     => 'inter1.woff',
+						'type'     => 'font/woff',
+						'tmp_name' => wp_tempnam( 'Inter-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'inter_italic_900.ttf' ),
+			),
+			'multiple unique font faces' => array(
+				'font_data'  => array(
+					'name'       => 'Lato',
+					'slug'       => 'lato',
+					'fontFamily' => 'Lato',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Lato',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
+							'uploadedFile' => 'files0',
+						),
+						array(
+							'fontFamily'   => 'Lato',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files1',
+						),
+						array(
+							'fontFamily'   => 'Lato',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files2',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'lato1.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => wp_tempnam( 'Lato-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+					'files1' => array(
+						'name'     => 'lato2.ttf',
+						'type'     => 'font/ttf',
+						'tmp_name' => wp_tempnam( 'Lato-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+					'files2' => array(
+						'name'     => 'lato2.woff',
+						'type'     => 'font/woff',
+						'tmp_name' => wp_tempnam( 'Lato-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'lato_normal_400.ttf', 'lato_normal_500.ttf' ),
+			),
+		);
+	}
+
+	public function test_should_overwrite_fontface_with_different_extension() {
+		$font_data_initial    = array(
+			'name'       => 'Inter',
+			'slug'       => 'inter',
+			'fontFamily' => 'Inter',
+			'fontFace'   => array(
+				array(
+					'fontFamily'   => 'Inter',
+					'fontStyle'    => 'italic',
+					'fontWeight'   => '500',
+					'uploadedFile' => 'files0',
+				),
+				array(
+					'fontFamily'   => 'Inter',
+					'fontStyle'    => 'italic',
+					'fontWeight'   => '900',
+					'uploadedFile' => 'files1',
+				),
+			),
+		);
+		$files_data_initial   = array(
+			'files0' => array(
+				'name'     => 'inter1.ttf',
+				'type'     => 'font/woff',
+				'tmp_name' => wp_tempnam( 'Inter-' ),
+				'error'    => 0,
+				'size'     => 123,
+			),
+			'files1' => array(
+				'name'     => 'inter1.woff',
+				'type'     => 'font/woff',
+				'tmp_name' => wp_tempnam( 'Inter-' ),
+				'error'    => 0,
+				'size'     => 123,
+			),
+		);
+		$font_data_overwrite  = array(
+			'name'       => 'Inter',
+			'slug'       => 'inter',
+			'fontFamily' => 'Inter',
+			'fontFace'   => array(
+				array(
+					'fontFamily'   => 'Inter',
+					'fontStyle'    => 'italic',
+					'fontWeight'   => '500',
+					'uploadedFile' => 'files0',
+				),
+				array(
+					'fontFamily'   => 'Inter',
+					'fontStyle'    => 'italic',
+					'fontWeight'   => '900',
+					'uploadedFile' => 'files1',
+				),
+			),
+		);
+		$files_data_overwrite = array(
+			'files0' => array(
+				'name'     => 'inter1.woff',
+				'type'     => 'font/woff',
+				'tmp_name' => wp_tempnam( 'Inter-' ),
+				'error'    => 0,
+				'size'     => 123,
+			),
+			'files1' => array(
+				'name'     => 'inter1.ttf',
+				'type'     => 'font/ttf',
+				'tmp_name' => wp_tempnam( 'Inter-' ),
+				'error'    => 0,
+				'size'     => 123,
+			),
+		);
+
+		$expected = array( 'inter_italic_500.woff', 'inter_italic_900.ttf' );
+
+		// Set up the temporary files.
+		foreach ( $files_data_initial as $file ) {
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			}
+		}
+		foreach ( $files_data_overwrite as $file ) {
+			if ( 'font/ttf' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $file['tmp_name'] );
+			} elseif ( 'font/woff' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
+			}
+		}
+
+		$font = new WP_Font_Family( $font_data_initial );
+		$font->install( $files_data_initial );
+
+		$font = new WP_Font_Family( $font_data_overwrite );
+		$font->install( $files_data_overwrite );
+
+		$this->assertCount( count( $expected ), $this->files_in_dir( static::$fonts_dir ), 'Font directory should contain the same number of files as expected' );
+
+		foreach ( $expected as $font_file ) {
+			$font_file = path_join( static::$fonts_dir, $font_file );
+			$this->assertFileExists( $font_file, "Font file [{$font_file}] should exists in the fonts/ directory after installing" );
+		}
 	}
 }

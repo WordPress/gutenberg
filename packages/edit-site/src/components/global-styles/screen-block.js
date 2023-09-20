@@ -118,8 +118,8 @@ function ScreenBlock( { name, variation } ) {
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
-		settings,
-		userSettings
+		userSettings,
+		settings
 	);
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
@@ -297,8 +297,8 @@ function ScreenBlock( { name, variation } ) {
 			{ hasImageSettingsPanel && (
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
-					userSettings={ userSettings }
-					settings={ settings }
+					value={ userSettings }
+					inheritedValue={ settings }
 				/>
 			) }
 

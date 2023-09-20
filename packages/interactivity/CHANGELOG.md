@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## 2.3.0 (2023-09-20)
+
 ### Enhancements
 
 -   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
+
+### Bug Fix
+
+-   Remove `role` attribute when set to `null` in `data-wp-bind`. ([#54608](https://github.com/WordPress/gutenberg/pull/54608))
+-   Add `timeout` option to `navigate()`, with a default value of `10000` milliseconds. ([#54474](https://github.com/WordPress/gutenberg/pull/54474))
 
 ## 2.2.0 (2023-08-31)
 

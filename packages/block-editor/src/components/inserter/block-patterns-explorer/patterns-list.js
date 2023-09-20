@@ -74,7 +74,7 @@ function PatternList( {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const { patterns: allPatterns, onClickPattern } = usePatternsState(
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -88,7 +88,7 @@ function PatternList( {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
-		const filteredPatterns = allPatterns.filter( ( pattern ) => {
+		const filteredPatterns = patterns.filter( ( pattern ) => {
 			if (
 				isPatternFiltered(
 					pattern,
@@ -127,7 +127,7 @@ function PatternList( {
 	}, [
 		searchValue,
 		patternSourceFilter,
-		allPatterns,
+		patterns,
 		selectedCategory,
 		registeredPatternCategories,
 		patternSyncFilter,
