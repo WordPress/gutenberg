@@ -41,15 +41,10 @@
 		height: $grid-unit-50;
 	}
 
-	&.is-size-compact {
-		input[type="search"].components-search-control__input {
-			height: $grid-unit-40;
-			padding-left: $grid-unit-10;
-		}
-
-		.components-search-control__icon {
-			right: $grid-unit-05;
-		}
+	&.is-size-compact input[type="search"].components-search-control__input {
+		height: $grid-unit-40;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-40;
 	}
 
 }
@@ -65,6 +60,10 @@
 	justify-content: center;
 
 	width: $icon-size;
+
+	.is-size-compact & {
+		right: $grid-unit-05;
+	}
 }
 
 .components-search-control__input-wrapper {
