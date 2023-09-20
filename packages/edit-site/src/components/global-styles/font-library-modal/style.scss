@@ -111,3 +111,19 @@
 		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 	}
 }
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.components-card {
+		width: 50%;
+		min-width: 250px;
+		max-width: 350px;
+	}
+}
