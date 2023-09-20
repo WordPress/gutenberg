@@ -260,9 +260,11 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             aria-label="$dialog_label"
             data-wp-class--initialized="context.core.image.initialized"
             data-wp-class--active="context.core.image.lightboxEnabled"
-			      data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
+            data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
             data-wp-bind--aria-hidden="!context.core.image.lightboxEnabled"
+            aria-hidden="true"
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
+            aria-modal="false"
             data-wp-effect="effects.core.image.initLightbox"
             data-wp-on--keydown="actions.core.image.handleKeydown"
             data-wp-on--mousewheel="actions.core.image.hideLightbox"
@@ -279,6 +281,23 @@ HTML;
 
 	return str_replace( '</figure>', $lightbox_html . '</figure>', $body_content );
 }
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_image_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-image-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-image-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-image-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_image_ensure_interactivity_dependency' );
 
 /**
  * Registers the `core/image` block on server.

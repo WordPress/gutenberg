@@ -202,9 +202,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
-				paths: [ tempCwd ],
-			} ) )
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
 		);
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {

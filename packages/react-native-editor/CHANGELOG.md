@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.104.0
 -   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
 -   [**] RichText - Update logic for the placeholder text color [#54259]
 

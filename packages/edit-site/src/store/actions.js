@@ -285,17 +285,17 @@ export const setPage =
 						.getEntityRecords( 'postType', 'wp_template', {
 							per_page: -1,
 						} )
-				 )?.find( ( { slug } ) => slug === currentTemplateSlug );
+				)?.find( ( { slug } ) => slug === currentTemplateSlug );
 				if ( currentTemplate ) {
 					template = currentTemplate;
 				} else {
 					// If a page has a `template` set and is not included in the list
 					// of the current theme's templates, query for current theme's default template.
-					template = await getDefaultTemplate( editedEntity?.link );
+					template = await getDefaultTemplate( editedEntity?.slug );
 				}
 			} else {
 				// Page's `template` is empty, that indicates we need to use the default template for the page.
-				template = await getDefaultTemplate( editedEntity?.link );
+				template = await getDefaultTemplate( editedEntity?.slug );
 			}
 		}
 

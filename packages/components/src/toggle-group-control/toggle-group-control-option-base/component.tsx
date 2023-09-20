@@ -38,7 +38,7 @@ const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } position="top center">
+			<Tooltip text={ text } placement="top">
 				{ children }
 			</Tooltip>
 		);

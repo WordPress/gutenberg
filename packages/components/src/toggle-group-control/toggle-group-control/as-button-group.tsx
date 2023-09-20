@@ -62,7 +62,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				isBlock: ! isAdaptiveWidth,
 				isDeselectable: true,
 				size,
-			} as ToggleGroupControlContextProps ),
+			} ) as ToggleGroupControlContextProps,
 		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
 	);
 
