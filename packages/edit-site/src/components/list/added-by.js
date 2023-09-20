@@ -19,10 +19,21 @@ import {
 } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
+
 /** @typedef {'wp_template'|'wp_template_part'} TemplateType */
 
 /** @type {TemplateType} */
-const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
+const TEMPLATE_POST_TYPE_NAMES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+];
 
 /**
  * @typedef {'theme'|'plugin'|'site'|'user'} AddedByType
@@ -176,7 +187,7 @@ export default function AddedBy( { postType, postId } ) {
 				{ text }
 				{ isCustomized && (
 					<span className="edit-site-list-added-by__customized-info">
-						{ postType === 'wp_template'
+						{ postType === TEMPLATE_POST_TYPE
 							? _x( 'Customized', 'template' )
 							: _x( 'Customized', 'template part' ) }
 					</span>
