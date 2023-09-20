@@ -322,12 +322,9 @@ test.describe( 'List View', () => {
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
 
-		// Focus should now be on the paragraph block since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
+		// Focus should now be on the list view toggle button.
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Paragraph block' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// List View should be closed.
