@@ -64,7 +64,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertArrayHasKey( 'data', $data, 'The response data does not have the key with the file data.' );
-		$this->assertSame( '{"this is mock data":true}', $data['data'], 'The response data does not have the expected file data.' );
+		$this->assertSame( array( 'this is mock data' => true ), $data['data'], 'The response data does not have the expected file data.' );
 	}
 
 	public function test_get_font_collection_from_url() {
