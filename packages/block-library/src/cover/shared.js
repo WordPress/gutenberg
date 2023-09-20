@@ -68,7 +68,6 @@ export function attributesFromMedia( media ) {
 	}
 
 	return {
-		useFeaturedImage: false,
 		url: media.url,
 		id: media.id,
 		alt: media?.alt,

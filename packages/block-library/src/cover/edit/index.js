@@ -189,6 +189,7 @@ function CoverEdit( {
 
 		setAttributes( {
 			...mediaAttributes,
+			useFeaturedImage: false,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
 		} );
