@@ -221,6 +221,15 @@ describe( 'Button', () => {
 		} );
 
 		describe( 'when isPressed is set', () => {
+			it( 'should set aria-pressed', () => {
+				render( <Button isPressed /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+					'aria-pressed',
+					'true'
+				);
+			} );
+
 			it( 'should use given aria-pressed value if provided', () => {
 				render( <Button isPressed aria-pressed={ false } /> );
 
@@ -304,15 +313,6 @@ describe( 'Button', () => {
 				);
 			}
 		);
-
-		it( 'should set aria-pressed when isPressed is set to', () => {
-			render( <Button isPressed /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-pressed',
-				'true'
-			);
-		} );
 
 		it( 'should populate tooltip with label content for buttons without visible labels (no children)', async () => {
 			const user = userEvent.setup();
