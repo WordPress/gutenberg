@@ -137,14 +137,13 @@ function CoverEdit( {
 				setOverlayColor( newOverlayColor );
 			}
 
+			const newIsDark = compositeIsDark(
+				dimRatio,
+				newOverlayColor,
+				averageBackgroundColor
+			);
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				isDark: compositeIsDark(
-					dimRatio,
-					newOverlayColor,
-					averageBackgroundColor
-				),
-			} );
+			setAttributes( { isDark: newIsDark } );
 		} )();
 		// Disable reason: Update the block only when the featured image changes.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,15 +181,16 @@ function CoverEdit( {
 		}
 
 		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
 
 		setAttributes( {
 			...mediaAttributes,
 			dimRatio: newDimRatio,
-			isDark: compositeIsDark(
-				newDimRatio,
-				newOverlayColor,
-				averageBackgroundColor
-			),
+			isDark: newIsDark,
 		} );
 	};
 
@@ -224,6 +224,12 @@ function CoverEdit( {
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
 		setOverlayColor( newOverlayColor );
 
 		// Make undo revert the next setAttributes and the previous setOverlayColor.
@@ -231,23 +237,21 @@ function CoverEdit( {
 
 		setAttributes( {
 			isUserOverlayColor: true,
-			isDark: compositeIsDark(
-				dimRatio,
-				newOverlayColor,
-				averageBackgroundColor
-			),
+			isDark: newIsDark,
 		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
 		setAttributes( {
 			dimRatio: newDimRatio,
-			isDark: compositeIsDark(
-				newDimRatio,
-				overlayColor.color,
-				averageBackgroundColor
-			),
+			isDark: newIsDark,
 		} );
 	};
 
