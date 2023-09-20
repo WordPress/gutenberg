@@ -32,5 +32,4 @@ class Tests_Fonts_WpFontLibrary_GetFontCollection extends WP_UnitTestCase {
 		$font_collection = WP_Font_Library::get_font_collection( 'not-registered-font-collection' );
 		$this->assertWPError( $font_collection );
 	}
-
 }

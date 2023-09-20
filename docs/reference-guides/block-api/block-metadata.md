@@ -464,7 +464,7 @@ Plugins and Themes can also register [custom block style](/docs/reference-guides
 
 It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
-See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
+See the [Example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 
 ### Variations
 
@@ -496,6 +496,25 @@ Block Variations is the API that allows a block to have similar versions of it, 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
 See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+
+### Block Hooks
+
+-   Type: `object`
+-   Optional
+-   Property: `blockHooks`
+-   Since: `WordPress 6.4.0`
+
+```json
+{
+	"blockHooks": {
+		"my-plugin/banner": "after"
+	}
+}
+```
+
+Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
+
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
 ### Editor Script
 

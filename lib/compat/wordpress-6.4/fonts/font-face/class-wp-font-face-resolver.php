@@ -5,6 +5,8 @@
  * @package    WordPress
  * @subpackage Fonts
  * @since      6.4.0
+ *
+ * @core-merge: this file is located in `wp-includes/fonts/`.
  */
 
 if ( class_exists( 'WP_Font_Face_Resolver' ) ) {
@@ -33,7 +35,7 @@ class WP_Font_Face_Resolver {
 		$settings = gutenberg_get_global_settings();
 
 		// Bail out early if there are no font settings.
-		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
+		if ( empty( $settings['typography']['fontFamilies'] ) ) {
 			return array();
 		}
 
@@ -54,10 +56,10 @@ class WP_Font_Face_Resolver {
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $definition ) {
 
-				// Skip if font-family "name" is not defined.
-				if ( empty( $definition['name'] ) ) {
-					continue;
-				}
+				// // Skip if font-family "name" is not defined.
+				// if ( empty( $definition['name'] ) ) {
+				// continue;
+				// }
 
 				// Skip if "fontFace" is not defined, meaning there are no variations.
 				if ( empty( $definition['fontFace'] ) ) {

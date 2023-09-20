@@ -39,7 +39,7 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				getBlockName,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			return getClientIdsOfDescendants( [ topLevelLockedBlock ] ).filter(
+			return getClientIdsOfDescendants( topLevelLockedBlock ).filter(
 				( clientId ) =>
 					getBlockName( clientId ) !== 'core/list-item' &&
 					getBlockEditingMode( clientId ) === 'contentOnly'
@@ -300,6 +300,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Border' ) }
 					/>
 					<InspectorControls.Slot group="styles" />
+					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background' ) }
+					/>
 					<PositionControls />
 					<div>
 						<AdvancedControls />

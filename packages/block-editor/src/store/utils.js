@@ -6,14 +6,7 @@
  * @return {Object} The mapped object.
  */
 export function mapRichTextSettings( attributeDefinition ) {
-	const {
-		multiline: multilineTag,
-		__unstableMultilineWrapperTags: multilineWrapperTags,
-		__unstablePreserveWhiteSpace: preserveWhiteSpace,
-	} = attributeDefinition;
-	return {
-		multilineTag,
-		multilineWrapperTags,
-		preserveWhiteSpace,
-	};
+	const { __unstablePreserveWhiteSpace: preserveWhiteSpace } =
+		attributeDefinition;
+	return { preserveWhiteSpace };
 }

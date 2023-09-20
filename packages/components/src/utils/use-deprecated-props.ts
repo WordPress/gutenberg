@@ -7,7 +7,7 @@ export function useDeprecated36pxDefaultSizeProp<
 	P extends Record< string, any > & {
 		__next36pxDefaultSize?: boolean;
 		__next40pxDefaultSize?: boolean;
-	}
+	},
 >(
 	props: P,
 	/** The component identifier in dot notation, e.g. `wp.components.ComponentName`. */

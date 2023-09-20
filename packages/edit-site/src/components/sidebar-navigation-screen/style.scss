@@ -109,10 +109,15 @@
 	&.is-dismissible {
 		padding-right: $grid-unit-10;
 	}
+
+	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
+		color: $gray-400;
+	}
+
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		color: $gray-100;
+		color: $white;
 	}
 }
 
@@ -134,6 +139,7 @@
 	.components-input-control__input {
 		color: $gray-200 !important;
 		background: $gray-800 !important;
+		border-radius: $radius-block-ui;
 	}
 	.components-input-control__backdrop {
 		border: 4px !important;

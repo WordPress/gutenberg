@@ -94,4 +94,3 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 	}
 
 }
-

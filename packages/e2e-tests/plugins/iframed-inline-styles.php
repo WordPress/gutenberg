@@ -9,14 +9,14 @@
 
 add_action(
 	'setup_theme',
-	static function() {
+	static function () {
 		add_theme_support( 'block-templates' );
 	}
 );
 
 add_action(
 	'init',
-	static function() {
+	static function () {
 		wp_register_script(
 			'iframed-inline-styles-editor-script',
 			plugin_dir_url( __FILE__ ) . 'iframed-inline-styles/editor.js',
@@ -40,7 +40,7 @@ add_action(
 
 add_action(
 	'enqueue_block_editor_assets',
-	static function() {
+	static function () {
 		wp_enqueue_style(
 			'iframed-inline-styles-compat-style',
 			plugin_dir_url( __FILE__ ) . 'iframed-inline-styles/compat-style.css',

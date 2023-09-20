@@ -72,7 +72,6 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		echo ( print_r( $response->get_data(), true ) );
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-
 	}
 
 

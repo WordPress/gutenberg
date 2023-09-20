@@ -44,7 +44,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 					'id'          => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
-					'data'        => '{"this is mock data":true}',
+					'data'        => array( 'this is mock data' => true ),
 				),
 			),
 		);

@@ -91,11 +91,6 @@ The following properties (non-exhaustive list) are made available:
 -   `placeholder: string` - A text hint to be shown to the user when the field
     value is empty, similar to the
     [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
--   `multiline: String` - A tag name to use for the tag that should be inserted
-    when Enter is pressed. For example: `li` in a list block, and `p` for a
-    block that can contain multiple paragraphs. The default is that only inline
-    elements are allowed to be used in inserted into the text, effectively
-    disabling the behavior of the "Enter" key.
 
 Example:
 

@@ -234,6 +234,7 @@ example: {
 #### variations (optional)
 
 -   **Type:** `Object[]`
+-   **Since**: `WordPress 5.9.0`
 
 Similarly to how the block's styles can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
 
@@ -265,6 +266,7 @@ parent: [ 'core/columns' ],
 #### ancestor (optional)
 
 -   **Type:** `Array`
+-   **Since**: `WordPress 6.0.0`
 
 The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
@@ -272,6 +274,35 @@ The `ancestor` property makes a block available inside the specified block types
 // Only allow this block when it is nested at any level in a Columns block.
 ancestor: [ 'core/columns' ],
 ```
+
+#### Block Hooks (optional)
+
+-   **Type:** `Object`
+-   **Since**: `WordPress 6.4.0`
+
+Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
+
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Allowed target values are:
+
+-   `before` – inject before the target block.
+-   `after` - inject after the target block.
+-   `firstChild` - inject before the first inner block of the target container block.
+-   `lastChild` - inject after the last inner block of the target container block.
+
+```js
+{
+	blockHooks: {
+		'core/verse': 'before'
+		'core/spacer': 'after',
+		'core/column': 'firstChild',
+		'core/group': 'lastChild',
+	}
+}
+```
+
+It’s crucial to emphasize that the Block Hooks feature is only designed to work with _static_ block-based templates, template parts, and patterns. For patterns, this includes those provided by the theme, from [Block Pattern Directory](https://wordpress.org/patterns/), or from calls to [`register_block_pattern`](https://developer.wordpress.org/reference/functions/register_block_pattern/).
+
+Block Hooks will not work with post content or patterns crafted by the user, such as synced patterns, or theme templates and template parts that have been modified by the user.
 
 ## Block Collections
 
