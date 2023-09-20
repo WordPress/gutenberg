@@ -64,10 +64,10 @@ add_action(
 );
 
 $default_font_collection = array(
-	'id'             => 'google-fonts',
-	'name'           => 'Google Fonts',
+	'id'             => 'default-font-collection',
+	'name'           => 'Default Font Collection',
 	'description'    => __( 'Add from Google Fonts. Fonts are copied to and served from your site.' ),
-	'data_json_file' => path_join( __DIR__, 'google-fonts.json' ),
+	'data_json_file' => path_join( __DIR__, 'default-font-collection.json' ),
 );
 
 wp_register_font_collection( $default_font_collection );

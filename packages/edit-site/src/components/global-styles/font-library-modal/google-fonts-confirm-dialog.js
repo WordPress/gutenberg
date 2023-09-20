@@ -14,7 +14,7 @@ function GoogleFontsConfirmDialog() {
 	const handleConfirm = () => {
 		// eslint-disable-next-line no-undef
 		window.localStorage.setItem(
-			'wp-font-library-google-fonts-permission',
+			'wp-font-library-default-font-collection-permission',
 			'true'
 		);
 		window.dispatchEvent( new Event( 'storage' ) );

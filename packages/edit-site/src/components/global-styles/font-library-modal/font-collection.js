@@ -35,12 +35,12 @@ const DEFAULT_CATEGORY = {
 	name: __( 'All' ),
 };
 function FontCollection( { id } ) {
-	const requiresPermission = id === 'google-fonts';
+	const requiresPermission = id === 'default-font-collection';
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
 			window.localStorage.getItem(
-				'wp-font-library-google-fonts-permission'
+				'wp-font-library-default-font-collection-permission'
 			) === 'true'
 		);
 	};
