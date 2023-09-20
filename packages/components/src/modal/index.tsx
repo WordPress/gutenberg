@@ -296,16 +296,16 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						<div ref={ childrenContainerRef }>
-							<div
-								ref={
-									focusOnMount === 'firstContentElement'
-										? focusOnMountRef
-										: undefined
-								}
-							>
-								{ children }
-							</div>
+
+						<div
+							ref={ useMergeRefs( [
+								childrenContainerRef,
+								focusOnMount === 'firstContentElement'
+									? focusOnMountRef
+									: null,
+							] ) }
+						>
+							{ children }
 						</div>
 					</div>
 				</div>
