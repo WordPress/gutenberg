@@ -84,7 +84,6 @@ function UnforwardedModal(
 	const focusOutsideProps = useFocusOutside( onRequestClose );
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
-	const noopRef = useRef< HTMLDivElement >( null );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
@@ -229,7 +228,7 @@ function UnforwardedModal(
 						focusReturnRef,
 						focusOnMount !== 'firstContentElement'
 							? focusOnMountRef
-							: noopRef,
+							: null,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
@@ -294,7 +293,7 @@ function UnforwardedModal(
 								ref={
 									focusOnMount === 'firstContentElement'
 										? focusOnMountRef
-										: noopRef
+										: undefined
 								}
 							>
 								{ children }
