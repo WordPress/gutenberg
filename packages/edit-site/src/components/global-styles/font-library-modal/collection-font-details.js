@@ -11,6 +11,7 @@ import {
  */
 import CollectionFontVariant from './collection-font-variant';
 import { isFontFontFaceInOutline } from './utils/fonts-outline';
+import { sortFontFaces } from './utils/sort-font-faces';
 
 function CollectionFontDetails( {
 	font,
@@ -19,7 +20,7 @@ function CollectionFontDetails( {
 } ) {
 	const fontFaces =
 		font.fontFace && font.fontFace.length
-			? font.fontFace
+			? sortFontFaces( font.fontFace )
 			: [
 					{
 						fontFamily: font.fontFamily,
