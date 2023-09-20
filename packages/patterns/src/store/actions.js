@@ -46,10 +46,11 @@ export const createPattern =
 
 /**
  * Create a pattern from a JSON file.
- * @param {File} file The JSON file instance of the pattern.
+ * @param {File}               file         The JSON file instance of the pattern.
+ * @param {number[]|undefined} [categories] Ids of any selected categories.
  */
 export const createPatternFromFile =
-	( file ) =>
+	( file, categories ) =>
 	async ( { dispatch } ) => {
 		const fileContent = await file.text();
 		/** @type {import('./types').PatternJSON} */
@@ -74,7 +75,8 @@ export const createPatternFromFile =
 		const pattern = await dispatch.createPattern(
 			parsedContent.title,
 			parsedContent.syncStatus,
-			parsedContent.content
+			parsedContent.content,
+			categories
 		);
 
 		return pattern;

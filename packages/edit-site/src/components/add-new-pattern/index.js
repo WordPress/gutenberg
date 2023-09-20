@@ -20,7 +20,12 @@ import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
+import {
+	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
+import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModal } = unlock( editPatternsPrivateApis );
@@ -39,6 +44,7 @@ export default function AddNewPattern() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
+	const { patternCategories } = usePatternCategories();
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -129,13 +135,22 @@ export default function AddNewPattern() {
 					const file = event.target.files?.[ 0 ];
 					if ( ! file ) return;
 					try {
-						const pattern = await createPatternFromFile( file );
+						const currentCategoryId =
+							params.categoryType !== TEMPLATE_PART_POST_TYPE &&
+							patternCategories.find(
+								( category ) =>
+									category.name === params.categoryId
+							)?.id;
+						const pattern = await createPatternFromFile(
+							file,
+							currentCategoryId
+								? [ currentCategoryId ]
+								: undefined
+						);
 
-						// Navigate to the All patterns category for the newly created pattern.
-						if (
-							params.categoryType !== PATTERN_TYPES.theme ||
-							params.categoryId !== PATTERN_DEFAULT_CATEGORY
-						) {
+						// Navigate to the All patterns category for the newly created pattern
+						// if we're not on that page already.
+						if ( ! currentCategoryId ) {
 							history.push( {
 								path: `/patterns`,
 								categoryType: PATTERN_TYPES.theme,
