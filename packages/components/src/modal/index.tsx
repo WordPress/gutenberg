@@ -79,11 +79,12 @@ function UnforwardedModal(
 
 	// The focus hook does not support 'firstContentElement' but this is a valid
 	// value for the Modal's focusOnMount prop. The following code ensures the focus
-	// hook will focus the first element in the element to which it is applied.
+	// hook will focus the first focusable node within the element to which it is applied.
 	// When `firstContentElement` is passed as the value of the focusOnMount prop,
-	// the focus hook is applied to the Modal's contentRef. Otherwise, the focus hook
-	// is applied to the Modal's ref. This ensures that the focus hook will focus the
-	// first element in the Modal's **content** when `firstContentElement` is passed.
+	// the focus hook is applied to the Modal's content element.
+	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
+	// focus hook will focus the first element in the Modal's **content** when
+	// `firstContentElement` is passed.
 	const focusOnMountRef = useFocusOnMount(
 		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
 	);
