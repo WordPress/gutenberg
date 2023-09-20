@@ -400,9 +400,7 @@ const elementTypes = [
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useId(
-			BlockListBlock
-		) }`;
+		const blockElementsContainerIdentifier = `wp-elements-${ useId() }`;
 
 		// The .editor-styles-wrapper selector is required on elements styles. As it is
 		// added to all other editor styles, not providing it causes reset and global
