@@ -14,6 +14,7 @@ const {
 	hasFileArgInCLI,
 	hasProjectFile,
 	hasPackageProp,
+	searchConfig,
 } = require( '../utils' );
 
 const args = getArgsFromCLI();
@@ -24,12 +25,7 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--configFile' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc.js' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc.json' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc.yaml' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc.yml' ) ||
-	hasProjectFile( 'npmpackagejsonlint.config.js' ) ||
-	hasProjectFile( '.npmpackagejsonlintrc' ) ||
+	searchConfig( 'npmpackagejsonlint' ) ||
 	hasPackageProp( 'npmpackagejsonlint' ) ||
 	// npm-package-json-lint v3.x used a different prop name.
 	hasPackageProp( 'npmPackageJsonLintConfig' );

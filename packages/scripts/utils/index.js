@@ -24,6 +24,7 @@ const {
 } = require( './config' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { getPackageProp, hasPackageProp } = require( './package' );
+const { searchConfig } = require( './cosmiconf' );
 
 module.exports = {
 	fromProjectRoot,
@@ -48,4 +49,5 @@ module.exports = {
 	hasPrettierConfig,
 	hasProjectFile,
 	spawnScript,
+	searchConfig,
 };
