@@ -114,8 +114,8 @@ function GridItem( { categoryId, item, ...props } ) {
 		const json = {
 			__file: item.type,
 			title: item.title,
-			content: item.reusableBlock.content.raw,
-			syncStatus: item.reusableBlock.wp_pattern_sync_status,
+			content: item.patternBlock.content.raw,
+			syncStatus: item.patternBlock.wp_pattern_sync_status,
 		};
 
 		return downloadjs(

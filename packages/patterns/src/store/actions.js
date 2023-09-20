@@ -71,7 +71,7 @@ export const createPatternFromFile =
 			throw new Error( 'Invalid Pattern JSON file' );
 		}
 
-		const pattern = await dispatch.__experimentalCreatePattern(
+		const pattern = await dispatch.createPattern(
 			parsedContent.title,
 			parsedContent.syncStatus,
 			parsedContent.content
