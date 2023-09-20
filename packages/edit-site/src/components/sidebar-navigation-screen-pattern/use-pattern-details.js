@@ -35,13 +35,13 @@ export default function usePatternDetails( postType, postId ) {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-	const { currentTheme, patternCategories } = useSelect( ( select ) => {
+	const { currentTheme, userPatternCategories } = useSelect( ( select ) => {
 		const { getCurrentTheme, getUserPatternCategories } =
 			select( coreStore );
 
 		return {
 			currentTheme: getCurrentTheme(),
-			patternCategories: getUserPatternCategories().patternCategoriesMap,
+			userPatternCategories: getUserPatternCategories(),
 		};
 	}, [] );
 
@@ -96,6 +96,11 @@ export default function usePatternDetails( postType, postId ) {
 			} );
 		}
 		if ( record.wp_pattern_category?.length > 0 ) {
+			const patternCategories = new Map();
+			userPatternCategories.forEach( ( userCategory ) =>
+				patternCategories.set( userCategory.id, userCategory )
+			);
+
 			const categories = record.wp_pattern_category
 				.filter( ( category ) => patternCategories.get( category ) )
 				.map( ( category ) => patternCategories.get( category ).label );

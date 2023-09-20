@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 25.8.0 (2023-09-20)
+
 ### Enhancements
 
+-   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
 -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
 -   `Popover`: Add the `is-positioned` CSS class only after the popover has finished animating ([#54178](https://github.com/WordPress/gutenberg/pull/54178)).
@@ -13,10 +16,13 @@
 -   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
 -   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
 -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+-   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
 -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+- `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fix
 
+-   `Notice`: Make the Close button render a tooltip to visually expose its accessible name. All icon buttons must always show a tooltip ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   `Tooltip`: dynamically render in the DOM only when visible ([#54312](https://github.com/WordPress/gutenberg/pull/54312)).
 -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
 -   `ToolbarItem`: Fix children not showing in rendered components ([#53314](https://github.com/WordPress/gutenberg/pull/53314)).
@@ -37,6 +43,7 @@
 -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
 -   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
 -   `Toolbar/ToolbarGroup`: Convert component to TypeScript ([#54317](https://github.com/WordPress/gutenberg/pull/54317)).
+-   `Modal`: add more unit tests ([#54569](https://github.com/WordPress/gutenberg/pull/54569)).
 
 ### Experimental
 

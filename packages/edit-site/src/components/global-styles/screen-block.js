@@ -118,8 +118,8 @@ function ScreenBlock( { name, variation } ) {
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
-		settings,
-		userSettings
+		userSettings,
+		settings
 	);
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
@@ -297,8 +297,8 @@ function ScreenBlock( { name, variation } ) {
 			{ hasImageSettingsPanel && (
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
-					userSettings={ userSettings }
-					settings={ settings }
+					value={ userSettings }
+					inheritedValue={ settings }
 				/>
 			) }
 
@@ -308,7 +308,7 @@ function ScreenBlock( { name, variation } ) {
 						{ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
-								'Add your own CSS to customize the appearance of the %s block.'
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
 							blockType?.title
 						) }

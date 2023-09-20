@@ -207,6 +207,23 @@ function register_block_core_search() {
 add_action( 'init', 'register_block_core_search' );
 
 /**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ */
+function block_core_search_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-search-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-search-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-search-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_search_ensure_interactivity_dependency' );
+
+/**
  * Builds the correct top level classnames for the 'core/search' block.
  *
  * @param array $attributes The block attributes.
@@ -266,7 +283,7 @@ function classnames_for_block_core_search( $attributes ) {
  * @return void
  */
 function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
-	$is_button_inside = 'button-inside' === _wp_array_get( $attributes, array( 'buttonPosition' ), false );
+	$is_button_inside = isset( $attributes['buttonPosition'] ) && 'button-inside' === $attributes['buttonPosition'];
 
 	$path = array( 'style', 'border', $property );
 

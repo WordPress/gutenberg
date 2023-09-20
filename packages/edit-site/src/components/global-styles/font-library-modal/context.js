@@ -15,7 +15,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
+import {
+	fetchInstallFonts,
+	fetchUninstallFonts,
+	fetchFontCollections,
+	fetchFontCollection,
+} from './resolvers';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import {
@@ -52,7 +57,7 @@ function FontLibraryProvider( { children } ) {
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	const refreshLibrary = () => {
-		setRefreshKey( ( prevKey ) => prevKey + 1 );
+		setRefreshKey( Date.now() );
 	};
 
 	const {
@@ -313,6 +318,30 @@ function FontLibraryProvider( { children } ) {
 		loadedFontUrls.add( src );
 	};
 
+	// Font Collections
+	const [ collections, setFontCollections ] = useState( [] );
+	const getFontCollections = async () => {
+		const response = await fetchFontCollections();
+		setFontCollections( response );
+	};
+	const getFontCollection = async ( id ) => {
+		const hasData = !! collections.find(
+			( collection ) => collection.id === id
+		)?.data;
+		if ( hasData ) return;
+		const response = await fetchFontCollection( id );
+		const updatedCollections = collections.map( ( collection ) =>
+			collection.id === id
+				? { ...collection, data: { ...response?.data } }
+				: collection
+		);
+		setFontCollections( updatedCollections );
+	};
+
+	useEffect( () => {
+		getFontCollections();
+	}, [] );
+
 	return (
 		<FontLibraryContext.Provider
 			value={ {
@@ -337,6 +366,8 @@ function FontLibraryProvider( { children } ) {
 				isResolvingLibrary,
 				hasResolvedLibrary,
 				isInstalling,
+				collections,
+				getFontCollection,
 			} }
 		>
 			{ children }

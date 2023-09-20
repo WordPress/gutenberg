@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.13.0 (2023-09-20)
+
 ### Enhancement
 
 -    Update promise order in `loginUser` to avoid any flakiness in the tests.
