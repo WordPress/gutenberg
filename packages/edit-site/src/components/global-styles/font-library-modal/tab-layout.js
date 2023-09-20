@@ -24,7 +24,7 @@ function TabLayout( { title, description, handleBack, children, footer } ) {
 									variant="tertiary"
 									onClick={ handleBack }
 									icon={ chevronLeft }
-									isSmall
+									size="small"
 								/>
 							) }
 							{ title && (
