@@ -247,7 +247,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 		const newIsDark = compositeIsDark(
 			dimRatio,
-			newOverlayColor,
+			overlayColor.color,
 			averageBackgroundColor
 		);
 
