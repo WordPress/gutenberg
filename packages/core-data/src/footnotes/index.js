@@ -57,7 +57,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			if ( value.indexOf( 'data-fn="' ) === -1 ) {
+			if ( value.indexOf( 'data-fn' ) === -1 ) {
 				continue;
 			}
 
