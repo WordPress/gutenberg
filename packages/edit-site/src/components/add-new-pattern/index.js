@@ -145,6 +145,8 @@ export default function AddNewPattern() {
 							type: 'snackbar',
 							id: 'import-pattern-error',
 						} );
+					} finally {
+						event.target.value = '';
 					}
 				} }
 			/>
