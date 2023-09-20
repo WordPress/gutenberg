@@ -72,7 +72,6 @@ export function attributesFromMedia( media ) {
 		id: media.id,
 		alt: media?.alt,
 		backgroundType: mediaType,
-		focalPoint: undefined,
 		...( mediaType === VIDEO_BACKGROUND_TYPE
 			? { hasParallax: undefined }
 			: {} ),

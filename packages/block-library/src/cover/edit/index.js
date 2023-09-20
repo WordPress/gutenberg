@@ -189,6 +189,7 @@ function CoverEdit( {
 
 		setAttributes( {
 			...mediaAttributes,
+			focalPoint: undefined,
 			useFeaturedImage: false,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
