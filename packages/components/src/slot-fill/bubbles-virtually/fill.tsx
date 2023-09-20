@@ -55,7 +55,7 @@ export default function Fill( props: FillComponentProps ) {
 	const wrappedChildren = (
 		<StyleProvider document={ slot.ref.current.ownerDocument }>
 			{ typeof children === 'function'
-				? children( slot.fillProps )
+				? children( slot.fillProps ?? {} )
 				: children }
 		</StyleProvider>
 	);

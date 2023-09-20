@@ -9,7 +9,7 @@ export type DistributiveOmit< T, K extends keyof any > = T extends any
 
 export type SlotKey = string | symbol;
 
-export type FillProps = any;
+export type FillProps = Record< string, any >;
 
 type SlotPropBase = {
 	/**
