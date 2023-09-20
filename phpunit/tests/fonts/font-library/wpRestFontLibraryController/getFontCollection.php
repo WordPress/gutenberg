@@ -21,6 +21,8 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 		// Mock font collection data file.
 		$mock_file = wp_tempnam( 'one-collection-' );
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
+		// Mock the wp_remote_request() function.
+		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 
 		$config_with_file = array(
 			'id'          => 'one-collection',
@@ -34,7 +36,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 			'id'          => 'collection-with-url',
 			'name'        => 'Another Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
-			'src'         => 'https://raw.githubusercontent.com/WordPress/gutenberg/trunk/schemas/json/theme.json',
+			'src'         => 'https://localhost/fonts/mock-font-collection.json',
 		);
 
 		wp_register_font_collection( $config_with_url );
@@ -56,6 +58,35 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 		);
 
 		wp_register_font_collection( $config_with_non_existing_url );
+	}
+
+	public function mock_request( $preempt, $args, $url ) {
+		// Check if it's the URL you want to mock.
+		if ( 'https://localhost/fonts/mock-font-collection.json' === $url ) {
+
+			// Mock the response body.
+			$mock_collection_data = array(
+				'fontFamilies' => 'mock',
+				'categories'   => 'mock',
+			);
+
+			return array(
+				'body'     => json_encode( $mock_collection_data ),
+				'response' => array(
+					'code' => 200,
+				),
+			);
+		}
+
+		// For any other URL, return false which ensures the request is made as usual (or you can return other mock data).
+		return false;
+	}
+
+	public function tear_down() {
+		// Remove the mock to not affect other tests.
+		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
+
+		parent::tear_down();
 	}
 
 	public function test_get_font_collection_from_file() {
