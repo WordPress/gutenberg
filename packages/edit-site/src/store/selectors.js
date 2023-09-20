@@ -366,8 +366,7 @@ export function isPage( state ) {
 }
 
 /**
- * Whether the site editor allows only page content blocks to be edited,
- * as opposed to any surrounding template entities or template parts.
+ * Whether or not the editor allows only page content to be edited.
  *
  * @param {Object} state Global application state.
  *
@@ -375,21 +374,4 @@ export function isPage( state ) {
  */
 export function hasPageContentFocus( state ) {
 	return isPage( state ) ? state.hasPageContentFocus : false;
-}
-
-/**
- * Returns the type of the current page content focus, or null if there is no
- * page content focus.
- *
- * Possible values are:
- *
- * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
- * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
- *
- * @param {Object} state Global application state.
- *
- * @return {'disableTemplate'|'hideTemplate'|null} Type of the current page content focus.
- */
-export function getPageContentFocusType( state ) {
-	return hasPageContentFocus( state ) ? state.pageContentFocusType : null;
 }

@@ -285,7 +285,7 @@ export const setPage =
 						.getEntityRecords( 'postType', 'wp_template', {
 							per_page: -1,
 						} )
-				 )?.find( ( { slug } ) => slug === currentTemplateSlug );
+				)?.find( ( { slug } ) => slug === currentTemplateSlug );
 				if ( currentTemplate ) {
 					template = currentTemplate;
 				} else {
@@ -616,7 +616,7 @@ export const switchEditorMode =
 	};
 
 /**
- * Sets whether the editor allows only page content to be edited.
+ * Sets whether or not the editor allows only page content to be edited.
  *
  * @param {boolean} hasPageContentFocus True to allow only page content to be
  *                                      edited, false to allow template to be
@@ -676,20 +676,3 @@ export const toggleDistractionFree =
 				);
 		} );
 	};
-
-/**
- * Sets the type of page content focus. Can be one of:
- *
- * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
- * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
- *
- * @param {'disableTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
- *
- * @return {Object} Action object.
- */
-export function setPageContentFocusType( pageContentFocusType ) {
-	return {
-		type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
-		pageContentFocusType,
-	};
-}

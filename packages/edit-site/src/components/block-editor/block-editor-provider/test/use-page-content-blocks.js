@@ -31,7 +31,11 @@ describe( 'usePageContentBlocks', () => {
 		createBlock( 'core/group', {}, [
 			createBlock( 'core/post-title' ),
 			createBlock( 'core/post-featured-image' ),
-			createBlock( 'core/query' ),
+			createBlock( 'core/query', {}, [
+				createBlock( 'core/post-title' ),
+				createBlock( 'core/post-featured-image' ),
+				createBlock( 'core/post-content' ),
+			] ),
 			createBlock( 'core/post-content' ),
 		] ),
 		createBlock( 'core/query' ),

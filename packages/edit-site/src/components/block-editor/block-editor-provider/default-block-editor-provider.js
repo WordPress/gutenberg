@@ -34,13 +34,14 @@ export default function DefaultBlockEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();
 
 	const { templateType, isTemplateHidden } = useSelect( ( select ) => {
-		const { getEditedPostType, getPageContentFocusType } =
-			select( editSiteStore );
-		const canvasMode = unlock( select( editSiteStore ) ).getCanvasMode();
+		const { getEditedPostType } = select( editSiteStore );
+		const { getPageContentFocusType, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		return {
 			templateType: getEditedPostType(),
 			isTemplateHidden:
-				canvasMode === 'edit' &&
+				getCanvasMode() === 'edit' &&
 				getPageContentFocusType() === 'hideTemplate',
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 		};

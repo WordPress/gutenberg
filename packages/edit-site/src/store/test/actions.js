@@ -13,7 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
-import { setHasPageContentFocus, setPageContentFocusType } from '../actions';
+import { setHasPageContentFocus } from '../actions';
 
 const ENTITY_TYPES = {
 	wp_template: {
@@ -330,15 +330,6 @@ describe( 'actions', () => {
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
 				hasPageContentFocus: false,
-			} );
-		} );
-	} );
-
-	describe( 'setPageContentFocusType', () => {
-		it( 'sets the page content focus type', () => {
-			expect( setPageContentFocusType( 'disableTemplate' ) ).toEqual( {
-				type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
-				pageContentFocusType: 'disableTemplate',
 			} );
 		} );
 	} );

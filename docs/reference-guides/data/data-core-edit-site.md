@@ -106,23 +106,6 @@ _Returns_
 
 -   `Object`: Page.
 
-### getPageContentFocusType
-
-Returns the type of the current page content focus, or null if there is no page content focus.
-
-Possible values are:
-
--   `'disableTemplate'`: Disable the blocks belonging to the page's template.
--   `'hideTemplate'`: Hide the blocks belonging to the page's template.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `'disableTemplate'|'hideTemplate'|null`: Type of the current page content focus.
-
 ### getReusableBlocks
 
 Returns any available Reusable blocks.
@@ -150,7 +133,7 @@ _Returns_
 
 ### hasPageContentFocus
 
-Whether the site editor allows only page content blocks to be edited, as opposed to any surrounding template entities or template parts.
+Whether or not the editor allows only page content to be edited.
 
 _Parameters_
 
@@ -312,7 +295,7 @@ _Returns_
 
 ### setHasPageContentFocus
 
-Sets whether the editor allows only page content to be edited.
+Sets whether or not the editor allows only page content to be edited.
 
 _Parameters_
 
@@ -395,21 +378,6 @@ _Parameters_
 _Returns_
 
 -   `number`: The resolved template ID for the page route.
-
-### setPageContentFocusType
-
-Sets the type of page content focus. Can be one of:
-
--   `'disableTemplate'`: Disable the blocks belonging to the page's template.
--   `'hideTemplate'`: Hide the blocks belonging to the page's template.
-
-_Parameters_
-
--   _pageContentFocusType_ `'disableTemplate'|'hideTemplate'`: The type of page content focus.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### setTemplate
 

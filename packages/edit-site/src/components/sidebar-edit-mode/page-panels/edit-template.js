@@ -30,15 +30,11 @@ const POPOVER_PROPS = {
 export default function EditTemplate() {
 	const { hasResolved, template, isTemplateHidden } = useSelect(
 		( select ) => {
-			const {
-				getEditedPostContext,
-				getEditedPostType,
-				getEditedPostId,
-				getPageContentFocusType,
-			} = select( editSiteStore );
-			const canvasMode = unlock(
+			const { getEditedPostContext, getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getCanvasMode, getPageContentFocusType } = unlock(
 				select( editSiteStore )
-			).getCanvasMode();
+			);
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const _context = getEditedPostContext();
@@ -54,17 +50,18 @@ export default function EditTemplate() {
 					queryArgs
 				),
 				template: getEditedEntityRecord( ...queryArgs ),
-				pageContentFocusType: getPageContentFocusType(),
 				isTemplateHidden:
-					canvasMode === 'edit' &&
+					getCanvasMode() === 'edit' &&
 					getPageContentFocusType() === 'hideTemplate',
 			};
 		},
 		[]
 	);
 
-	const { setHasPageContentFocus, setPageContentFocusType } =
-		useDispatch( editSiteStore );
+	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	// Disable reason: `useDispatch` can't be called conditionally.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { setPageContentFocusType } = unlock( useDispatch( editSiteStore ) );
 
 	if ( ! hasResolved ) {
 		return null;
