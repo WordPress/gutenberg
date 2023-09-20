@@ -73,7 +73,7 @@ export default function SidebarNavigationScreenPage() {
 			actions={
 				<>
 					<PageActions
-						postId={ postId }
+						post={ record }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
 							navigator.goTo( '/page' );

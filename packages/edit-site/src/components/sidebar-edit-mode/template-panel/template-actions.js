@@ -11,11 +11,12 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
+import RenameMenuItem from '../../rename-menu-item';
 
 export default function Actions( { template } ) {
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
-	if ( ! isRevertable ) {
+	if ( ! isRevertable && ! template.is_custom ) {
 		return null;
 	}
 	return (
@@ -27,17 +28,20 @@ export default function Actions( { template } ) {
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
-					<MenuItem
-						info={ __(
-							'Use the template as supplied by the theme.'
-						) }
-						onClick={ () => {
-							revertTemplate( template );
-							onClose();
-						} }
-					>
-						{ __( 'Clear customizations' ) }
-					</MenuItem>
+					{ isRevertable && (
+						<MenuItem
+							info={ __(
+								'Use the template as supplied by the theme.'
+							) }
+							onClick={ () => {
+								revertTemplate( template );
+								onClose();
+							} }
+						>
+							{ __( 'Clear customizations' ) }
+						</MenuItem>
+					) }
+					<RenameMenuItem item={ template } onClose={ onClose } />
 				</MenuGroup>
 			) }
 		</DropdownMenu>

@@ -51,11 +51,7 @@ export default function TrashPageMenuItem( { postId, onRemove } ) {
 	}
 	return (
 		<>
-			<MenuItem
-				onClick={ () => removePage() }
-				isDestructive
-				variant="secondary"
-			>
+			<MenuItem onClick={ () => removePage() } isDestructive>
 				{ __( 'Move to Trash' ) }
 			</MenuItem>
 		</>

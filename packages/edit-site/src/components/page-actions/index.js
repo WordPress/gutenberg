@@ -9,9 +9,10 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import TrashPageMenuItem from './trash-page-menu-item';
+import EditPageMenuItem from '../rename-menu-item';
 
 export default function PageActions( {
-	postId,
+	post,
 	className,
 	toggleProps,
 	onRemove,
@@ -23,10 +24,11 @@ export default function PageActions( {
 			className={ className }
 			toggleProps={ toggleProps }
 		>
-			{ () => (
+			{ ( { onClose } ) => (
 				<MenuGroup>
+					<EditPageMenuItem item={ post } onClose={ onClose } />
 					<TrashPageMenuItem
-						postId={ postId }
+						postId={ post.id }
 						onRemove={ onRemove }
 					/>
 				</MenuGroup>

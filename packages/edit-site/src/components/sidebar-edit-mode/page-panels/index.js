@@ -20,30 +20,26 @@ import { store as editSiteStore } from '../../../store';
 import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
+import PageActions from './page-actions';
 
 export default function PagePanels() {
-	const { id, type, hasResolved, status, date, password, title, modified } =
-		useSelect( ( select ) => {
-			const { getEditedPostContext } = select( editSiteStore );
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const context = getEditedPostContext();
-			const queryArgs = [ 'postType', context.postType, context.postId ];
-			const page = getEditedEntityRecord( ...queryArgs );
-			return {
-				hasResolved: hasFinishedResolution(
-					'getEditedEntityRecord',
-					queryArgs
-				),
-				title: page?.title,
-				id: page?.id,
-				type: page?.type,
-				status: page?.status,
-				date: page?.date,
-				password: page?.password,
-				modified: page?.modified,
-			};
-		}, [] );
+	const { page, hasResolved } = useSelect( ( select ) => {
+		const { getEditedPostContext } = select( editSiteStore );
+		const { getEditedEntityRecord, hasFinishedResolution } =
+			select( coreStore );
+		const context = getEditedPostContext();
+		const queryArgs = [ 'postType', context.postType, context.postId ];
+		const record = getEditedEntityRecord( ...queryArgs );
+		return {
+			hasResolved: hasFinishedResolution(
+				'getEditedEntityRecord',
+				queryArgs
+			),
+			page: record,
+		};
+	}, [] );
+
+	const { id, type, status, date, password, title, modified } = page;
 
 	if ( ! hasResolved ) {
 		return null;
@@ -55,6 +51,7 @@ export default function PagePanels() {
 				<SidebarCard
 					title={ decodeEntities( title ) }
 					icon={ pageIcon }
+					actions={ <PageActions page={ page } /> }
 					description={
 						<VStack>
 							<Text>
