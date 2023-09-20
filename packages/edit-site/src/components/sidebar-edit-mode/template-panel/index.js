@@ -17,6 +17,7 @@ import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
 import LastRevision from './last-revision';
 import SidebarCard from '../sidebar-card';
+import PatternCategories from './pattern-categories';
 
 const CARD_ICONS = {
 	wp_block: symbol,
@@ -24,24 +25,29 @@ const CARD_ICONS = {
 };
 
 export default function TemplatePanel() {
-	const { title, description, icon, record } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } =
-			select( editorStore );
+	const { title, description, icon, record, postType } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const { __experimentalGetTemplateInfo: getTemplateInfo } =
+				select( editorStore );
 
-		const postType = getEditedPostType();
-		const postId = getEditedPostId();
-		const _record = getEditedEntityRecord( 'postType', postType, postId );
-		const info = getTemplateInfo( _record );
+			const type = getEditedPostType();
+			const postId = getEditedPostId();
+			const _record = getEditedEntityRecord( 'postType', type, postId );
+			const info = getTemplateInfo( _record );
 
-		return {
-			title: info.title,
-			description: info.description,
-			icon: info.icon,
-			record: _record,
-		};
-	}, [] );
+			return {
+				title: info.title,
+				description: info.description,
+				icon: info.icon,
+				record: _record,
+				postType: type,
+			};
+		},
+		[]
+	);
 
 	if ( ! title && ! description ) {
 		return null;
@@ -64,6 +70,7 @@ export default function TemplatePanel() {
 			>
 				<LastRevision />
 			</PanelRow>
+			{ postType === 'wp_block' && <PatternCategories post={ record } /> }
 		</PanelBody>
 	);
 }
