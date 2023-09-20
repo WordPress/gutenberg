@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
@@ -15,10 +15,7 @@ import { useAsyncList } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import {
-	useAvailableTemplates,
-	useEditedPostContext,
-} from '../page-panels/hooks';
+import { useAvailableTemplates } from '../page-panels/hooks';
 
 export default function ReplaceTemplateButton( { onClick } ) {
 	const [ showModal, setShowModal ] = useState( false );
@@ -27,19 +24,25 @@ export default function ReplaceTemplateButton( { onClick } ) {
 		setShowModal( false );
 	}, [] );
 
-	// TODO - this isn't a post, it's a template, so fetch the template entity.
-	const { postType, postId } = useEditedPostContext();
+	const { postId, postType } = useSelect( ( select ) => {
+		return {
+			postId: select( editSiteStore ).getEditedPostId(),
+			postType: select( editSiteStore ).getEditedPostType(),
+		};
+	}, [] );
+
 	const entitiy = useEntityRecord( 'postType', postType, postId );
-	const { setPage } = useDispatch( editSiteStore );
+
+	//const { setPage } = useDispatch( editSiteStore );
 	if ( ! availableTemplates?.length ) {
 		return null;
 	}
 	const onTemplateSelect = async ( template ) => {
-		entitiy.edit( { template: template.name }, { undoIgnore: true } );
+		entitiy.edit( template );
 		// TODO - work out how to save the template.
-		await setPage( {
-			context: { postType, postId },
-		} );
+		//	await setPage( {
+		//		context: { postType, postId },
+		//	} );
 		onClose(); // Close the template suggestions modal first.
 		onClick();
 	};
@@ -74,12 +77,14 @@ function TemplatesList( { onSelect } ) {
 	const availableTemplates = useAvailableTemplates();
 	const templatesAsPatterns = useMemo(
 		() =>
-			availableTemplates.map( ( template ) => ( {
-				name: template.slug,
-				blocks: parse( template.content.raw ),
-				title: decodeEntities( template.title.rendered ),
-				id: template.id,
-			} ) ),
+			availableTemplates.map( ( template ) => {
+				return {
+					name: template.slug,
+					blocks: parse( template.content.raw ),
+					title: decodeEntities( template.title.rendered ),
+					id: template.id,
+				};
+			} ),
 		[ availableTemplates ]
 	);
 	const shownTemplates = useAsyncList( templatesAsPatterns );
