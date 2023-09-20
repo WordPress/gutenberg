@@ -43,7 +43,7 @@ import ResizableCoverPopover from './resizable-cover-popover';
 import {
 	getMediaColor,
 	compositeIsDark,
-	DEFAULT_AVERAGE_COLOR,
+	DEFAULT_BACKGROUND_COLOR,
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 
@@ -209,7 +209,7 @@ function CoverEdit( {
 		const newIsDark = compositeIsDark(
 			dimRatio,
 			newOverlayColor,
-			DEFAULT_AVERAGE_COLOR
+			DEFAULT_BACKGROUND_COLOR
 		);
 
 		setAttributes( {
@@ -345,7 +345,7 @@ function CoverEdit( {
 
 		const averageBackgroundColor = newUseFeaturedImage
 			? await getMediaColor( mediaUrl )
-			: DEFAULT_AVERAGE_COLOR;
+			: DEFAULT_BACKGROUND_COLOR;
 
 		const newOverlayColor = ! isUserOverlayColor
 			? averageBackgroundColor
