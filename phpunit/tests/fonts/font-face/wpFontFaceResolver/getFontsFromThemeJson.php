@@ -196,7 +196,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_
 			'fontFamily comma-separated list' => array(
 				'fonts'         => array(
 					array(
-						'fontFamily' => 'DM Sans, sans-serif',
+						'fontFamily' => '"DM Sans", sans-serif',
 						'slug'       => 'dm-sans',
 						'fontFace'   => $font_face,
 					),
