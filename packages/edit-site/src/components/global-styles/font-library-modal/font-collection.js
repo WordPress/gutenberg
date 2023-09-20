@@ -124,8 +124,14 @@ function FontCollection( { id } ) {
 
 	return (
 		<TabLayout
-			title={ selectedCollection.name }
-			description={ selectedCollection.description }
+			title={
+				! selectedFont ? selectedCollection.name : selectedFont.name
+			}
+			description={
+				! selectedFont
+					? selectedCollection.description
+					: __( 'Select font variants to install.' )
+			}
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
 				fontsToInstall.length > 0 && (
