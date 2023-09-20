@@ -3,13 +3,9 @@
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -19,7 +15,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { store as editWidgetsStore } from '../../store';
 
-export default function ListViewSidebar() {
+export default function ListViewSidebar( { listViewToggleElement } ) {
 	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
 
 	// Use internal state instead of a ref to make sure that the component
@@ -27,15 +23,22 @@ export default function ListViewSidebar() {
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const headerFocusReturnRef = useFocusReturn();
-	const contentFocusReturnRef = useFocusReturn();
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			setIsListViewOpened( false );
-		}
-	}
+	// When closing the list view, focus should return to the toggle button.
+	const closeListView = useCallback( () => {
+		setIsListViewOpened( false );
+		listViewToggleElement?.focus();
+	}, [ listViewToggleElement, setIsListViewOpened ] );
+
+	const closeOnEscape = useCallback(
+		( event ) => {
+			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+				event.preventDefault();
+				closeListView();
+			}
+		},
+		[ closeListView ]
+	);
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -43,24 +46,17 @@ export default function ListViewSidebar() {
 			className="edit-widgets-editor__list-view-panel"
 			onKeyDown={ closeOnEscape }
 		>
-			<div
-				className="edit-widgets-editor__list-view-panel-header"
-				ref={ headerFocusReturnRef }
-			>
+			<div className="edit-widgets-editor__list-view-panel-header">
 				<strong>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
 					label={ __( 'Close' ) }
-					onClick={ () => setIsListViewOpened( false ) }
+					onClick={ closeListView }
 				/>
 			</div>
 			<div
 				className="edit-widgets-editor__list-view-panel-content"
-				ref={ useMergeRefs( [
-					contentFocusReturnRef,
-					focusOnMountRef,
-					setDropZoneElement,
-				] ) }
+				ref={ useMergeRefs( [ focusOnMountRef, setDropZoneElement ] ) }
 			>
 				<ListView dropZoneElement={ dropZoneElement } />
 			</div>

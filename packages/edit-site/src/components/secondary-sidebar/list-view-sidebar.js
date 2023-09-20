@@ -1,17 +1,10 @@
 /**
  * WordPress dependencies
  */
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -28,30 +21,25 @@ import { unlock } from '../../lock-unlock';
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar( { listViewToggleElement } ) {
-	const hasBlocksSelected = useSelect(
-		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
-		[]
-	);
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	// The next 2 hooks handle focus for when the sidebar closes and returning focus to the element that had focus before sidebar opened.
-	const headerFocusReturnRef = useFocusReturn();
-	const contentFocusReturnRef = useFocusReturn();
+
+	// When closing the list view, focus should return to the toggle button.
+	const closeListView = useCallback( () => {
+		setIsListViewOpened( false );
+		listViewToggleElement?.focus();
+	}, [ listViewToggleElement, setIsListViewOpened ] );
 
 	const closeOnEscape = useCallback(
 		( event ) => {
 			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 				event.preventDefault();
-				setIsListViewOpened( false );
-
-				if ( ! hasBlocksSelected ) {
-					listViewToggleElement?.focus();
-				}
+				closeListView();
 			}
 		},
-		[ hasBlocksSelected, listViewToggleElement, setIsListViewOpened ]
+		[ closeListView ]
 	);
 
 	// Use internal state instead of a ref to make sure that the component
@@ -90,17 +78,12 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 				sidebarRef.current.ownerDocument.activeElement
 			)
 		) {
-			setIsListViewOpened( false );
-			// When no block is selected and the sidebar is closed,
-			// focus should be returned to the list view toggle button.
-			if ( ! hasBlocksSelected ) {
-				listViewToggleElement?.focus();
-			}
+			closeListView();
 		} else {
 			// If the list view or close button does not have focus, focus should be moved to it.
 			handleSidebarFocus();
 		}
-	}, [ hasBlocksSelected, listViewToggleElement, setIsListViewOpened ] );
+	}, [ closeListView ] );
 
 	// This only fires when the sidebar is open because of the conditional rendering.
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
@@ -116,22 +99,18 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<div
-				className="edit-site-editor__list-view-panel-header"
-				ref={ headerFocusReturnRef }
-			>
+			<div className="edit-site-editor__list-view-panel-header">
 				<strong>{ __( 'List View' ) }</strong>
 				<Button
 					icon={ closeSmall }
 					label={ __( 'Close' ) }
-					onClick={ () => setIsListViewOpened( false ) }
+					onClick={ closeListView }
 					ref={ sidebarCloseButtonRef }
 				/>
 			</div>
 			<div
 				className="edit-site-editor__list-view-panel-content"
 				ref={ useMergeRefs( [
-					contentFocusReturnRef,
 					focusOnMountRef,
 					setDropZoneElement,
 					listViewRef,
