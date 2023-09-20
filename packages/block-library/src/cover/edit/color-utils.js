@@ -20,7 +20,7 @@ extend( [ namesPlugin ] );
 /**
  * Fallback color when the average color can't be computed.
  */
-export const DEFAULT_AVERAGE_COLOR = '#FFFFFF';
+export const DEFAULT_AVERAGE_COLOR = '#FFF';
 
 /**
  * Default dim color specified in style.css.
