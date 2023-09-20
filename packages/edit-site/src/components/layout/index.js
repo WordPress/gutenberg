@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { ThemeProvider } from '@wordpress/theme';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -256,7 +257,9 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<Header />
+								<ThemeProvider className="edit-site-layout_header-wrapper">
+									<Header />
+								</ThemeProvider>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
@@ -368,11 +371,13 @@ export default function Layout() {
 															backgroundColor,
 													} }
 												>
-													<Editor
-														isLoading={
-															isEditorLoading
-														}
-													/>
+													<ThemeProvider className="edit-site-editor-wrapper">
+														<Editor
+															isLoading={
+																isEditorLoading
+															}
+														/>
+													</ThemeProvider>
 												</ResizableFrame>
 											</ErrorBoundary>
 										</motion.div>
