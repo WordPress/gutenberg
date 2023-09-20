@@ -28,7 +28,7 @@ function GoogleFontsConfirmDialog() {
 					<Spacer margin={ 6 } />
 					<Text as="p">
 						{ __(
-							'To install Google Fonts you have to give permission to connect directly to Google Servers. The fonts install will be downloaded from Google servers at install time and stored in your server.'
+							'To install fonts from Google you must give permission to connect directly to Google servers. The fonts you install will be downloaded from Google and stored on your site. Your site will then use these locally-hosted fonts.'
 						) }
 					</Text>
 					<Spacer margin={ 3 } />
