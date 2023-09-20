@@ -28,6 +28,7 @@ import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
+	TEMPLATE_ORIGINS,
 } from '../../utils/constants';
 
 export default function usePatternDetails( postType, postId ) {
@@ -155,7 +156,8 @@ export default function usePatternDetails( postType, postId ) {
 	if (
 		postType === TEMPLATE_PART_POST_TYPE &&
 		addedBy.text &&
-		( record.origin === 'plugin' || record.has_theme_file === true )
+		( record.origin === TEMPLATE_ORIGINS.plugin ||
+			record.has_theme_file === true )
 	) {
 		details.push( {
 			label: __( 'Customized' ),

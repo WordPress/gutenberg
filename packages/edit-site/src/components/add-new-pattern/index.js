@@ -23,7 +23,6 @@ import { store as editSiteStore } from '../../store';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
-	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
@@ -65,7 +64,7 @@ export default function AddNewPattern() {
 		// Navigate to the created template part editor.
 		history.push( {
 			postId: templatePart.id,
-			postType: TEMPLATE_POST_TYPE,
+			postType: TEMPLATE_PART_POST_TYPE,
 			canvas: 'edit',
 		} );
 	}

@@ -28,13 +28,15 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_AREA_DEFAULT_CATEGORY } from '../../utils/constants';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+} from '../../utils/constants';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
-import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function CreateTemplatePartModal( {
 	closeModal,

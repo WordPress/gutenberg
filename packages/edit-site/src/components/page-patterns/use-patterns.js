@@ -16,6 +16,7 @@ import {
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -33,7 +34,7 @@ const templatePartToPattern = ( templatePart ) => ( {
 	} ),
 	categories: [ templatePart.area ],
 	description: templatePart.description || '',
-	isCustom: templatePart.source === 'custom',
+	isCustom: templatePart.source === TEMPLATE_ORIGINS.custom,
 	keywords: templatePart.keywords || [],
 	id: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
