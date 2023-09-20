@@ -68,7 +68,7 @@ $default_font_collection = array(
 	'id'             => 'default-font-collection',
 	'name'           => 'Google Fonts',
 	'description'    => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'data_json_file' => path_join( __DIR__, 'default-font-collection.json' ),
+	'src'            => 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/main/output/google-fonts-with-previews.json',
 );
 
 wp_register_font_collection( $default_font_collection );
