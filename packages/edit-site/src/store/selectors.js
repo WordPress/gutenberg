@@ -366,7 +366,8 @@ export function isPage( state ) {
 }
 
 /**
- * Whether or not the editor allows only page content to be edited.
+ * Whether the site editor allows only page content blocks to be edited,
+ * as opposed to any surrounding template entities or template parts.
  *
  * @param {Object} state Global application state.
  *

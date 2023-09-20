@@ -33,13 +33,16 @@ const noop = () => {};
 export default function DefaultBlockEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();
 
-	const { templateType, pageContentFocusType } = useSelect( ( select ) => {
+	const { templateType, isTemplateHidden } = useSelect( ( select ) => {
 		const { getEditedPostType, getPageContentFocusType } =
 			select( editSiteStore );
-
+		const canvasMode = unlock( select( editSiteStore ) ).getCanvasMode();
 		return {
 			templateType: getEditedPostType(),
-			pageContentFocusType: getPageContentFocusType(),
+			isTemplateHidden:
+				canvasMode === 'edit' &&
+				getPageContentFocusType() === 'hideTemplate',
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 		};
 	}, [] );
 
@@ -47,21 +50,17 @@ export default function DefaultBlockEditorProvider( { children } ) {
 		'postType',
 		templateType
 	);
-	const isPageContentFocused = pageContentFocusType === 'hideTemplate';
-	const pageContentBlock = usePageContentBlocks(
-		blocks,
-		isPageContentFocused
-	);
+	const pageContentBlock = usePageContentBlocks( blocks, isTemplateHidden );
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={
-				isPageContentFocused && pageContentBlock.length
+				isTemplateHidden && pageContentBlock.length
 					? pageContentBlock
 					: blocks
 			}
-			onInput={ isPageContentFocused ? noop : onInput }
-			onChange={ isPageContentFocused ? noop : onChange }
+			onInput={ isTemplateHidden ? noop : onInput }
+			onChange={ isTemplateHidden ? noop : onChange }
 			useSubRegistry={ false }
 		>
 			{ children }

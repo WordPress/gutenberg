@@ -150,7 +150,7 @@ _Returns_
 
 ### hasPageContentFocus
 
-Whether or not the editor allows only page content to be edited.
+Whether the site editor allows only page content blocks to be edited, as opposed to any surrounding template entities or template parts.
 
 _Parameters_
 
@@ -405,7 +405,7 @@ Sets the type of page content focus. Can be one of:
 
 _Parameters_
 
--   _pageContentFocusType_ `'disbleTemplate'|'hideTemplate'`: The type of page content focus.
+-   _pageContentFocusType_ `'disableTemplate'|'hideTemplate'`: The type of page content focus.
 
 _Returns_
 

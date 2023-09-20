@@ -285,7 +285,7 @@ export const setPage =
 						.getEntityRecords( 'postType', 'wp_template', {
 							per_page: -1,
 						} )
-				)?.find( ( { slug } ) => slug === currentTemplateSlug );
+				 )?.find( ( { slug } ) => slug === currentTemplateSlug );
 				if ( currentTemplate ) {
 					template = currentTemplate;
 				} else {
@@ -683,7 +683,7 @@ export const toggleDistractionFree =
  * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
  * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
  *
- * @param {'disbleTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
+ * @param {'disableTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
  *
  * @return {Object} Action object.
  */

@@ -20,6 +20,7 @@ import { check } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
+import { unlock } from '../../../lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-page-panels-edit-template__dropdown',
@@ -27,7 +28,7 @@ const POPOVER_PROPS = {
 };
 
 export default function EditTemplate() {
-	const { hasResolved, template, pageContentFocusType } = useSelect(
+	const { hasResolved, template, isTemplateHidden } = useSelect(
 		( select ) => {
 			const {
 				getEditedPostContext,
@@ -35,6 +36,9 @@ export default function EditTemplate() {
 				getEditedPostId,
 				getPageContentFocusType,
 			} = select( editSiteStore );
+			const canvasMode = unlock(
+				select( editSiteStore )
+			).getCanvasMode();
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const _context = getEditedPostContext();
@@ -51,6 +55,9 @@ export default function EditTemplate() {
 				),
 				template: getEditedEntityRecord( ...queryArgs ),
 				pageContentFocusType: getPageContentFocusType(),
+				isTemplateHidden:
+					canvasMode === 'edit' &&
+					getPageContentFocusType() === 'hideTemplate',
 			};
 		},
 		[]
@@ -62,8 +69,6 @@ export default function EditTemplate() {
 	if ( ! hasResolved ) {
 		return null;
 	}
-
-	const isTemplateHidden = pageContentFocusType !== 'disableTemplate';
 
 	return (
 		<HStack className="edit-site-summary-field">
