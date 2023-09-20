@@ -39,7 +39,7 @@ function FontCollection( { id } ) {
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
-			localStorage.getItem(
+			window.localStorage.getItem(
 				'wp-font-library-google-fonts-permission'
 			) === 'true'
 		);

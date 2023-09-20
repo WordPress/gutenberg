@@ -14,7 +14,6 @@ const config = {
 		node: true,
 	},
 	globals: {
-		localStorage: true,
 		window: true,
 		document: true,
 		SCRIPT_DEBUG: 'readonly',

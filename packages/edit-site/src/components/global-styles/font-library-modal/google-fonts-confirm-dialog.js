@@ -13,7 +13,7 @@ import {
 function GoogleFontsConfirmDialog() {
 	const handleConfirm = () => {
 		// eslint-disable-next-line no-undef
-		localStorage.setItem(
+		window.localStorage.setItem(
 			'wp-font-library-google-fonts-permission',
 			'true'
 		);
