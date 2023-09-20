@@ -109,10 +109,15 @@
 	&.is-dismissible {
 		padding-right: $grid-unit-10;
 	}
+
+	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
+		color: $gray-400;
+	}
+
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		color: $gray-100;
+		color: $white;
 	}
 }
 
