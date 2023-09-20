@@ -292,7 +292,7 @@ function GridItem( { categoryId, item, ...props } ) {
 								onClose={ onClose }
 								label={ __( 'Duplicate' ) }
 							/>
-							{ item.type === USER_PATTERNS && (
+							{ item.type === PATTERN_TYPES.user && (
 								<MenuItem onClick={ () => exportAsJSON() }>
 									{ __( 'Export as JSON' ) }
 								</MenuItem>
