@@ -1,55 +1,8 @@
-# TabPanel
+# Tabs
 
-Tabs is a collection of React components that combine to render an ARIA-compliant TabPanel.
+Tabs is a collection of React components that combine to render an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
 
 Tabs organizes content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen.
-
-![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
-
-## Table of contents
-
-1. Design guidelines
-2. Development guidelines
-
-## Design guidelines
-
-### Usage
-
-Tabs organizes and allows navigation between groups of content that are related and at the same level of hierarchy.
-
-#### Tabs in a set
-
-As a set, all individual tab items are unified by a shared topic. For clarity, each tab item should contain content that is distinct from all the other tabs in a set.
-
-### Anatomy
-
-![](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541787297310_TabPanelAnatomy.png)
-
-1. Container
-2. Active text label
-3. Active tab indicator
-4. Inactive text label
-5. Tab item
-
-#### Labels
-
-Tab labels appear in a single row, in the same typeface and size. Use text labels that clearly and succinctly describe the content of a tab, and make sure that a set of tabs contains a cohesive group of items that share a common characteristic.
-
-Tab labels can wrap to a second line, but do not add a second row of tabs.
-
-#### Active tab indicators
-
-To differentiate an active tab from an inactive tab, apply an underline and color change to the active tab’s text and icon.
-
-![An underline and color change differentiate an active tab from the inactive ones.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541787691601_TabPanelActiveTab.png)
-
-### Behavior
-
-Users can navigate between tabs by clicking the desired tab with their mouse. They can also tap the tab key on their keyboard to focus the `tablist`, and then navigate between tabs by tapping the arrow keys on their keyboard.
-
-### Placement
-
-Tabs are generally placed above content, allowing them to control the UI region displayed below them. It is also possible to render the tabs or the content elsewhere in the UI, using a `SlotFill` component when necessary.
 
 ## Development guidelines
 
@@ -94,7 +47,7 @@ const MyUncontrolledTabs = () => (
 
 #### Controlled Mode
 
-Tabs can also be used in a controlled mode, where the selected tab is specified by a parent component. In this mode, the `initialTabId` prop will be ignored if it is provided. Instead, the `selectedTabId` value will be used to determine the selected tab. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab.
+Tabs can also be used in a controlled mode, where the parent component specifies the `selectedTabId` and the `onSelect` props to control tab selection. In this mode, the `initialTabId` prop will be ignored if it is provided. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab, leaving the controlling component in charge of implementing the desired logic.
 
 ```jsx
 import { Tabs } from '@wordpress/components';
