@@ -15,22 +15,22 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		// Mock the wp_remote_request() function
+		// Mock the wp_remote_request() function.
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 	}
 
 	public function tear_down() {
-		// Remove the mock to not affect other tests
+		// Remove the mock to not affect other tests.
 		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
 
 		parent::tear_down();
 	}
 
 	public function mock_request( $preempt, $args, $url ) {
-		// Check if it's the URL you want to mock
+		// Check if it's the URL you want to mock.
 		if ( 'https://localhost/fonts/mock-font-collection.json' === $url ) {
 
-			// Mock the response body
+			// Mock the response body.
 			$mock_collection_data = array(
 				'fontFamilies' => 'mock',
 				'categories'   => 'mock',
@@ -44,7 +44,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 			);
 		}
 
-		// For any other URL, return false which ensures the request is made as usual (or you can return other mock data)
+		// For any other URL, return false which ensures the request is made as usual (or you can return other mock data).
 		return false;
 	}
 
