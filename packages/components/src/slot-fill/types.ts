@@ -16,6 +16,7 @@ type SlotPropBase = {
 	 * Slot name.
 	 */
 	name: SlotKey;
+
 	/**
 	 * props to pass from `Slot` to `Fill`.
 	 *
@@ -32,7 +33,18 @@ export type SlotComponentProps =
 			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
 			 */
 			bubblesVirtually: true;
+
+			/**
+			 * A function that returns nodes to be rendered.
+			 * Not supported when `bubblesVirtually` is true.
+			 */
 			children?: never;
+
+			/**
+			 * className.
+			 * Not supported when `bubblesVirtually` is true.
+			 */
+			className?: string | undefined;
 	  } )
 	| ( SlotPropBase & {
 			/**
@@ -47,6 +59,12 @@ export type SlotComponentProps =
 			 * Not supported when `bubblesVirtually` is true.
 			 */
 			children?: ( fills: ReactNode ) => ReactNode;
+
+			/**
+			 * className.
+			 * Not supported when `bubblesVirtually` is false.
+			 */
+			className?: never;
 	  } );
 
 export type FillComponentProps = {

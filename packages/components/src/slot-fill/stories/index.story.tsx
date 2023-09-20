@@ -47,7 +47,6 @@ export const Default: StoryFn< typeof Slot > = ( props ) => {
 	);
 };
 Default.args = {
-	className: 'my-slot',
 	bubblesVirtually: true,
 	as: 'span',
 };

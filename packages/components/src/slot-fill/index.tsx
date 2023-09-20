@@ -43,7 +43,8 @@ export function Fill( props: FillComponentProps ) {
 }
 
 export function UnforwardedSlot(
-	props: WordPressComponentProps< SlotComponentProps, 'div' >,
+	props: SlotComponentProps &
+		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
 	ref: ForwardedRef< any >
 ) {
 	const { bubblesVirtually, ...restProps } = props;
