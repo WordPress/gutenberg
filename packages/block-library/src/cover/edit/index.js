@@ -190,7 +190,7 @@ function CoverEdit( {
 		setAttributes( {
 			...mediaAttributes,
 			focalPoint: undefined,
-			useFeaturedImage: false,
+			useFeaturedImage: undefined,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
 		} );
@@ -219,7 +219,7 @@ function CoverEdit( {
 			focalPoint: undefined,
 			hasParallax: undefined,
 			isRepeated: undefined,
-			useFeaturedImage: false,
+			useFeaturedImage: undefined,
 			isDark: newIsDark,
 		} );
 	};
