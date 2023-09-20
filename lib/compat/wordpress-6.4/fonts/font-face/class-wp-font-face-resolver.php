@@ -101,7 +101,7 @@ class WP_Font_Face_Resolver {
 			$font_family = explode( ',', $font_family )[0];
 		}
 
-		return $font_family;
+		return trim( $font_family, "\"'" );
 	}
 
 	/**
