@@ -26,7 +26,7 @@ function TabList( { children, className, style }: TabListProps ) {
 		<Ariakit.TabList
 			style={ style }
 			store={ store }
-			className={ classnames( 'components-tabs__tabs-item', className ) }
+			className={ classnames( 'components-tabs__tabs', className ) }
 		>
 			{ children }
 		</Ariakit.TabList>
