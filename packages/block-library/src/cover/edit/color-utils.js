@@ -18,9 +18,10 @@ import { applyFilters } from '@wordpress/hooks';
 extend( [ namesPlugin ] );
 
 /**
- * Fallback color when the average color can't be computed.
+ * Fallback color when the average color can't be computed. The image may be
+ * rendering as transparent, and most sites have a light color background.
  */
-export const DEFAULT_AVERAGE_COLOR = '#FFF';
+export const DEFAULT_BACKGROUND_COLOR = '#FFF';
 
 /**
  * Default dim color specified in style.css.
@@ -67,11 +68,11 @@ export function retrieveFastAverageColor() {
  */
 export const getMediaColor = memoize( async ( url ) => {
 	if ( ! url ) {
-		return DEFAULT_AVERAGE_COLOR;
+		return DEFAULT_BACKGROUND_COLOR;
 	}
 
 	// making the default color rgb for compat with FAC
-	const { r, g, b, a } = colord( DEFAULT_AVERAGE_COLOR ).toRgb();
+	const { r, g, b, a } = colord( DEFAULT_BACKGROUND_COLOR ).toRgb();
 
 	try {
 		const imgCrossOrigin = applyFilters(
@@ -93,7 +94,7 @@ export const getMediaColor = memoize( async ( url ) => {
 		return color.hex;
 	} catch ( error ) {
 		// If there's an error return the fallback color.
-		return DEFAULT_AVERAGE_COLOR;
+		return DEFAULT_BACKGROUND_COLOR;
 	}
 } );
 
