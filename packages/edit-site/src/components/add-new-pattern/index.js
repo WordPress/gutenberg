@@ -72,13 +72,6 @@ export default function AddNewPattern() {
 			onClick: () => setShowPatternModal( true ),
 			title: __( 'Create pattern' ),
 		},
-		{
-			icon: symbol,
-			onClick: () => {
-				patternUploadInputRef.current.click();
-			},
-			title: __( 'Import pattern from JSON' ),
-		},
 	];
 
 	// Remove condition when command palette issues are resolved.
@@ -90,6 +83,14 @@ export default function AddNewPattern() {
 			title: __( 'Create template part' ),
 		} );
 	}
+
+	controls.push( {
+		icon: symbol,
+		onClick: () => {
+			patternUploadInputRef.current.click();
+		},
+		title: __( 'Import pattern from JSON' ),
+	} );
 
 	return (
 		<>
