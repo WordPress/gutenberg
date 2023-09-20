@@ -7,9 +7,12 @@ import {
 	DropZone,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	FormFileUpload,
+	Notice,
+	FlexItem,
 } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +25,7 @@ import { loadFontFaceInBrowser } from './utils';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
+	const [ notice, setNotice ] = useState( null );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -126,33 +130,60 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		await installFonts( fontFamilies );
+		setNotice( null );
+		const status = await installFonts( fontFamilies );
+		if ( status ) {
+			setNotice( {
+				type: 'success',
+				message: __( 'There was an error installing the fonts.' ),
+			} );
+		} else {
+			setNotice( {
+				type: 'warning',
+				message: __( 'There was an error installing the fonts.' ),
+			} );
+		}
 	};
 
 	return (
 		<>
-			<Text className="font-library-modal__subtitle">
-				{ __( 'Upload Fonts' ) }
-			</Text>
-			<Spacer margin={ 2 } />
-			<DropZone onFilesDrop={ handleDropZone } />
-			<FormFileUpload
-				accept={ ALLOWED_FILE_EXTENSIONS.map(
-					( ext ) => `.${ ext }`
-				).join( ',' ) }
-				multiple={ true }
-				onChange={ onFilesUpload }
-				render={ ( { openFileDialog } ) => (
-					<Button
-						className="font-library-modal__upload-area"
-						onClick={ openFileDialog }
-					>
-						<span>
-							{ __( 'Drag and drop your font files here.' ) }
-						</span>
-					</Button>
+			<Spacer margin={ 16 } />
+			<VStack className="font-library-modal__local-fonts">
+				<FormFileUpload
+					accept={ ALLOWED_FILE_EXTENSIONS.map(
+						( ext ) => `.${ ext }`
+					).join( ',' ) }
+					multiple={ true }
+					onChange={ onFilesUpload }
+					render={ ( { openFileDialog } ) => (
+						<Button
+							className="font-library-modal__upload-area"
+							onClick={ openFileDialog }
+						>
+							<span>{ __( 'Upload font' ) }</span>
+							<DropZone onFilesDrop={ handleDropZone } />
+						</Button>
+					) }
+				/>
+				{ notice && (
+					<FlexItem>
+						<Spacer margin={ 2 } />
+						<Notice
+							isDismissible={ false }
+							status={ notice.type }
+							className="font-library-modal__upload-area__notice"
+						>
+							{ notice.message }
+						</Notice>
+					</FlexItem>
 				) }
-			/>
+				<Spacer margin={ 2 } />
+				<Text className="font-library-modal__upload-area__text">
+					{ __(
+						'Uploaded fonts will appear up in your library and can be used in your theme after that. Formats .ttf, .woff, and .woff2 are supported.'
+					) }
+				</Text>
+			</VStack>
 		</>
 	);
 }

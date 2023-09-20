@@ -219,11 +219,6 @@ function FontLibraryProvider( { children } ) {
 			setIsInstalling( false );
 			return true;
 		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.error( e );
-			createErrorNotice( __( 'Error installing fonts.' ), {
-				type: 'snackbar',
-			} );
 			setIsInstalling( false );
 			return false;
 		}
