@@ -46,11 +46,19 @@ import {
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
+import useEditedEntityRecord from '../use-edited-entity-record';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
+};
+
+const typeLabels = {
+	wp_block: __( 'Editing pattern:' ),
+	wp_navigation: __( 'Editing navigation menu:' ),
+	wp_template: __( 'Editing template:' ),
+	wp_template_part: __( 'Editing template part:' ),
 };
 
 export default function HeaderEditMode() {
@@ -116,6 +124,7 @@ export default function HeaderEditMode() {
 		};
 	}, [] );
 
+	const { record, getTitle } = useEditedEntityRecord();
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
@@ -183,12 +192,19 @@ export default function HeaderEditMode() {
 		ease: 'easeOut',
 	};
 
+	const title = hasDefaultEditorCanvasView
+		? `${
+				typeLabels[ record.type ] ?? typeLabels.wp_template
+		  } ${ getTitle() }`
+		: getEditorCanvasContainerTitle( editorCanvasView );
+
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
+			<VisuallyHidden as="h1">{ title }</VisuallyHidden>
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
 					as={ motion.div }

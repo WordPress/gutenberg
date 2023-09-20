@@ -20,16 +20,20 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as editPostStore } from '../../../store';
 
 function DocumentActions() {
-	const { template, isEditing } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } =
-			select( editPostStore );
-		const _isEditing = isEditingTemplate();
+	const { template, isCommandCenterOpen, isEditing } = useSelect(
+		( select ) => {
+			const { isEditingTemplate, getEditedPostTemplate } =
+				select( editPostStore );
+			const _isEditing = isEditingTemplate();
 
-		return {
-			template: _isEditing ? getEditedPostTemplate() : null,
-			isEditing: _isEditing,
-		};
-	}, [] );
+			return {
+				template: _isEditing ? getEditedPostTemplate() : null,
+				isEditing: _isEditing,
+				isCommandCenterOpen: select( commandsStore ).isOpen(),
+			};
+		},
+		[]
+	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
@@ -60,6 +64,12 @@ function DocumentActions() {
 			<Button
 				className="edit-post-document-actions__command"
 				onClick={ () => openCommandCenter() }
+				aria-haspopup="dialog"
+				aria-expanded={ isCommandCenterOpen }
+				label={ `${ __(
+					'Command Palette'
+				) } ${ displayShortcut.primary( 'k' ) }` }
+				showTooltip
 			>
 				<HStack
 					className="edit-post-document-actions__title"
@@ -67,7 +77,12 @@ function DocumentActions() {
 					justify="center"
 				>
 					<BlockIcon icon={ layout } />
-					<Text size="body" as="h1">
+					<Text
+						className="edit-post-document-actions__text"
+						size="body"
+						as="span"
+						color={ undefined }
+					>
 						<VisuallyHidden as="span">
 							{ __( 'Editing template: ' ) }
 						</VisuallyHidden>
