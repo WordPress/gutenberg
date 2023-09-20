@@ -17,6 +17,7 @@ function gutenberg_enqueue_commands() {
 
 	wp_enqueue_style( 'wp-commands' );
 	wp_enqueue_script( 'wp-core-commands' );
+
 	wp_add_inline_script(
 		'wp-core-commands',
 		<<<'EOT'
@@ -30,7 +31,8 @@ function gutenberg_enqueue_commands() {
 			const root = wp.element.createRoot(mountPoint);
 
 			function CommandMenuWrapper() {
-			useCommands();
+				useCommands();
+
 				return (
 					wp.element.createElement(
 						RouterProvider,
