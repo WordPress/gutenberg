@@ -141,12 +141,49 @@ export function UnforwardedButton(
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+
+	const { role = 'button' } = additionalProps;
+	let ariaPropName:
+		| 'aria-pressed'
+		| 'aria-checked'
+		| 'aria-selected'
+		| undefined;
+
+	switch ( role ) {
+		case 'button':
+			ariaPropName = 'aria-pressed';
+			break;
+		case 'checkbox':
+		case 'menuitemcheckbox':
+		case 'menuitemradio':
+		case 'radio':
+		case 'switch':
+			ariaPropName = 'aria-checked';
+			break;
+		case 'gridcell':
+		case 'option':
+		case 'row':
+		case 'tab':
+			ariaPropName = 'aria-selected';
+			break;
+		default:
+		// no-op
+	}
+	const ariaProp = ariaPropName
+		? {
+				[ ariaPropName ]:
+					ariaPropName in additionalProps
+						? additionalProps[ ariaPropName ]
+						: isPressed,
+		  }
+		: {};
+
 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
 		Tag === 'button'
 			? {
 					type: 'button',
 					disabled: trulyDisabled,
-					'aria-pressed': isPressed,
+					...ariaProp,
 			  }
 			: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
