@@ -56,10 +56,10 @@ class WP_Font_Face_Resolver {
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $definition ) {
 
-				// Skip if font-family "name" is not defined.
-				if ( empty( $definition['name'] ) ) {
-					continue;
-				}
+				// // Skip if font-family "name" is not defined.
+				// if ( empty( $definition['name'] ) ) {
+				// continue;
+				// }
 
 				// Skip if "fontFace" is not defined, meaning there are no variations.
 				if ( empty( $definition['fontFace'] ) ) {

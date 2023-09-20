@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { getPreviewStyle } from '../index';
+import { getFamilyPreviewStyle, formatFontFamily } from '../preview-styles';
 
-describe( 'getPreviewStyle', () => {
+describe( 'getFamilyPreviewStyle', () => {
 	it( 'should return default fontStyle and fontWeight if fontFace is not provided', () => {
 		const family = { fontFamily: 'Rosario' };
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontWeight: '400',
@@ -23,7 +23,7 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'normal', fontWeight: '600' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'normal',
@@ -40,7 +40,7 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'italic', fontWeight: '600' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'italic',
@@ -57,7 +57,7 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'normal', fontWeight: '700' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'normal',
@@ -74,7 +74,7 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'normal', fontWeight: '400' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'normal',
@@ -92,7 +92,7 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'normal', fontWeight: '600' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'normal',
@@ -110,12 +110,52 @@ describe( 'getPreviewStyle', () => {
 				{ fontStyle: 'italic', fontWeight: '200 900' },
 			],
 		};
-		const result = getPreviewStyle( family );
+		const result = getFamilyPreviewStyle( family );
 		const expected = {
 			fontFamily: 'Rosario',
 			fontStyle: 'normal',
 			fontWeight: '400',
 		};
 		expect( result ).toEqual( expected );
+	} );
+} );
+
+describe( 'formatFontFamily', () => {
+	it( 'should transform "Baloo 2, system-ui" correctly', () => {
+		expect( formatFontFamily( 'Baloo 2, system-ui' ) ).toBe(
+			"'Baloo 2', system-ui"
+		);
+	} );
+
+	it( 'should ignore extra spaces', () => {
+		expect( formatFontFamily( '  Baloo 2   , system-ui' ) ).toBe(
+			"'Baloo 2', system-ui"
+		);
+	} );
+
+	it( 'should keep quoted strings unchanged', () => {
+		expect(
+			formatFontFamily(
+				"Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
+			)
+		).toBe(
+			"Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif"
+		);
+	} );
+
+	it( 'should wrap single font name with spaces in quotes', () => {
+		expect( formatFontFamily( 'Baloo 2' ) ).toBe( "'Baloo 2'" );
+	} );
+
+	it( 'should wrap multiple font names with spaces in quotes', () => {
+		expect( formatFontFamily( 'Baloo Bhai 2, Baloo 2' ) ).toBe(
+			"'Baloo Bhai 2', 'Baloo 2'"
+		);
+	} );
+
+	it( 'should wrap only those font names with spaces which are not already quoted', () => {
+		expect( formatFontFamily( 'Baloo Bhai 2, Arial' ) ).toBe(
+			"'Baloo Bhai 2', Arial"
+		);
 	} );
 } );

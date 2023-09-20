@@ -9,10 +9,15 @@ import {
 /**
  * Internal dependencies
  */
-import LibraryFontVariant from './library-font-variant';
+import CollectionFontVariant from './collection-font-variant';
+import { isFontFontFaceInOutline } from './utils/fonts-outline';
 import { sortFontFaces } from './utils/sort-font-faces';
 
-function LibraryFontDetails( { font } ) {
+function CollectionFontDetails( {
+	font,
+	handleToggleVariant,
+	fontToInstallOutline,
+} ) {
 	const fontFaces =
 		font.fontFace && font.fontFace.length
 			? sortFontFaces( font.fontFace )
@@ -30,10 +35,16 @@ function LibraryFontDetails( { font } ) {
 			<VStack spacing={ 0 }>
 				<Spacer margin={ 8 } />
 				{ fontFaces.map( ( face, i ) => (
-					<LibraryFontVariant
+					<CollectionFontVariant
 						font={ font }
 						face={ face }
 						key={ `face${ i }` }
+						handleToggleVariant={ handleToggleVariant }
+						selected={ isFontFontFaceInOutline(
+							font.slug,
+							face,
+							fontToInstallOutline
+						) }
 					/>
 				) ) }
 			</VStack>
@@ -42,4 +53,4 @@ function LibraryFontDetails( { font } ) {
 	);
 }
 
-export default LibraryFontDetails;
+export default CollectionFontDetails;

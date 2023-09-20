@@ -7,15 +7,17 @@ import {
 	Button,
 	Flex,
 	FlexItem,
+	Icon,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import FontDemo from './font-demo';
-import { getPreviewStyle } from './utils';
+import { getFamilyPreviewStyle } from './utils/preview-styles';
+import { chevronRight } from '@wordpress/icons';
 
-function FontCard( { font, onClick, actionHandler, variantsText } ) {
+function FontCard( { font, onClick, variantsText } ) {
 	const fakeFontFace = {
 		fontStyle: 'normal',
 		fontWeight: '400',
@@ -31,7 +33,7 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 			  ) || font.fontFace[ 0 ]
 			: fakeFontFace;
 
-	const demoStyle = getPreviewStyle( font );
+	const demoStyle = getFamilyPreviewStyle( font );
 
 	const variantsCount = font.fontFace?.length || 1;
 
@@ -47,6 +49,7 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 		>
 			<Flex justify="space-between" wrap={ false }>
 				<FontDemo
+					customPreviewUrl={ font.preview }
 					fontFace={ displayFontFace }
 					text={ font.name }
 					style={ demoStyle }
@@ -60,7 +63,9 @@ function FontCard( { font, onClick, actionHandler, variantsText } ) {
 									_n( 'variant', 'variants', variantsCount ) }
 						</Text>
 					</FlexItem>
-					<FlexItem>{ !! actionHandler && actionHandler }</FlexItem>
+					<FlexItem>
+						<Icon icon={ chevronRight } />
+					</FlexItem>
 				</Flex>
 			</Flex>
 		</Button>
