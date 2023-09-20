@@ -356,8 +356,10 @@ describe( 'Tabs', () => {
 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 			);
 
-			// onSelect gets called on the initial render.
+			// onSelect gets called on the initial render. It should be called
+			// with the first enabled tab, which is alpha.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -424,8 +426,10 @@ describe( 'Tabs', () => {
 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 			);
 
-			// onSelect gets called on the initial render.
+			// onSelect gets called on the initial render. It should be called
+			// with the first enabled tab, which is alpha.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -522,14 +526,17 @@ describe( 'Tabs', () => {
 				/>
 			);
 
-			// onSelect gets called on the initial render.
+			// onSelect gets called on the initial render. It should be called
+			// with the first enabled tab, which is alpha.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
 			await user.keyboard( '[Tab]' );
 			expect( await getSelectedTab() ).toHaveFocus();
+			// Confirm onSelect has not been re-called
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 			// Press the right arrow key three times. Since the delta tab is disabled:
@@ -594,9 +601,10 @@ describe( 'Tabs', () => {
 				/>
 			);
 
-			// onSelect gets called on the initial render with the default
-			// selected tab.
+			// onSelect gets called on the initial render. It should be called
+			// with the first enabled tab, which is alpha.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Click on Alpha and make sure it is selected.
 			// onSelect shouldn't fire since the selected tab didn't change.
@@ -606,7 +614,8 @@ describe( 'Tabs', () => {
 
 			// Navigate forward with arrow keys. Make sure Beta is focused, but
 			// that the tab selection happens only when pressing the spacebar
-			// or enter key.
+			// or enter key. onSelect shouldn't fire since the selected tab
+			// didn't change.
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect(
@@ -619,7 +628,8 @@ describe( 'Tabs', () => {
 
 			// Navigate forward with arrow keys. Make sure Gamma (last tab) is
 			// focused, but that tab selection happens only when pressing the
-			// spacebar or enter key.
+			// spacebar or enter key. onSelect shouldn't fire since the selected
+			// tab didn't change.
 			await user.keyboard( '[ArrowRight]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect(
@@ -972,6 +982,8 @@ describe( 'Tabs', () => {
 					/>
 				);
 
+				// Confirm that alpha is still selected, and that onSelect has
+				// not been called again.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			} );
