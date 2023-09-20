@@ -34,7 +34,7 @@ function GoogleFontsConfirmDialog() {
 					<Spacer margin={ 3 } />
 					<Text as="p">
 						{ __(
-							'If you prefer to avoid this, you can upload font files.'
+							'You can alternatively upload files directly on the Library tab.'
 						) }
 					</Text>
 					<Spacer margin={ 6 } />
