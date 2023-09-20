@@ -3,12 +3,12 @@
 /**
  * WordPress dependencies
  */
-import { test } from '@wordpress/e2e-test-utils-playwright';
+import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
-import { PerfUtils, Metrics } from '../fixtures';
+import { PerfUtils } from '../fixtures';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
@@ -31,8 +31,8 @@ const results = {
 
 test.describe( 'Site Editor Performance', () => {
 	test.use( {
-		perfUtils: async ( { browser, page }, use ) => {
-			await use( new PerfUtils( { browser, page } ) );
+		perfUtils: async ( { page }, use ) => {
+			await use( new PerfUtils( { page } ) );
 		},
 		metrics: async ( { page }, use ) => {
 			await use( new Metrics( { page } ) );
@@ -161,7 +161,7 @@ test.describe( 'Site Editor Performance', () => {
 			const iterations = samples + throwaway;
 
 			// Start tracing.
-			await perfUtils.startTracing();
+			await metrics.startTracing();
 
 			// Type the testing sequence into the empty paragraph.
 			await paragraph.type( 'x'.repeat( iterations ), {
@@ -172,11 +172,11 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			const traceResults = await perfUtils.stopTracing();
+			await metrics.stopTracing();
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations( traceResults );
+				metrics.getTypingEventDurations();
 
 			// Save the results.
 			for ( let i = throwaway; i < iterations; i++ ) {

@@ -13,11 +13,10 @@ import path from 'path';
  * Internal dependencies
  */
 import { readFile } from '../utils.js';
-
 export class PerfUtils {
-	constructor( { browser, page } ) {
-		this.browser = browser;
+	constructor( { page } ) {
 		this.page = page;
+		this.browser = page.context().browser();
 	}
 
 	async getCanvas() {
@@ -129,18 +128,5 @@ export class PerfUtils {
 			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
-	}
-
-	async startTracing( options = {} ) {
-		return await this.browser.startTracing( this.page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-			...options,
-		} );
-	}
-
-	async stopTracing() {
-		const traceBuffer = await this.browser.stopTracing();
-		return JSON.parse( traceBuffer.toString() );
 	}
 }

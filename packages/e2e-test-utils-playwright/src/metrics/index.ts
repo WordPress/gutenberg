@@ -1,11 +1,51 @@
 /**
  * External dependencies
  */
-import type { Page } from '@playwright/test';
+import type { Page, Browser } from '@playwright/test';
+
+type EventType =
+	| 'click'
+	| 'focus'
+	| 'focusin'
+	| 'keydown'
+	| 'keypress'
+	| 'keyup'
+	| 'mouseout'
+	| 'mouseover';
+
+interface TraceEvent {
+	cat: string;
+	name: string;
+	dur?: number;
+	args: {
+		data?: {
+			type: EventType;
+		};
+	};
+}
+
+interface LoadingDurations {
+	serverResponse: number;
+	firstPaint: number;
+	domContentLoaded: number;
+	loaded: number;
+	firstContentfulPaint: number;
+	timeSinceResponseEnd: number;
+}
+
+type MetricsConstructorProps = {
+	page: Page;
+};
 
 export class Metrics {
-	constructor( public readonly page: Page ) {
+	browser: Browser;
+	page: Page;
+	trace: { traceEvents: TraceEvent[] };
+
+	constructor( { page }: MetricsConstructorProps ) {
 		this.page = page;
+		this.browser = page.context().browser()!;
+		this.trace = { traceEvents: [] };
 	}
 
 	/**
@@ -37,11 +77,9 @@ export class Metrics {
 	 * Returns time to first byte (TTFB) using the Navigation Timing API.
 	 *
 	 * @see https://web.dev/ttfb/#measure-ttfb-in-javascript
-	 *
-	 * @return {Promise<number>} TTFB value.
 	 */
-	async getTimeToFirstByte() {
-		return this.page.evaluate< number >( () => {
+	async getTimeToFirstByte(): Promise< number > {
+		return await this.page.evaluate< number >( () => {
 			const { responseStart, startTime } = (
 				performance.getEntriesByType(
 					'navigation'
@@ -56,11 +94,9 @@ export class Metrics {
 	 *
 	 * @see https://w3c.github.io/largest-contentful-paint/
 	 * @see https://web.dev/lcp/#measure-lcp-in-javascript
-	 *
-	 * @return {Promise<number>} LCP value.
 	 */
-	async getLargestContentfulPaint() {
-		return this.page.evaluate< number >(
+	async getLargestContentfulPaint(): Promise< number > {
+		return await this.page.evaluate< number >(
 			() =>
 				new Promise( ( resolve ) => {
 					new PerformanceObserver( ( entryList ) => {
@@ -82,11 +118,9 @@ export class Metrics {
 	 *
 	 * @see https://github.com/WICG/layout-instability
 	 * @see https://web.dev/cls/#measure-layout-shifts-in-javascript
-	 *
-	 * @return {Promise<number>} CLS value.
 	 */
-	async getCumulativeLayoutShift() {
-		return this.page.evaluate< number >(
+	async getCumulativeLayoutShift(): Promise< number > {
+		return await this.page.evaluate< number >(
 			() =>
 				new Promise( ( resolve ) => {
 					let CLS = 0;
@@ -107,5 +141,133 @@ export class Metrics {
 					} );
 				} )
 		);
+	}
+
+	/**
+	 * Returns the loading durations using the Navigation Timing API. All the
+	 * durations exclude the server response time.
+	 */
+	async getLoadingDurations(): Promise< LoadingDurations > {
+		return await this.page.evaluate( () => {
+			const [
+				{
+					requestStart,
+					responseStart,
+					responseEnd,
+					domContentLoadedEventEnd,
+					loadEventEnd,
+				},
+			] = performance.getEntriesByType(
+				'navigation'
+			) as PerformanceNavigationTiming[];
+			const paintTimings = performance.getEntriesByType(
+				'paint'
+			) as PerformancePaintTiming[];
+
+			const firstPaintStartTime = paintTimings.find(
+				( { name } ) => name === 'first-paint'
+			)?.startTime as number;
+
+			const firstContentfulPaintStartTime = paintTimings.find(
+				( { name } ) => name === 'first-contentful-paint'
+			)?.startTime as number;
+
+			return {
+				// Server side metric.
+				serverResponse: responseStart - requestStart,
+				// For client side metrics, consider the end of the response (the
+				// browser receives the HTML) as the start time (0).
+				firstPaint: firstPaintStartTime - responseEnd,
+				domContentLoaded: domContentLoadedEventEnd - responseEnd,
+				loaded: loadEventEnd - responseEnd,
+				firstContentfulPaint:
+					firstContentfulPaintStartTime - responseEnd,
+				timeSinceResponseEnd: performance.now() - responseEnd,
+			};
+		} );
+	}
+
+	/**
+	 *  Starts Chromium tracing with predefined options for performance testing.
+	 *
+	 * @param options Options to pass to `browser.startTracing()`.
+	 */
+	async startTracing( options = {} ): Promise< void > {
+		return await this.browser.startTracing( this.page, {
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
+			...options,
+		} );
+	}
+
+	/**
+	 * Stops Chromium tracing and saves the trace.
+	 */
+	async stopTracing(): Promise< void > {
+		const traceBuffer = await this.browser.stopTracing();
+		const traceJSON = JSON.parse( traceBuffer.toString() );
+
+		this.trace = traceJSON;
+	}
+
+	/**
+	 * Returns the durations of all typing events.
+	 */
+	getTypingEventDurations(): number[][] {
+		return [
+			this.getEventDurations( 'keydown' ),
+			this.getEventDurations( 'keypress' ),
+			this.getEventDurations( 'keyup' ),
+		];
+	}
+
+	/**
+	 * Returns the durations of all selection events.
+	 */
+	getSelectionEventDurations(): number[][] {
+		return [
+			this.getEventDurations( 'focus' ),
+			this.getEventDurations( 'focusin' ),
+		];
+	}
+
+	/**
+	 * Returns the durations of all click events.
+	 */
+	getClickEventDurations(): number[][] {
+		return [ this.getEventDurations( 'click' ) ];
+	}
+
+	/**
+	 * Returns the durations of all hover events.
+	 */
+	getHoverEventDurations(): number[][] {
+		return [
+			this.getEventDurations( 'mouseover' ),
+			this.getEventDurations( 'mouseout' ),
+		];
+	}
+
+	/**
+	 * Returns the durations of all events of a given type.
+	 *
+	 * @param eventType The type of event to filter.
+	 */
+	getEventDurations( eventType: EventType ): number[] {
+		if ( this.trace.traceEvents.length === 0 ) {
+			throw new Error(
+				'No trace events found. Did you forget to call stopTracing()?'
+			);
+		}
+
+		return this.trace.traceEvents
+			.filter(
+				( item: TraceEvent ): boolean =>
+					item.cat === 'devtools.timeline' &&
+					item.name === 'EventDispatch' &&
+					item?.args?.data?.type === eventType &&
+					!! item.dur
+			)
+			.map( ( item ) => ( item.dur ? item.dur / 1000 : 0 ) );
 	}
 }

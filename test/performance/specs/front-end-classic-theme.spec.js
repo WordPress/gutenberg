@@ -3,12 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { test } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
-import { Metrics } from '../fixtures';
+import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 const results = {
 	timeToFirstByte: [],

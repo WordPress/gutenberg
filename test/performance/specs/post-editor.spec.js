@@ -3,12 +3,12 @@
 /**
  * WordPress dependencies
  */
-import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
-import { PerfUtils, Metrics } from '../fixtures';
+import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
@@ -32,8 +32,8 @@ const results = {
 
 test.describe( 'Post Editor Performance', () => {
 	test.use( {
-		perfUtils: async ( { browser, page }, use ) => {
-			await use( new PerfUtils( { browser, page } ) );
+		perfUtils: async ( { page }, use ) => {
+			await use( new PerfUtils( { page } ) );
 		},
 		metrics: async ( { page }, use ) => {
 			await use( new Metrics( { page } ) );
@@ -120,7 +120,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 
 			// Start tracing.
-			await perfUtils.startTracing();
+			await metrics.startTracing();
 
 			// Type the testing sequence into the empty paragraph.
 			await paragraph.type( 'x'.repeat( iterations ), {
@@ -131,11 +131,11 @@ test.describe( 'Post Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			const traceResults = await perfUtils.stopTracing();
+			await metrics.stopTracing();
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations( traceResults );
+				metrics.getTypingEventDurations();
 
 			// Save the results.
 			for ( let i = throwaway; i < iterations; i++ ) {
@@ -174,7 +174,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 
 			// Start tracing.
-			await perfUtils.startTracing();
+			await metrics.startTracing();
 
 			// Start typing in the middle of the text.
 			await firstParagraph.type( 'x'.repeat( iterations ), {
@@ -185,11 +185,11 @@ test.describe( 'Post Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			const traceResults = await perfUtils.stopTracing();
+			await metrics.stopTracing();
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations( traceResults );
+				metrics.getTypingEventDurations();
 
 			// Save the results.
 			for ( let i = throwaway; i < iterations; i++ ) {
@@ -227,17 +227,16 @@ test.describe( 'Post Editor Performance', () => {
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
-				await perfUtils.startTracing();
+				await metrics.startTracing();
 
 				// Click the next paragraph.
 				await paragraphs.nth( i ).click();
 
 				// Stop tracing.
-				const traceResults = await perfUtils.stopTracing();
+				await metrics.stopTracing();
 
 				// Get the durations.
-				const allDurations =
-					metrics.getSelectionEventDurations( traceResults );
+				const allDurations = metrics.getSelectionEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -277,7 +276,7 @@ test.describe( 'Post Editor Performance', () => {
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
-				await perfUtils.startTracing();
+				await metrics.startTracing();
 
 				// Open List View.
 				await listViewToggle.click();
@@ -287,11 +286,10 @@ test.describe( 'Post Editor Performance', () => {
 				);
 
 				// Stop tracing.
-				const traceResults = await perfUtils.stopTracing();
+				await metrics.stopTracing();
 
 				// Get the durations.
-				const [ mouseClickEvents ] =
-					metrics.getClickEventDurations( traceResults );
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -334,7 +332,7 @@ test.describe( 'Post Editor Performance', () => {
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
-				await perfUtils.startTracing();
+				await metrics.startTracing();
 
 				// Open Inserter.
 				await globalInserterToggle.click();
@@ -344,11 +342,10 @@ test.describe( 'Post Editor Performance', () => {
 				);
 
 				// Stop tracing.
-				const traceResults = await perfUtils.stopTracing();
+				await metrics.stopTracing();
 
 				// Get the durations.
-				const [ mouseClickEvents ] =
-					metrics.getClickEventDurations( traceResults );
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -398,17 +395,17 @@ test.describe( 'Post Editor Performance', () => {
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
-				await perfUtils.startTracing();
+				await metrics.startTracing();
 
 				// Type to trigger search.
 				await page.keyboard.type( 'p' );
 
 				// Stop tracing.
-				const traceResults = await perfUtils.stopTracing();
+				await metrics.stopTracing();
 
 				// Get the durations.
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-					metrics.getTypingEventDurations( traceResults );
+					metrics.getTypingEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -464,18 +461,18 @@ test.describe( 'Post Editor Performance', () => {
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
-				await perfUtils.startTracing();
+				await metrics.startTracing();
 
 				// Hover Inserter items.
 				await paragraphBlockItem.hover();
 				await headingBlockItem.hover();
 
 				// Stop tracing.
-				const traceResults = await perfUtils.stopTracing();
+				await metrics.stopTracing();
 
 				// Get the durations.
 				const [ mouseOverEvents, mouseOutEvents ] =
-					metrics.getHoverEventDurations( traceResults );
+					metrics.getHoverEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
