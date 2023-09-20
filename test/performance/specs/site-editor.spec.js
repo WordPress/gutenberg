@@ -75,8 +75,8 @@ test.describe( 'Site Editor Performance', () => {
 		const samples = 10;
 		const throwaway = 1;
 		const iterations = samples + throwaway;
-		for ( let i = 0; i < iterations; i++ ) {
-			test( `Run the test (${ i + 1 } of ${ iterations })`, async ( {
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				page,
 				perfUtils,
 				metrics,

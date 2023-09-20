@@ -221,7 +221,7 @@ test.describe( 'Post Editor Performance', () => {
 			const samples = 10;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
-			for ( let i = 0; i < iterations; i++ ) {
+			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -240,7 +240,7 @@ test.describe( 'Post Editor Performance', () => {
 					metrics.getSelectionEventDurations( traceResults );
 
 				// Save the results.
-				if ( i >= throwaway ) {
+				if ( i > throwaway ) {
 					results.focus.push(
 						allDurations.reduce( ( acc, eventDurations ) => {
 							return acc + sum( eventDurations );
@@ -271,7 +271,7 @@ test.describe( 'Post Editor Performance', () => {
 			const samples = 10;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
-			for ( let i = 0; i < iterations; i++ ) {
+			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -294,7 +294,7 @@ test.describe( 'Post Editor Performance', () => {
 					metrics.getClickEventDurations( traceResults );
 
 				// Save the results.
-				if ( i >= throwaway ) {
+				if ( i > throwaway ) {
 					results.listViewOpen.push( mouseClickEvents[ 0 ] );
 				}
 
@@ -328,7 +328,7 @@ test.describe( 'Post Editor Performance', () => {
 			const samples = 10;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
-			for ( let i = 0; i < iterations; i++ ) {
+			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -351,7 +351,7 @@ test.describe( 'Post Editor Performance', () => {
 					metrics.getClickEventDurations( traceResults );
 
 				// Save the results.
-				if ( i >= throwaway ) {
+				if ( i > throwaway ) {
 					results.inserterOpen.push( mouseClickEvents[ 0 ] );
 				}
 
@@ -392,7 +392,7 @@ test.describe( 'Post Editor Performance', () => {
 			const samples = 10;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
-			for ( let i = 0; i < iterations; i++ ) {
+			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -411,7 +411,7 @@ test.describe( 'Post Editor Performance', () => {
 					metrics.getTypingEventDurations( traceResults );
 
 				// Save the results.
-				if ( i >= throwaway ) {
+				if ( i > throwaway ) {
 					results.inserterSearch.push(
 						keyDownEvents[ 0 ] +
 							keyPressEvents[ 0 ] +
@@ -458,7 +458,7 @@ test.describe( 'Post Editor Performance', () => {
 			const samples = 10;
 			const throwaway = 1;
 			const iterations = samples + throwaway;
-			for ( let i = 0; i < iterations; i++ ) {
+			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -478,7 +478,7 @@ test.describe( 'Post Editor Performance', () => {
 					metrics.getHoverEventDurations( traceResults );
 
 				// Save the results.
-				if ( i >= throwaway ) {
+				if ( i > throwaway ) {
 					for ( let k = 0; k < mouseOverEvents.length; k++ ) {
 						results.inserterHover.push(
 							mouseOverEvents[ k ] + mouseOutEvents[ k ]

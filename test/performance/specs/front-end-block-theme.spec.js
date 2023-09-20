@@ -39,10 +39,11 @@ test.describe( 'Front End Performance', () => {
 	const samples = 16;
 	const throwaway = 0;
 	const iterations = samples + throwaway;
-	for ( let i = 0; i < iterations; i++ ) {
-		test( `Measure TTFB, LCP, and LCP-TTFB (${
-			i + 1
-		} of ${ iterations })`, async ( { page, metrics } ) => {
+	for ( let i = 1; i <= iterations; i++ ) {
+		test( `Measure TTFB, LCP, and LCP-TTFB (${ i } of ${ iterations })`, async ( {
+			page,
+			metrics,
+		} ) => {
 			// Go to the base URL.
 			// eslint-disable-next-line playwright/no-networkidle
 			await page.goto( '/', { waitUntil: 'networkidle' } );
@@ -52,7 +53,7 @@ test.describe( 'Front End Performance', () => {
 			const lcp = await metrics.getLargestContentfulPaint();
 
 			// Save the results.
-			if ( i >= throwaway ) {
+			if ( i > throwaway ) {
 				results.largestContentfulPaint.push( lcp );
 				results.timeToFirstByte.push( ttfb );
 				results.lcpMinusTtfb.push( lcp - ttfb );
