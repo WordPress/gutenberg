@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 export const PATTERN_TYPES = {
 	synced: 'synced',
@@ -63,6 +64,31 @@ export function BlockPatternsSyncFilter( {
 	patternSyncFilter,
 	patternSourceFilter,
 } ) {
+	const [ patternSyncMenuOptions, setPatternSyncMenuOptions ] =
+		useState( patternSyncOptions );
+
+	function handleSetSourceFilterChange( newSourceFilter ) {
+		setPatternSourceFilter( newSourceFilter );
+		// We need to disable the sync filter option if the source filter is not 'all' or 'user'
+		// otherwise applying them will just result in no patterns being shown.
+		if (
+			newSourceFilter !== 'all' &&
+			newSourceFilter !== PATTERN_TYPES.user
+		) {
+			setPatternSyncMenuOptions(
+				patternSyncOptions.map( ( item ) => {
+					if ( item.value !== 'all' ) {
+						return { ...item, disabled: true };
+					}
+					return item;
+				} )
+			);
+			setPatternSyncFilter( 'all' );
+			return;
+		}
+		setPatternSyncMenuOptions( patternSyncOptions );
+	}
+
 	return (
 		<>
 			<DropdownMenu
@@ -92,18 +118,18 @@ export function BlockPatternsSyncFilter( {
 							<MenuItemsChoice
 								choices={ patternSourceOptions }
 								onSelect={ ( value ) => {
+									handleSetSourceFilterChange( value );
 									onClose();
-									setPatternSourceFilter( value );
 								} }
 								value={ patternSourceFilter }
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Type' ) }>
 							<MenuItemsChoice
-								choices={ patternSyncOptions }
+								choices={ patternSyncMenuOptions }
 								onSelect={ ( value ) => {
-									onClose();
 									setPatternSyncFilter( value );
+									onClose();
 								} }
 								value={ patternSyncFilter }
 							/>
