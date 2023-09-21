@@ -94,6 +94,9 @@ export function BlockPatternsSyncFilter( {
 	return (
 		<>
 			<DropdownMenu
+				popoverProps={ {
+					placement: 'right-end',
+				} }
 				label="Filter patterns"
 				icon={
 					<Icon
@@ -114,14 +117,13 @@ export function BlockPatternsSyncFilter( {
 					/>
 				}
 			>
-				{ ( { onClose } ) => (
+				{ () => (
 					<>
 						<MenuGroup label={ __( 'Author' ) }>
 							<MenuItemsChoice
 								choices={ patternSourceOptions }
 								onSelect={ ( value ) => {
 									handleSetSourceFilterChange( value );
-									onClose();
 								} }
 								value={ patternSourceFilter }
 							/>
@@ -131,7 +133,6 @@ export function BlockPatternsSyncFilter( {
 								choices={ patternSyncMenuOptions }
 								onSelect={ ( value ) => {
 									setPatternSyncFilter( value );
-									onClose();
 								} }
 								value={ patternSyncFilter }
 							/>
