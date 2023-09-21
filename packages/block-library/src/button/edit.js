@@ -6,11 +6,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { 
-	updateLinkAttributes,
-	NEW_TAB_TARGET,
-	NOFOLLOW_REL
- } from './utils';
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 
 /**
  * WordPress dependencies
@@ -259,12 +256,14 @@ function ButtonEdit( props ) {
 							opensInNewTab: newOpensInNewTab,
 							nofollow: newNofollow,
 						} ) =>
-							setAttributes( updateLinkAttributes( { 
-								rel, 
-								url: newURL, 
-								opensInNewTab: newOpensInNewTab, 
-								nofollow: newNofollow 
-							} ) )
+							setAttributes(
+								getUpdatedLinkAttributes( {
+									rel,
+									url: newURL,
+									opensInNewTab: newOpensInNewTab,
+									nofollow: newNofollow,
+								} )
+							)
 						}
 						onRemove={ () => {
 							unlink();
