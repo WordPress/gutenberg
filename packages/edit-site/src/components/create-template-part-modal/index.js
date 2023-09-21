@@ -28,7 +28,7 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+import { TEMPLATE_PART_AREA_DEFAULT_CATEGORY } from '../../utils/constants';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
@@ -46,7 +46,7 @@ export default function CreateTemplatePartModal( {
 	const existingTemplateParts = useExistingTemplateParts();
 
 	const [ title, setTitle ] = useState( '' );
-	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
+	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_DEFAULT_CATEGORY );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 

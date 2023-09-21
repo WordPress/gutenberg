@@ -10,12 +10,16 @@ import { __ } from '@wordpress/i18n';
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
-import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
+import {
+	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+} from '../../utils/constants';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
 	defaultCategories.push( {
-		name: 'uncategorized',
+		name: TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 		label: __( 'Uncategorized' ),
 	} );
 	const themePatterns = useThemePatterns();
