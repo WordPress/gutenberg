@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
  * Internal dependencies
  */
 import { store as patternsStore } from '../store';
-import CategorySelector from './category-selector';
+import CategorySelector, { CATEGORY_SLUG } from './category-selector';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
@@ -34,56 +35,69 @@ export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
 } ) {
 	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
-	const [ categories, setCategories ] = useState( [] );
+	const [ categoryTerms, setCategoryTerms ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
-	const [ saveCategoryPromise, setSaveCategoryPromise ] = useState();
-	const [ isSaving, setIsSaving ] = useState();
+	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
-
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	async function addPattern( patternTitle, sync, patternCategories ) {
+	async function onCreate( patternTitle, sync ) {
+		if ( isSaving ) return;
+
 		try {
+			setIsSaving( true );
+			const categories = await Promise.all(
+				categoryTerms.map( ( termName ) =>
+					findOrCreateTerm( termName )
+				)
+			);
+
 			const newPattern = await createPattern(
 				patternTitle,
 				sync,
 				typeof content === 'function' ? content() : content,
-				patternCategories
+				categories
 			);
-			setIsSaving( false );
 			onSuccess( {
 				pattern: newPattern,
 				categoryId: PATTERN_DEFAULT_CATEGORY,
 			} );
 		} catch ( error ) {
-			setIsSaving( false );
 			createErrorNotice( error.message, {
 				type: 'snackbar',
 				id: 'convert-to-pattern-error',
 			} );
 			onError();
+		} finally {
+			setIsSaving( false );
+			setCategoryTerms( [] );
+			setTitle( '' );
 		}
 	}
 
-	async function onCreate( patternTitle, sync ) {
-		setIsSaving( true );
-		// Check that any onBlur save of the categories is completed
-		// before creating the pattern and closing the modal.
-		if ( saveCategoryPromise ) {
-			const newTerms = await saveCategoryPromise;
-			addPattern(
-				patternTitle,
-				sync,
-				newTerms.map( ( cat ) => cat.id )
+	/**
+	 * @param {string} term
+	 * @return {Promise<number>} The pattern category id.
+	 */
+	async function findOrCreateTerm( term ) {
+		try {
+			const newTerm = await saveEntityRecord(
+				'taxonomy',
+				CATEGORY_SLUG,
+				{ name: term },
+				{ throwOnError: true }
 			);
-			return;
-		}
-		addPattern( patternTitle, sync, categories );
-	}
+			invalidateResolution( 'getUserPatternCategories' );
+			return newTerm.id;
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
 
-	const handleCategorySelection = ( selectedCategories ) => {
-		setCategories( selectedCategories.map( ( cat ) => cat.id ) );
-	};
+			return error.data.term_id;
+		}
+	}
 
 	return (
 		<Modal
@@ -98,7 +112,6 @@ export default function CreatePatternModal( {
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					onCreate( title, syncType );
-					setTitle( '' );
 				} }
 			>
 				<VStack spacing="5">
@@ -111,8 +124,8 @@ export default function CreatePatternModal( {
 						className="patterns-create-modal__name-input"
 					/>
 					<CategorySelector
-						onCategorySelection={ handleCategorySelection }
-						setSaveCategoryPromise={ setSaveCategoryPromise }
+						values={ categoryTerms }
+						onChange={ setCategoryTerms }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
@@ -142,7 +155,6 @@ export default function CreatePatternModal( {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ isSaving }
 							aria-disabled={ isSaving }
 							isBusy={ isSaving }
 						>

@@ -4,20 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
 const unescapeString = ( arg ) => {
 	return decodeEntities( arg );
-};
-
-const unescapeTerm = ( term ) => {
-	return {
-		...term,
-		name: unescapeString( term.name ),
-	};
 };
 
 const EMPTY_ARRAY = [];
@@ -27,16 +20,11 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name',
 	context: 'view',
 };
-const slug = 'wp_pattern_category';
+export const CATEGORY_SLUG = 'wp_pattern_category';
 
-export default function CategorySelector( {
-	onCategorySelection,
-	setSaveCategoryPromise,
-} ) {
-	const [ values, setValues ] = useState( [] );
+export default function CategorySelector( { values, onChange } ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
-	const { invalidateResolution } = useDispatch( coreStore );
 
 	const { searchResults } = useSelect(
 		( select ) => {
@@ -44,7 +32,7 @@ export default function CategorySelector( {
 
 			return {
 				searchResults: !! search
-					? getEntityRecords( 'taxonomy', slug, {
+					? getEntityRecords( 'taxonomy', CATEGORY_SLUG, {
 							...DEFAULT_QUERY,
 							search,
 					  } )
@@ -60,28 +48,7 @@ export default function CategorySelector( {
 		);
 	}, [ searchResults ] );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
-
-	async function findOrCreateTerm( term ) {
-		try {
-			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
-				throwOnError: true,
-			} );
-			invalidateResolution( 'getUserPatternCategories' );
-			return unescapeTerm( newTerm );
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
-			}
-
-			return {
-				id: error.data.term_id,
-				name: term.name,
-			};
-		}
-	}
-
-	function onChange( termNames ) {
+	function handleChange( termNames ) {
 		const uniqueTerms = termNames.reduce( ( terms, newTerm ) => {
 			if (
 				! terms.some(
@@ -93,21 +60,7 @@ export default function CategorySelector( {
 			return terms;
 		}, [] );
 
-		setValues( uniqueTerms );
-
-		// If the user clicks the create pattern modal button directly after entering
-		// a category we need to return a promise so the pattern doesn't save before
-		// the save of the categories is completed.
-		const categorySaving = Promise.all(
-			uniqueTerms.map( ( termName ) =>
-				findOrCreateTerm( { name: termName } )
-			)
-		).then( ( newTerms ) => {
-			setSaveCategoryPromise();
-			onCategorySelection( newTerms );
-			return newTerms;
-		} );
-		setSaveCategoryPromise( categorySaving );
+		onChange( uniqueTerms );
 	}
 
 	return (
@@ -116,7 +69,7 @@ export default function CategorySelector( {
 				className="patterns-menu-items__convert-modal-categories"
 				value={ values }
 				suggestions={ suggestions }
-				onChange={ onChange }
+				onChange={ handleChange }
 				onInputChange={ debouncedSearch }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				label={ __( 'Categories' ) }
