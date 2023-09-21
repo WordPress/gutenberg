@@ -16,6 +16,7 @@ import {
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
@@ -62,7 +63,7 @@ const selectTemplatePartsAsPatterns = (
 	const templatePartAreas = knownAreas.map( ( area ) => area.area );
 
 	const templatePartHasCategory = ( item, category ) => {
-		if ( category !== 'uncategorized' ) {
+		if ( category !== TEMPLATE_PART_AREA_DEFAULT_CATEGORY ) {
 			return item.templatePart.area === category;
 		}
 
@@ -74,7 +75,7 @@ const selectTemplatePartsAsPatterns = (
 
 	const isResolving = getIsResolving( 'getEntityRecords', [
 		'postType',
-		'wp_template_part',
+		TEMPLATE_PART_POST_TYPE,
 		query,
 	] );
 

@@ -16,6 +16,7 @@ export const NAVIGATION_POST_TYPE = 'wp_navigation';
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const TEMPLATE_CUSTOM_SOURCE = 'custom';
+export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 
 // Patterns.
 export const {
@@ -31,6 +32,16 @@ export const FOCUSABLE_ENTITIES = [
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
 ];
+
+/**
+ * Block types that are considered to be page content. These are the only blocks
+ * editable when hasPageContentFocus() is true.
+ */
+export const PAGE_CONTENT_BLOCK_TYPES = {
+	'core/post-title': true,
+	'core/post-featured-image': true,
+	'core/post-content': true,
+};
 
 export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
