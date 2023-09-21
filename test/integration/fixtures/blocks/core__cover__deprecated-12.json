@@ -6,12 +6,15 @@
 			"alt": "",
 			"hasParallax": false,
 			"isRepeated": false,
-			"dimRatio": 100,
-			"overlayColor": "primary",
+			"dimRatio": 50,
+			"customOverlayColor": "#3615d9",
 			"backgroundType": "image",
 			"isDark": true,
-			"useFeaturedImage": false,
+			"useFeaturedImage": true,
 			"tagName": "div",
+			"layout": {
+				"type": "constrained"
+			},
 			"isUserOverlayColor": true
 		},
 		"innerBlocks": [
