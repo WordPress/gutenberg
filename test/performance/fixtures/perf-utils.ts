@@ -27,8 +27,10 @@ export class PerfUtils {
 	}
 
 	/**
-	 * Returns the locator for the editor canvas element. This supports either
-	 * the legacy canvas or the iframed canvas.
+	 * Returns the locator for the editor canvas element. This supports both the
+	 * legacy and the iframed canvas.
+	 *
+	 * @return Locator for the editor canvas element.
 	 */
 	async getCanvas() {
 		return await Promise.any( [
@@ -55,6 +57,8 @@ export class PerfUtils {
 
 	/**
 	 * Saves the post as a draft and returns its URL.
+	 *
+	 * @return URL of the saved draft.
 	 */
 	async saveDraft() {
 		await this.page
@@ -89,6 +93,8 @@ export class PerfUtils {
 
 	/**
 	 * Enters the Site Editor's edit mode.
+	 *
+	 * @return Locator for the editor canvas element.
 	 */
 	async enterSiteEditorEditMode() {
 		const canvas = await this.getCanvas();

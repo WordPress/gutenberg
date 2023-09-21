@@ -147,6 +147,8 @@ export class Metrics {
 	/**
 	 * Returns the loading durations using the Navigation Timing API. All the
 	 * durations exclude the server response time.
+	 *
+	 * @return Object with loading metrics durations.
 	 */
 	async getLoadingDurations() {
 		return await this.page.evaluate( () => {
@@ -189,7 +191,7 @@ export class Metrics {
 	}
 
 	/**
-	 *  Starts Chromium tracing with predefined options for performance testing.
+	 * Starts Chromium tracing with predefined options for performance testing.
 	 *
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
@@ -212,7 +214,8 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns the durations of all typing events.
+	 * @return Durations of all traced `keydown`, `keypress`, and `keyup`
+	 * events.
 	 */
 	getTypingEventDurations() {
 		return [
@@ -223,7 +226,7 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns the durations of all selection events.
+	 * @return Durations of all traced `focus` and `focusin` events.
 	 */
 	getSelectionEventDurations() {
 		return [
@@ -233,14 +236,14 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns the durations of all click events.
+	 * @return Durations of all traced `click` events.
 	 */
 	getClickEventDurations() {
 		return [ this.getEventDurations( 'click' ) ];
 	}
 
 	/**
-	 * Returns the durations of all hover events.
+	 * @return Durations of all traced `mouseover` and `mouseout` events.
 	 */
 	getHoverEventDurations() {
 		return [
@@ -250,9 +253,8 @@ export class Metrics {
 	}
 
 	/**
-	 * Returns the durations of all events of a given type.
-	 *
-	 * @param eventType The type of event to filter.
+	 * @param eventType Type of event to filter.
+	 * @return Durations of all events of a given type.
 	 */
 	getEventDurations( eventType: EventType ) {
 		if ( this.trace.traceEvents.length === 0 ) {
