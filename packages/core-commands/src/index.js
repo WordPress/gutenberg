@@ -1,2 +1,2 @@
-export { unlock } from './lock-unlock';
 export { privateApis } from './private-apis';
+export { CommandsMenuWrapper } from './commands-menu-wrapper';

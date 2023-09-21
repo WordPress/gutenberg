@@ -21,8 +21,7 @@ function gutenberg_enqueue_commands() {
 	wp_add_inline_script(
 		'wp-core-commands',
 		<<<'EOT'
-			const { useCommands } = wp.coreCommands.unlock(wp.coreCommands.privateApis);
-			const { RouterProvider } = wp.coreCommands.unlock(wp.router.privateApis);
+			const CommandsMenuWrapper = wp.coreCommands.CommandsMenuWrapper;
 			const mountPoint = document.createElement('div');
 
 			mountPoint.id = 'wp-commands';
@@ -30,22 +29,10 @@ function gutenberg_enqueue_commands() {
 
 			const root = wp.element.createRoot(mountPoint);
 
-			function CommandMenuWrapper() {
-				useCommands();
-
-				return (
-					wp.element.createElement(
-						RouterProvider,
-						null,
-						wp.element.createElement(wp.commands.CommandMenu, null)
-					)
-				);
-			}
-
 			root.render(
-				wp.element.createElement(CommandMenuWrapper, null)
+				wp.element.createElement(CommandsMenuWrapper, null)
 			);
-		EOT
+EOT
 	);
 }
 

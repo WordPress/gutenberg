@@ -221,7 +221,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				break;
 
 			case 'wp-edit-widgets':
-				array_push($dependencies, 'wp-core-commands');
+				array_push( $dependencies, 'wp-core-commands' );
 				break;
 
 			case 'wp-preferences':
