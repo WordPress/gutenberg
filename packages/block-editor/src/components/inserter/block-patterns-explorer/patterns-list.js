@@ -121,8 +121,6 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			<PatternsListHeader
 				filterValue={ searchValue }
 				filteredBlockPatternsLength={ filteredBlockPatterns.length }
-				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
 			/>
 
 			<InserterListbox>
