@@ -9,13 +9,19 @@ import { __ } from '@wordpress/i18n';
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 export default function TemplatePartNavigationMenuListItem( { id } ) {
-	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title', id );
+	const [ title ] = useEntityProp(
+		'postType',
+		NAVIGATION_POST_TYPE,
+		'title',
+		id
+	);
 
 	const linkInfo = useLink( {
 		postId: id,
-		postType: 'wp_navigation',
+		postType: NAVIGATION_POST_TYPE,
 	} );
 
 	if ( ! id ) return null;
