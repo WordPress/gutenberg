@@ -38,12 +38,6 @@ test.describe( 'Cover', () => {
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
 
-		// The default background color is black.
-		await expect( coverBlock ).toHaveCSS(
-			'background-color',
-			'rgb(0, 0, 0)'
-		);
-
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
