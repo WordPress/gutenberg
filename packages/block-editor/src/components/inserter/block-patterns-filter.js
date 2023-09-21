@@ -32,14 +32,6 @@ const patternSourceOptions = [
 	},
 ];
 
-export const PATTERN_SOURCE_FILTERS = patternSourceOptions.reduce(
-	( patternSourceFilters, { value, label } ) => {
-		patternSourceFilters[ value ] = label;
-		return patternSourceFilters;
-	},
-	{}
-);
-
 export const SYNC_TYPES = {
 	all: 'all',
 	full: 'fully',
