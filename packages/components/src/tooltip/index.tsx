@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Ariakit from '@ariakit/react/tooltip';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies

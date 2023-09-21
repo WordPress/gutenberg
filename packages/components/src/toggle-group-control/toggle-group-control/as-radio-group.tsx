@@ -3,7 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioStore } from '@ariakit/react/radio';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -61,7 +61,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		  }
 		: undefined;
 
-	const radio = useRadioStore( {
+	const radio = Ariakit.useRadioStore( {
 		defaultValue,
 		value,
 		setValue: wrappedOnChangeProp,
@@ -84,7 +84,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 
 	return (
 		<ToggleGroupControlContext.Provider value={ groupContextValue }>
-			<RadioGroup
+			<Ariakit.RadioGroup
 				store={ radio }
 				aria-label={ label }
 				render={ <View /> }
@@ -93,7 +93,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				ref={ forwardedRef }
 			>
 				{ children }
-			</RadioGroup>
+			</Ariakit.RadioGroup>
 		</ToggleGroupControlContext.Provider>
 	);
 }
