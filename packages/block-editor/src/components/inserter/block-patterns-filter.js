@@ -16,10 +16,16 @@ export const PATTERN_TYPES = {
 	unsynced: 'unsynced',
 	user: 'user',
 	theme: 'theme',
+	directory: 'directory',
 };
 
 const patternSourceOptions = [
 	{ value: 'all', label: __( 'All' ) },
+	{
+		value: PATTERN_TYPES.directory,
+		label: __( 'Directory' ),
+		info: __( 'Pattern directory & core' ),
+	},
 	{
 		value: PATTERN_TYPES.theme,
 		label: __( 'Theme' ),

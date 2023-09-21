@@ -47,10 +47,25 @@ export const allPatternsCategory = {
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
-	// If theme source selected, filter out user created patterns.
+	const isUserPattern = pattern.name.startsWith( 'core/block' );
+	const isDirectoryPattern =
+		pattern.source === 'core' ||
+		pattern.source?.startsWith( 'pattern-directory' );
+
+	// If theme source selected, filter out user created patterns and those from
+	// the core patterns directory.
 	if (
 		sourceFilter === PATTERN_TYPES.theme &&
-		pattern.name.startsWith( 'core/block' )
+		( isUserPattern || isDirectoryPattern )
+	) {
+		return true;
+	}
+
+	// If the directory source is selected, filter out user created patterns
+	// and those bundled with the theme.
+	if (
+		sourceFilter === PATTERN_TYPES.directory &&
+		( isUserPattern || ! isDirectoryPattern )
 	) {
 		return true;
 	}
