@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+
 ### Bug Fix
 
 -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
