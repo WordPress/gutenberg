@@ -161,11 +161,11 @@ export class Metrics {
 
 			const firstPaintStartTime = paintTimings.find(
 				( { name } ) => name === 'first-paint'
-			)?.startTime as number;
+			)!.startTime;
 
 			const firstContentfulPaintStartTime = paintTimings.find(
 				( { name } ) => name === 'first-contentful-paint'
-			)?.startTime as number;
+			)!.startTime;
 
 			return {
 				// Server side metric.
