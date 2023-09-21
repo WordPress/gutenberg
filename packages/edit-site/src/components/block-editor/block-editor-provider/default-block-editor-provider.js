@@ -51,13 +51,18 @@ export default function DefaultBlockEditorProvider( { children } ) {
 		'postType',
 		templateType
 	);
-	const pageContentBlock = usePageContentBlocks( blocks, isTemplateHidden );
+	const pageContentBlocks = usePageContentBlocks( {
+		blocks,
+		isPageContentFocused: isTemplateHidden,
+		wrapPageContent: true,
+	} );
+
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={
-				isTemplateHidden && pageContentBlock.length
-					? pageContentBlock
+				isTemplateHidden && pageContentBlocks.length
+					? pageContentBlocks
 					: blocks
 			}
 			onInput={ isTemplateHidden ? noop : onInput }
