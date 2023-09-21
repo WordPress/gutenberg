@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { test, expect, Metrics } from '@wordpress/e2e-test-utils-playwright';
+import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
@@ -280,10 +280,7 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Open List View.
 				await listViewToggle.click();
-				await expect( listViewToggle ).toHaveAttribute(
-					'aria-expanded',
-					'true'
-				);
+				await perfUtils.expectExpandedState( listViewToggle, 'true' );
 
 				// Stop tracing.
 				await metrics.stopTracing();
@@ -298,10 +295,7 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Close List View
 				await listViewToggle.click();
-				await expect( listViewToggle ).toHaveAttribute(
-					'aria-expanded',
-					'false'
-				);
+				await perfUtils.expectExpandedState( listViewToggle, 'false' );
 			}
 		} );
 	} );
@@ -336,8 +330,8 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Open Inserter.
 				await globalInserterToggle.click();
-				await expect( globalInserterToggle ).toHaveAttribute(
-					'aria-expanded',
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
 					'true'
 				);
 
@@ -354,8 +348,8 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Close Inserter.
 				await globalInserterToggle.click();
-				await expect( globalInserterToggle ).toHaveAttribute(
-					'aria-expanded',
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
 					'false'
 				);
 			}
@@ -381,10 +375,7 @@ test.describe( 'Post Editor Performance', () => {
 
 			// Open Inserter.
 			await globalInserterToggle.click();
-			await expect( globalInserterToggle ).toHaveAttribute(
-				'aria-expanded',
-				'true'
-			);
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
 			const samples = 10;
 			const throwaway = 1;
@@ -447,10 +438,7 @@ test.describe( 'Post Editor Performance', () => {
 
 			// Open Inserter.
 			await globalInserterToggle.click();
-			await expect( globalInserterToggle ).toHaveAttribute(
-				'aria-expanded',
-				'true'
-			);
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
 			const samples = 10;
 			const throwaway = 1;
