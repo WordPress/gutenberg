@@ -41,14 +41,3 @@ export function getEditorCanvasContainerView( state ) {
 export function getPageContentFocusType( state ) {
 	return hasPageContentFocus( state ) ? state.pageContentFocusType : null;
 }
-
-/**
- * Returns whether the Patterns page was accessed or not.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Whether the Patterns page was accessed or not.
- */
-export function didAccessPatternsPage( state ) {
-	return state.didAccessPatternsPage;
-}

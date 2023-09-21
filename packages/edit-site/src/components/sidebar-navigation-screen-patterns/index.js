@@ -11,7 +11,7 @@ import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { file } from '@wordpress/icons';
 
 /**
@@ -30,7 +30,6 @@ import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 function TemplatePartGroup( { areas, currentArea, currentType } ) {
 	return (
@@ -89,8 +88,6 @@ function PatternCategoriesGroup( {
 }
 
 export default function SidebarNavigationScreenPatterns() {
-	const { setDidAccessPatternsPage } = unlock( useDispatch( editSiteStore ) );
-	setDidAccessPatternsPage( true );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
@@ -107,7 +104,13 @@ export default function SidebarNavigationScreenPatterns() {
 		const settings = select( editSiteStore ).getSettings();
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
-	const templatePartsLink = useLink( { path: '/wp_template_part/all' } );
+	const templatePartsLink = useLink( {
+		path: '/wp_template_part/all',
+		// If a classic theme that supports template parts accessed
+		// the Patterns page directly, preserve that state in the URL.
+		didAccessPatternsPage: isTemplatePartsMode ? 1 : undefined,
+	} );
+
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
 			<SidebarNavigationItem
