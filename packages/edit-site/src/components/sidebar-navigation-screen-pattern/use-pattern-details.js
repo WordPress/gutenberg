@@ -86,7 +86,7 @@ export default function usePatternDetails( postType, postId ) {
 
 	const details = [];
 
-	if ( postType === PATTERN_TYPES.user || TEMPLATE_PART_POST_TYPE ) {
+	if ( postType === PATTERN_TYPES.user || postType === TEMPLATE_PART_POST_TYPE ) {
 		details.push( {
 			label: __( 'Syncing' ),
 			value:
