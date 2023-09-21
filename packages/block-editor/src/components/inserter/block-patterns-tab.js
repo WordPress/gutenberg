@@ -83,7 +83,8 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 
 	if (
 		syncFilter === SYNC_TYPES.unsynced &&
-		pattern.syncStatus !== 'unsynced'
+		pattern.syncStatus !== 'unsynced' &&
+		isUserPattern
 	) {
 		return true;
 	}
