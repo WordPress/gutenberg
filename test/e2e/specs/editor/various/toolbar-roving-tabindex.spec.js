@@ -26,14 +26,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Paragraph' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 

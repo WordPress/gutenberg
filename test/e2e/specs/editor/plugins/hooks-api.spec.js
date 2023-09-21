@@ -41,7 +41,7 @@ test.describe( 'Using Hooks API', () => {
 		await page.keyboard.type( 'First paragraph' );
 
 		const paragraphBlock = editor.canvas.locator(
-			'role=document[name="Paragraph block"i]'
+			'role=document[name="Block: Paragraph"i]'
 		);
 		await expect( paragraphBlock ).toHaveText( 'First paragraph' );
 		await page.click(

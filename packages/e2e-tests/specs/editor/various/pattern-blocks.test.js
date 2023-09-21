@@ -136,7 +136,7 @@ describe( 'Pattern blocks', () => {
 		);
 
 		// Make sure the reusable block has loaded properly before attempting to publish the post.
-		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
 
 		await publishPost();
 
@@ -146,8 +146,8 @@ describe( 'Pattern blocks', () => {
 		await page.waitForSelector( closePublishPanelSelector );
 		await page.click( closePublishPanelSelector );
 
-		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
-		await canvas().focus( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
+		await canvas().focus( 'p[aria-label="Block: Paragraph"]' );
 
 		// Change the block's content.
 		await page.keyboard.type( 'Einen ' );
@@ -157,7 +157,7 @@ describe( 'Pattern blocks', () => {
 
 		// Check that its content is up to date.
 		const paragraphContent = await canvas().$eval(
-			'p[aria-label="Paragraph block"]',
+			'p[aria-label="Block: Paragraph"]',
 			( element ) => element.innerText
 		);
 		expect( paragraphContent ).toMatch( 'Einen Guten Berg!' );
@@ -341,11 +341,11 @@ describe( 'Pattern blocks', () => {
 
 		// Make an edit to the reusable block and assert that there's only a
 		// paragraph in a reusable block.
-		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
-		await canvas().click( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Block: Paragraph"]' );
+		await canvas().click( 'p[aria-label="Block: Paragraph"]' );
 		await page.keyboard.type( '2' );
 		const selector =
-			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Paragraph block"][.="12"]';
+			'//div[@aria-label="Block: Pattern"]//p[@aria-label="Block: Paragraph"][.="12"]';
 		const reusableBlockWithParagraph = await page.$x( selector );
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
