@@ -27,25 +27,23 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	}
 
 	public function mock_request( $preempt, $args, $url ) {
-		// Check if it's the URL you want to mock.
-		if ( 'https://localhost/fonts/mock-font-collection.json' === $url ) {
-
-			// Mock the response body.
-			$mock_collection_data = array(
-				'fontFamilies' => 'mock',
-				'categories'   => 'mock',
-			);
-
-			return array(
-				'body'     => json_encode( $mock_collection_data ),
-				'response' => array(
-					'code' => 200,
-				),
-			);
+		// if the URL is not the URL you want to mock, return false.
+		if ( 'https://localhost/fonts/mock-font-collection.json' !== $url ) {
+			return false;
 		}
 
-		// For any other URL, return false which ensures the request is made as usual (or you can return other mock data).
-		return false;
+		// Mock the response body.
+		$mock_collection_data = array(
+			'fontFamilies' => 'mock',
+			'categories'   => 'mock',
+		);
+
+		return array(
+			'body'     => json_encode( $mock_collection_data ),
+			'response' => array(
+				'code' => 200,
+			),
+		);
 	}
 
 	/**
