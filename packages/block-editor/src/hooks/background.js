@@ -9,13 +9,14 @@ import {
 	DropZone,
 	FlexItem,
 	MenuItem,
+	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Platform, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 
@@ -96,12 +97,24 @@ export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
 	} );
 }
 
-function InspectorImagePreview( { label, url: imgUrl } ) {
+function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
-				<img src={ imgUrl } alt="" />
+				<span
+					className="block-editor-hooks__background__inspector-image-indicator-wrapper"
+					aria-hidden
+				>
+					{ imgUrl && (
+						<span
+							className="block-editor-hooks__background__inspector-image-indicator"
+							style={ {
+								backgroundImage: `url(${ imgUrl })`,
+							} }
+						/>
+					) }
+				</span>
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
@@ -109,6 +122,13 @@ function InspectorImagePreview( { label, url: imgUrl } ) {
 					>
 						{ imgLabel }
 					</Truncate>
+					<VisuallyHidden as="span">
+						{ sprintf(
+							/* translators: %s: file name */
+							__( 'Selected image: %s' ),
+							filename
+						) }
+					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
 		</ItemGroup>
@@ -232,7 +252,8 @@ function BackgroundImagePanelItem( props ) {
 						onSelect={ onSelectMedia }
 						name={
 							<InspectorImagePreview
-								label={ title }
+								label={ __( 'Background image' ) }
+								filename={ title }
 								url={ url }
 							/>
 						}
@@ -254,11 +275,18 @@ function BackgroundImagePanelItem( props ) {
 								<div className="block-editor-hooks__background__inspector-upload-container">
 									<Button
 										onClick={ open }
-										variant="secondary"
+										aria-label={ __(
+											'Background image style'
+										) }
 									>
-										{ __( 'Add background image' ) }
+										<InspectorImagePreview
+											label={ __( 'Background image' ) }
+										/>
 									</Button>
-									<DropZone onFilesDrop={ onFilesDrop } />
+									<DropZone
+										onFilesDrop={ onFilesDrop }
+										label={ __( 'Drop to upload' ) }
+									/>
 								</div>
 							) }
 						/>
