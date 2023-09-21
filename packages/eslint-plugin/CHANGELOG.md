@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0 (2023-09-20)
+
 ### Breaking Changes
 
 -   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):

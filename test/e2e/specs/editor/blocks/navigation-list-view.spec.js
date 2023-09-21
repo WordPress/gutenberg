@@ -272,7 +272,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
 				} )
 				.getByText( 'Top Level Item 2' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( `can edit menu items`, async ( { page, editor, requestUtils } ) => {
@@ -522,7 +522,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Check that despite being the last inserted block, the Link UI is not displayed
 		// in this scenario because it was not **just** inserted into the List View (i.e.
 		// we have unmounted the list view and then remounted it).
-		await expect( linkControl.getSearchInput() ).not.toBeVisible();
+		await expect( linkControl.getSearchInput() ).toBeHidden();
 	} );
 } );
 
@@ -570,9 +570,7 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator(
-				'.components-menu-item__info-wrapper .components-menu-item__item'
-			) // this is the only way to get the label text without the URL.
+			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }

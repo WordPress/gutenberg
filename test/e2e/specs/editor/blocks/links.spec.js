@@ -231,7 +231,7 @@ test.describe( 'Links', () => {
 
 		// Check that the Advanced settings are still closed.
 		// This verifies that the editor preference was persisted.
-		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeVisible();
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeHidden();
 	} );
 
 	test( 'can toggle link settings and save', async ( {
