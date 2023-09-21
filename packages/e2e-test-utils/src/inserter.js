@@ -238,7 +238,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 				await page.$x(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
 				)
-			 )[ 0 ];
+			)[ 0 ];
 		} catch ( error ) {
 			// noop
 		}

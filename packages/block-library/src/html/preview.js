@@ -8,6 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { SandBox } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 // Default styles used to unset some of the styles
 // that might be inherited from the editor style.
@@ -32,7 +33,12 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 
 	return (
 		<>
-			<SandBox html={ content } styles={ styles } />
+			<SandBox
+				html={ content }
+				styles={ styles }
+				title={ __( 'Custom HTML Preview' ) }
+				tabIndex={ -1 }
+			/>
 			{ /*
 				An overlay is added when the block is not selected in order to register click events.
 				Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it

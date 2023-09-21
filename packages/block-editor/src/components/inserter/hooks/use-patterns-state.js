@@ -31,8 +31,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				userPatternCategories:
-					__experimentalUserPatternCategories?.patternCategories,
+				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
@@ -80,7 +79,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return { patterns, allCategories, onClickPattern };
+	return [ patterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

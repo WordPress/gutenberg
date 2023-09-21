@@ -38,7 +38,7 @@ type ResourcePermissionsResolution< IdType > = [
 	HasResolved,
 	ResolutionDetails &
 		GlobalResourcePermissionsResolution &
-		( IdType extends void ? SpecificResourcePermissionsResolution : {} )
+		( IdType extends void ? SpecificResourcePermissionsResolution : {} ),
 ];
 
 /**

@@ -21,7 +21,11 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import { DEFAULT_CATEGORY, DEFAULT_TYPE } from '../page-patterns/utils';
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
@@ -43,10 +47,10 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 							icon={ getTemplatePartIcon( area ) }
 							label={ label }
 							id={ area }
-							type="wp_template_part"
+							type={ TEMPLATE_PART_POST_TYPE }
 							isActive={
 								currentArea === area &&
-								currentType === 'wp_template_part'
+								currentType === TEMPLATE_PART_POST_TYPE
 							}
 						/>
 					)
@@ -74,8 +78,8 @@ function PatternCategoriesGroup( {
 						type="pattern"
 						isActive={
 							currentCategory === `${ category.name }` &&
-							( currentType === 'pattern' ||
-								currentType === 'wp_block' )
+							( currentType === PATTERN_TYPES.theme ||
+								currentType === PATTERN_TYPES.user )
 						}
 					/>
 				) ) }
@@ -89,8 +93,8 @@ export default function SidebarNavigationScreenPatterns() {
 	setDidAccessPatternsPage( true );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
-	const currentCategory = categoryId || DEFAULT_CATEGORY;
-	const currentType = categoryType || DEFAULT_TYPE;
+	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
+	const currentType = categoryType || PATTERN_TYPES.user;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();

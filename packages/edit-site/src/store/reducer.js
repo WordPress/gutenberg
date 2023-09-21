@@ -178,6 +178,23 @@ export function hasPageContentFocus( state = false, action ) {
 }
 
 /**
+ * Reducer used to track the type of page content focus.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function pageContentFocusType( state = 'disableTemplate', action ) {
+	switch ( action.type ) {
+		case 'SET_PAGE_CONTENT_FOCUS_TYPE':
+			return action.pageContentFocusType;
+	}
+
+	return state;
+}
+
+/**
  * Reducer used to track whether the Patterns page was accessed or not.
  *
  * @param {boolean} state  Current state.
@@ -204,5 +221,6 @@ export default combineReducers( {
 	canvasMode,
 	editorCanvasContainerView,
 	hasPageContentFocus,
+	pageContentFocusType,
 	didAccessPatternsPage,
 } );

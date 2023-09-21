@@ -298,7 +298,6 @@
 		},
 		"settingsPropertiesLightbox": {
 			"type": "object",
-			"additionalProperties": false,
 			"properties": {
 				"lightbox": {
 					"description": "Settings related to the lightbox.",
@@ -312,7 +311,8 @@
 							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
 							"type": "boolean"
 						}
-					}
+					},
+					"additionalProperties": false
 				}
 			}
 		},

@@ -2,8 +2,11 @@
 	{
 		"blockName": "core/image",
 		"attrs": {
-			"lightbox": {
-				"enabled": true
+			"behaviors": {
+				"lightbox": {
+					"enabled": true,
+					"animation": "fade"
+				}
 			},
 			"id": 8,
 			"sizeSlug": "large",

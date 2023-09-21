@@ -107,11 +107,10 @@ test.describe( 'Site Editor List View', () => {
 		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).not.toBeVisible();
 
-		// Focus should now be on the Open Navigation button since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
-		await expect( openNavigationButton ).toBeFocused();
+		// Focus should now be on the list view toggle button.
+		await expect(
+			page.getByRole( 'button', { name: 'List View' } )
+		).toBeFocused();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -131,6 +130,8 @@ test.describe( 'Site Editor List View', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).not.toBeVisible();
-		await expect( openNavigationButton ).toBeFocused();
+		await expect(
+			page.getByRole( 'button', { name: 'List View' } )
+		).toBeFocused();
 	} );
 } );

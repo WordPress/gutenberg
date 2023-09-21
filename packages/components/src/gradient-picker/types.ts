@@ -75,7 +75,7 @@ type GradientPickerBaseProps = {
 			'aria-labelledby'?: string;
 			'aria-label'?: never;
 	  }
- );
+);
 
 export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	/**

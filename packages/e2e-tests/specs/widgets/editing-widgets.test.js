@@ -388,9 +388,8 @@ describe( 'Widgets screen', () => {
 				name: 'Block: Widget Area',
 			} );
 			await firstWidgetArea.focus();
-			const marqueeBlock = await getBlockInGlobalInserter(
-				'Marquee Greeting'
-			);
+			const marqueeBlock =
+				await getBlockInGlobalInserter( 'Marquee Greeting' );
 			await marqueeBlock.click();
 			await page.waitForFunction(
 				( expectedMarquees ) => {
@@ -721,9 +720,8 @@ describe( 'Widgets screen', () => {
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
 		// Insert a paragraph it should be in the first widget area.
-		const inserterParagraphBlock = await getBlockInGlobalInserter(
-			'Paragraph'
-		);
+		const inserterParagraphBlock =
+			await getBlockInGlobalInserter( 'Paragraph' );
 		await inserterParagraphBlock.hover();
 		await inserterParagraphBlock.click();
 		const addedParagraphBlockInFirstWidgetArea = await find(
