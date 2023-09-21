@@ -8,7 +8,7 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
  */
 import fs from 'fs';
 import path from 'path';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 /**
  * Internal dependencies
@@ -167,5 +167,15 @@ export class PerfUtils {
 			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
+	}
+
+	async expectExpandedState( locator: Locator, state: 'true' | 'false' ) {
+		return await Promise.any( [
+			// eslint-disable-next-line playwright/missing-playwright-await
+			expect( locator ).toHaveAttribute( 'aria-expanded', state ),
+			// Legacy selector.
+			// eslint-disable-next-line playwright/missing-playwright-await
+			expect( locator ).toHaveAttribute( 'aria-pressed', state ),
+		] );
 	}
 }
