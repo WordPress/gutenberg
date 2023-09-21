@@ -44,23 +44,52 @@ describe( 'usePageContentBlocks', () => {
 	];
 	it( 'should return empty array if `isPageContentFocused` is `false`', () => {
 		const { result } = renderHook( () =>
-			usePageContentBlocks( blocksList, false )
+			usePageContentBlocks( {
+				blocks: blocksList,
+				isPageContentFocused: false,
+			} )
 		);
 		expect( result.current ).toEqual( [] );
 	} );
 	it( 'should return empty array if `blocks` is undefined', () => {
 		const { result } = renderHook( () =>
-			usePageContentBlocks( undefined, true )
+			usePageContentBlocks( {
+				blocks: undefined,
+				isPageContentFocused: true,
+			} )
 		);
 		expect( result.current ).toEqual( [] );
 	} );
 	it( 'should return empty array if `blocks` is an empty array', () => {
-		const { result } = renderHook( () => usePageContentBlocks( [], true ) );
+		const { result } = renderHook( () =>
+			usePageContentBlocks( {
+				blocks: [],
+				isPageContentFocused: true,
+			} )
+		);
 		expect( result.current ).toEqual( [] );
 	} );
 	it( 'should return new block list', () => {
 		const { result } = renderHook( () =>
-			usePageContentBlocks( blocksList, true )
+			usePageContentBlocks( {
+				blocks: blocksList,
+				isPageContentFocused: true,
+			} )
+		);
+		expect( result.current ).toEqual( [
+			createBlock( 'core/post-title' ),
+			createBlock( 'core/post-featured-image' ),
+			createBlock( 'core/post-content' ),
+			createBlock( 'core/post-content' ),
+		] );
+	} );
+	it( 'should return new block list wrapped in a Group block', () => {
+		const { result } = renderHook( () =>
+			usePageContentBlocks( {
+				blocks: blocksList,
+				isPageContentFocused: true,
+				wrapPageContent: true,
+			} )
 		);
 		expect( result.current ).toEqual( [
 			{

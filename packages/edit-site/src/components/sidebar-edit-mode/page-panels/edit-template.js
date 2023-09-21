@@ -11,7 +11,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 
 /**
@@ -21,6 +21,7 @@ import { store as editSiteStore } from '../../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../../lock-unlock';
+import usePageContentBlocks from '../../block-editor/block-editor-provider/use-page-content-blocks';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-page-panels-edit-template__dropdown',
@@ -28,7 +29,7 @@ const POPOVER_PROPS = {
 };
 
 export default function EditTemplate() {
-	const { hasResolved, template, isTemplateHidden } = useSelect(
+	const { hasResolved, template, isTemplateHidden, postType } = useSelect(
 		( select ) => {
 			const { getEditedPostContext, getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
@@ -38,11 +39,13 @@ export default function EditTemplate() {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const _context = getEditedPostContext();
+			const _postType = getEditedPostType();
 			const queryArgs = [
 				'postType',
 				getEditedPostType(),
 				getEditedPostId(),
 			];
+
 			return {
 				context: _context,
 				hasResolved: hasFinishedResolution(
@@ -53,15 +56,23 @@ export default function EditTemplate() {
 				isTemplateHidden:
 					getCanvasMode() === 'edit' &&
 					getPageContentFocusType() === 'hideTemplate',
+				postType: _postType,
 			};
 		},
 		[]
 	);
 
+	const [ blocks ] = useEntityBlockEditor( 'postType', postType );
+
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
 	// Disable reason: `useDispatch` can't be called conditionally.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { setPageContentFocusType } = unlock( useDispatch( editSiteStore ) );
+	// Check if there are any post content block types in the blocks tree.
+	const pageContentBlocks = usePageContentBlocks( {
+		blocks,
+		isPageContentFocused: true,
+	} );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -97,20 +108,24 @@ export default function EditTemplate() {
 							<SwapTemplateButton onClick={ onClose } />
 						</MenuGroup>
 						<ResetDefaultTemplate onClick={ onClose } />
-						<MenuGroup>
-							<MenuItem
-								icon={ ! isTemplateHidden ? check : undefined }
-								onClick={ () => {
-									setPageContentFocusType(
-										isTemplateHidden
-											? 'disableTemplate'
-											: 'hideTemplate'
-									);
-								} }
-							>
-								{ __( 'Template preview' ) }
-							</MenuItem>
-						</MenuGroup>
+						{ !! pageContentBlocks?.length && (
+							<MenuGroup>
+								<MenuItem
+									icon={
+										! isTemplateHidden ? check : undefined
+									}
+									onClick={ () => {
+										setPageContentFocusType(
+											isTemplateHidden
+												? 'disableTemplate'
+												: 'hideTemplate'
+										);
+									} }
+								>
+									{ __( 'Template preview' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
 					</>
 				) }
 			</DropdownMenu>
