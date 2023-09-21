@@ -39,8 +39,10 @@ export default function Actions( { template } ) {
 				( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
 			)
 			.filter( filterOutDuplicatesByName )
-			// TODO use the correct type.
-			.filter( ( pattern ) => pattern.templateTypes?.includes( 'home' ) )
+			// Filter only the patterns that are compatible with the current template.
+			.filter( ( pattern ) =>
+				pattern.templateTypes?.includes( template.slug )
+			)
 			.map( ( pattern ) => ( {
 				...pattern,
 				keywords: pattern.keywords || [],
