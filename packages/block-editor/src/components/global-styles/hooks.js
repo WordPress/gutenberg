@@ -117,7 +117,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ??
 				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value !== undefined && value !== null ) {
+			if ( value !== undefined ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
