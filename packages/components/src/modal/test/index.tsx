@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Modal from '../';
+import type { ModalProps } from '../types';
 
 const noop = () => {};
 
@@ -235,5 +236,128 @@ describe( 'Modal', () => {
 		expect(
 			screen.getByText( 'A sweet button', { selector: 'button' } )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'Focus handling', () => {
+		let originalGetClientRects: () => DOMRectList;
+
+		const FocusMountDemo = ( {
+			focusOnMount,
+		}: Pick< ModalProps, 'focusOnMount' > ) => {
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<>
+					<button onClick={ () => setIsShown( true ) }>
+						Toggle Modal
+					</button>
+					{ isShown && (
+						<Modal
+							focusOnMount={ focusOnMount }
+							onRequestClose={ () => setIsShown( false ) }
+						>
+							<p>Modal content</p>
+							<a href="https://wordpress.org">
+								First Focusable Content Element
+							</a>
+
+							<a href="https://wordpress.org">
+								Another Focusable Content Element
+							</a>
+						</Modal>
+					) }
+				</>
+			);
+		};
+
+		beforeEach( () => {
+			/**
+			 * The test environment does not have a layout engine, so we need to mock
+			 * the getClientRects method. This ensures that the focusable elements can be
+			 * found by the `focusOnMount` logic which depends on layout information
+			 * to determine if the element is visible or not.
+			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
+			 */
+			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+			window.HTMLElement.prototype.getClientRects = function () {
+				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+			};
+		} );
+
+		afterEach( () => {
+			// Restore original HTMLElement prototype.
+			// See beforeEach for details.
+			window.HTMLElement.prototype.getClientRects =
+				originalGetClientRects;
+		} );
+
+		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
+			const user = userEvent.setup();
+
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button', {
+				name: 'Toggle Modal',
+			} );
+
+			await user.click( opener );
+
+			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
+		} );
+
+		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+
+			render( <FocusMountDemo focusOnMount={ true } /> );
+
+			const opener = screen.getByRole( 'button', {
+				name: 'Toggle Modal',
+			} );
+
+			await user.click( opener );
+
+			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
+		} );
+
+		it( 'should focus the first focusable element in the contents (if found) when `firstContentElement` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+
+			render( <FocusMountDemo focusOnMount="firstContentElement" /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect(
+				screen.getByText( 'First Focusable Content Element' )
+			).toHaveFocus();
+		} );
+
+		it( 'should focus the first element anywhere within the Modal when `firstElement` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+
+			render( <FocusMountDemo focusOnMount="firstElement" /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Close' } )
+			).toHaveFocus();
+		} );
+
+		it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+
+			render( <FocusMountDemo focusOnMount={ false } /> );
+
+			const opener = screen.getByRole( 'button', {
+				name: 'Toggle Modal',
+			} );
+
+			await user.click( opener );
+
+			expect( opener ).toHaveFocus();
+		} );
 	} );
 } );
