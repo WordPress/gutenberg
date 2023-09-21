@@ -104,7 +104,7 @@ test.describe( 'Block Locking', () => {
 		} );
 
 		const paragraph = editor.canvas.getByRole( 'document', {
-			name: 'Paragraph block',
+			name: 'Block: Paragraph',
 		} );
 		await paragraph.click();
 
