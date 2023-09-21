@@ -31,7 +31,7 @@ const slug = 'wp_pattern_category';
 
 export default function CategorySelector( {
 	onCategorySelection,
-	setCategorySaving,
+	setSaveCategoryPromise,
 } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
@@ -98,18 +98,16 @@ export default function CategorySelector( {
 		// If the user clicks the create pattern modal button directly after entering
 		// a category we need to return a promise so the pattern doesn't save before
 		// the save of the categories is completed.
-		const categorySaving = new Promise( function ( resolve ) {
-			Promise.all(
-				uniqueTerms.map( ( termName ) =>
-					findOrCreateTerm( { name: termName } )
-				)
-			).then( ( newTerms ) => {
-				setCategorySaving();
-				onCategorySelection( newTerms );
-				resolve( newTerms );
-			} );
+		const categorySaving = Promise.all(
+			uniqueTerms.map( ( termName ) =>
+				findOrCreateTerm( { name: termName } )
+			)
+		).then( ( newTerms ) => {
+			setSaveCategoryPromise();
+			onCategorySelection( newTerms );
+			return newTerms;
 		} );
-		setCategorySaving( categorySaving );
+		setSaveCategoryPromise( categorySaving );
 	}
 
 	return (

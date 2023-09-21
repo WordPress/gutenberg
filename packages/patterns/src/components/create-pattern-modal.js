@@ -36,7 +36,8 @@ export default function CreatePatternModal( {
 	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
 	const [ categories, setCategories ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
-	const [ categorySaving, setCategorySaving ] = useState();
+	const [ saveCategoryPromise, setSaveCategoryPromise ] = useState();
+	const [ isSaving, setIsSaving ] = useState();
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -49,11 +50,13 @@ export default function CreatePatternModal( {
 				typeof content === 'function' ? content() : content,
 				patternCategories
 			);
+			setIsSaving( false );
 			onSuccess( {
 				pattern: newPattern,
 				categoryId: PATTERN_DEFAULT_CATEGORY,
 			} );
 		} catch ( error ) {
+			setIsSaving( false );
 			createErrorNotice( error.message, {
 				type: 'snackbar',
 				id: 'convert-to-pattern-error',
@@ -63,10 +66,11 @@ export default function CreatePatternModal( {
 	}
 
 	async function onCreate( patternTitle, sync ) {
+		setIsSaving( true );
 		// Check that any onBlur save of the categories is completed
 		// before creating the pattern and closing the modal.
-		if ( categorySaving ) {
-			const newTerms = await categorySaving;
+		if ( saveCategoryPromise ) {
+			const newTerms = await saveCategoryPromise;
 			addPattern(
 				patternTitle,
 				sync,
@@ -108,7 +112,7 @@ export default function CreatePatternModal( {
 					/>
 					<CategorySelector
 						onCategorySelection={ handleCategorySelection }
-						setCategorySaving={ setCategorySaving }
+						setSaveCategoryPromise={ setSaveCategoryPromise }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
@@ -135,7 +139,12 @@ export default function CreatePatternModal( {
 							{ __( 'Cancel' ) }
 						</Button>
 
-						<Button variant="primary" type="submit">
+						<Button
+							variant="primary"
+							type="submit"
+							disabled={ isSaving }
+							aria-disabled={ isSaving }
+						>
 							{ __( 'Create' ) }
 						</Button>
 					</HStack>
