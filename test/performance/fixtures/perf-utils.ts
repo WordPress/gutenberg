@@ -8,19 +8,29 @@ import { expect } from '@wordpress/e2e-test-utils-playwright';
  */
 import fs from 'fs';
 import path from 'path';
+import type { Page } from '@playwright/test';
 
 /**
  * Internal dependencies
  */
 import { readFile } from '../utils.js';
+
+type PerfUtilsConstructorProps = {
+	page: Page;
+};
+
 export class PerfUtils {
-	constructor( { page } ) {
+	page: Page;
+
+	constructor( { page }: PerfUtilsConstructorProps ) {
 		this.page = page;
-		this.browser = page.context().browser();
 	}
 
+	/**
+	 * Returns the locator for the editor canvas element. This supports either
+	 * the legacy canvas or the iframed canvas.
+	 */
 	async getCanvas() {
-		// Handles both legacy and iframed canvas.
 		return await Promise.any( [
 			( async () => {
 				const legacyCanvasLocator = this.page.locator(
@@ -43,6 +53,9 @@ export class PerfUtils {
 		] );
 	}
 
+	/**
+	 * Saves the post as a draft and returns its URL.
+	 */
 	async saveDraft() {
 		await this.page
 			.getByRole( 'button', { name: 'Save draft' } )
@@ -54,6 +67,9 @@ export class PerfUtils {
 		return this.page.url();
 	}
 
+	/**
+	 * Disables the editor autosave function.
+	 */
 	async disableAutosave() {
 		await this.page.evaluate( () => {
 			return window.wp.data
@@ -71,11 +87,13 @@ export class PerfUtils {
 		expect( autosaveInterval ).toBe( 100000000000 );
 	}
 
+	/**
+	 * Enters the Site Editor's edit mode.
+	 */
 	async enterSiteEditorEditMode() {
 		const canvas = await this.getCanvas();
 
 		await canvas.locator( 'body' ).click();
-		// Second click is needed for the legacy edit mode.
 		await canvas
 			.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 			.click();
@@ -83,32 +101,44 @@ export class PerfUtils {
 		return canvas;
 	}
 
+	/**
+	 * Loads blocks from the small post with containers fixture into the editor
+	 * canvas.
+	 */
 	async loadBlocksForSmallPostWithContainers() {
 		return await this.loadBlocksFromHtml(
 			path.join(
-				process.env.ASSETS_PATH,
+				process.env.ASSETS_PATH!,
 				'small-post-with-containers.html'
 			)
 		);
 	}
 
+	/**
+	 * Loads blocks from the large post fixture into the editor canvas.
+	 */
 	async loadBlocksForLargePost() {
 		return await this.loadBlocksFromHtml(
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
+			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
 		);
 	}
 
-	async loadBlocksFromHtml( filepath ) {
+	/**
+	 * Loads blocks from an HTML fixture with given path into the editor canvas.
+	 *
+	 * @param filepath Path to the HTML fixture.
+	 */
+	async loadBlocksFromHtml( filepath: string ) {
 		if ( ! fs.existsSync( filepath ) ) {
 			throw new Error( `File not found: ${ filepath }` );
 		}
 
-		return await this.page.evaluate( ( html ) => {
+		return await this.page.evaluate( ( html: string ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = parse( html );
 
-			blocks.forEach( ( block ) => {
+			blocks.forEach( ( block: any ) => {
 				if ( block.name === 'core/image' ) {
 					delete block.attributes.id;
 					delete block.attributes.url;
@@ -119,6 +149,9 @@ export class PerfUtils {
 		}, readFile( filepath ) );
 	}
 
+	/**
+	 * Generates and loads a 1000 empty paragraphs into the editor canvas.
+	 */
 	async load1000Paragraphs() {
 		await this.page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
