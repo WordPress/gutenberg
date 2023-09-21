@@ -13,6 +13,7 @@ import { Icon } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 export const PATTERN_TYPES = {
+	all: 'all',
 	synced: 'synced',
 	unsynced: 'unsynced',
 	user: 'user',
@@ -21,7 +22,7 @@ export const PATTERN_TYPES = {
 };
 
 const patternSourceOptions = [
-	{ value: 'all', label: __( 'All' ) },
+	{ value: PATTERN_TYPES.all, label: __( 'All' ) },
 	{
 		value: PATTERN_TYPES.directory,
 		label: __( 'Directory' ),
@@ -40,12 +41,13 @@ const patternSourceOptions = [
 ];
 
 export const SYNC_TYPES = {
+	all: 'all',
 	full: 'fully',
 	unsynced: 'unsynced',
 };
 
 const patternSyncOptions = [
-	{ value: 'all', label: __( 'All' ) },
+	{ value: SYNC_TYPES.all, label: __( 'All' ) },
 	{
 		value: SYNC_TYPES.full,
 		label: __( 'Synced' ),
@@ -72,18 +74,18 @@ export function BlockPatternsSyncFilter( {
 		// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 		// otherwise applying them will just result in no patterns being shown.
 		if (
-			newSourceFilter !== 'all' &&
+			newSourceFilter !== PATTERN_TYPES.all &&
 			newSourceFilter !== PATTERN_TYPES.user
 		) {
 			setPatternSyncMenuOptions(
 				patternSyncOptions.map( ( item ) => {
-					if ( item.value !== 'all' ) {
+					if ( item.value !== SYNC_TYPES.all ) {
 						return { ...item, disabled: true };
 					}
 					return item;
 				} )
 			);
-			setPatternSyncFilter( 'all' );
+			setPatternSyncFilter( SYNC_TYPES.all );
 			return;
 		}
 		setPatternSyncMenuOptions( patternSyncOptions );
