@@ -26,7 +26,6 @@ test.describe( 'Cover', () => {
 
 	test( 'can set overlay color using color picker on block placeholder', async ( {
 		editor,
-		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = editor.canvas.getByRole( 'document', {
