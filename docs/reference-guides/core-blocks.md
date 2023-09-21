@@ -526,7 +526,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 ## Pattern placeholder
 
-Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
+Show a pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
 -	**Name:** core/pattern
 -	**Category:** theme

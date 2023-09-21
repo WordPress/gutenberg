@@ -184,7 +184,7 @@ function InserterSearchResults( {
 	const patternsUI = !! filteredBlockPatterns.length && (
 		<InserterPanel
 			title={
-				<VisuallyHidden>{ __( 'Block patterns' ) }</VisuallyHidden>
+				<VisuallyHidden>{ __( 'Patterns' ) }</VisuallyHidden>
 			}
 		>
 			<div className="block-editor-inserter__quick-inserter-patterns">

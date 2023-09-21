@@ -7,7 +7,7 @@
  */
 
 /**
- * Unit tests for REST API for Block Patterns.
+ * Unit tests for REST API for Patterns.
  *
  * @group restapi
  * @covers Gutenberg_REST_Block_Patterns_Controller_6_2

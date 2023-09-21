@@ -164,11 +164,11 @@ The Block Directory enables installing new block plugins from [WordPress.org.](h
 remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
 ```
 
-## Block Patterns
+## Patterns
 
 ### `should_load_remote_block_patterns`
 
-Default `true`. The filter is checked when registering remote block patterns, set to false to disable.
+Default `true`. The filter is checked when registering remote patterns, set to false to disable.
 
 For example, to disable use:
 

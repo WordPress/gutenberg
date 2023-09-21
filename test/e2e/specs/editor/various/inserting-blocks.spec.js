@@ -200,7 +200,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
@@ -272,7 +272,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();

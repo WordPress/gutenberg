@@ -1271,22 +1271,22 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations(
 }
 
 /**
- * Retrieve the list of registered block patterns.
+ * Retrieve the list of registered patterns.
  *
  * @param state Data state.
  *
- * @return Block pattern list.
+ * @return Pattern list.
  */
 export function getBlockPatterns( state: State ): Array< any > {
 	return state.blockPatterns;
 }
 
 /**
- * Retrieve the list of registered block pattern categories.
+ * Retrieve the list of registered pattern categories.
  *
  * @param state Data state.
  *
- * @return Block pattern category list.
+ * @return Pattern category list.
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;

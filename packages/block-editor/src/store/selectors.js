@@ -2414,7 +2414,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
  * @param {string|string[]} blockNames   Block's name or array of block names to find matching pattens.
  * @param {?string}         rootClientId Optional target root client ID.
  *
- * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
+ * @return {Array} The list of matched patterns based on declared `blockTypes` and block name.
  */
 export const getPatternsByBlockTypes = createSelector(
 	( state, blockNames, rootClientId = null ) => {
@@ -2471,9 +2471,9 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  * For now we only handle blocks without InnerBlocks and take into account
  * the `__experimentalRole` property of blocks' attributes for the transformation.
  *
- * We return the first set of possible eligible block patterns,
+ * We return the first set of possible eligible patterns,
  * by checking the `blockTypes` property. We still have to recurse through
- * block pattern's blocks and try to find matches from the selected blocks.
+ * pattern's blocks and try to find matches from the selected blocks.
  * Now this happens in the consumer to avoid heavy operations in the selector.
  *
  * @param {Object}   state        Editor state.
@@ -2507,9 +2507,9 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			new Set( blocks.map( ( { name } ) => name ) )
 		);
 		/**
-		 * Here we will return first set of possible eligible block patterns,
+		 * Here we will return first set of possible eligible patterns,
 		 * by checking the `blockTypes` property. We still have to recurse through
-		 * block pattern's blocks and try to find matches from the selected blocks.
+		 * pattern's blocks and try to find matches from the selected blocks.
 		 * Now this happens in the consumer to avoid heavy operations in the selector.
 		 */
 		return getPatternsByBlockTypes(

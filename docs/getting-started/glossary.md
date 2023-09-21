@@ -64,7 +64,7 @@ A type of block where the content of which may change and cannot be determined a
 
 ## Full Site Editing
 
-This refers to a collection of features that ultimately allows users to edit their entire website using blocks as the starting point. This feature set includes everything from block patterns to global styles to templates to design tools for blocks (and more). First released in WordPress 5.9.
+This refers to a collection of features that ultimately allows users to edit their entire website using blocks as the starting point. This feature set includes everything from patterns to global styles to templates to design tools for blocks (and more). First released in WordPress 5.9.
 
 ## Global Styles
 
