@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug fix
+
+-   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements
