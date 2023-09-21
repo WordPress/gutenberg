@@ -5,6 +5,18 @@ import { useState } from '@wordpress/element';
 
 export default function useInternalValue( value ) {
 	const [ internalValue, setInternalValue ] = useState( value || {} );
+	const [ previousValue, setPreviousValue ] = useState( value );
+
+	// If the value prop changes, update the internal state.
+	// See:
+	// - https://github.com/WordPress/gutenberg/pull/51387#issuecomment-1722927384.
+	// - https://react.dev/reference/react/useState#storing-information-from-previous-renders.
+	if ( value !== previousValue ) {
+		setPreviousValue( value );
+		if ( value !== internalValue ) {
+			setInternalValue( value );
+		}
+	}
 
 	const setInternalURLInputValue = ( nextValue ) => {
 		setInternalValue( {
