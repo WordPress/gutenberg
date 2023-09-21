@@ -87,7 +87,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			<RadioGroup
 				store={ radio }
 				aria-label={ label }
-				as={ View }
+				render={ <View /> }
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
