@@ -19,11 +19,7 @@ function CollectionFontVariant( {
 	selected,
 } ) {
 	const handleToggleActivation = () => {
-		if ( font?.fontFace ) {
-			handleToggleVariant( font, face );
-			return;
-		}
-		handleToggleVariant( font );
+		handleToggleVariant( font, face );
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );

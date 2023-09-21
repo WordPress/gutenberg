@@ -32,6 +32,7 @@ import {
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
 import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
+import { filterFakeFacesFromFamilies } from './utils/filter-fonts';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -199,15 +200,17 @@ function FontLibraryProvider( { children } ) {
 	async function installFonts( fonts ) {
 		setIsInstalling( true );
 		try {
+			// Remove the fake font faces (used to render system fonts) from the fonts to install.
+			const filteredFonts = filterFakeFacesFromFamilies( fonts );
 			// Prepare formData to install.
-			const formData = makeFormDataFromFontFamilies( fonts );
+			const formData = makeFormDataFromFontFamilies( filteredFonts );
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			const fontsInstalled = await fetchInstallFonts( formData );
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
 			const fontToBeActivated = getIntersectingFontFaces(
 				fontsInstalled,
-				fonts
+				filteredFonts
 			);
 			// Activate the font families (add the font families to the global styles).
 			activateCustomFontFamilies( fontToBeActivated );
@@ -279,16 +282,18 @@ function FontLibraryProvider( { children } ) {
 			...fontFamilies,
 			custom: newCustomFonts,
 		} );
-		// Add custom fonts to the browser.
 		fontsToAdd.forEach( ( font ) => {
-			font.fontFace.forEach( ( face ) => {
-				// Load font faces just in the iframe because they already are in the document.
-				loadFontFaceInBrowser(
-					face,
-					getDisplaySrcFromFontFace( face.src ),
-					'iframe'
-				);
-			} );
+			// If the font has font faces (not a system font) it adds the font faces to the browser.
+			if ( Array.isArray( font.fontFace ) ) {
+				font.fontFace.forEach( ( face ) => {
+					// Load font faces just in the iframe because they already are in the document.
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face.src ),
+						'iframe'
+					);
+				} );
+			}
 		} );
 	};
 

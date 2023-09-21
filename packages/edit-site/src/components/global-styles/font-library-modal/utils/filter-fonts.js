@@ -1,4 +1,4 @@
-export default function filterFonts( fonts, filters ) {
+export function filterFonts( fonts, filters ) {
 	const { category, search } = filters;
 	let filteredFonts = fonts || [];
 
@@ -15,4 +15,15 @@ export default function filterFonts( fonts, filters ) {
 	}
 
 	return filteredFonts;
+}
+
+export function filterFakeFacesFromFamilies( fonts ) {
+	return fonts.reduce( ( acc, font ) => {
+		const { fontFace, ...filteredFont } = font;
+		const filteredFaces = fontFace.filter( ( face ) => ! face.fake );
+		if ( filteredFaces.length ) {
+			filteredFont.fontFace = filteredFaces;
+		}
+		return [ ...acc, filteredFont ];
+	}, [] );
 }

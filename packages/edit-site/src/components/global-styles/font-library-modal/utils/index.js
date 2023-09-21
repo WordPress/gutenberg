@@ -8,6 +8,20 @@ export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
 		font.name = font.fontFamily || font.slug;
 	}
+
+	// If the font family doen't have a fontFace (as system fonts), we create a fake one.
+	// This will be later removed when the font is sent to server to install.
+	if ( ! font.fontFace || ! font.fontFace.length ) {
+		font.fontFace = [
+			{
+				fontFamily: font.fontFamily || font.slug,
+				fontStyle: 'normal',
+				fontWeight: '400',
+				fake: true,
+			},
+		];
+	}
+
 	return {
 		...font,
 		...extraValues,

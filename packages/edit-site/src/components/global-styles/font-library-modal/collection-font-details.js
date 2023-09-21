@@ -18,16 +18,7 @@ function CollectionFontDetails( {
 	handleToggleVariant,
 	fontToInstallOutline,
 } ) {
-	const fontFaces =
-		font.fontFace && font.fontFace.length
-			? sortFontFaces( font.fontFace )
-			: [
-					{
-						fontFamily: font.fontFamily,
-						fontStyle: 'normal',
-						fontWeight: '400',
-					},
-			  ];
+	const fontFaces = sortFontFaces( font.fontFace );
 
 	return (
 		<>

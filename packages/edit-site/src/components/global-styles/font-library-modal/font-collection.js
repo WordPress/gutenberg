@@ -24,11 +24,12 @@ import TabLayout from './tab-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
-import filterFonts from './utils/filter-fonts';
+import { filterFonts } from './utils/filter-fonts';
 import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
+import { setUIValuesNeeded } from './utils';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -105,6 +106,10 @@ function FontCollection( { id } ) {
 
 	const resetSearch = () => {
 		setFilters( { ...filters, search: '' } );
+	};
+
+	const handleSelectFont = ( font ) => {
+		setSelectedFont( setUIValuesNeeded( font ) );
 	};
 
 	const handleUnselectFont = () => {
@@ -222,7 +227,7 @@ function FontCollection( { id } ) {
 							key={ font.slug }
 							font={ font }
 							onClick={ () => {
-								setSelectedFont( font );
+								handleSelectFont( font );
 							} }
 						/>
 					) ) }
