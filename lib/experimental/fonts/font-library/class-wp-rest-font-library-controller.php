@@ -217,6 +217,15 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 								);
 							}
 						}
+
+						if ( !isset ( $font_face['uploadedFile'] )  && !isset ( $font_face['downloadFromUrl'] ) && !isset ( $font_face['src'] ) ) {
+							$error_messages[] = sprintf(
+								// translators: 1: font family index, 2: font face index.
+								__( 'Font family [%1$s] Font face [%2$s] should have a reference to a font file asset.', 'gutenberg' ),
+								$family_index,
+								$face_index
+							);
+						}
 					}
 				}
 			}
