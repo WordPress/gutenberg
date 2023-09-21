@@ -19,7 +19,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 			'description'    => 'A mock font collection to be unregistered.',
 			'data_json_file' => 'my-collection-data.json',
 		);
-		$collection = WP_Font_Library::register_font_collection( $config );
+		WP_Font_Library::register_font_collection( $config );
 	}
 
 	public function test_should_unregister_font_collection() {
