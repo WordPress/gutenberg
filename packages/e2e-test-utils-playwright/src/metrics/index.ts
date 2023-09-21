@@ -49,7 +49,7 @@ export class Metrics {
 	 * @param fields Optional fields to filter.
 	 */
 	async getServerTiming( fields: string[] = [] ) {
-		return this.page.evaluate(
+		return this.page.evaluate< Record< string, number >, string[] >(
 			( f: string[] ) =>
 				(
 					performance.getEntriesByType(
@@ -72,9 +72,11 @@ export class Metrics {
 	 * Returns time to first byte (TTFB) using the Navigation Timing API.
 	 *
 	 * @see https://web.dev/ttfb/#measure-ttfb-in-javascript
+	 *
+	 * @return TTFB value.
 	 */
 	async getTimeToFirstByte() {
-		return await this.page.evaluate( () => {
+		return await this.page.evaluate< number >( () => {
 			const { responseStart, startTime } = (
 				performance.getEntriesByType(
 					'navigation'
@@ -89,9 +91,11 @@ export class Metrics {
 	 *
 	 * @see https://w3c.github.io/largest-contentful-paint/
 	 * @see https://web.dev/lcp/#measure-lcp-in-javascript
+	 *
+	 * @return LCP value.
 	 */
 	async getLargestContentfulPaint() {
-		return await this.page.evaluate(
+		return await this.page.evaluate< number >(
 			() =>
 				new Promise( ( resolve ) => {
 					new PerformanceObserver( ( entryList ) => {
@@ -113,9 +117,11 @@ export class Metrics {
 	 *
 	 * @see https://github.com/WICG/layout-instability
 	 * @see https://web.dev/cls/#measure-layout-shifts-in-javascript
+	 *
+	 * @return CLS value.
 	 */
 	async getCumulativeLayoutShift() {
-		return await this.page.evaluate(
+		return await this.page.evaluate< number >(
 			() =>
 				new Promise( ( resolve ) => {
 					let CLS = 0;
