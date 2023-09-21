@@ -57,6 +57,29 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
+	/**
+	 * Registers a new Font Collection in the Font Library.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param string[] $config {
+	 *     Font collection associative array of configuration options.
+	 *
+	 *     @type string $id             The font collection's unique ID.
+	 *     @type string $data_json_file The font collection's data JSON file.
+	 * }
+	 */
+	function wp_unregister_font_collection( $collection_id ) {
+		add_action(
+			'init',
+			function () use ( $collection_id ) {
+				WP_Font_Library::unregister_font_collection( $collection_id );
+			}
+		);
+	}
+}
+
 add_action(
 	'enqueue_block_editor_assets',
 	function () {
