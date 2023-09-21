@@ -33,7 +33,6 @@ const patternSourceOptions = [
 ];
 
 export const SYNC_TYPES = {
-	all: 'all',
 	full: 'fully',
 	unsynced: 'unsynced',
 };

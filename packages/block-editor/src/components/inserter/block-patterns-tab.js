@@ -47,29 +47,32 @@ export const allPatternsCategory = {
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
+	// If theme source selected, filter out user created patterns.
 	if (
 		sourceFilter === PATTERN_TYPES.theme &&
 		pattern.name.startsWith( 'core/block' )
 	) {
 		return true;
 	}
+
+	// If user source selected, filter out theme patterns. Any pattern without
+	// an id wasn't created by a user.
 	if ( sourceFilter === PATTERN_TYPES.user && ! pattern.id ) {
 		return true;
 	}
-	if (
-		sourceFilter === PATTERN_TYPES.user &&
-		syncFilter === SYNC_TYPES.full &&
-		pattern.syncStatus !== ''
-	) {
+
+	// Filter by sync status.
+	if ( syncFilter === SYNC_TYPES.full && pattern.syncStatus !== '' ) {
 		return true;
 	}
+
 	if (
-		sourceFilter === PATTERN_TYPES.user &&
 		syncFilter === SYNC_TYPES.unsynced &&
 		pattern.syncStatus !== 'unsynced'
 	) {
 		return true;
 	}
+
 	return false;
 }
 
