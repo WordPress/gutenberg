@@ -385,7 +385,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Should navigate to the next block.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -805,7 +805,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		const paragraphBlock = editor.canvas
-			.locator( 'role=document[name="Paragraph block"i]' )
+			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.first();
 		const paragraphRect = await paragraphBlock.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
@@ -870,7 +870,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:image -->` );
 
 		const paragraphBlock = editor.canvas.locator(
-			'role=document[name="Paragraph block"i]'
+			'role=document[name="Block: Paragraph"i]'
 		);
 
 		// Find a point outside the paragraph between the blocks where it's
@@ -975,7 +975,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.mouse.up();
 
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -1037,7 +1037,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^\.a+$/ );
 	} );
 
@@ -1071,7 +1071,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^a+\.a$/ );
 	} );
 
@@ -1107,7 +1107,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
 			editor.canvas.locator(
-				'role=document[name="Paragraph block"i] >> nth = 0'
+				'role=document[name="Block: Paragraph"i] >> nth = 0'
 			)
 		).toHaveText( /^.a+$/ );
 	} );

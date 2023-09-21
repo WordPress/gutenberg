@@ -43,7 +43,7 @@ test.describe( 'Draggable block', () => {
 <!-- /wp:paragraph -->` );
 
 		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		await editor.showBlockToolbar();
 
@@ -57,7 +57,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -115,7 +115,7 @@ test.describe( 'Draggable block', () => {
 <!-- /wp:paragraph -->` );
 
 		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		await editor.showBlockToolbar();
 
@@ -129,7 +129,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -198,7 +198,7 @@ test.describe( 'Draggable block', () => {
 		} );
 
 		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		await editor.showBlockToolbar();
 
@@ -212,7 +212,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the left half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -279,7 +279,7 @@ test.describe( 'Draggable block', () => {
 		} );
 
 		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		await editor.showBlockToolbar();
 
@@ -293,7 +293,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the right half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
