@@ -20,6 +20,7 @@ import { store as editSiteStore } from '../../store';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
 	const [ templateContent, setTemplateContent ] = useState( '' );
@@ -198,7 +199,7 @@ export default function StartTemplateOptions() {
 				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
-					'wp_template' === _postType &&
+					TEMPLATE_POST_TYPE === _postType &&
 					! select( preferencesStore ).get(
 						'core/edit-site',
 						'welcomeGuide'
