@@ -415,6 +415,23 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 					),
 				),
 			),
+
+			'font family with a font face without references to any asset' => array (
+				'font_families' => array (
+					array(
+						'fontFamily' => "Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif",
+						'slug'       => 'humanist',
+						'name'       => 'Humanist',
+						'fontFace'   => array(
+							array(
+								'fontFamily'      => "Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif",
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+							),
+						),
+					),
+				)
+			)
 		);
 	}
 }
