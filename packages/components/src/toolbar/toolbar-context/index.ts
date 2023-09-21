@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type * as Ariakit from '@ariakit/react/toolbar';
+import type * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
