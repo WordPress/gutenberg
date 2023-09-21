@@ -1,61 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
-import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { useAvailableTemplates } from '../page-panels/hooks';
-import { unlock } from '../../../lock-unlock';
-import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
 
-// This is duplicated.
-const filterOutDuplicatesByName = ( currentItem, index, items ) =>
-	index === items.findIndex( ( item ) => currentItem.name === item.name );
-
-const selectAvailablePatterns = ( select ) => {
-	const { getSettings } = unlock( select( editSiteStore ) );
-	const settings = getSettings();
-	const blockPatterns =
-		settings.__experimentalAdditionalBlockPatterns ??
-		settings.__experimentalBlockPatterns;
-
-	const restBlockPatterns = select( coreStore ).getBlockPatterns();
-
-	const patterns = [
-		...( blockPatterns || [] ),
-		...( restBlockPatterns || [] ),
-	]
-		.filter(
-			( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
-		)
-		.filter( filterOutDuplicatesByName )
-		// TODO use the correct type.
-		.filter( ( pattern ) => pattern.templateTypes?.includes( 'home' ) )
-		.map( ( pattern ) => ( {
-			...pattern,
-			keywords: pattern.keywords || [],
-			type: PATTERN_TYPES.theme,
-			blocks: parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} ),
-		} ) );
-
-	return patterns;
-};
-
-export default function ReplaceTemplateButton( { onClick } ) {
+export default function ReplaceTemplateButton( {
+	onClick,
+	availableTemplates,
+} ) {
 	const [ showModal, setShowModal ] = useState( false );
 	//const availableTemplates = useAvailableTemplates();
 	const onClose = useCallback( () => {
@@ -71,15 +33,14 @@ export default function ReplaceTemplateButton( { onClick } ) {
 
 	const entitiy = useEntityRecord( 'postType', postType, postId );
 
-	// Should we also get templates?
-	const availableTemplates = useSelect( selectAvailablePatterns );
 	if ( ! availableTemplates?.length ) {
 		return null;
 	}
 
-	const onTemplateSelect = async ( template ) => {
-		entitiy.edit( { content: template.content } );
+	const onTemplateSelect = async ( selectedTemplate ) => {
 		// TODO - trigger a reload
+		entitiy.edit( { content: selectedTemplate.content } );
+
 		onClose(); // Close the template suggestions modal first.
 		onClick();
 	};
@@ -102,7 +63,10 @@ export default function ReplaceTemplateButton( { onClick } ) {
 					isFullScreen
 				>
 					<div className="edit-site-template-panel__replace-template-modal__content">
-						<TemplatesList onSelect={ onTemplateSelect } />
+						<TemplatesList
+							availableTemplates={ availableTemplates }
+							onSelect={ onTemplateSelect }
+						/>
 					</div>
 				</Modal>
 			) }
@@ -110,9 +74,7 @@ export default function ReplaceTemplateButton( { onClick } ) {
 	);
 }
 
-function TemplatesList( { onSelect } ) {
-	//const availableTemplates = useAvailableTemplates();
-	const availableTemplates = useSelect( selectAvailablePatterns );
+function TemplatesList( { availableTemplates, onSelect } ) {
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => {
@@ -120,7 +82,6 @@ function TemplatesList( { onSelect } ) {
 					name: template.name,
 					blocks: template.blocks,
 					title: template.title,
-					id: template.name,
 					content: template.content,
 				};
 			} ),
