@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import filterFonts from '../filter-fonts';
+import { filterFonts } from '../filter-fonts';
 
 describe( 'filterFonts', () => {
 	const mockFonts = [
