@@ -144,6 +144,7 @@ export default function CreatePatternModal( {
 							type="submit"
 							disabled={ isSaving }
 							aria-disabled={ isSaving }
+							isBusy={ isSaving }
 						>
 							{ __( 'Create' ) }
 						</Button>
