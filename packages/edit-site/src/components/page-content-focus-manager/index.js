@@ -22,9 +22,6 @@ export default function PageContentFocusManager( { contentRef } ) {
 			return {
 				canvasMode: _canvasMode,
 				pageContentFocusType: getPageContentFocusType(),
-				shouldDisplayPageContentTemplates:
-					getCanvasMode() !== 'edit' &&
-					getPageContentFocusType() !== 'disableTemplate',
 				hasPageContentFocus:
 					select( editSiteStore ).hasPageContentFocus(),
 			};
