@@ -19,7 +19,11 @@ import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
-import { PATTERN_DEFAULT_CATEGORY, PATTERN_TYPES } from '../../utils/constants';
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
@@ -39,10 +43,10 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 							icon={ getTemplatePartIcon( area ) }
 							label={ label }
 							id={ area }
-							type="wp_template_part"
+							type={ TEMPLATE_PART_POST_TYPE }
 							isActive={
 								currentArea === area &&
-								currentType === 'wp_template_part'
+								currentType === TEMPLATE_PART_POST_TYPE
 							}
 						/>
 					)

@@ -176,10 +176,10 @@ const test = base.extend<
 		{ scope: 'worker' },
 	],
 	lighthouse: async ( { page, lighthousePort }, use ) => {
-		await use( new Lighthouse( page, lighthousePort ) );
+		await use( new Lighthouse( { page, port: lighthousePort } ) );
 	},
 	metrics: async ( { page }, use ) => {
-		await use( new Metrics( page ) );
+		await use( new Metrics( { page } ) );
 	},
 } );
 

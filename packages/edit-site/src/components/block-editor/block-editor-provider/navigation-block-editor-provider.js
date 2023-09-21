@@ -16,6 +16,7 @@ import { createBlock } from '@wordpress/blocks';
 import { unlock } from '../../../lock-unlock';
 import useSiteEditorSettings from '../use-site-editor-settings';
 import { store as editSiteStore } from '../../../store';
+import { NAVIGATION_POST_TYPE } from '../../../utils/constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -37,7 +38,7 @@ const noop = () => {};
 export default function NavigationBlockEditorProvider( { children } ) {
 	const defaultSettings = useSiteEditorSettings();
 
-	const navigationMenuId = useEntityId( 'postType', 'wp_navigation' );
+	const navigationMenuId = useEntityId( 'postType', NAVIGATION_POST_TYPE );
 
 	const blocks = useMemo( () => {
 		return [
