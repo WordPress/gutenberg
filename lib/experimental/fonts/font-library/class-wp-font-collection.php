@@ -91,7 +91,7 @@ class WP_Font_Collection {
 
 			$data = json_decode( wp_remote_retrieve_body( $response ), true );
 			if ( empty( $data ) ) {
-				return new WP_Error( 'font_collection_read_error', __( 'Error reading the Font Collection data JSON file contents.', 'gutenberg' ) );
+				return new WP_Error( 'font_collection_read_error', __( 'Error decoding the Font Collection data from the REST response JSON.', 'gutenberg' ) );
 			}
 			// If the src is a file path, read the data from the file.
 		} else {
