@@ -58,6 +58,14 @@ function addLeadingSlash( url ) {
 	return url?.replace( /^\/?/, '/' );
 }
 
+function removeTrailingSlash( url ) {
+	const trimmedURL = url?.trim();
+
+	if ( ! trimmedURL?.length ) return url;
+
+	return url?.replace( /\/$/, '' );
+}
+
 const partialRight =
 	( fn, ...partialArgs ) =>
 	( ...args ) =>
@@ -84,6 +92,7 @@ function getURLForDisplay( url ) {
 		getPath,
 		defaultTo( '' ),
 		partialRight( filterURLForDisplay, 24 ),
+		removeTrailingSlash,
 		addLeadingSlash
 	)( url );
 }
