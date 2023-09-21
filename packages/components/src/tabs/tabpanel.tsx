@@ -2,7 +2,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -31,10 +30,7 @@ function TabPanel( { children, id, className, style }: TabPanelProps ) {
 			style={ style }
 			store={ store }
 			id={ `${ instanceId }-${ id }-view` }
-			className={ classnames(
-				'components-tabs__tab-content',
-				className
-			) }
+			className={ className }
 		>
 			{ children }
 		</Ariakit.TabPanel>

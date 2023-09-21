@@ -14,9 +14,9 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { TabProps } from './types';
-import Button from '../button';
 import warning from '@wordpress/warning';
 import { TabsContext } from './context';
+import { TabButton } from './styles';
 
 function Tab( {
 	children,
@@ -38,13 +38,13 @@ function Tab( {
 		<Ariakit.Tab
 			store={ store }
 			id={ instancedTabId }
-			className={ classnames( 'components-tabs__tabs-item', className, {
+			className={ classnames( className, {
 				[ activeClass ]: instancedTabId === store.useState().activeId,
 			} ) }
 			style={ style }
 			disabled={ disabled }
 			render={
-				<Button
+				<TabButton
 					icon={ icon }
 					label={ icon && title }
 					showTooltip={ true }

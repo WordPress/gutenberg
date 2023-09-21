@@ -2,8 +2,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
@@ -14,6 +12,7 @@ import warning from '@wordpress/warning';
  */
 import type { TabListProps } from './types';
 import { useTabsContext } from './context';
+import { TabListWrapper } from './styles';
 
 function TabList( { children, className, style }: TabListProps ) {
 	const context = useTabsContext();
@@ -26,7 +25,8 @@ function TabList( { children, className, style }: TabListProps ) {
 		<Ariakit.TabList
 			style={ style }
 			store={ store }
-			className={ classnames( 'components-tabs__tabs', className ) }
+			className={ className }
+			render={ <TabListWrapper /> }
 		>
 			{ children }
 		</Ariakit.TabList>
