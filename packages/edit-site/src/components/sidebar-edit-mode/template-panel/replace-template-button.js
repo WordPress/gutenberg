@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -19,7 +19,6 @@ export default function ReplaceTemplateButton( {
 	availableTemplates,
 } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	//const availableTemplates = useAvailableTemplates();
 	const onClose = useCallback( () => {
 		setShowModal( false );
 	}, [] );
@@ -32,10 +31,6 @@ export default function ReplaceTemplateButton( {
 	}, [] );
 
 	const entitiy = useEntityRecord( 'postType', postType, postId );
-
-	if ( ! availableTemplates?.length ) {
-		return null;
-	}
 
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		// TODO - trigger a reload
@@ -75,25 +70,13 @@ export default function ReplaceTemplateButton( {
 }
 
 function TemplatesList( { availableTemplates, onSelect } ) {
-	const templatesAsPatterns = useMemo(
-		() =>
-			availableTemplates.map( ( template ) => {
-				return {
-					name: template.name,
-					blocks: template.blocks,
-					title: template.title,
-					content: template.content,
-				};
-			} ),
-		[ availableTemplates ]
-	);
-	const shownTemplates = useAsyncList( templatesAsPatterns );
+	const shownTemplates = useAsyncList( availableTemplates );
 
 	// TODO - make this use a grid layout.
 	return (
 		<BlockPatternsList
 			label={ __( 'Templates' ) }
-			blockPatterns={ templatesAsPatterns }
+			blockPatterns={ availableTemplates }
 			shownPatterns={ shownTemplates }
 			onClickPattern={ onSelect }
 		/>

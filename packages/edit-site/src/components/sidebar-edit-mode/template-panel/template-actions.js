@@ -22,7 +22,8 @@ export default function Actions( { template } ) {
 	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
-	const selectAvailablePatterns = ( select ) => {
+	// Should we also get templates?
+	const availableTemplates = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		const settings = getSettings();
 		const blockPatterns =
@@ -52,10 +53,15 @@ export default function Actions( { template } ) {
 				} ),
 			} ) );
 
-		return patterns;
-	};
-	// Should we also get templates?
-	const availableTemplates = useSelect( selectAvailablePatterns );
+		return patterns.map( ( pattern ) => {
+			return {
+				name: pattern.name,
+				blocks: pattern.blocks,
+				title: pattern.title,
+				content: pattern.content,
+			};
+		} );
+	} );
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
 
