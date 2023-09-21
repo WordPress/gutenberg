@@ -43,9 +43,10 @@ import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
-const context = createContext<
-	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
->( [] );
+const level0Dismissers: MutableRefObject<
+	ModalProps[ 'onRequestClose' ] | undefined
+>[] = [];
+const context = createContext( level0Dismissers );
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -138,23 +139,24 @@ function UnforwardedModal(
 	}, [] );
 
 	const dismissers = useContext( context );
+	const isLevel0 = dismissers === level0Dismissers;
 	useEffect( () => {
 		const openModalCount = dismissers.push( refOnRequestClose );
 
-		if ( openModalCount === 1 ) {
+		if ( openModalCount === 1 && isLevel0 ) {
 			document.body.classList.add( bodyOpenClassName );
-		} else if ( openModalCount > 1 ) {
-			dismissers[ 0 ].current?.();
 		}
+
+		if ( openModalCount > 1 ) dismissers[ 0 ].current?.();
 
 		return () => {
 			dismissers.shift();
 
-			if ( dismissers.length === 0 ) {
+			if ( dismissers.length === 0 && isLevel0 ) {
 				document.body.classList.remove( bodyOpenClassName );
 			}
 		};
-	}, [ bodyOpenClassName, dismissers ] );
+	}, [ dismissers, isLevel0 ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
