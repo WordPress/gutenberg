@@ -10,16 +10,53 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
 import { useAvailableTemplates } from '../page-panels/hooks';
+import { unlock } from '../../../lock-unlock';
+import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
+
+// This is duplicated.
+const filterOutDuplicatesByName = ( currentItem, index, items ) =>
+	index === items.findIndex( ( item ) => currentItem.name === item.name );
+
+const selectAvailablePatterns = ( select ) => {
+	const { getSettings } = unlock( select( editSiteStore ) );
+	const settings = getSettings();
+	const blockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ??
+		settings.__experimentalBlockPatterns;
+
+	const restBlockPatterns = select( coreStore ).getBlockPatterns();
+
+	const patterns = [
+		...( blockPatterns || [] ),
+		...( restBlockPatterns || [] ),
+	]
+		.filter(
+			( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
+		)
+		.filter( filterOutDuplicatesByName )
+		.filter( ( pattern ) => pattern.templateTypes?.includes( 'home' ) )
+		.map( ( pattern ) => ( {
+			...pattern,
+			keywords: pattern.keywords || [],
+			type: PATTERN_TYPES.theme,
+			blocks: parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} ),
+		} ) );
+
+	return patterns;
+};
 
 export default function ReplaceTemplateButton( { onClick } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	const availableTemplates = useAvailableTemplates();
+	//const availableTemplates = useAvailableTemplates();
 	const onClose = useCallback( () => {
 		setShowModal( false );
 	}, [] );
@@ -31,14 +68,25 @@ export default function ReplaceTemplateButton( { onClick } ) {
 		};
 	}, [] );
 
-	const entitiy = useEntityRecord( 'postType', postType, postId );
+	// Should we also get templates?
 
+	//console.log( selectThemePatterns );
+	const entitiy = useEntityRecord( 'postType', postType, postId );
+	console.log( 'entitiy', entitiy );
+
+	const availableTemplates = useSelect( selectAvailablePatterns );
+	console.log( availableTemplates );
 	//const { setPage } = useDispatch( editSiteStore );
 	if ( ! availableTemplates?.length ) {
 		return null;
 	}
 	const onTemplateSelect = async ( template ) => {
-		entitiy.edit( template );
+		const templateObjectItself = availableTemplates.find(
+			( availableTemplate ) => availableTemplate.name === template.id
+		);
+		console.log( templateObjectItself.content );
+
+		entitiy.edit( { content: templateObjectItself.content } );
 		// TODO - work out how to save the template.
 		//	await setPage( {
 		//		context: { postType, postId },
@@ -74,15 +122,16 @@ export default function ReplaceTemplateButton( { onClick } ) {
 }
 
 function TemplatesList( { onSelect } ) {
-	const availableTemplates = useAvailableTemplates();
+	//const availableTemplates = useAvailableTemplates();
+	const availableTemplates = useSelect( selectAvailablePatterns );
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => {
 				return {
-					name: template.slug,
-					blocks: parse( template.content.raw ),
-					title: decodeEntities( template.title.rendered ),
-					id: template.id,
+					name: template.name,
+					blocks: template.blocks,
+					title: template.title,
+					id: template.name,
 				};
 			} ),
 		[ availableTemplates ]

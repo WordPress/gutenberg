@@ -48,6 +48,7 @@ export function useAvailableTemplates() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const isPostsPage = useIsPostsPage();
 	const templates = useTemplates();
+	console.log( 'templates', templates );
 	return useMemo(
 		() =>
 			// The posts page template cannot be changed.
