@@ -4,6 +4,15 @@
 import classnames from 'classnames';
 
 /**
+ * Internal dependencies
+ */
+import { 
+	updateLinkAttributes,
+	NEW_TAB_TARGET,
+	NOFOLLOW_REL
+ } from './utils';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -32,11 +41,6 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
-import { prependHTTP } from '@wordpress/url';
-
-const NEW_TAB_REL = 'noreferrer noopener';
-const NEW_TAB_TARGET = '_blank';
-const NOFOLLOW_REL = 'nofollow';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -101,37 +105,6 @@ function ButtonEdit( props ) {
 	} = attributes;
 
 	const TagName = tagName || 'a';
-
-	function updateLinkAttributes( newUrl, opensInNewWindow, nofollow ) {
-		let newLinkTarget;
-		// Since `rel` is editable attribute, we need to check for existing values and proceed accordingly. 
-		let updatedRel = rel || '';
-
-		if ( opensInNewWindow ) {
-			newLinkTarget = NEW_TAB_TARGET;
-			updatedRel = updatedRel?.includes( NEW_TAB_REL )
-				? updatedRel
-				: updatedRel + ` ${ NEW_TAB_REL }`;
-		} else {
-			const relRegex = new RegExp( `\\b${ NEW_TAB_REL }\\s*`, 'g' );
-			updatedRel = updatedRel?.replace( relRegex, '' ).trim();
-		}
-
-		if ( nofollow ) {
-			updatedRel = updatedRel?.includes( NOFOLLOW_REL )
-				? updatedRel
-				: updatedRel + ` ${ NOFOLLOW_REL }`;
-		} else {
-			const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
-			updatedRel = updatedRel?.replace( relRegex, '' ).trim();
-		}
-
-		setAttributes( {
-			url: prependHTTP( newUrl ),
-			linkTarget: newLinkTarget,
-			rel: updatedRel || undefined,
-		} );
-	}
 
 	function setButtonText( newText ) {
 		// Remove anchor tags from button text content.
@@ -282,15 +255,16 @@ function ButtonEdit( props ) {
 					<LinkControl
 						value={ linkValue }
 						onChange={ ( {
-							url: newURL = '',
+							url: newURL,
 							opensInNewTab: newOpensInNewTab,
-							nofollow: newNoFollow,
+							nofollow: newNofollow,
 						} ) =>
-							updateLinkAttributes(
-								newURL,
-								newOpensInNewTab,
-								newNoFollow
-							)
+							setAttributes( updateLinkAttributes( { 
+								rel, 
+								url: newURL, 
+								opensInNewTab: newOpensInNewTab, 
+								nofollow: newNofollow 
+							} ) )
 						}
 						onRemove={ () => {
 							unlink();

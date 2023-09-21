@@ -1,34 +1,109 @@
-// npm run test:unit -- packages/block-library/src/button
+/**
+ * Internal dependencies
+ */
+import { updateLinkAttributes } from '../utils';
 
-import React from 'react';
-import { render } from '@testing-library/react';
-import ButtonEdit from '../edit'; // Import your ButtonEdit component
+describe( 'updateLinkAttributes method', () => {
+	it( 'should correctly handle unassigned rel', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: true,
+			nofollow: false,
+		};
 
-// Mock the setAttributes function
-const mockSetAttributes = jest.fn();
+		const result = updateLinkAttributes(options);
 
-describe('ButtonEdit Component', () => {
-  it('should update link attributes correctly', () => {
-    const attributes = {
-      // Initialize your attributes as needed for the test
-    };
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( '_blank' );
+		expect( result.rel ).toEqual( 'noreferrer noopener' );
+	} );
 
-    const { updateLinkAttributes } = render(
-      <ButtonEdit
-        attributes={attributes}
-        setAttributes={mockSetAttributes}
-        // Add other required props here
-      />
-    );
+	it( 'should return empty rel value as undefined', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: false,
+			nofollow: false,
+		};	
 
-    // Call the updateLinkAttributes method with desired arguments
-    updateLinkAttributes('newURL', true, true);
+		const result = updateLinkAttributes(options);
 
-    // Assert that setAttributes was called with the expected parameters
-    expect(mockSetAttributes).toHaveBeenCalledWith({
-      url: 'newURL',
-      linkTarget: 'new_tab_target_value', // Replace with your expected value
-      rel: 'rel_value', // Replace with your expected value
-    });
-  });
-});
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( undefined );
+		expect( result.rel ).toEqual( undefined );
+	} ); 
+
+	it( 'should correctly handle rel with existing values', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: true,
+			nofollow: true,
+			rel: 'rel_value',
+		};
+
+		const result = updateLinkAttributes(options);
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( '_blank' );
+		expect( result.rel ).toEqual( 'rel_value noreferrer noopener nofollow' );
+	} );
+
+	it( 'should correctly update link attributes with opensInNewTab', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: true,
+			nofollow: false,
+			rel: 'rel_value',
+		};
+
+		const result = updateLinkAttributes(options);
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( '_blank' );
+		expect( result.rel ).toEqual( 'rel_value noreferrer noopener' );
+	} );
+
+	it ( 'should correctly update link attributes with nofollow', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: false,
+			nofollow: true,
+			rel: 'rel_value',
+		};
+
+		const result = updateLinkAttributes(options);
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( undefined );
+		expect( result.rel ).toEqual( 'rel_value nofollow' );
+	} );
+
+	it ( 'should correctly handle rel with existing nofollow values and remove duplicates', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: true,
+			nofollow: true,
+			rel: 'rel_value nofollow',
+		};
+
+		const result = updateLinkAttributes(options);
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( '_blank' );
+		expect( result.rel ).toEqual( 'rel_value nofollow noreferrer noopener' );
+	} );
+
+	it ( 'should correctly handle rel with existing new tab values and remove duplicates', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: true,
+			nofollow: false,
+			rel: 'rel_value noreferrer noopener',
+		};
+
+		const result = updateLinkAttributes(options);
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( '_blank' );
+		expect( result.rel ).toEqual( 'rel_value noreferrer noopener' );
+	} );
+} )
