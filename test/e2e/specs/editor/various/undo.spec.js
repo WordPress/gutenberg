@@ -453,7 +453,7 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect(
 			page.locator( 'role=button[name="Redo"]' )
-		).not.toBeDisabled();
+		).toBeEnabled();
 		await page.click( 'role=button[name="Redo"]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

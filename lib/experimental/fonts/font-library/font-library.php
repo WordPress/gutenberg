@@ -57,10 +57,18 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
-// @core-merge: This code needs to be removed.
 add_action(
 	'enqueue_block_editor_assets',
 	function () {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
 	}
 );
+
+$default_font_collection = array(
+	'id'             => 'default-font-collection',
+	'name'           => 'Google Fonts',
+	'description'    => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+	'data_json_file' => path_join( __DIR__, 'default-font-collection.json' ),
+);
+
+wp_register_font_collection( $default_font_collection );
