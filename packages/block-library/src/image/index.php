@@ -91,16 +91,16 @@ function block_core_image_get_lightbox_settings( $block ) {
 	}
 
 	if ( ! isset( $lightbox_settings ) ) {
-		$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+		$lightbox_settings = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
 
 		// If not present in global settings, check the top-level global settings.
 		//
 		// NOTE: If no block-level settings are found, the previous call to
-		// `gutenberg_get_global_settings` will return the whole `theme.json`
+		// `wp_get_global_settings` will return the whole `theme.json`
 		// structure in which case we can check if the "lightbox" key is present at
 		// the top-level of the global settings and use its value.
 		if ( isset( $lightbox_settings['lightbox'] ) ) {
-			$lightbox_settings = gutenberg_get_global_settings( array( 'lightbox' ) );
+			$lightbox_settings = wp_get_global_settings( array( 'lightbox' ) );
 		}
 	}
 
@@ -117,7 +117,7 @@ function block_core_image_get_lightbox_settings( $block ) {
 function block_core_image_render_lightbox( $block_content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-	$aria_label = __( 'Enlarge image', 'gutenberg' );
+	$aria_label = __( 'Enlarge image' );
 
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
@@ -127,7 +127,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	if ( $alt_attribute ) {
 		/* translators: %s: Image alt text. */
-		$aria_label = sprintf( __( 'Enlarge image: %s', 'gutenberg' ), $alt_attribute );
+		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
 	}
 	$content = $processor->get_updated_html();
 
@@ -251,8 +251,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$close_button_color = esc_attr( wp_get_global_styles( array( 'color', 'text' ) ) );
-	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image', 'gutenberg' );
-	$close_button_label = esc_attr__( 'Close', 'gutenberg' );
+	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
+	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
         <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
