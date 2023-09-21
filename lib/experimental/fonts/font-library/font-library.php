@@ -59,16 +59,11 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 
 if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	/**
-	 * Registers a new Font Collection in the Font Library.
+	 * Unregister Font Collection from the Font Library.
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param string[] $config {
-	 *     Font collection associative array of configuration options.
-	 *
-	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $data_json_file The font collection's data JSON file.
-	 * }
+	 * @param string $collection_id The font collection's id.
 	 */
 	function wp_unregister_font_collection( $collection_id ) {
 		add_action(
