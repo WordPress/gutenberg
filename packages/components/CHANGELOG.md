@@ -14,6 +14,7 @@
 ### Internal
 
 -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+-   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
 
 ## 25.8.0 (2023-09-20)
 
