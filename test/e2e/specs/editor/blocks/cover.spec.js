@@ -40,8 +40,9 @@ test.describe( 'Cover', () => {
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
-		const [ blackRGB ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
+		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
+			coverBlock
+		);
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
@@ -90,14 +91,12 @@ test.describe( 'Cover', () => {
 		);
 
 		// The hidden span must be used as the target for opacity and color value.
+		const x = coverBlock.locator( 'span[aria-hidden="true"]' );
+
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
-		expect( backgroundDimColor ).toBe( 'rgb(255, 255, 255)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		await expect( x ).toHaveCSS( 'background-color', 'rgb(179, 179, 179)' );
+		await expect( x ).toHaveCSS( 'opacity', '0.5' );
 	} );
 
 	test( 'can have the title edited', async ( { editor } ) => {
@@ -227,18 +226,12 @@ test.describe( 'Cover', () => {
 		} );
 
 		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
+		const x = coverBlock.locator( 'span[aria-hidden="true"]' );
 
-		// The hidden span must be used as the target for opacity and color value.
 		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
 		// The hidden span value returns the correct opacity at 0.5.
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		await expect( x ).toHaveCSS( 'background-color', 'rgb(179, 179, 179)' );
+		await expect( x ).toHaveCSS( 'opacity', '0.5' );
 	} );
 } );
 
