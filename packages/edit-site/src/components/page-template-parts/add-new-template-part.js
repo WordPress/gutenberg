@@ -13,6 +13,7 @@ import { Button } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -22,7 +23,9 @@ export default function AddNewTemplatePart() {
 			select( editSiteStore ).getSettings();
 		return {
 			canCreate: ! supportsTemplatePartsMode,
-			postType: select( coreStore ).getPostType( 'wp_template_part' ),
+			postType: select( coreStore ).getPostType(
+				TEMPLATE_PART_POST_TYPE
+			),
 		};
 	}, [] );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -45,7 +48,7 @@ export default function AddNewTemplatePart() {
 						setIsModalOpen( false );
 						history.push( {
 							postId: templatePart.id,
-							postType: 'wp_template_part',
+							postType: TEMPLATE_PART_POST_TYPE,
 							canvas: 'edit',
 						} );
 					} }

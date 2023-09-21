@@ -20,31 +20,26 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await admin.createNewPost();
 
 		// Add title to enable valid non-empty post save.
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Hello Meta'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Hello Meta' );
 
-		// Type something.
-		await page.click( 'role=button[name="Text"i]' );
-		await page.click( '#test_tinymce_id' );
-		await page.keyboard.type( 'Typing in a metabox' );
-		await page.type( '#test_tinymce_id-html', 'Typing in a metabox' );
-		await page.click( 'role=button[name="Visual"i]' );
+		// Switch tinymce to Text mode, first waiting for it to initialize
+		// because otherwise it will flip back to Visual mode once initialized.
+		await page.locator( '#test_tinymce_id_ifr' ).waitFor();
+		await page.locator( 'role=button[name="Text"i]' ).click();
+
+		// Type something in the tinymce Text mode textarea.
+		const metaBoxField = page.locator( '#test_tinymce_id' );
+		await metaBoxField.type( 'Typing in a metabox' );
+
+		// Switch tinymce back to Visual mode.
+		await page.locator( 'role=button[name="Visual"i]' ).click();
 
 		await editor.publishPost();
+		await page.reload();
 
-		// Close the publish panel so that it won't cover the tinymce editor.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Close panel"i]'
-		);
-
-		await expect( page.locator( '.edit-post-layout' ) ).toBeVisible();
-
-		await page.click( 'role=button[name="Text"i]' );
-
-		// Expect the typed text on the tinymce editor
-		const content = page.locator( '#test_tinymce_id' );
-		await expect( content ).toHaveValue( 'Typing in a metabox' );
+		// Expect the typed text in the tinymce Text mode textarea.
+		await expect( metaBoxField ).toHaveValue( 'Typing in a metabox' );
 	} );
 } );

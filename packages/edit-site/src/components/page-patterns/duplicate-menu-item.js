@@ -70,7 +70,7 @@ export default function DuplicateMenuItem( {
 
 			const result = await saveEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				{ slug, title, content, area },
 				{ throwOnError: true }
 			);
@@ -162,7 +162,7 @@ export default function DuplicateMenuItem( {
 
 			const result = await saveEntityRecord(
 				'postType',
-				'wp_block',
+				PATTERN_TYPES.user,
 				{
 					content: isThemePattern
 						? item.content
