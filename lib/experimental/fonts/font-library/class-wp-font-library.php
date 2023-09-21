@@ -66,7 +66,7 @@ class WP_Font_Library {
 	 * @param string $collection_id Font collection id.
 	 * @return bool True if the font collection was unregistered successfully and false otherwise.
 	 */
-	public static function unregister_font_collection ( $collection_id ) {
+	public static function unregister_font_collection( $collection_id ) {
 		if ( ! isset( self::$collections[ $collection_id ] ) ) {
 			return false;
 		}
