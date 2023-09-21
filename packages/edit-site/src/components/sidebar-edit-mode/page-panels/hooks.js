@@ -4,12 +4,18 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { TEMPLATE_POST_TYPE } from '../../../utils/constants';
+import {
+	PATTERN_CORE_SOURCES,
+	PATTERN_TYPES,
+	TEMPLATE_POST_TYPE,
+} from '../../../utils/constants';
+import { unlock } from '../../../lock-unlock';
 
 export function useEditedPostContext() {
 	return useSelect(
@@ -48,7 +54,6 @@ export function useAvailableTemplates() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const isPostsPage = useIsPostsPage();
 	const templates = useTemplates();
-	console.log( 'templates', templates );
 	return useMemo(
 		() =>
 			// The posts page template cannot be changed.
@@ -86,4 +91,48 @@ export function useCurrentTemplateSlug() {
 	// to the current theme's default template.
 	return templates?.find( ( template ) => template.slug === entityTemplate )
 		?.slug;
+}
+
+// This is duplicated.
+const filterOutDuplicatesByName = ( currentItem, index, items ) =>
+	index === items.findIndex( ( item ) => currentItem.name === item.name );
+
+// Should we also get templates?
+export function useAvailablePatterns( template ) {
+	return useSelect(
+		( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const settings = getSettings();
+			const blockPatterns =
+				settings.__experimentalAdditionalBlockPatterns ??
+				settings.__experimentalBlockPatterns;
+
+			const restBlockPatterns = select( coreStore ).getBlockPatterns();
+
+			const patterns = [
+				...( blockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			]
+				.filter(
+					( pattern ) =>
+						! PATTERN_CORE_SOURCES.includes( pattern.source )
+				)
+				.filter( filterOutDuplicatesByName )
+				// Filter only the patterns that are compatible with the current template.
+				.filter( ( pattern ) =>
+					pattern.templateTypes?.includes( template.slug )
+				)
+				.map( ( pattern ) => ( {
+					...pattern,
+					keywords: pattern.keywords || [],
+					type: PATTERN_TYPES.theme,
+					blocks: parse( pattern.content, {
+						__unstableSkipMigrationLogs: true,
+					} ),
+				} ) );
+
+			return patterns;
+		},
+		[ template ]
+	);
 }

@@ -72,7 +72,6 @@ export default function ReplaceTemplateButton( {
 function TemplatesList( { availableTemplates, onSelect } ) {
 	const shownTemplates = useAsyncList( availableTemplates );
 
-	// TODO - make this use a grid layout.
 	return (
 		<BlockPatternsList
 			label={ __( 'Templates' ) }
