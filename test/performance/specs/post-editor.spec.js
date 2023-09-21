@@ -162,7 +162,7 @@ test.describe( 'Post Editor Performance', () => {
 
 			// Select the block where we type in.
 			const firstParagraph = canvas
-				.getByRole( 'document', { name: 'Paragraph block' } )
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.first();
 			await firstParagraph.click();
 
