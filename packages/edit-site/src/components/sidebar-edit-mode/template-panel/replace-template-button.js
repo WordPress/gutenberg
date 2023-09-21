@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
@@ -41,6 +41,7 @@ const selectAvailablePatterns = ( select ) => {
 			( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
 		)
 		.filter( filterOutDuplicatesByName )
+		// TODO use the correct type.
 		.filter( ( pattern ) => pattern.templateTypes?.includes( 'home' ) )
 		.map( ( pattern ) => ( {
 			...pattern,
@@ -68,29 +69,17 @@ export default function ReplaceTemplateButton( { onClick } ) {
 		};
 	}, [] );
 
-	// Should we also get templates?
-
-	//console.log( selectThemePatterns );
 	const entitiy = useEntityRecord( 'postType', postType, postId );
-	console.log( 'entitiy', entitiy );
 
+	// Should we also get templates?
 	const availableTemplates = useSelect( selectAvailablePatterns );
-	console.log( availableTemplates );
-	//const { setPage } = useDispatch( editSiteStore );
 	if ( ! availableTemplates?.length ) {
 		return null;
 	}
-	const onTemplateSelect = async ( template ) => {
-		const templateObjectItself = availableTemplates.find(
-			( availableTemplate ) => availableTemplate.name === template.id
-		);
-		console.log( templateObjectItself.content );
 
-		entitiy.edit( { content: templateObjectItself.content } );
-		// TODO - work out how to save the template.
-		//	await setPage( {
-		//		context: { postType, postId },
-		//	} );
+	const onTemplateSelect = async ( template ) => {
+		entitiy.edit( { content: template.content } );
+		// TODO - trigger a reload
 		onClose(); // Close the template suggestions modal first.
 		onClick();
 	};
@@ -132,6 +121,7 @@ function TemplatesList( { onSelect } ) {
 					blocks: template.blocks,
 					title: template.title,
 					id: template.name,
+					content: template.content,
 				};
 			} ),
 		[ availableTemplates ]
