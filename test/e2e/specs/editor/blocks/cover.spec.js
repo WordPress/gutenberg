@@ -39,19 +39,20 @@ test.describe( 'Cover', () => {
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
 
-		// Get the RGB value of Black.
-		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
-			coverBlock
+		// The default background color is black.
+		await expect( coverBlock ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 0)'
 		);
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
-		// Get the RGB value of the background dim.
-		const [ actualRGB ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
-
-		expect( blackRGB ).toEqual( actualRGB );
+		// Assert that after clicking black, the background color is black.
+		await expect( coverBlock ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 0)'
+		);
 	} );
 
 	test( 'can set background image using image upload on block placeholder', async ( {
@@ -267,12 +268,5 @@ class CoverBlockUtils {
 		await locator.setInputFiles( tmpFileName );
 
 		return filename;
-	}
-
-	async getBackgroundColorAndOpacity( locator ) {
-		return await locator.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		} );
 	}
 }
