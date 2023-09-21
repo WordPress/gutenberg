@@ -370,10 +370,6 @@ class WP_Font_Family {
 	 * @return bool True if the font faces were downloaded or moved successfully, false otherwise.
 	 */
 	private function download_or_move_font_faces( $files ) {
-		if ( ! $this->has_font_faces() ) {
-			return true;
-		}
-
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
 			// If the fonts are not meant to be dowloaded or uploaded
@@ -595,17 +591,20 @@ class WP_Font_Family {
 	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
 	 */
 	public function install( $files = null ) {
-		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
-		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
-		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-
-		if ( ! $were_assets_written ) {
-			return new WP_Error(
-				'font_face_download_failed',
-				__( 'The font face assets could not be written.', 'gutenberg' )
-			);
+		// If the font family has font faces it handle the assets.
+		if ( $this->has_font_faces() ) {
+			add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+			add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+			$were_assets_written = $this->download_or_move_font_faces( $files );
+			remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+			remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+			
+			if ( ! $were_assets_written ) {
+				return new WP_Error(
+					'font_face_download_failed',
+					__( 'The font face assets could not be written.', 'gutenberg' )
+				);
+			}
 		}
 
 		$post_id = $this->create_or_update_font_post();
