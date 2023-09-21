@@ -201,7 +201,7 @@ test.describe( 'Cover', () => {
 		expect( newCoverBlockBox.height ).toBe( coverBlockBox.height + 100 );
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% black when transformed from the Image block', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -227,15 +227,10 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		// The hidden span must be used as the target for opacity and color value.
-		const overlay = coverBlock.locator( 'span[aria-hidden="true"]' );
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		await expect( overlay ).toHaveCSS(
-			'background-color',
-			'rgb(179, 179, 179)'
-		);
+		await expect( overlay ).toHaveCSS( 'background-color', 'rgb(0, 0, 0)' );
 		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
 } );
