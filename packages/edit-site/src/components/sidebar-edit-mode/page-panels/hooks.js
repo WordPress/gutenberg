@@ -99,6 +99,36 @@ const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 
 // Should we also get templates?
 export function useAvailablePatterns( template ) {
+	const currentThemeStylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme().stylesheet
+	);
+
+	function injectThemeAttributeInBlockTemplateContent( block ) {
+		if (
+			block.innerBlocks.find(
+				( innerBlock ) => innerBlock.name === 'core/template-part'
+			)
+		) {
+			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+				if (
+					innerBlock.name === 'core/template-part' &&
+					innerBlock.attributes.theme === undefined
+				) {
+					innerBlock.attributes.theme = currentThemeStylesheet;
+				}
+				return innerBlock;
+			} );
+		}
+
+		if (
+			block.name === 'core/template-part' &&
+			block.attributes.theme === undefined
+		) {
+			block.attributes.theme = currentThemeStylesheet;
+		}
+		return block;
+	}
+
 	return useSelect(
 		( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
@@ -128,7 +158,9 @@ export function useAvailablePatterns( template ) {
 					type: PATTERN_TYPES.theme,
 					blocks: parse( pattern.content, {
 						__unstableSkipMigrationLogs: true,
-					} ),
+					} ).map( ( block ) =>
+						injectThemeAttributeInBlockTemplateContent( block )
+					),
 				} ) );
 
 			return patterns;
