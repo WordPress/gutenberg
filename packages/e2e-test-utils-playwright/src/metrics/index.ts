@@ -28,15 +28,6 @@ interface Trace {
 	traceEvents: TraceEvent[];
 }
 
-interface LoadingDurations {
-	serverResponse: number;
-	firstPaint: number;
-	domContentLoaded: number;
-	loaded: number;
-	firstContentfulPaint: number;
-	timeSinceResponseEnd: number;
-}
-
 type MetricsConstructorProps = {
 	page: Page;
 };
@@ -58,7 +49,7 @@ export class Metrics {
 	 * @param fields Optional fields to filter.
 	 */
 	async getServerTiming( fields: string[] = [] ) {
-		return this.page.evaluate< Record< string, number >, string[] >(
+		return this.page.evaluate(
 			( f: string[] ) =>
 				(
 					performance.getEntriesByType(
@@ -82,8 +73,8 @@ export class Metrics {
 	 *
 	 * @see https://web.dev/ttfb/#measure-ttfb-in-javascript
 	 */
-	async getTimeToFirstByte(): Promise< number > {
-		return await this.page.evaluate< number >( () => {
+	async getTimeToFirstByte() {
+		return await this.page.evaluate( () => {
 			const { responseStart, startTime } = (
 				performance.getEntriesByType(
 					'navigation'
@@ -99,8 +90,8 @@ export class Metrics {
 	 * @see https://w3c.github.io/largest-contentful-paint/
 	 * @see https://web.dev/lcp/#measure-lcp-in-javascript
 	 */
-	async getLargestContentfulPaint(): Promise< number > {
-		return await this.page.evaluate< number >(
+	async getLargestContentfulPaint() {
+		return await this.page.evaluate(
 			() =>
 				new Promise( ( resolve ) => {
 					new PerformanceObserver( ( entryList ) => {
@@ -123,8 +114,8 @@ export class Metrics {
 	 * @see https://github.com/WICG/layout-instability
 	 * @see https://web.dev/cls/#measure-layout-shifts-in-javascript
 	 */
-	async getCumulativeLayoutShift(): Promise< number > {
-		return await this.page.evaluate< number >(
+	async getCumulativeLayoutShift() {
+		return await this.page.evaluate(
 			() =>
 				new Promise( ( resolve ) => {
 					let CLS = 0;
@@ -151,7 +142,7 @@ export class Metrics {
 	 * Returns the loading durations using the Navigation Timing API. All the
 	 * durations exclude the server response time.
 	 */
-	async getLoadingDurations(): Promise< LoadingDurations > {
+	async getLoadingDurations() {
 		return await this.page.evaluate( () => {
 			const [
 				{
@@ -196,7 +187,7 @@ export class Metrics {
 	 *
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
-	async startTracing( options = {} ): Promise< void > {
+	async startTracing( options = {} ) {
 		return await this.browser.startTracing( this.page, {
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
@@ -207,7 +198,7 @@ export class Metrics {
 	/**
 	 * Stops Chromium tracing and saves the trace.
 	 */
-	async stopTracing(): Promise< void > {
+	async stopTracing() {
 		const traceBuffer = await this.browser.stopTracing();
 		const traceJSON = JSON.parse( traceBuffer.toString() );
 
@@ -217,7 +208,7 @@ export class Metrics {
 	/**
 	 * Returns the durations of all typing events.
 	 */
-	getTypingEventDurations(): number[][] {
+	getTypingEventDurations() {
 		return [
 			this.getEventDurations( 'keydown' ),
 			this.getEventDurations( 'keypress' ),
@@ -228,7 +219,7 @@ export class Metrics {
 	/**
 	 * Returns the durations of all selection events.
 	 */
-	getSelectionEventDurations(): number[][] {
+	getSelectionEventDurations() {
 		return [
 			this.getEventDurations( 'focus' ),
 			this.getEventDurations( 'focusin' ),
@@ -238,14 +229,14 @@ export class Metrics {
 	/**
 	 * Returns the durations of all click events.
 	 */
-	getClickEventDurations(): number[][] {
+	getClickEventDurations() {
 		return [ this.getEventDurations( 'click' ) ];
 	}
 
 	/**
 	 * Returns the durations of all hover events.
 	 */
-	getHoverEventDurations(): number[][] {
+	getHoverEventDurations() {
 		return [
 			this.getEventDurations( 'mouseover' ),
 			this.getEventDurations( 'mouseout' ),
@@ -257,7 +248,7 @@ export class Metrics {
 	 *
 	 * @param eventType The type of event to filter.
 	 */
-	getEventDurations( eventType: EventType ): number[] {
+	getEventDurations( eventType: EventType ) {
 		if ( this.trace.traceEvents.length === 0 ) {
 			throw new Error(
 				'No trace events found. Did you forget to call stopTracing()?'
