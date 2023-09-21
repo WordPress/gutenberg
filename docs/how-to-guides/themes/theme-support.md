@@ -9,7 +9,7 @@ There are a few new concepts to consider when building themes:
 -   **Responsive Embeds** - Themes must opt-in to responsive embeds.
 -   **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 -   **Block Tools** - Themes can opt-in to several block tools like line height, custom units.
--   **Core Block Patterns** - Themes can opt-out of the default block patterns.
+-   **Core Patterns** - Themes can opt-out of the default patterns.
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. They also [provide opt-in opinionated styles](#default-block-styles). Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
@@ -339,9 +339,9 @@ Themes can also filter the available custom units.
 add_theme_support( 'custom-units', 'rem', 'em' );
 ```
 
-### Disabling the default block patterns.
+### Disabling the default patterns
 
-WordPress comes with a number of block patterns built-in, themes can opt-out of the bundled patterns and provide their own set using the following code:
+WordPress comes with a number of patterns built-in, themes can opt-out of the bundled patterns and provide their own set using the following code:
 
 ```php
 remove_theme_support( 'core-block-patterns' );

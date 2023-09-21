@@ -8,7 +8,7 @@ test.describe( 'adding patterns', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should insert a block pattern', async ( { page, editor } ) => {
+	test( 'should insert a pattern', async ( { page, editor } ) => {
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);

@@ -70,12 +70,12 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 }
 
 /**
- * Retrieves the available block patterns for the given area.
+ * Retrieves the available patterns for the given area.
  *
  * @param {string} area     Template part area.
  * @param {string} clientId Block Client ID. (The container of the block can impact allowed blocks).
  *
- * @return {Array} array of block patterns.
+ * @return {Array} array of patterns.
  */
 export function useAlternativeBlockPatterns( area, clientId ) {
 	return useSelect(

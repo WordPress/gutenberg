@@ -1,10 +1,10 @@
-# Block Patterns List
+# Patterns List
 
-The `BlockPatternList` component makes a list of the different registered block patterns. It uses the `BlockPreview` component to display a preview for each block pattern.
+The `BlockPatternList` component makes a list of the different registered patterns. It uses the `BlockPreview` component to display a preview for each pattern.
 
 For more infos about blocks patterns, read [this](https://make.wordpress.org/core/2020/07/16/block-patterns-in-wordpress-5-5/).
 
-![Block patterns sidebar in WordPress 5.5](https://make.wordpress.org/core/files/2020/09/blocks-patterns-sidebar-in-wordpress-5-5.png)
+![Patterns sidebar in WordPress 5.5](https://make.wordpress.org/core/files/2020/09/blocks-patterns-sidebar-in-wordpress-5-5.png)
 
 ## Table of contents
 
@@ -15,7 +15,7 @@ For more infos about blocks patterns, read [this](https://make.wordpress.org/cor
 
 ### Usage
 
-Renders a block patterns list.
+Renders a patterns list.
 
 ```jsx
 import { BlockPatternList } from '@wordpress/block-editor';
@@ -33,28 +33,28 @@ const MyBlockPatternList = () => (
 
 #### blockPatterns
 
-An array of block patterns that can be shown in the block patterns list.
+An array of patterns that can be shown in the patterns list.
 
 -   Type: `Array`
 -   Required: Yes
 
 #### shownPatterns
 
-An array of shown block patterns objects.
+An array of shown patterns objects.
 
 -   Type: `Array`
 -   Required: Yes
 
 #### onClickPattern
 
-The performed event after a click on a block pattern. In most cases, the pattern is inserted in the block editor.
+The performed event after a click on a pattern. In most cases, the pattern is inserted in the block editor.
 
 -   Type: `Function`
 -   Required: Yes
 
 #### isDraggable
 
-Enables drag and drop functionality to the available block patterns.
+Enables drag and drop functionality to the available patterns.
 
 -   Type: `boolean`
 -   Required: No
@@ -68,11 +68,11 @@ The orientation value determines which arrow keys can be used to move focus. Ava
 
 #### label
 
-The aria label for the block patterns list.
+The aria label for the patterns list.
 
 -   Type: `string`
 -   Required: No
--   Default: `Block Patterns`
+-   Default: `Patterns`
 
 ## Related components
 

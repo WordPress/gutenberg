@@ -7,7 +7,7 @@
  */
 
 /**
- * Core class used to access block patterns via the REST API.
+ * Core class used to access patterns via the REST API.
  *
  * @since 6.4.0
  *
@@ -15,7 +15,7 @@
  */
 class Gutenberg_REST_Block_Patterns_Controller extends Gutenberg_REST_Block_Patterns_Controller_6_3 {
 	/**
-	 * Prepare a raw block pattern before it gets output in a REST API response.
+	 * Prepare a raw pattern before it gets output in a REST API response.
 	 *
 	 * @todo In the long run, we'd likely want to have a filter in the `WP_Block_Patterns_Registry` class
 	 * instead to allow us plugging in code like this.

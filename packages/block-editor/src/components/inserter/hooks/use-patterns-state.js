@@ -13,7 +13,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../../store';
 
 /**
- * Retrieves the block patterns inserter state.
+ * Retrieves the patterns inserter state.
  *
  * @param {Function} onInsert     function called when inserter a list of blocks.
  * @param {string=}  rootClientId Insertion's root client ID.
@@ -66,8 +66,8 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			);
 			createSuccessNotice(
 				sprintf(
-					/* translators: %s: block pattern title. */
-					__( 'Block pattern "%s" inserted.' ),
+					/* translators: %s: pattern title. */
+					__( 'Pattern "%s" inserted.' ),
 					pattern.title
 				),
 				{

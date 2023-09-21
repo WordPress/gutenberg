@@ -327,11 +327,11 @@ export function useScopedBlockVariations( attributes ) {
 }
 
 /**
- * Hook that returns the block patterns for a specific block type.
+ * Hook that returns the patterns for a specific block type.
  *
  * @param {string} clientId The block's client ID.
  * @param {string} name     The block type name.
- * @return {Object[]} An array of valid block patterns.
+ * @return {Object[]} An array of valid patterns.
  */
 export const usePatterns = ( clientId, name ) => {
 	return useSelect(

@@ -49,7 +49,7 @@ function PatternsListHeader( {
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
-				/* translators: %d: number of patterns. %s: block pattern search query */
+				/* translators: %d: number of patterns. %s: pattern search query */
 				_n(
 					'%1$d pattern found for "%2$s"',
 					'%1$d patterns found for "%2$s"',

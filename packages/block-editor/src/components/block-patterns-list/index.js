@@ -147,7 +147,7 @@ function BlockPatternList( {
 	onHover,
 	onClickPattern,
 	orientation,
-	label = __( 'Block Patterns' ),
+	label = __( 'Patterns' ),
 	showTitlesAsTooltip,
 } ) {
 	const composite = useCompositeState( { orientation } );

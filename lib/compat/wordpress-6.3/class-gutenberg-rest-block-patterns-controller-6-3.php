@@ -7,7 +7,7 @@
  */
 
 /**
- * Core class used to access block patterns via the REST API.
+ * Core class used to access patterns via the REST API.
  *
  * @since 6.0.0
  *
@@ -23,7 +23,7 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Pattern
 	private $remote_patterns_loaded;
 
 	/**
-	 * Prepare a raw block pattern before it gets output in a REST API response.
+	 * Prepare a raw pattern before it gets output in a REST API response.
 	 *
 	 * @since 6.0.0
 	 * @since 6.3.0 Added `source` property.
@@ -61,7 +61,7 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Pattern
 	}
 
 	/**
-	 * Retrieves the block pattern schema, conforming to JSON Schema.
+	 * Retrieves the pattern schema, conforming to JSON Schema.
 	 *
 	 * @since 6.0.0
 	 * @since 6.1.0 Added `post_types` property.
@@ -168,7 +168,7 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Pattern
 	}
 
 	/**
-	 * Retrieves all block patterns.
+	 * Retrieves all patterns.
 	 *
 	 * @since 6.0.0
 	 * @since 6.2.0 Added migration for old core pattern categories to the new ones.
@@ -178,7 +178,7 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Pattern
 	 */
 	public function get_items( $request ) {
 		if ( ! $this->remote_patterns_loaded ) {
-			// Load block patterns from w.org.
+			// Load patterns from w.org.
 			gutenberg_load_remote_block_patterns(); // Patterns with the `core` keyword.
 			gutenberg_load_remote_featured_patterns(); // Patterns in the `featured` category.
 			gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.

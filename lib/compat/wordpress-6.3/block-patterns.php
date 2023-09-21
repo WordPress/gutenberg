@@ -6,9 +6,9 @@
  */
 
 /**
- * Registers the block pattern sources.
+ * Registers the pattern sources.
  *
- * @since 6.3.0 Added source to core block patterns.
+ * @since 6.3.0 Added source to core patterns.
  */
 function gutenberg_register_core_block_patterns_and_categories() {
 	$should_register_core_patterns = get_theme_support( 'core-block-patterns' );
@@ -55,7 +55,7 @@ function gutenberg_load_remote_block_patterns( $deprecated = null ) {
 	$supports_core_patterns = get_theme_support( 'core-block-patterns' );
 
 	/**
-	 * Filter to disable remote block patterns.
+	 * Filter to disable remote patterns.
 	 *
 	 * @since 5.8.0
 	 *
