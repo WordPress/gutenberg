@@ -78,7 +78,7 @@ test.describe( 'Cover', () => {
 		} ).toPass();
 	} );
 
-	test( 'dims background image down by 50% by default', async ( {
+	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -91,11 +91,9 @@ test.describe( 'Cover', () => {
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
-		// The hidden span must be used as the target for opacity and color value.
-		const overlay = coverBlock.locator( 'span[aria-hidden="true"]' );
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
 		await expect( overlay ).toHaveCSS(
 			'background-color',
 			'rgb(179, 179, 179)'
