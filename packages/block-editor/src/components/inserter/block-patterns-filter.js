@@ -10,9 +10,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 
 export const PATTERN_TYPES = {
 	synced: 'synced',
