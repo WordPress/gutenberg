@@ -302,6 +302,47 @@ describe( 'Modal', () => {
 			).toHaveFocus();
 		} );
 
+		it( 'should focus the first element anywhere within the Modal when `firstElement` passed as value for `focusOnMount` prop', async () => {
+			const user = userEvent.setup();
+
+			const FocusMountDemo = () => {
+				const [ isShown, setIsShown ] = useState( false );
+				return (
+					<>
+						<button onClick={ () => setIsShown( true ) }>📣</button>
+						{ isShown && (
+							<Modal
+								focusOnMount="firstElement"
+								onRequestClose={ () => setIsShown( false ) }
+							>
+								<p>Modal content</p>
+								<a
+									href="https://wordpress.org"
+									data-testid="first-focusable-element"
+								>
+									Focusable Element
+								</a>
+
+								<a href="https://wordpress.org">
+									Another Focusable Element
+								</a>
+							</Modal>
+						) }
+					</>
+				);
+			};
+
+			render( <FocusMountDemo /> );
+
+			const opener = screen.getByRole( 'button' );
+
+			await user.click( opener );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Close' } )
+			).toHaveFocus();
+		} );
+
 		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 			const FocusMountDemo = () => {
