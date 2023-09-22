@@ -34,6 +34,7 @@ function useDeprecatedProps( {
 	isSecondary,
 	isTertiary,
 	isLink,
+	isPressed,
 	isSmall,
 	size,
 	variant,
@@ -41,6 +42,9 @@ function useDeprecatedProps( {
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedSize = size;
 	let computedVariant = variant;
+	const newProps: { 'aria-pressed'?: boolean } = {
+		'aria-pressed': isPressed,
+	};
 
 	if ( isSmall ) {
 		computedSize ??= 'small';
@@ -72,7 +76,14 @@ function useDeprecatedProps( {
 		computedVariant ??= 'link';
 	}
 
+	if ( isPressed ) {
+		deprecated( 'Button isPressed prop', {
+			alternative: 'aria-pressed={ true }',
+		} );
+	}
+
 	return {
+		...newProps,
 		...otherProps,
 		size: computedSize,
 		variant: computedVariant,
@@ -85,7 +96,6 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
-		isPressed,
 		isBusy,
 		isDestructive,
 		className,
@@ -106,10 +116,16 @@ export function UnforwardedButton(
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
-	const { href, target, ...additionalProps } =
-		'href' in buttonOrAnchorProps
-			? buttonOrAnchorProps
-			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
+	const {
+		href,
+		target,
+		'aria-checked': ariaChecked,
+		'aria-pressed': ariaPressed,
+		'aria-selected': ariaSelected,
+		...additionalProps
+	} = 'href' in buttonOrAnchorProps
+		? buttonOrAnchorProps
+		: { href: undefined, target: undefined, ...buttonOrAnchorProps };
 
 	const instanceId = useInstanceId(
 		Button,
@@ -131,7 +147,17 @@ export function UnforwardedButton(
 		'is-small': size === 'small',
 		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
-		'is-pressed': isPressed,
+
+		// Including these classes for consistency and legacy purposes.
+		// `is-pressed` was added by the (deprecated) `isPressed` prop.
+		// Component styling is tied to the value of the respective
+		// `aria-*` attributes.
+		'is-checked': ariaChecked && ariaChecked !== 'false',
+		'is-checked-mixed': ariaChecked === 'mixed',
+		'is-pressed': ariaPressed && ariaPressed !== 'false',
+		'is-pressed-mixed': ariaPressed === 'mixed',
+		'is-selected': ariaSelected && ariaSelected !== 'false',
+
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
@@ -146,7 +172,9 @@ export function UnforwardedButton(
 			? {
 					type: 'button',
 					disabled: trulyDisabled,
-					'aria-pressed': isPressed,
+					'aria-checked': ariaChecked,
+					'aria-pressed': ariaPressed,
+					'aria-selected': ariaSelected,
 			  }
 			: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
