@@ -842,3 +842,10 @@ attributes: {
     }
 }
 ```
+
+### __experimentalBlockRenaming
+
+-   Type: `boolean`
+-   Default value: `true`
+
+This value signals that a block supports the ability to have a custom name provided. This value is persisted to the block metadata attribute.
