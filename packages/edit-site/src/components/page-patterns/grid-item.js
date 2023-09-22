@@ -113,14 +113,14 @@ function GridItem( { categoryId, item, ...props } ) {
 	const exportAsJSON = () => {
 		const json = {
 			__file: item.type,
-			title: item.title,
+			title: item.title || item.name,
 			content: item.patternBlock.content.raw,
 			syncStatus: item.patternBlock.wp_pattern_sync_status,
 		};
 
 		return downloadjs(
 			JSON.stringify( json, null, 2 ),
-			`${ kebabCase( item.title ) }.json`,
+			`${ kebabCase( item.title || item.name ) }.json`,
 			'application/json'
 		);
 	};
@@ -160,7 +160,7 @@ function GridItem( { categoryId, item, ...props } ) {
 		: sprintf(
 				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
 				__( 'Are you sure you want to delete "%s"?' ),
-				item.title
+				item.title || item.name
 		  );
 
 	const additionalStyles = ! backgroundColor
@@ -246,7 +246,7 @@ function GridItem( { categoryId, item, ...props } ) {
 									// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 									tabIndex="-1"
 								>
-									{ item.title }
+									{ item.title || item.name }
 								</Button>
 							</Heading>
 						) }
