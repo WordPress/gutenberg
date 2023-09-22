@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Button,
 	DropZone,
 	FlexItem,
 	MenuItem,
@@ -25,8 +29,6 @@ import { getFilename } from '@wordpress/url';
  */
 import InspectorControls from '../components/inspector-controls';
 import MediaReplaceFlow from '../components/media-replace-flow';
-import MediaUpload from '../components/media-upload';
-import MediaUploadCheck from '../components/media-upload/check';
 import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
@@ -103,7 +105,12 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
 				<span
-					className="block-editor-hooks__background__inspector-image-indicator-wrapper"
+					className={ classnames(
+						'block-editor-hooks__background__inspector-image-indicator-wrapper',
+						{
+							'has-image': imgUrl,
+						}
+					) }
 					aria-hidden
 				>
 					{ imgUrl && (
@@ -123,11 +130,13 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 						{ imgLabel }
 					</Truncate>
 					<VisuallyHidden as="span">
-						{ sprintf(
-							/* translators: %s: file name */
-							__( 'Selected image: %s' ),
-							filename
-						) }
+						{ filename
+							? sprintf(
+									/* translators: %s: file name */
+									__( 'Selected image: %s' ),
+									filename
+							  )
+							: __( 'No image selected' ) }
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
@@ -243,55 +252,29 @@ function BackgroundImagePanelItem( props ) {
 			panelId={ clientId }
 		>
 			<div className="block-editor-hooks__background__inspector-media-replace-container">
-				{ !! url && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-						accept="image/*"
-						onSelect={ onSelectMedia }
-						name={
-							<InspectorImagePreview
-								label={ __( 'Background image' ) }
-								filename={ title }
-								url={ url }
-							/>
-						}
-						variant="secondary"
-					>
-						<MenuItem
-							onClick={ () => resetBackgroundImage( props ) }
-						>
-							{ __( 'Reset ' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
-				) }
-				{ ! url && (
-					<MediaUploadCheck>
-						<MediaUpload
-							onSelect={ onSelectMedia }
-							allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-							render={ ( { open } ) => (
-								<div className="block-editor-hooks__background__inspector-upload-container">
-									<Button
-										onClick={ open }
-										aria-label={ __(
-											'Background image style'
-										) }
-									>
-										<InspectorImagePreview
-											label={ __( 'Background image' ) }
-										/>
-									</Button>
-									<DropZone
-										onFilesDrop={ onFilesDrop }
-										label={ __( 'Drop to upload' ) }
-									/>
-								</div>
-							) }
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+					accept="image/*"
+					onSelect={ onSelectMedia }
+					name={
+						<InspectorImagePreview
+							label={ __( 'Background image' ) }
+							filename={ title }
+							url={ url }
 						/>
-					</MediaUploadCheck>
-				) }
+					}
+					variant="secondary"
+				>
+					<MenuItem onClick={ () => resetBackgroundImage( props ) }>
+						{ __( 'Reset ' ) }
+					</MenuItem>
+				</MediaReplaceFlow>
+				<DropZone
+					onFilesDrop={ onFilesDrop }
+					label={ __( 'Drop to upload' ) }
+				/>
 			</div>
 		</ToolsPanelItem>
 	);
