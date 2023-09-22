@@ -61,12 +61,33 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static $theme = null;
 
 	/**
+	 * Container to cache theme support data.
+	 *
+	 * @since n.e.x.t
+	 * @var array
+	 */
+	protected static $theme_support_data = null;
+
+	/**
 	 * Container for data coming from the user.
 	 *
 	 * @since 5.9.0
 	 * @var WP_Theme_JSON
 	 */
 	protected static $user = null;
+
+	/**
+	 * Container for merged data.
+	 *
+	 * @since n.e.x.t
+	 * @var WP_Theme_JSON
+	 */
+	protected static $merged = array(
+		'default' => null,
+		'blocks'  => null,
+		'theme'   => null,
+		'custom'  => null,
+	);
 
 	/**
 	 * Stores the ID of the custom post type
@@ -290,6 +311,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$theme;
 		}
 
+		// Save theme supports data for future use.
+		static::$theme_support_data = self::get_theme_supports_data();
+
+		$with_theme_supports = new WP_Theme_JSON_Gutenberg( static::$theme_support_data );
+		$with_theme_supports->merge( static::$theme );
+		return $with_theme_supports;
+	}
+
+	/**
+	 * Get merged theme supports data
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return array Config that adheres to the theme.json schema.
+	 */
+	private static function get_theme_supports_data() {
 		/*
 		 * We want the presets and settings declared in theme.json
 		 * to override the ones declared via theme supports.
@@ -297,6 +334,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * and merge the static::$theme upon that.
 		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+
 		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
@@ -355,9 +393,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			// END EXPERIMENTAL.
 		}
-		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
-		$with_theme_supports->merge( static::$theme );
-		return $with_theme_supports;
+
+		return $theme_support_data;
 	}
 
 	/**
@@ -597,26 +634,58 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
+		if ( ! in_array( $origin, WP_Theme_JSON_Gutenberg::VALID_ORIGINS, true ) ) {
+			$origin = 'custom';
+		}
+
+		// Map origins to block cache values.
+		$cache_map = array(
+			'default' => 'core',
+			'blocks'  => 'blocks',
+			'theme'   => 'theme',
+			'custom'  => 'user',
+		);
+
+		if (
+			null !== static::$merged[ $origin ]
+			&& static::has_same_registered_blocks( $cache_map[ $origin ] )
+			// Ensure theme supports data is fresh before returning cached data for theme and custom origins.
+			&& ( ! in_array( $origin, array( 'theme', 'custom' ), true ) || static::get_theme_supports_data() === static::$theme_support_data )
+		) {
+			return static::$merged[ $origin ];
+		}
+
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
 			$result->set_spacing_sizes();
+
+			static::$merged[ $origin ] = $result;
+
 			return $result;
 		}
 
 		$result->merge( static::get_block_data() );
 		if ( 'blocks' === $origin ) {
+			static::$merged[ $origin ] = $result;
+
 			return $result;
 		}
 
 		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
 			$result->set_spacing_sizes();
+
+			static::$merged[ $origin ] = $result;
+
 			return $result;
 		}
 
 		$result->merge( static::get_user_data() );
 		$result->set_spacing_sizes();
+
+		static::$merged[ $origin ] = $result;
+
 		return $result;
 	}
 
@@ -695,6 +764,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'blocks' => array(),
 			'theme'  => array(),
 			'user'   => array(),
+		);
+		static::$merged                   = array(
+			'default' => null,
+			'blocks'  => null,
+			'theme'   => null,
+			'custom'  => null,
 		);
 		static::$theme                    = null;
 		static::$user                     = null;
