@@ -989,6 +989,25 @@ describe( 'Tabs', () => {
 	} );
 
 	describe( 'Controlled mode', () => {
+		it( 'should render the tab specified by the `selectedTabId` prop', async () => {
+			render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
+
+			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect(
+				await screen.findByRole( 'tabpanel', { name: 'Beta' } )
+			).toBeInTheDocument();
+		} );
+		it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
+			render(
+				<ControlledTabs
+					tabs={ TABS }
+					selectedTabId="gamma"
+					initialTabId="beta"
+				/>
+			);
+
+			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+		} );
 		it( 'should not render any tab if `selectedTabId` does not match any known tab', () => {
 			render(
 				<ControlledTabs
@@ -1004,233 +1023,60 @@ describe( 'Tabs', () => {
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
-		it( 'should not render any tab if `selectedTabId` refers to a disabled tab', async () => {
-			const TABS_WITH_DELTA_WITH_BETA_DISABLED = TABS_WITH_DELTA.map(
-				( tabObj ) =>
-					tabObj.id === 'beta'
-						? {
-								...tabObj,
-								tab: {
-									...tabObj.tab,
-									disabled: true,
-								},
-						  }
-						: tabObj
+		it( 'should not render any tab if the active tab is removed', async () => {
+			const { rerender } = render(
+				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
 
-			render(
+			// Remove beta
+			rerender(
 				<ControlledTabs
-					tabs={ TABS_WITH_DELTA_WITH_BETA_DISABLED }
-					selectedTabId="beta"
+					tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
 				/>
 			);
 
+			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
+
 			// No tab should be selected i.e. it doesn't fall back to first tab.
-			await waitFor( () => {
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-			} );
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
-		describe( 'Without `initialTabId` prop', () => {
-			it( 'should render the tab specified by the `selectedTabId` prop', async () => {
-				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect(
-					await screen.findByRole( 'tabpanel', { name: 'Beta' } )
-				).toBeInTheDocument();
-			} );
-			it( 'should not render any tab if the active tab is removed', async () => {
-				const { rerender } = render(
-					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
-				);
-
-				// Remove beta
-				rerender(
-					<ControlledTabs
-						tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
-					/>
-				);
-
-				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
-
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
-			} );
-		} );
-		describe( 'With `initialTabId`', () => {
-			it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
-				render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						initialTabId="beta"
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			} );
-			it( 'should render the specified `selectedTabId` when `initialTabId` does not match any known tab', async () => {
-				render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						initialTabId="does-not-exist"
-					/>
-				);
-
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			} );
-			it( 'should not change tabs when initialTabId is changed', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						initialTabId="beta"
-					/>
-				);
-
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						initialTabId="alpha"
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			} );
-			it( 'should not render any tab if the currently active tab is removed', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						initialTabId="gamma"
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-
-				// Remove beta
-				rerender(
-					<ControlledTabs
-						tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
-						selectedTabId="beta"
-						initialTabId="gamma"
-					/>
-				);
-
-				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
-			} );
-			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						initialTabId="gamma"
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-
-				// Remove gamma
-				rerender(
-					<ControlledTabs
-						tabs={ TABS.slice( 0, 2 ) }
-						selectedTabId="gamma"
-						initialTabId="gamma"
-					/>
-				);
-
-				expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
-			} );
-			it( 'does not select `initialTabId` if it becomes available after the initial render', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						initialTabId="delta"
-					/>
-				);
-
-				// The controlled tab, Beta, should be selected.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-
-				// Re-render with the tab associated to `initialTabId` available.
-				rerender(
-					<ControlledTabs
-						tabs={ TABS_WITH_DELTA }
-						selectedTabId="beta"
-						initialTabId="delta"
-					/>
-				);
-
-				// Beta should remain selected, even after the `initialTabId` of Delta becomes available.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			} );
-		} );
 		describe( 'Disabled tab', () => {
-			it( 'should render the specified `selectedTabId` (not the first enabled tab) when the tab associated to `initialTabId` is disabled', async () => {
-				const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
-					tabObj.id === 'beta'
-						? {
-								...tabObj,
-								tab: {
-									...tabObj.tab,
-									disabled: true,
-								},
-						  }
-						: tabObj
+			it( 'should not render any tab if `selectedTabId` refers to a disabled tab', async () => {
+				const TABS_WITH_DELTA_WITH_BETA_DISABLED = TABS_WITH_DELTA.map(
+					( tabObj ) =>
+						tabObj.id === 'beta'
+							? {
+									...tabObj,
+									tab: {
+										...tabObj.tab,
+										disabled: true,
+									},
+							  }
+							: tabObj
 				);
 
-				const { rerender } = render(
+				render(
 					<ControlledTabs
-						tabs={ TABS_WITH_BETA_DISABLED }
-						selectedTabId="gamma"
-						initialTabId="beta"
+						tabs={ TABS_WITH_DELTA_WITH_BETA_DISABLED }
+						selectedTabId="beta"
 					/>
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-
-				// Re-enable all tabs
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						initialTabId="beta"
-					/>
-				);
-
-				// Even if the initial tab becomes enabled again, the selected tab doesn't
-				// change.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				// No tab should be selected i.e. it doesn't fall back to first tab.
+				await waitFor( () => {
+					expect(
+						screen.queryByRole( 'tab', { selected: true } )
+					).not.toBeInTheDocument();
+				} );
+				// No tabpanel should be rendered either
+				expect(
+					screen.queryByRole( 'tabpanel' )
+				).not.toBeInTheDocument();
 			} );
 			it( 'should not render any tab when the selected tab becomes disabled', async () => {
 				const { rerender } = render(
@@ -1285,83 +1131,6 @@ describe( 'Tabs', () => {
 					screen.queryByRole( 'tabpanel' )
 				).not.toBeInTheDocument();
 			} );
-			it( 'should not render any tab when the tab associated to `initialTabId` becomes disabled while being the active tab', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						initialTabId="gamma"
-						selectedTabId="gamma"
-					/>
-				);
-
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-
-				const TABS_WITH_GAMMA_DISABLED = TABS.map( ( tabObj ) =>
-					tabObj.id === 'gamma'
-						? {
-								...tabObj,
-								tab: {
-									...tabObj.tab,
-									disabled: true,
-								},
-						  }
-						: tabObj
-				);
-
-				rerender(
-					<ControlledTabs
-						tabs={ TABS_WITH_GAMMA_DISABLED }
-						initialTabId="gamma"
-						selectedTabId="gamma"
-					/>
-				);
-
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				// `waitFor` is needed here to prevent testing library from
-				// throwing a 'not wrapped in `act()`' error.
-				await waitFor( () => {
-					expect(
-						screen.queryByRole( 'tab', { selected: true } )
-					).not.toBeInTheDocument();
-				} );
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
-
-				// re-enable all tabs
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						initialTabId="gamma"
-						selectedTabId="gamma"
-					/>
-				);
-
-				// If the previously selected tab is reenabled, it should not
-				// be reselected.
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
-			} );
 		} );
-	} );
-
-	describe( 'Without `initialTabId` prop', () => {
-		describe( 'in uncontrolled mode', () => {} );
-		describe( 'in controlled mode', () => {} );
-	} );
-	describe( 'With `initialTabId`', () => {
-		describe( 'in uncontrolled mode', () => {} );
-		describe( 'in controlled mode', () => {} );
-	} );
-	describe( 'Controlled Mode', () => {} );
-	describe( 'Disabled Tab', () => {
-		describe( 'in uncontrolled mode', () => {} );
-		describe( 'in controlled mode', () => {} );
 	} );
 } );
