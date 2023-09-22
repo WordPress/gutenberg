@@ -23,7 +23,7 @@ export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
-import { combineReducers, default as createReduxStore } from './redux-store';
+export { default as createReduxStore } from './redux-store';
 export { dispatch } from './dispatch';
 export { select } from './select';
 
@@ -75,35 +75,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export { combineReducers };
-
-/**
- * Creates a data store descriptor for the provided Redux store configuration containing
- * properties describing reducer, actions, selectors, controls and resolvers.
- *
- * @example
- * ```js
- * import { createReduxStore } from '@wordpress/data';
- *
- * const store = createReduxStore( 'demo', {
- *     reducer: ( state = 'OK' ) => state,
- *     selectors: {
- *         getValue: ( state ) => state,
- *     },
- * } );
- * ```
- *
- * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
- * @template Selectors
- * @param {string}                                    key     Unique namespace identifier.
- * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
- *                                                            describing reducer, actions, selectors,
- *                                                            and resolvers.
- *
- * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
- */
-export { createReduxStore };
+export { combineReducers } from './redux-store';
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

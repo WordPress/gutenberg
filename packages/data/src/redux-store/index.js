@@ -34,7 +34,7 @@ export { combineReducers };
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
  * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template {Record<string,import('../types').ActionCreator>} Actions
  * @template Selectors
  */
 
@@ -119,6 +119,32 @@ function createBindingCache( bind ) {
 	};
 }
 
+/**
+ * Creates a data store descriptor for the provided Redux store configuration containing
+ * properties describing reducer, actions, selectors, controls and resolvers.
+ *
+ * @example
+ * ```js
+ * import { createReduxStore } from '@wordpress/data';
+ *
+ * const store = createReduxStore( 'demo', {
+ *     reducer: ( state = 'OK' ) => state,
+ *     selectors: {
+ *         getValue: ( state ) => state,
+ *     },
+ * } );
+ * ```
+ *
+ * @template State
+ * @template {Record<string,import('../types').ActionCreator>} Actions
+ * @template Selectors
+ * @param {string}                                    key     Unique namespace identifier.
+ * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
+ *                                                            describing reducer, actions, selectors,
+ *                                                            and resolvers.
+ *
+ * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
+ */
 export default function createReduxStore( key, options ) {
 	const privateActions = {};
 	const privateSelectors = {};
