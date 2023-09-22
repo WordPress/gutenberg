@@ -48,6 +48,8 @@ const level0Dismissers: MutableRefObject<
 >[] = [];
 const context = createContext( level0Dismissers );
 
+let isBodyOpenClassActive = false;
+
 function UnforwardedModal(
 	props: ModalProps,
 	forwardedRef: ForwardedRef< HTMLDivElement >
@@ -128,35 +130,43 @@ function UnforwardedModal(
 		}
 	}, [ contentRef ] );
 
-	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
-	useEffect( () => {
-		refOnRequestClose.current = onRequestClose;
-	}, [ onRequestClose ] );
-
+	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
 		ariaHelper.modalize( ref.current );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
+	// Keeps a fresh ref for the subsequent effect.
+	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+	useEffect( () => {
+		refOnRequestClose.current = onRequestClose;
+	}, [ onRequestClose ] );
+
 	const dismissers = useContext( context );
 	const isLevel0 = dismissers === level0Dismissers;
-	useEffect( () => {
-		const openModalCount = dismissers.push( refOnRequestClose );
 
-		if ( openModalCount === 1 && isLevel0 ) {
+	// Updates the stack tracking open modals at this level and calls
+	// onRequestClose for the prior modal if applicable.
+	useEffect( () => {
+		dismissers.push( refOnRequestClose );
+		const [ first, second ] = dismissers;
+		if ( second ) first?.current?.();
+		return () => void dismissers.shift();
+	}, [ dismissers ] );
+
+	// Adds/removes the value of bodyOpenClassName to body element.
+	useEffect( () => {
+		if ( ! isBodyOpenClassActive ) {
+			isBodyOpenClassActive = true;
 			document.body.classList.add( bodyOpenClassName );
 		}
-
-		if ( openModalCount > 1 ) dismissers[ 0 ].current?.();
-
 		return () => {
-			dismissers.shift();
-
-			if ( dismissers.length === 0 && isLevel0 ) {
+			if ( isLevel0 && dismissers.length === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
+				isBodyOpenClassActive = false;
 			}
 		};
-	}, [ dismissers, isLevel0 ] );
+	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
