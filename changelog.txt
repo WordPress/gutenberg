@@ -1,45 +1,5 @@
 == Changelog ==
 
-= 16.7.0-rc.2 =
-
-
-
-## Changelog
-
-### Enhancements
-
-#### Patterns
-- Memoize `useSelect` for `usePatterns`. ([54588](https://github.com/WordPress/gutenberg/pull/54588))
-
-#### Design Tools
-- Improve background image control. ([54439](https://github.com/WordPress/gutenberg/pull/54439))
-
-#### List View
-- Try directing focus to the list view toggle button when closing the list view. ([54175](https://github.com/WordPress/gutenberg/pull/54175))
-
-
-### Bug Fixes
-
-#### Block API
-- Block Hooks: Avoid processing empty content for loaded templates. ([54719](https://github.com/WordPress/gutenberg/pull/54719))
-
-#### Design Tools
-- Background Image control: Use consistent button, ensure descriptive text accounts for no image selected. ([54711](https://github.com/WordPress/gutenberg/pull/54711))
-
-
-### Various
-
-#### Plugin
-- Update uuid package to 9.0.1. ([54725](https://github.com/WordPress/gutenberg/pull/54725))
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@andrewserong @gziolo @kevin940726 @mikachan @richtabor
-
-
 = 16.7.0-rc.1 =
 
 ## Changelog
