@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -141,17 +141,20 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList( {
-	isDraggable,
-	blockPatterns,
-	shownPatterns,
-	onHover,
-	onClickPattern,
-	orientation,
-	label = __( 'Block Patterns' ),
-	showTitlesAsTooltip,
-	pagingProps,
-} ) {
+function BlockPatternList(
+	{
+		isDraggable,
+		blockPatterns,
+		shownPatterns,
+		onHover,
+		onClickPattern,
+		orientation,
+		label = __( 'Block Patterns' ),
+		showTitlesAsTooltip,
+		pagingProps,
+	},
+	ref
+) {
 	const composite = useCompositeState( { orientation } );
 	return (
 		<Composite
@@ -159,6 +162,7 @@ function BlockPatternList( {
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
+			ref={ ref }
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
@@ -183,4 +187,4 @@ function BlockPatternList( {
 	);
 }
 
-export default BlockPatternList;
+export default forwardRef( BlockPatternList );

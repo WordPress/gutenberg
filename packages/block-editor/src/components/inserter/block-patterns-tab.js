@@ -220,7 +220,7 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId,
 		patternSourceFilter
 	);
-	const container = useRef();
+	const scrollContainerRef = useRef();
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -265,7 +265,7 @@ export function BlockPatternsCategoryPanel( {
 	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
 		category,
-		container
+		scrollContainerRef
 	);
 
 	// Hide block pattern preview on unmount.
@@ -273,10 +273,7 @@ export function BlockPatternsCategoryPanel( {
 	useEffect( () => () => onHover( null ), [] );
 
 	return (
-		<div
-			className="block-editor-inserter__patterns-category-panel"
-			ref={ container }
-		>
+		<div className="block-editor-inserter__patterns-category-panel">
 			<VStack
 				spacing={ 2 }
 				className="block-editor-inserter__patterns-category-panel-header"
@@ -309,6 +306,7 @@ export function BlockPatternsCategoryPanel( {
 
 			{ currentCategoryPatterns.length > 0 && (
 				<BlockPatternList
+					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }
 					onClickPattern={ onClickPattern }
