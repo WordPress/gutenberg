@@ -101,6 +101,7 @@ export const navigate = async ( href, options = {} ) => {
 	if ( navigatingTo !== href ) return;
 
 	if ( page ) {
+		if ( options.beforeRender ) await options.beforeRender();
 		renderRegions( page );
 		window.history[ options.replace ? 'replaceState' : 'pushState' ](
 			{},
