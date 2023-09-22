@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import * as Ariakit from '@ariakit/react/tooltip';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
