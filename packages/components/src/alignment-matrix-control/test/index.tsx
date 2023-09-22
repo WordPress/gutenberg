@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -19,13 +19,8 @@ const getCell = ( name: string ) => {
 
 const asyncRender = async ( jsx: any ) => {
 	const view = render( jsx );
-	await act( async () => {
-		// This allows the component to properly establish
-		// its initial state, that sometimes isn't otherwise
-		// ready in time for tests to start.
-		await new Promise( requestAnimationFrame );
-		await new Promise( requestAnimationFrame );
-		await new Promise( requestAnimationFrame );
+	await waitFor( () => {
+		expect( getCell( 'top left' ) ).toHaveAttribute( 'tabindex', '-1' );
 	} );
 	return view;
 };
