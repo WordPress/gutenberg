@@ -66,8 +66,7 @@
 			}
 		},
 		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true,
-		"__experimentalMetadata": true
+		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"
