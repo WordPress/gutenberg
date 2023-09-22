@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -24,6 +24,7 @@ import { Icon, symbol } from '@wordpress/icons';
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import BlockPatternsPaging from '../block-patterns-paging';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -140,16 +141,20 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList( {
-	isDraggable,
-	blockPatterns,
-	shownPatterns,
-	onHover,
-	onClickPattern,
-	orientation,
-	label = __( 'Block Patterns' ),
-	showTitlesAsTooltip,
-} ) {
+function BlockPatternList(
+	{
+		isDraggable,
+		blockPatterns,
+		shownPatterns,
+		onHover,
+		onClickPattern,
+		orientation,
+		label = __( 'Block Patterns' ),
+		showTitlesAsTooltip,
+		pagingProps,
+	},
+	ref
+) {
 	const composite = useCompositeState( { orientation } );
 	return (
 		<Composite
@@ -157,6 +162,7 @@ function BlockPatternList( {
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
+			ref={ ref }
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
@@ -174,8 +180,11 @@ function BlockPatternList( {
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
+			{ pagingProps && pagingProps.numPages > 1 && (
+				<BlockPatternsPaging { ...pagingProps } />
+			) }
 		</Composite>
 	);
 }
 
-export default BlockPatternList;
+export default forwardRef( BlockPatternList );

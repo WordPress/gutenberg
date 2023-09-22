@@ -80,17 +80,12 @@ interface UserState {
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
 
-interface UserPatternCategory {
+export interface UserPatternCategory {
 	id: number;
 	name: string;
 	label: string;
 	slug: string;
 	description: string;
-}
-
-export interface UserPatternCategories {
-	patternCategories: Array< UserPatternCategory >;
-	patternCategoriesMap: Map< number, UserPatternCategory >;
 }
 
 type Optional< T > = T | undefined;
@@ -278,7 +273,7 @@ export interface GetEntityRecord {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -290,7 +285,7 @@ export interface GetEntityRecord {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -317,7 +312,7 @@ export const getEntityRecord = createSelector(
 	( <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -381,7 +376,7 @@ export const getEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	EntityRecord extends ET.EntityRecord< any >
+	EntityRecord extends ET.EntityRecord< any >,
 >( state: State, kind: string, name: string, key: EntityRecordKey ) {
 	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
@@ -478,7 +473,7 @@ export interface GetEntityRecords {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -489,7 +484,7 @@ export interface GetEntityRecords {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -511,7 +506,7 @@ export interface GetEntityRecords {
 export const getEntityRecords = ( <
 	EntityRecord extends
 		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >
+		| Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -1241,21 +1236,13 @@ export function getBlockPatternCategories( state: State ): Array< any > {
  *
  * @param state Data state.
  *
- * @return User patterns category array and map keyed by id.
+ * @return User patterns category array.
  */
 
 export function getUserPatternCategories(
 	state: State
-): UserPatternCategories {
-	const patternCategoriesMap = new Map< number, UserPatternCategory >();
-	state.userPatternCategories?.forEach(
-		( userCategory: UserPatternCategory ) =>
-			patternCategoriesMap.set( userCategory.id, userCategory )
-	);
-	return {
-		patternCategories: state.userPatternCategories,
-		patternCategoriesMap,
-	};
+): Array< UserPatternCategory > {
+	return state.userPatternCategories;
 }
 
 /**

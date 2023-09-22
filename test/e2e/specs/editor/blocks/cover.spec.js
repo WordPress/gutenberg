@@ -40,9 +40,8 @@ test.describe( 'Cover', () => {
 		await expect( blackColorSwatch ).toBeVisible();
 
 		// Get the RGB value of Black.
-		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
-			coverBlock
-		);
+		const [ blackRGB ] =
+			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
@@ -120,7 +119,7 @@ test.describe( 'Cover', () => {
 		// Activate the paragraph block inside the Cover block.
 		// The name of the block differs depending on whether text has been entered or not.
 		const coverBlockParagraph = coverBlock.getByRole( 'document', {
-			name: /Paragraph block|Empty block; start writing or type forward slash to choose a block/,
+			name: /Block: Paragraph|Empty block; start writing or type forward slash to choose a block/,
 		} );
 		await expect( coverBlockParagraph ).toBeEditable();
 

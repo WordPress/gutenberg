@@ -7,7 +7,13 @@
 			{
 				"docs/getting-started/devenv/README.md": [
 					{
-						"docs/getting-started/devenv/docker-ubuntu.md": []
+						"docs/getting-started/devenv/nodejs-development-environment.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-wp-env.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-wp-now.md": []
 					}
 				]
 			},

@@ -2,11 +2,16 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import downloadjs from 'downloadjs';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
  */
-import { BlockPreview } from '@wordpress/block-editor';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -38,15 +43,23 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
  */
 import RenameMenuItem from './rename-menu-item';
 import DuplicateMenuItem from './duplicate-menu-item';
-import { PATTERNS, TEMPLATE_PARTS, USER_PATTERNS, SYNC_TYPES } from './utils';
+import {
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_SYNC_TYPES,
+} from '../../utils/constants';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 
 function GridItem( { categoryId, item, ...props } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const { __experimentalDeleteReusableBlock } =
@@ -54,9 +67,9 @@ function GridItem( { categoryId, item, ...props } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const isUserPattern = item.type === USER_PATTERNS;
-	const isNonUserPattern = item.type === PATTERNS;
-	const isTemplatePart = item.type === TEMPLATE_PARTS;
+	const isUserPattern = item.type === PATTERN_TYPES.user;
+	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -97,6 +110,20 @@ function GridItem( { categoryId, item, ...props } ) {
 	};
 	const deleteItem = () =>
 		isTemplatePart ? removeTemplate( item ) : deletePattern();
+	const exportAsJSON = () => {
+		const json = {
+			__file: item.type,
+			title: item.title || item.name,
+			content: item.patternBlock.content.raw,
+			syncStatus: item.patternBlock.wp_pattern_sync_status,
+		};
+
+		return downloadjs(
+			JSON.stringify( json, null, 2 ),
+			`${ kebabCase( item.title || item.name ) }.json`,
+			'application/json'
+		);
+	};
 
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isCustomPattern =
@@ -123,7 +150,8 @@ function GridItem( { categoryId, item, ...props } ) {
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
 	} else {
-		itemIcon = item.syncStatus === SYNC_TYPES.full ? symbol : undefined;
+		itemIcon =
+			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
 
 	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
@@ -132,8 +160,12 @@ function GridItem( { categoryId, item, ...props } ) {
 		: sprintf(
 				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
 				__( 'Are you sure you want to delete "%s"?' ),
-				item.title
+				item.title || item.name
 		  );
+
+	const additionalStyles = ! backgroundColor
+		? [ { css: 'body { background: #fff; }' } ]
+		: undefined;
 
 	return (
 		<li className={ patternClassNames }>
@@ -143,8 +175,12 @@ function GridItem( { categoryId, item, ...props } ) {
 				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
 				{ ...props }
-				onClick={ item.type !== PATTERNS ? onClick : undefined }
-				aria-disabled={ item.type !== PATTERNS ? 'false' : 'true' }
+				onClick={
+					item.type !== PATTERN_TYPES.theme ? onClick : undefined
+				}
+				aria-disabled={
+					item.type !== PATTERN_TYPES.theme ? 'false' : 'true'
+				}
 				aria-label={ item.title }
 				aria-describedby={
 					ariaDescriptions.length
@@ -159,7 +195,12 @@ function GridItem( { categoryId, item, ...props } ) {
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+				{ ! isEmpty && (
+					<BlockPreview
+						blocks={ item.blocks }
+						additionalStyles={ additionalStyles }
+					/>
+				) }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
 				<div
@@ -182,7 +223,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				>
 					{ itemIcon && ! isNonUserPattern && (
 						<Tooltip
-							position="top center"
+							placement="top"
 							text={ __(
 								'Editing this pattern will also update anywhere it is used'
 							) }
@@ -194,7 +235,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						</Tooltip>
 					) }
 					<Flex as="span" gap={ 0 } justify="left">
-						{ item.type === PATTERNS ? (
+						{ item.type === PATTERN_TYPES.theme ? (
 							item.title
 						) : (
 							<Heading level={ 5 }>
@@ -205,13 +246,13 @@ function GridItem( { categoryId, item, ...props } ) {
 									// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 									tabIndex="-1"
 								>
-									{ item.title }
+									{ item.title || item.name }
 								</Button>
 							</Heading>
 						) }
-						{ item.type === PATTERNS && (
+						{ item.type === PATTERN_TYPES.theme && (
 							<Tooltip
-								position="top center"
+								placement="top"
 								text={ __( 'This pattern cannot be edited.' ) }
 							>
 								<Icon
@@ -251,6 +292,12 @@ function GridItem( { categoryId, item, ...props } ) {
 								onClose={ onClose }
 								label={ __( 'Duplicate' ) }
 							/>
+							{ item.type === PATTERN_TYPES.user && (
+								<MenuItem onClick={ () => exportAsJSON() }>
+									{ __( 'Export as JSON' ) }
+								</MenuItem>
+							) }
+
 							{ isCustomPattern && (
 								<MenuItem
 									isDestructive={ ! hasThemeFile }

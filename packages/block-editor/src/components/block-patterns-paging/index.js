@@ -16,7 +16,7 @@ export default function Pagination( {
 	totalItems,
 } ) {
 	return (
-		<VStack>
+		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<Text variant="muted">
 				{
 					// translators: %s: Total number of patterns.

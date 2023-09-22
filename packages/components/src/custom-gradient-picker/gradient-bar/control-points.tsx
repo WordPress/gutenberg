@@ -93,7 +93,7 @@ function GradientColorPickerDropdown( {
 			( {
 				placement: 'bottom',
 				offset: 8,
-			} as const ),
+			} ) as const,
 		[]
 	);
 

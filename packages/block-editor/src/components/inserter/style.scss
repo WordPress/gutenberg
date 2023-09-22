@@ -299,13 +299,10 @@ $block-inserter-tabs-height: 44px;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
 	position: absolute;
-	padding: $grid-unit-40 $grid-unit-30;
 	top: 0;
 	left: 0;
 	height: 100%;
 	width: 100%;
-	overflow-y: auto;
-	scrollbar-gutter: stable both-edges;
 
 	@include break-medium {
 		left: 100%;
@@ -314,7 +311,10 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-block-patterns-list {
-		margin-top: $grid-unit-30;
+		overflow-y: auto;
+		flex-grow: 1;
+		height: 100%;
+		padding: $grid-unit-40 $grid-unit-30;
 	}
 }
 
@@ -331,9 +331,17 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-category-panel {
 	padding: 0 $grid-unit-20;
-
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 	@include break-medium {
 		padding: 0;
+	}
+	.block-editor-inserter__patterns-category-panel-header {
+		padding: 16px $grid-unit-30;
+	}
+	.block-editor-inserter__patterns-category-no-results {
+		margin-top: $grid-unit-30;
 	}
 }
 
