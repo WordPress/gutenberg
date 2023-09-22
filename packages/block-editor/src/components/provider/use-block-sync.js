@@ -111,9 +111,7 @@ export default function useBlockSync( {
 			// before the actual blocks get set properly in state.
 			registry.batch( () => {
 				setHasControlledInnerBlocks( clientId, true );
-				const storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlock( block )
-				);
+				const storeBlocks = controlledBlocks.map( ( block ) => block );
 				if ( subscribed.current ) {
 					pendingChanges.current.incoming = storeBlocks;
 				}
