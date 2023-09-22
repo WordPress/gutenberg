@@ -31,10 +31,14 @@ export const settings = {
 		const customName = attributes?.metadata?.name;
 
 		if ( context === 'list-view' && customName ) {
-			return attributes?.metadata?.name;
+			return customName;
 		}
 
 		if ( context === 'accessibility' ) {
+			if ( customName ) {
+				return customName;
+			}
+
 			const { content } = attributes;
 			return ! content || content.length === 0 ? __( 'Empty' ) : content;
 		}
