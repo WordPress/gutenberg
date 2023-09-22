@@ -268,13 +268,6 @@ export function BlockPatternsCategoryPanel( {
 		scrollContainerRef
 	);
 
-	useEffect(
-		function scrollToTopOnCategoryChange() {
-			scrollContainerRef.current?.scrollTo( 0, 0 );
-		},
-		[ category.name ]
-	);
-
 	// Hide block pattern preview on unmount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
