@@ -49,8 +49,7 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"layout": true,
-		"__experimentalMetadata": true
+		"layout": true
 	},
 	"editorStyle": "wp-block-query-editor",
 	"style": "wp-block-query",
