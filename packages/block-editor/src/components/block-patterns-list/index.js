@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -25,7 +25,6 @@ import { Icon, symbol } from '@wordpress/icons';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
-import usePatternsPaging from '../inserter/hooks/use-patterns-paging';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -144,31 +143,18 @@ function BlockPatternPlaceholder() {
 
 function BlockPatternList( {
 	isDraggable,
+	blockPatterns,
+	shownPatterns,
 	onHover,
 	onClickPattern,
 	orientation,
 	label = __( 'Block Patterns' ),
 	showTitlesAsTooltip,
-	currentCategoryPatterns,
-	category,
-	patternFilter,
+	pagingProps,
 } ) {
 	const composite = useCompositeState( { orientation } );
-	const container = useRef();
-	const pagingProps = usePatternsPaging(
-		currentCategoryPatterns,
-		category,
-		container,
-		patternFilter
-	);
-	const {
-		categoryPatternsAsyncList: shownPatterns,
-		categoryPatterns: blockPatterns,
-	} = pagingProps;
-
 	return (
 		<Composite
-			ref={ container }
 			{ ...composite }
 			role="listbox"
 			className="block-editor-block-patterns-list"
@@ -190,7 +176,7 @@ function BlockPatternList( {
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
-			{ pagingProps.numPages > 1 && (
+			{ pagingProps && pagingProps.numPages > 1 && (
 				<BlockPatternsPaging { ...pagingProps } />
 			) }
 		</Composite>

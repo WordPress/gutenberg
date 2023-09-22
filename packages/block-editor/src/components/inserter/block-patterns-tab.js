@@ -31,6 +31,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import usePatternsPaging from './hooks/use-patterns-paging';
 import {
 	BlockPatternsSyncFilter,
 	SYNC_TYPES,
@@ -261,6 +262,12 @@ export function BlockPatternsCategoryPanel( {
 		]
 	);
 
+	const pagingProps = usePatternsPaging(
+		currentCategoryPatterns,
+		category,
+		container
+	);
+
 	// Hide block pattern preview on unmount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
@@ -302,15 +309,17 @@ export function BlockPatternsCategoryPanel( {
 
 			{ currentCategoryPatterns.length > 0 && (
 				<BlockPatternList
-					currentCategoryPatterns={ currentCategoryPatterns }
-					category={ category }
+					shownPatterns={ pagingProps.categoryPatternsAsyncList }
+					blockPatterns={ pagingProps.categoryPatterns }
 					onClickPattern={ onClickPattern }
 					onHover={ onHover }
 					label={ category.label }
 					orientation="vertical"
+					category={ category.name }
 					isDraggable
 					showTitlesAsTooltip={ showTitlesAsTooltip }
 					patternFilter={ patternSourceFilter }
+					pagingProps={ pagingProps }
 				/>
 			) }
 		</div>
