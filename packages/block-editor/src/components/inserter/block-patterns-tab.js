@@ -278,7 +278,10 @@ export function BlockPatternsCategoryPanel( {
 			className="block-editor-inserter__patterns-category-panel"
 			ref={ container }
 		>
-			<VStack spacing={ 2 }>
+			<VStack
+				spacing={ 2 }
+				className="block-editor-inserter__patterns-category-panel-header"
+			>
 				<HStack>
 					<FlexBlock>
 						<Heading level={ 4 } as="div">
