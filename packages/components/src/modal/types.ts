@@ -104,7 +104,7 @@ export type ModalProps = {
 	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
 	 * modal's contents, or using the `style` prop to set a specific `max-width`.
 	 */
-	contentWidth?: 'small' | 'medium' | 'large';
+	contentWidth?: 'small' | 'medium' | 'large' | 'fill';
 	/**
 	 *  Handle the key down on the modal frame `div`.
 	 */
