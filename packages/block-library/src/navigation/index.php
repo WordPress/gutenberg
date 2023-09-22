@@ -813,6 +813,8 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  * Ensure that the view script has the `wp-interactivity` dependency.
  *
  * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
  */
 function block_core_navigation_ensure_interactivity_dependency() {
 	global $wp_scripts;

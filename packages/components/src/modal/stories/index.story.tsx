@@ -28,7 +28,8 @@ const meta: Meta< typeof Modal > = {
 			control: { type: null },
 		},
 		focusOnMount: {
-			control: { type: 'boolean' },
+			options: [ true, false, 'firstElement', 'firstContentElement' ],
+			control: { type: 'select' },
 		},
 		role: {
 			control: { type: 'text' },

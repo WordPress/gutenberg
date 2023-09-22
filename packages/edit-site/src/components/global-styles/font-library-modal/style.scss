@@ -1,4 +1,14 @@
 .font-library-modal {
+	// @todo: If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
 	.components-modal__header {
 		border-bottom: none;
 	}

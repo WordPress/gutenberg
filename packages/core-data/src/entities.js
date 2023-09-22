@@ -400,7 +400,9 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
-			registerSyncConfigs( configs );
+			if ( window.__experimentalEnableSync ) {
+				registerSyncConfigs( configs );
+			}
 			return configs;
 		}
 
@@ -412,7 +414,9 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
-		registerSyncConfigs( configs );
+		if ( window.__experimentalEnableSync ) {
+			registerSyncConfigs( configs );
+		}
 		dispatch( addEntities( configs ) );
 
 		return configs;
