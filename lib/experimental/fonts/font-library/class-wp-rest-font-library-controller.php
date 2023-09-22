@@ -325,7 +325,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				'rest_cannot_write_fonts_folder',
 				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
 				array(
-					'status' => 403,
+					'status' => 550,
 				)
 			);
 		}
