@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -17,31 +17,13 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory, isPatternFiltered } from '../block-patterns-tab';
-import { BlockPatternsSyncFilter } from '../block-patterns-sync-filter';
-import {
-	PATTERN_TYPES,
-	PATTERN_SOURCE_FILTERS,
-} from '../block-patterns-source-filter';
+import { allPatternsCategory } from '../block-patterns-tab';
 
-function PatternsListHeader( {
-	filterValue,
-	filteredBlockPatternsLength,
-	selectedCategory,
-	patternCategories,
-} ) {
+function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
 		return null;
 	}
-	let filter = filterValue;
-	if ( selectedCategory !== allPatternsCategory.name ) {
-		const category = patternCategories.find(
-			( patternCategory ) => patternCategory.name === selectedCategory
-		);
-		if ( category ) {
-			filter = `${ filter } - ${ category?.label }`;
-		}
-	}
+
 	return (
 		<Heading
 			level={ 2 }
@@ -49,26 +31,19 @@ function PatternsListHeader( {
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
-				/* translators: %d: number of patterns. %s: block pattern search query */
+				/* translators: %d: number of patterns. */
 				_n(
-					'%1$d pattern found for "%2$s"',
-					'%1$d patterns found for "%2$s"',
+					'%d pattern found',
+					'%d patterns found',
 					filteredBlockPatternsLength
 				),
-				filteredBlockPatternsLength,
-				filter
+				filteredBlockPatternsLength
 			) }
 		</Heading>
 	);
 }
 
-function PatternList( {
-	searchValue,
-	patternSourceFilter,
-	selectedCategory,
-	patternCategories,
-} ) {
-	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
+function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -89,16 +64,6 @@ function PatternList( {
 
 	const filteredBlockPatterns = useMemo( () => {
 		const filteredPatterns = patterns.filter( ( pattern ) => {
-			if (
-				isPatternFiltered(
-					pattern,
-					patternSourceFilter,
-					patternSyncFilter
-				)
-			) {
-				return false;
-			}
-
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
@@ -119,18 +84,12 @@ function PatternList( {
 			return filteredPatterns;
 		}
 
-		return searchItems(
-			filteredPatterns,
-			searchValue,
-			patternSourceFilter
-		);
+		return searchItems( filteredPatterns, searchValue );
 	}, [
 		searchValue,
-		patternSourceFilter,
 		patterns,
 		selectedCategory,
 		registeredPatternCategories,
-		patternSyncFilter,
 	] );
 
 	// Announce search results on change.
@@ -150,8 +109,7 @@ function PatternList( {
 	const pagingProps = usePatternsPaging(
 		filteredBlockPatterns,
 		selectedCategory,
-		container,
-		patternSourceFilter
+		container
 	);
 
 	const hasItems = !! filteredBlockPatterns?.length;
@@ -161,23 +119,11 @@ function PatternList( {
 			ref={ container }
 		>
 			<PatternsListHeader
-				filterValue={
-					searchValue || PATTERN_SOURCE_FILTERS[ patternSourceFilter ]
-				}
+				filterValue={ searchValue }
 				filteredBlockPatternsLength={ filteredBlockPatterns.length }
-				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
 			/>
 
 			<InserterListbox>
-				{ patternSourceFilter === PATTERN_TYPES.user &&
-					! searchValue && (
-						<BlockPatternsSyncFilter
-							patternSyncFilter={ patternSyncFilter }
-							setPatternSyncFilter={ setPatternSyncFilter }
-						/>
-					) }
-
 				{ hasItems && (
 					<BlockPatternsList
 						shownPatterns={ pagingProps.categoryPatternsAsyncList }
