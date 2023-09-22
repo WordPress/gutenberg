@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 export const PATTERN_TYPES = {
 	all: 'all',
@@ -46,19 +46,8 @@ export const SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
-const patternSyncOptions = [
-	{ value: SYNC_TYPES.all, label: __( 'All' ) },
-	{
-		value: SYNC_TYPES.full,
-		label: __( 'Synced' ),
-		info: __( 'Updated everywhere' ),
-	},
-	{
-		value: SYNC_TYPES.unsynced,
-		label: __( 'Standard' ),
-		info: __( 'Edit freely' ),
-	},
-];
+const getShouldDisableSyncFilter = ( sourceFilter ) =>
+	sourceFilter !== PATTERN_TYPES.all && sourceFilter !== PATTERN_TYPES.user;
 
 export function BlockPatternsSyncFilter( {
 	setPatternSyncFilter,
@@ -67,29 +56,35 @@ export function BlockPatternsSyncFilter( {
 	patternSourceFilter,
 	scrollContainerRef,
 } ) {
-	const [ patternSyncMenuOptions, setPatternSyncMenuOptions ] =
-		useState( patternSyncOptions );
+	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
+	// otherwise applying them will just result in no patterns being shown.
+	const shouldDisableSyncFilter =
+		getShouldDisableSyncFilter( patternSourceFilter );
+
+	const patternSyncMenuOptions = useMemo(
+		() => [
+			{ value: SYNC_TYPES.all, label: __( 'All' ) },
+			{
+				value: SYNC_TYPES.full,
+				label: __( 'Synced' ),
+				info: __( 'Updated everywhere' ),
+				disabled: shouldDisableSyncFilter,
+			},
+			{
+				value: SYNC_TYPES.unsynced,
+				label: __( 'Standard' ),
+				info: __( 'Edit freely' ),
+				disabled: shouldDisableSyncFilter,
+			},
+		],
+		[ shouldDisableSyncFilter ]
+	);
 
 	function handleSetSourceFilterChange( newSourceFilter ) {
 		setPatternSourceFilter( newSourceFilter );
-		// We need to disable the sync filter option if the source filter is not 'all' or 'user'
-		// otherwise applying them will just result in no patterns being shown.
-		if (
-			newSourceFilter !== PATTERN_TYPES.all &&
-			newSourceFilter !== PATTERN_TYPES.user
-		) {
-			setPatternSyncMenuOptions(
-				patternSyncOptions.map( ( item ) => {
-					if ( item.value !== SYNC_TYPES.all ) {
-						return { ...item, disabled: true };
-					}
-					return item;
-				} )
-			);
+		if ( getShouldDisableSyncFilter( newSourceFilter ) ) {
 			setPatternSyncFilter( SYNC_TYPES.all );
-			return;
 		}
-		setPatternSyncMenuOptions( patternSyncOptions );
 	}
 
 	return (
