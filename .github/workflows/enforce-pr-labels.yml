@@ -10,7 +10,7 @@ jobs:
         steps:
             - uses: mheap/github-action-required-labels@v5
               with:
-                  mode: exactly
+                  mode: minimum
                   count: 1
                   labels: '[Type] Accessibility (a11y), [Type] Automated Testing, [Type] Breaking Change, [Type] Bug, [Type] Build Tooling, [Type] Code Quality, [Type] Copy, [Type] Developer Documentation, [Type] Enhancement, [Type] Experimental, [Type] Feature, [Type] New API, [Type] Task, [Type] Performance, [Type] Project Management, [Type] Regression, [Type] Security, [Type] WP Core Ticket, Backport from WordPress Core'
                   add_comment: true
