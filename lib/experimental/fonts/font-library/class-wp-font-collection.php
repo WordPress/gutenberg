@@ -51,8 +51,8 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config name is required as a non-empty string.' );
 		}
 
-		if ( empty( $config['data_json_file'] ) || ! is_string( $config['data_json_file'] ) ) {
-			throw new Exception( 'Font Collection config "data_json_file" option is required as a non-empty string.' );
+		if ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) {
+			throw new Exception( 'Font Collection config "src" option is required as a non-empty string.' );
 		}
 
 		$this->config = $config;
@@ -78,18 +78,35 @@ class WP_Font_Collection {
 	 *                        else an instance of WP_Error on failure.
 	 */
 	public function get_data() {
-		if ( ! file_exists( $this->config['data_json_file'] ) ) {
-			return new WP_Error( 'font_collection_file_error', __( 'Font Collection data JSON file does not exist.', 'gutenberg' ) );
-		}
+		// If the src is a URL, fetch the data from the URL.
+		if ( false !== strpos( $this->config['src'], 'http' ) && false !== strpos( $this->config['src'], '://' ) ) {
+			if ( ! wp_http_validate_url( $this->config['src'] ) ) {
+				return new WP_Error( 'font_collection_read_error', __( 'Invalid URL for Font Collection data.', 'gutenberg' ) );
+			}
 
-		$data = wp_json_file_decode( $this->config['data_json_file'], array( 'associative' => true ) );
-		if ( empty( $data ) ) {
-			return new WP_Error( 'font_collection_read_error', __( 'Error reading the Font Collection data JSON file contents.', 'gutenberg' ) );
+			$response = wp_remote_get( $this->config['src'] );
+			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				return new WP_Error( 'font_collection_read_error', __( 'Error fetching the Font Collection data from a URL.', 'gutenberg' ) );
+			}
+
+			$data = json_decode( wp_remote_retrieve_body( $response ), true );
+			if ( empty( $data ) ) {
+				return new WP_Error( 'font_collection_read_error', __( 'Error decoding the Font Collection data from the REST response JSON.', 'gutenberg' ) );
+			}
+			// If the src is a file path, read the data from the file.
+		} else {
+			if ( ! file_exists( $this->config['src'] ) ) {
+				return new WP_Error( 'font_collection_read_error', __( 'Font Collection data JSON file does not exist.', 'gutenberg' ) );
+			}
+			$data = wp_json_file_decode( $this->config['src'], array( 'associative' => true ) );
+			if ( empty( $data ) ) {
+				return new WP_Error( 'font_collection_read_error', __( 'Error reading the Font Collection data JSON file contents.', 'gutenberg' ) );
+			}
 		}
 
 		$collection_data         = $this->get_config();
 		$collection_data['data'] = $data;
-		unset( $collection_data['data_json_file'] );
+		unset( $collection_data['src'] );
 		return $collection_data;
 	}
 }

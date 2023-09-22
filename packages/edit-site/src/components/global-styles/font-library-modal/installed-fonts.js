@@ -110,12 +110,12 @@ function InstalledFonts() {
 									/>
 								) ) }
 							</FontsGrid>
+							<Spacer margin={ 8 } />
 						</>
 					) }
 
 					{ baseThemeFonts.length > 0 && (
 						<>
-							<Spacer margin={ 8 } />
 							<FontsGrid title={ __( 'Theme Fonts' ) }>
 								{ baseThemeFonts.map( ( font ) => (
 									<LibraryFontCard

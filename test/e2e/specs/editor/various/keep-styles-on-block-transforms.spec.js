@@ -54,7 +54,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
-		await page.click( 'role=button[name="Paragraph"i]' );
+		await page.click( 'role=button[name="Multiple blocks selected"i]' );
 		await page.click( 'role=menuitem[name="Heading"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

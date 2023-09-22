@@ -47,7 +47,7 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *     Font collection associative array of configuration options.
 	 *
 	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $data_json_file The font collection's data JSON file.
+	 *     @type string $src The font collection's data JSON file.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
@@ -65,10 +65,10 @@ add_action(
 );
 
 $default_font_collection = array(
-	'id'             => 'default-font-collection',
-	'name'           => 'Google Fonts',
-	'description'    => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'data_json_file' => path_join( __DIR__, 'default-font-collection.json' ),
+	'id'          => 'default-font-collection',
+	'name'        => 'Google Fonts',
+	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+	'src'         => 'https://raw.githubusercontent.com/WordPress/google-fonts-to-wordpress-collection/main/output/google-fonts-with-previews.json',
 );
 
 wp_register_font_collection( $default_font_collection );

@@ -10,6 +10,11 @@ import { useDebounce } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 
+/**
+ * Internal dependencies
+ */
+import { PATTERN_TYPES } from '../../../utils/constants';
+
 export const unescapeString = ( arg ) => {
 	return decodeEntities( arg );
 };
@@ -171,7 +176,7 @@ export default function PatternCategories( { post } ) {
 	}
 
 	function onUpdateTerms( newTermIds ) {
-		editEntityRecord( 'postType', 'wp_block', post.id, {
+		editEntityRecord( 'postType', PATTERN_TYPES.user, post.id, {
 			wp_pattern_category: newTermIds,
 		} );
 	}
