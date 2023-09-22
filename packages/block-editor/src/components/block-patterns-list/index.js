@@ -151,13 +151,15 @@ function BlockPatternList( {
 	showTitlesAsTooltip,
 	currentCategoryPatterns,
 	category,
+	patternFilter,
 } ) {
 	const composite = useCompositeState( { orientation } );
 	const container = useRef();
 	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
 		category,
-		container
+		container,
+		patternFilter
 	);
 	const {
 		categoryPatternsAsyncList: shownPatterns,
