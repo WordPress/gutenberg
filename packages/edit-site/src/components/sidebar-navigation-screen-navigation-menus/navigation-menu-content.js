@@ -98,6 +98,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		<>
 			{ ! isLoading && (
 				<PrivateListView
+					dropIndicatorClassName="edit-site-sidebar-navigation-screen-navigation-menus__list-view-drop-indicator"
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }

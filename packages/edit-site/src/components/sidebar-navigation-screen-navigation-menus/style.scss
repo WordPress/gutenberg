@@ -99,3 +99,10 @@
 .edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor {
 	display: none;
 }
+
+
+.edit-site-sidebar-navigation-screen-navigation-menus__list-view-drop-indicator {
+	.block-editor-list-view-drop-indicator__line {
+		border: 1px solid $gray-900 !important;
+	}
+}

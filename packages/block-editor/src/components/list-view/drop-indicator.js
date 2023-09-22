@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
@@ -7,6 +12,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 export default function ListViewDropIndicator( {
+	dropIndicatorClassName,
 	listViewRef,
 	blockDropTarget,
 } ) {
@@ -243,7 +249,10 @@ export default function ListViewDropIndicator( {
 			animate={ false }
 			anchor={ popoverAnchor }
 			focusOnMount={ false }
-			className="block-editor-list-view-drop-indicator"
+			className={ classnames(
+				'block-editor-list-view-drop-indicator',
+				dropIndicatorClassName
+			) }
 			variant="unstyled"
 		>
 			<div

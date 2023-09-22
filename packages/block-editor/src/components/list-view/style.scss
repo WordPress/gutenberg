@@ -4,6 +4,10 @@
 	padding: 0;
 	margin: 0;
 
+	* {
+		box-sizing: border-box;
+	}
+
 	// Move upwards when in modal.
 	.components-modal__content & {
 		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
@@ -431,8 +435,10 @@ $block-navigation-max-indent: 8;
 	pointer-events: none;
 
 	.block-editor-list-view-drop-indicator__line {
+		box-sizing: border-box;
 		background: var(--wp-admin-theme-color);
-		height: 4px;
+		height: 6px;
+		border: 1px solid $white;
 		border-radius: 4px;
 	}
 }
