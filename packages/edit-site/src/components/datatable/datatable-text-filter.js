@@ -38,7 +38,7 @@ export default function DataTableTextFilter( {
 			value={ search }
 			label={ searchLabel }
 			placeholder={ searchLabel }
-			size='compact'
+			size="compact"
 		/>
 	);
 }

@@ -6,7 +6,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
@@ -37,9 +37,7 @@ function TemplateTitle( props ) {
 	const template = props.row.original;
 	const { isCustomized } = useAddedBy( template.type, template.id );
 	return (
-		<VStack
-			spacing={ 1 }
-		>
+		<VStack spacing={ 1 }>
 			<Heading as="h3" level={ 5 }>
 				<Link
 					params={ {
@@ -52,7 +50,12 @@ function TemplateTitle( props ) {
 				</Link>
 			</Heading>
 			{ isCustomized && (
-				<Text variant="muted" size={ 12 } lineHeight={ "16px" } className="edit-site-list-added-by__customized-info">
+				<Text
+					variant="muted"
+					size={ 12 }
+					lineHeight={ '16px' }
+					className="edit-site-list-added-by__customized-info"
+				>
 					{ template.type === 'wp_template'
 						? _x( 'Customized', 'template' )
 						: _x( 'Customized', 'template part' ) }
@@ -143,9 +146,7 @@ export default function PageTemplates() {
 								isTemplateRevertable( template ),
 						} }
 					>
-						<VStack
-							spacing={ 4 }
-						>
+						<VStack spacing={ 4 }>
 							<HStack justify="space-between">
 								<DataTableGlobalSearchInput />
 								<DataTableActions
