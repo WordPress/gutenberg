@@ -18,11 +18,15 @@ import { WebrtcProvider } from 'y-webrtc';
  * @return {Promise<() => void>} Promise that resolves when the connection is established.
  */
 export function connectWebRTC( objectId, objectType, doc ) {
-	const docName = `${ objectType }-${ objectId }`;
-	new WebrtcProvider( docName, doc, {
-		// @ts-ignore
-		password: window.__experimentalCollaborativeEditingSecret,
-	} );
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		const docName = `${ objectType }-${ objectId }`;
+		new WebrtcProvider( docName, doc, {
+			// @ts-ignore
+			password: window.__experimentalCollaborativeEditingSecret,
+		} );
 
-	return Promise.resolve( () => true );
+		return Promise.resolve( () => true );
+	}
+
+	return Promise.resolve( () => {} );
 }
