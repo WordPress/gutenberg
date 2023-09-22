@@ -289,6 +289,7 @@ export function BlockPatternsCategoryPanel( {
 						patternSourceFilter={ patternSourceFilter }
 						setPatternSyncFilter={ setPatternSyncFilter }
 						setPatternSourceFilter={ setPatternSourceFilter }
+						scrollContainerRef={ scrollContainerRef }
 					/>
 				</HStack>
 				{ category.description && (

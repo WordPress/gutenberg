@@ -65,6 +65,7 @@ export function BlockPatternsSyncFilter( {
 	setPatternSourceFilter,
 	patternSyncFilter,
 	patternSourceFilter,
+	scrollContainerRef,
 } ) {
 	const [ patternSyncMenuOptions, setPatternSyncMenuOptions ] =
 		useState( patternSyncOptions );
@@ -124,6 +125,10 @@ export function BlockPatternsSyncFilter( {
 								choices={ patternSourceOptions }
 								onSelect={ ( value ) => {
 									handleSetSourceFilterChange( value );
+									scrollContainerRef.current?.scrollTo(
+										0,
+										0
+									);
 								} }
 								value={ patternSourceFilter }
 							/>
@@ -133,6 +138,10 @@ export function BlockPatternsSyncFilter( {
 								choices={ patternSyncMenuOptions }
 								onSelect={ ( value ) => {
 									setPatternSyncFilter( value );
+									scrollContainerRef.current?.scrollTo(
+										0,
+										0
+									);
 								} }
 								value={ patternSyncFilter }
 							/>
