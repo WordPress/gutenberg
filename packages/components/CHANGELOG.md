@@ -7,6 +7,11 @@
 -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
 -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
 
+### Internal
+
+-   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+-   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements
