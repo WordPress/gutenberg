@@ -819,11 +819,9 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 				// Delta (which is disabled) has focus
-				await waitFor( () =>
-					expect(
-						screen.getByRole( 'tab', { name: 'Delta' } )
-					).toHaveFocus()
-				);
+				expect(
+					screen.getByRole( 'tab', { name: 'Delta' } )
+				).toHaveFocus();
 
 				// Alpha retains the selection, even if it's not focused.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -859,7 +857,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should select first enabled tab when the tab associated to `initialTabId` is disabled', async () => {
-				const TABS_ONLY_BETA_ENABLED = TABS.map( ( tabObj ) =>
+				const TABS_ONLY_GAMMA_ENABLED = TABS.map( ( tabObj ) =>
 					tabObj.id !== 'gamma'
 						? {
 								...tabObj,
@@ -872,7 +870,7 @@ describe( 'Tabs', () => {
 				);
 				const { rerender } = render(
 					<UncontrolledTabs
-						tabs={ TABS_ONLY_BETA_ENABLED }
+						tabs={ TABS_ONLY_GAMMA_ENABLED }
 						initialTabId="beta"
 					/>
 				);
@@ -1006,7 +1004,7 @@ describe( 'Tabs', () => {
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
-		it( 'should not render any tab if `selectedTabId` refers to an disabled tab', async () => {
+		it( 'should not render any tab if `selectedTabId` refers to a disabled tab', async () => {
 			const TABS_WITH_DELTA_WITH_BETA_DISABLED = TABS_WITH_DELTA.map(
 				( tabObj ) =>
 					tabObj.id === 'beta'
@@ -1037,7 +1035,7 @@ describe( 'Tabs', () => {
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 		describe( 'Without `initialTabId` prop', () => {
-			it( 'should render the tab specified by the `specifiedTabId` prop', async () => {
+			it( 'should render the tab specified by the `selectedTabId` prop', async () => {
 				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
@@ -1050,7 +1048,7 @@ describe( 'Tabs', () => {
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
-				// Remove
+				// Remove beta
 				rerender(
 					<ControlledTabs
 						tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
