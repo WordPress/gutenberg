@@ -144,14 +144,20 @@ function UnforwardedModal(
 
 	const dismissers = useContext( context );
 	const isLevel0 = dismissers === level0Dismissers;
+	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
 
 	// Updates the stack tracking open modals at this level and calls
-	// onRequestClose for the prior modal if applicable.
+	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
 		dismissers.push( refOnRequestClose );
 		const [ first, second ] = dismissers;
 		if ( second ) first?.current?.();
-		return () => void dismissers.shift();
+
+		const nested = nestedDismissers.current;
+		return () => {
+			nested[ 0 ]?.current?.();
+			dismissers.shift();
+		};
 	}, [ dismissers ] );
 
 	// Adds/removes the value of bodyOpenClassName to body element.
@@ -344,10 +350,8 @@ function UnforwardedModal(
 		</div>
 	);
 
-	const nextLevelDismissers = useRef( [] );
-
 	return createPortal(
-		<context.Provider value={ nextLevelDismissers.current }>
+		<context.Provider value={ nestedDismissers.current }>
 			{ modal }
 		</context.Provider>,
 		document.body
