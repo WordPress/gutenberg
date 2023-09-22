@@ -8,12 +8,14 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { wordpress, category, media } from '@wordpress/icons';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TabPanel from '..';
 import cleanupTooltip from '../../tooltip/test/utils';
+import type { TabPanelProps } from '../types';
 
 const TABS = [
 	{
@@ -33,16 +35,44 @@ const TABS = [
 	},
 ];
 
+const UncontrolledTabPanel = ( { tabName, ...props }: TabPanelProps ) => {
+	return <TabPanel { ...props } />;
+};
+
+const ControlledTabPanel = ( {
+	tabName,
+	onSelect,
+	...props
+}: TabPanelProps ) => {
+	const [ value, setValue ] = useState( tabName );
+	const handleOnSelect: TabPanelProps[ 'onSelect' ] = ( newValue ) => {
+		setValue( newValue );
+		onSelect?.( newValue );
+	};
+
+	useEffect( () => {
+		setValue( tabName );
+	}, [ tabName ] );
+
+	return (
+		<>
+			<TabPanel
+				{ ...props }
+				tabName={ value }
+				onSelect={ handleOnSelect }
+			/>
+		</>
+	);
+};
+
 const getSelectedTab = async () =>
 	await screen.findByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
 
 describe.each( [
-	[ 'uncontrolled', TabPanel ],
-	// The controlled component tests will be added once we certify the
-	// uncontrolled component's behaviour on trunk.
-	// [ 'controlled', TabPanel ],
+	[ 'uncontrolled', UncontrolledTabPanel ],
+	[ 'controlled', ControlledTabPanel ],
 ] )( 'TabPanel %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
@@ -384,6 +414,85 @@ describe.each( [
 		} );
 	} );
 
+	describe( 'With `tabName`', () => {
+		it( 'should render the tab set by tabName prop', async () => {
+			render(
+				<Component
+					tabName="beta"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			let expectedTab = 'Alpha';
+			if ( Component === ControlledTabPanel ) {
+				expectedTab = 'Beta';
+			}
+			expect( await getSelectedTab() ).toHaveTextContent( expectedTab );
+		} );
+
+		it( 'should render the tab set by tabName prop when tabName and initialTabName are set', async () => {
+			render(
+				<Component
+					initialTabName="gamma"
+					tabName="beta"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			let expectedTab = 'Gamma';
+			if ( Component === ControlledTabPanel ) {
+				expectedTab = 'Beta';
+			}
+			expect( await getSelectedTab() ).toHaveTextContent( expectedTab );
+		} );
+
+		it( 'should not select a tab when `tabName` does not match any known tab', () => {
+			render(
+				<Component
+					initialTabName="does-not-exist"
+					tabName="does-not-exist"
+					tabs={ TABS }
+					children={ () => undefined }
+				/>
+			);
+
+			// No tab should be selected i.e. it doesn't fall back to first tab.
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
+
+			// No tabpanel should be rendered either
+			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should change tabs when tabName is changed', async () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					tabName="beta"
+					tabs={ TABS }
+					onSelect={ mockOnSelect }
+					children={ () => undefined }
+				/>
+			);
+
+			rerender(
+				<Component
+					tabName="alpha"
+					tabs={ TABS }
+					onSelect={ mockOnSelect }
+					children={ () => undefined }
+				/>
+			);
+
+			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
 	describe( 'Disabled Tab', () => {
 		it( 'should disable the tab when `disabled` is `true`', async () => {
 			const user = userEvent.setup();
@@ -453,7 +562,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', async () => {
+		it( 'should select first enabled tab when the tab associated to `initialTabName` / `tabName` is disabled', async () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
@@ -465,6 +574,7 @@ describe.each( [
 						return { ...tab, disabled: true };
 					} ) }
 					initialTabName="beta"
+					tabName="beta"
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
 				/>
@@ -479,6 +589,7 @@ describe.each( [
 				<Component
 					tabs={ TABS }
 					initialTabName="beta"
+					tabName="beta"
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
 				/>
@@ -533,12 +644,13 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 		} );
 
-		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', async () => {
+		it( 'should select the first enabled tab when the tab associated to `initialTabName` / `tabName` becomes disabled while being the active tab', async () => {
 			const mockOnSelect = jest.fn();
 
 			const { rerender } = render(
 				<Component
 					initialTabName="gamma"
+					tabName="gamma"
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
@@ -552,6 +664,7 @@ describe.each( [
 			rerender(
 				<Component
 					initialTabName="gamma"
+					tabName="gamma"
 					tabs={ [
 						TABS[ 0 ],
 						TABS[ 1 ],
@@ -569,6 +682,7 @@ describe.each( [
 			rerender(
 				<Component
 					initialTabName="gamma"
+					tabName="gamma"
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }

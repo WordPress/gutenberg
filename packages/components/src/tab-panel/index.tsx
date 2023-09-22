@@ -78,6 +78,7 @@ const UnforwardedTabPanel = (
 		tabs,
 		selectOnMove = true,
 		initialTabName,
+		tabName,
 		orientation = 'horizontal',
 		activeClass = 'is-active',
 		onSelect,
@@ -87,11 +88,11 @@ const UnforwardedTabPanel = (
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 
 	const prependInstanceId = useCallback(
-		( tabName: string | undefined ) => {
-			if ( typeof tabName === 'undefined' ) {
+		( tab: string | undefined ) => {
+			if ( typeof tab === 'undefined' ) {
 				return;
 			}
-			return `${ instanceId }-${ tabName }`;
+			return `${ instanceId }-${ tab }`;
 		},
 		[ instanceId ]
 	);
@@ -118,14 +119,14 @@ const UnforwardedTabPanel = (
 		},
 		orientation,
 		selectOnMove,
-		defaultSelectedId: prependInstanceId( initialTabName ),
+		defaultSelectedId: prependInstanceId( tabName || initialTabName ),
 	} );
 
 	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
 
 	const setTabStoreSelectedId = useCallback(
-		( tabName: string ) => {
-			tabStore.setState( 'selectedId', prependInstanceId( tabName ) );
+		( tab: string ) => {
+			tabStore.setState( 'selectedId', prependInstanceId( tab ) );
 		},
 		[ prependInstanceId, tabStore ]
 	);
@@ -144,6 +145,13 @@ const UnforwardedTabPanel = (
 			onSelect?.( selectedTabName );
 		}
 	}, [ selectedTabName, initialTabName, onSelect, previousSelectedTabName ] );
+
+	// handle selection of tabName
+	useEffect( () => {
+		if ( tabName ) {
+			setTabStoreSelectedId( tabName );
+		}
+	}, [ tabName, setTabStoreSelectedId ] );
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
@@ -190,6 +198,7 @@ const UnforwardedTabPanel = (
 			setTabStoreSelectedId( firstEnabledTab.name );
 		}
 	}, [ tabs, selectedTab?.disabled, setTabStoreSelectedId, instanceId ] );
+
 	return (
 		<div className={ className } ref={ ref }>
 			<Ariakit.TabList
