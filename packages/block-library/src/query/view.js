@@ -18,6 +18,19 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
+const animationEnd = ( animationName, dom ) =>
+	new Promise( ( resolve ) => {
+		const handler = ( event ) => {
+			if ( event.animationName === animationName ) {
+				dom.removeEventListener( 'animationend', handler );
+				dom.removeEventListener( 'animationcancel', handler );
+				resolve();
+			}
+		};
+		dom.addEventListener( 'animationend', handler );
+		dom.addEventListener( 'animationcancel', handler );
+	} );
+
 store( {
 	selectors: {
 		core: {
@@ -26,6 +39,10 @@ store( {
 					context.core.query.animation === 'start',
 				finishAnimation: ( { context } ) =>
 					context.core.query.animation === 'finish',
+				fadeOutPostTemplate: ( { context } ) =>
+					context.core.query.postTemplateAnimation === 'fade-out',
+				fadeInPostTemplate: ( { context } ) =>
+					context.core.query.postTemplateAnimation === 'fade-in',
 			},
 		},
 	},
@@ -36,8 +53,8 @@ store( {
 					if ( isValidLink( ref ) && isValidEvent( event ) ) {
 						event.preventDefault();
 
-						const id = ref.closest( '[data-wp-navigation-id]' )
-							.dataset.wpNavigationId;
+						const region = ref.closest( '[data-wp-navigation-id]' );
+						const id = region.dataset.wpNavigationId;
 
 						// Don't announce the navigation immediately, wait 300 ms.
 						const timeout = setTimeout( () => {
@@ -46,7 +63,17 @@ store( {
 							context.core.query.animation = 'start';
 						}, 400 );
 
-						await navigate( ref.href );
+						const beforeRender = async () => {
+							context.core.query.postTemplateAnimation =
+								'fade-out';
+							await animationEnd(
+								'wp-block-post-template__fade-out',
+								region
+							);
+						};
+
+						await navigate( ref.href, { beforeRender } );
+						context.core.query.postTemplateAnimation = 'fade-in';
 
 						// Dismiss loading message if it hasn't been added yet.
 						clearTimeout( timeout );
