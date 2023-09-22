@@ -59,6 +59,8 @@ type BaseButtonProps = {
 	isDestructive?: boolean;
 	/**
 	 * Renders a pressed button style.
+	 *
+	 * @deprecated Use `aria-pressed` instead
 	 */
 	isPressed?: boolean;
 	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
