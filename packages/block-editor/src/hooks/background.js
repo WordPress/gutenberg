@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
@@ -100,7 +105,12 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
 				<span
-					className="block-editor-hooks__background__inspector-image-indicator-wrapper"
+					className={ classnames(
+						'block-editor-hooks__background__inspector-image-indicator-wrapper',
+						{
+							'has-image': imgUrl,
+						}
+					) }
 					aria-hidden
 				>
 					{ imgUrl && (

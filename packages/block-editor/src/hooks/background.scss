@@ -45,6 +45,10 @@
 	width: 20px;
 	height: 20px;
 	flex: none;
+
+	&.has-image {
+		background: #fff; // No diagonal line for non-empty background image. A background color is in use to account for partially transparent images.
+	}
 }
 
 .block-editor-hooks__background__inspector-image-indicator {
