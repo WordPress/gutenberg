@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import { combineReducers, createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -14,6 +13,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { combineReducers } from './combine-reducers';
 import { builtinControls } from '../controls';
 import { lock } from '../lock-unlock';
 import promise from '../promise-middleware';
