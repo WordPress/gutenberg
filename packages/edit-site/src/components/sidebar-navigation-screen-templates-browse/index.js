@@ -11,16 +11,20 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { store as editSiteStore } from '../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const config = {
-	wp_template: {
+	[ TEMPLATE_POST_TYPE ]: {
 		title: __( 'All templates' ),
 		description: __(
 			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 		),
 	},
-	wp_template_part: {
+	[ TEMPLATE_PART_POST_TYPE ]: {
 		title: __( 'All template parts' ),
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
