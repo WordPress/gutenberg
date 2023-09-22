@@ -136,10 +136,11 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const {
-			params: { path, postType, didAccessPatternsPage },
-		} = useLocation();
-		const isPatternsPage = path === '/patterns' || postType === 'wp_block';
+		const location = useLocation();
+
+		const isPatternsPage =
+			location?.path === '/patterns' || location?.postType === 'wp_block';
+		const didAccessPatternsPage = !! location?.didAccessPatternsPage;
 
 		const isBlockBasedTheme = useIsBlockBasedTheme();
 		const { records, isLoading } = useSelect( ( select ) => {
