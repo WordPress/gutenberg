@@ -23,6 +23,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	CATEGORY_TYPES,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { searchItems } from './search-items';
@@ -266,13 +267,13 @@ export const usePatterns = (
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( categoryType === TEMPLATE_PART_POST_TYPE ) {
+			if ( categoryType === CATEGORY_TYPES.templatePart ) {
 				return selectTemplatePartsAsPatterns(
 					select,
 					categoryId,
 					search
 				);
-			} else if ( categoryType === PATTERN_TYPES.theme ) {
+			} else if ( categoryType === CATEGORY_TYPES.pattern ) {
 				return selectPatterns( select, categoryId, syncStatus, search );
 			} else if ( categoryType === PATTERN_TYPES.user ) {
 				return selectUserPatterns( select, syncStatus, search );

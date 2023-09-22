@@ -22,6 +22,11 @@ export const TEMPLATE_ORIGINS = {
 };
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 
+export const CATEGORY_TYPES = {
+	templatePart: 'wp_template_part',
+	pattern: 'pattern',
+};
+
 // Patterns.
 export const {
 	PATTERN_TYPES,

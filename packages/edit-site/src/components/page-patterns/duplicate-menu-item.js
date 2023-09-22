@@ -15,6 +15,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
+	CATEGORY_TYPES,
 } from '../../utils/constants';
 import {
 	useExistingTemplateParts,
@@ -90,7 +91,7 @@ export default function DuplicateMenuItem( {
 			history.push( {
 				postType: TEMPLATE_PART_POST_TYPE,
 				postId: result?.id,
-				categoryType: TEMPLATE_PART_POST_TYPE,
+				categoryType: CATEGORY_TYPES.templatePart,
 				categoryId,
 			} );
 
@@ -188,7 +189,7 @@ export default function DuplicateMenuItem( {
 			);
 
 			history.push( {
-				categoryType: PATTERN_TYPES.theme,
+				categoryType: CATEGORY_TYPES.pattern,
 				categoryId,
 				postType: PATTERN_TYPES.user,
 				postId: result?.id,

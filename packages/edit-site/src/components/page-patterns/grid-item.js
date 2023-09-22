@@ -47,6 +47,7 @@ import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
+	CATEGORY_TYPES,
 } from '../../utils/constants';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
@@ -75,7 +76,9 @@ function GridItem( { categoryId, item, ...props } ) {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
-		categoryType: item.type,
+		categoryType: isTemplatePart
+			? CATEGORY_TYPES.templatePart
+			: CATEGORY_TYPES.pattern,
 	} );
 
 	const isEmpty = ! item.blocks?.length;

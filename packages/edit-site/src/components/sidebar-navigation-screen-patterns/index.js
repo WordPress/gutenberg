@@ -23,6 +23,7 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	CATEGORY_TYPES,
 } from '../../utils/constants';
 import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
@@ -88,7 +89,7 @@ export default function SidebarNavigationScreenPatterns() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = categoryType || PATTERN_TYPES.user;
+	const currentType = categoryType || CATEGORY_TYPES.pattern;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
