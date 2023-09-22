@@ -467,10 +467,8 @@ function gutenberg_should_render_lightbox( $block ) {
 
 add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
 
-
-
 /**
- * Registers the metadata block attribute for block types.
+ * Registers the metadata block attribute for all block types.
  *
  * @param array $args Array of arguments for registering a block type.
  * @return array $args
