@@ -64,11 +64,8 @@ store( {
 						context.core.query.animation = 'finish';
 
 						// Focus the first anchor of the Query block.
-						document
-							.querySelector(
-								`[data-wp-navigation-id=${ id }] a[href]`
-							)
-							?.focus();
+						const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
+						document.querySelector( firstAnchor )?.focus();
 					}
 				},
 				prefetch: async ( { ref } ) => {
