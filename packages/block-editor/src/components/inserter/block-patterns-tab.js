@@ -31,7 +31,6 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
-import BlockPatternsPaging from '../block-patterns-paging';
 import usePatternsPaging from './hooks/use-patterns-paging';
 import {
 	BlockPatternsSyncFilter,
@@ -320,10 +319,8 @@ export function BlockPatternsCategoryPanel( {
 					isDraggable
 					showTitlesAsTooltip={ showTitlesAsTooltip }
 					patternFilter={ patternSourceFilter }
+					pagingProps={ pagingProps }
 				/>
-			) }
-			{ pagingProps.numPages > 1 && (
-				<BlockPatternsPaging { ...pagingProps } />
 			) }
 		</div>
 	);

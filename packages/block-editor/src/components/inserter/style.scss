@@ -312,7 +312,6 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-block-patterns-list {
 		overflow-y: auto;
-		scrollbar-gutter: stable both-edges;
 		flex-grow: 1;
 		height: 100%;
 		padding: $grid-unit-40 $grid-unit-30;
@@ -339,7 +338,7 @@ $block-inserter-tabs-height: 44px;
 		padding: 0;
 	}
 	.block-editor-inserter__patterns-category-panel-header {
-		padding: $grid-unit-40 $grid-unit-30;
+		padding: 16px $grid-unit-30;
 	}
 	.block-editor-inserter__patterns-category-no-results {
 		margin-top: $grid-unit-30;

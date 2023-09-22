@@ -24,6 +24,7 @@ import { Icon, symbol } from '@wordpress/icons';
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import BlockPatternsPaging from '../block-patterns-paging';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -149,6 +150,7 @@ function BlockPatternList( {
 	orientation,
 	label = __( 'Block Patterns' ),
 	showTitlesAsTooltip,
+	pagingProps,
 } ) {
 	const composite = useCompositeState( { orientation } );
 	return (
@@ -174,6 +176,9 @@ function BlockPatternList( {
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
+			{ pagingProps.numPages > 1 && (
+				<BlockPatternsPaging { ...pagingProps } />
+			) }
 		</Composite>
 	);
 }
