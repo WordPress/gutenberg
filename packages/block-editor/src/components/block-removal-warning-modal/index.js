@@ -52,19 +52,30 @@ export function BlockRemovalWarningModal( { rules } ) {
 			onRequestClose={ clearBlockRemovalPrompt }
 		>
 			{ blockNamesForPrompt.length === 1 ? (
-				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
+				<p>
+					{ rules[ blockNamesForPrompt[ 0 ] ] }{ ' ' }
+					{ __(
+						"Only proceed to remove this block if you're absolutely sure of what you're doing."
+					) }{ ' ' }
+				</p>
 			) : (
-				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
-					{ blockNamesForPrompt.map( ( name ) => (
-						<li key={ name }>{ rules[ name ] }</li>
-					) ) }
-				</ul>
+				<>
+					<ul
+						style={ { listStyleType: 'disc', paddingLeft: '1rem' } }
+					>
+						{ blockNamesForPrompt.map( ( name ) => (
+							<li key={ name }>{ rules[ name ] }</li>
+						) ) }
+					</ul>
+					<p>
+						{ ' ' }
+						{ __(
+							"Only proceed to remove these blocks if you're absolutely sure of what you're doing."
+						) }
+					</p>
+				</>
 			) }
-			<p>
-				{ blockNamesForPrompt.length > 1
-					? __( 'Removing these blocks is not advised.' )
-					: __( 'Removing this block is not advised.' ) }
-			</p>
+
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
 					{ __( 'Cancel' ) }
