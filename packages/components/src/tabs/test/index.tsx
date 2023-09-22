@@ -732,6 +732,49 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
+			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab becomes disabled', async () => {
+				const user = userEvent.setup();
+				const mockOnSelect = jest.fn();
+
+				const { rerender } = render(
+					<UncontrolledTabs
+						tabs={ TABS }
+						initialTabId="gamma"
+						onSelect={ mockOnSelect }
+					/>
+				);
+
+				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+
+				await user.click(
+					screen.getByRole( 'tab', { name: 'Alpha' } )
+				);
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+				const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id === 'alpha'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
+				rerender(
+					<UncontrolledTabs
+						tabs={ TABS_WITH_ALPHA_DISABLED }
+						initialTabId="gamma"
+						onSelect={ mockOnSelect }
+					/>
+				);
+
+				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			} );
+
 			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
 				const { rerender } = render(
 					<UncontrolledTabs tabs={ TABS } initialTabId="gamma" />

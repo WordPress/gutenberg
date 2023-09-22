@@ -52,16 +52,15 @@ function Tabs( {
 		// Ariakit internally refers to disabled tabs as `dimmed`.
 		return ! item.dimmed;
 	} );
+	const initialTab = items.find(
+		( item ) => item.id === `${ instanceId }-${ initialTabId }`
+	);
 
 	// Handle selecting the initial tab.
 	useLayoutEffect( () => {
 		if ( isControlled ) {
 			return;
 		}
-
-		const initialTab = items.find(
-			( item ) => item.id === `${ instanceId }-${ initialTabId }`
-		);
 
 		// Wait for the denoted initial tab to be declared before making a
 		// selection. This ensures that if a tab is declared lazily it can
@@ -82,8 +81,8 @@ function Tabs( {
 		}
 	}, [
 		firstEnabledTab?.id,
+		initialTab,
 		initialTabId,
-		instanceId,
 		isControlled,
 		items,
 		selectedId,
@@ -103,12 +102,25 @@ function Tabs( {
 			return;
 		}
 
-		// If the currently selected tab becomes disabled, select the first
+		// If the currently selected tab becomes disabled, fall back to the
+		// `initialTabId` if possible. Otherwise select the first
 		// enabled tab (if there is one).
+
+		if ( initialTab && ! initialTab.dimmed ) {
+			setSelectedId( initialTab?.id );
+			return;
+		}
+
 		if ( firstEnabledTab ) {
 			setSelectedId( firstEnabledTab?.id );
 		}
-	}, [ firstEnabledTab, isControlled, selectedTab?.dimmed, setSelectedId ] );
+	}, [
+		firstEnabledTab,
+		initialTab,
+		isControlled,
+		selectedTab?.dimmed,
+		setSelectedId,
+	] );
 
 	return (
 		<TabsContext.Provider value={ { store, instanceId, activeClass } }>
