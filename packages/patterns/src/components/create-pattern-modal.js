@@ -43,7 +43,9 @@ export default function CreatePatternModal( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	async function onCreate( patternTitle, sync ) {
-		if ( isSaving ) return;
+		if ( ! title || isSaving ) {
+			return;
+		}
 
 		try {
 			setIsSaving( true );
@@ -155,7 +157,7 @@ export default function CreatePatternModal( {
 						<Button
 							variant="primary"
 							type="submit"
-							aria-disabled={ isSaving }
+							aria-disabled={ ! title || isSaving }
 							isBusy={ isSaving }
 						>
 							{ __( 'Create' ) }

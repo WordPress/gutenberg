@@ -14,6 +14,9 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
@@ -28,48 +31,63 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
-import BlockPatternsPaging from '../block-patterns-paging';
 import usePatternsPaging from './hooks/use-patterns-paging';
-import {
-	PATTERN_TYPES,
-	default as BlockPatternsSourceFilter,
-} from './block-patterns-source-filter';
 import {
 	BlockPatternsSyncFilter,
 	SYNC_TYPES,
-} from './block-patterns-sync-filter';
+	PATTERN_TYPES,
+} from './block-patterns-filter';
 
 const noop = () => {};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All categories' ),
+	label: __( 'All Patterns' ),
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
+	const isUserPattern = pattern.name.startsWith( 'core/block' );
+	const isDirectoryPattern =
+		pattern.source === 'core' ||
+		pattern.source?.startsWith( 'pattern-directory' );
+
+	// If theme source selected, filter out user created patterns and those from
+	// the core patterns directory.
 	if (
 		sourceFilter === PATTERN_TYPES.theme &&
-		pattern.name.startsWith( 'core/block' )
+		( isUserPattern || isDirectoryPattern )
 	) {
 		return true;
 	}
+
+	// If the directory source is selected, filter out user created patterns
+	// and those bundled with the theme.
+	if (
+		sourceFilter === PATTERN_TYPES.directory &&
+		( isUserPattern || ! isDirectoryPattern )
+	) {
+		return true;
+	}
+
+	// If user source selected, filter out theme patterns. Any pattern without
+	// an id wasn't created by a user.
 	if ( sourceFilter === PATTERN_TYPES.user && ! pattern.id ) {
 		return true;
 	}
-	if (
-		sourceFilter === PATTERN_TYPES.user &&
-		syncFilter === SYNC_TYPES.full &&
-		pattern.syncStatus !== ''
-	) {
+
+	// Filter by sync status.
+	if ( syncFilter === SYNC_TYPES.full && pattern.syncStatus !== '' ) {
 		return true;
 	}
+
 	if (
-		sourceFilter === PATTERN_TYPES.user &&
 		syncFilter === SYNC_TYPES.unsynced &&
-		pattern.syncStatus !== 'unsynced'
+		pattern.syncStatus !== 'unsynced' &&
+		isUserPattern
 	) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -190,26 +208,26 @@ export function BlockPatternsCategoryPanel( {
 	onHover = noop,
 	category,
 	showTitlesAsTooltip,
-	patternFilter,
 } ) {
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
+	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 
 	const availableCategories = usePatternsCategories(
 		rootClientId,
-		patternFilter
+		patternSourceFilter
 	);
-	const container = useRef();
+	const scrollContainerRef = useRef();
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
 				if (
 					isPatternFiltered(
 						pattern,
-						patternFilter,
+						patternSourceFilter,
 						patternSyncFilter
 					)
 				) {
@@ -239,7 +257,7 @@ export function BlockPatternsCategoryPanel( {
 			allPatterns,
 			availableCategories,
 			category.name,
-			patternFilter,
+			patternSourceFilter,
 			patternSyncFilter,
 		]
 	);
@@ -247,7 +265,7 @@ export function BlockPatternsCategoryPanel( {
 	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
 		category,
-		container
+		scrollContainerRef
 	);
 
 	// Hide block pattern preview on unmount.
@@ -255,25 +273,41 @@ export function BlockPatternsCategoryPanel( {
 	useEffect( () => () => onHover( null ), [] );
 
 	return (
-		<div
-			className="block-editor-inserter__patterns-category-panel"
-			ref={ container }
-		>
-			<div className="block-editor-inserter__patterns-category-panel-title">
-				{ category.label }
-			</div>
-			<p>{ category.description }</p>
-			{ patternFilter === PATTERN_TYPES.user && (
-				<BlockPatternsSyncFilter
-					patternSyncFilter={ patternSyncFilter }
-					setPatternSyncFilter={ setPatternSyncFilter }
-				/>
-			) }
-			{ ! currentCategoryPatterns.length && (
-				<div>{ __( 'No results found' ) }</div>
-			) }
+		<div className="block-editor-inserter__patterns-category-panel">
+			<VStack
+				spacing={ 2 }
+				className="block-editor-inserter__patterns-category-panel-header"
+			>
+				<HStack>
+					<FlexBlock>
+						<Heading level={ 4 } as="div">
+							{ category.label }
+						</Heading>
+					</FlexBlock>
+					<BlockPatternsSyncFilter
+						patternSyncFilter={ patternSyncFilter }
+						patternSourceFilter={ patternSourceFilter }
+						setPatternSyncFilter={ setPatternSyncFilter }
+						setPatternSourceFilter={ setPatternSourceFilter }
+						scrollContainerRef={ scrollContainerRef }
+					/>
+				</HStack>
+				{ category.description && (
+					<Text>{ category.description }</Text>
+				) }
+				{ ! currentCategoryPatterns.length && (
+					<Text
+						variant="muted"
+						className="block-editor-inserter__patterns-category-no-results"
+					>
+						{ __( 'No results found' ) }
+					</Text>
+				) }
+			</VStack>
+
 			{ currentCategoryPatterns.length > 0 && (
 				<BlockPatternList
+					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }
 					onClickPattern={ onClickPattern }
@@ -283,11 +317,9 @@ export function BlockPatternsCategoryPanel( {
 					category={ category.name }
 					isDraggable
 					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternFilter }
+					patternFilter={ patternSourceFilter }
+					pagingProps={ pagingProps }
 				/>
-			) }
-			{ pagingProps.numPages > 1 && (
-				<BlockPatternsPaging { ...pagingProps } />
 			) }
 		</div>
 	);
@@ -300,12 +332,8 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 
-	const categories = usePatternsCategories(
-		rootClientId,
-		patternSourceFilter
-	);
+	const categories = usePatternsCategories( rootClientId );
 
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -317,23 +345,13 @@ function BlockPatternsTabs( {
 						aria-label={ __( 'Block pattern categories' ) }
 						className="block-editor-inserter__block-patterns-tabs"
 					>
-						<BlockPatternsSourceFilter
-							value={ patternSourceFilter }
-							onChange={ ( value ) => {
-								setPatternSourceFilter( value );
-								onSelectCategory( allPatternsCategory, value );
-							} }
-						/>
 						<ItemGroup role="list">
 							{ categories.map( ( category ) => (
 								<Item
 									role="listitem"
 									key={ category.name }
 									onClick={ () =>
-										onSelectCategory(
-											category,
-											patternSourceFilter
-										)
+										onSelectCategory( category )
 									}
 									className={
 										category === selectedCategory

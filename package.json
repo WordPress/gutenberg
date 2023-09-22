@@ -253,7 +253,7 @@
 		"terser-webpack-plugin": "5.3.9",
 		"typescript": "5.1.6",
 		"uglify-js": "3.13.7",
-		"uuid": "8.3.0",
+		"uuid": "9.0.1",
 		"wd": "1.12.1",
 		"webpack": "5.88.2",
 		"webpack-bundle-analyzer": "4.9.1",
