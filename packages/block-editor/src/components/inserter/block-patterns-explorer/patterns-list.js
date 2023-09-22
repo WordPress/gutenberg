@@ -31,10 +31,10 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
-				/* translators: %d: number of patterns. %s: block pattern search query */
+				/* translators: %d: number of patterns. */
 				_n(
-					'%1$d pattern found',
-					'%1$d patterns found',
+					'%d pattern found',
+					'%d patterns found',
 					filteredBlockPatternsLength
 				),
 				filteredBlockPatternsLength
