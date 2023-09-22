@@ -104,11 +104,13 @@ export default function SidebarNavigationScreenPatterns() {
 		const settings = select( editSiteStore ).getSettings();
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
+
 	const templatePartsLink = useLink( {
 		path: '/wp_template_part/all',
 		// If a classic theme that supports template parts accessed
 		// the Patterns page directly, preserve that state in the URL.
-		didAccessPatternsPage: isTemplatePartsMode ? 1 : undefined,
+		didAccessPatternsPage:
+			! isBlockBasedTheme && isTemplatePartsMode ? 1 : undefined,
 	} );
 
 	const footer = ! isMobileViewport ? (
