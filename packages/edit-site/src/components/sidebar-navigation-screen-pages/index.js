@@ -168,7 +168,7 @@ export default function SidebarNavigationScreenPages() {
 								) }
 								{ isHomePageBlog && homeTemplate && (
 									<PageItem
-										postType="wp_template"
+										postType={ TEMPLATE_POST_TYPE }
 										postId={ homeTemplate.id }
 										key={ homeTemplate.id }
 										icon={ home }
@@ -204,7 +204,7 @@ export default function SidebarNavigationScreenPages() {
 					<VStack spacing={ 0 }>
 						{ dynamicPageTemplates?.map( ( item ) => (
 							<PageItem
-								postType="wp_template"
+								postType={ TEMPLATE_POST_TYPE }
 								postId={ item.id }
 								key={ item.id }
 								icon={ layout }
