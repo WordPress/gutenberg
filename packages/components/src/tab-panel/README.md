@@ -144,6 +144,14 @@ The name of the tab to be selected upon mounting of component. If this prop is n
 -   Required: No
 -   Default: none
 
+#### tabName
+
+The name of the tab to be selected.
+
+-   Type: `String`
+-   Required: No
+-   Default: none
+
 #### selectOnMove
 
 When `true`, the tab will be selected when receiving focus (automatic tab activation). When `false`, the tab will be selected only when clicked (manual tab activation). See the [official W3C docs](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/) for more info.

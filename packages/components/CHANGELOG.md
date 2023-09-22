@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `TabPanel`: add tabName prop for tab panel ([#46704](https://github.com/WordPress/gutenberg/pull/46704)).
+
 ### Enhancements
 
 -   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
