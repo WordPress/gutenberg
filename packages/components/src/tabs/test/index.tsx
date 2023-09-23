@@ -1051,7 +1051,7 @@ describe( 'Tabs', () => {
 
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 		} );
-		it( 'should not render any tab if `selectedTabId` does not match any known tab', () => {
+		it( 'should not render any tab if `selectedTabId` does not match any known tab', async () => {
 			render(
 				<ControlledTabs
 					tabs={ TABS_WITH_DELTA }
@@ -1060,9 +1060,13 @@ describe( 'Tabs', () => {
 			);
 
 			// No tab should be selected i.e. it doesn't fall back to first tab.
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).not.toBeInTheDocument();
+			// `waitFor` is needed here to prevent testing library from
+			// throwing a 'not wrapped in `act()`' error.
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tab', { selected: true } )
+				).not.toBeInTheDocument()
+			);
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
@@ -1075,12 +1079,28 @@ describe( 'Tabs', () => {
 			rerender(
 				<ControlledTabs
 					tabs={ TABS.filter( ( tab ) => tab.id !== 'beta' ) }
+					selectedTabId="beta"
 				/>
 			);
 
 			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
 
 			// No tab should be selected i.e. it doesn't fall back to first tab.
+			// `waitFor` is needed here to prevent testing library from
+			// throwing a 'not wrapped in `act()`' error.
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tab', { selected: true } )
+				).not.toBeInTheDocument()
+			);
+			// No tabpanel should be rendered either
+			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+
+			// Restore beta
+			rerender( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
+
+			// No tab should be selected i.e. it doesn't reselect the previously
+			// removed tab.
 			expect(
 				screen.queryByRole( 'tab', { selected: true } )
 			).not.toBeInTheDocument();

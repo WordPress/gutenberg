@@ -6,7 +6,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useEffect, useLayoutEffect } from '@wordpress/element';
 
 /**
@@ -119,6 +119,28 @@ function Tabs( {
 		initialTab,
 		isControlled,
 		selectedTab?.dimmed,
+		setSelectedId,
+	] );
+
+	const previousSelectedId = usePrevious( selectedId );
+	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
+	useEffect( () => {
+		if ( ! isControlled ) {
+			return;
+		}
+
+		// If there was a previously selected tab (i.e. not 'undefined' as on the
+		// first render), and the `selectedTabId` can't be found, clear the
+		// selection.
+		if ( !! previousSelectedId && !! selectedTabId && ! selectedTab ) {
+			setSelectedId( null );
+		}
+	}, [
+		isControlled,
+		previousSelectedId,
+		selectedId,
+		selectedTab,
+		selectedTabId,
 		setSelectedId,
 	] );
 
