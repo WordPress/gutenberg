@@ -38,9 +38,14 @@ function runShellScript( script, cwd, env = {} ) {
 				},
 			},
 			function ( error, stdout, stderr ) {
-				if ( error ) {
-					console.log( stdout ); // Sometimes the error message is thrown via stdout.
+				if ( stdout ) {
+					console.log( stdout );
+				}
+				if ( stderr ) {
 					console.log( stderr );
+				}
+
+				if ( error ) {
 					reject( error );
 				} else {
 					resolve( true );

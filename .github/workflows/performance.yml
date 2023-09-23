@@ -48,7 +48,7 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf 18caa796e85254902e159358b6fad24d3ef0f8b0 bd2a881101727b03b0be09382b34841af5a3c03e --wp-version 6.3
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
