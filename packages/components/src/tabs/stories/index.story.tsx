@@ -303,3 +303,85 @@ export const ControlledMode = ControlledModeTemplate.bind( {} );
 ControlledMode.args = {
 	selectedTabId: 'tab3',
 };
+
+const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	const [ disableTab2, setDisableTab2 ] = useState( false );
+
+	return (
+		<>
+			<Button
+				variant="primary"
+				onClick={ () => setDisableTab2( ! disableTab2 ) }
+			>
+				{ disableTab2 ? 'Enable' : 'Disable' } Tab 2
+			</Button>
+			<Tabs { ...props }>
+				<Tabs.TabList>
+					<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
+						Tab 1
+					</Tabs.Tab>
+					<Tabs.Tab
+						id={ 'tab2' }
+						title={ 'Tab 2' }
+						disabled={ disableTab2 }
+					>
+						Tab 2
+					</Tabs.Tab>
+					<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
+						Tab 3
+					</Tabs.Tab>
+				</Tabs.TabList>
+				<Tabs.TabPanel id={ 'tab1' }>
+					<p>Selected tab: Tab 1</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab2' }>
+					<p>Selected tab: Tab 2</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab3' }>
+					<p>Selected tab: Tab 3</p>
+				</Tabs.TabPanel>
+			</Tabs>
+		</>
+	);
+};
+export const TabBecomesDisabled = TabBecomesDisabledTemplate.bind( {} );
+
+const TabGetsRemovedTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	const [ removeTab1, setRemoveTab1 ] = useState( false );
+
+	return (
+		<>
+			<Button
+				variant="primary"
+				onClick={ () => setRemoveTab1( ! removeTab1 ) }
+			>
+				{ removeTab1 ? 'Restore' : 'Remove' } Tab 1
+			</Button>
+			<Tabs { ...props }>
+				<Tabs.TabList>
+					{ ! removeTab1 && (
+						<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
+							Tab 1
+						</Tabs.Tab>
+					) }
+					<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
+						Tab 2
+					</Tabs.Tab>
+					<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
+						Tab 3
+					</Tabs.Tab>
+				</Tabs.TabList>
+				<Tabs.TabPanel id={ 'tab1' }>
+					<p>Selected tab: Tab 1</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab2' }>
+					<p>Selected tab: Tab 2</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ 'tab3' }>
+					<p>Selected tab: Tab 3</p>
+				</Tabs.TabPanel>
+			</Tabs>
+		</>
+	);
+};
+export const TabGetsRemoved = TabGetsRemovedTemplate.bind( {} );
