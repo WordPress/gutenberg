@@ -44,7 +44,7 @@ export type SlotComponentProps =
 			 * className.
 			 * Not supported when `bubblesVirtually` is true.
 			 */
-			className?: string | undefined;
+			className?: string;
 	  } )
 	| ( SlotPropBase & {
 			/**
