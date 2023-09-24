@@ -24,13 +24,6 @@ export default function TableOfContentsList( {
 	disableLinkActivation?: boolean;
 	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
 } ): WPElement {
-	// Handle onClick callback.
-	const handleOnClick = ( event: MouseEvent< HTMLAnchorElement > ) => {
-		if ( 'function' === typeof onClick ) {
-			onClick( event );
-		}
-	};
-
 	return (
 		<>
 			{ nestedHeadingList.map( ( node, index ) => {
@@ -42,7 +35,10 @@ export default function TableOfContentsList( {
 						href={ link }
 						aria-disabled={ disableLinkActivation || undefined }
 						onClick={
-							disableLinkActivation ? handleOnClick : undefined
+							disableLinkActivation &&
+							'function' === typeof onClick
+								? onClick
+								: undefined
 						}
 					>
 						{ content }
@@ -61,7 +57,12 @@ export default function TableOfContentsList( {
 									disableLinkActivation={
 										disableLinkActivation
 									}
-									onClick={ handleOnClick }
+									onClick={
+										disableLinkActivation &&
+										'function' === typeof onClick
+											? onClick
+											: undefined
+									}
 								/>
 							</ol>
 						) : null }
