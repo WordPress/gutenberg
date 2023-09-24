@@ -45,6 +45,11 @@ export const allPatternsCategory = {
 	label: __( 'All Patterns' ),
 };
 
+const myPatternsCategory = {
+	name: 'myPatterns',
+	label: __( 'My patterns' ),
+};
+
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
@@ -146,8 +151,8 @@ export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 		}
 		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
 			categories.unshift( {
-				name: 'my-patterns',
-				label: _x( 'My patterns' ),
+				name: myPatternsCategory.name,
+				label: myPatternsCategory.label,
 			} );
 		}
 		if ( filteredPatterns.length > 0 ) {
@@ -243,7 +248,7 @@ export function BlockPatternsCategoryPanel( {
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
-				if ( category.name === 'my-patterns' && pattern.id ) {
+				if ( category.name === myPatternsCategory.name && pattern.id ) {
 					return true;
 				}
 				if ( category.name !== 'uncategorized' ) {
