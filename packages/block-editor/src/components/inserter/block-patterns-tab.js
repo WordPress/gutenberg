@@ -144,6 +144,12 @@ export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
+		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
+			categories.unshift( {
+				name: 'my-patterns',
+				label: _x( 'My patterns' ),
+			} );
+		}
 		if ( filteredPatterns.length > 0 ) {
 			categories.unshift( {
 				name: allPatternsCategory.name,
@@ -235,6 +241,9 @@ export function BlockPatternsCategoryPanel( {
 				}
 
 				if ( category.name === allPatternsCategory.name ) {
+					return true;
+				}
+				if ( category.name === 'my-patterns' && pattern.id ) {
 					return true;
 				}
 				if ( category.name !== 'uncategorized' ) {
