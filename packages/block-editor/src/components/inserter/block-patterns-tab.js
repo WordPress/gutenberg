@@ -45,7 +45,7 @@ export const allPatternsCategory = {
 	label: __( 'All Patterns' ),
 };
 
-const myPatternsCategory = {
+export const myPatternsCategory = {
 	name: 'myPatterns',
 	label: __( 'My patterns' ),
 };
