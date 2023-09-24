@@ -24,7 +24,7 @@ import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	TEMPLATE_PART_POST_TYPE,
-	CATEGORY_TYPES,
+	PATTERN_CATEGORY_TYPES,
 } from '../../utils/constants';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
@@ -53,7 +53,7 @@ export default function AddNewPattern() {
 		history.push( {
 			postId: pattern.id,
 			postType: PATTERN_TYPES.user,
-			categoryType: CATEGORY_TYPES.pattern,
+			categoryType: PATTERN_CATEGORY_TYPES.pattern,
 			categoryId,
 			canvas: 'edit',
 		} );
@@ -138,7 +138,7 @@ export default function AddNewPattern() {
 					try {
 						const currentCategoryId =
 							params.categoryType !==
-								CATEGORY_TYPES.templatePart &&
+								PATTERN_CATEGORY_TYPES.templatePart &&
 							patternCategories.find(
 								( category ) =>
 									category.name === params.categoryId
@@ -155,7 +155,7 @@ export default function AddNewPattern() {
 						if ( ! currentCategoryId ) {
 							history.push( {
 								path: `/patterns`,
-								categoryType: CATEGORY_TYPES.pattern,
+								categoryType: PATTERN_CATEGORY_TYPES.pattern,
 								categoryId: PATTERN_DEFAULT_CATEGORY,
 							} );
 						}

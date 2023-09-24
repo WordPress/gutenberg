@@ -22,17 +22,13 @@ export const TEMPLATE_ORIGINS = {
 };
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 
-export const CATEGORY_TYPES = {
-	templatePart: 'wp_template_part',
-	pattern: 'pattern',
-};
-
 // Patterns.
 export const {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_CORE_SOURCES,
 	PATTERN_SYNC_TYPES,
+	PATTERN_CATEGORY_TYPES,
 } = unlock( patternPrivateApis );
 
 // Entities that are editable in focus mode.

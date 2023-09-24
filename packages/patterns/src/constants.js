@@ -14,3 +14,8 @@ export const PATTERN_SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
 };
+
+export const PATTERN_CATEGORY_TYPES = {
+	templatePart: 'wp_template_part',
+	pattern: 'pattern',
+};
