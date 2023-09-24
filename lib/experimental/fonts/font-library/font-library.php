@@ -57,12 +57,6 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
-add_action(
-	'enqueue_block_editor_assets',
-	function () {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
-	}
-);
 
 $default_font_collection = array(
 	'id'          => 'default-font-collection',
