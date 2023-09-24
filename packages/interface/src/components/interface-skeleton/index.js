@@ -11,7 +11,7 @@ import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
