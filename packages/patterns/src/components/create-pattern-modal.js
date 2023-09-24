@@ -28,15 +28,21 @@ import CategorySelector, { CATEGORY_SLUG } from './category-selector';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
-	onSuccess,
-	onError,
-	content,
-	onClose,
+	buttonLabel = __( 'Create' ),
+	categories: categoriesProp = [],
 	className = 'patterns-menu-items__convert-modal',
+	content,
+	modalTitle = __( 'Create pattern' ),
+	onClose,
+	onError,
+	onSuccess,
+	syncType: syncTypeProp = PATTERN_SYNC_TYPES.full,
+	title: titleProp = '',
 } ) {
-	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
-	const [ categoryTerms, setCategoryTerms ] = useState( [] );
-	const [ title, setTitle ] = useState( '' );
+	const [ syncType, setSyncType ] = useState( syncTypeProp );
+	const [ categoryTerms, setCategoryTerms ] = useState( categoriesProp );
+	const [ title, setTitle ] = useState( titleProp );
+
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
@@ -145,7 +151,7 @@ export default function CreatePatternModal( {
 
 	return (
 		<Modal
-			title={ __( 'Create pattern' ) }
+			title={ modalTitle }
 			onRequestClose={ () => {
 				onClose();
 				setTitle( '' );
@@ -203,7 +209,7 @@ export default function CreatePatternModal( {
 							aria-disabled={ ! title || isSaving }
 							isBusy={ isSaving }
 						>
-							{ __( 'Create' ) }
+							{ buttonLabel }
 						</Button>
 					</HStack>
 				</VStack>
