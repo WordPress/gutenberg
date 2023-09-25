@@ -272,10 +272,6 @@ class WP_Block_Parser {
 		$name      = $namespace . $matches['name'][0];
 		$has_attrs = isset( $matches['attrs'] ) && -1 !== $matches['attrs'][1];
 
-		/*
-		 * Fun fact! It's not trivial in PHP to create "an empty associative array" since all arrays
-		 * are associative arrays. If we use `array()` we get a JSON `[]`
-		 */
 		$attrs = $has_attrs
 			? json_decode( $matches['attrs'][0], /* as-associative */ true )
 			: array();
