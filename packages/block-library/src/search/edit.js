@@ -345,7 +345,6 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<RichText
-						tagName="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
