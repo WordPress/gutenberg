@@ -14,6 +14,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'First block' );
+
+		// Ensure the fixed toolbar option is off.
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	test( 'ensures base block toolbars use roving tabindex', async ( {
