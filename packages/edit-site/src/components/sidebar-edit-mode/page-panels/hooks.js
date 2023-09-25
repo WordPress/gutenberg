@@ -101,21 +101,18 @@ function injectThemeAttributeInBlockTemplateContent(
 	block,
 	currentThemeStylesheet
 ) {
-	if (
-		block.innerBlocks.find(
-			( innerBlock ) => innerBlock.name === 'core/template-part'
-		)
-	) {
-		block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
-			if (
-				innerBlock.name === 'core/template-part' &&
-				innerBlock.attributes.theme === undefined
-			) {
-				innerBlock.attributes.theme = currentThemeStylesheet;
-			}
-			return innerBlock;
-		} );
-	}
+	block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+		if (
+			innerBlock.name === 'core/template-part' &&
+			innerBlock.attributes.theme === undefined
+		) {
+			innerBlock.attributes.theme = currentThemeStylesheet;
+		}
+		return injectThemeAttributeInBlockTemplateContent(
+			innerBlock,
+			currentThemeStylesheet
+		);
+	} );
 
 	if (
 		block.name === 'core/template-part' &&
