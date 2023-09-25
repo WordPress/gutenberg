@@ -50,18 +50,6 @@
 // The `maybeJSON` function is not needed in PHP because its return semantics
 // are the same as `json_decode`
 
-if ( ! function_exists( 'peg_empty_attrs' ) ) {
-     function peg_empty_attrs() {
-         static $empty_attrs = null;
-
-         if ( null === $empty_attrs ) {
-             $empty_attrs = json_decode( '{}', true );
-         }
-
-         return $empty_attrs;
-     }
-}
-
 // array arguments are backwards because of PHP
 if ( ! function_exists( 'peg_process_inner_content' ) ) {
     function peg_process_inner_content( $array ) {
@@ -90,7 +78,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
         if ( ! empty( $pre ) ) {
             $blocks[] = array(
                 'blockName' => null,
-                'attrs' => peg_empty_attrs(),
+                'attrs' => array(),
                 'innerBlocks' => array(),
                 'innerHTML' => $pre,
                 'innerContent' => array( $pre ),
@@ -105,7 +93,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
             if ( ! empty( $html ) ) {
                 $blocks[] = array(
                     'blockName' => null,
-                    'attrs' => peg_empty_attrs(),
+                    'attrs' => array(),
                     'innerBlocks' => array(),
                     'innerHTML' => $html,
                     'innerContent' => array( $html ),
@@ -116,7 +104,7 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
         if ( ! empty( $post ) ) {
             $blocks[] = array(
                 'blockName' => null,
-                'attrs' => peg_empty_attrs(),
+                'attrs' => array(),
                 'innerBlocks' => array(),
                 'innerHTML' => $post,
                 'innerContent' => array( $post ),
@@ -224,7 +212,7 @@ Block_Void
     /** <?php
     return array(
       'blockName'    => $blockName,
-      'attrs'        => empty( $attrs ) ? peg_empty_attrs() : $attrs,
+      'attrs'        => empty( $attrs ) ? array() : $attrs,
       'innerBlocks'  => array(),
       'innerHTML'    => '',
       'innerContent' => array(),
@@ -248,7 +236,7 @@ Block_Balanced
 
     return array(
       'blockName'    => $s['blockName'],
-      'attrs'        => empty( $s['attrs'] ) ? peg_empty_attrs() : $s['attrs'],
+      'attrs'        => empty( $s['attrs'] ) ? array() : $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => $innerHTML,
       'innerContent' => $innerContent,
