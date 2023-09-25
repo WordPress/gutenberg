@@ -385,12 +385,14 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			const objectId = entityConfig.getSyncObjectId( recordId );
-			getSyncProvider().update(
-				entityConfig.syncObjectType + '--edit',
-				objectId,
-				edit.edits
-			);
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				const objectId = entityConfig.getSyncObjectId( recordId );
+				getSyncProvider().update(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					edit.edits
+				);
+			}
 		} else {
 			if ( ! options.undoIgnore ) {
 				select.getUndoManager().addRecord(
@@ -426,14 +428,13 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoManager().getUndoRecord();
-		if ( ! undoEdit ) {
+		const undoRecord = select.getUndoManager().undo();
+		if ( ! undoRecord ) {
 			return;
 		}
-		select.getUndoManager().undo();
 		dispatch( {
 			type: 'UNDO',
-			record: undoEdit,
+			record: undoRecord,
 		} );
 	};
 
@@ -444,14 +445,13 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getUndoManager().getRedoRecord();
-		if ( ! redoEdit ) {
+		const redoRecord = select.getUndoManager().redo();
+		if ( ! redoRecord ) {
 			return;
 		}
-		select.getUndoManager().redo();
 		dispatch( {
 			type: 'REDO',
-			record: redoEdit,
+			record: redoRecord,
 		} );
 	};
 

@@ -24,6 +24,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarButton from '../sidebar-button';
 import AddNewPageModal from '../add-new-page';
 import { unlock } from '../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -50,7 +51,7 @@ export default function SidebarNavigationScreenPages() {
 		}
 	);
 	const { records: templates, isResolving: isLoadingTemplates } =
-		useEntityRecords( 'postType', 'wp_template', {
+		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
 
@@ -130,7 +131,7 @@ export default function SidebarNavigationScreenPages() {
 
 		return {
 			icon: itemIcon,
-			postType: postsPageTemplateId ? 'wp_template' : 'page',
+			postType: postsPageTemplateId ? TEMPLATE_POST_TYPE : 'page',
 			postId: postsPageTemplateId || id,
 		};
 	};
@@ -167,7 +168,7 @@ export default function SidebarNavigationScreenPages() {
 								) }
 								{ isHomePageBlog && homeTemplate && (
 									<PageItem
-										postType="wp_template"
+										postType={ TEMPLATE_POST_TYPE }
 										postId={ homeTemplate.id }
 										key={ homeTemplate.id }
 										icon={ home }
@@ -203,7 +204,7 @@ export default function SidebarNavigationScreenPages() {
 					<VStack spacing={ 0 }>
 						{ dynamicPageTemplates?.map( ( item ) => (
 							<PageItem
-								postType="wp_template"
+								postType={ TEMPLATE_POST_TYPE }
 								postId={ item.id }
 								key={ item.id }
 								icon={ layout }

@@ -190,7 +190,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const resetButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByText( 'Reset' );
+			.getByText( 'Use default template' );
 		await expect( resetButton ).toBeVisible();
 		await resetButton.click();
 		await expect( templateOptionsButton ).toHaveText( 'Single Entries' );

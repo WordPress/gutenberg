@@ -44,7 +44,7 @@ store( {
 							context.core.query.message =
 								context.core.query.loadingText;
 							context.core.query.animation = 'start';
-						}, 300 );
+						}, 400 );
 
 						await navigate( ref.href );
 
@@ -62,17 +62,26 @@ store( {
 								: '' );
 
 						context.core.query.animation = 'finish';
+						context.core.query.url = ref.href;
 
 						// Focus the first anchor of the Query block.
-						document
-							.querySelector(
-								`[data-wp-navigation-id=${ id }] a[href]`
-							)
-							?.focus();
+						const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
+						document.querySelector( firstAnchor )?.focus();
 					}
 				},
 				prefetch: async ( { ref } ) => {
 					if ( isValidLink( ref ) ) {
+						await prefetch( ref.href );
+					}
+				},
+			},
+		},
+	},
+	effects: {
+		core: {
+			query: {
+				prefetch: async ( { ref, context } ) => {
+					if ( context.core.query.url && isValidLink( ref ) ) {
 						await prefetch( ref.href );
 					}
 				},

@@ -55,12 +55,14 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true,
 				"textTransform": true
 			}
 		},
+		"__unstablePasteTextInline": true,
 		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-heading-editor",

@@ -24,6 +24,12 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import {
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_SYNC_TYPES,
+	TEMPLATE_ORIGINS,
+} from '../../utils/constants';
 
 export default function usePatternDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -35,10 +41,16 @@ export default function usePatternDetails( postType, postId ) {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-	const currentTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme(),
-		[]
-	);
+	const { currentTheme, userPatternCategories } = useSelect( ( select ) => {
+		const { getCurrentTheme, getUserPatternCategories } =
+			select( coreStore );
+
+		return {
+			currentTheme: getCurrentTheme(),
+			userPatternCategories: getUserPatternCategories(),
+		};
+	}, [] );
+
 	const addedBy = useAddedBy( postType, postId );
 	const isAddedByActiveTheme =
 		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
@@ -47,7 +59,7 @@ export default function usePatternDetails( postType, postId ) {
 
 	if ( ! description && addedBy.text ) {
 		description =
-			postType === 'wp_block'
+			postType === PATTERN_TYPES.user
 				? sprintf(
 						// translators: %s: pattern title e.g: "Header".
 						__( 'This is the %s pattern.' ),
@@ -60,7 +72,7 @@ export default function usePatternDetails( postType, postId ) {
 				  );
 	}
 
-	if ( ! description && postType === 'wp_block' && record?.title ) {
+	if ( ! description && postType === PATTERN_TYPES.user && record?.title ) {
 		description = sprintf(
 			// translators: %s: user created pattern title e.g. "Footer".
 			__( 'This is the %s pattern.' ),
@@ -74,17 +86,42 @@ export default function usePatternDetails( postType, postId ) {
 
 	const details = [];
 
-	if ( postType === 'wp_block' || 'wp_template_part' ) {
+	if (
+		postType === PATTERN_TYPES.user ||
+		postType === TEMPLATE_PART_POST_TYPE
+	) {
 		details.push( {
 			label: __( 'Syncing' ),
 			value:
-				record.wp_pattern_sync_status === 'unsynced'
+				record.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
 					? __( 'Not synced' )
 					: __( 'Fully synced' ),
 		} );
+
+		if ( record.wp_pattern_category?.length === 0 ) {
+			details.push( {
+				label: __( 'Categories' ),
+				value: __( 'Uncategorized' ),
+			} );
+		}
+		if ( record.wp_pattern_category?.length > 0 ) {
+			const patternCategories = new Map();
+			userPatternCategories.forEach( ( userCategory ) =>
+				patternCategories.set( userCategory.id, userCategory )
+			);
+
+			const categories = record.wp_pattern_category
+				.filter( ( category ) => patternCategories.get( category ) )
+				.map( ( category ) => patternCategories.get( category ).label );
+
+			details.push( {
+				label: __( 'Categories' ),
+				value: categories.length > 0 ? categories.join( ', ' ) : '',
+			} );
+		}
 	}
 
-	if ( postType === 'wp_template_part' ) {
+	if ( postType === TEMPLATE_PART_POST_TYPE ) {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === record.area
 		);
@@ -105,7 +142,7 @@ export default function usePatternDetails( postType, postId ) {
 	}
 
 	if (
-		postType === 'wp_template_part' &&
+		postType === TEMPLATE_PART_POST_TYPE &&
 		addedBy.text &&
 		! isAddedByActiveTheme
 	) {
@@ -120,9 +157,10 @@ export default function usePatternDetails( postType, postId ) {
 	}
 
 	if (
-		postType === 'wp_template_part' &&
+		postType === TEMPLATE_PART_POST_TYPE &&
 		addedBy.text &&
-		( record.origin === 'plugin' || record.has_theme_file === true )
+		( record.origin === TEMPLATE_ORIGINS.plugin ||
+			record.has_theme_file === true )
 	) {
 		details.push( {
 			label: __( 'Customized' ),

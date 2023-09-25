@@ -66,7 +66,7 @@ test.describe( 'Site editor writing flow', () => {
 		// Tab to the inspector, tabbing three times to go past the two resize handles.
 		await pageUtils.pressKeys( 'Tab', { times: 3 } );
 		const inspectorTemplateTab = page.locator(
-			'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Template part"i]'
 		);
 		await expect( inspectorTemplateTab ).toBeFocused();
 	} );

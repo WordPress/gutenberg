@@ -22,7 +22,7 @@ import type {
 } from './types';
 
 function mergeProps<
-	T extends { className?: string; [ key: string ]: unknown }
+	T extends { className?: string; [ key: string ]: unknown },
 >( defaultProps: Partial< T > = {}, props: T = {} as T ) {
 	const mergedProps: T = {
 		...defaultProps,
