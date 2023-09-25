@@ -22,6 +22,7 @@ import { useAddedBy } from '../list/added-by';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -108,7 +109,9 @@ export default function SidebarNavigationScreenTemplate() {
 	// indicates the user has arrived at the template via the "manage all"
 	// page and the back button should return them to that list page.
 	const backPath =
-		postType !== 'wp_template' ? `/${ postType }/all` : `/${ postType }`;
+		postType !== TEMPLATE_POST_TYPE
+			? `/${ postType }/all`
+			: `/${ postType }`;
 	return (
 		<SidebarNavigationScreen
 			title={ title }
