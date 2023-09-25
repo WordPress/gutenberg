@@ -69,3 +69,15 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-post-template {
+		&.fade-in,
+		&.fade-out {
+			transition-duration: 0s;
+			transition-delay: 0s;
+			animation-duration: 1ms;
+			animation-delay: -1ms;
+		}
+	}
+}
