@@ -47,20 +47,21 @@ export function BlockPatternsSyncFilter( {
 	scrollContainerRef,
 	category,
 } ) {
+	const currentPatternSoureFilter =
+		category.name === myPatternsCategory.name
+			? PATTERN_TYPES.user
+			: patternSourceFilter;
+
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 	// otherwise applying them will just result in no patterns being shown.
-	const shouldDisableSyncFilter =
-		getShouldDisableSyncFilter( patternSourceFilter );
+	const shouldDisableSyncFilter = getShouldDisableSyncFilter(
+		currentPatternSoureFilter
+	);
 
 	// We also need to disable the directory and theme source filter options if the category
 	// is `myPatterns` otherwise applying them will also just result in no patterns being shown.
 	const shouldDisableNonUserSources =
 		getShouldDisableNonUserSources( category );
-
-	const currentPatternSoureFilter =
-		category.name === myPatternsCategory.name
-			? PATTERN_TYPES.user
-			: patternSourceFilter;
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
