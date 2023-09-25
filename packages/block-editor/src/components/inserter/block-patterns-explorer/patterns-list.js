@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -111,6 +111,14 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 		selectedCategory,
 		container
 	);
+
+	// Reset page when search value changes.
+	const [ previousSearchValue, setPreviousSearchValue ] =
+		useState( searchValue );
+	if ( searchValue !== previousSearchValue ) {
+		setPreviousSearchValue( searchValue );
+		pagingProps.changePage( 1 );
+	}
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
