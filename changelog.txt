@@ -1,5 +1,127 @@
 == Changelog ==
 
+= 16.7.0-rc.2 =
+
+## Changelog
+
+### Features
+
+#### Typography
+- Font Library: Font Collections frontend. ([54566](https://github.com/WordPress/gutenberg/pull/54566))
+
+
+### Enhancements
+
+#### Interactivity API
+- Query block: Start prefetching on first click to next/previous. ([54781](https://github.com/WordPress/gutenberg/pull/54781))
+
+#### Collaborative Editing
+- Try bundling sync package. ([54738](https://github.com/WordPress/gutenberg/pull/54738))
+
+#### Patterns
+- Memoize `useSelect` for `usePatterns`. ([54588](https://github.com/WordPress/gutenberg/pull/54588))
+
+#### Design Tools
+- Improve background image control. ([54439](https://github.com/WordPress/gutenberg/pull/54439))
+
+#### List View
+- Try directing focus to the list view toggle button when closing the list view. ([54175](https://github.com/WordPress/gutenberg/pull/54175))
+
+#### Typography
+- Font Library: Load collection JSON data from a URL in the collection configuration. ([54067](https://github.com/WordPress/gutenberg/pull/54067))
+
+
+### Bug Fixes
+
+- Block Editor: Fix 'isBlockSubtreeDisabled' private selector. ([54618](https://github.com/WordPress/gutenberg/pull/54618))
+- Make sure sync code only runs when experiment is enabled. ([54710](https://github.com/WordPress/gutenberg/pull/54710))
+
+#### Patterns
+- Add My patterns back to post editor inserter categories. ([54767](https://github.com/WordPress/gutenberg/pull/54767))
+- De-emphasise pattern filters in inserter. ([54681](https://github.com/WordPress/gutenberg/pull/54681))
+- Fix All Patterns category default display. ([54721](https://github.com/WordPress/gutenberg/pull/54721))
+- Fix bug with new categories not showing. ([54768](https://github.com/WordPress/gutenberg/pull/54768))
+- Fix bug with pattern categories not saving sometimes. ([54676](https://github.com/WordPress/gutenberg/pull/54676))
+- Fix category type for back link. ([54753](https://github.com/WordPress/gutenberg/pull/54753))
+- Fix duplication of uncategorized patterns. ([54755](https://github.com/WordPress/gutenberg/pull/54755))
+- Inject the theme name into the block attributes. ([54595](https://github.com/WordPress/gutenberg/pull/54595))
+- Reinstate my patterns category in site editor. ([54726](https://github.com/WordPress/gutenberg/pull/54726))
+- Require a title in the creation modal. ([54717](https://github.com/WordPress/gutenberg/pull/54717))
+- Use slug as fallback for empty title. ([54731](https://github.com/WordPress/gutenberg/pull/54731))
+
+#### Typography
+- Font Face: Get name from "fontFamily" setting, not "name". ([54615](https://github.com/WordPress/gutenberg/pull/54615))
+- Font Library: Fix modal width on mobile viewport. ([54518](https://github.com/WordPress/gutenberg/pull/54518))
+
+#### Block Editor
+- Reset page after changing pattern filters or search value. ([54774](https://github.com/WordPress/gutenberg/pull/54774))
+
+#### Interactivity API
+- Query Loop: Select first anchor inside Post Template with "enhanced pagination" enabled. ([54730](https://github.com/WordPress/gutenberg/pull/54730))
+
+#### Plugin
+- Update cherry-pick script to correctly verify GitHub CLI setup. ([54720](https://github.com/WordPress/gutenberg/pull/54720))
+
+#### Block API
+- Block Hooks: Avoid processing empty content for loaded templates. ([54719](https://github.com/WordPress/gutenberg/pull/54719))
+
+#### Site Editor
+- CreateTemplatePartModal: Disable the 'Create' button while saving. ([54716](https://github.com/WordPress/gutenberg/pull/54716))
+
+#### Design Tools
+- Background Image control: Use consistent button, ensure descriptive text accounts for no image selected. ([54711](https://github.com/WordPress/gutenberg/pull/54711))
+
+#### Block Library
+- Replace the `gutenberg_` prefix with `wp_` in image block. ([54678](https://github.com/WordPress/gutenberg/pull/54678))
+
+#### Components
+- DateTimePicker: Fix onChange callback check so that it also works inside iframes. ([54669](https://github.com/WordPress/gutenberg/pull/54669))
+
+#### Fonts API
+- Font Library: Fix space above theme fonts in font library modal. ([54598](https://github.com/WordPress/gutenberg/pull/54598))
+
+
+### Accessibility
+
+#### Components
+- Allow Modal to place focus on first element within contents via new API. ([54590](https://github.com/WordPress/gutenberg/pull/54590))
+- Improve the placeholder instructions accessibility. ([45801](https://github.com/WordPress/gutenberg/pull/45801))
+
+
+### Documentation
+
+- Add missing global declaration in DocBlock of interactivity files. ([54683](https://github.com/WordPress/gutenberg/pull/54683))
+
+
+### Code Quality
+
+#### Site Editor
+- Prune store constants. ([54585](https://github.com/WordPress/gutenberg/pull/54585))
+- Use constants rather than hard coded template strings. ([54586](https://github.com/WordPress/gutenberg/pull/54586))
+
+#### Patterns
+- Fix sidebar nav screen fallback category. ([54754](https://github.com/WordPress/gutenberg/pull/54754))
+
+#### Typography
+- Font Library: Refactor logic to disable font library in the frontend. ([54748](https://github.com/WordPress/gutenberg/pull/54748))
+
+#### Plugin
+- Ensure that Block Hooks work correctly after landing in WP core. ([54651](https://github.com/WordPress/gutenberg/pull/54651))
+- Update uuid package to 9.0.1. ([54725](https://github.com/WordPress/gutenberg/pull/54725))
+
+### Tools
+
+#### Testing
+- Font Library: Use resolvable domain in test. ([54763](https://github.com/WordPress/gutenberg/pull/54763))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @afercia @andrewserong @ciampo @DAreRodz @getdave @glendaviesnz @gziolo @hellofromtonya @kevin940726 @luisherranz @madhusudhand @Mamaduka @matiasbenedetto @mikachan @ramonjd @richtabor @SaxonF @scruffian @t-hamano @tellthemachines
+
+
 = 16.7.0-rc.1 =
 
 ## Changelog
