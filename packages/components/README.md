@@ -31,8 +31,6 @@ In non-WordPress projects, link to the `build-style/style.css` file directly, it
 
 ### Popovers
 
-_If you're using [`Popover`](/packages/components/src/popover/README.md) outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
-
 By default, the `Popover` component will render within an extra element appended to the body of the document.
 
 If you want to precisely contol where the popovers render, you will need to use the `Popover.Slot` component.
@@ -55,7 +53,7 @@ const Example = () => {
 	<SlotFillProvider>
 		<MyComponentWithPopover />
 		<Popover.Slot />
-	</SlotFillProvider>
+	</SlotFillProvider>;
 };
 ```
 
