@@ -97,7 +97,7 @@ export default function AddNewPattern() {
 		onClick: () => {
 			patternUploadInputRef.current.click();
 		},
-		title: __( 'Import .json' ),
+		title: __( 'Import pattern from JSON' ),
 	} );
 
 	return (
