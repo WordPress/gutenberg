@@ -139,7 +139,8 @@ test.describe( 'Site Editor Performance', () => {
 			// timings.
 			await page
 				.locator(
-					'.edit-site-canvas-loader, .edit-site-canvas-spinner' // Spinner is used in the legacy editor.
+					// Spinner was used instead of the progress bar in an earlier version of the site editor.
+					'.edit-site-canvas-loader, .edit-site-canvas-spinner'
 				)
 				.waitFor( { state: 'hidden', timeout: 120_000 } );
 
