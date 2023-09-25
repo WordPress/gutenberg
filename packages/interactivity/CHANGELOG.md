@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `beforeRender` option to `navigate()`: an async function that runs right before the HTML is updated. ([#54746](https://github.com/WordPress/gutenberg/pull/54746))
+
 ## 2.3.0 (2023-09-20)
 
 ### Enhancements
