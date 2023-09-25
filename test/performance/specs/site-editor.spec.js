@@ -138,7 +138,10 @@ test.describe( 'Site Editor Performance', () => {
 			// canvas is ready, and we don't want it to affect the typing
 			// timings.
 			await page
-				.locator( '.edit-site-canvas-loader' )
+				.locator(
+					// Spinner was used instead of the progress bar in an earlier version of the site editor.
+					'.edit-site-canvas-loader, .edit-site-canvas-spinner'
+				)
 				.waitFor( { state: 'hidden', timeout: 120_000 } );
 
 			const canvas = await perfUtils.getCanvas();

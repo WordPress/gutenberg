@@ -158,7 +158,7 @@ export default function DuplicateMenuItem( {
 				__( '%s (Copy)' ),
 				item.title || item.name
 			);
-			const categories = await getCategories( item.categories );
+			const categories = await getCategories( item.categories || [] );
 
 			const result = await saveEntityRecord(
 				'postType',

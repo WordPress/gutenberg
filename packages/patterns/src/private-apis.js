@@ -7,6 +7,7 @@ import PatternsMenuItems from './components';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
 	PATTERN_CORE_SOURCES,
 	PATTERN_SYNC_TYPES,
 } from './constants';
@@ -17,6 +18,7 @@ lock( privateApis, {
 	PatternsMenuItems,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
 	PATTERN_CORE_SOURCES,
 	PATTERN_SYNC_TYPES,
 } );
