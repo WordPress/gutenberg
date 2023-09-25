@@ -61,6 +61,13 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 				<StyledAriakitMenu
 					gutter={ 8 }
 					shift={ menu.parent ? -9 : 0 }
+					getPersistentElements={ () =>
+						Array.from(
+							document.querySelectorAll(
+								'.components-modal__screen-overlay'
+							)
+						)
+					}
 					modal
 				>
 					{ children }
