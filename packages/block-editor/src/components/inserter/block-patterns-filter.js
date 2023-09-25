@@ -57,6 +57,11 @@ export function BlockPatternsSyncFilter( {
 	const shouldDisableNonUserSources =
 		getShouldDisableNonUserSources( category );
 
+	const currentPatternSoureFilter =
+		category.name === myPatternsCategory.name
+			? PATTERN_TYPES.user
+			: patternSourceFilter;
+
 	const patternSyncMenuOptions = useMemo(
 		() => [
 			{ value: SYNC_TYPES.all, label: __( 'All' ) },
@@ -149,7 +154,7 @@ export function BlockPatternsSyncFilter( {
 										0
 									);
 								} }
-								value={ patternSourceFilter }
+								value={ currentPatternSoureFilter }
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Type' ) }>
