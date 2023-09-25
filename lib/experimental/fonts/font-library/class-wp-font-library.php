@@ -23,7 +23,6 @@ class WP_Font_Library {
 	const PHP_7_TTF_MIME_TYPE = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
 
 	const ALLOWED_FONT_MIME_TYPES = array(
-		'otf'   => 'font/otf',
 		'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : self::PHP_7_TTF_MIME_TYPE,
 		'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
 		'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',

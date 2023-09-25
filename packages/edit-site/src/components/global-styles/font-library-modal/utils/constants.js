@@ -3,7 +3,7 @@
  */
 import { _x } from '@wordpress/i18n';
 
-export const ALLOWED_FILE_EXTENSIONS = [ 'otf', 'ttf', 'woff', 'woff2' ];
+export const ALLOWED_FILE_EXTENSIONS = [ 'ttf', 'woff', 'woff2' ];
 
 export const FONT_WEIGHTS = {
 	100: _x( 'Thin', 'font weight' ),
