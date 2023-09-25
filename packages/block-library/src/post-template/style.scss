@@ -31,11 +31,11 @@
 	}
 
 	&.fade-out {
-		animation: wp-block-post-template__fade-out 200ms ease-in forwards;
+		animation: wp-block-post-template__fade-out 150ms ease-in forwards;
 	}
 
 	&.fade-in {
-		animation: wp-block-post-template__fade-in 200ms ease-out forwards;
+		animation: wp-block-post-template__fade-in 150ms ease-out forwards;
 	}
 
 	@keyframes wp-block-post-template__fade-out {
