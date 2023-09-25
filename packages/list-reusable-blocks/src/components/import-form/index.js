@@ -50,7 +50,7 @@ function ImportForm( { instanceId, onUpload } ) {
 						uiMessage = __( 'Invalid JSON file' );
 						break;
 					case 'Invalid Pattern JSON file':
-						uiMessage = __( 'Invalid Pattern JSON file' );
+						uiMessage = __( 'Invalid pattern JSON file' );
 						break;
 					default:
 						uiMessage = __( 'Unknown error' );

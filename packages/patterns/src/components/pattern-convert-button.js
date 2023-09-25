@@ -110,12 +110,12 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 			pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
 				? sprintf(
 						// translators: %s: the name the user has given to the pattern.
-						__( 'Unsynced Pattern created: %s' ),
+						__( 'Unsynced pattern created: %s' ),
 						pattern.title.raw
 				  )
 				: sprintf(
 						// translators: %s: the name the user has given to the pattern.
-						__( 'Synced Pattern created: %s' ),
+						__( 'Synced pattern created: %s' ),
 						pattern.title.raw
 				  ),
 			{
