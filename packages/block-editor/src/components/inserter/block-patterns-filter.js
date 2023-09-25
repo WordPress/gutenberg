@@ -47,6 +47,10 @@ export function BlockPatternsSyncFilter( {
 	scrollContainerRef,
 	category,
 } ) {
+	// If the category is `myPatterns` then we need to set the source filter to `user`, but
+	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
+	// they may be confused when switching to another category if the haven't explicity set
+	// this filter themselves.
 	const currentPatternSourceFilter =
 		category.name === myPatternsCategory.name
 			? PATTERN_TYPES.user
