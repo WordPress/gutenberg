@@ -179,7 +179,7 @@ function block_core_form_privacy_form() {
 	 *
 	 * @return bool Whether to show the core/form-submission-notification block.
 	 */
-	$show_notification = static function( $show, $attributes ) use ( $actions_performed, $actions_errored ) {
+	$show_notification = static function ( $show, $attributes ) use ( $actions_performed, $actions_errored ) {
 		switch ( $attributes['type'] ) {
 			case 'success':
 				return ! empty( $actions_performed ) && empty( $actions_errored );
