@@ -29,6 +29,6 @@ abstract class WP_REST_Font_Library_Controller_UnitTestCase extends WP_UnitTestC
 		$reflection = new ReflectionClass( 'WP_Font_Library' );
 		$property   = $reflection->getProperty( 'collections' );
 		$property->setAccessible( true );
-		$property->setValue( array() );
+		$property->setValue( null, array() );
 	}
 }
