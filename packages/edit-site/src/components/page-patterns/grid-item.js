@@ -75,7 +75,7 @@ function GridItem( { categoryId, item, ...props } ) {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
-		categoryType: item.type,
+		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 	} );
 
 	const isEmpty = ! item.blocks?.length;
