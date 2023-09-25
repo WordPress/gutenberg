@@ -408,7 +408,7 @@ class Gutenberg_HTML_Tag_Processor_6_4 {
 	 * Tracks spans of duplicate attributes on a given tag, used for removing
 	 * all copies of an attribute when calling `remove_attribute()`.
 	 *
-	 * @since 6.3.1
+	 * @since 6.3.2
 	 *
 	 * @var (WP_HTML_Span[])[]|null
 	 */
