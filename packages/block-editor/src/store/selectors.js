@@ -2303,7 +2303,7 @@ function getUnsyncedPatterns( state ) {
 		.map( ( reusableBlock ) => {
 			return {
 				name: `core/block/${ reusableBlock.id }`,
-				title: reusableBlock.title.raw,
+				title: reusableBlock.title?.raw,
 				categories: [ 'custom' ],
 				content: reusableBlock.content.raw,
 			};
