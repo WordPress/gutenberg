@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
@@ -26,8 +27,10 @@ export const toggleButton = css`
 	outline-width: 2px;
 	outline-offset: 2px;
 	outline-color: hsl( 204 100% 40% );
-	box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 ),
-		inset 0 -1px 0 rgba( 0, 0, 0, 0.1 ), 0 1px 1px rgba( 0, 0, 0, 0.1 );
+	box-shadow:
+		inset 0 0 0 1px rgba( 0, 0, 0, 0.1 ),
+		inset 0 -1px 0 rgba( 0, 0, 0, 0.1 ),
+		0 1px 1px rgba( 0, 0, 0, 0.1 );
 	font-weight: 500;
 
 	&:hover {
@@ -93,7 +96,8 @@ export const StyledAriakitMenu = styled( Ariakit.Menu )`
 	background-color: hsl( 204 20% 100% );
 	padding: 0.5rem;
 	color: hsl( 204 10% 10% );
-	box-shadow: 0 10px 15px -3px rgb( 0 0 0 / 0.1 ),
+	box-shadow:
+		0 10px 15px -3px rgb( 0 0 0 / 0.1 ),
 		0 4px 6px -4px rgb( 0 0 0 / 0.1 );
 	outline: none !important;
 	overflow: visible;
