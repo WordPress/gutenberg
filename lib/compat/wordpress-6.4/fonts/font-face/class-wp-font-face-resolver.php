@@ -5,6 +5,8 @@
  * @package    WordPress
  * @subpackage Fonts
  * @since      6.4.0
+ *
+ * @core-merge: this file is located in `wp-includes/fonts/`.
  */
 
 if ( class_exists( 'WP_Font_Face_Resolver' ) ) {
@@ -33,7 +35,7 @@ class WP_Font_Face_Resolver {
 		$settings = gutenberg_get_global_settings();
 
 		// Bail out early if there are no font settings.
-		if ( empty( $settings['typography'] ) || empty( $settings['typography']['fontFamilies'] ) ) {
+		if ( empty( $settings['typography']['fontFamilies'] ) ) {
 			return array();
 		}
 
@@ -54,28 +56,52 @@ class WP_Font_Face_Resolver {
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
 			foreach ( $font_families as $definition ) {
 
-				// Skip if font-family "name" is not defined.
-				if ( empty( $definition['name'] ) ) {
-					continue;
-				}
-
 				// Skip if "fontFace" is not defined, meaning there are no variations.
 				if ( empty( $definition['fontFace'] ) ) {
 					continue;
 				}
 
-				$font_family = $definition['name'];
-
-				// Prepare the fonts array structure for this font-family.
-				if ( ! array_key_exists( $font_family, $fonts ) ) {
-					$fonts[ $font_family ] = array();
+				// Skip if "fontFamily" is not defined.
+				if ( empty( $definition['fontFamily'] ) ) {
+					continue;
 				}
 
-				$fonts[ $font_family ] = static::convert_font_face_properties( $definition['fontFace'], $font_family );
+				$font_family_name = static::maybe_parse_name_from_comma_separated_list( $definition['fontFamily'] );
+
+				// Skip if no font family is defined.
+				if ( empty( $font_family_name ) ) {
+					continue;
+				}
+
+				// Prepare the fonts array structure for this font-family.
+				if ( ! array_key_exists( $font_family_name, $fonts ) ) {
+					$fonts[ $font_family_name ] = array();
+				}
+
+				$fonts[ $font_family_name ] = static::convert_font_face_properties( $definition['fontFace'], $font_family_name );
 			}
 		}
 
 		return $fonts;
+	}
+
+	/**
+	 * Parse font-family name from comma-separated lists.
+	 *
+	 * If the given `fontFamily` is a comma-separated lists (example: "Inter, sans-serif" ),
+	 * parse and return the fist font from the list.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param string $font_family Font family `fontFamily' to parse.
+	 * @return string Font-family name.
+	 */
+	private static function maybe_parse_name_from_comma_separated_list( $font_family ) {
+		if ( str_contains( $font_family, ',' ) ) {
+			$font_family = explode( ',', $font_family )[0];
+		}
+
+		return trim( $font_family, "\"'" );
 	}
 
 	/**

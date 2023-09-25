@@ -46,7 +46,7 @@ test.describe( 'Test Custom Post Types', () => {
 		}
 
 		const parentPageLocator = page.getByRole( 'combobox', {
-			name: 'Parent Page',
+			name: 'Parent',
 		} );
 
 		await parentPageLocator.click();

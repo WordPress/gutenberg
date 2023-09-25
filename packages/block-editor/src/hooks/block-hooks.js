@@ -250,10 +250,8 @@ export const withBlockHooks = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withBlockHooks' );
 
-if ( window?.__experimentalBlockHooks ) {
-	addFilter(
-		'editor.BlockEdit',
-		'core/block-hooks/with-inspector-control',
-		withBlockHooks
-	);
-}
+addFilter(
+	'editor.BlockEdit',
+	'core/block-hooks/with-inspector-control',
+	withBlockHooks
+);

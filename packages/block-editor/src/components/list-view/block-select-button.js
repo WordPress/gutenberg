@@ -233,9 +233,7 @@ function ListViewBlockSelectButton(
 					) }
 					{ positionLabel && isSticky && (
 						<Tooltip text={ positionLabel }>
-							<span className="block-editor-list-view-block-select-button__sticky">
-								<Icon icon={ pinSmall } />
-							</span>
+							<Icon icon={ pinSmall } />
 						</Tooltip>
 					) }
 					{ images.length ? (

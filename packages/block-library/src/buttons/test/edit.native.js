@@ -55,9 +55,10 @@ describe( 'Buttons block', () => {
 
 			// onLayout event has to be explicitly dispatched in BlockList component,
 			// otherwise the inner blocks are not rendered.
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -66,19 +67,18 @@ describe( 'Buttons block', () => {
 				},
 			} );
 
-			const [ buttonInnerBlock ] = await within(
-				buttonsBlock
-			).findAllByLabelText( /Button Block\. Row 1/ );
+			const [ buttonInnerBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 1/
+				);
 			fireEvent.press( buttonInnerBlock );
 
-			const settingsButton = await editor.findByLabelText(
-				'Open Settings'
-			);
+			const settingsButton =
+				await editor.findByLabelText( 'Open Settings' );
 			fireEvent.press( settingsButton );
 
-			const radiusStepper = await editor.findByLabelText(
-				/Border Radius/
-			);
+			const radiusStepper =
+				await editor.findByLabelText( /Border Radius/ );
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
 				'Increment',
@@ -98,9 +98,10 @@ describe( 'Buttons block', () => {
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -119,9 +120,10 @@ describe( 'Buttons block', () => {
 			fireEvent.press( appenderButton );
 
 			// Check for new button
-			const [ secondButtonBlock ] = await within(
-				buttonsBlock
-			).findAllByLabelText( /Button Block\. Row 2/ );
+			const [ secondButtonBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 2/
+				);
 			expect( secondButtonBlock ).toBeVisible();
 
 			// Add a Paragraph block using the empty placeholder at the bottom
@@ -148,9 +150,10 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonsBlock );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -207,9 +210,10 @@ describe( 'Buttons block', () => {
 				const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 				// Trigger inner blocks layout
-				const innerBlockListWrapper = await within(
-					buttonsBlock
-				).findByTestId( 'block-list-wrapper' );
+				const innerBlockListWrapper =
+					await within( buttonsBlock ).findByTestId(
+						'block-list-wrapper'
+					);
 				fireEvent( innerBlockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {

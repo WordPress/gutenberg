@@ -297,7 +297,7 @@ test.describe( 'Preview with private custom post type', () => {
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 } );
 

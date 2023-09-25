@@ -20,11 +20,13 @@ if ( class_exists( 'WP_Font_Library' ) ) {
  */
 class WP_Font_Library {
 
+	const PHP_7_TTF_MIME_TYPE = PHP_VERSION_ID >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
+
 	const ALLOWED_FONT_MIME_TYPES = array(
 		'otf'   => 'font/otf',
-		'ttf'   => 'font/ttf',
-		'woff'  => 'font/woff',
-		'woff2' => 'font/woff2',
+		'ttf'   => PHP_VERSION_ID >= 70400 ? 'font/sfnt' : self::PHP_7_TTF_MIME_TYPE,
+		'woff'  => PHP_VERSION_ID >= 80100 ? 'font/woff' : 'application/font-woff',
+		'woff2' => PHP_VERSION_ID >= 80100 ? 'font/woff2' : 'application/font-woff2',
 	);
 
 	/**
@@ -117,5 +119,17 @@ class WP_Font_Library {
 		$defaults['url']     = $defaults['baseurl'] . '/fonts';
 
 		return $defaults;
+	}
+
+	/**
+	 * Sets the allowed mime types for fonts.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array $mime_types List of allowed mime types.
+	 * @return array Modified upload directory.
+	 */
+	public static function set_allowed_mime_types( $mime_types ) {
+		return array_merge( $mime_types, self::ALLOWED_FONT_MIME_TYPES );
 	}
 }

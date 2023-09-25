@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { useToolbarStore, Toolbar } from '@ariakit/react/toolbar';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -21,7 +22,7 @@ function UnforwardedToolbarContainer(
 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
-	const toolbarStore = useToolbarStore( {
+	const toolbarStore = Ariakit.useToolbarStore( {
 		focusLoop: true,
 		rtl: isRTL(),
 	} );
@@ -29,7 +30,7 @@ function UnforwardedToolbarContainer(
 	return (
 		// This will provide state for `ToolbarButton`'s
 		<ToolbarContext.Provider value={ toolbarStore }>
-			<Toolbar
+			<Ariakit.Toolbar
 				ref={ ref }
 				aria-label={ label }
 				store={ toolbarStore }
