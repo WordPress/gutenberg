@@ -45,6 +45,11 @@ export const allPatternsCategory = {
 	label: __( 'All Patterns' ),
 };
 
+export const myPatternsCategory = {
+	name: 'myPatterns',
+	label: __( 'My patterns' ),
+};
+
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
@@ -144,6 +149,9 @@ export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
+		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
+			categories.unshift( myPatternsCategory );
+		}
 		if ( filteredPatterns.length > 0 ) {
 			categories.unshift( {
 				name: allPatternsCategory.name,
@@ -191,6 +199,7 @@ export function BlockPatternsCategoryDialog( {
 			className="block-editor-inserter__patterns-category-dialog"
 		>
 			<BlockPatternsCategoryPanel
+				key={ category.name }
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				onHover={ onHover }
@@ -235,6 +244,9 @@ export function BlockPatternsCategoryPanel( {
 				}
 
 				if ( category.name === allPatternsCategory.name ) {
+					return true;
+				}
+				if ( category.name === myPatternsCategory.name && pattern.id ) {
 					return true;
 				}
 				if ( category.name !== 'uncategorized' ) {
@@ -290,6 +302,7 @@ export function BlockPatternsCategoryPanel( {
 						setPatternSyncFilter={ setPatternSyncFilter }
 						setPatternSourceFilter={ setPatternSourceFilter }
 						scrollContainerRef={ scrollContainerRef }
+						category={ category }
 					/>
 				</HStack>
 				{ category.description && (
@@ -398,6 +411,7 @@ function BlockPatternsTabs( {
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
 						<BlockPatternsCategoryPanel
+							key={ category.name }
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
 							category={ category }

@@ -17,7 +17,7 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory } from '../block-patterns-tab';
+import { allPatternsCategory, myPatternsCategory } from '../block-patterns-tab';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -67,7 +67,9 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
-
+			if ( selectedCategory === myPatternsCategory.name && pattern.id ) {
+				return true;
+			}
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory = pattern.categories.some(
 					( category ) =>
