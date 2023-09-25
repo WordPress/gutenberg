@@ -119,19 +119,10 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 		}
 	}
 
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		return {
-			register,
-			bootstrap,
-			update,
-			discard,
-		};
-	}
-
 	return {
-		register: () => {},
-		bootstrap: () => Promise.resolve(),
-		update: () => {},
-		discard: () => Promise.resolve(),
+		register,
+		bootstrap,
+		update,
+		discard,
 	};
 };

@@ -75,6 +75,8 @@ export const getEntityRecord =
 			// Entity supports configs,
 			// use the sync algorithm instead of the old fetch behavior.
 			if (
+				// eslint-disable-next-line @wordpress/is-gutenberg-plugin
+				process.env.IS_GUTENBERG_PLUGIN &&
 				window.__experimentalEnableSync &&
 				entityConfig.syncConfig &&
 				! query

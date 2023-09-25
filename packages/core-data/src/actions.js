@@ -384,7 +384,12 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
+		if (
+			// eslint-disable-next-line @wordpress/is-gutenberg-plugin
+			process.env.IS_GUTENBERG_PLUGIN &&
+			window.__experimentalEnableSync &&
+			entityConfig.syncConfig
+		) {
 			const objectId = entityConfig.getSyncObjectId( recordId );
 			getSyncProvider().update(
 				entityConfig.syncObjectType + '--edit',

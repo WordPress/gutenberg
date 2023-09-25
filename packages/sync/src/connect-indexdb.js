@@ -20,16 +20,12 @@ import { IndexeddbPersistence } from 'y-indexeddb';
  * @return {Promise<() => void>} Promise that resolves when the connection is established.
  */
 export function connectIndexDb( objectId, objectType, doc ) {
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		const docName = `${ objectType }-${ objectId }`;
-		const provider = new IndexeddbPersistence( docName, doc );
+	const docName = `${ objectType }-${ objectId }`;
+	const provider = new IndexeddbPersistence( docName, doc );
 
-		return new Promise( ( resolve ) => {
-			provider.on( 'synced', () => {
-				resolve( () => provider.destroy() );
-			} );
+	return new Promise( ( resolve ) => {
+		provider.on( 'synced', () => {
+			resolve( () => provider.destroy() );
 		} );
-	}
-
-	return Promise.resolve( () => {} );
+	} );
 }

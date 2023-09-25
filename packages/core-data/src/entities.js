@@ -400,9 +400,12 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
-			if ( window.__experimentalEnableSync ) {
-				registerSyncConfigs( configs );
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( window.__experimentalEnableSync ) {
+					registerSyncConfigs( configs );
+				}
 			}
+
 			return configs;
 		}
 
@@ -414,9 +417,12 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
-		if ( window.__experimentalEnableSync ) {
-			registerSyncConfigs( configs );
+		if ( process.env.IS_GUTENBERG_PLUGIN ) {
+			if ( window.__experimentalEnableSync ) {
+				registerSyncConfigs( configs );
+			}
 		}
+
 		dispatch( addEntities( configs ) );
 
 		return configs;
