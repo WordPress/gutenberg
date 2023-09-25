@@ -35,7 +35,7 @@ _If you're using [`Popover`](/packages/components/src/popover/README.md) or [`To
 
 By default, the `Popover` component will render within an extra element appended to the body of the document.
 
-If you want to precisely contol where the popovers render, you will need to use the `Popover.Slot` component.
+If you want to precisely control where the popovers render, you will need to use the `Popover.Slot` component.
 
 A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
 So the same considerations should be applied to them.
