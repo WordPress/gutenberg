@@ -150,10 +150,7 @@ export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
 			} );
 		}
 		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
-			categories.unshift( {
-				name: myPatternsCategory.name,
-				label: myPatternsCategory.label,
-			} );
+			categories.unshift( myPatternsCategory );
 		}
 		if ( filteredPatterns.length > 0 ) {
 			categories.unshift( {
