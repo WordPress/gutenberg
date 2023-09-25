@@ -138,7 +138,9 @@ test.describe( 'Site Editor Performance', () => {
 			// canvas is ready, and we don't want it to affect the typing
 			// timings.
 			await page
-				.locator( '.edit-site-canvas-loader' )
+				.locator(
+					'.edit-site-canvas-loader, .edit-site-canvas-spinner' // Spinner is used in the legacy editor.
+				)
 				.waitFor( { state: 'hidden', timeout: 120_000 } );
 
 			const canvas = await perfUtils.getCanvas();
