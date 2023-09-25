@@ -1,20 +1,18 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
  */
 import { menu } from '@wordpress/icons';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { DropdownMenu, DropdownMenuItem } from '..';
+import { DropdownMenu, DropdownMenuItem, DropdownMenuContext } from '..';
 import Icon from '../../icon';
 import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
@@ -108,7 +106,10 @@ export const WithModalAsSiblingOfMenuItem: StoryFn< typeof DropdownMenu > = (
 	const [ isModalOpen, setModalOpen ] = useState( false );
 	return (
 		<DropdownMenu { ...props }>
-			<DropdownMenuItem onClick={ () => setModalOpen( true ) }>
+			<DropdownMenuItem
+				hideOnClick={ false }
+				onClick={ () => setModalOpen( true ) }
+			>
 				Open modal
 			</DropdownMenuItem>
 			{ isModalOpen && (
@@ -129,16 +130,19 @@ WithModalAsSiblingOfMenuItem.args = {
 const ExampleSlotFill = createSlotFill( 'Example' );
 
 const Slot = () => {
-	const ariakitMenuStore = Ariakit.useMenuContext();
+	const dropdownMenuContext = useContext( DropdownMenuContext );
 
 	// Forwarding the content of the slot so that it can be used by the fill
 	const fillProps = useMemo(
 		() => ( {
 			forwardedContext: [
-				[ Ariakit.MenuProvider, { store: ariakitMenuStore } ],
+				[
+					DropdownMenuContext.Provider,
+					{ value: dropdownMenuContext },
+				],
 			],
 		} ),
-		[ ariakitMenuStore ]
+		[ dropdownMenuContext ]
 	);
 
 	return <ExampleSlotFill.Slot fillProps={ fillProps } bubblesVirtually />;
@@ -175,13 +179,20 @@ export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
 		<SlotFillProvider>
 			<DropdownMenu { ...props }>
 				<DropdownMenuItem>Item</DropdownMenuItem>
-				<Slot />
+				<DropdownMenu trigger="Nested">
+					<Slot />
+				</DropdownMenu>
 			</DropdownMenu>
 
 			<Fill>
 				<DropdownMenuItem hideOnClick={ false }>
 					Item from fill
 				</DropdownMenuItem>
+				<DropdownMenu trigger="Nested in fill">
+					<DropdownMenuItem hideOnClick={ false }>
+						Test
+					</DropdownMenuItem>
+				</DropdownMenu>
 			</Fill>
 		</SlotFillProvider>
 	);
