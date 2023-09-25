@@ -432,9 +432,8 @@ describe( 'Embed block', () => {
 
 	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
@@ -456,9 +455,8 @@ describe( 'Embed block', () => {
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
@@ -501,9 +499,8 @@ describe( 'Embed block', () => {
 			const previousURL = 'https://twitter.com/notnownikki';
 			const invalidURL = 'http://';
 
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
@@ -541,9 +538,8 @@ describe( 'Embed block', () => {
 		it( 'sets empty state when setting an empty URL', async () => {
 			const previousURL = 'https://twitter.com/notnownikki';
 
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
@@ -570,9 +566,8 @@ describe( 'Embed block', () => {
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
 
 			// Get empty embed link.
-			const emptyLinkTextInput = await editor.findByPlaceholderText(
-				'Add link'
-			);
+			const emptyLinkTextInput =
+				await editor.findByPlaceholderText( 'Add link' );
 
 			expect( emptyLinkTextInput ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -680,9 +675,8 @@ describe( 'Embed block', () => {
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
-				const editor = await initializeWithEmbedBlock(
-					RICH_TEXT_EMBED_HTML
-				);
+				const editor =
+					await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 				// Open alignment options.
 				fireEvent.press( await editor.findByLabelText( 'Align' ) );
@@ -714,9 +708,8 @@ describe( 'Embed block', () => {
 				return mockOtherResponses( req );
 			} );
 
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			await editor.findByText( 'Unable to embed media' );
 
@@ -749,9 +742,8 @@ describe( 'Embed block', () => {
 				return mockOtherResponses( req );
 			} );
 
-			const editor = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const editor =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Convert embed to link.
 			fireEvent.press( editor.getByText( 'More options' ) );
@@ -826,9 +818,8 @@ describe( 'Embed block', () => {
 
 	describe( 'preview coming soon', () => {
 		it( 'previews post for providers which embed preview is not available yet', async () => {
-			const { getByText, getByTestId } = await initializeWithEmbedBlock(
-				PHOTO_EMBED_HTML
-			);
+			const { getByText, getByTestId } =
+				await initializeWithEmbedBlock( PHOTO_EMBED_HTML );
 
 			// Try to preview the post.
 			fireEvent.press( getByText( 'PREVIEW POST' ) );
@@ -848,9 +839,8 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'dismisses no preview modal', async () => {
-			const { getByText, getByTestId } = await initializeWithEmbedBlock(
-				PHOTO_EMBED_HTML
-			);
+			const { getByText, getByTestId } =
+				await initializeWithEmbedBlock( PHOTO_EMBED_HTML );
 
 			// Try to preview the post.
 			fireEvent.press( getByText( 'PREVIEW POST' ) );
@@ -908,9 +898,8 @@ describe( 'Embed block', () => {
 			);
 
 			// Get the created embed block.
-			const [ embedBlock ] = await editor.findAllByLabelText(
-				/Embed Block\. Row 1/
-			);
+			const [ embedBlock ] =
+				await editor.findAllByLabelText( /Embed Block\. Row 1/ );
 
 			expect( embedBlock ).toBeDefined();
 
@@ -996,9 +985,8 @@ describe( 'Embed block', () => {
 
 			fireEvent.press( await editor.findByText( 'Embed' ) );
 
-			const [ block ] = await editor.findAllByLabelText(
-				/Embed Block\. Row 1/
-			);
+			const [ block ] =
+				await editor.findAllByLabelText( /Embed Block\. Row 1/ );
 
 			const blockName = within( block ).getByText( 'Embed' );
 
@@ -1037,9 +1025,8 @@ describe( 'Embed block', () => {
 
 				fireEvent.press( await editor.findByText( title ) );
 
-				const [ block ] = await editor.findAllByLabelText(
-					/Embed Block\. Row 1/
-				);
+				const [ block ] =
+					await editor.findAllByLabelText( /Embed Block\. Row 1/ );
 
 				const blockName = within( block ).getByText( title );
 
@@ -1096,9 +1083,8 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const screen = await initializeWithEmbedBlock(
-				RICH_TEXT_EMBED_HTML
-			);
+			const screen =
+				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press( await screen.findByLabelText( 'Open Settings' ) );
@@ -1120,9 +1106,8 @@ describe( 'Embed block', () => {
 			// Wait for media settings panel.
 			let mediaSettingsPanel;
 			try {
-				mediaSettingsPanel = await screen.findByText(
-					'Media settings'
-				);
+				mediaSettingsPanel =
+					await screen.findByText( 'Media settings' );
 			} catch ( e ) {
 				// NOOP.
 			}

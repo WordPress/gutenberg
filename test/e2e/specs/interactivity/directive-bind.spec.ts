@@ -126,7 +126,7 @@ test.describe( 'data-wp-bind', () => {
 					 * Value that the HTMLElement instance property should
 					 * contain after hydration.
 					 */
-					entityPropValue: any
+					entityPropValue: any,
 				]
 			>;
 		};
