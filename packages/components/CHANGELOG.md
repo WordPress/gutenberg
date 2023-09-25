@@ -4,18 +4,49 @@
 
 ### Enhancements
 
+-   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+
+### Bug Fix
+
+-   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+-   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+-   `FormTokenField`: Add `box-sizing` reset style and reset default padding ([#54734](https://github.com/WordPress/gutenberg/pull/54734)).
+
+### Internal
+
+-   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+-   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
+-   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+
+## 25.8.0 (2023-09-20)
+
+### Enhancements
+
+-   Add new option `firstContentElement` to Modal's `focusOnMount` prop to allow consumers to focus the first element within the Modal's **contents** ([#54590](https://github.com/WordPress/gutenberg/pull/54590)).
+-   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
 -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
 -   `Popover`: Add the `is-positioned` CSS class only after the popover has finished animating ([#54178](https://github.com/WordPress/gutenberg/pull/54178)).
 -   `Tooltip`: Replace the existing tooltip to simplify the implementation and improve accessibility while maintaining the same behaviors and API ([#48440](https://github.com/WordPress/gutenberg/pull/48440)).
 -   `Dropdown` and `DropdownMenu`: support controlled mode for the dropdown's open/closed state ([#54257](https://github.com/WordPress/gutenberg/pull/54257)).
+-   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
+-   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
+-   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
+-   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+-   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
+-   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+- `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fix
 
+-   `Notice`: Make the Close button render a tooltip to visually expose its accessible name. All icon buttons must always show a tooltip ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   `Tooltip`: dynamically render in the DOM only when visible ([#54312](https://github.com/WordPress/gutenberg/pull/54312)).
 -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
 -   `ToolbarItem`: Fix children not showing in rendered components ([#53314](https://github.com/WordPress/gutenberg/pull/53314)).
 -   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54196](https://github.com/WordPress/gutenberg/pull/54196)).
+-   `InputControl`: Fix focus style size ([#54394](https://github.com/WordPress/gutenberg/pull/54394)).
+-   `BorderControl`: Use standard focus style on BorderControl ([#54429](https://github.com/WordPress/gutenberg/pull/54429)).
+-   `Color values`: Update borderFocus to ADMIN.theme ([#54425](https://github.com/WordPress/gutenberg/pull/54425)).
 
 ### Internal
 
@@ -27,10 +58,18 @@
 -   `Higher Order` -- `with-focus-outside`: Convert to TypeScript ([#53980](https://github.com/WordPress/gutenberg/pull/53980)).
 -   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
 -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
+-   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
+-   `Toolbar/ToolbarGroup`: Convert component to TypeScript ([#54317](https://github.com/WordPress/gutenberg/pull/54317)).
+-   `Modal`: add more unit tests ([#54569](https://github.com/WordPress/gutenberg/pull/54569)).
 
 ### Experimental
 
 -   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#54036](https://github.com/WordPress/gutenberg/pull/54036).
+
+### New Features
+
+-   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
+-   `Tooltip`: Add `placement` prop to replace deprecated `position`([#54264](https://github.com/WordPress/gutenberg/pull/54264)).
 
 ## 25.7.0 (2023-08-31)
 

@@ -310,4 +310,26 @@ describe( 'Tooltip', () => {
 			await screen.findByRole( 'button', { description: 'tooltip text' } )
 		).toBeInTheDocument();
 	} );
+
+	it( 'should not hide tooltip when the anchor is clicked if hideOnClick is false', async () => {
+		const user = userEvent.setup();
+
+		render( <Tooltip { ...props } hideOnClick={ false } /> );
+
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		await user.hover( button );
+
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
+
+		await user.click( button );
+
+		expect(
+			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
+
+		await cleanupTooltip( user );
+	} );
 } );

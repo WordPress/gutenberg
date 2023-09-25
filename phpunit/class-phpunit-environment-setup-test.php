@@ -17,5 +17,4 @@ class Phpunit_Environment_Setup_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $is_multisite_in_env, is_multisite(), 'Despite WP_MULTISITE being set in the environment, the tests were not run in multisite mode. There is likely an issue with the phpunit setup.' );
 	}
-
 }

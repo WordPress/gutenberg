@@ -76,10 +76,15 @@ function UnforwardedUnitControl(
 			unitsProp
 		);
 		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
-		const firstCharacters = rest.reduce( ( carry, { value } ) => {
-			const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
-			return carry.includes( first ) ? carry : `${ carry }|${ first }`;
-		}, escapeRegExp( firstUnitValue.substring( 0, 1 ) ) );
+		const firstCharacters = rest.reduce(
+			( carry, { value } ) => {
+				const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
+				return carry.includes( first )
+					? carry
+					: `${ carry }|${ first }`;
+			},
+			escapeRegExp( firstUnitValue.substring( 0, 1 ) )
+		);
 		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
 	}, [ nonNullValueProp, unitProp, unitsProp ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(

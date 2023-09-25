@@ -4,6 +4,12 @@
 import classnames from 'classnames';
 
 /**
+ * Internal dependencies
+ */
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -32,9 +38,14 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
-import { prependHTTP } from '@wordpress/url';
 
-const NEW_TAB_REL = 'noreferrer noopener';
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: __( 'Mark as nofollow' ),
+	},
+];
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -92,22 +103,6 @@ function ButtonEdit( props ) {
 
 	const TagName = tagName || 'a';
 
-	function onToggleOpenInNewTab( value ) {
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( newLinkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
-		}
-
-		setAttributes( {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		} );
-	}
-
 	function setButtonText( newText ) {
 		// Remove anchor tags from button text content.
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
@@ -138,7 +133,9 @@ function ButtonEdit( props ) {
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
-	const opensInNewTab = linkTarget === '_blank';
+	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
+	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+	const isLinkTag = 'a' === TagName;
 
 	function startEditing( event ) {
 		event.preventDefault();
@@ -163,8 +160,8 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab } ),
-		[ url, opensInNewTab ]
+		() => ( { url, opensInNewTab, nofollow } ),
+		[ url, opensInNewTab, nofollow ]
 	);
 
 	return (
@@ -220,7 +217,7 @@ function ButtonEdit( props ) {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				{ ! isURLSet && 'a' === TagName && (
+				{ ! isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -229,7 +226,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && 'a' === TagName && (
+				{ isURLSet && isLinkTag && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -240,7 +237,7 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-			{ 'a' === TagName && isSelected && ( isEditingURL || isURLSet ) && (
+			{ isLinkTag && isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
 					placement="bottom"
 					onClose={ () => {
@@ -255,20 +252,25 @@ function ButtonEdit( props ) {
 					<LinkControl
 						value={ linkValue }
 						onChange={ ( {
-							url: newURL = '',
+							url: newURL,
 							opensInNewTab: newOpensInNewTab,
-						} ) => {
-							setAttributes( { url: prependHTTP( newURL ) } );
-
-							if ( opensInNewTab !== newOpensInNewTab ) {
-								onToggleOpenInNewTab( newOpensInNewTab );
-							}
-						} }
+							nofollow: newNofollow,
+						} ) =>
+							setAttributes(
+								getUpdatedLinkAttributes( {
+									rel,
+									url: newURL,
+									opensInNewTab: newOpensInNewTab,
+									nofollow: newNofollow,
+								} )
+							)
+						}
 						onRemove={ () => {
 							unlink();
 							richTextRef.current?.focus();
 						} }
 						forceIsEditingLink={ isEditingURL }
+						settings={ LINK_SETTINGS }
 					/>
 				</Popover>
 			) }
@@ -279,7 +281,7 @@ function ButtonEdit( props ) {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				{ 'a' === TagName && (
+				{ isLinkTag && (
 					<TextControl
 						__nextHasNoMarginBottom
 						label={ __( 'Link rel' ) }

@@ -130,6 +130,7 @@ function SandBox( {
 	styles = [],
 	scripts = [],
 	onFocus,
+	tabIndex,
 }: SandBoxProps ) {
 	const ref = useRef< HTMLIFrameElement >();
 	const [ width, setWidth ] = useState( 0 );
@@ -282,6 +283,7 @@ function SandBox( {
 		<iframe
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			title={ title }
+			tabIndex={ tabIndex }
 			className="components-sandbox"
 			sandbox="allow-scripts allow-same-origin allow-presentation"
 			onFocus={ onFocus }

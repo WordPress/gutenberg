@@ -18,7 +18,7 @@ import type { WordPressComponentFromProps } from '.';
 
 type AcceptsTwoArgs<
 	F extends ( ...args: any ) => any,
-	ErrorMessage = never
+	ErrorMessage = never,
 > = Parameters< F >[ 'length' ] extends 2 ? {} : ErrorMessage;
 
 type ContextConnectOptions = {
@@ -34,7 +34,7 @@ type ContextConnectOptions = {
  * @return The connected WordPressComponent
  */
 export function contextConnect<
-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null
+	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
 >(
 	Component: C &
 		AcceptsTwoArgs<
@@ -66,7 +66,7 @@ export function contextConnectWithoutRef< P >(
 // component wrappers.
 function _contextConnect<
 	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
-	O extends ContextConnectOptions
+	O extends ContextConnectOptions,
 >(
 	Component: C,
 	namespace: string,

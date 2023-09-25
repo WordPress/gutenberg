@@ -261,7 +261,7 @@ class Tests_Fonts_WPFontsResolver_RegisterFontsFromThemeJson extends WP_Fonts_Te
 		 * @return WP_Theme_JSON_Data_Gutenberg| WP_Theme_JSON_Data Modified instance.
 		 * @throws ReflectionException
 		 */
-		$remove_expected_font_family = static function( $theme_json_data ) use ( $expected_font_family ) {
+		$remove_expected_font_family = static function ( $theme_json_data ) use ( $expected_font_family ) {
 			// Need to get the underlying data array which is in WP_Theme_JSON_Gutenberg | WP_Theme_JSON object.
 			$property = new ReflectionProperty( $theme_json_data, 'theme_json' );
 			$property->setAccessible( true );

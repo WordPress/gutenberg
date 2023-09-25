@@ -207,24 +207,25 @@ You can attach private selectors and actions to a public store:
 
 ```js
 // In packages/package1/store.js:
-import { privateHasContentRoleAttribute, ...selectors } from './selectors';
-import { privateToggleFeature, ...actions } from './selectors';
+import { privateHasContentRoleAttribute } from './private-selectors';
+import { privateToggleFeature } from './private-actions';
 // The `lock` function is exported from the internal private-apis.js file where
 // the opt-in function was called.
 import { lock, unlock } from './lock-unlock';
 
-export const store = registerStore(/* ... */);
+export const store = registerStore( /* ... */ );
 // Attach a private action to the exported store:
-unlock( store ).registerPrivateActions({
-	privateToggleFeature
+unlock( store ).registerPrivateActions( {
+	privateToggleFeature,
 } );
 
 // Attach a private action to the exported store:
-unlock( store ).registerPrivateSelectors({
-	privateHasContentRoleAttribute
+unlock( store ).registerPrivateSelectors( {
+	privateHasContentRoleAttribute,
 } );
+```
 
-
+```js
 // In packages/package2/MyComponent.js:
 import { store } from '@wordpress/package1';
 import { useSelect } from '@wordpress/data';
@@ -233,17 +234,18 @@ import { useSelect } from '@wordpress/data';
 import { unlock } from './lock-unlock';
 
 function MyComponent() {
-    const hasRole = useSelect( ( select ) => (
-		// Use the private selector:
-        unlock( select( store ) ).privateHasContentRoleAttribute()
+	const hasRole = useSelect(
+		( select ) =>
+			// Use the private selector:
+			unlock( select( store ) ).privateHasContentRoleAttribute()
 		// Note the unlock() is required. This line wouldn't work:
-        // select( store ).privateHasContentRoleAttribute()
-    ) );
+		// select( store ).privateHasContentRoleAttribute()
+	);
 
 	// Use the private action:
 	unlock( useDispatch( store ) ).privateToggleFeature();
 
-    // ...
+	// ...
 }
 ```
 
@@ -263,7 +265,9 @@ lock( privateApis, {
 	privateClass: class PrivateClass {},
 	privateVariable: 5,
 } );
+```
 
+```js
 // In packages/package2/index.js:
 import { privateApis } from '@wordpress/package1';
 import { unlock } from './lock-unlock';
@@ -336,7 +340,9 @@ export function validateBlocks( blocks ) {
 
 export const privateApis = {};
 lock( privateApis, { privateValidateBlocks } );
+```
 
+```js
 // In @wordpress/package2/index.js:
 import { privateApis as package1PrivateApis } from '@wordpress/package1';
 import { unlock } from './lock-unlock';
@@ -363,30 +369,30 @@ const PrivateMyButton = ( { title, privateShowIcon = true } ) => {
 
 	return (
 		<button>
-			{ privateShowIcon  && <Icon src={some icon} /> } { title }
+			{ privateShowIcon && <Icon src={ someIcon } /> } { title }
 		</button>
 	);
-}
+};
 
 // The stable public component is a thin wrapper that calls the
 // private component with the private features disabled
-export const MyButton = ( { title } ) =>
-    <PrivateMyButton title={ title } privateShowIcon={ false } />
+export const MyButton = ( { title } ) => (
+	<PrivateMyButton title={ title } privateShowIcon={ false } />
+);
 
 export const privateApis = {};
 lock( privateApis, { PrivateMyButton } );
+```
 
-
+```js
 // In @wordpress/package2/index.js:
 import { privateApis } from '@wordpress/package1';
 import { unlock } from './lock-unlock';
 
 // The private component may be "unlocked" given the stable component:
-const { PrivateMyButton } = unlock(privateApis);
+const { PrivateMyButton } = unlock( privateApis );
 export function MyComponent() {
-	return (
-		<PrivateMyButton data={data} privateShowIcon={ true } />
-	)
+	return <PrivateMyButton data={ data } privateShowIcon={ true } />;
 }
 ```
 
@@ -438,13 +444,14 @@ function privateInCorePublicInPlugin() {}
 
 // Gutenberg treats both functions as private APIs internally:
 const privateApis = {};
-lock(privateApis, { privateEverywhere, privateInCorePublicInPlugin });
+lock( privateApis, { privateEverywhere, privateInCorePublicInPlugin } );
 
 // The privateInCorePublicInPlugin function is explicitly exported,
 // but this export will not be merged into WordPress core thanks to
 // the process.env.IS_GUTENBERG_PLUGIN check.
 if ( process.env.IS_GUTENBERG_PLUGIN ) {
-   export const privateInCorePublicInPlugin = unlock( privateApis ).privateInCorePublicInPlugin;
+	export const privateInCorePublicInPlugin =
+		unlock( privateApis ).privateInCorePublicInPlugin;
 }
 ```
 
@@ -459,7 +466,7 @@ const a = 10;
 // Bad:
 const object = {
 	a: a,
-	performAction: function() {
+	performAction: function () {
 		// ...
 	},
 };
@@ -771,7 +778,7 @@ Documenting a function component should be treated the same as any other functio
  *
  * @return {?string} Block title.
  */
-```
+````
 
 For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://react.dev/reference/react/Component#static-proptypes).
 
