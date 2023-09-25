@@ -267,10 +267,26 @@ export function BlockPatternsCategoryPanel( {
 		category,
 		scrollContainerRef
 	);
+	const { changePage } = pagingProps;
 
 	// Hide block pattern preview on unmount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
+
+	const onSetPatternSyncFilter = useCallback(
+		( value ) => {
+			setPatternSyncFilter( value );
+			changePage( 1 );
+		},
+		[ setPatternSyncFilter, changePage ]
+	);
+	const onSetPatternSourceFilter = useCallback(
+		( value ) => {
+			setPatternSourceFilter( value );
+			changePage( 1 );
+		},
+		[ setPatternSourceFilter, changePage ]
+	);
 
 	return (
 		<div className="block-editor-inserter__patterns-category-panel">
@@ -287,8 +303,8 @@ export function BlockPatternsCategoryPanel( {
 					<BlockPatternsSyncFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
-						setPatternSyncFilter={ setPatternSyncFilter }
-						setPatternSourceFilter={ setPatternSourceFilter }
+						setPatternSyncFilter={ onSetPatternSyncFilter }
+						setPatternSourceFilter={ onSetPatternSourceFilter }
 						scrollContainerRef={ scrollContainerRef }
 					/>
 				</HStack>
