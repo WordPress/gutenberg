@@ -25,7 +25,7 @@ import { loadFontFaceInBrowser } from './utils';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
-	const [ notice, setNotice ] = useState( null );
+	const [ notice ] = useState( null );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -130,24 +130,13 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		setNotice( null );
-		const status = await installFonts( fontFamilies );
-		if ( status ) {
-			setNotice( {
-				type: 'success',
-				message: __( 'There was an error installing the fonts.' ),
-			} );
-		} else {
-			setNotice( {
-				type: 'warning',
-				message: __( 'There was an error installing the fonts.' ),
-			} );
-		}
+		await installFonts( fontFamilies );
 	};
 
 	return (
 		<>
 			<Spacer margin={ 16 } />
+			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library-modal__local-fonts">
 				<FormFileUpload
 					accept={ ALLOWED_FILE_EXTENSIONS.map(
@@ -161,7 +150,6 @@ function LocalFonts() {
 							onClick={ openFileDialog }
 						>
 							<span>{ __( 'Upload font' ) }</span>
-							<DropZone onFilesDrop={ handleDropZone } />
 						</Button>
 					) }
 				/>

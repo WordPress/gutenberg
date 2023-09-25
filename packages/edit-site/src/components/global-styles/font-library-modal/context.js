@@ -308,7 +308,7 @@ function FontLibraryProvider( { children } ) {
 		// Get the src of the font.
 		const src = getDisplaySrcFromFontFace( fontFace.src, themeUrl );
 		// If the font is already loaded, don't load it again.
-		if ( loadedFontUrls.has( src ) ) return;
+		if ( ! src || loadedFontUrls.has( src ) ) return;
 		// Load the font in the browser.
 		loadFontFaceInBrowser( fontFace, src, 'document' );
 		// Add the font to the loaded fonts list.
