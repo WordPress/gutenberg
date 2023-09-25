@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v1.6.4'
+        aztecVersion = 'v1.8.0'
         wordpressUtilsVersion = '3.3.0'
 
         // main
@@ -49,7 +49,7 @@ List<String> dirs = [
 android {
     namespace "org.wordpress.mobile.ReactNativeAztec"
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 24
