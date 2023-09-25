@@ -47,7 +47,7 @@ export function BlockPatternsSyncFilter( {
 	scrollContainerRef,
 	category,
 } ) {
-	const currentPatternSoureFilter =
+	const currentPatternSourceFilter =
 		category.name === myPatternsCategory.name
 			? PATTERN_TYPES.user
 			: patternSourceFilter;
@@ -55,7 +55,7 @@ export function BlockPatternsSyncFilter( {
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 	// otherwise applying them will just result in no patterns being shown.
 	const shouldDisableSyncFilter = getShouldDisableSyncFilter(
-		currentPatternSoureFilter
+		currentPatternSourceFilter
 	);
 
 	// We also need to disable the directory and theme source filter options if the category
@@ -155,7 +155,7 @@ export function BlockPatternsSyncFilter( {
 										0
 									);
 								} }
-								value={ currentPatternSoureFilter }
+								value={ currentPatternSourceFilter }
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Type' ) }>
