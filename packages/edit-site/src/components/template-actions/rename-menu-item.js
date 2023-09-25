@@ -56,6 +56,8 @@ export default function RenameMenuItem( { postType, postId, onClose } ) {
 
 	async function onRename( event ) {
 		event.preventDefault();
+		const postTypeLabel =
+			POST_TYPE_LABELS[ postType ] ?? POST_TYPE_LABELS.wp_template;
 
 		try {
 			await editEntityRecord( 'postType', record.type, record.id, {
@@ -80,11 +82,9 @@ export default function RenameMenuItem( { postType, postId, onClose } ) {
 
 			createSuccessNotice(
 				sprintf(
-					// translators: %1$s is a post type label, e.g., Template, Template Part or Pattern. %2$s is the new title.
-					__( '%1$s renamed to "%2$s".' ),
-					POST_TYPE_LABELS[ postType ] ??
-						POST_TYPE_LABELS.wp_template,
-					editedTitle
+					// translators: %s is a post type label, e.g., Template, Template Part or Pattern.
+					__( '%s renamed.' ),
+					postTypeLabel
 				),
 				{
 					type: 'snackbar',
@@ -95,7 +95,7 @@ export default function RenameMenuItem( { postType, postId, onClose } ) {
 			const fallbackErrorMessage = sprintf(
 				// translators: %s is a post type label, e.g., Template, Template Part or Pattern.
 				__( 'An error occurred while renaming the %s.' ),
-				POST_TYPE_LABELS[ postType ] ?? POST_TYPE_LABELS.wp_template
+				postTypeLabel
 			);
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
