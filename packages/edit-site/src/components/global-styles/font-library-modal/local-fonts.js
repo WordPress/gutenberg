@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	DropZone,
@@ -26,6 +26,11 @@ import { loadFontFaceInBrowser } from './utils';
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
+	const supportedFormats =
+		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
+			.map( ( extension ) => `.${ extension }` )
+			.join( ', ' ) +
+		` ${ __( 'and' ) } .${ ALLOWED_FILE_EXTENSIONS.slice( -1 ) }`;
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -174,8 +179,12 @@ function LocalFonts() {
 				) }
 				<Spacer margin={ 2 } />
 				<Text className="font-library-modal__upload-area__text">
-					{ __(
-						'Uploaded fonts will appear up in your library and can be used in your theme after that. Formats .ttf, .woff, and .woff2 are supported.'
+					{ sprintf(
+						/* translators: %s: allowed font formats: ex: .ttf, .woff and .woff2 */
+						__(
+							'Uploaded fonts will appear up in your library and can be used in your theme after that. Formats %s are supported.'
+						),
+						supportedFormats
 					) }
 				</Text>
 			</VStack>
