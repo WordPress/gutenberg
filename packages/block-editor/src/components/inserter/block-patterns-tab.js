@@ -199,6 +199,7 @@ export function BlockPatternsCategoryDialog( {
 			className="block-editor-inserter__patterns-category-dialog"
 		>
 			<BlockPatternsCategoryPanel
+				key={ category.name }
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				onHover={ onHover }
@@ -410,6 +411,7 @@ function BlockPatternsTabs( {
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
 						<BlockPatternsCategoryPanel
+							key={ category.name }
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
 							category={ category }
