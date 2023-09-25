@@ -97,74 +97,91 @@ export function useCurrentTemplateSlug() {
 const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 	index === items.findIndex( ( item ) => currentItem.name === item.name );
 
+function injectThemeAttributeInBlockTemplateContent(
+	block,
+	currentThemeStylesheet
+) {
+	if (
+		block.innerBlocks.find(
+			( innerBlock ) => innerBlock.name === 'core/template-part'
+		)
+	) {
+		block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+			if (
+				innerBlock.name === 'core/template-part' &&
+				innerBlock.attributes.theme === undefined
+			) {
+				innerBlock.attributes.theme = currentThemeStylesheet;
+			}
+			return innerBlock;
+		} );
+	}
+
+	if (
+		block.name === 'core/template-part' &&
+		block.attributes.theme === undefined
+	) {
+		block.attributes.theme = currentThemeStylesheet;
+	}
+	return block;
+}
+
+function preparePatterns( patterns, template, currentThemeStylesheet ) {
+	return (
+		patterns
+			.filter(
+				( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
+			)
+			.filter( filterOutDuplicatesByName )
+			// Filter only the patterns that are compatible with the current template.
+			.filter( ( pattern ) =>
+				pattern.templateTypes?.includes( template.slug )
+			)
+			.map( ( pattern ) => ( {
+				...pattern,
+				keywords: pattern.keywords || [],
+				type: PATTERN_TYPES.theme,
+				blocks: parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} ).map( ( block ) => {
+					const injected = injectThemeAttributeInBlockTemplateContent(
+						block,
+						currentThemeStylesheet
+					);
+					return injected;
+				} ),
+			} ) )
+	);
+}
+
 // Should we also get templates?
 export function useAvailablePatterns( template ) {
 	const currentThemeStylesheet = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet
 	);
 
-	function injectThemeAttributeInBlockTemplateContent( block ) {
-		if (
-			block.innerBlocks.find(
-				( innerBlock ) => innerBlock.name === 'core/template-part'
-			)
-		) {
-			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
-				if (
-					innerBlock.name === 'core/template-part' &&
-					innerBlock.attributes.theme === undefined
-				) {
-					innerBlock.attributes.theme = currentThemeStylesheet;
-				}
-				return innerBlock;
-			} );
-		}
+	let availablePatterns = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( editSiteStore ) );
+		const settings = getSettings();
 
-		if (
-			block.name === 'core/template-part' &&
-			block.attributes.theme === undefined
-		) {
-			block.attributes.theme = currentThemeStylesheet;
-		}
-		return block;
-	}
+		const blockPatterns =
+			settings.__experimentalAdditionalBlockPatterns ??
+			settings.__experimentalBlockPatterns;
 
-	return useSelect(
-		( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const settings = getSettings();
-			const blockPatterns =
-				settings.__experimentalAdditionalBlockPatterns ??
-				settings.__experimentalBlockPatterns;
+		const restBlockPatterns = select( coreStore ).getBlockPatterns();
 
-			const restBlockPatterns = select( coreStore ).getBlockPatterns();
+		const patterns = [
+			...( blockPatterns || [] ),
+			...( restBlockPatterns || [] ),
+		];
+		return patterns;
+	} );
 
-			const patterns = [
-				...( blockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( pattern ) =>
-						! PATTERN_CORE_SOURCES.includes( pattern.source )
-				)
-				.filter( filterOutDuplicatesByName )
-				// Filter only the patterns that are compatible with the current template.
-				.filter( ( pattern ) =>
-					pattern.templateTypes?.includes( template.slug )
-				)
-				.map( ( pattern ) => ( {
-					...pattern,
-					keywords: pattern.keywords || [],
-					type: PATTERN_TYPES.theme,
-					blocks: parse( pattern.content, {
-						__unstableSkipMigrationLogs: true,
-					} ).map( ( block ) =>
-						injectThemeAttributeInBlockTemplateContent( block )
-					),
-				} ) );
-
-			return patterns;
-		},
-		[ template ]
+	availablePatterns = preparePatterns(
+		availablePatterns,
+		template,
+		currentThemeStylesheet
 	);
+
+	return availablePatterns;
 }
