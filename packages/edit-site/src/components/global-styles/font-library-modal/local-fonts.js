@@ -25,7 +25,7 @@ import { loadFontFaceInBrowser } from './utils';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
-	const [ notice ] = useState( null );
+	const [ notice, setNotice ] = useState( null );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -130,7 +130,14 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		await installFonts( fontFamilies );
+		setNotice( null );
+		const status = await installFonts( fontFamilies );
+		if ( status ) {
+			setNotice( {
+				type: 'success',
+				message: __( 'Upload successful.' ),
+			} );
+		}
 	};
 
 	return (
