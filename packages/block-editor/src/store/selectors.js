@@ -2294,7 +2294,6 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUserPatterns( state ) {
 	const userPatterns =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-
 	const userPatternCategories =
 		state?.settings?.__experimentalUserPatternCategories ?? [];
 	const categories = new Map();
