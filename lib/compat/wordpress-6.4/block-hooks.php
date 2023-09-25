@@ -87,7 +87,6 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 	return $settings;
 }
-add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
 
 /**
  * Register a hooked block for automatic insertion into a given block hook.
@@ -256,7 +255,6 @@ function gutenberg_parse_and_serialize_block_templates( $query_result ) {
 
 	return $query_result;
 }
-add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_templates', 10, 1 );
 
 /**
  * Filters the block template object after it has been (potentially) fetched from the theme file.
@@ -279,7 +277,37 @@ function gutenberg_parse_and_serialize_blocks( $block_template ) {
 
 	return $block_template;
 }
-add_filter( 'get_block_file_template', 'gutenberg_parse_and_serialize_blocks', 10, 1 );
+
+/**
+ * Register the `block_hooks` field for the block-types REST API controller.
+ *
+ * @return void
+ */
+function gutenberg_register_block_hooks_rest_field() {
+	register_rest_field(
+		'block-type',
+		'block_hooks',
+		array(
+			'schema' => array(
+				'description'       => __( 'This block is automatically inserted near any occurence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
+				'patternProperties' => array(
+					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
+						'type' => 'string',
+						'enum' => array( 'before', 'after', 'first_child', 'last_child' ),
+					),
+				),
+			),
+		)
+	);
+}
+
+// Install the polyfill for Block Hooks only if it isn't already handled in WordPress core.
+if ( ! function_exists( 'traverse_and_serialize_blocks' ) ) {
+	add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
+	add_filter( 'get_block_templates', 'gutenberg_parse_and_serialize_block_templates', 10, 1 );
+	add_filter( 'get_block_file_template', 'gutenberg_parse_and_serialize_blocks', 10, 1 );
+	add_action( 'rest_api_init', 'gutenberg_register_block_hooks_rest_field' );
+}
 
 // Helper functions.
 // -----------------
@@ -345,27 +373,3 @@ function gutenberg_serialize_block( $block ) {
 function gutenberg_serialize_blocks( $blocks ) {
 	return implode( '', array_map( 'gutenberg_serialize_block', $blocks ) );
 }
-
-/**
- * Register the `block_hooks` field for the block-types REST API controller.
- *
- * @return void
- */
-function gutenberg_register_block_hooks_rest_field() {
-	register_rest_field(
-		'block-type',
-		'block_hooks',
-		array(
-			'schema' => array(
-				'description'       => __( 'This block is automatically inserted near any occurence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
-				'patternProperties' => array(
-					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
-						'type' => 'string',
-						'enum' => array( 'before', 'after', 'first_child', 'last_child' ),
-					),
-				),
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_block_hooks_rest_field' );
