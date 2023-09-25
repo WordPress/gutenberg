@@ -8,6 +8,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
  */
 import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
 import {
 	DropdownMenu as DropdownMenuV2,
@@ -22,6 +23,7 @@ import {
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
 import { ComponentsContext } from './ui/context/context-system-provider';
+import Theme from './theme';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -45,4 +47,6 @@ lock( privateApis, {
 	DropdownMenuSeparatorV2,
 	DropdownSubMenuV2,
 	DropdownSubMenuTriggerV2,
+	ProgressBar,
+	Theme,
 } );

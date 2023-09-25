@@ -117,6 +117,7 @@ export default function NavigationInnerBlocks( {
 					? InnerBlocks.ButtonBlockAppender
 					: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
+			__experimentalCaptureToolbars: true,
 		}
 	);
 

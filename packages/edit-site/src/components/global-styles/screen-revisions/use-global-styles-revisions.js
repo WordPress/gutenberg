@@ -89,7 +89,6 @@ export default function useGlobalStylesRevisions() {
 					id: 'unsaved',
 					styles: userConfig?.styles,
 					settings: userConfig?.settings,
-					behaviors: userConfig?.behaviors,
 					author: {
 						name: currentUser?.name,
 						avatar_urls: currentUser?.avatar_urls,
@@ -99,6 +98,12 @@ export default function useGlobalStylesRevisions() {
 
 				_modifiedRevisions.unshift( unsavedRevision );
 			}
+
+			_modifiedRevisions.push( {
+				id: 'parent',
+				styles: {},
+				settings: {},
+			} );
 		}
 
 		return {

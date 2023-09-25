@@ -16,15 +16,16 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import normalizeRecordKey from '../../utils/normalize-record-key';
+import TemplateActions from '../template-actions';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function SidebarNavigationScreenPattern() {
+	const navigator = useNavigator();
+	const {
+		params: { postType, postId },
+	} = navigator;
 	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
-	const { params } = useNavigator();
-	const { postType } = params;
-	const postId = normalizeRecordKey( params?.postId );
 
 	useInitEditedEntityFromURL();
 
@@ -34,18 +35,28 @@ export default function SidebarNavigationScreenPattern() {
 	// indicates the user has arrived at the template part via the "manage all"
 	// page and the back button should return them to that list page.
 	const backPath =
-		! categoryType && postType === 'wp_template_part'
+		! categoryType && postType === TEMPLATE_PART_POST_TYPE
 			? '/wp_template_part/all'
 			: '/patterns';
 
 	return (
 		<SidebarNavigationScreen
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<>
+					<TemplateActions
+						postType={ postType }
+						postId={ postId }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( backPath );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</>
 			}
 			backPath={ backPath }
 			{ ...patternDetails }

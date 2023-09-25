@@ -36,8 +36,9 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) =>
-			<WrappedComponent { ...props } colors={ colorsArray } />,
+		( WrappedComponent ) => ( props ) => (
+			<WrappedComponent { ...props } colors={ colorsArray } />
+		),
 		'withCustomColorPalette'
 	);
 

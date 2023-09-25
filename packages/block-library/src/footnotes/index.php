@@ -34,7 +34,7 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 	$footnotes = json_decode( $footnotes, true );
 
-	if ( count( $footnotes ) === 0 ) {
+	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
 	}
 
@@ -98,7 +98,7 @@ function wp_save_footnotes_meta( $revision_id ) {
 
 		if ( $footnotes ) {
 			// Can't use update_post_meta() because it doesn't allow revisions.
-			update_metadata( 'post', $revision_id, 'footnotes', $footnotes );
+			update_metadata( 'post', $revision_id, 'footnotes', wp_slash( $footnotes ) );
 		}
 	}
 }
@@ -154,15 +154,14 @@ function wp_add_footnotes_revisions_to_post_meta( $post ) {
 
 			if ( $footnotes ) {
 				// Can't use update_post_meta() because it doesn't allow revisions.
-				update_metadata( 'post', $wp_temporary_footnote_revision_id, 'footnotes', $footnotes );
+				update_metadata( 'post', $wp_temporary_footnote_revision_id, 'footnotes', wp_slash( $footnotes ) );
 			}
 		}
 	}
 }
 
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_action( "rest_after_insert_{$post_type}", 'wp_add_footnotes_revisions_to_post_meta' );
-}
+add_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' );
+add_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' );
 
 /**
  * Restores the footnotes meta value from the revision.
@@ -176,7 +175,7 @@ function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 	$footnotes = get_post_meta( $revision_id, 'footnotes', true );
 
 	if ( $footnotes ) {
-		update_post_meta( $post_id, 'footnotes', $footnotes );
+		update_post_meta( $post_id, 'footnotes', wp_slash( $footnotes ) );
 	} else {
 		delete_post_meta( $post_id, 'footnotes' );
 	}
@@ -211,4 +210,77 @@ add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
 function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
-add_filter( 'wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+
+/**
+ * The REST API autosave endpoint doesn't save meta, so we can use the
+ * `wp_creating_autosave` when it updates an exiting autosave, and
+ * `_wp_put_post_revision` when it creates a new autosave.
+ *
+ * @since 6.3.0
+ *
+ * @param int|array $autosave The autosave ID or array.
+ */
+function _wp_rest_api_autosave_meta( $autosave ) {
+	// Ensure it's a REST API request.
+	if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+		return;
+	}
+
+	$body = rest_get_server()->get_raw_data();
+	$body = json_decode( $body, true );
+
+	if ( ! isset( $body['meta']['footnotes'] ) ) {
+		return;
+	}
+
+	// `wp_creating_autosave` passes the array,
+	// `_wp_put_post_revision` passes the ID.
+	$id = is_int( $autosave ) ? $autosave : $autosave['ID'];
+
+	if ( ! $id ) {
+		return;
+	}
+
+	update_post_meta( $id, 'footnotes', wp_slash( $body['meta']['footnotes'] ) );
+}
+// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L391C1-L391C1.
+add_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
+// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
+// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
+add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
+
+/**
+ * This is a workaround for the autosave endpoint returning early if the
+ * revision field are equal. The problem is that "footnotes" is not real
+ * revision post field, so there's nothing to compare against.
+ *
+ * This trick sets the "footnotes" field (value doesn't matter), which will
+ * cause the autosave endpoint to always update the latest revision. That should
+ * be fine, it should be ok to update the revision even if nothing changed. Of
+ * course, this is temporary fix.
+ *
+ * @since 6.3.0
+ *
+ * @param WP_Post         $prepared_post The prepared post object.
+ * @param WP_REST_Request $request       The request object.
+ *
+ * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L365-L384.
+ * See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L219.
+ */
+function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
+	// We only want to be altering POST requests.
+	if ( $request->get_method() !== 'POST' ) {
+		return $prepared_post;
+	}
+
+	// Only alter requests for the '/autosaves' route.
+	if ( substr( $request->get_route(), -strlen( '/autosaves' ) ) !== '/autosaves' ) {
+		return $prepared_post;
+	}
+
+	$prepared_post->footnotes = '[]';
+	return $prepared_post;
+}
+
+add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );

@@ -121,7 +121,7 @@ describe( 'Container block without paragraph support', () => {
 		// Insert an image block.
 		const insertButton = (
 			await page.$x( `//button//span[contains(text(), 'Image')]` )
-		 )[ 0 ];
+		)[ 0 ];
 		await insertButton.click();
 
 		// Check the inserted content.

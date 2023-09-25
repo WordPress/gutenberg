@@ -71,6 +71,11 @@ describe( 'useGlobalStylesRevisions', () => {
 				settings: {},
 				styles: {},
 			},
+			{
+				id: 'parent',
+				settings: {},
+				styles: {},
+			},
 		] );
 	} );
 
@@ -103,6 +108,11 @@ describe( 'useGlobalStylesRevisions', () => {
 				},
 				id: 1,
 				isLatest: true,
+				settings: {},
+				styles: {},
+			},
+			{
+				id: 'parent',
 				settings: {},
 				styles: {},
 			},

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, MouseEvent as ReactMouseEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,6 @@ import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 import type { ToolbarButtonProps } from './types';
 import type { WordPressComponentProps } from '../../ui/context';
-import type React from 'react';
 
 function UnforwardedToolbarButton(
 	{
@@ -45,7 +44,7 @@ function UnforwardedToolbarButton(
 					shortcut={ props.shortcut }
 					data-subscript={ props.subscript }
 					onClick={ (
-						event: React.MouseEvent<
+						event: ReactMouseEvent<
 							HTMLButtonElement & HTMLAnchorElement,
 							MouseEvent
 						>

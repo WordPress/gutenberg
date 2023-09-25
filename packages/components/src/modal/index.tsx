@@ -66,15 +66,28 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
 	const ref = useRef< HTMLDivElement >();
+
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+
+	// The focus hook does not support 'firstContentElement' but this is a valid
+	// value for the Modal's focusOnMount prop. The following code ensures the focus
+	// hook will focus the first focusable node within the element to which it is applied.
+	// When `firstContentElement` is passed as the value of the focusOnMount prop,
+	// the focus hook is applied to the Modal's content element.
+	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
+	// focus hook will focus the first element in the Modal's **content** when
+	// `firstContentElement` is passed.
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
@@ -170,13 +183,32 @@ function UnforwardedModal(
 		[ hasScrolledContent ]
 	);
 
-	const onOverlayPress: React.PointerEventHandler< HTMLDivElement > = (
-		event
-	) => {
-		if ( event.target === event.currentTarget ) {
-			event.preventDefault();
-			onRequestClose( event );
-		}
+	let pressTarget: EventTarget | null = null;
+	const overlayPressHandlers: {
+		onPointerDown: React.PointerEventHandler< HTMLDivElement >;
+		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+	} = {
+		onPointerDown: ( event ) => {
+			if ( event.isPrimary && event.target === event.currentTarget ) {
+				pressTarget = event.target;
+				// Avoids loss of focus yet also leaves `useFocusOutside`
+				// practically useless with its only potential trigger being
+				// programmatic focus movement. TODO opt for either removing
+				// the hook or enhancing it such that this isn't needed.
+				event.preventDefault();
+			}
+		},
+		// Closes the modal with two exceptions. 1. Opening the context menu on
+		// the overlay. 2. Pressing on the overlay then dragging the pointer
+		// over the modal and releasing. Due to the modal being a child of the
+		// overlay, such a gesture is a `click` on the overlay and cannot be
+		// excepted by a `click` handler. Thus the tactic of handling
+		// `pointerup` and comparing its target to that of the `pointerdown`.
+		onPointerUp: ( { target, button } ) => {
+			const isSameTarget = target === pressTarget;
+			pressTarget = null;
+			if ( button === 0 && isSameTarget ) onRequestClose();
+		},
 	};
 
 	return createPortal(
@@ -188,13 +220,7 @@ function UnforwardedModal(
 				overlayClassName
 			) }
 			onKeyDown={ handleEscapeKeyDown }
-			// Avoids loss of focus from clicking the overlay and also obviates
-			// `useFocusOutside` aside from cases of focus programmatically
-			// moving outside. TODO ideally both the hook and this handler
-			// won't be needed and one can be removed.
-			onPointerDown={
-				shouldCloseOnClickOutside ? onOverlayPress : undefined
-			}
+			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
@@ -209,7 +235,9 @@ function UnforwardedModal(
 					ref={ useMergeRefs( [
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMountRef,
+						focusOnMount !== 'firstContentElement'
+							? focusOnMountRef
+							: null,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
@@ -257,6 +285,7 @@ function UnforwardedModal(
 										</h1>
 									) }
 								</div>
+								{ headerActions }
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }
@@ -268,7 +297,17 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						<div ref={ childrenContainerRef }>{ children }</div>
+
+						<div
+							ref={ useMergeRefs( [
+								childrenContainerRef,
+								focusOnMount === 'firstContentElement'
+									? focusOnMountRef
+									: null,
+							] ) }
+						>
+							{ children }
+						</div>
 					</div>
 				</div>
 			</StyleProvider>

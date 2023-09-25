@@ -20,6 +20,7 @@ import { store as editSiteStore } from '../../store';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
 	const [ templateContent, setTemplateContent ] = useState( '' );
@@ -50,6 +51,37 @@ function useStartPatterns( fallbackContent ) {
 		};
 	}, [] );
 
+	const currentThemeStylesheet = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme().stylesheet
+	);
+
+	// Duplicated from packages/block-library/src/pattern/edit.js.
+	function injectThemeAttributeInBlockTemplateContent( block ) {
+		if (
+			block.innerBlocks.find(
+				( innerBlock ) => innerBlock.name === 'core/template-part'
+			)
+		) {
+			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+				if (
+					innerBlock.name === 'core/template-part' &&
+					innerBlock.attributes.theme === undefined
+				) {
+					innerBlock.attributes.theme = currentThemeStylesheet;
+				}
+				return innerBlock;
+			} );
+		}
+
+		if (
+			block.name === 'core/template-part' &&
+			block.attributes.theme === undefined
+		) {
+			block.attributes.theme = currentThemeStylesheet;
+		}
+		return block;
+	}
+
 	return useMemo( () => {
 		// filter patterns that are supposed to be used in the current template being edited.
 		return [
@@ -68,7 +100,12 @@ function useStartPatterns( fallbackContent ) {
 					);
 				} )
 				.map( ( pattern ) => {
-					return { ...pattern, blocks: parse( pattern.content ) };
+					return {
+						...pattern,
+						blocks: parse( pattern.content ).map( ( block ) =>
+							injectThemeAttributeInBlockTemplateContent( block )
+						),
+					};
 				} ),
 		];
 	}, [ fallbackContent, slug, patterns ] );
@@ -162,7 +199,7 @@ export default function StartTemplateOptions() {
 				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
-					'wp_template' === _postType &&
+					TEMPLATE_POST_TYPE === _postType &&
 					! select( preferencesStore ).get(
 						'core/edit-site',
 						'welcomeGuide'

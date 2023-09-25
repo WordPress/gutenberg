@@ -15,6 +15,7 @@ import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Rotation tests', () => {
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -70,6 +71,7 @@ describe( 'Gutenberg Editor Paste tests', () => {
 	} );
 
 	it.skip( 'copies plain text from one paragraph block and pastes in another', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -107,14 +109,13 @@ describe( 'Gutenberg Editor Paste tests', () => {
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( text ).toBe( testData.pastePlainText );
-
-		await editorPage.removeBlock();
-		await editorPage.removeBlock();
 	} );
 
 	it.skip( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// Create paragraph block with styled text by editing html.
-		await editorPage.setHtmlContent( testData.pasteHtmlText );
+		await editorPage.initializeEditor( {
+			initialData: testData.pasteHtmlText,
+		} );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);

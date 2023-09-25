@@ -1,4 +1,7 @@
 .wp-block-file {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&:not(.wp-element-button) {
 		font-size: 0.8em;
 	}
@@ -26,6 +29,12 @@
 	margin-bottom: 1em;
 }
 
+@media (max-width: 768px) {
+	.wp-block-file__embed {
+		display: none;
+	}
+}
+
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;
@@ -33,7 +42,6 @@
 	display: inline-block;
 
 	&:is(a) {
-
 		&:hover,
 		&:visited,
 		&:focus,

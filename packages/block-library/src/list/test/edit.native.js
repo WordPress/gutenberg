@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	selectRangeInRichText,
 	typeInRichText,
 	fireEvent,
@@ -422,11 +423,9 @@ describe( 'List block', () => {
 
 		<!-- wp:list-item -->
 		<li>Two</li>
-		<!-- /wp:list-item --></ul>
-		<!-- /wp:list -->
+		<!-- /wp:list-item -->
 
-		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
@@ -577,6 +576,10 @@ describe( 'List block', () => {
 			preventDefault() {},
 			keyCode: BACKSPACE,
 		} );
+		// Inner blocks batch store updates with microtasks.
+		// To avoid `act` warnings, we let queued microtasks to be executed.
+		// Reference: https://t.ly/b95nA
+		await act( async () => {} );
 
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->

@@ -3,7 +3,6 @@
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
-	BlockSettingsMenuControls,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -35,11 +34,13 @@ import { unlock } from '../../lock-unlock';
  * @param {Object}   props              Component props.
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
+ * @param {()=>void} props.onClose      Callback to close the menu.
  * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
 export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
+	onClose,
 } ) {
 	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
 		blockEditorPrivateApis
@@ -148,80 +149,71 @@ export default function ReusableBlockConvertButton( {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => setIsModalOpen( true ) }
+		<>
+			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
+				{ showRenameHint
+					? __( 'Create pattern/reusable block' )
+					: __( 'Create pattern' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<Modal
+					title={ __( 'Create pattern' ) }
+					onRequestClose={ () => {
+						setIsModalOpen( false );
+						setTitle( '' );
+					} }
+					overlayClassName="reusable-blocks-menu-items__convert-modal"
+				>
+					<form
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							onConvert( title );
+							setIsModalOpen( false );
+							setTitle( '' );
+							onClose();
+						} }
 					>
-						{ showRenameHint
-							? __( 'Create pattern/reusable block' )
-							: __( 'Create pattern' ) }
-					</MenuItem>
-					{ isModalOpen && (
-						<Modal
-							title={ __( 'Create pattern' ) }
-							onRequestClose={ () => {
-								setIsModalOpen( false );
-								setTitle( '' );
-							} }
-							overlayClassName="reusable-blocks-menu-items__convert-modal"
-						>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onConvert( title );
-									setIsModalOpen( false );
-									setTitle( '' );
-									onClose();
+						<VStack spacing="5">
+							<ReusableBlocksRenameHint />
+							<TextControl
+								__nextHasNoMarginBottom
+								label={ __( 'Name' ) }
+								value={ title }
+								onChange={ setTitle }
+								placeholder={ __( 'My pattern' ) }
+							/>
+
+							<ToggleControl
+								label={ __( 'Synced' ) }
+								help={ __(
+									'Editing the pattern will update it anywhere it is used.'
+								) }
+								checked={ ! syncType }
+								onChange={ () => {
+									setSyncType(
+										! syncType ? 'unsynced' : undefined
+									);
 								} }
-							>
-								<VStack spacing="5">
-									<ReusableBlocksRenameHint />
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Name' ) }
-										value={ title }
-										onChange={ setTitle }
-										placeholder={ __( 'My pattern' ) }
-									/>
+							/>
+							<HStack justify="right">
+								<Button
+									variant="tertiary"
+									onClick={ () => {
+										setIsModalOpen( false );
+										setTitle( '' );
+									} }
+								>
+									{ __( 'Cancel' ) }
+								</Button>
 
-									<ToggleControl
-										label={ __( 'Synced' ) }
-										help={ __(
-											'Editing the pattern will update it anywhere it is used.'
-										) }
-										checked={ ! syncType }
-										onChange={ () => {
-											setSyncType(
-												! syncType
-													? 'unsynced'
-													: undefined
-											);
-										} }
-									/>
-									<HStack justify="right">
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												setIsModalOpen( false );
-												setTitle( '' );
-											} }
-										>
-											{ __( 'Cancel' ) }
-										</Button>
-
-										<Button variant="primary" type="submit">
-											{ __( 'Create' ) }
-										</Button>
-									</HStack>
-								</VStack>
-							</form>
-						</Modal>
-					) }
-				</>
+								<Button variant="primary" type="submit">
+									{ __( 'Create' ) }
+								</Button>
+							</HStack>
+						</VStack>
+					</form>
+				</Modal>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }

@@ -19,7 +19,6 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts}' ).map(
 );
 
 module.exports = {
-	verbose: true,
 	rootDir: '../../',
 	// Automatically clear mock calls and instances between every test.
 	clearMocks: true,

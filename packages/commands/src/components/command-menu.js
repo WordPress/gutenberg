@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
-import { Icon } from '@wordpress/icons';
+import { Icon, search as inputIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -53,9 +54,14 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 					>
 						<HStack
 							alignment="left"
-							className="commands-command-menu__item"
+							className={ classnames(
+								'commands-command-menu__item',
+								{
+									'has-icon': command.icon,
+								}
+							) }
 						>
-							<Icon icon={ command.icon } />
+							{ command.icon && <Icon icon={ command.icon } /> }
 							<span>
 								<TextHighlight
 									text={ command.label }
@@ -123,9 +129,11 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className="commands-command-menu__item"
+						className={ classnames( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<Icon icon={ command.icon } />
+						{ command.icon && <Icon icon={ command.icon } /> }
 						<span>
 							<TextHighlight
 								text={ command.label }
@@ -168,12 +176,16 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Type a command or search' ) }
+			placeholder={ __( 'Search for commands' ) }
 			aria-activedescendant={ selectedItemId }
+			icon={ search }
 		/>
 	);
 }
 
+/**
+ * @ignore
+ */
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
@@ -188,7 +200,7 @@ export function CommandMenu() {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the command palette' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
@@ -198,7 +210,11 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
+		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.defaultPrevented ) return;
+
 			event.preventDefault();
 			if ( isOpen ) {
 				close();
@@ -256,6 +272,7 @@ export function CommandMenu() {
 					onKeyDown={ onKeyDown }
 				>
 					<div className="commands-command-menu__header">
+						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
