@@ -52,7 +52,7 @@ export function BlockPatternsSyncFilter( {
 	const shouldDisableSyncFilter =
 		getShouldDisableSyncFilter( patternSourceFilter );
 
-	// We also need to disable the directory and theme source filter options if the if the category
+	// We also need to disable the directory and theme source filter options if the category
 	// is `myPatterns` otherwise applying them will also just result in no patterns being shown.
 	const shouldDisableNonUserSources =
 		getShouldDisableNonUserSources( category );
