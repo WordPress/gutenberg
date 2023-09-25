@@ -12,6 +12,11 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { myPatternsCategory } from './block-patterns-tab';
+
 export const PATTERN_TYPES = {
 	all: 'all',
 	synced: 'synced',
@@ -20,25 +25,6 @@ export const PATTERN_TYPES = {
 	theme: 'theme',
 	directory: 'directory',
 };
-
-const patternSourceOptions = [
-	{ value: PATTERN_TYPES.all, label: __( 'All' ) },
-	{
-		value: PATTERN_TYPES.directory,
-		label: __( 'Directory' ),
-		info: __( 'Pattern directory & core' ),
-	},
-	{
-		value: PATTERN_TYPES.theme,
-		label: __( 'Theme' ),
-		info: __( 'Bundled with the theme' ),
-	},
-	{
-		value: PATTERN_TYPES.user,
-		label: __( 'User' ),
-		info: __( 'Custom created' ),
-	},
-];
 
 export const SYNC_TYPES = {
 	all: 'all',
@@ -49,17 +35,27 @@ export const SYNC_TYPES = {
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== PATTERN_TYPES.all && sourceFilter !== PATTERN_TYPES.user;
 
+const getShouldDisableNonUserSources = ( category ) => {
+	return category.name === myPatternsCategory.name;
+};
+
 export function BlockPatternsSyncFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
 	patternSyncFilter,
 	patternSourceFilter,
 	scrollContainerRef,
+	category,
 } ) {
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 	// otherwise applying them will just result in no patterns being shown.
 	const shouldDisableSyncFilter =
 		getShouldDisableSyncFilter( patternSourceFilter );
+
+	// We also need to disable the directory and theme source filter options if the if the category
+	// is `myPatterns` otherwise applying them will also just result in no patterns being shown.
+	const shouldDisableNonUserSources =
+		getShouldDisableNonUserSources( category );
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
@@ -78,6 +74,34 @@ export function BlockPatternsSyncFilter( {
 			},
 		],
 		[ shouldDisableSyncFilter ]
+	);
+
+	const patternSourceMenuOptions = useMemo(
+		() => [
+			{
+				value: PATTERN_TYPES.all,
+				label: __( 'All' ),
+				disabled: shouldDisableNonUserSources,
+			},
+			{
+				value: PATTERN_TYPES.directory,
+				label: __( 'Directory' ),
+				info: __( 'Pattern directory & core' ),
+				disabled: shouldDisableNonUserSources,
+			},
+			{
+				value: PATTERN_TYPES.theme,
+				label: __( 'Theme' ),
+				info: __( 'Bundled with the theme' ),
+				disabled: shouldDisableNonUserSources,
+			},
+			{
+				value: PATTERN_TYPES.user,
+				label: __( 'User' ),
+				info: __( 'Custom created' ),
+			},
+		],
+		[ shouldDisableNonUserSources ]
 	);
 
 	function handleSetSourceFilterChange( newSourceFilter ) {
@@ -117,7 +141,7 @@ export function BlockPatternsSyncFilter( {
 					<>
 						<MenuGroup label={ __( 'Author' ) }>
 							<MenuItemsChoice
-								choices={ patternSourceOptions }
+								choices={ patternSourceMenuOptions }
 								onSelect={ ( value ) => {
 									handleSetSourceFilterChange( value );
 									scrollContainerRef.current?.scrollTo(
