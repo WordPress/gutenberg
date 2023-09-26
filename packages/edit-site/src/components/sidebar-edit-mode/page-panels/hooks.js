@@ -166,9 +166,7 @@ export function useAvailablePatterns( template ) {
 		return patterns;
 	} );
 
-	return preparePatterns(
-		availablePatterns,
-		template,
-		currentThemeStylesheet
+	return useMemo( () =>
+		preparePatterns( availablePatterns, template, currentThemeStylesheet )
 	);
 }
