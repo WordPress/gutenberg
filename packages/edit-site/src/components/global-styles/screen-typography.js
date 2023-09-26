@@ -22,9 +22,10 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
-					{ ! window.__experimentalDisableFontLibrary && (
-						<FontFamilies />
-					) }
+					{ FontFamilies &&
+						! window.__experimentalDisableFontLibrary && (
+							<FontFamilies />
+						) }
 					<TypographyElements />
 				</VStack>
 			</div>
