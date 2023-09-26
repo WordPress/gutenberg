@@ -36,7 +36,10 @@ export default function ReplaceTemplateButton( {
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		//FIXME: This is a hack to get around the fact that the template is not being set correctly.
 		await setTemplate( null, null );
-		await entity.edit( { content: selectedTemplate.content } );
+		await entity.edit( {
+			blocks: selectedTemplate.blocks,
+			content: selectedTemplate.content,
+		} );
 		await setTemplate( postId, template.slug );
 		onClose(); // Close the template suggestions modal first.
 		onClick();

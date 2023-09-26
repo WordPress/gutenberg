@@ -140,13 +140,12 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 				type: PATTERN_TYPES.theme,
 				blocks: parse( pattern.content, {
 					__unstableSkipMigrationLogs: true,
-				} ).map( ( block ) => {
-					const injected = injectThemeAttributeInBlockTemplateContent(
+				} ).map( ( block ) =>
+					injectThemeAttributeInBlockTemplateContent(
 						block,
 						currentThemeStylesheet
-					);
-					return injected;
-				} ),
+					)
+				),
 			} ) )
 	);
 }
