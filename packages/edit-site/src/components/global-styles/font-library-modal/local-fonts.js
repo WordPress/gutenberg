@@ -46,6 +46,7 @@ function LocalFonts() {
 	 * @return {void}
 	 */
 	const handleFilesUpload = ( files ) => {
+		setNotice( null );
 		const uniqueFilenames = new Set();
 		const selectedFiles = [ ...files ];
 		const allowedFiles = selectedFiles.filter( ( file ) => {
@@ -135,7 +136,6 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		setNotice( null );
 		const status = await installFonts( fontFamilies );
 		if ( status ) {
 			setNotice( {
@@ -180,9 +180,9 @@ function LocalFonts() {
 				<Spacer margin={ 2 } />
 				<Text className="font-library-modal__upload-area__text">
 					{ sprintf(
-						/* translators: %s: allowed font formats: ex: .ttf, .woff and .woff2 */
+						/* translators: %s: supported font formats: ex: .ttf, .woff and .woff2 */
 						__(
-							'Uploaded fonts will appear up in your library and can be used in your theme after that. Formats %s are supported.'
+							'Uploaded fonts appear in your library and can be used in your theme. Supported formats: %s.'
 						),
 						supportedFormats
 					) }
