@@ -62,6 +62,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 			$p->set_attribute( 'data-wp-key', 'query-pagination-previous' );
 			$p->set_attribute( 'data-wp-on--click', 'actions.core.query.navigate' );
 			$p->set_attribute( 'data-wp-on--mouseenter', 'actions.core.query.prefetch' );
+			$p->set_attribute( 'data-wp-effect', 'effects.core.query.prefetch' );
 			$content = $p->get_updated_html();
 		}
 	}

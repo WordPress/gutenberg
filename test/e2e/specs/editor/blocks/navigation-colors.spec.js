@@ -413,6 +413,10 @@ class ColorControl {
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();
 
+		// Move the mouse to avoid accidentally triggering hover
+		// state on the links once the overlay opens.
+		await this.page.mouse.move( 1000, 1000 );
+
 		const overlay = this.editor.canvas
 			.locator( '.wp-block-navigation__responsive-container' )
 			.filter( { hasText: 'Submenu Link' } );
