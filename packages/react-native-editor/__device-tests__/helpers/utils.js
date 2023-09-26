@@ -59,11 +59,12 @@ const getIOSPlatformVersions = () => {
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
-	return runtimes
-		.reverse()
-		.filter(
-			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
-		);
+	return runtimes.reverse().filter(
+		( { name, isAvailable, version } ) =>
+			name.startsWith( 'iOS' ) &&
+			/15(\.\d+)+/.test( version ) && // Appium 1 does not support newer iOS versions
+			isAvailable
+	);
 };
 
 // Initialises the driver and desired capabilities for appium.
@@ -122,7 +123,7 @@ const setupDriver = async () => {
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+					'No compatible iOS simulators available! Please verify that you have iOS 15 simulators installed.'
 				);
 			}
 			// eslint-disable-next-line no-console
