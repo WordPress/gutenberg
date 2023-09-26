@@ -9,7 +9,6 @@
  * Renders the `core/footnotes` block on the server.
  *
  * @since 6.3.0
- * @since 6.4.0 Core added post meta revisions, so this is no longer needed.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
