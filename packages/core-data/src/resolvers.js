@@ -79,39 +79,41 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				const objectId = entityConfig.getSyncObjectId( key );
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					const objectId = entityConfig.getSyncObjectId( key );
 
-				// Loads the persisted document.
-				await getSyncProvider().bootstrap(
-					entityConfig.syncObjectType,
-					objectId,
-					( record ) => {
-						dispatch.receiveEntityRecords(
-							kind,
-							name,
-							record,
-							query
-						);
-					}
-				);
+					// Loads the persisted document.
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType,
+						objectId,
+						( record ) => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								record,
+								query
+							);
+						}
+					);
 
-				// Boostraps the edited document as well (and load from peers).
-				await getSyncProvider().bootstrap(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					( record ) => {
-						dispatch( {
-							type: 'EDIT_ENTITY_RECORD',
-							kind,
-							name,
-							recordId: key,
-							edits: record,
-							meta: {
-								undo: undefined,
-							},
-						} );
-					}
-				);
+					// Boostraps the edited document as well (and load from peers).
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType + '--edit',
+						objectId,
+						( record ) => {
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits: record,
+								meta: {
+									undo: undefined,
+								},
+							} );
+						}
+					);
+				}
 			} else {
 				if ( query !== undefined && query._fields ) {
 					// If requesting specific fields, items and query association to said
@@ -617,6 +619,31 @@ export const getBlockPatternCategories =
 			path: '/wp/v2/block-patterns/categories',
 		} );
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
+	};
+
+export const getUserPatternCategories =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const patternCategories = await resolveSelect.getEntityRecords(
+			'taxonomy',
+			'wp_pattern_category',
+			{
+				per_page: -1,
+				_fields: 'id,name,description,slug',
+			}
+		);
+
+		const mappedPatternCategories =
+			patternCategories?.map( ( userCategory ) => ( {
+				...userCategory,
+				label: userCategory.name,
+				name: userCategory.slug,
+			} ) ) || [];
+
+		dispatch( {
+			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
+			patternCategories: mappedPatternCategories,
+		} );
 	};
 
 export const getNavigationFallbackId =

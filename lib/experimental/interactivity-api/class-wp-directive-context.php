@@ -44,7 +44,7 @@ class WP_Directive_Context {
 	 *
 	 * @param array $context A context.
 	 */
-	function __construct( $context = array() ) {
+	public function __construct( $context = array() ) {
 		$this->set_context( $context );
 	}
 

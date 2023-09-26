@@ -104,13 +104,18 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	public function get_font_collection( $request ) {
 		$id         = $request->get_param( 'id' );
 		$collection = WP_Font_Library::get_font_collection( $id );
-
+		// If the collection doesn't exist returns a 404.
 		if ( is_wp_error( $collection ) ) {
 			$collection->add_data( array( 'status' => 404 ) );
 			return $collection;
 		}
-
-		return new WP_REST_Response( $collection->get_data() );
+		$collection_with_data = $collection->get_data();
+		// If there was an error getting the collection data, return the error.
+		if ( is_wp_error( $collection_with_data ) ) {
+			$collection_with_data->add_data( array( 'status' => 500 ) );
+			return $collection_with_data;
+		}
+		return new WP_REST_Response( $collection_with_data );
 	}
 
 	/**

@@ -57,7 +57,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -380,7 +380,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -598,7 +598,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;
@@ -915,7 +915,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-8:focus-within {
-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
   z-index: 1;
   outline: 2px solid transparent;

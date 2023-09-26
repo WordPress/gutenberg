@@ -44,6 +44,7 @@ import {
 	VkIcon,
 	WhatsAppIcon,
 	WordPressIcon,
+	XIcon,
 	YelpIcon,
 	YouTubeIcon,
 } from './icons';
@@ -303,6 +304,13 @@ const variations = [
 		attributes: { service: 'whatsapp' },
 		title: 'WhatsApp',
 		icon: WhatsAppIcon,
+	},
+	{
+		name: 'x',
+		attributes: { service: 'x' },
+		keywords: [ 'twitter' ],
+		title: 'X',
+		icon: XIcon,
 	},
 	{
 		name: 'yelp',

@@ -18,7 +18,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
-
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../utils/constants';
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
@@ -126,7 +129,7 @@ export const getSettings = createSelector(
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
-				'wp_template' === getEditedPostType( state ),
+				TEMPLATE_POST_TYPE === getEditedPostType( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -300,7 +303,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 
 		const templateParts = select( coreDataStore ).getEntityRecords(
 			'postType',
-			'wp_template_part',
+			TEMPLATE_PART_POST_TYPE,
 			{ per_page: -1 }
 		);
 

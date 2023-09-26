@@ -8,6 +8,8 @@ import classnames from 'classnames';
  */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
+import { useEffect } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -72,9 +74,16 @@ export function Placeholder(
 		modifierClassNames,
 		withIllustration ? 'has-illustration' : null
 	);
+
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
+
+	useEffect( () => {
+		if ( instructions ) {
+			speak( instructions );
+		}
+	}, [ instructions ] );
 
 	return (
 		<div { ...additionalProps } className={ classes }>
@@ -90,14 +99,12 @@ export function Placeholder(
 				<Icon icon={ icon } />
 				{ label }
 			</div>
-			<fieldset className={ fieldsetClasses }>
-				{ !! instructions && (
-					<legend className="components-placeholder__instructions">
-						{ instructions }
-					</legend>
-				) }
-				{ children }
-			</fieldset>
+			{ !! instructions && (
+				<div className="components-placeholder__instructions">
+					{ instructions }
+				</div>
+			) }
+			<div className={ fieldsetClasses }>{ children }</div>
 		</div>
 	);
 }

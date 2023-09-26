@@ -187,9 +187,15 @@ Titles are required for accessibility reasons, see `aria.labelledby` and `title`
 
 -   Required: No
 
-#### `focusOnMount`: `boolean | 'firstElement'`
+#### `focusOnMount`: `boolean | 'firstElement'` | 'firstContentElement'
 
 If this property is true, it will focus the first tabbable element rendered in the modal.
+
+If this property is false, focus will not be transferred and it is the responsibility of the consumer to ensure accessible focus management.
+
+If set to `firstElement` focus will be placed on the first tabbable element anywhere within the Modal.
+
+If set to `firstContentElement` focus will be placed on the first tabbable element within the Modal's **content** (i.e. children). Note that it is the responsibility of the consumer to ensure there is at least one tabbable element within the children **or the focus will be lost**.
 
 -   Required: No
 -   Default: `true`
