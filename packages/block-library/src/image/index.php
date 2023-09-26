@@ -252,10 +252,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$enlarged_image_content = $q->get_updated_html();
 
-	$background_color = esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) );
+	// If the current theme is NOT a block theme, we need to set the background
+	// color & close button color to some default values because we can't get them
+	// from the Global Styles.
+	$background_color   = wp_is_block_theme() ? esc_attr( wp_get_global_styles( array( 'color', 'background' ) ) ) : 'white';
+	$close_button_color = wp_is_block_theme() ? esc_attr( wp_get_global_styles( array( 'color', 'text' ) ) ) : 'black';
 
 	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-	$close_button_color = esc_attr( wp_get_global_styles( array( 'color', 'text' ) ) );
 	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
 	$close_button_label = esc_attr__( 'Close' );
 
