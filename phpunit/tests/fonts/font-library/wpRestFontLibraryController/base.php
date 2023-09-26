@@ -40,7 +40,6 @@ abstract class WP_REST_Font_Library_Controller_UnitTestCase extends WP_UnitTestC
 		$property   = $reflection->getProperty( 'collections' );
 		$property->setAccessible( true );
 		$property->setValue( null, array() );
-		$property->setValue( array() );
 
 		// Clean up the /fonts directory.
 		foreach ( $this->files_in_dir( static::$fonts_dir ) as $file ) {
