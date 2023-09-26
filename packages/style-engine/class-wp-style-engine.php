@@ -314,7 +314,7 @@ final class WP_Style_Engine {
 	 *
 	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
+	public static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
 			return array();
 		}
@@ -361,7 +361,7 @@ final class WP_Style_Engine {
 	 *
 	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 	 */
-	protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
+	public static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
 		if ( empty( $style_value ) ) {
 			return array();
 		}
