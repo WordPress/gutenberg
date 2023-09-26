@@ -8,6 +8,7 @@ import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useAsyncList } from '@wordpress/compose';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -34,7 +35,7 @@ export default function ReplaceTemplateButton( {
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		await entity.edit( {
 			blocks: selectedTemplate.blocks,
-			content: selectedTemplate.content,
+			content: serialize( selectedTemplate.blocks ),
 		} );
 		onClose(); // Close the template suggestions modal first.
 		onClick();
