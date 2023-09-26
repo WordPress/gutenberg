@@ -165,7 +165,15 @@ export function useAvailablePatterns( template ) {
 		...( restBlockPatterns || [] ),
 	];
 
-	return useMemo( () =>
-		preparePatterns( mergedPatterns, template, currentThemeStylesheet )
-	);
+return useMemo( () => {
+		const mergedPatterns = [
+			...( blockPatterns || [] ),
+			...( restBlockPatterns || [] ),
+		];
+		return preparePatterns(
+			mergedPatterns,
+			template,
+			currentThemeStylesheet
+		);
+	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
 }
