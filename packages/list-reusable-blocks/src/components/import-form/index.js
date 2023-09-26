@@ -49,7 +49,7 @@ function ImportForm( { instanceId, onUpload } ) {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
-					case 'Invalid Pattern JSON file':
+					case 'Invalid pattern JSON file':
 						uiMessage = __( 'Invalid pattern JSON file' );
 						break;
 					default:
