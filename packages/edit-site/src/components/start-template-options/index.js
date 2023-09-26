@@ -26,13 +26,18 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 	const [ templateContent, setTemplateContent ] = useState( '' );
 
 	useEffect( () => {
+		const abortController = new AbortController();
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', {
 				slug,
 				is_custom: isCustom,
 				ignore_empty: true,
 			} ),
-		} ).then( ( { content } ) => setTemplateContent( content.raw ) );
+			signal: abortController.signal,
+		} ).then( ( { content } ) => setTemplateContent( content ) );
+		return () => {
+			abortController.abort();
+		};
 	}, [ isCustom, slug ] );
 	return templateContent;
 }
@@ -55,39 +60,39 @@ function useStartPatterns( fallbackContent ) {
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet
 	);
 
-	// Duplicated from packages/block-library/src/pattern/edit.js.
-	function injectThemeAttributeInBlockTemplateContent( block ) {
-		if (
-			block.innerBlocks.find(
-				( innerBlock ) => innerBlock.name === 'core/template-part'
-			)
-		) {
-			block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
-				if (
-					innerBlock.name === 'core/template-part' &&
-					innerBlock.attributes.theme === undefined
-				) {
-					innerBlock.attributes.theme = currentThemeStylesheet;
-				}
-				return innerBlock;
-			} );
-		}
-
-		if (
-			block.name === 'core/template-part' &&
-			block.attributes.theme === undefined
-		) {
-			block.attributes.theme = currentThemeStylesheet;
-		}
-		return block;
-	}
-
 	return useMemo( () => {
+		// Duplicated from packages/block-library/src/pattern/edit.js.
+		function injectThemeAttributeInBlockTemplateContent( block ) {
+			if (
+				block.innerBlocks.find(
+					( innerBlock ) => innerBlock.name === 'core/template-part'
+				)
+			) {
+				block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
+					if (
+						innerBlock.name === 'core/template-part' &&
+						innerBlock.attributes.theme === undefined
+					) {
+						innerBlock.attributes.theme = currentThemeStylesheet;
+					}
+					return innerBlock;
+				} );
+			}
+
+			if (
+				block.name === 'core/template-part' &&
+				block.attributes.theme === undefined
+			) {
+				block.attributes.theme = currentThemeStylesheet;
+			}
+			return block;
+		}
+
 		// filter patterns that are supposed to be used in the current template being edited.
 		return [
-			{
+			fallbackContent.raw && {
 				name: 'fallback',
-				blocks: parse( fallbackContent ),
+				blocks: parse( fallbackContent.raw ),
 				title: __( 'Fallback content' ),
 			},
 			...patterns
@@ -107,8 +112,8 @@ function useStartPatterns( fallbackContent ) {
 						),
 					};
 				} ),
-		];
-	}, [ fallbackContent, slug, patterns ] );
+		].filter( ( pattern ) => !! pattern );
+	}, [ fallbackContent, patterns, currentThemeStylesheet, slug ] );
 }
 
 function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
