@@ -1,8 +1,4 @@
 /**
- * Defines as extensibility slot for the Settings sidebar
- */
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
@@ -22,7 +18,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * Renders items below the Status & Availability panel in the Document Sidebar.
  *
  * @param {Object}                props                                 Component properties.
- * @param {string}                props.name                            The machine-friendly name for the panel.
+ * @param {string}                props.name                            Required. A machine-friendly name for the panel.
  * @param {string}                [props.className]                     An optional class name added to the row.
  * @param {string}                [props.title]                         The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
@@ -42,6 +38,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * 		{
  * 			className: 'my-document-setting-plugin',
  * 			title: 'My Panel',
+ * 			name: 'my-panel',
  * 		},
  * 		__( 'My Document Setting Panel' )
  * 	);
@@ -59,7 +56,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
  *
  * const MyDocumentSettingTest = () => (
- * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel" name="my-panel">
  *			<p>My Document Setting Panel</p>
  *		</PluginDocumentSettingPanel>
  *	);

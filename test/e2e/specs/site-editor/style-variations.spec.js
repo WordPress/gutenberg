@@ -174,15 +174,15 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Color palettes"i]' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Foreground"i]' )
+			page.locator( 'role=option[name="Color: Foreground"i]' )
 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Background"i]' )
+			page.locator( 'role=option[name="Color: Background"i]' )
 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Awesome pink"i]' )
+			page.locator( 'role=option[name="Color: Awesome pink"i]' )
 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
 	} );
 

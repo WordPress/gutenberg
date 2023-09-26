@@ -1,47 +1,131 @@
 # Gutenberg PHP
 
+The Gutenberg plugin is continuously enhancing existing features and creating new ones. Some features, once considered stable and useful, are merged into Core (the WordPress source code) during a WordPress release. Others remain in the plugin forever or are eventually removed as the minimum supported WordPress version changes.
+
+During a WordPress release, new features, bugfixes and other changes are "synced" between the Gutenberg plugin and WordPress Core. Consistent naming and directory structures make this process easier by preventing naming conflicts and compartmentalizing release-specific code.
+
+The following documentation is intended to act as a guide only. If you're unsure about naming or where to place new PHP files, please don't hesitate to ping other contributors on Github or ask in the #core-editor channel on [WordPress Slack](https://make.wordpress.org/chat/).
+
 ## File structure
 
-Gutenberg adds features to WordPress Core using PHP hooks and filters. Some
-features, once considered stable and useful, are merged into Core during a Core
-release. Some features remain in the plugin forever or are removed.
+To make it easier for contributors to identify features that should be merged into Core and those that can be deleted, Gutenberg uses the following file structure for its PHP code:
 
-To make it easier for contributors to know which features need to be merged to
-Core and which features can be deleted, Gutenberg uses the following file
-structure for its PHP code:
+- `lib/experimental` - Experimental features that exist only in the plugin. They should not be merged into Core.
+- `lib/compat/wordpress-X.Y` - Stable features that are intended to be merged into Core in a future `X.Y` release, or that were previously merged to Core in the `X.Y` release and remain in the plugin for backwards compatibility when running the plugin on older versions of WordPress.
+- `lib/compat/plugin` - Features for backwards compatibility for the plugin consumers. These files don't need to be merged into Core and should have a timeline for when they should be removed from the plugin.
 
-- `lib/experimental` - Experimental features that exist only in the plugin. They
-  are not ready to be merged to Core.
-- `lib/stable` - Stable features that exist only in the plugin. They could one
-  day be merged to Core, but not yet.
-- `lib/compat/wordpress-X.Y` - Stable features that are intended to be merged to
-  Core in the future X.Y release, or that were previously merged to Core in the
-  X.Y release and remain in the plugin for backwards compatibility when running
-  the plugin on older versions of WordPress.
-- `lib/compat/plugin` - Features for backwards compatibility for the plugin consumers. These files don't need to be merged to Core and should have a timeline for when they should be removed from the plugin.
+Files at the root of `/lib` are generally considered to contain "evergreen" code. Such code is both fundamental to the proper functioning of the plugin, and also so often updated that versioning it between WordPress releases is not practical. Changes to these files are merged into Core as required.
 
 ## Best practices
 
-### Prefer the `wp` prefix
+There are a few best practices that should be observed when adding new files to the Gutenberg plugin.
 
-For features that may be merged to Core, it's best to use a `wp_` prefix for functions or a `WP_` prefix for classes.
+### Using `gutenberg` suffixes/prefixes vs. `wp` prefixes
 
-This applies to both experimental and stable features.
+To avoid naming conflicts with WordPress Core and other plugins, the Gutenberg plugin uses the `gutenberg` identifier in many of its PHP classes and function names, e.g., `WP_Theme_JSON_Gutenberg` and `gutenberg_get_block_editor_settings`.
 
-Using the `wp_` prefix avoids us having to rename functions and classes from `gutenberg_` to `wp_` if the feature is merged to Core.
-
-Functions that are intended solely for the plugin, e.g., plugin infrastructure, should use the `gutenberg_` prefix.
-
-#### Feature that might be merged to Core
+This is especially so for classes and functions whose functionality is ubiquitous and constantly being updated — so-called "evergreen" code. Anything related to `WP_Theme_JSON_Gutenberg` is a good example of this: this class controls the way Gutenberg processes and outputs global styles and much more, and its methods are called in many places. In every aspect of plugin functionality, we want plugin users to have access to the latest versions of these files, even if they are running an older version of WordPress.
 
 ```php
-function wp_get_navigation( $slug ) { ... }
+/**
+* Returns something useful.
+*
+* @since 6.2.0 Updates to something even more useful.
+* @since 6.3.0 Now more useful than ever.
+*
+* @return string Something useful.
+*/
+function gutenberg_get_something_useful() {
+	// ...
+}
 ```
 
-#### Plugin infrastructure that will never be merged to Core
+When porting new functions into Core, the function must be renamed to use the `wp_` prefix for functions or a `WP_` prefix for classes.
 
 ```php
-function gutenberg_get_navigation( $slug ) { ... }
+/**
+* Returns something useful.
+*
+* @since 6.2.0 Updates to something even more useful.
+* @since 6.3.0 Now more useful than ever.
+*
+* @return string Something useful.
+*/
+function wp_get_something_useful() {
+	// ...
+}
+```
+
+Plugin code that is stable and expected to be merged "as-is" into Core in the near future can use the `wp_` prefix for functions or a `WP_` prefix for classes.
+
+When doing so, care must be taken to ensure that no duplicate declarations to create functions or classes exist between Gutenberg and WordPress core code. A quick codebase search will also help you know if your new names are unique.
+
+Wrapping such code in `class_exists()` and `function_exists()` checks should be used to ensure it executes in the plugin up until it is merged to Core, or when running the plugin on older versions of WordPress.
+
+```php
+if ( ! function_exists( 'wp_a_new_and_stable_feature' ) ) {
+	/**
+	* A very new and stable feature.
+	*
+	* @return string Something useful.
+	*/
+	function wp_a_new_and_stable_feature() {
+		// ...
+	}
+}
+```
+
+Or for classes:
+
+```php
+/**
+ * WP_A_Stable_Class class
+ *
+ * @package WordPress
+ * @since 6.3.0
+ */
+if ( class_exists( 'WP_A_Stable_Class' ) ) {
+	return;
+}
+
+/**
+ * A very stable class that does something.
+ *
+ * @since 6.3.0
+ */
+class WP_A_Stable_Class { ... }
+```
+
+Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
+
+When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
+
+As always, get in touch with your fellow contributors if you're unsure.
+
+### Documentation and annotations
+
+For every class, method and function in the plugin, refer to the [WordPress PHP documentation standards](https://developer.wordpress.org/coding-standards/inline-documentation-standards/php/) when documenting your code.
+
+It's particularly important to observe annotation standards, and `@since` descriptions that specify the target WordPress version, so that all contributors can easily identify what needs to be (or what already has been) merged to Core and when.
+
+Developers should also write a brief note about _how_ their feature should be merged to Core, for example, which Core file or function should be patched.
+
+Notes can be included in the doc comment.
+
+This helps future developers know what to do when merging Gutenberg features into Core.
+
+```php
+/**
+ * Returns a navigation object for the given slug.
+ *
+ * Should live in `wp-includes/navigation.php` when merged to Core.
+ *
+ * @since 6.3.0
+ *
+ * @param string $slug
+ * @return WP_Navigation
+ */
+function wp_get_navigation( $slug ) { ... }
 ```
 
 ### Group PHP code by _feature_
@@ -79,67 +163,19 @@ function wp_register_navigation_cpt() { ... }
 add_action( 'init', 'wp_register_navigation_cpt' );
 ```
 
-### Wrap functions and classes with `! function_exists` and `! class_exists`
+### Requiring files in lib/load.php
+Should the load order allow it, try to group imports according to WordPress release, then feature. It'll help everyone to quickly recognise the files that belong to specific WordPress releases.
 
-Developers should take care to not define functions and classes that are already defined.
+Existing comments in `lib/load.php` should act as a guide.
 
-When writing new functions and classes, it's good practice to use `! function_exists` and `! class_exists`.
+## When to sync changes to Gutenberg PHP with Core and vice versa
 
-If Core has defined a symbol once and then Gutenberg defines it a second time, fatal errors will occur.
+If you've changed or added PHP files to the Gutenberg plugin, you'll need to confirm whether the changes are to be synced to WordPress Core, and therefore featured in the next release of WordPress.
 
-Wrapping functions and classes avoids such errors if the feature is merged to Core.
+The Gutenberg Github pull request in question should be labeled with the `Needs PHP backport` label if the changes are to be synced to Core.
 
-#### Good
+If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after your pull request is merged.
 
-```php
-// lib/experimental/navigation/navigation.php
+So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced (often called "backporting") to Gutenberg. The relevant Gutenberg Github pull request should be labeled with the `Backport from WordPress Core` label.
 
-if ( ! function_exists( 'wp_get_navigation' ) ) {
-	function wp_get_navigation( $slug ) { ... }
-}
-
-// lib/experimental/navigation/class-wp-navigation.php
-
-if ( class_exists( 'WP_Navigation' ) ) {
-	return;
-}
-
-class WP_Navigation { ... }
-```
-
-#### Not so good
-
-```php
-// lib/experimental/navigation/navigation.php
-
-function wp_get_navigation( $slug ) { ... }
-
-// lib/experimental/navigation/class-gutenberg-navigation.php
-
-class WP_Navigation { ... }
-```
-
-Furthermore, a quick codebase search will also help you know if your new method is unique.
-
-### Note how your feature should look when merged to Core
-
-Developers should write a brief note about how their feature should be merged to Core, for example, which Core file or function should be patched.
-
-Notes can be included in the doc comment.
-
-This helps future developers know what to do when merging Gutenberg features into Core.
-
-#### Good
-
-```php
-/**
- * Returns a navigation object for the given slug.
- *
- * Should live in `wp-includes/navigation.php` when merged to Core.
- *
- * @param string $slug
- *
- * @return WP_Navigation
- */
-function wp_get_navigation( $slug ) { ... }
-```
+If you're unsure, you can always ask for help in the #core-editor channel in [WordPress Slack](https://make.wordpress.org/chat/).

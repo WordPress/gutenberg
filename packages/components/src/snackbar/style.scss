@@ -1,11 +1,12 @@
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $gray-900;
+	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+	backdrop-filter: blur($grid-unit-20) saturate(180%);
 	border-radius: $radius-block-ui;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	box-shadow: $shadow-popover;
 	color: $white;
-	padding: 16px 24px;
+	padding: $grid-unit-15 ($grid-unit-05 * 5);
 	width: 100%;
 	max-width: 600px;
 	box-sizing: border-box;
@@ -20,9 +21,7 @@
 	}
 
 	&:focus {
-		box-shadow:
-			0 0 0 1px $white,
-			0 0 0 3px $components-color-accent;
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 	}
 
 	&.components-snackbar-explicit-dismiss {
@@ -30,7 +29,7 @@
 	}
 
 	.components-snackbar__content-with-icon {
-		margin-left: 24px;
+		margin-left: $grid-unit-30;
 	}
 
 	.components-snackbar__icon {
@@ -40,7 +39,7 @@
 	}
 
 	.components-snackbar__dismiss-button {
-		margin-left: 32px;
+		margin-left: $grid-unit-30;
 		cursor: pointer;
 	}
 }
@@ -91,5 +90,5 @@
 
 .components-snackbar-list__notice-container {
 	position: relative;
-	padding-top: 8px;
+	padding-top: $grid-unit-10;
 }

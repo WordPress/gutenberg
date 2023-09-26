@@ -23,6 +23,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -39,7 +40,6 @@ import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
-import { unlock } from '../../lock-unlock';
 import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
@@ -73,7 +73,9 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled' );
+	const blockTitle =
+		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
+
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -84,9 +86,7 @@ function ListViewBlock( {
 	);
 	const blockEditingMode = useSelect(
 		( select ) =>
-			unlock( select( blockEditorStore ) ).getBlockEditingMode(
-				clientId
-			),
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
 		[ clientId ]
 	);
 
@@ -150,6 +150,20 @@ function ListViewBlock( {
 			cellRef.current.focus();
 		}
 	}, [] );
+
+	// If multiple blocks are selected, deselect all blocks when the user
+	// presses the escape key.
+	const onKeyDown = ( event ) => {
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			selectedClientIds.length > 0
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			selectBlock( event, undefined );
+		}
+	};
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
@@ -258,6 +272,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }

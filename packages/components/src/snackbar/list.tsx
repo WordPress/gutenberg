@@ -29,13 +29,21 @@ const SNACKBAR_VARIANTS = {
 		height: 'auto',
 		opacity: 1,
 		transition: {
-			height: { stiffness: 1000, velocity: -100 },
+			height: { type: 'tween', duration: 0.3, ease: [ 0, 0, 0.2, 1 ] },
+			opacity: {
+				type: 'tween',
+				duration: 0.25,
+				delay: 0.05,
+				ease: [ 0, 0, 0.2, 1 ],
+			},
 		},
 	},
 	exit: {
 		opacity: 0,
 		transition: {
-			duration: 0.5,
+			type: 'tween',
+			duration: 0.1,
+			ease: [ 0, 0, 0.2, 1 ],
 		},
 	},
 };

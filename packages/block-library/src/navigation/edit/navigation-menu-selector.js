@@ -100,7 +100,7 @@ function NavigationMenuSelector( {
 	let selectorLabel = '';
 
 	if ( isCreatingMenu || isResolvingNavigationMenus ) {
-		selectorLabel = __( 'Loading …' );
+		selectorLabel = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
 		selectorLabel = __( 'Choose or create a Navigation menu' );

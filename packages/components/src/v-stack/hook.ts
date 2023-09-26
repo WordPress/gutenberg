@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
+import { useContextSystem } from '../ui/context';
 import { useHStack } from '../h-stack';
 import type { VStackProps } from './types';
 
