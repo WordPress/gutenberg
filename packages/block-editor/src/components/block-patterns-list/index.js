@@ -149,7 +149,7 @@ function BlockPatternList(
 		onHover,
 		onClickPattern,
 		orientation,
-		label = __( 'Block Patterns' ),
+		label = __( 'Block patterns' ),
 		showTitlesAsTooltip,
 		pagingProps,
 	},
