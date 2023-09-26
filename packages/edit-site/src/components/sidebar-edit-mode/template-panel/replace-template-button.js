@@ -44,7 +44,7 @@ export default function ReplaceTemplateButton( {
 		<>
 			<MenuItem
 				info={ __(
-					'Replace this template entirely with another like it.'
+					'Replace the contents of this template with another.'
 				) }
 				onClick={ () => setShowModal( true ) }
 			>
