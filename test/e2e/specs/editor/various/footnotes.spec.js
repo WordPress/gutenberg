@@ -393,7 +393,7 @@ test.describe( 'Footnotes', () => {
 		await page.keyboard.type( '1' );
 
 		// Publish post with the footnote set to "1".
-		await editor.publishPost();
+		const postId = await editor.publishPost();
 
 		// Test previewing changes to meta.
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
@@ -431,7 +431,9 @@ test.describe( 'Footnotes', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Post' } )
 			.click();
-		await page.locator( 'a:text("View Post")' ).click();
+
+		// Visit the published post.
+		await page.goto( `/?p=${ postId }` );
 
 		// Verify that the published post footnote still says "1".
 		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
