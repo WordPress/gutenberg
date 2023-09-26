@@ -50,6 +50,26 @@
 				max-width: none;
 			}
 		}
+
+		&.has-width-small,
+		&.has-width-medium,
+		&.has-width-large {
+			width: 100%;
+		}
+
+		// The following widths were selected to align with existing baselines
+		// found elsewhere in the editor.
+		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
+		&.has-width-small {
+			max-width: 384px;
+		}
+		&.has-width-medium {
+			max-width: 512px;
+		}
+		&.has-width-large {
+			max-width: 832px;
+		}
+
 	}
 
 	@include break-large() {
@@ -145,26 +165,5 @@
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 		outline-offset: -2px;
-	}
-
-	@include break-small() {
-		&.has-width-small,
-		.has-width-medium,
-		.has-width-large {
-			width: 100%;
-		}
-
-		// The following widths were selected to align with existing baselines
-		// found elsewhere in the editor.
-		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
-		&.has-width-small {
-			max-width: 384px;
-		}
-		&.has-width-medium {
-			max-width: 512px;
-		}
-		&.has-width-large {
-			max-width: 832px;
-		}
 	}
 }

@@ -248,6 +248,12 @@ function UnforwardedModal(
 						{
 							'is-full-screen':
 								isFullScreen || contentWidth === 'fill',
+						},
+						{
+							[ contentWidthClass ]:
+								! isFullScreen &&
+								contentWidth &&
+								contentWidth !== 'fill',
 						}
 					) }
 					style={ style }
@@ -273,10 +279,6 @@ function UnforwardedModal(
 							'hide-header': __experimentalHideHeader,
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
-							[ contentWidthClass ]:
-								! isFullScreen &&
-								contentWidth &&
-								contentWidth !== 'fill',
 						} ) }
 						role="document"
 						onScroll={ onContentContainerScroll }
