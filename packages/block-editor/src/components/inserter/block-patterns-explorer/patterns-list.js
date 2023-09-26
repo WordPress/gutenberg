@@ -135,14 +135,18 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 
 			<InserterListbox>
 				{ hasItems && (
-					<BlockPatternsList
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
-						blockPatterns={ pagingProps.categoryPatterns }
-						onClickPattern={ onClickPattern }
-						isDraggable={ false }
-					/>
+					<>
+						<BlockPatternsList
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							isDraggable={ false }
+						/>
+						<BlockPatternsPaging { ...pagingProps } />
+					</>
 				) }
-				<BlockPatternsPaging { ...pagingProps } />
 			</InserterListbox>
 		</div>
 	);
