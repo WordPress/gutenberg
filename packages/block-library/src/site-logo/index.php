@@ -50,7 +50,7 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
-	$border_attributes = get_block_core_site_logo_border_attributes( $attributes );
+	$border_attributes = block_core_site_logo_get_border_attributes( $attributes );
 	if ( $border_attributes ) {
 		$processor = new WP_HTML_Tag_Processor( $custom_logo );
 		$processor->next_tag( 'img' );
@@ -80,7 +80,7 @@ function render_block_core_site_logo( $attributes ) {
  * @param array $attributes The block attributes.
  * @return array The border-related classnames and styles for the block.
  */
-function get_block_core_site_logo_border_attributes( $attributes ) {
+function block_core_site_logo_get_border_attributes( $attributes ) {
 
 	$border_styles = array();
 	$sides         = array( 'top', 'right', 'bottom', 'left' );
