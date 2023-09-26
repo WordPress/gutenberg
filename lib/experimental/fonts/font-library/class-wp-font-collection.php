@@ -79,7 +79,7 @@ class WP_Font_Collection {
 	 */
 	public function get_data() {
 		// If the src is a URL, fetch the data from the URL.
-		if ( false !== strpos( $this->config['src'], 'http' ) && false !== strpos( $this->config['src'], '://' ) ) {
+		if ( str_contains( $this->config['src'], 'http' ) && str_contains( $this->config['src'], '://' ) ) {
 			if ( ! wp_http_validate_url( $this->config['src'] ) ) {
 				return new WP_Error( 'font_collection_read_error', __( 'Invalid URL for Font Collection data.', 'gutenberg' ) );
 			}
