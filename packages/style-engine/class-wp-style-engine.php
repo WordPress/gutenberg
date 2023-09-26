@@ -42,7 +42,7 @@ final class WP_Style_Engine {
 	 *
 	 * @var array
 	 */
-	private static $block_style_definition_metadata = array();
+	public static $block_style_definition_metadata = array();
 
 	/**
 	 * Registers a style definition metadata for a defined path.
@@ -90,7 +90,7 @@ final class WP_Style_Engine {
 	 *
 	 * @return string The css var, or an empty string if no match for slug found.
 	 */
-	protected static function get_css_var_value( $style_value, $css_vars ) {
+	public static function get_css_var_value( $style_value, $css_vars ) {
 		foreach ( $css_vars as  $property_key => $css_var_pattern ) {
 			$slug = static::get_slug_from_preset_value( $style_value, $property_key );
 			if ( static::is_valid_style_value( $slug ) ) {
@@ -293,95 +293,6 @@ final class WP_Style_Engine {
 		}
 
 		$css_declarations[ $style_property_keys['default'] ] = $style_value;
-		return $css_declarations;
-	}
-
-	/**
-	 * Style value parser that returns a CSS definition array comprising style properties
-	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
-	 * e.g., "$style_property-$individual_feature: $value;", which could represent the following:
-	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
-	 * "border-image-{outset|source|width|repeat|slice}: {value};"
-	 *
-	 * @param array $style_value                    A single raw style value from $block_styles array.
-	 * @param array $individual_property_definition A single style definition from static::$block_style_definition_metadata,
-	 *                                              representing an individual property of a CSS property, e.g., 'top' in 'border-top'.
-	 * @param array $options                        {
-	 *     Optional. An array of options. Default empty array.
-	 *
-	 *     @type bool $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
-	 * }
-	 *
-	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
-		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
-			return array();
-		}
-
-		/*
-		 * The first item in $individual_property_definition['path'] array tells us the style property, e.g., "border".
-		 * We use this to get a corresponding CSS style definition such as "color" or "width" from the same group.
-		 * The second item in $individual_property_definition['path'] array refers to the individual property marker, e.g., "top".
-		 */
-		$definition_group_key    = $individual_property_definition['path'][0];
-		$individual_property_key = $individual_property_definition['path'][1];
-		$should_skip_css_vars    = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
-		$css_declarations        = array();
-
-		foreach ( $style_value as $css_property => $value ) {
-			if ( empty( $value ) ) {
-				continue;
-			}
-
-			// Build a path to the individual rules in definitions.
-			$style_definition_path = array( $definition_group_key, $css_property );
-			$style_definition      = _wp_array_get( static::$block_style_definition_metadata, $style_definition_path, null );
-
-			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
-				// Set a CSS var if there is a valid preset value.
-				if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
-					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
-				}
-				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
-				$css_declarations[ $individual_css_property ] = $value;
-			}
-		}
-		return $css_declarations;
-	}
-
-	/**
-	 * Style value parser that constructs a CSS definition array comprising a single CSS property and value.
-	 * If the provided value is an array containing a `url` property, the function will return a CSS definition array
-	 * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
-	 * e.g., array( 'background-image' => "url( '...' )" ).
-	 *
-	 * @param array $style_value      A single raw style value from $block_styles array.
-	 * @param array $style_definition A single style definition from static::$block_style_definition_metadata.
-	 *
-	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-	 */
-	protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
-		if ( empty( $style_value ) ) {
-			return array();
-		}
-
-		$css_declarations = array();
-
-		if ( isset( $style_definition['property_keys']['default'] ) ) {
-			$value = null;
-
-			if ( ! empty( $style_value['url'] ) ) {
-				$value = "url('" . $style_value['url'] . "')";
-			} elseif ( is_string( $style_value ) ) {
-				$value = $style_value;
-			}
-
-			if ( null !== $value ) {
-				$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
-			}
-		}
-
 		return $css_declarations;
 	}
 

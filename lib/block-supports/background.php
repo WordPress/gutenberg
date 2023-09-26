@@ -92,6 +92,41 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	return $block_content;
 }
 
+/**
+ * Style value parser that constructs a CSS definition array comprising a single CSS property and value.
+ * If the provided value is an array containing a `url` property, the function will return a CSS definition array
+ * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
+ * e.g., array( 'background-image' => "url( '...' )" ).
+ *
+ * @param array $style_value      A single raw style value from $block_styles array.
+ * @param array $style_definition A single style definition from static::$block_style_definition_metadata.
+ *
+ * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+ */
+function _gutenberg_block_supports_get_url_or_value_css_declaration( $style_value, $style_definition ) {
+	if ( empty( $style_value ) ) {
+		return array();
+	}
+
+	$css_declarations = array();
+
+	if ( isset( $style_definition['property_keys']['default'] ) ) {
+		$value = null;
+
+		if ( ! empty( $style_value['url'] ) ) {
+			$value = "url('" . $style_value['url'] . "')";
+		} elseif ( is_string( $style_value ) ) {
+			$value = $style_value;
+		}
+
+		if ( null !== $value ) {
+			$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
+		}
+	}
+
+	return $css_declarations;
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'background',
@@ -109,7 +144,7 @@ WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
 			'property_keys' => array(
 				'default' => 'background-image',
 			),
-			'value_func'    => array( 'WP_Style_Engine_Gutenberg', 'get_url_or_value_css_declaration' ),
+			'value_func'    => '_gutenberg_block_supports_get_url_or_value_css_declaration',
 			'path'          => array( 'background', 'backgroundImage' ),
 		),
 		'backgroundSize'  => array(
