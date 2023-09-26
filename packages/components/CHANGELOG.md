@@ -14,6 +14,7 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to version `0.3.3` ([#54818](https://github.com/WordPress/gutenberg/pull/54818))
 -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
 -   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
 -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
