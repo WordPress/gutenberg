@@ -291,6 +291,22 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	public function uninstall_fonts( $request ) {
 		$fonts_param = $request->get_param( 'fontFamilies' );
 
+		if ( empty( $fonts_to_install ) ) {
+			return new WP_Error(
+				'no_fonts_to_install',
+				__( 'No fonts to uninstall', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$needs_write_permission = $this->needs_write_permission( $fonts_to_install );
+		if ( $needs_write_permission ) {
+			$write_permission = $this->has_write_permission();
+			if ( is_wp_error( $write_permission ) ) {
+				return $write_permission;
+			}
+		}
+
 		foreach ( $fonts_param as $font_data ) {
 			$font   = new WP_Font_Family( $font_data );
 			$result = $font->uninstall();
@@ -321,7 +337,17 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				)
 			);
 		}
+		return true;
+	}
 
+	/**
+	 * Checks whether the user has write permissions to the temp and fonts directories.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
+	 */
+	private function has_write_permission () {
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir   = get_temp_dir();
 		$upload_dir = wp_upload_dir()['basedir'];
@@ -330,12 +356,33 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				'rest_cannot_write_fonts_folder',
 				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
 				array(
-					'status' => 500,
+					'status' => 550,
 				)
 			);
 		}
-
 		return true;
+	}
+
+	/**
+	 * Checks whether the request needs write permissions.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array[] $font_families Font families to install.
+	 * @return bool Whether the request needs write permissions.
+	 */
+	private function needs_write_permission ( $font_families ) {
+		foreach ( $font_families as $font ) {
+			if ( isset( $font['fontFace'] ) ) {
+				foreach ( $font['fontFace'] as $face ) {
+					// If the font is being downloaded from a URL or uploaded, it needs write permissions.
+					if ( isset( $face['downloadFromUrl'] ) || isset( $face['uploadedFile'] ) ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -369,11 +416,20 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			);
 		}
 
+		$needs_write_permission = $this->needs_write_permission( $fonts_to_install );
+		if ( $needs_write_permission ) {
+			$write_permission = $this->has_write_permission();
+			if ( is_wp_error( $write_permission ) ) {
+				return $write_permission;
+			}
+		}
+
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
 
 		// Iterates the fonts data received and creates a new WP_Font_Family object for each one.
 		$fonts_installed = array();
+
 		foreach ( $fonts_to_install as $font_data ) {
 			$font = new WP_Font_Family( $font_data );
 			$font->install( $files );
