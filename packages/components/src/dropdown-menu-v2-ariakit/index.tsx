@@ -92,6 +92,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 					store={ dropdownMenuStore }
 					gutter={ dropdownMenuStore.parent ? 16 : 8 }
 					shift={ dropdownMenuStore.parent ? -9 : 0 }
+					hideOnHoverOutside={ false }
 					modal
 				>
 					<DropdownMenuContext.Provider value={ contextValue }>
