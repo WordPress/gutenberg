@@ -2,7 +2,7 @@
  * External dependencies
  */
 import postcss from 'postcss';
-import wrap from 'postcss-editor-styles';
+import wrap from 'postcss-prefixwrap';
 import rebaseUrl from 'postcss-urlrebase';
 
 /**
@@ -14,10 +14,15 @@ import rebaseUrl from 'postcss-urlrebase';
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
 	return Object.values( styles ?? [] ).map( ( { css, baseURL } ) => {
-		return postcss( [
-			wrap( { scopeTo: wrapperClassName } ),
-			rebaseUrl( { rootUrl: baseURL } ),
-		] ).process( css, {} ).css; // use sync PostCSS API
+		return postcss(
+			[
+				wrapperClassName &&
+					wrap( `.${ wrapperClassName }`, {
+						prefixRootTags: true,
+					} ),
+				rebaseUrl( { rootUrl: baseURL } ),
+			].filter( Boolean )
+		).process( css, {} ).css; // use sync PostCSS API
 	} );
 };
 
