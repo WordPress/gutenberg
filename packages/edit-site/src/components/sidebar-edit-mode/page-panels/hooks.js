@@ -149,7 +149,7 @@ export function useAvailablePatterns( template ) {
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet
 	);
 
-	let availablePatterns = useSelect( ( select ) => {
+	const availablePatterns = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		const settings = getSettings();
 
@@ -166,11 +166,9 @@ export function useAvailablePatterns( template ) {
 		return patterns;
 	} );
 
-	availablePatterns = preparePatterns(
+	return preparePatterns(
 		availablePatterns,
 		template,
 		currentThemeStylesheet
 	);
-
-	return availablePatterns;
 }
