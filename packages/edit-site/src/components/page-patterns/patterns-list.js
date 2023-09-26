@@ -35,7 +35,7 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 const SYNC_FILTERS = {
 	all: __( 'All' ),
 	[ PATTERN_SYNC_TYPES.full ]: __( 'Synced' ),
-	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Standard' ),
+	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Not synced' ),
 };
 
 const SYNC_DESCRIPTIONS = {
