@@ -76,6 +76,7 @@ const MEDIA_OPTIONS = [
 	'Take a Video',
 	'WordPress Media Library',
 ];
+const DEFAULT_OPACITY_VALUE = '50';
 
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
@@ -359,10 +360,12 @@ describe( 'when an image is attached', () => {
 		// Update Opacity attribute
 		const opacityControl = getByLabelText( /Opacity/ );
 		fireEvent.press(
-			within( opacityControl ).getByText( '50', { hidden: true } )
+			within( opacityControl ).getByText( DEFAULT_OPACITY_VALUE, {
+				hidden: true,
+			} )
 		);
 		const heightTextInput = within( opacityControl ).getByDisplayValue(
-			'50',
+			DEFAULT_OPACITY_VALUE,
 			{ hidden: true }
 		);
 		fireEvent.changeText( heightTextInput, '20' );
