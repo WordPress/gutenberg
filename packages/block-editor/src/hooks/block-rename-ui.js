@@ -69,9 +69,10 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 			aria={ {
 				describedby: dialogDescription,
 			} }
+			focusOnMount="firstContentElement"
 		>
 			<p id={ dialogDescription }>
-				{ __( 'Choose a custom name for this block.' ) }
+				{ __( 'Enter a custom name for this block.' ) }
 			</p>
 			<form
 				onSubmit={ ( e ) => {

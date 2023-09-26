@@ -162,7 +162,7 @@ test.describe( 'Multi-block selection', () => {
 			} );
 		}
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '3' } )
 			.click();
 
@@ -262,7 +262,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -279,11 +279,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'button', { name: 'Group' } )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '2' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -327,7 +327,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click( { modifiers: [ 'Shift' ] } );
 		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.type( 'new content' );
@@ -360,12 +360,12 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'group' } )
 			.nth( 1 )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'first' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -389,7 +389,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		const paragraphBlock = editor.canvas.getByRole( 'document', {
-			name: 'Paragraph block',
+			name: 'Block: Paragraph',
 		} );
 		const { height } = await paragraphBlock.boundingBox();
 		await paragraphBlock.click( { position: { x: 0, y: height / 2 } } );
@@ -429,7 +429,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowDown' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		await paragraph1.hover();
@@ -466,7 +466,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowDown' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		await paragraph1.hover();
@@ -644,7 +644,7 @@ test.describe( 'Multi-block selection', () => {
 		}
 
 		const [ , paragraph2, paragraph3 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		// Focus the last paragraph block and hide the block toolbar.
@@ -700,7 +700,7 @@ test.describe( 'Multi-block selection', () => {
 
 		const paragraph1 = editor.canvas
 			.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 			.filter( { hasText: '1' } );
 		await paragraph1.click( {
@@ -803,7 +803,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 		// Focus the last paragraph block.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.nth( 1 )
 			.click();
 
@@ -1162,7 +1162,7 @@ test.describe( 'Multi-block selection', () => {
 
 		// Focus and move the caret to the right of the first paragraph.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'a' } )
 			.click();
 
@@ -1200,7 +1200,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 		// Focus and move the caret to the end.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: ']2' } )
 			.click();
 
@@ -1211,7 +1211,7 @@ test.describe( 'Multi-block selection', () => {
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1[' } )
 			.click( {
 				// Ensure clicking on the right half of the element.
@@ -1296,7 +1296,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.hover();
 		await page.mouse.down();
 		await editor.canvas

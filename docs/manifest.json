@@ -12,15 +12,27 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-now",
+		"slug": "get-started-with-wp-now",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-now.md",
 		"parent": "devenv"
 	},
 	{
@@ -70,18 +82,6 @@
 		"slug": "submitting-to-block-directory",
 		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "getting-started"
-	},
-	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "getting-started"
 	},
 	{
 		"title": "Glossary",
@@ -1917,6 +1917,12 @@
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
 		"parent": "packages"
 	},
 	{

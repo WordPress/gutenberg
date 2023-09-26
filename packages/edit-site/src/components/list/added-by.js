@@ -19,10 +19,22 @@ import {
 } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_ORIGINS,
+} from '../../utils/constants';
+
 /** @typedef {'wp_template'|'wp_template_part'} TemplateType */
 
 /** @type {TemplateType} */
-const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
+const TEMPLATE_POST_TYPE_NAMES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+];
 
 /**
  * @typedef {'theme'|'plugin'|'site'|'user'} AddedByType
@@ -64,11 +76,12 @@ export function useAddedBy( postType, postId ) {
 				// or 'custom' source.
 				if (
 					template.has_theme_file &&
-					( template.origin === 'theme' ||
+					( template.origin === TEMPLATE_ORIGINS.theme ||
 						( ! template.origin &&
-							[ 'theme', 'custom' ].includes(
-								template.source
-							) ) )
+							[
+								TEMPLATE_ORIGINS.theme,
+								TEMPLATE_ORIGINS.custom,
+							].includes( template.source ) ) )
 				) {
 					return {
 						type: 'theme',
@@ -76,18 +89,23 @@ export function useAddedBy( postType, postId ) {
 						text:
 							getTheme( template.theme )?.name?.rendered ||
 							template.theme,
-						isCustomized: template.source === 'custom',
+						isCustomized:
+							template.source === TEMPLATE_ORIGINS.custom,
 					};
 				}
 
 				// Added by plugin.
-				if ( template.has_theme_file && template.origin === 'plugin' ) {
+				if (
+					template.has_theme_file &&
+					template.origin === TEMPLATE_ORIGINS.plugin
+				) {
 					return {
-						type: 'plugin',
+						type: TEMPLATE_ORIGINS.plugin,
 						icon: pluginIcon,
 						text:
 							getPlugin( template.theme )?.name || template.theme,
-						isCustomized: template.source === 'custom',
+						isCustomized:
+							template.source === TEMPLATE_ORIGINS.custom,
 					};
 				}
 
@@ -97,7 +115,7 @@ export function useAddedBy( postType, postId ) {
 				// site logo and title.
 				if (
 					! template.has_theme_file &&
-					template.source === 'custom' &&
+					template.source === TEMPLATE_ORIGINS.custom &&
 					! template.author
 				) {
 					const siteData = getEntityRecord(
@@ -176,7 +194,7 @@ export default function AddedBy( { postType, postId } ) {
 				{ text }
 				{ isCustomized && (
 					<span className="edit-site-list-added-by__customized-info">
-						{ postType === 'wp_template'
+						{ postType === TEMPLATE_POST_TYPE
 							? _x( 'Customized', 'template' )
 							: _x( 'Customized', 'template part' ) }
 					</span>

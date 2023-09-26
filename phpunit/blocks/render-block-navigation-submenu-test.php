@@ -208,6 +208,5 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'has-text-color has-background',
 			'Submenu block should not apply "has-*" color classes if missing from context'
 		);
-
 	}
 }
