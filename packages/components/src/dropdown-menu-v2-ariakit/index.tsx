@@ -92,13 +92,6 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 					store={ dropdownMenuStore }
 					gutter={ dropdownMenuStore.parent ? 16 : 8 }
 					shift={ dropdownMenuStore.parent ? -9 : 0 }
-					getPersistentElements={ () =>
-						Array.from(
-							document.querySelectorAll(
-								'.components-modal__screen-overlay'
-							)
-						)
-					}
 					modal
 				>
 					<DropdownMenuContext.Provider value={ contextValue }>
