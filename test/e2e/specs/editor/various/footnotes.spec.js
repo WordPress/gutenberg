@@ -392,9 +392,10 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( '1' );
 
-		// Publish post.
+		// Publish post with the footnote set to "1".
 		await editor.publishPost();
 
+		// Test previewing changes to meta.
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( '2' );
@@ -409,8 +410,7 @@ test.describe( 'Footnotes', () => {
 		await previewPage.close();
 		await editorPage.bringToFront();
 
-		// Test again, this time with an existing revision (different code
-		// path).
+		// Test again, this time with an existing revision (different code path).
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
 		await page.keyboard.press( 'End' );
 		// Test slashing.
@@ -422,10 +422,8 @@ test.describe( 'Footnotes', () => {
 		await expect(
 			previewPage2.locator( 'ol.wp-block-footnotes li' )
 		).toHaveText( '123″  ↩︎' );
-		/*
-	These tests won't pass until https://core.trac.wordpress.org/ticket/20564 is committed
-		// Verify that the published post is unchanged.
-		// Navigate to the published post.
+
+		// Verify that the published post is unchanged after previewing changes to meta.
 		await previewPage2.close();
 		await editorPage.bringToFront();
 		await editor.openDocumentSettingsSidebar();
@@ -439,6 +437,5 @@ test.describe( 'Footnotes', () => {
 		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
 			'1 ↩︎'
 		);
-	*/
 	} );
 } );
