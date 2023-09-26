@@ -158,14 +158,9 @@ export function useAvailablePatterns( template ) {
 				currentThemeStylesheet:
 					select( coreStore ).getCurrentTheme().stylesheet,
 			};
-		} );
+		}, [] );
 
-	const mergedPatterns = [
-		...( blockPatterns || [] ),
-		...( restBlockPatterns || [] ),
-	];
-
-return useMemo( () => {
+	return useMemo( () => {
 		const mergedPatterns = [
 			...( blockPatterns || [] ),
 			...( restBlockPatterns || [] ),
