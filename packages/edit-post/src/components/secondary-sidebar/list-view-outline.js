@@ -64,32 +64,31 @@ export default function ListViewOutline() {
 			headingCount: getGlobalBlockCount( 'core/heading' ),
 		};
 	}, [] );
-	const instanceId = useInstanceId( ListViewOutline );
+	const instanceId = useInstanceId(
+		ListViewOutline,
+		'edit-post-editor-list-view-overview-outline'
+	);
 	return (
 		<div className="edit-post-editor__list-view-overview__container">
-			<p
-				id={ `edit-post-editor-list-view-overview-outline-${ instanceId }` }
-			>
-				{ __( 'Document outline' ) }
-			</p>
+			<p id={ instanceId }>{ __( 'Document outline' ) }</p>
 			<ul
 				className="edit-post-editor__list-view-overview"
-				aria-describedby={ `edit-post-editor-list-view-overview-outline-${ instanceId }` }
+				aria-describedby={ instanceId }
 			>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Characters:' ) }</Text>
+					<Text>{ __( 'Characters:' ) }&nbsp;</Text>
 					<Text>
 						<CharacterCount />
 					</Text>
 				</li>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Words:' ) }</Text>
+					<Text>{ __( 'Words:' ) }&nbsp;</Text>
 					<Text>
 						<WordCount />
 					</Text>
 				</li>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Time to read:' ) }</Text>
+					<Text>{ __( 'Time to read:' ) }&nbsp;</Text>
 					<Text>
 						<TimeToRead />
 					</Text>

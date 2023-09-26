@@ -18,28 +18,27 @@ export default function ListViewInfo() {
 			};
 		}
 	);
-	const instanceId = useInstanceId( ListViewInfo );
+	const instanceId = useInstanceId(
+		ListViewInfo,
+		'edit-post-editor-list-view-overview-info'
+	);
 	return (
 		<div className="edit-post-editor__list-view-overview__container">
-			<p
-				id={ `edit-post-editor-list-view-overview-info-${ instanceId }` }
-			>
-				{ __( 'Document info' ) }
-			</p>
+			<p id={ instanceId }>{ __( 'Document info' ) }</p>
 			<ul
 				className="edit-post-editor__list-view-overview"
-				aria-describedby={ `edit-post-editor-list-view-overview-info-${ instanceId }` }
+				aria-describedby={ instanceId }
 			>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Headings:' ) }</Text>
+					<Text>{ __( 'Headings:' ) }&nbsp;</Text>
 					<Text>{ headingCount }</Text>
 				</li>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Paragraphs:' ) }</Text>
+					<Text>{ __( 'Paragraphs:' ) }&nbsp;</Text>
 					<Text>{ paragraphCount }</Text>
 				</li>
 				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Blocks:' ) }</Text>
+					<Text>{ __( 'Blocks:' ) }&nbsp;</Text>
 					<Text>{ blockCount }</Text>
 				</li>
 			</ul>
