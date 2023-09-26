@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
@@ -16,10 +16,8 @@ import { store as editSiteStore } from '../../../store';
 
 export default function ReplaceTemplateButton( {
 	onClick,
-	template,
 	availableTemplates,
 } ) {
-	const { setTemplate } = useDispatch( editSiteStore );
 	const [ showModal, setShowModal ] = useState( false );
 	const onClose = useCallback( () => {
 		setShowModal( false );
@@ -34,13 +32,10 @@ export default function ReplaceTemplateButton( {
 
 	const entity = useEntityRecord( 'postType', postType, postId );
 	const onTemplateSelect = async ( selectedTemplate ) => {
-		//FIXME: This is a hack to get around the fact that the template is not being set correctly.
-		await setTemplate( null, null );
 		await entity.edit( {
 			blocks: selectedTemplate.blocks,
 			content: selectedTemplate.content,
 		} );
-		await setTemplate( postId, template.slug );
 		onClose(); // Close the template suggestions modal first.
 		onClick();
 	};
