@@ -9,7 +9,7 @@ exports[`color settings clears the selected overlay color and mantains the inner
 `;
 
 exports[`color settings sets a color for the overlay background when the placeholder is visible 1`] = `
-"<!-- wp:cover {"overlayColor":"vivid-red","isUserOverlayColor":true} -->
+"<!-- wp:cover {"overlayColor":"vivid-red","isUserOverlayColor":true,"layout":{"type":"constrained"}} -->
 <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-vivid-red-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
@@ -25,7 +25,7 @@ exports[`color settings sets a gradient overlay background when a solid backgrou
 `;
 
 exports[`color settings toggles between solid colors and gradients 1`] = `
-"<!-- wp:cover {"isUserOverlayColor":true,"gradient":"light-green-cyan-to-vivid-green-cyan"} -->
+"<!-- wp:cover {"isUserOverlayColor":true,"gradient":"light-green-cyan-to-vivid-green-cyan","layout":{"type":"constrained"}} -->
 <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim has-background-gradient has-light-green-cyan-to-vivid-green-cyan-gradient-background"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
