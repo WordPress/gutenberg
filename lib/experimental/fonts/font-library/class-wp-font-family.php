@@ -181,8 +181,9 @@ class WP_Font_Family {
 			'test_form'                => false,
 			// Seems mime type for files that are not images cannot be tested.
 			// See wp_check_filetype_and_ext().
-			'test_type'                => false,
-			'unique_filename_callback' => static function() use ( $filename ) {
+			'test_type'                => true,
+			'mimes'                    => WP_Font_Library::ALLOWED_FONT_MIME_TYPES,
+			'unique_filename_callback' => static function () use ( $filename ) {
 				// Keep the original filename.
 				return $filename;
 			},
@@ -379,6 +380,20 @@ class WP_Font_Family {
 			// (for example to install fonts that use a remote url).
 			$new_font_face = $font_face;
 
+			$font_face_is_repeated = false;
+
+			// If the font face has the same fontStyle and fontWeight as an existing, continue.
+			foreach ( $new_font_faces as $font_to_compare ) {
+				if ( $new_font_face['fontStyle'] === $font_to_compare['fontStyle'] &&
+					$new_font_face['fontWeight'] === $font_to_compare['fontWeight'] ) {
+					$font_face_is_repeated = true;
+				}
+			}
+
+			if ( $font_face_is_repeated ) {
+				continue;
+			}
+
 			// If installing google fonts, download the font face assets.
 			if ( ! empty( $font_face['downloadFromUrl'] ) ) {
 				$new_font_face = $this->download_font_face_assets( $new_font_face );
@@ -483,6 +498,29 @@ class WP_Font_Family {
 	}
 
 	/**
+	 * Gets the font faces that are in both the existing and incoming font families.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array $existing The existing font faces.
+	 * @param array $incoming The incoming font faces.
+	 * @return array The font faces that are in both the existing and incoming font families.
+	 */
+	private function get_intersecting_font_faces( $existing, $incoming ) {
+		$intersecting = array();
+		foreach ( $existing as $existing_face ) {
+			foreach ( $incoming as $incoming_face ) {
+				if ( $incoming_face['fontStyle'] === $existing_face['fontStyle'] &&
+					$incoming_face['fontWeight'] === $existing_face['fontWeight'] &&
+					$incoming_face['src'] !== $existing_face['src'] ) {
+					$intersecting[] = $existing_face;
+				}
+			}
+		}
+		return $intersecting;
+	}
+
+	/**
 	 * Updates a post for a font family.
 	 *
 	 * @since 6.4.0
@@ -493,7 +531,23 @@ class WP_Font_Family {
 	private function update_font_post( $post ) {
 		$post_font_data = json_decode( $post->post_content, true );
 		$new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
-		$this->data     = $new_data;
+		if ( isset( $post_font_data['fontFace'] ) && ! empty( $post_font_data['fontFace'] ) ) {
+			$intersecting = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
+		}
+
+		if ( isset( $intersecting ) && ! empty( $intersecting ) ) {
+			$serialized_font_faces   = array_map( 'serialize', $new_data['fontFace'] );
+			$serialized_intersecting = array_map( 'serialize', $intersecting );
+
+			$diff = array_diff( $serialized_font_faces, $serialized_intersecting );
+
+			$new_data['fontFace'] = array_values( array_map( 'unserialize', $diff ) );
+
+			foreach ( $intersecting as $intersect ) {
+				$this->delete_font_face_assets( $intersect );
+			}
+		}
+		$this->data = $new_data;
 
 		$post = array(
 			'ID'           => $post->ID,
@@ -541,9 +595,11 @@ class WP_Font_Family {
 	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
 	 */
 	public function install( $files = null ) {
+		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
 		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		if ( ! $were_assets_written ) {
 			return new WP_Error(

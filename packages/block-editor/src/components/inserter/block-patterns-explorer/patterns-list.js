@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
-import { useDebounce, useAsyncList } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
@@ -11,18 +11,19 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import BlockPatternsList from '../../block-patterns-list';
-import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
-
-const INITIAL_INSERTER_RESULTS = 2;
+import BlockPatternsPaging from '../../block-patterns-paging';
+import usePatternsPaging from '../hooks/use-patterns-paging';
+import { allPatternsCategory, myPatternsCategory } from '../block-patterns-tab';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
 		return null;
 	}
+
 	return (
 		<Heading
 			level={ 2 }
@@ -30,25 +31,25 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
-				/* translators: %d: number of patterns. %s: block pattern search query */
+				/* translators: %d: number of patterns. */
 				_n(
-					'%1$d pattern found for "%2$s"',
-					'%1$d patterns found for "%2$s"',
+					'%d pattern found',
+					'%d patterns found',
 					filteredBlockPatternsLength
 				),
-				filteredBlockPatternsLength,
-				filterValue
+				filteredBlockPatternsLength
 			) }
 		</Heading>
 	);
 }
 
-function PatternList( { filterValue, selectedCategory, patternCategories } ) {
+function PatternList( { searchValue, selectedCategory, patternCategories } ) {
+	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const [ allPatterns, , onSelectBlockPattern ] = usePatternsState(
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -62,30 +63,40 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
-		if ( ! filterValue ) {
-			return allPatterns.filter( ( pattern ) =>
-				selectedCategory === 'uncategorized'
-					? ! pattern.categories?.length ||
-					  pattern.categories.every(
-							( category ) =>
-								! registeredPatternCategories.includes(
-									category
-								)
-					  )
-					: pattern.categories?.includes( selectedCategory )
-			);
+		const filteredPatterns = patterns.filter( ( pattern ) => {
+			if ( selectedCategory === allPatternsCategory.name ) {
+				return true;
+			}
+			if ( selectedCategory === myPatternsCategory.name && pattern.id ) {
+				return true;
+			}
+			if ( selectedCategory === 'uncategorized' ) {
+				const hasKnownCategory = pattern.categories.some(
+					( category ) =>
+						registeredPatternCategories.includes( category )
+				);
+
+				return ! pattern.categories?.length || ! hasKnownCategory;
+			}
+
+			return pattern.categories?.includes( selectedCategory );
+		} );
+
+		if ( ! searchValue ) {
+			return filteredPatterns;
 		}
-		return searchItems( allPatterns, filterValue );
+
+		return searchItems( filteredPatterns, searchValue );
 	}, [
-		filterValue,
-		allPatterns,
+		searchValue,
+		patterns,
 		selectedCategory,
 		registeredPatternCategories,
 	] );
 
 	// Announce search results on change.
 	useEffect( () => {
-		if ( ! filterValue ) {
+		if ( ! searchValue ) {
 			return;
 		}
 		const count = filteredBlockPatterns.length;
@@ -95,30 +106,46 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filterValue, debouncedSpeak, filteredBlockPatterns.length ] );
+	}, [ searchValue, debouncedSpeak, filteredBlockPatterns.length ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
-		step: INITIAL_INSERTER_RESULTS,
-	} );
+	const pagingProps = usePatternsPaging(
+		filteredBlockPatterns,
+		selectedCategory,
+		container
+	);
+
+	// Reset page when search value changes.
+	const [ previousSearchValue, setPreviousSearchValue ] =
+		useState( searchValue );
+	if ( searchValue !== previousSearchValue ) {
+		setPreviousSearchValue( searchValue );
+		pagingProps.changePage( 1 );
+	}
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
-		<div className="block-editor-block-patterns-explorer__list">
-			{ hasItems && (
-				<PatternsListHeader
-					filterValue={ filterValue }
-					filteredBlockPatternsLength={ filteredBlockPatterns.length }
-				/>
-			) }
+		<div
+			className="block-editor-block-patterns-explorer__list"
+			ref={ container }
+		>
+			<PatternsListHeader
+				filterValue={ searchValue }
+				filteredBlockPatternsLength={ filteredBlockPatterns.length }
+			/>
+
 			<InserterListbox>
-				{ ! hasItems && <InserterNoResults /> }
 				{ hasItems && (
-					<BlockPatternsList
-						shownPatterns={ currentShownPatterns }
-						blockPatterns={ filteredBlockPatterns }
-						onClickPattern={ onSelectBlockPattern }
-						isDraggable={ false }
-					/>
+					<>
+						<BlockPatternsList
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							isDraggable={ false }
+						/>
+						<BlockPatternsPaging { ...pagingProps } />
+					</>
 				) }
 			</InserterListbox>
 		</div>

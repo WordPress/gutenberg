@@ -31,14 +31,14 @@ function PatternCategoriesList( {
 	);
 }
 
-function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
+function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__search';
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
 				__nextHasNoMarginBottom
-				onChange={ setFilterValue }
-				value={ filterValue }
+				onChange={ setSearchValue }
+				value={ searchValue }
 				label={ __( 'Search for patterns' ) }
 				placeholder={ __( 'Search' ) }
 			/>
@@ -50,17 +50,17 @@ function PatternExplorerSidebar( {
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
-	filterValue,
-	setFilterValue,
+	searchValue,
+	setSearchValue,
 } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__sidebar';
 	return (
 		<div className={ baseClassName }>
 			<PatternsExplorerSearch
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				searchValue={ searchValue }
+				setSearchValue={ setSearchValue }
 			/>
-			{ ! filterValue && (
+			{ ! searchValue && (
 				<PatternCategoriesList
 					selectedCategory={ selectedCategory }
 					patternCategories={ patternCategories }

@@ -9,6 +9,7 @@
 			router: {
 				status: 'idle',
 				navigations: 0,
+				timeout: 10000,
 			}
 		},
 		actions: {
@@ -20,8 +21,9 @@
 					state.router.status = 'busy';
 
 					const force = e.target.dataset.forceNavigation === 'true';
+					const { timeout } = state.router;
 
-					await navigate( e.target.href, { force } );
+					await navigate( e.target.href, { force, timeout } );
 
 					state.router.navigations -= 1;
 
@@ -29,6 +31,10 @@
 						state.router.status = 'idle';
 					}
 				},
+				toggleTimeout: ( { state }) => {
+					state.router.timeout =
+						state.router.timeout === 10000 ? 0 : 10000;
+				}
 			},
 		},
 	} );

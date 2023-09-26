@@ -27,7 +27,7 @@ import withNotices from '..';
 import type { WithNoticeProps } from '../types';
 
 // Implementation detail of Notice component used to query the dismissal button.
-const stockDismissText = 'Dismiss this notice';
+const stockDismissText = 'Close';
 
 function noticesFrom( list: string[] ) {
 	return list.map( ( item ) => ( { id: item, content: item } ) );
