@@ -14,10 +14,10 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_register_font_collection() {
 		$config     = array(
-			'id'             => 'my-collection',
-			'name'           => 'My Collection',
-			'description'    => 'My Collection Description',
-			'data_json_file' => 'my-collection-data.json',
+			'id'          => 'my-collection',
+			'name'        => 'My Collection',
+			'description' => 'My Collection Description',
+			'src'         => 'my-collection-data.json',
 		);
 		$collection = WP_Font_Library::register_font_collection( $config );
 		$this->assertInstanceOf( 'WP_Font_Collection', $collection );
@@ -25,9 +25,9 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_return_error_if_id_is_missing() {
 		$config = array(
-			'name'           => 'My Collection',
-			'description'    => 'My Collection Description',
-			'data_json_file' => 'my-collection-data.json',
+			'name'        => 'My Collection',
+			'description' => 'My Collection Description',
+			'src'         => 'my-collection-data.json',
 		);
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font Collection config ID is required as a non-empty string.' );
@@ -36,9 +36,9 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_return_error_if_name_is_missing() {
 		$config = array(
-			'id'             => 'my-collection',
-			'description'    => 'My Collection Description',
-			'data_json_file' => 'my-collection-data.json',
+			'id'          => 'my-collection',
+			'description' => 'My Collection Description',
+			'src'         => 'my-collection-data.json',
 		);
 		$this->expectException( 'Exception' );
 		$this->expectExceptionMessage( 'Font Collection config name is required as a non-empty string.' );
@@ -54,16 +54,16 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_return_error_if_id_is_repeated() {
 		$config1 = array(
-			'id'             => 'my-collection-1',
-			'name'           => 'My Collection 1',
-			'description'    => 'My Collection 1 Description',
-			'data_json_file' => 'my-collection-1-data.json',
+			'id'          => 'my-collection-1',
+			'name'        => 'My Collection 1',
+			'description' => 'My Collection 1 Description',
+			'src'         => 'my-collection-1-data.json',
 		);
 		$config2 = array(
-			'id'             => 'my-collection-1',
-			'name'           => 'My Collection 2',
-			'description'    => 'My Collection 2 Description',
-			'data_json_file' => 'my-collection-2-data.json',
+			'id'          => 'my-collection-1',
+			'name'        => 'My Collection 2',
+			'description' => 'My Collection 2 Description',
+			'src'         => 'my-collection-2-data.json',
 		);
 
 		// Register first collection.

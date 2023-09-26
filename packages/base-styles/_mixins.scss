@@ -82,8 +82,8 @@
 
 @mixin input-style__focus() {
 	border-color: var(--wp-admin-theme-color);
-	box-shadow: 0 0 0 ($border-width-focus-fallback - $border-width) var(--wp-admin-theme-color);
-
+	// Expand the default border focus style by .5px to be a total of 1.5px.
+	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 }

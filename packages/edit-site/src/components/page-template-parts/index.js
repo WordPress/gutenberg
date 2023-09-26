@@ -19,11 +19,12 @@ import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplatePart from './add-new-template-part';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function PageTemplateParts() {
 	const { records: templateParts } = useEntityRecords(
 		'postType',
-		'wp_template_part',
+		TEMPLATE_PART_POST_TYPE,
 		{
 			per_page: -1,
 		}

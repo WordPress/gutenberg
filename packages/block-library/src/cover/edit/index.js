@@ -2,8 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { extend } from 'colord';
-import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
@@ -37,14 +35,17 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
-	getCoverIsDark,
 } from '../shared';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
-
-extend( [ namesPlugin ] );
+import {
+	getMediaColor,
+	compositeIsDark,
+	DEFAULT_BACKGROUND_COLOR,
+	DEFAULT_OVERLAY_COLOR,
+} from './color-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -83,6 +84,8 @@ function CoverEdit( {
 	const {
 		contentPosition,
 		id,
+		url: originalUrl,
+		backgroundType: originalBackgroundType,
 		useFeaturedImage,
 		dimRatio,
 		focalPoint,
@@ -95,6 +98,7 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 		tagName: TagName = 'div',
+		isUserOverlayColor,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -114,23 +118,34 @@ function CoverEdit( {
 	);
 	const mediaUrl = media?.source_url;
 
+	// User can change the featured image outside of the block, but we still
+	// need to update the block when that happens. This effect should only
+	// run when the featured image changes in that case. All other cases are
+	// handled in their respective callbacks.
 	useEffect( () => {
-		async function setIsDark() {
-			__unstableMarkNextChangeAsNotPersistent();
-			const isDarkSetting = await getCoverIsDark(
-				mediaUrl,
+		( async () => {
+			if ( ! useFeaturedImage ) {
+				return;
+			}
+
+			const averageBackgroundColor = await getMediaColor( mediaUrl );
+
+			let newOverlayColor = overlayColor.color;
+			if ( ! isUserOverlayColor ) {
+				newOverlayColor = averageBackgroundColor;
+				__unstableMarkNextChangeAsNotPersistent();
+				setOverlayColor( newOverlayColor );
+			}
+
+			const newIsDark = compositeIsDark(
 				dimRatio,
-				overlayColor.color
+				newOverlayColor,
+				averageBackgroundColor
 			);
-			setAttributes( {
-				isDark: isDarkSetting,
-			} );
-		}
-		if ( useFeaturedImage ) {
-			setIsDark();
-		}
-		// We only ever want to run this effect if the mediaUrl changes.
-		// All other changes to the isDark state are handled in the appropriate event handlers.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { isDark: newIsDark } );
+		} )();
+		// Disable reason: Update the block only when the featured image changes.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ mediaUrl ] );
 
@@ -141,32 +156,62 @@ function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  attributes.url?.replaceAll( '&amp;', '&' );
+		  originalUrl?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
-		: attributes.backgroundType;
+		: originalBackgroundType;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const setMedia = attributesFromMedia( setAttributes, dimRatio );
 
 	const onSelectMedia = async ( newMedia ) => {
-		// Only pass the url to getCoverIsDark if the media is an image as video is not handled.
-		const newUrl = newMedia?.type === 'image' ? newMedia.url : undefined;
-		const isDarkSetting = await getCoverIsDark(
-			newUrl,
-			dimRatio,
-			overlayColor.color
+		const mediaAttributes = attributesFromMedia( newMedia );
+
+		const averageBackgroundColor = await getMediaColor(
+			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
 		);
-		setMedia( newMedia, isDarkSetting );
+
+		let newOverlayColor = overlayColor.color;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = averageBackgroundColor;
+			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		setAttributes( {
+			...mediaAttributes,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: newDimRatio,
+			isDark: newIsDark,
+		} );
 	};
 
-	const onClearMedia = async () => {
-		const isDarkSetting = await getCoverIsDark(
-			undefined,
+	const onClearMedia = () => {
+		let newOverlayColor = overlayColor.color;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = DEFAULT_OVERLAY_COLOR;
+			setOverlayColor( undefined );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newIsDark = compositeIsDark(
 			dimRatio,
-			overlayColor.color
+			newOverlayColor,
+			DEFAULT_BACKGROUND_COLOR
 		);
+
 		setAttributes( {
 			url: undefined,
 			id: undefined,
@@ -174,38 +219,49 @@ function CoverEdit( {
 			focalPoint: undefined,
 			hasParallax: undefined,
 			isRepeated: undefined,
-			useFeaturedImage: false,
-			isDark: isDarkSetting,
+			useFeaturedImage: undefined,
+			isDark: newIsDark,
 		} );
 	};
 
-	const onSetOverlayColor = async ( colorValue ) => {
-		const isDarkSetting = await getCoverIsDark( url, dimRatio, colorValue );
-		setOverlayColor( colorValue );
+	const onSetOverlayColor = async ( newOverlayColor ) => {
+		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		setOverlayColor( newOverlayColor );
+
+		// Make undo revert the next setAttributes and the previous setOverlayColor.
 		__unstableMarkNextChangeAsNotPersistent();
+
 		setAttributes( {
-			isDark: isDarkSetting,
+			isUserOverlayColor: true,
+			isDark: newIsDark,
 		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
-		const isDarkSetting = await getCoverIsDark(
-			url,
+		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
 			newDimRatio,
-			overlayColor.color
+			overlayColor.color,
+			averageBackgroundColor
 		);
 
 		setAttributes( {
 			dimRatio: newDimRatio,
-			isDark: isDarkSetting,
+			isDark: newIsDark,
 		} );
 	};
-
-	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
+
+	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -285,18 +341,43 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
-		const isDarkSetting = await ( useFeaturedImage
-			? getCoverIsDark( undefined, dimRatio, overlayColor.color )
-			: getCoverIsDark( mediaUrl, dimRatio, overlayColor.color ) );
+		const newUseFeaturedImage = ! useFeaturedImage;
+
+		const averageBackgroundColor = newUseFeaturedImage
+			? await getMediaColor( mediaUrl )
+			: DEFAULT_BACKGROUND_COLOR;
+
+		const newOverlayColor = ! isUserOverlayColor
+			? averageBackgroundColor
+			: overlayColor.color;
+
+		if ( ! isUserOverlayColor ) {
+			if ( newUseFeaturedImage ) {
+				setOverlayColor( newOverlayColor );
+			} else {
+				setOverlayColor( undefined );
+			}
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
 		setAttributes( {
 			id: undefined,
 			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			useFeaturedImage: newUseFeaturedImage,
+			dimRatio: newDimRatio,
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
-			isDark: isDarkSetting,
+			isDark: newIsDark,
 		} );
 	};
 

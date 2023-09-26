@@ -50,8 +50,10 @@ export const buttonView = ( {
 	padding: 0 12px;
 	position: relative;
 	text-align: center;
-	transition: background ${ CONFIG.transitionDurationFast } linear,
-		color ${ CONFIG.transitionDurationFast } linear, font-weight 60ms linear;
+	transition:
+		background ${ CONFIG.transitionDurationFast } linear,
+		color ${ CONFIG.transitionDurationFast } linear,
+		font-weight 60ms linear;
 	${ reduceMotion( 'transition' ) }
 	user-select: none;
 	width: 100%;
@@ -82,7 +84,8 @@ const deselectable = css`
 	color: ${ COLORS.gray[ 900 ] };
 
 	&:focus {
-		box-shadow: inset 0 0 0 1px ${ COLORS.white },
+		box-shadow:
+			inset 0 0 0 1px ${ COLORS.white },
 			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
 		outline: 2px solid transparent;
 	}

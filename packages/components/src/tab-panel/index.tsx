@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import classnames from 'classnames';
 import type { ForwardedRef } from 'react';

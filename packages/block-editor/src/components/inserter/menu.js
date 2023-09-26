@@ -27,7 +27,6 @@ import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs, {
 	BlockPatternsCategoryDialog,
 } from './block-patterns-tab';
-import ReusableBlocksTab from './reusable-blocks-tab';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useDebouncedInput from './hooks/use-debounced-input';
@@ -55,6 +54,7 @@ function InserterMenu(
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
+	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
@@ -121,8 +121,9 @@ function InserterMenu(
 	);
 
 	const onClickPatternCategory = useCallback(
-		( patternCategory ) => {
+		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
+			setPatternFilter( filter );
 		},
 		[ setSelectedPatternCategory ]
 	);
@@ -174,17 +175,6 @@ function InserterMenu(
 		]
 	);
 
-	const reusableBlocksTab = useMemo(
-		() => (
-			<ReusableBlocksTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsert }
-				onHover={ onHover }
-			/>
-		),
-		[ destinationRootClientId, onInsert, onHover ]
-	);
-
 	const mediaTab = useMemo(
 		() => (
 			<MediaTab
@@ -208,13 +198,11 @@ function InserterMenu(
 				return blocksTab;
 			} else if ( tab.name === 'patterns' ) {
 				return patternsTab;
-			} else if ( tab.name === 'reusable' ) {
-				return reusableBlocksTab;
 			} else if ( tab.name === 'media' ) {
 				return mediaTab;
 			}
 		},
-		[ blocksTab, patternsTab, reusableBlocksTab, mediaTab ]
+		[ blocksTab, patternsTab, mediaTab ]
 	);
 
 	const searchRef = useRef();
@@ -235,6 +223,15 @@ function InserterMenu(
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
 		selectedMediaCategory;
+
+	const handleSetSelectedTab = ( value ) => {
+		// If no longer on patterns tab remove the category setting.
+		if ( value !== 'patterns' ) {
+			setSelectedPatternCategory( null );
+		}
+		setSelectedTab( value );
+	};
+
 	return (
 		<div className="block-editor-inserter__menu">
 			<div
@@ -278,7 +275,7 @@ function InserterMenu(
 						showReusableBlocks={ hasReusableBlocks }
 						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
-						onSelect={ setSelectedTab }
+						onSelect={ handleSetSelectedTab }
 					>
 						{ getCurrentTab }
 					</InserterTabs>
@@ -305,6 +302,7 @@ function InserterMenu(
 					onInsert={ onInsertPattern }
 					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
+					patternFilter={ patternFilter }
 					showTitlesAsTooltip
 				/>
 			) }

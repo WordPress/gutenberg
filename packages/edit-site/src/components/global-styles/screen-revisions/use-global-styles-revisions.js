@@ -89,7 +89,6 @@ export default function useGlobalStylesRevisions() {
 					id: 'unsaved',
 					styles: userConfig?.styles,
 					settings: userConfig?.settings,
-					behaviors: userConfig?.behaviors,
 					author: {
 						name: currentUser?.name,
 						avatar_urls: currentUser?.avatar_urls,

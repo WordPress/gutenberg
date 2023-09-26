@@ -12,7 +12,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { WordPressComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { baseLabelTypography, COLORS, rtl } from '../../utils';
+import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
 import { space } from '../../ui/utils/space';
 
@@ -275,7 +275,7 @@ const backdropFocusedStyles = ( {
 	let outlineOffset;
 
 	if ( isFocused ) {
-		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
+		boxShadow = CONFIG.controlBoxShadowFocus;
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline = `2px solid transparent`;
 		outlineOffset = `-2px`;

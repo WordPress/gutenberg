@@ -10,7 +10,7 @@ export type WordPressComponentProps<
 	/** The HTML element to inherit props from. */
 	T extends React.ElementType,
 	/** Supports polymorphism through the `as` prop. */
-	IsPolymorphic extends boolean = true
+	IsPolymorphic extends boolean = true,
 > = P &
 	// The `children` prop is being explicitly omitted since it is otherwise implicitly added
 	// by `ComponentPropsWithRef`. The context is that components should require the `children`
@@ -26,7 +26,7 @@ export type WordPressComponentProps<
 export type WordPressComponent<
 	T extends React.ElementType,
 	O,
-	IsPolymorphic extends boolean
+	IsPolymorphic extends boolean,
 > = {
 	< TT extends React.ElementType >(
 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
@@ -49,7 +49,7 @@ export type WordPressComponent<
 
 export type WordPressComponentFromProps<
 	Props,
-	ForwardsRef extends boolean = true
+	ForwardsRef extends boolean = true,
 > = Props extends WordPressComponentProps< infer P, infer T, infer I >
 	? WordPressComponent<
 			T,

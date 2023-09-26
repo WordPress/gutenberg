@@ -40,7 +40,6 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
-import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,7 +51,6 @@ import {
 	computePopoverPosition,
 	positionToPlacement,
 	placementToMotionAnimationProps,
-	getReferenceOwnerDocument,
 	getReferenceElement,
 } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
@@ -199,9 +197,6 @@ const UnforwardedPopover = (
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
-	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
-		Document | undefined
-	>();
 
 	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
 		( node ) => {
@@ -315,15 +310,6 @@ const UnforwardedPopover = (
 		?.current;
 
 	useLayoutEffect( () => {
-		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
-			anchor,
-			anchorRef,
-			anchorRect,
-			getAnchorRect,
-			fallbackReferenceElement,
-			fallbackDocument: document,
-		} );
-
 		const resultingReferenceElement = getReferenceElement( {
 			anchor,
 			anchorRef,
@@ -333,8 +319,6 @@ const UnforwardedPopover = (
 		} );
 
 		refs.setReference( resultingReferenceElement );
-
-		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
 		anchorRef,
@@ -347,33 +331,6 @@ const UnforwardedPopover = (
 		fallbackReferenceElement,
 		refs,
 	] );
-
-	// If the reference element is in a different ownerDocument (e.g. iFrame),
-	// we need to manually update the floating's position as the reference's owner
-	// document scrolls.
-	useLayoutEffect( () => {
-		if (
-			! referenceOwnerDocument ||
-			! referenceOwnerDocument.defaultView
-		) {
-			return;
-		}
-
-		const { defaultView } = referenceOwnerDocument;
-		const { frameElement } = defaultView;
-
-		const scrollContainer = frameElement
-			? getScrollContainer( frameElement )
-			: null;
-
-		defaultView.addEventListener( 'resize', update );
-		scrollContainer?.addEventListener( 'scroll', update );
-
-		return () => {
-			defaultView.removeEventListener( 'resize', update );
-			scrollContainer?.removeEventListener( 'scroll', update );
-		};
-	}, [ referenceOwnerDocument, update ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		refs.setFloating,

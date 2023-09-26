@@ -3,7 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Radio } from '@ariakit/react/radio';
+import * as Ariakit from '@ariakit/react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -38,7 +38,7 @@ const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } position="top center">
+			<Tooltip text={ text } placement="top">
 				{ children }
 			</Tooltip>
 		);
@@ -140,7 +140,7 @@ function ToggleGroupControlOptionBase(
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
-					<Radio
+					<Ariakit.Radio
 						render={
 							<button
 								{ ...commonProps }
@@ -154,7 +154,7 @@ function ToggleGroupControlOptionBase(
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
-					</Radio>
+					</Ariakit.Radio>
 				) }
 			</WithToolTip>
 			{ /* Animated backdrop using framer motion's shared layout animation */ }
