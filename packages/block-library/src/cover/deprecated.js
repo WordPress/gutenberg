@@ -183,7 +183,7 @@ const v7toV10BlockSupports = {
 };
 
 // Deprecation for blocks that does not have the aria-label when the image background is fixed or repeated.
-const v12 = {
+const v13 = {
 	attributes: {
 		url: {
 			type: 'string',
@@ -1720,4 +1720,4 @@ const v1 = {
 	},
 };
 
-export default [ v12, v11, v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
+export default [ v13, v12, v11, v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
