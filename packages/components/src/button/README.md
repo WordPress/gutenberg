@@ -186,7 +186,7 @@ Renders a red text-based button style to indicate destructive behavior.
 
 Renders a pressed button style.
 
-Deprecated in favor of the native `aria-pressed` prop. If both props are defined, the `aria-pressed` prop will take precedence.
+If the native `aria-pressed` attribute is also set, it will take precedence.
 
 -   Required: No
 
