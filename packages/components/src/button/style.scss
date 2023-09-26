@@ -308,11 +308,8 @@
 	}
 
 	// Toggled style.
-	&[aria-checked="true"],
-	&[aria-checked="mixed"],
 	&[aria-pressed="true"],
-	&[aria-pressed="mixed"],
-	&[aria-selected="true"] {
+	&[aria-pressed="mixed"] {
 		color: $components-color-foreground-inverted;
 		background: $components-color-foreground;
 

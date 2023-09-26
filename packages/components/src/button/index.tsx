@@ -42,7 +42,9 @@ function useDeprecatedProps( {
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedSize = size;
 	let computedVariant = variant;
+
 	const newProps: { 'aria-pressed'?: boolean } = {
+		// @TODO Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
 	};
 
@@ -74,12 +76,6 @@ function useDeprecatedProps( {
 
 	if ( isLink ) {
 		computedVariant ??= 'link';
-	}
-
-	if ( isPressed ) {
-		deprecated( 'Button isPressed prop', {
-			alternative: 'aria-pressed={ true }',
-		} );
 	}
 
 	return {
@@ -148,15 +144,8 @@ export function UnforwardedButton(
 		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
 
-		// Including these classes for consistency and legacy purposes.
-		// `is-pressed` was added by the (deprecated) `isPressed` prop.
-		// Component styling is tied to the value of the respective
-		// `aria-*` attributes.
-		'is-checked': ariaChecked && ariaChecked !== 'false',
-		'is-checked-mixed': ariaChecked === 'mixed',
 		'is-pressed': ariaPressed && ariaPressed !== 'false',
 		'is-pressed-mixed': ariaPressed === 'mixed',
-		'is-selected': ariaSelected && ariaSelected !== 'false',
 
 		'is-busy': isBusy,
 		'is-link': variant === 'link',

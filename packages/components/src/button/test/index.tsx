@@ -28,9 +28,7 @@ describe( 'Button', () => {
 			expect( button ).toHaveClass( 'components-button' );
 			expect( button ).not.toHaveClass( 'is-large' );
 			expect( button ).not.toHaveClass( 'is-primary' );
-			expect( button ).not.toHaveClass( 'is-checked' );
 			expect( button ).not.toHaveClass( 'is-pressed' );
-			expect( button ).not.toHaveClass( 'is-selected' );
 			expect( button ).toBeEnabled();
 			expect( button ).not.toHaveAttribute( 'aria-disabled' );
 			expect( button ).toHaveAttribute( 'type', 'button' );
@@ -74,20 +72,6 @@ describe( 'Button', () => {
 			expect( button ).toHaveClass( 'is-link' );
 		} );
 
-		it( 'should render a button element with is-checked without button class', () => {
-			render( <Button aria-checked /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-checked' );
-		} );
-
-		it( 'should render a button element with is-checked-mixed without button class', () => {
-			render( <Button aria-checked="mixed" /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass(
-				'is-checked is-checked-mixed'
-			);
-		} );
-
 		it( 'should render a button element with is-pressed without button class', () => {
 			render( <Button aria-pressed /> );
 
@@ -100,12 +84,6 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-pressed is-pressed-mixed'
 			);
-		} );
-
-		it( 'should render a button element with is-selected without button class', () => {
-			render( <Button aria-selected /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-selected' );
 		} );
 
 		it( 'should render a button element with has-text when children are passed', async () => {
@@ -472,9 +450,6 @@ describe( 'Button', () => {
 				'aria-pressed',
 				'true'
 			);
-
-			// Expect a deprecation message.
-			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should prioritize the `aria-pressed` prop over `isPressed`', () => {
