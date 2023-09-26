@@ -9,7 +9,7 @@ exports[`color settings clears the selected overlay color and mantains the inner
 `;
 
 exports[`color settings sets a color for the overlay background when the placeholder is visible 1`] = `
-"<!-- wp:cover {"overlayColor":"vivid-red"} -->
+"<!-- wp:cover {"overlayColor":"vivid-red","isUserOverlayColor":true} -->
 <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-vivid-red-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
@@ -25,8 +25,8 @@ exports[`color settings sets a gradient overlay background when a solid backgrou
 `;
 
 exports[`color settings toggles between solid colors and gradients 1`] = `
-"<!-- wp:cover {"gradient":"light-green-cyan-to-vivid-green-cyan","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim has-background-gradient has-light-green-cyan-to-vivid-green-cyan-gradient-background"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+"<!-- wp:cover {"isUserOverlayColor":true,"gradient":"light-green-cyan-to-vivid-green-cyan"} -->
+<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim has-background-gradient has-light-green-cyan-to-vivid-green-cyan-gradient-background"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -97,7 +97,7 @@ exports[`when an image is attached updates background opacity 1`] = `
 `;
 
 exports[`when no media is attached and overlay color is set adds image 1`] = `
-"<!-- wp:cover {"url":"https://test.files.wordpress.com/local-image-1.mp4","id":2000,"dimRatio":50,"overlayColor":"cyan-bluish-gray","isUserOverlayColor":true} -->
+"<!-- wp:cover {"url":"https://test.files.wordpress.com/local-image-1.mp4","id":2000,"dimRatio":50,"overlayColor":"cyan-bluish-gray","isUserOverlayColor":true,"isDark":false} -->
 <div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-2000" src="https://test.files.wordpress.com/local-image-1.mp4" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
