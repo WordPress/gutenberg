@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`'isDark' attribute does not add attribute when using a dark color 1`] = `
+"<!-- wp:cover {"overlayColor":"black","isUserOverlayColor":true,"layout":{"type":"constrained"}} -->
+<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`'isDark' attribute sets to false when using a light color 1`] = `
+"<!-- wp:cover {"overlayColor":"white","isUserOverlayColor":true,"isDark":false,"layout":{"type":"constrained"}} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-white-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`'isDark' attribute updates value when changing opacity 1`] = `
+"<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":80,"overlayColor":"foreground","isUserOverlayColor":true} -->
+<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim-80 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`'isDark' attribute updates value when changing opacity 2`] = `
+"<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":20,"overlayColor":"foreground","isUserOverlayColor":true,"isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
 exports[`color settings clears the selected overlay color and mantains the inner blocks 1`] = `
 "<!-- wp:cover {"isUserOverlayColor":true,"isDark":false} -->
 <div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->

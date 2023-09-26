@@ -64,6 +64,8 @@ const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 
+const COLOR_BLACK = '#000000';
+const COLOR_WHITE = '#ffffff';
 const COLOR_PINK = '#f78da7';
 const COLOR_RED = '#cf2e2e';
 const COLOR_GRAY = '#abb8c3';
@@ -694,5 +696,81 @@ describe( 'minimum height settings', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			}
 		);
+	} );
+} );
+
+describe( "'isDark' attribute", () => {
+	it( 'does not add attribute when using a dark color', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+		const { getByTestId, findByLabelText } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Select overlay color
+		fireEvent.press( getByTestId( COLOR_BLACK ) );
+
+		// Wait for the block to be created
+		fireEvent.press( await findByLabelText( /Cover Block\. Row 1/ ) );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'sets to false when using a light color', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
+		} );
+		const { getByTestId, findByLabelText } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Select overlay color
+		fireEvent.press( getByTestId( COLOR_WHITE ) );
+
+		// Wait for the block to be created
+		fireEvent.press( await findByLabelText( /Cover Block\. Row 1/ ) );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'updates value when changing opacity', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_IMAGE_HTML,
+		} );
+		const { getByLabelText } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		// Update opacity to 80
+		const opacityControl = getByLabelText( /Opacity/ );
+		fireEvent.press(
+			within( opacityControl ).getByText( DEFAULT_OPACITY_VALUE, {
+				hidden: true,
+			} )
+		);
+		const opacityValue = within( opacityControl ).getByDisplayValue(
+			DEFAULT_OPACITY_VALUE,
+			{
+				hidden: true,
+			}
+		);
+		fireEvent.changeText( opacityValue, '80' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+
+		// Update opacity to 20
+		fireEvent.changeText( opacityValue, '20' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
