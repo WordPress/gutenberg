@@ -39,7 +39,7 @@ test.describe( 'Query block', () => {
 
 			await page
 				.getByRole( 'dialog', { name: 'Choose a pattern' } )
-				.getByRole( 'option', { name: 'Not synced' } )
+				.getByRole( 'option', { name: 'Standard' } )
 				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
