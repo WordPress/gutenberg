@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	ButtonGroup,
@@ -17,7 +17,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, createPortal } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,13 +25,12 @@ import { useContext, createPortal } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
-import { LayoutStyle } from '../components/block-list/layout';
-import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { kebabCase } from '../utils/object';
 import { useBlockSettings } from './utils';
+import { unlock } from '../lock-unlock';
 
 const layoutBlockSupportKey = 'layout';
 
@@ -364,7 +363,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const shouldRenderLayoutStyles =
 			blockSupportsLayout && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
@@ -404,26 +402,23 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layoutClasses
 		);
 
+		const { setStyleOverride, deleteStyleOverride } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
+		useEffect( () => {
+			if ( ! css ) return;
+			setStyleOverride( id, { css } );
+			return () => {
+				deleteStyleOverride( id );
+			};
+		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+
 		return (
-			<>
-				{ shouldRenderLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal(
-						<LayoutStyle
-							blockName={ name }
-							selector={ selector }
-							css={ css }
-							layout={ usedLayout }
-							style={ attributes?.style }
-						/>,
-						element
-					) }
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={ layoutClassNames }
-				/>
-			</>
+			<BlockListBlock
+				{ ...props }
+				__unstableLayoutClassNames={ layoutClassNames }
+			/>
 		);
 	},
 	'withLayoutStyles'
@@ -449,7 +444,6 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		const shouldRenderChildLayoutStyles =
 			hasChildLayout && ! disableLayoutStyles;
 
-		const element = useContext( BlockList.__unstableElementContext );
 		const id = useInstanceId( BlockListBlock );
 		const selector = `.wp-container-content-${ id }`;
 
@@ -472,15 +466,19 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 		} );
 
-		return (
-			<>
-				{ shouldRenderChildLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
+		const { setStyleOverride, deleteStyleOverride } = unlock(
+			useDispatch( blockEditorStore )
 		);
+
+		useEffect( () => {
+			if ( ! css ) return;
+			setStyleOverride( id, { css } );
+			return () => {
+				deleteStyleOverride( id );
+			};
+		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+
+		return <BlockListBlock { ...props } className={ className } />;
 	},
 	'withChildLayoutStyles'
 );

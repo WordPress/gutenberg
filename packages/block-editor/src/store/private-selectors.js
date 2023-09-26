@@ -45,9 +45,8 @@ export function getLastInsertedBlocksClientIds( state ) {
 export const isBlockSubtreeDisabled = createSelector(
 	( state, clientId ) => {
 		const isChildSubtreeDisabled = ( childClientId ) => {
-			const mode = state.blockEditingModes.get( childClientId );
 			return (
-				( mode === undefined || mode === 'disabled' ) &&
+				getBlockEditingMode( state, childClientId ) === 'disabled' &&
 				getBlockOrder( state, childClientId ).every(
 					isChildSubtreeDisabled
 				)
@@ -58,7 +57,12 @@ export const isBlockSubtreeDisabled = createSelector(
 			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
 		);
 	},
-	( state ) => [ state.blockEditingModes, state.blocks.parents ]
+	( state ) => [
+		state.blocks.parents,
+		state.blocks.order,
+		state.blockEditingModes,
+		state.blockListSettings,
+	]
 );
 
 /**
@@ -138,4 +142,25 @@ export function getRemovalPromptData( state ) {
  */
 export function getBlockRemovalRules( state ) {
 	return state.blockRemovalRules;
+}
+
+/**
+ * Returns the client ID of the block settings menu that is currently open.
+ *
+ * @param {Object} state Global application state.
+ * @return {string|null} The client ID of the block menu that is currently open.
+ */
+export function getOpenedBlockSettingsMenu( state ) {
+	return state.openedBlockSettingsMenu;
+}
+
+/**
+ * Returns all style overrides, intended to be merged with global editor styles.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Map} A map of style IDs to style overrides.
+ */
+export function getStyleOverrides( state ) {
+	return state.styleOverrides;
 }

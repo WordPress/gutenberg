@@ -36,13 +36,13 @@
 
 	button.components-button.block-editor-block-styles__item {
 		color: $gray-900;
-		box-shadow: inset 0 0 0 1px $gray-400;
+		box-shadow: inset 0 0 0 $border-width $gray-300;
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
-			box-shadow: inset 0 0 0 1px $gray-400;
+			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
 		&.is-active,
@@ -58,7 +58,7 @@
 
 		&:focus,
 		&.is-active:focus {
-			@include button-style__focus();
+			box-shadow: inset 0 0 0 $border-width var(--wp-components-color-background, #fff), 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		}
 	}
 
