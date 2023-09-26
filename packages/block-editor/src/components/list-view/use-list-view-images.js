@@ -12,13 +12,17 @@ import { store as blockEditorStore } from '../../store';
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
 
-function getImageUrl( block ) {
+function getImage( block ) {
 	if ( block.name !== 'core/image' ) {
 		return;
 	}
 
 	if ( block.attributes?.url ) {
-		return { url: block.attributes.url, alt: block.attributes.alt };
+		return {
+			url: block.attributes.url,
+			alt: block.attributes.alt,
+			clientId: block.clientId,
+		};
 	}
 }
 
@@ -30,7 +34,7 @@ function getImagesFromGallery( block ) {
 	const images = [];
 
 	for ( const innerBlock of block.innerBlocks ) {
-		const img = getImageUrl( innerBlock );
+		const img = getImage( innerBlock );
 		if ( img ) {
 			images.push( img );
 		}
@@ -43,7 +47,7 @@ function getImagesFromGallery( block ) {
 }
 
 function getImagesFromBlock( block, isExpanded ) {
-	const img = getImageUrl( block );
+	const img = getImage( block );
 	if ( img ) {
 		return [ img ];
 	}

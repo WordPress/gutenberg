@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
@@ -9,16 +9,27 @@ import { useState, createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { default as CircularOptionPicker } from '..';
+import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
 	currentColor?: string;
 	setCurrentColor?: ( v: string | undefined ) => void;
 } >( {} );
 
-const meta: ComponentMeta< typeof CircularOptionPicker > = {
+const meta: Meta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.Option': CircularOptionPicker.Option,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.DropdownLinkAction':
+			CircularOptionPicker.DropdownLinkAction,
+	},
 	argTypes: {
 		actions: { control: { type: null } },
 		options: { control: { type: null } },
@@ -95,12 +106,38 @@ const DefaultActions = () => {
 	);
 };
 
-const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
+const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 	<CircularOptionPicker { ...props } />
 );
 
 export const Default = Template.bind( {} );
-Default.args = { options: <DefaultOptions /> };
+Default.args = {
+	'aria-label': 'Circular Option Picker',
+	options: <DefaultOptions />,
+};
+
+export const AsButtons = Template.bind( {} );
+AsButtons.args = {
+	...Default.args,
+	asButtons: true,
+};
+
+export const WithLoopingDisabled = Template.bind( {} );
+WithLoopingDisabled.args = {
+	...Default.args,
+	loop: false,
+};
+WithLoopingDisabled.parameters = {
+	docs: {
+		source: {
+			code: `<CircularOptionPicker
+  aria-label="${ WithLoopingDisabled.args[ 'aria-label' ] }"
+  loop={false}
+  options={<DefaultOptions />}
+/>`,
+		},
+	},
+};
 
 export const WithButtonAction = Template.bind( {} );
 WithButtonAction.args = {

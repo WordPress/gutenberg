@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, getByText } from '@testing-library/react';
 import type { CSSProperties } from 'react';
 
 /**
@@ -23,17 +23,17 @@ import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
-	NonNullable< PopoverProps[ 'placement' ] >
+	NonNullable< PopoverProps[ 'placement' ] >,
 ];
 type PlacementToAnimationOriginTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	number,
-	number
+	number,
 ];
 type PlacementToInitialTranslationTuple = [
 	NonNullable< PopoverProps[ 'placement' ] >,
 	'translateY' | 'translateX',
-	CSSProperties[ 'translate' ]
+	CSSProperties[ 'translate' ],
 ];
 
 // There's no matching `placement` for 'middle center' positions,
@@ -110,6 +110,20 @@ describe( 'Popover', () => {
 
 				await waitFor( () =>
 					expect( screen.getByRole( 'tooltip' ) ).toBeVisible()
+				);
+			} );
+
+			it( 'should render inline regardless of slot name', async () => {
+				const { container } = render(
+					<Popover inline __unstableSlotName="Popover">
+						Hello
+					</Popover>
+				);
+
+				await waitFor( () =>
+					// We want to explicitly check if it's within the container.
+					// eslint-disable-next-line testing-library/prefer-screen-queries
+					expect( getByText( container, 'Hello' ) ).toBeVisible()
 				);
 			} );
 		} );

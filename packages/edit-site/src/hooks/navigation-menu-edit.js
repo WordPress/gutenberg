@@ -15,6 +15,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { useLink } from '../components/routes/link';
 import { unlock } from '../lock-unlock';
+import { NAVIGATION_POST_TYPE } from '../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -26,7 +27,7 @@ function NavigationMenuEdit( { attributes } ) {
 		( select ) => {
 			return select( coreStore ).getEntityRecord(
 				'postType',
-				'wp_navigation',
+				NAVIGATION_POST_TYPE,
 				// Ideally this should be an official public API.
 				ref
 			);

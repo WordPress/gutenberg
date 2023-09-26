@@ -18,6 +18,8 @@ use PHP_CodeSniffer\Sniffs\Sniff;
  * determined by the parent directory name. It enforces that function names start
  * with one of the allowed prefixes defined in the sniffer configuration.
  *
+ * @link https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/README.md#naming-convention-for-php-functions
+ *
  * @package gutenberg/gutenberg-coding-standards
  *
  * @since   1.0.0

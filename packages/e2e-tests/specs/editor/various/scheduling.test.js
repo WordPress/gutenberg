@@ -23,7 +23,9 @@ describe( 'Scheduling', () => {
 		} );
 	};
 
-	describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
+	// @todo: Change `UTC+1` back to `UTC` once the core regressions is resolved.
+	// See: https://github.com/WordPress/gutenberg/pull/54806#issuecomment-1734840171.
+	describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 		`Timezone %s`,
 		( timezone ) => {
 			let oldTimezone;

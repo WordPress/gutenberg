@@ -23,7 +23,7 @@ import {
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock, Popover } from '@wordpress/components';
+import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -210,6 +210,10 @@ function Layout() {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
+
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
+
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -220,11 +224,17 @@ function Layout() {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// We need to add the show-icon-labels class to the body element so it is applied to modals.
+	if ( showIconLabels ) {
+		document.body.classList.add( 'show-icon-labels' );
+	} else {
+		document.body.classList.remove( 'show-icon-labels' );
+	}
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
 		'is-distraction-free': isDistractionFree && isLargeViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
@@ -238,7 +248,11 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
+			return (
+				<ListViewSidebar
+					listViewToggleElement={ listViewToggleElement }
+				/>
+			);
 		}
 
 		return null;
@@ -266,7 +280,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
-			<SettingsSidebar />
+
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
@@ -279,6 +293,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
@@ -357,8 +372,8 @@ function Layout() {
 			<WelcomeGuide />
 			<PostSyncStatusModal />
 			<StartPageOptions />
-			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
+			<SettingsSidebar />
 		</>
 	);
 }

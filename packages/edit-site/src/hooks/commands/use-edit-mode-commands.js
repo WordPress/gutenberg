@@ -14,6 +14,7 @@ import {
 	blockDefault,
 	code,
 	keyboard,
+	listView,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -32,6 +33,7 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { unlock } from '../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -130,7 +132,7 @@ function useManipulateDocumentCommands() {
 
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
 				  sprintf(
 						'Reset template: %s',
@@ -154,7 +156,7 @@ function useManipulateDocumentCommands() {
 
 	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
 				  sprintf(
 						'Delete template: %s',
@@ -166,7 +168,7 @@ function useManipulateDocumentCommands() {
 						decodeEntities( template.title )
 				  );
 		const path =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? '/wp_template'
 				: '/wp_template_part/all';
 		commands.push( {
@@ -194,28 +196,38 @@ function useEditUICommands() {
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
-		setIsInserterOpened,
+		toggleDistractionFree,
 		setIsListViewOpened,
 		switchEditorMode,
 	} = useDispatch( editSiteStore );
-	const { canvasMode, editorMode, activeSidebar, showBlockBreadcrumbs } =
-		useSelect(
-			( select ) => ( {
-				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-				editorMode: select( editSiteStore ).getEditorMode(),
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editSiteStore.name ),
-				showBlockBreadcrumbs: select( preferencesStore ).get(
-					'core/edit-site',
-					'showBlockBreadcrumbs'
-				),
-			} ),
-			[]
-		);
+	const {
+		canvasMode,
+		editorMode,
+		activeSidebar,
+		showBlockBreadcrumbs,
+		isListViewOpen,
+		isDistractionFree,
+	} = useSelect( ( select ) => {
+		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		return {
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editorMode: getEditorMode(),
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
+			isListViewOpen: isListViewOpened(),
+			isDistractionFree: select( preferencesStore ).get(
+				editSiteStore.name,
+				'distractionFree'
+			),
+		};
+	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
-	const { get: getPreference } = useSelect( preferencesStore );
-	const { set: setPreference, toggle } = useDispatch( preferencesStore );
+	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
 
 	if ( canvasMode !== 'edit' ) {
@@ -265,20 +277,7 @@ function useEditUICommands() {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
 		callback: ( { close } ) => {
-			setPreference( 'core/edit-site', 'fixedToolbar', false );
-			setIsInserterOpened( false );
-			setIsListViewOpened( false );
-			closeGeneralSidebar();
-			toggle( 'core/edit-site', 'distractionFree' );
-			createInfoNotice(
-				getPreference( 'core/edit-site', 'distractionFree' )
-					? __( 'Distraction free on.' )
-					: __( 'Distraction free off.' ),
-				{
-					id: 'core/edit-site/distraction-free-mode/notice',
-					type: 'snackbar',
-				}
-			);
+			toggleDistractionFree();
 			close();
 		},
 	} );
@@ -288,6 +287,9 @@ function useEditUICommands() {
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
 			toggle( 'core/edit-site', 'fixedToolbar' );
+			if ( isDistractionFree ) {
+				toggleDistractionFree();
+			}
 			close();
 		},
 	} );
@@ -338,6 +340,16 @@ function useEditUICommands() {
 					type: 'snackbar',
 				}
 			);
+		},
+	} );
+
+	commands.push( {
+		name: 'core/toggle-list-view',
+		label: __( 'Toggle list view' ),
+		icon: listView,
+		callback: ( { close } ) => {
+			setIsListViewOpened( ! isListViewOpen );
+			close();
 		},
 	} );
 

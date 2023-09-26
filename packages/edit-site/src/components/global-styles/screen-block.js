@@ -61,21 +61,20 @@ const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
-	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasEffectsPanel,
 	useHasFiltersPanel,
+	useHasImageSettingsPanel,
 	useGlobalStyle,
-	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
-	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
 	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -92,20 +91,36 @@ function ScreenBlock( { name, variation } ) {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
-	const { behavior } = useGlobalBehaviors( name, 'user' );
-
 	const blockType = getBlockType( name );
+
+	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		settings?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.blockGap &&
+		( blockType?.supports?.spacing?.__experimentalSkipSerialization ===
+			true ||
+			blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+				( spacingType ) => spacingType === 'blockGap'
+			) )
+	) {
+		settings.spacing.blockGap = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
-	const hasBehaviorsPanel = useHasBehaviorsPanel( rawSettings, name );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasImageSettingsPanel = useHasImageSettingsPanel(
+		name,
+		userSettings,
+		settings
+	);
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -136,18 +151,39 @@ function ScreenBlock( { name, variation } ) {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 	const onChangeDimensions = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
+		if ( newStyle.layout !== userSettings.layout ) {
+			setSettings( {
+				...userSettings,
+				layout: newStyle.layout,
+			} );
+		}
+	};
+	const onChangeLightbox = ( newSetting ) => {
+		// If the newSetting is undefined, this means that the user has deselected
+		// (reset) the lightbox setting.
+		if ( newSetting === undefined ) {
 			setSettings( {
 				...rawSettings,
-				layout: newStyle.layout,
+				lightbox: undefined,
+			} );
+
+			// Otherwise, we simply set the lightbox setting to the new value but
+			// taking care of not overriding the other lightbox settings.
+		} else {
+			setSettings( {
+				...rawSettings,
+				lightbox: {
+					...rawSettings.lightbox,
+					...newSetting,
+				},
 			} );
 		}
 	};
@@ -258,13 +294,21 @@ function ScreenBlock( { name, variation } ) {
 					includeLayoutControls
 				/>
 			) }
+			{ hasImageSettingsPanel && (
+				<ImageSettingsPanel
+					onChange={ onChangeLightbox }
+					value={ userSettings }
+					inheritedValue={ settings }
+				/>
+			) }
+
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
 					<p>
 						{ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
-								'Add your own CSS to customize the appearance of the %s block.'
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
 							blockType?.title
 						) }
@@ -274,14 +318,6 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
-					{ hasBehaviorsPanel && (
-						<StylesBehaviorsPanel
-							value={ behavior }
-							onChange={ setBehavior }
-							behaviors={ inheritedBehaviors }
-							blockName={ name }
-						></StylesBehaviorsPanel>
-					) }
 				</PanelBody>
 			) }
 		</>

@@ -22,7 +22,7 @@ import type {
 } from './types';
 
 function mergeProps<
-	T extends { className?: string; [ key: string ]: unknown }
+	T extends { className?: string; [ key: string ]: unknown },
 >( defaultProps: Partial< T > = {}, props: T = {} as T ) {
 	const mergedProps: T = {
 		...defaultProps,
@@ -56,6 +56,10 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		disableOpenOnArrowDown = false,
 		text,
 		noIcons,
+
+		open,
+		defaultOpen,
+		onToggle: onToggleProp,
 
 		// Context
 		variant,
@@ -211,6 +215,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 					</NavigableMenu>
 				);
 			} }
+			open={ open }
+			defaultOpen={ defaultOpen }
+			onToggle={ onToggleProp }
 		/>
 	);
 }

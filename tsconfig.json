@@ -44,6 +44,7 @@
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/token-list" },
+		{ "path": "packages/undo-manager" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" }

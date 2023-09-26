@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	render,
-	screen,
-	fireEvent,
-	waitForElementToBeRemoved,
-	waitFor,
-} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -137,6 +131,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
+				const user = userEvent.setup();
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
 				render(
@@ -147,11 +142,9 @@ describe( 'Confirm', () => {
 
 				const confirmDialog = screen.getByRole( 'dialog' );
 
-				//The overlay click is handled by detecting an onBlur from the modal frame.
-				// TODO: replace with `@testing-library/user-event`
-				fireEvent.blur( confirmDialog );
-
-				await waitForElementToBeRemoved( confirmDialog );
+				// Disable reason: Semantic queries can’t reach the overlay.
+				// eslint-disable-next-line testing-library/no-node-access
+				await user.click( confirmDialog.parentElement );
 
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
@@ -315,6 +308,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
+			const user = userEvent.setup();
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			render(
@@ -329,13 +323,11 @@ describe( 'Confirm', () => {
 
 			const confirmDialog = screen.getByRole( 'dialog' );
 
-			//The overlay click is handled by detecting an onBlur from the modal frame.
-			// TODO: replace with `@testing-library/user-event`
-			fireEvent.blur( confirmDialog );
+			// Disable reason: Semantic queries can’t reach the overlay.
+			// eslint-disable-next-line testing-library/no-node-access
+			await user.click( confirmDialog.parentElement );
 
-			// Wait for a DOM side effect here, so that the `queueBlurCheck` in the
-			// `useFocusOutside` hook properly executes its timeout task.
-			await waitFor( () => expect( onCancel ).toHaveBeenCalled() );
+			expect( onCancel ).toHaveBeenCalled();
 		} );
 
 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {

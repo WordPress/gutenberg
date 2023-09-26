@@ -126,9 +126,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 							),
 						),
 					),
-					'behaviors'                   => array(
-						'default' => true,
-					),
 				)
 			),
 		);
@@ -159,9 +156,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 							),
 						),
 					),
-					'behaviors'                   => array(
-						'lightbox' => true,
-					),
 				)
 			),
 		);
@@ -191,9 +185,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 								),
 							),
 						),
-					),
-					'behaviors'                   => array(
-						'default' => true,
 					),
 				)
 			),
@@ -279,11 +270,6 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			$response_revision_item['styles'],
 			'Check that the revision styles match the updated styles.'
 		);
-		$this->assertEquals(
-			$config['behaviors'],
-			$response_revision_item['behaviors'],
-			'Check that the revision behaviors match the updated behaviors.'
-		);
 	}
 
 	/**
@@ -323,11 +309,10 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertCount( 10, $properties, 'Schema properties array has exactly 10 elements.' );
+		$this->assertCount( 9, $properties, 'Schema properties array has exactly 9 elements.' );
 		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array has "id" key.' );
 		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array has "styles" key.' );
 		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array has "settings" key.' );
-		$this->assertArrayHasKey( 'behaviors', $properties, 'Schema properties array has "behaviors" key.' );
 		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array has "parent" key.' );
 		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array has "author" key.' );
 		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array has "date" key.' );

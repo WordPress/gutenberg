@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 12.10.0 (2023-09-20)
+
+- The Deprecated multiline prop on RichText will now fall back to using multiple
+  rich text instances instead of a single multiline instance. The prop remains
+  deprecated.
+
+## 12.9.0 (2023-08-31)
+
+### Enhancements
+
+- Embed the `ObserveTyping` behavior within the `BlockList` component making to simplify instanciations of third-party block editors.
+
 ## 12.8.0 (2023-08-16)
 
 ## 12.7.0 (2023-08-10)
