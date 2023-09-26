@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { debounce, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -65,51 +65,55 @@ export function useInputAndSelection( props ) {
 
 		let isComposing = false;
 
-		function onInput( event ) {
-			// Do not trigger a change if characters are being composed.
-			// Browsers  will usually emit a final `input` event when the
-			// characters are composed.
-			// As of December 2019, Safari doesn't support
-			// nativeEvent.isComposing.
-			if ( isComposing ) {
-				return;
-			}
+		const onInput = debounce(
+			( event ) => {
+				// Do not trigger a change if characters are being composed.
+				// Browsers  will usually emit a final `input` event when the
+				// characters are composed.
+				// As of December 2019, Safari doesn't support
+				// nativeEvent.isComposing.
+				if ( isComposing ) {
+					return;
+				}
 
-			let inputType;
+				let inputType;
 
-			if ( event ) {
-				inputType = event.inputType;
-			}
+				if ( event ) {
+					inputType = event.inputType;
+				}
 
-			const { record, applyRecord, createRecord, handleChange } =
-				propsRef.current;
+				const { record, applyRecord, createRecord, handleChange } =
+					propsRef.current;
 
-			// The browser formatted something or tried to insert HTML.
-			// Overwrite it. It will be handled later by the format library if
-			// needed.
-			if (
-				inputType &&
-				( inputType.indexOf( 'format' ) === 0 ||
-					INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType ) )
-			) {
-				applyRecord( record.current );
-				return;
-			}
+				// The browser formatted something or tried to insert HTML.
+				// Overwrite it. It will be handled later by the format library if
+				// needed.
+				if (
+					inputType &&
+					( inputType.indexOf( 'format' ) === 0 ||
+						INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType ) )
+				) {
+					applyRecord( record.current );
+					return;
+				}
 
-			const currentValue = createRecord();
-			const { start, activeFormats: oldActiveFormats = [] } =
-				record.current;
+				const currentValue = createRecord();
+				const { start, activeFormats: oldActiveFormats = [] } =
+					record.current;
 
-			// Update the formats between the last and new caret position.
-			const change = updateFormats( {
-				value: currentValue,
-				start,
-				end: currentValue.start,
-				formats: oldActiveFormats,
-			} );
+				// Update the formats between the last and new caret position.
+				const change = updateFormats( {
+					value: currentValue,
+					start,
+					end: currentValue.start,
+					formats: oldActiveFormats,
+				} );
 
-			handleChange( change );
-		}
+				handleChange( change );
+			},
+			50,
+			{ leading: true, trailing: false }
+		);
 
 		/**
 		 * Syncs the selection to local state. A callback for the
