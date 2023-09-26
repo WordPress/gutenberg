@@ -145,28 +145,27 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 }
 
 export function useAvailablePatterns( template ) {
-	const currentThemeStylesheet = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme().stylesheet
-	);
+	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
+		useSelect( ( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const settings = getSettings();
 
-	const availablePatterns = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		const settings = getSettings();
+			return {
+				blockPatterns:
+					settings.__experimentalAdditionalBlockPatterns ??
+					settings.__experimentalBlockPatterns,
+				restBlockPatterns: select( coreStore ).getBlockPatterns(),
+				currentThemeStylesheet:
+					select( coreStore ).getCurrentTheme().stylesheet,
+			};
+		} );
 
-		const blockPatterns =
-			settings.__experimentalAdditionalBlockPatterns ??
-			settings.__experimentalBlockPatterns;
-
-		const restBlockPatterns = select( coreStore ).getBlockPatterns();
-
-		const patterns = [
-			...( blockPatterns || [] ),
-			...( restBlockPatterns || [] ),
-		];
-		return patterns;
-	} );
+	const mergedPatterns = [
+		...( blockPatterns || [] ),
+		...( restBlockPatterns || [] ),
+	];
 
 	return useMemo( () =>
-		preparePatterns( availablePatterns, template, currentThemeStylesheet )
+		preparePatterns( mergedPatterns, template, currentThemeStylesheet )
 	);
 }
