@@ -70,7 +70,7 @@ Determines where to display the provided `icon`.
 -   Type: `boolean`
 -   Required: No
 
-Whether or not the menu item is currently selected.
+Whether or not the menu item is currently selected. `isSelected` is only taken into account when the `role` prop is either `"menuitemcheckbox"` or `"menuitemradio"`.
 
 ### `shortcut`
 

@@ -27,7 +27,6 @@ import { safeDecodeURI } from '@wordpress/url';
  * @param {Object}                          updatedValue    New block attributes to update.
  * @param {Function}                        setAttributes   Block attribute update function.
  * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
- *
  */
 
 export const updateAttributes = (

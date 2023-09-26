@@ -127,7 +127,14 @@ export function TimePicker( {
 		method: 'hours' | 'minutes' | 'date' | 'year'
 	) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
-			if ( ! ( event.target instanceof HTMLInputElement ) ) {
+			// `instanceof` checks need to get the instance definition from the
+			// corresponding window object — therefore, the following logic makes
+			// the component work correctly even when rendered inside an iframe.
+			const HTMLInputElementInstance =
+				( event.target as HTMLInputElement )?.ownerDocument.defaultView
+					?.HTMLInputElement ?? HTMLInputElement;
+
+			if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
 				return;
 			}
 

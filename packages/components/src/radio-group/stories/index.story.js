@@ -12,6 +12,7 @@ import RadioGroup from '../';
 export default {
 	title: 'Components (Deprecated)/RadioGroup',
 	component: RadioGroup,
+	subcomponents: { Radio },
 	parameters: {
 		docs: {
 			description: {
@@ -39,7 +40,7 @@ export const _default = () => {
 	/* eslint-enable no-restricted-syntax */
 };
 
-export const disabled = () => {
+export const Disabled = () => {
 	/* eslint-disable no-restricted-syntax */
 	return (
 		<RadioGroup
@@ -77,6 +78,6 @@ const ControlledRadioGroupWithState = () => {
 	/* eslint-enable no-restricted-syntax */
 };
 
-export const controlled = () => {
+export const Controlled = () => {
 	return <ControlledRadioGroupWithState />;
 };

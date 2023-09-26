@@ -8,9 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableEditorStyles as EditorStyles,
-	__unstableIframe as Iframe,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -24,7 +22,17 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
+
+function EditorCanvas( {
+	enableResizing,
+	settings,
+	children,
+	contentRef,
+	...props
+} ) {
 	const { canvasMode, deviceType, isZoomOutMode } = useSelect(
 		( select ) => ( {
 			deviceType:
@@ -38,7 +46,6 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
-	const mouseMoveTypingRef = useMouseMoveTypingReset();
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
@@ -65,20 +72,25 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	};
 
 	return (
-		<Iframe
-			expand={ isZoomOutMode }
-			scale={ ( isZoomOutMode && 0.45 ) || undefined }
-			frameSize={ isZoomOutMode ? 100 : undefined }
-			style={ enableResizing ? {} : deviceStyles }
-			ref={ mouseMoveTypingRef }
-			name="editor-canvas"
-			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
-				'is-focused': isFocused && canvasMode === 'view',
-			} ) }
-			{ ...props }
-			{ ...( canvasMode === 'view' ? viewModeProps : {} ) }
+		<BlockCanvas
+			height="100%"
+			iframeProps={ {
+				expand: isZoomOutMode,
+				scale: isZoomOutMode ? 0.45 : undefined,
+				frameSize: isZoomOutMode ? 100 : undefined,
+				style: enableResizing ? {} : deviceStyles,
+				className: classnames(
+					'edit-site-visual-editor__editor-canvas',
+					{
+						'is-focused': isFocused && canvasMode === 'view',
+					}
+				),
+				...props,
+				...( canvasMode === 'view' ? viewModeProps : {} ),
+			} }
+			styles={ settings.styles }
+			contentRef={ contentRef }
 		>
-			<EditorStyles styles={ settings.styles } />
 			<style>{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
@@ -93,7 +105,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				}}}`
 			}</style>
 			{ children }
-		</Iframe>
+		</BlockCanvas>
 	);
 }
 

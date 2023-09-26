@@ -49,3 +49,22 @@ export const setEditorCanvasContainerView =
 			view,
 		} );
 	};
+
+/**
+ * Sets the type of page content focus. Can be one of:
+ *
+ * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
+ * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
+ *
+ * @param {'disableTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
+ *
+ * @return {Object} Action object.
+ */
+export const setPageContentFocusType =
+	( pageContentFocusType ) =>
+	( { dispatch } ) => {
+		dispatch( {
+			type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
+			pageContentFocusType,
+		} );
+	};

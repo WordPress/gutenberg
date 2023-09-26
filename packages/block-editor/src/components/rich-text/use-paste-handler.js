@@ -9,13 +9,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 } from '@wordpress/blocks';
-import {
-	isEmpty,
-	insert,
-	create,
-	replace,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
-} from '@wordpress/rich-text';
+import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -26,23 +20,6 @@ import { splitValue } from './split-value';
 import { shouldDismissPastedFiles } from '../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
-
-/**
- * Replaces line separators with line breaks if not multiline.
- * Replaces line breaks with line separators if multiline.
- *
- * @param {RichTextValue} value       Value to adjust.
- * @param {boolean}       isMultiline Whether to adjust to multiline or not.
- *
- * @return {RichTextValue} Adjusted value.
- */
-function adjustLines( value, isMultiline ) {
-	if ( isMultiline ) {
-		return replace( value, /\n+/g, LINE_SEPARATOR );
-	}
-
-	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
-}
 
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
@@ -58,9 +35,7 @@ export function usePasteHandler( props ) {
 				tagName,
 				onReplace,
 				onSplit,
-				onSplitMiddle,
 				__unstableEmbedURLOnPaste,
-				multilineTag,
 				preserveWhiteSpace,
 				pastePlainText,
 			} = propsRef.current;
@@ -129,6 +104,20 @@ export function usePasteHandler( props ) {
 			}
 
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
+
+			// If the data comes from a rich text instance, we can directly use it
+			// without filtering the data. The filters are only meant for externally
+			// pasted content and remove inline styles.
+			if ( isInternal ) {
+				const pastedValue = create( {
+					html,
+					preserveWhiteSpace,
+				} );
+				addActiveFormats( pastedValue, value.activeFormats );
+				onChange( insert( value, pastedValue ) );
+				return;
+			}
 
 			if ( pastePlainText ) {
 				onChange( insert( value, create( { text: plainText } ) ) );
@@ -179,8 +168,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
-						multilineTag,
 					} );
 				}
 
@@ -215,19 +202,10 @@ export function usePasteHandler( props ) {
 				mode,
 				tagName,
 				preserveWhiteSpace,
-				// If the data comes from a rich text instance, we can directly
-				// use it without filtering the data. The filters are only meant
-				// for externally pasted content and remove inline styles.
-				disableFilters: !! clipboardData.getData( 'rich-text' ),
 			} );
 
 			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				valueToInsert = adjustLines( valueToInsert, !! multilineTag );
-
+				const valueToInsert = create( { html: content } );
 				addActiveFormats( valueToInsert, value.activeFormats );
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
@@ -239,8 +217,6 @@ export function usePasteHandler( props ) {
 						pastedBlocks: content,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
-						multilineTag,
 					} );
 				}
 			}

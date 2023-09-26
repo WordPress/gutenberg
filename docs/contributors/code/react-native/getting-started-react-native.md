@@ -133,7 +133,7 @@ To run a single test instead of the entire suite, use `npm run native device-tes
 npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
-Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [Appium Inspector](https://github.com/appium/appium-inspector/) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block.
+Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. If so, you can manually start the Appium server via `npm run native appium:start`, and (optionally) comment out related code in the `beforeAll` and `afterAll` block.
 
 For a more detailed outline of the UI tests and how to get started writing one, please visit the [UI Test documentation](/packages/react-native-editor/__device-tests__/README.md) and our [contributing guide](/packages/react-native-editor/__device-tests__/CONTRIBUTING.md).
 

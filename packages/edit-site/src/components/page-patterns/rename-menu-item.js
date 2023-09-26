@@ -18,7 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PARTS } from './utils';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function RenameMenuItem( { item, onClose } ) {
 	const [ title, setTitle ] = useState( () => item.title );
@@ -29,7 +29,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( item.type === TEMPLATE_PARTS && ! item.isCustom ) {
+	if ( item.type === TEMPLATE_PART_POST_TYPE && ! item.isCustom ) {
 		return null;
 	}
 
@@ -49,14 +49,25 @@ export default function RenameMenuItem( { item, onClose } ) {
 				throwOnError: true,
 			} );
 
-			createSuccessNotice( __( 'Entity renamed.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				item.type === TEMPLATE_PART_POST_TYPE
+					? __( 'Template part renamed.' )
+					: __( 'Pattern renamed.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				item.type === TEMPLATE_PART_POST_TYPE
+					? __(
+							'An error occurred while reverting the template part.'
+					  )
+					: __( 'An error occurred while reverting the pattern.' );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while renaming the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -79,7 +90,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 						setIsModalOpen( false );
 						onClose();
 					} }
-					overlayClassName="edit-site-list__rename_modal"
+					overlayClassName="edit-site-list__rename-modal"
 				>
 					<form onSubmit={ onRename }>
 						<VStack spacing="5">

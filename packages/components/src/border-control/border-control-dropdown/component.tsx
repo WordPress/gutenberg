@@ -235,7 +235,7 @@ const BorderControlDropdown = (
 							onClose();
 						} }
 					>
-						{ __( 'Reset to default' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</DropdownContentWrapper>
 			) }

@@ -32,7 +32,7 @@ const meta = {
 		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
@@ -87,22 +87,22 @@ const _defaultSnippet = `() => {
 
   return (
     <>
-    <ConfirmDialog
-      isOpen={ isOpen }
-      onConfirm={ handleConfirm }
-      onCancel={ handleCancel }
-    >
-      Would you like to privately publish the post now?
-    </ConfirmDialog>
+      <ConfirmDialog
+        isOpen={ isOpen }
+        onConfirm={ handleConfirm }
+        onCancel={ handleCancel }
+      >
+        Would you like to privately publish the post now?
+      </ConfirmDialog>
 
-    <Heading level={ 1 }>{ confirmVal }</Heading>
+      <Heading level={ 1 }>{ confirmVal }</Heading>
 
-    <Button variant="primary" onClick={ () => setIsOpen( true ) }>
-      Open ConfirmDialog
-    </Button>
+      <Button variant="primary" onClick={ () => setIsOpen( true ) }>
+        Open ConfirmDialog
+      </Button>
     </>
-    );
-  };`;
+  );
+};`;
 _default.args = {};
 _default.parameters = {
 	docs: {
@@ -110,14 +110,13 @@ _default.parameters = {
 			code: _defaultSnippet,
 			language: 'jsx',
 			type: 'auto',
-			format: 'true',
 		},
 	},
 };
 
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
-export const withCustomButtonLabels = Template.bind( {} );
-withCustomButtonLabels.args = {
+export const WithCustomButtonLabels = Template.bind( {} );
+WithCustomButtonLabels.args = {
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };

@@ -1,7 +1,7 @@
 name: Enforce labels on Pull Request
 on:
     pull_request_target:
-        types: [opened, labeled, unlabeled, synchronize]
+        types: [labeled, unlabeled, ready_for_review, review_requested]
 jobs:
     type-related-labels:
         runs-on: ubuntu-latest

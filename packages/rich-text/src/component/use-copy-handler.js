@@ -17,8 +17,7 @@ export function useCopyHandler( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onCopy( event ) {
-			const { record, multilineTag, preserveWhiteSpace } =
-				propsRef.current;
+			const { record, preserveWhiteSpace } = propsRef.current;
 			const { ownerDocument } = element;
 			if (
 				isCollapsed( record.current ) ||
@@ -29,18 +28,10 @@ export function useCopyHandler( props ) {
 
 			const selectedRecord = slice( record.current );
 			const plainText = getTextContent( selectedRecord );
-			const tagName = element.tagName.toLowerCase();
-
-			let html = toHTMLString( {
+			const html = toHTMLString( {
 				value: selectedRecord,
-				multilineTag,
 				preserveWhiteSpace,
 			} );
-
-			if ( tagName && tagName !== 'span' && tagName !== 'div' ) {
-				html = `<${ tagName }>${ html }</${ tagName }>`;
-			}
-
 			event.clipboardData.setData( 'text/plain', plainText );
 			event.clipboardData.setData( 'text/html', html );
 			event.clipboardData.setData( 'rich-text', 'true' );

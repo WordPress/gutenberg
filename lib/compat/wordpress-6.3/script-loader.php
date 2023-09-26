@@ -79,9 +79,13 @@ function _gutenberg_get_iframed_editor_assets() {
 		}
 	}
 
+	// Remove the deprecated `print_emoji_styles` handler.
+	// It avoids breaking style generation with a deprecation message.
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
 	ob_start();
 	wp_print_styles();
 	$styles = ob_get_clean();
+	add_action( 'wp_print_styles', 'print_emoji_styles' );
 
 	ob_start();
 	wp_print_head_scripts();
@@ -100,7 +104,7 @@ function _gutenberg_get_iframed_editor_assets() {
 
 add_filter(
 	'block_editor_settings_all',
-	static function( $settings ) {
+	static function ( $settings ) {
 		// We must override what core is passing now.
 		$settings['__unstableResolvedAssets'] = _gutenberg_get_iframed_editor_assets();
 		return $settings;

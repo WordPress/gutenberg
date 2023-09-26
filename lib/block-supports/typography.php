@@ -15,21 +15,21 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	$typography_supports = $block_type->supports['typography'] ?? false;
 	if ( ! $typography_supports ) {
 		return;
 	}
 
-	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
-	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
-	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
-	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
-	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
-	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
-	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
-	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
+	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
+	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
+	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
+	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
+	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
@@ -80,7 +80,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	$typography_supports = $block_type->supports['typography'] ?? false;
 	if ( ! $typography_supports ) {
 		return array();
 	}
@@ -89,16 +89,16 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
-	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
-	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
-	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
-	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
-	$has_text_columns_support    = _wp_array_get( $typography_supports, array( 'textColumns' ), false );
-	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
-	$has_writing_mode_support    = _wp_array_get( $typography_supports, array( '__experimentalWritingMode' ), false );
+	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
+	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
+	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
+	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
+	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
@@ -140,11 +140,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	if ( $has_line_height_support && ! $should_skip_line_height ) {
-			$typography_block_styles['lineHeight'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null );
+			$typography_block_styles['lineHeight'] = $block_attributes['style']['typography']['lineHeight'] ?? null;
 	}
 
 	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumns'] ) ) {
-		$typography_block_styles['textColumns'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'textColumns' ), null );
+		$typography_block_styles['textColumns'] = $block_attributes['style']['typography']['textColumns'] ?? null;
 	}
 
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
@@ -163,7 +163,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	if ( $has_writing_mode_support && ! $should_skip_writing_mode && isset( $block_attributes['style']['typography']['writingMode'] ) ) {
-		$typography_block_styles['writingMode'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'writingMode' ), null );
+		$typography_block_styles['writingMode'] = $block_attributes['style']['typography']['writingMode'] ?? null;
 	}
 
 	$attributes = array();
@@ -244,7 +244,6 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 	}
 
 	return $block_content;
-
 }
 
 /**
@@ -415,7 +414,14 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 
 /**
  * Returns a font-size value based on a given font-size preset.
- * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
+ * Takes into account fluid typography parameters and attempts to return a CSS
+ * formula depending on available, valid values.
+ *
+ * @since 6.1.0
+ * @since 6.1.1 Adjusted rules for min and max font sizes.
+ * @since 6.2.0 Added 'settings.typography.fluid.minFontSize' support.
+ * @since 6.3.0 Using layout.wideSize as max viewport width, and logarithmic scale factor to calculate minimum font scale.
+ * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
  *
  * @param array $preset                     {
  *     Required. fontSizes preset value as seen in theme.json.
