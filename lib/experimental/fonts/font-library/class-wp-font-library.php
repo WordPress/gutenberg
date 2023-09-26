@@ -31,7 +31,7 @@ class WP_Font_Library {
 	 *
 	 * @return Array A collection of mime types keyed by file extension.
 	 */
-	public static function get_expected_font_mime_types_per_PHP_version( $php_version_id = PHP_VERSION_ID ) {
+	public static function get_expected_font_mime_types_per_php_version( $php_version_id = PHP_VERSION_ID ) {
 
 		$php_7_ttf_mime_type = $php_version_id >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
 
@@ -144,6 +144,6 @@ class WP_Font_Library {
 	 * @return array Modified upload directory.
 	 */
 	public static function set_allowed_mime_types( $mime_types ) {
-		return array_merge( $mime_types, self::get_expected_font_mime_types_per_PHP_version() );
+		return array_merge( $mime_types, self::get_expected_font_mime_types_per_php_version() );
 	}
 }
