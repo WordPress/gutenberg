@@ -142,9 +142,7 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 						isDraggable={ false }
 					/>
 				) }
-				{ pagingProps.numPages > 1 && (
-					<BlockPatternsPaging { ...pagingProps } />
-				) }
+				<BlockPatternsPaging { ...pagingProps } />
 			</InserterListbox>
 		</div>
 	);
