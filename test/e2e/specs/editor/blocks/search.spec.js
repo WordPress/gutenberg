@@ -74,26 +74,21 @@ test.describe( 'Search', () => {
 
 		await expect( searchBlock ).toBeVisible();
 
-		const navBlockInEditor = await page.evaluate( () => {
-			const allBlocks = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
+		// The only way to access the inner controlled blocks of the Navigation block
+		// is to access the edited entity record for the associated Navigation Menu record.
+		const editedMenuRecord = await page.evaluate( ( menuId ) => {
+			return window.wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', 'wp_navigation', menuId );
+		}, createdMenu?.id );
 
-			const block = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlock( allBlocks[ 0 ].clientId );
-			return block;
+		// The 2nd block in the Navigation block is the Search block.
+		const searchBlockAttributes = editedMenuRecord.blocks[ 1 ].attributes;
+
+		expect( searchBlockAttributes ).toMatchObject( {
+			showLabel: false,
+			buttonUseIcon: true,
+			buttonPosition: 'button-inside',
 		} );
-
-		await expect.poll( navBlockInEditor ).toMatchObject( [
-			{
-				name: 'core/search',
-				attributes: {
-					showLabel: false,
-					buttonUseIcon: true,
-					buttonPosition: 'button-inside',
-				},
-			},
-		] );
 	} );
 } );
