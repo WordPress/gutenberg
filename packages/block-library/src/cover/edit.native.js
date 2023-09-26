@@ -43,10 +43,9 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
-	getColorObjectByColorValue,
-	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	store as blockEditorStore,
+	withColors,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -74,7 +73,11 @@ import {
 	COVER_DEFAULT_HEIGHT,
 } from './shared';
 import Controls from './controls';
-import useCoverIsDark from './use-cover-is-dark';
+import {
+	compositeIsDark,
+	DEFAULT_BACKGROUND_COLOR,
+	DEFAULT_OVERLAY_COLOR,
+} from './edit/color-utils';
 
 /**
  * Constants
@@ -131,6 +134,8 @@ const Cover = ( {
 	selectBlock,
 	blockWidth,
 	hasInnerBlocks,
+	overlayColor,
+	setOverlayColor,
 } ) => {
 	const {
 		backgroundType,
@@ -140,14 +145,13 @@ const Cover = ( {
 		url,
 		id,
 		style,
-		customOverlayColor,
 		minHeightUnit = 'px',
 		allowedBlocks,
 		templateLock,
 		customGradient,
 		gradient,
-		overlayColor,
 		isDark,
+		isUserOverlayColor,
 	} = attributes;
 	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
@@ -173,17 +177,12 @@ const Cover = ( {
 	const gradients = useMobileGlobalStylesColors( 'gradients' );
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );
-	const overlayColorValue = getColorObjectByAttributeValues(
-		colorsDefault,
-		overlayColor
-	);
+	const overlayColorValue = overlayColor?.color;
 
 	const hasBackground = !! (
 		url ||
 		( style && style.color && style.color.background ) ||
-		attributes.overlayColor ||
-		overlayColorValue.color ||
-		customOverlayColor ||
+		overlayColorValue ||
 		gradientValue
 	);
 
@@ -205,10 +204,38 @@ const Cover = ( {
 	// Don't show failure if upload is in progress.
 	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
 
-	const onSelectMedia = ( media ) => {
+	const onSelectMedia = ( newMedia ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes, dimRatio );
-		onSelect( media );
+		const mediaAttributes = attributesFromMedia( newMedia );
+
+		// The web version generates the overlay color based on the average color of
+		// the background image. On the native version, we don't support this
+		// functionality yet so we use the default background color.
+		const averageBackgroundColor = DEFAULT_BACKGROUND_COLOR;
+
+		let newOverlayColor = overlayColorValue;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = averageBackgroundColor;
+			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		setAttributes( {
+			...mediaAttributes,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: newDimRatio,
+			isDark: newIsDark,
+		} );
 	};
 
 	const onMediaPressed = () => {
@@ -232,26 +259,99 @@ const Cover = ( {
 	};
 
 	const onClearMedia = useCallback( () => {
+		let newOverlayColor = overlayColorValue;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = DEFAULT_OVERLAY_COLOR;
+			setOverlayColor( undefined );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			DEFAULT_BACKGROUND_COLOR
+		);
+
 		setAttributes( {
+			url: undefined,
+			id: undefined,
+			backgroundType: undefined,
 			focalPoint: undefined,
 			hasParallax: undefined,
-			id: undefined,
-			url: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: undefined,
+			isDark: newIsDark,
 		} );
+
 		closeSettingsBottomSheet();
-	}, [ closeSettingsBottomSheet ] );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		closeSettingsBottomSheet,
+		dimRatio,
+		isUserOverlayColor,
+		overlayColorValue,
+		setAttributes,
+		setOverlayColor,
+	] );
 
-	function setColor( color ) {
-		const colorValue = getColorObjectByColorValue( colorsDefault, color );
+	const onSetOverlayColor = useCallback(
+		( newOverlayColor ) => {
+			// Do nothing for falsy values.
+			if ( ! newOverlayColor ) {
+				return;
+			}
 
-		setAttributes( {
-			// Clear all related attributes (only one should be set).
-			overlayColor: colorValue?.slug ?? undefined,
-			customOverlayColor: ( ! colorValue?.slug && color ) ?? undefined,
-			gradient: undefined,
-			customGradient: undefined,
-		} );
-	}
+			// The web version generates the overlay color based on the average color of
+			// the background image. On the native version, we don't support this
+			// functionality yet so we use the default background color.
+			const averageBackgroundColor = DEFAULT_BACKGROUND_COLOR;
+			const newIsDark = compositeIsDark(
+				dimRatio,
+				newOverlayColor,
+				averageBackgroundColor
+			);
+
+			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+
+			setAttributes( {
+				isUserOverlayColor: true,
+				isDark: newIsDark,
+				gradient: undefined,
+				customGradient: undefined,
+			} );
+		},
+		[
+			__unstableMarkNextChangeAsNotPersistent,
+			dimRatio,
+			setAttributes,
+			setOverlayColor,
+		]
+	);
+
+	const onUpdateDimRatio = useCallback(
+		( newDimRatio ) => {
+			// The web version generates the overlay color based on the average color of
+			// the background image. On the native version, we don't support this
+			// functionality yet so we use the default background color.
+			const averageBackgroundColor = DEFAULT_BACKGROUND_COLOR;
+			const newIsDark = compositeIsDark(
+				newDimRatio,
+				overlayColorValue,
+				averageBackgroundColor
+			);
+
+			setAttributes( {
+				dimRatio: newDimRatio,
+				isDark: newIsDark,
+			} );
+		},
+		[ overlayColorValue, setAttributes ]
+	);
 
 	function openColorPicker() {
 		selectBlock();
@@ -261,12 +361,6 @@ const Cover = ( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const isCoverDark = useCoverIsDark(
-		isDark,
-		url,
-		dimRatio,
-		overlayColorValue?.color
-	);
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
@@ -277,14 +371,13 @@ const Cover = ( {
 		// parent styles for the current block. If there are,
 		// it will use that color instead.
 		setAttributes( {
-			isDark: isCoverDark,
-			childrenStyles: isCoverDark
+			childrenStyles: isDark
 				? styles.defaultColor
 				: styles.defaultColorLightMode,
 		} );
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
-		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
+		if ( isDark && attributes.className?.includes( 'is-light' ) ) {
 			const className = classnames( attributes.className, {
 				'is-light': false,
 			} );
@@ -292,7 +385,12 @@ const Cover = ( {
 				className: className !== '' ? className : undefined,
 			} );
 		}
-	}, [ isCoverDark ] );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		attributes.className,
+		isDark,
+		setAttributes,
+	] );
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
@@ -304,13 +402,12 @@ const Cover = ( {
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
 			backgroundColor:
-				customOverlayColor ||
-				overlayColorValue?.color ||
+				overlayColorValue ||
 				style?.color?.background ||
 				styles.overlay?.color,
 		},
 		// While we don't support theme colors we add a default bg color.
-		! overlayColorValue.color && ! url ? backgroundColor : {},
+		! overlayColorValue && ! url ? backgroundColor : {},
 		isImage &&
 			isParentSelected &&
 			! isUploadInProgress &&
@@ -370,9 +467,9 @@ const Cover = ( {
 		styles.selectedColorTextDark
 	);
 
-	const bottomLabelText = customOverlayColor ? (
+	const bottomLabelText = overlayColorValue ? (
 		<Text style={ selectedColorText }>
-			{ customOverlayColor.toUpperCase() }
+			{ overlayColorValue.toUpperCase() }
 		</Text>
 	) : (
 		__( 'Select a color' )
@@ -395,7 +492,7 @@ const Cover = ( {
 						shouldEnableBottomSheetMaxHeight={
 							shouldEnableBottomSheetMaxHeight
 						}
-						setColor={ setColor }
+						setColor={ onSetOverlayColor }
 						onNavigationBack={ closeSettingsBottomSheet }
 						onHandleClosingBottomSheet={
 							onHandleClosingBottomSheet
@@ -509,11 +606,8 @@ const Cover = ( {
 					height={
 						styles.mediaPlaceholderEmptyStateContainer?.height
 					}
-					backgroundColor={ customOverlayColor }
-					hideContent={
-						customOverlayColor !== '' &&
-						customOverlayColor !== undefined
-					}
+					backgroundColor={ overlayColorValue }
+					hideContent={ !! overlayColorValue }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -537,7 +631,7 @@ const Cover = ( {
 									customIndicatorWrapperStyles={
 										styles.paletteCustomIndicatorWrapper
 									}
-									setColor={ setColor }
+									setColor={ onSetOverlayColor }
 									onCustomPress={ openColorPicker }
 									defaultSettings={ coverDefaultPalette }
 									shouldShowCustomLabel={ false }
@@ -566,6 +660,8 @@ const Cover = ( {
 						onClearMedia={ onClearMedia }
 						onSelectMedia={ onSelectMedia }
 						setAttributes={ setAttributes }
+						setOverlayColor={ onSetOverlayColor }
+						updateDimRatio={ onUpdateDimRatio }
 					/>
 				</InspectorControls>
 			) }
@@ -644,6 +740,7 @@ const Cover = ( {
 };
 
 export default compose( [
+	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const { getSelectedBlockClientId, getBlock } =
 			select( blockEditorStore );
