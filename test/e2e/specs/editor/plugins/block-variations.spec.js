@@ -89,7 +89,7 @@ test.describe( 'Block variations', () => {
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Paragraph block' } )
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'This is a success message!' );
 	} );
 

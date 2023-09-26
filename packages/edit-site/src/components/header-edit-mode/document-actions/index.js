@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { sprintf, __, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -32,9 +32,26 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_TYPES,
+	PATTERN_SYNC_TYPES,
+} from '../../../utils/constants';
+
+const typeLabels = {
+	[ PATTERN_TYPES.user ]: __( 'Editing pattern:' ),
+	[ NAVIGATION_POST_TYPE ]: __( 'Editing navigation menu:' ),
+	[ TEMPLATE_POST_TYPE ]: __( 'Editing template:' ),
+	[ TEMPLATE_PART_POST_TYPE ]: __( 'Editing template part:' ),
+};
 
 export default function DocumentActions() {
-	const isPage = useSelect( ( select ) => select( editSiteStore ).isPage() );
+	const isPage = useSelect(
+		( select ) => select( editSiteStore ).isPage(),
+		[]
+	);
 	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
@@ -118,12 +135,10 @@ function TemplateDocumentActions( { className, onBack } ) {
 		);
 	}
 
-	const entityLabel = getEntityLabel( record.type );
-
 	let typeIcon = icon;
-	if ( record.type === 'wp_navigation' ) {
+	if ( record.type === NAVIGATION_POST_TYPE ) {
 		typeIcon = navigationIcon;
-	} else if ( record.type === 'wp_block' ) {
+	} else if ( record.type === PATTERN_TYPES.user ) {
 		typeIcon = symbol;
 	}
 
@@ -131,17 +146,15 @@ function TemplateDocumentActions( { className, onBack } ) {
 		<BaseDocumentActions
 			className={ classnames( className, {
 				'is-synced-entity':
-					record.wp_pattern_sync_status !== 'unsynced',
+					record.wp_pattern_sync_status !==
+					PATTERN_SYNC_TYPES.unsynced,
 			} ) }
 			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
-				{ sprintf(
-					/* translators: %s: the entity being edited, like "template"*/
-					__( 'Editing %s: ' ),
-					entityLabel
-				) }
+				{ typeLabels[ record.type ] ??
+					typeLabels[ TEMPLATE_POST_TYPE ] }
 			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
@@ -186,21 +199,4 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			</Button>
 		</div>
 	);
-}
-
-function getEntityLabel( entityType ) {
-	let label = '';
-	switch ( entityType ) {
-		case 'wp_navigation':
-			label = 'navigation menu';
-			break;
-		case 'wp_template_part':
-			label = 'template part';
-			break;
-		default:
-			label = 'template';
-			break;
-	}
-
-	return label;
 }

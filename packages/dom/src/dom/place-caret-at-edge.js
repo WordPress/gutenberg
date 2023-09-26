@@ -5,6 +5,7 @@ import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
 import isRTL from './is-rtl';
+import { scrollIfNoRange } from './scroll-if-no-range';
 
 /**
  * Gets the range to place.
@@ -70,26 +71,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	let range = getRange( container, isReverse, x );
+	const range = scrollIfNoRange( container, isReverse, () =>
+		getRange( container, isReverse, x )
+	);
 
-	// If no range range can be created or it is outside the container, the
-	// element may be out of view.
-	if (
-		! range ||
-		! range.startContainer ||
-		! container.contains( range.startContainer )
-	) {
-		container.scrollIntoView( isReverse );
-		range = range = getRange( container, isReverse, x );
-
-		if (
-			! range ||
-			! range.startContainer ||
-			! container.contains( range.startContainer )
-		) {
-			return;
-		}
-	}
+	if ( ! range ) return;
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;

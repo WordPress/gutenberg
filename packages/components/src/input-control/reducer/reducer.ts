@@ -11,12 +11,8 @@ import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	InputState,
-	StateReducer,
-	initialInputControlState,
-	initialStateReducer,
-} from './state';
+import type { InputState, StateReducer } from './state';
+import { initialInputControlState, initialStateReducer } from './state';
 import * as actions from './actions';
 import type { InputChangeCallback } from '../types';
 

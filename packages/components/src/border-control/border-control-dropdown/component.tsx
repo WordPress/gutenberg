@@ -19,7 +19,8 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
@@ -234,7 +235,7 @@ const BorderControlDropdown = (
 							onClose();
 						} }
 					>
-						{ __( 'Reset to default' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</DropdownContentWrapper>
 			) }

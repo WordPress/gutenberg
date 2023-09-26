@@ -3,21 +3,13 @@
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useBlockEditingMode } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
-
-const PAGE_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../utils/constants';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
@@ -51,8 +43,7 @@ const withDisableNonPageContentBlocks = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const isDescendentOfQueryLoop = props.context.queryId !== undefined;
 		const isPageContent =
-			PAGE_CONTENT_BLOCK_TYPES.includes( props.name ) &&
-			! isDescendentOfQueryLoop;
+			PAGE_CONTENT_BLOCK_TYPES[ props.name ] && ! isDescendentOfQueryLoop;
 		const mode = isPageContent ? 'contentOnly' : undefined;
 		useBlockEditingMode( mode );
 		return <BlockEdit { ...props } />;

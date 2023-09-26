@@ -356,3 +356,90 @@ describe( 'hasResolvingSelectors', () => {
 		expect( result ).toBe( true );
 	} );
 } );
+
+describe( 'countSelectorsByStatus', () => {
+	let registry;
+
+	beforeEach( () => {
+		registry = createRegistry();
+		registry.registerStore( 'store', {
+			reducer: ( state = null, action ) => {
+				if ( action.type === 'RECEIVE' ) {
+					return action.items;
+				}
+
+				return state;
+			},
+			selectors: {
+				getFoo: ( state ) => state,
+				getBar: ( state ) => state,
+				getBaz: ( state ) => state,
+				getFailingFoo: ( state ) => state,
+				getFailingBar: ( state ) => state,
+			},
+			resolvers: {
+				getFailingFoo: () => {
+					throw new Error( 'error fetching' );
+				},
+				getFailingBar: () => {
+					throw new Error( 'error fetching' );
+				},
+			},
+		} );
+	} );
+
+	it( 'counts selectors properly by status, excluding missing statuses', () => {
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).startResolution( 'getBar', [] );
+		registry.dispatch( 'store' ).startResolution( 'getBaz', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getBaz', [] );
+
+		const { countSelectorsByStatus } = registry.select( 'store' );
+		const result = countSelectorsByStatus();
+
+		expect( result ).toEqual( {
+			finished: 2,
+			resolving: 1,
+		} );
+	} );
+
+	it( 'counts errors properly', async () => {
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		await resolve( registry, 'getFailingFoo' );
+		await resolve( registry, 'getFailingBar' );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+
+		const { countSelectorsByStatus } = registry.select( 'store' );
+		const result = countSelectorsByStatus();
+
+		expect( result ).toEqual( {
+			finished: 1,
+			error: 2,
+		} );
+	} );
+
+	it( 'applies memoization and returns the same object for the same state', () => {
+		const { countSelectorsByStatus } = registry.select( 'store' );
+
+		expect( countSelectorsByStatus() ).toBe( countSelectorsByStatus() );
+
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+
+		expect( countSelectorsByStatus() ).toBe( countSelectorsByStatus() );
+	} );
+
+	it( 'returns a new object when different state is provided', () => {
+		const { countSelectorsByStatus } = registry.select( 'store' );
+
+		const result1 = countSelectorsByStatus();
+
+		registry.dispatch( 'store' ).startResolution( 'getFoo', [] );
+		registry.dispatch( 'store' ).finishResolution( 'getFoo', [] );
+
+		const result2 = countSelectorsByStatus();
+
+		expect( result1 ).not.toBe( result2 );
+	} );
+} );

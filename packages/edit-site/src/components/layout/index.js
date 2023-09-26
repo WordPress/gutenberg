@@ -26,7 +26,10 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	useBlockCommands,
+} from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -66,6 +69,7 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
+	useBlockCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
@@ -123,6 +127,8 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -212,7 +218,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						as={ motion.div }
 						variants={ {
 							isDistractionFree: { x: '-100%' },
 							isDistractionFreeHovering: { x: 0 },
@@ -253,7 +258,11 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<Header />
+								<Header
+									setListViewToggleElement={
+										setListViewToggleElement
+									}
+								/>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
@@ -366,6 +375,9 @@ export default function Layout() {
 													} }
 												>
 													<Editor
+														listViewToggleElement={
+															listViewToggleElement
+														}
 														isLoading={
 															isEditorLoading
 														}

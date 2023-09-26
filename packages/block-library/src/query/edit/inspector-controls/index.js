@@ -27,6 +27,7 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
 import { unlock } from '../../../lock-unlock';
 import {
@@ -40,8 +41,9 @@ import {
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
-	const { query, displayLayout } = attributes;
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -202,6 +204,11 @@ export default function QueryInspectorControls( props ) {
 								}
 							/>
 						) }
+						<EnhancedPaginationControl
+							enhancedPagination={ enhancedPagination }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
+						/>
 					</PanelBody>
 				</InspectorControls>
 			) }

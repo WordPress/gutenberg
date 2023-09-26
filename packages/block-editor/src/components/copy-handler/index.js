@@ -198,6 +198,7 @@ export function useClipboardHandler() {
 				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
 					removeBlocks( selectedBlockClientIds );
 				} else {
+					event.target.ownerDocument.activeElement.contentEditable = false;
 					__unstableDeleteSelection();
 				}
 			} else if ( event.type === 'paste' ) {

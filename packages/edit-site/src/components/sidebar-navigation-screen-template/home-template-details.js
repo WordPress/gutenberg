@@ -28,6 +28,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};
 
@@ -37,7 +38,7 @@ function TemplateAreaButton( { postId, icon, title } ) {
 		footer,
 	};
 	const linkInfo = useLink( {
-		postType: 'wp_template_part',
+		postType: TEMPLATE_PART_POST_TYPE,
 		postId,
 	} );
 
@@ -198,8 +199,10 @@ export default function HomeTemplateDetails() {
 				<SidebarNavigationScreenDetailsPanelRow>
 					<CheckboxControl
 						className="edit-site-sidebar-navigation-screen__input-control"
-						label="Allow comments on new posts"
-						help="Changes will apply to new posts only. Individual posts may override these settings."
+						label={ __( 'Allow comments on new posts' ) }
+						help={ __(
+							'Changes will apply to new posts only. Individual posts may override these settings.'
+						) }
 						checked={ commentsOnNewPostsValue }
 						onChange={ setAllowCommentsOnNewPosts }
 					/>

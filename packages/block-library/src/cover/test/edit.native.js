@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Pressable } from 'react-native';
+import { Image } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -12,7 +12,6 @@ import {
 	getBlock,
 	openBlockSettings,
 } from 'test/helpers';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
@@ -170,9 +169,8 @@ describe( 'when an image is attached', () => {
 			/>
 		);
 		fireEvent.press( screen.getByLabelText( 'Edit image' ) );
-		const [ clearMediaButton ] = await screen.findAllByText(
-			'Clear Media'
-		);
+		const [ clearMediaButton ] =
+			await screen.findAllByText( 'Clear Media' );
 		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -192,9 +190,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await screen.findByText(
-			'Fixed background'
-		);
+		const fixedBackgroundButton =
+			await screen.findByText( 'Fixed background' );
 		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -211,9 +208,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
 			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
@@ -240,9 +236,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -269,9 +264,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -361,9 +355,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -400,9 +393,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -456,9 +448,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -512,9 +503,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -541,9 +531,6 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'displays the hex color value in the custom color picker', async () => {
-		HsvColorPicker.mockImplementation( ( props ) => {
-			return <Pressable { ...props } testID="hsv-color-picker" />;
-		} );
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );

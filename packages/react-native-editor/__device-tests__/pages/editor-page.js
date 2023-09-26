@@ -22,27 +22,14 @@ const {
 	typeString,
 	waitForVisible,
 	clickIfClickable,
+	launchApp,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
 
-const initializeEditorPage = async () => {
+const setupEditor = async () => {
 	const driver = await setupDriver();
-	await isEditorVisible( driver );
-	const initialValues = await setupInitialValues( driver );
-	return new EditorPage( driver, initialValues );
-};
-
-// Stores initial values from the editor for different helpers.
-const setupInitialValues = async ( driver ) => {
-	const initialValues = {};
-	const addButton = await driver.elementsByAccessibilityId( ADD_BLOCK_ID );
-
-	if ( addButton.length !== 0 ) {
-		initialValues.addButtonLocation = await addButton[ 0 ].getLocation();
-	}
-
-	return initialValues;
+	return new EditorPage( driver );
 };
 
 class EditorPage {
@@ -53,11 +40,12 @@ class EditorPage {
 	verseBlockName = 'Verse';
 	orderedListButtonName = 'Ordered';
 
-	constructor( driver, initialValues ) {
+	constructor( driver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
-		this.initialValues = initialValues;
+		this.initialValues = {};
+		this.blockNames = blockNames;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
@@ -65,14 +53,28 @@ class EditorPage {
 		}
 	}
 
+	async initializeEditor( { initialData } = {} ) {
+		await launchApp( this.driver, { initialData } );
+
+		// Stores initial values from the editor for different helpers.
+		const addButton =
+			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+
+		if ( addButton.length !== 0 ) {
+			this.initialValues.addButtonLocation =
+				await addButton[ 0 ].getLocation();
+		}
+
+		await isEditorVisible( this.driver );
+	}
+
 	async getBlockList() {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
 	async getAddBlockButton() {
-		const elements = await this.driver.elementsByAccessibilityId(
-			ADD_BLOCK_ID
-		);
+		const elements =
+			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
 		return elements[ 0 ];
 	}
 
@@ -193,9 +195,8 @@ class EditorPage {
 			await swipeDown( this.driver );
 		}
 
-		const elements = await this.driver.elementsByAccessibilityId(
-			titleElement
-		);
+		const elements =
+			await this.driver.elementsByAccessibilityId( titleElement );
 
 		if (
 			elements.length === 0 ||
@@ -429,15 +430,7 @@ class EditorPage {
 		// Click on block of choice.
 		const blockButton = await this.findBlockButton( blockName );
 
-		if ( isAndroid() ) {
-			await blockButton.click();
-		} else {
-			await this.driver.execute( 'mobile: tap', {
-				element: blockButton,
-				x: 10,
-				y: 10,
-			} );
-		}
+		await blockButton.click();
 	}
 
 	static getInserterPageHeight( screenHeight ) {
@@ -526,15 +519,16 @@ class EditorPage {
 				toY: EditorPage.getInserterPageHeight( height ),
 				duration: 0.5,
 			} );
+			// Wait for dragging gesture
+			await this.driver.sleep( 2000 );
 		}
 
 		return blockButton;
 	}
 
 	async clickToolBarButton( buttonName ) {
-		const toolBarButton = await this.driver.elementByAccessibilityId(
-			buttonName
-		);
+		const toolBarButton =
+			await this.driver.elementByAccessibilityId( buttonName );
 		await toolBarButton.click();
 	}
 
@@ -542,9 +536,8 @@ class EditorPage {
 		let navigateUpElements = [];
 		do {
 			await this.driver.sleep( 2000 );
-			navigateUpElements = await this.driver.elementsByAccessibilityId(
-				'Navigate Up'
-			);
+			navigateUpElements =
+				await this.driver.elementsByAccessibilityId( 'Navigate Up' );
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
 			}
@@ -786,9 +779,8 @@ class EditorPage {
 			this.driver,
 			'//XCUIElementTypeOther[@name="Media Add image or video"]'
 		);
-		const addMediaButton = await mediaSection.elementByAccessibilityId(
-			'Add image or video'
-		);
+		const addMediaButton =
+			await mediaSection.elementByAccessibilityId( 'Add image or video' );
 		await addMediaButton.click();
 	}
 
@@ -812,9 +804,8 @@ class EditorPage {
 			this.accessibilityIdKey
 		);
 		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
-		const imageBlockInnerElement = await this.driver.elementByXPath(
-			blockLocator
-		);
+		const imageBlockInnerElement =
+			await this.driver.elementByXPath( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 
@@ -1026,6 +1017,7 @@ const blockNames = {
 	paragraph: 'Paragraph',
 	search: 'Search',
 	separator: 'Separator',
+	socialIcons: 'Social Icons',
 	spacer: 'Spacer',
 	verse: 'Verse',
 	shortcode: 'Shortcode',
@@ -1036,4 +1028,4 @@ const blockNames = {
 	unsupported: 'Unsupported',
 };
 
-module.exports = { initializeEditorPage, blockNames };
+module.exports = { setupEditor, blockNames };
