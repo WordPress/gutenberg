@@ -23,7 +23,9 @@ import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
 import { PATTERN_SYNC_TYPES } from '../constants';
 
-const { DropdownMenuItemV2Ariakit } = unlock( componentsPrivateApis );
+const { DropdownMenuV2Ariakit, DropdownMenuItemV2Ariakit } = unlock(
+	componentsPrivateApis
+);
 
 /**
  * Menu control to convert block(s) to a pattern block.
@@ -128,13 +130,11 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 		setIsModalOpen( false );
 	};
 	return (
-		<>
+		<DropdownMenuV2Ariakit trigger="Nested test">
 			<DropdownMenuItemV2Ariakit
 				// icon={ symbol }
-				onClick={ ( event ) => {
-					setIsModalOpen( true );
-					event.preventDefault();
-				} }
+				onClick={ () => setIsModalOpen( true ) }
+				hideOnClick={ false }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			>
@@ -154,6 +154,6 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 					} }
 				/>
 			) }
-		</>
+		</DropdownMenuV2Ariakit>
 	);
 }

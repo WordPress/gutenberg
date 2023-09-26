@@ -250,7 +250,7 @@ export function BlockSettingsDropdown( {
 					trigger={ <Icon icon={ moreVertical } /> }
 				>
 					<DropdownMenuItemV2Ariakit>
-						Hello Brooke
+						Test item
 					</DropdownMenuItemV2Ariakit>
 					{ canCopyStyles && (
 						<>
