@@ -48,6 +48,8 @@ function Controls( {
 	onClearMedia,
 	onSelectMedia,
 	setAttributes,
+	updateDimRatio,
+	setOverlayColor,
 } ) {
 	const {
 		backgroundType,
@@ -78,10 +80,6 @@ function Controls( {
 		],
 		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
-
-	const onOpacityChange = useCallback( ( value ) => {
-		setAttributes( { dimRatio: value } );
-	}, [] );
 
 	const onChangeUnit = useCallback( ( nextUnit ) => {
 		setAttributes( {
@@ -275,6 +273,7 @@ function Controls( {
 				gradient={ attributes.gradient }
 				customGradient={ attributes.customGradient }
 				setAttributes={ setAttributes }
+				onColorChange={ setOverlayColor }
 			/>
 
 			{ url ? (
@@ -284,7 +283,7 @@ function Controls( {
 						minimumValue={ 0 }
 						maximumValue={ 100 }
 						value={ dimRatio }
-						onChange={ onOpacityChange }
+						onChange={ updateDimRatio }
 						style={ styles.rangeCellContainer }
 						separatorType={ 'topFullWidth' }
 					/>

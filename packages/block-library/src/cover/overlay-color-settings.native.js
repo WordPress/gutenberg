@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	getGradientSlugByValue,
@@ -22,6 +21,7 @@ function OverlayColorSettings( {
 	gradient,
 	customGradient,
 	setAttributes,
+	onColorChange,
 } ) {
 	const colors = useMobileGlobalStylesColors();
 	const gradients = useMobileGlobalStylesColors( 'gradients' );
@@ -45,19 +45,6 @@ function OverlayColorSettings( {
 				customGradient: undefined,
 				[ attributeName ]: value,
 			} );
-		};
-
-		const onColorChange = ( value ) => {
-			// Do nothing for falsy values.
-			if ( ! value ) {
-				return;
-			}
-			const colorObject = getColorObjectByColorValue( colors, value );
-			if ( colorObject?.slug ) {
-				setOverlayAttribute( 'overlayColor', colorObject.slug );
-			} else {
-				setOverlayAttribute( 'customOverlayColor', value );
-			}
 		};
 
 		const onGradientChange = ( value ) => {
@@ -92,7 +79,7 @@ function OverlayColorSettings( {
 				onColorCleared,
 			},
 		];
-	}, [ colorValue, gradientValue, colors, gradients ] );
+	}, [ onColorChange, colorValue, gradientValue, setAttributes, gradients ] );
 
 	return (
 		<PanelColorGradientSettings
