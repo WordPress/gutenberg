@@ -144,7 +144,6 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 	);
 }
 
-// Should we also get templates?
 export function useAvailablePatterns( template ) {
 	const currentThemeStylesheet = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet

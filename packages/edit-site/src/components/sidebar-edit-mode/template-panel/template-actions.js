@@ -15,18 +15,10 @@ import ReplaceTemplateButton from './replace-template-button';
 import { useAvailablePatterns } from '../page-panels/hooks';
 export default function Actions( { template } ) {
 	const availablePatterns = useAvailablePatterns( template );
-	const availableTemplates = availablePatterns.map( ( pattern ) => {
-		return {
-			name: pattern.name,
-			blocks: pattern.blocks,
-			title: pattern.title,
-			content: pattern.content,
-		};
-	} );
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
 
-	if ( ! isRevertable && availableTemplates.length === 0 ) {
+	if ( ! isRevertable && availablePatterns.length === 0 ) {
 		return null;
 	}
 
@@ -52,9 +44,9 @@ export default function Actions( { template } ) {
 							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
-					{ availableTemplates.length > 0 && (
+					{ availablePatterns.length > 0 && (
 						<ReplaceTemplateButton
-							availableTemplates={ availableTemplates }
+							availableTemplates={ availablePatterns }
 							template={ template }
 							onClick={ onClose }
 						/>
