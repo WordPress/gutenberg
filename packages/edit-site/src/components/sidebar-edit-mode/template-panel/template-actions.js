@@ -44,7 +44,7 @@ export default function Actions( { template } ) {
 							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
-					{ availablePatterns.length > 0 && (
+					{ availablePatterns.length > 1 && (
 						<ReplaceTemplateButton
 							availableTemplates={ availablePatterns }
 							template={ template }
