@@ -109,7 +109,7 @@ WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
 			'property_keys' => array(
 				'default' => 'background-image',
 			),
-			'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
+			'value_func'    => array( 'WP_Style_Engine_Gutenberg', 'get_url_or_value_css_declaration' ),
 			'path'          => array( 'background', 'backgroundImage' ),
 		),
 		'backgroundSize'  => array(

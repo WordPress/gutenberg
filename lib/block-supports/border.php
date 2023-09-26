@@ -199,28 +199,28 @@ WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
 			'path'          => array( 'border', 'width' ),
 		),
 		'top'    => array(
-			'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
+			'value_func' => array( 'WP_Style_Engine_Gutenberg', 'get_individual_property_css_declarations' ),
 			'path'       => array( 'border', 'top' ),
 			'css_vars'   => array(
 				'color' => '--wp--preset--color--$slug',
 			),
 		),
 		'right'  => array(
-			'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
+			'value_func' => array( 'WP_Style_Engine_Gutenberg', 'get_individual_property_css_declarations' ),
 			'path'       => array( 'border', 'right' ),
 			'css_vars'   => array(
 				'color' => '--wp--preset--color--$slug',
 			),
 		),
 		'bottom' => array(
-			'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
+			'value_func' => array( 'WP_Style_Engine_Gutenberg', 'get_individual_property_css_declarations' ),
 			'path'       => array( 'border', 'bottom' ),
 			'css_vars'   => array(
 				'color' => '--wp--preset--color--$slug',
 			),
 		),
 		'left'   => array(
-			'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
+			'value_func' => array( 'WP_Style_Engine_Gutenberg', 'get_individual_property_css_declarations' ),
 			'path'       => array( 'border', 'left' ),
 			'css_vars'   => array(
 				'color' => '--wp--preset--color--$slug',
