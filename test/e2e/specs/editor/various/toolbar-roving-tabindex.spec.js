@@ -16,6 +16,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.type( 'First block' );
 
 		// Ensure the fixed toolbar option is off.
+		// See: https://github.com/WordPress/gutenberg/pull/54785.
 		await editor.setIsFixedToolbar( false );
 	} );
 
