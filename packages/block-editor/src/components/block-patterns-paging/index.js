@@ -27,66 +27,69 @@ export default function Pagination( {
 					)
 				}
 			</Text>
-			<HStack
-				expanded={ false }
-				spacing={ 3 }
-				justify="flex-start"
-				className="block-editor-patterns__grid-pagination"
-			>
+
+			{ numPages > 1 && (
 				<HStack
 					expanded={ false }
-					spacing={ 1 }
-					className="block-editor-patterns__grid-pagination-previous"
+					spacing={ 3 }
+					justify="flex-start"
+					className="block-editor-patterns__grid-pagination"
 				>
-					<Button
-						variant="tertiary"
-						onClick={ () => changePage( 1 ) }
-						disabled={ currentPage === 1 }
-						aria-label={ __( 'First page' ) }
+					<HStack
+						expanded={ false }
+						spacing={ 1 }
+						className="block-editor-patterns__grid-pagination-previous"
 					>
-						<span>«</span>
-					</Button>
-					<Button
-						variant="tertiary"
-						onClick={ () => changePage( currentPage - 1 ) }
-						disabled={ currentPage === 1 }
-						aria-label={ __( 'Previous page' ) }
+						<Button
+							variant="tertiary"
+							onClick={ () => changePage( 1 ) }
+							disabled={ currentPage === 1 }
+							aria-label={ __( 'First page' ) }
+						>
+							<span>«</span>
+						</Button>
+						<Button
+							variant="tertiary"
+							onClick={ () => changePage( currentPage - 1 ) }
+							disabled={ currentPage === 1 }
+							aria-label={ __( 'Previous page' ) }
+						>
+							<span>‹</span>
+						</Button>
+					</HStack>
+					<Text variant="muted">
+						{ sprintf(
+							// translators: %1$s: Current page number, %2$s: Total number of pages.
+							_x( '%1$s of %2$s', 'paging' ),
+							currentPage,
+							numPages
+						) }
+					</Text>
+					<HStack
+						expanded={ false }
+						spacing={ 1 }
+						className="block-editor-patterns__grid-pagination-next"
 					>
-						<span>‹</span>
-					</Button>
+						<Button
+							variant="tertiary"
+							onClick={ () => changePage( currentPage + 1 ) }
+							disabled={ currentPage === numPages }
+							aria-label={ __( 'Next page' ) }
+						>
+							<span>›</span>
+						</Button>
+						<Button
+							variant="tertiary"
+							onClick={ () => changePage( numPages ) }
+							disabled={ currentPage === numPages }
+							aria-label={ __( 'Last page' ) }
+							size="default"
+						>
+							<span>»</span>
+						</Button>
+					</HStack>
 				</HStack>
-				<Text variant="muted">
-					{ sprintf(
-						// translators: %1$s: Current page number, %2$s: Total number of pages.
-						_x( '%1$s of %2$s', 'paging' ),
-						currentPage,
-						numPages
-					) }
-				</Text>
-				<HStack
-					expanded={ false }
-					spacing={ 1 }
-					className="block-editor-patterns__grid-pagination-next"
-				>
-					<Button
-						variant="tertiary"
-						onClick={ () => changePage( currentPage + 1 ) }
-						disabled={ currentPage === numPages }
-						aria-label={ __( 'Next page' ) }
-					>
-						<span>›</span>
-					</Button>
-					<Button
-						variant="tertiary"
-						onClick={ () => changePage( numPages ) }
-						disabled={ currentPage === numPages }
-						aria-label={ __( 'Last page' ) }
-						size="default"
-					>
-						<span>»</span>
-					</Button>
-				</HStack>
-			</HStack>
+			) }
 		</VStack>
 	);
 }

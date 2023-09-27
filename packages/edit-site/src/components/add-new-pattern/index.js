@@ -4,7 +4,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { plus, symbol, symbolFilled } from '@wordpress/icons';
+import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -93,7 +93,7 @@ export default function AddNewPattern() {
 	}
 
 	controls.push( {
-		icon: symbol,
+		icon: upload,
 		onClick: () => {
 			patternUploadInputRef.current.click();
 		},

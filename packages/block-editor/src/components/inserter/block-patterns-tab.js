@@ -42,7 +42,7 @@ const noop = () => {};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All Patterns' ),
+	label: __( 'All patterns' ),
 };
 
 export const myPatternsCategory = {
