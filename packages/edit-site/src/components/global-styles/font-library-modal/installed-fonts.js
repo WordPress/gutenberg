@@ -69,7 +69,7 @@ function InstalledFonts() {
 		: null;
 
 	const shouldDisplayDeleteButton =
-		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+		!! libraryFontSelected && libraryFontSelected?.source === 'custom';
 
 	useEffect( () => {
 		refreshLibrary();
