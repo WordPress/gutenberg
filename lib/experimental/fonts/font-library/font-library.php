@@ -71,5 +71,5 @@ if ( ! function_exists( 'wp_register_default_fonts' ) && ! function_exists( 'wp_
 		return WP_Font_Library::register_default_fonts( $fonts );
 	}
 
-	add_filter( 'wp_theme_json_data_default', array ( 'WP_Font_Library', 'add_default_fonts_to_theme_json' ) );
+	add_filter( 'wp_theme_json_data_default', array( 'WP_Font_Library', 'add_default_fonts_to_theme_json' ) );
 }
