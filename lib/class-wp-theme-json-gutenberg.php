@@ -1159,7 +1159,7 @@ class WP_Theme_JSON_Gutenberg {
 				$css_value          = $part[1];
 				$root_selectors     = explode( ',', $selector );
 				$combined_selectors = array_map(
-					static function( $root_selector ) use ( $nested_selector ) {
+					static function ( $root_selector ) use ( $nested_selector ) {
 						return $root_selector . $nested_selector;
 					},
 					$root_selectors
