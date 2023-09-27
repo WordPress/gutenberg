@@ -43,7 +43,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => array( $this, 'install_fonts' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'check_font_library_permissions_write' ),
 					'args'                => array(
 						'fontFamilies' => array(
 							'required'          => true,
@@ -62,7 +62,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
 					'callback'            => array( $this, 'uninstall_fonts' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'check_font_library_permissions_write' ),
 					'args'                => $this->uninstall_schema(),
 				),
 			)
@@ -75,7 +75,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_font_collections' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'check_font_library_permissions_read' ),
 				),
 			)
 		);
@@ -87,7 +87,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_font_collection' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'check_font_library_permissions_read' ),
 				),
 			)
 		);
@@ -305,13 +305,34 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks whether the user has permissions to update the Font Library.
+	 * Checks whether the user has read permission to the Font Library.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function check_font_library_permissions_read( $request ) {
+		if( current_user_can('editor') || current_user_can('administrator') || current_user_can('author') ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_cannot_read_font_library',
+			__( 'Sorry, you are not allowed to read the Font Library on this site.', 'gutenberg' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
+	}
+
+	/**
+	 * Checks whether the user has write permissions to the Font Library.
 	 *
 	 * @since 6.4.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	public function update_font_library_permissions_check() {
+	public function check_font_library_permissions_write( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_update_font_library',
@@ -322,13 +343,24 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			);
 		}
 
+		// check if request has assets to write or delete.
+		$fonts_param = $request->get_param( 'fontFamilies' );
+		$fonts_to_install = json_decode( $fonts_param, true );
+		$method = $request->get_method();
+
+		if ( 'POST' === $method ) {
+			// check if files are present.
+		} elseif ( 'DELETE' === $method ) {
+			
+		}
+
 		// The update endpoints requires write access to the temp and the fonts directories.
-		$temp_dir   = get_temp_dir();
-		$upload_dir = wp_upload_dir()['basedir'];
-		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
+		$temp_dir  = get_temp_dir();
+		$fonts_dir = WP_Font_Library::get_fonts_dir();
+		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $fonts_dir ) ) {
 			return new WP_Error(
-				'rest_cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
+				'rest_cannot_write_to_fonts_dir',
+				__( 'Error: WordPress does not have write permission for the fonts directory on the server.', 'gutenberg' ),
 				array(
 					'status' => 500,
 				)
