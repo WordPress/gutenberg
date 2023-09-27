@@ -34,10 +34,11 @@ function injectThemeAttributeInBlockTemplateContent(
 }
 
 function preparePatterns( patterns, template, currentThemeStylesheet ) {
-	// This is duplicated.
+	// Filter out duplicates.
 	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
+	// Filter out core patterns.
 	const filterOutCorePatterns = ( pattern ) =>
 		! PATTERN_CORE_SOURCES.includes( pattern.source );
 
