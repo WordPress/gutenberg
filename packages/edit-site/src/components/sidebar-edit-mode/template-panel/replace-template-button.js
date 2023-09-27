@@ -40,6 +40,11 @@ export default function ReplaceTemplateButton( {
 			content: serialize( selectedTemplate.blocks ),
 		} );
 	};
+
+	if ( ! availableTemplates.length || availableTemplates.length < 1 ) {
+		return null;
+	}
+
 	return (
 		<>
 			<MenuItem

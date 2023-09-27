@@ -49,14 +49,11 @@ export default function Actions( { template } ) {
 							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
-					{ !! availablePatterns.length &&
-						availablePatterns.length > 1 && (
-							<ReplaceTemplateButton
-								availableTemplates={ availablePatterns }
-								template={ template }
-								onClick={ onClose }
-							/>
-						) }
+					<ReplaceTemplateButton
+						availableTemplates={ availablePatterns }
+						template={ template }
+						onClick={ onClose }
+					/>
 				</MenuGroup>
 			) }
 		</DropdownMenu>
