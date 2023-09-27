@@ -44,7 +44,8 @@ test.describe( 'Unsynced pattern', () => {
 <!-- /wp:paragraph -->`
 		);
 
-		// Check that the new pattern is availble in the inserter.
+		// Check that the new pattern is availble in the inserter and that is gets inserted as
+		// a plain paragraph block.
 		await page.getByLabel( 'Toggle block inserter' ).click();
 		await page
 			.getByRole( 'searchbox', {
@@ -52,7 +53,17 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 			.fill( 'My unsynced pattern' );
 		await page.getByLabel( 'Search for blocks and patterns' ).click();
+		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		await expect( page.getByLabel( 'My unsynced pattern' ) ).toBeVisible();
+		const updatedContent = await editor.getEditedPostContent();
+		expect( updatedContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>A useful paragraph to reuse</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A useful paragraph to reuse</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 } );
