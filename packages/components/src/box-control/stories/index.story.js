@@ -42,7 +42,7 @@ function DemoExample( {
 	);
 }
 
-export const arbitrarySides = () => {
+export const ArbitrarySides = () => {
 	return (
 		<DemoExample
 			sides={ [ 'top', 'bottom' ] }
@@ -51,7 +51,7 @@ export const arbitrarySides = () => {
 	);
 };
 
-export const singleSide = () => {
+export const SingleSide = () => {
 	return (
 		<DemoExample
 			sides={ [ 'bottom' ] }
@@ -60,11 +60,11 @@ export const singleSide = () => {
 	);
 };
 
-export const axialControls = () => {
+export const AxialControls = () => {
 	return <DemoExample splitOnAxis={ true } />;
 };
 
-export const axialControlsWithSingleSide = () => {
+export const AxialControlsWithSingleSide = () => {
 	return (
 		<DemoExample
 			sides={ [ 'horizontal' ] }

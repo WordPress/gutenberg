@@ -179,7 +179,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ accept }
-								multiple={ multiple }
+								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
@@ -220,7 +220,7 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURL } position="bottom">
+							<Tooltip text={ mediaURL }>
 								<div>
 									<LinkControl
 										value={ { url: mediaURL } }

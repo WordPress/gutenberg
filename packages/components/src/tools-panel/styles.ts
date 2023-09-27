@@ -148,7 +148,7 @@ export const DropdownMenu = css`
 `;
 
 export const ResetLabel = styled.span`
-	color: ${ COLORS.ui.themeDark10 };
+	color: ${ COLORS.theme.accentDarker10 };
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;

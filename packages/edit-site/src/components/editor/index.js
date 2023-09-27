@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -39,10 +40,11 @@ import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
-import CanvasSpinner from '../canvas-spinner';
+import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
@@ -57,13 +59,6 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-const typeLabels = {
-	wp_template: __( 'Template' ),
-	wp_template_part: __( 'Template Part' ),
-	wp_block: __( 'Pattern' ),
-	wp_navigation: __( 'Navigation' ),
-};
-
 // Prevent accidental removal of certain blocks, asking the user for
 // confirmation.
 const blockRemovalRules = {
@@ -76,7 +71,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { isLoading } ) {
+export default function Editor( { listViewToggleElement, isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -170,7 +165,8 @@ export default function Editor( { isLoading } ) {
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			typeLabels[ editedPostType ] ?? typeLabels.wp_template
+			POST_TYPE_LABELS[ editedPostType ] ??
+				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
 
@@ -178,9 +174,21 @@ export default function Editor( { isLoading } ) {
 	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
+	const loadingProgressId = useInstanceId(
+		CanvasLoader,
+		'edit-site-editor__loading-progress'
+	);
+
+	const contentProps = isLoading
+		? {
+				'aria-busy': 'true',
+				'aria-describedby': loadingProgressId,
+		  }
+		: undefined;
+
 	return (
 		<>
-			{ isLoading ? <CanvasSpinner /> : null }
+			{ isLoading ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -232,13 +240,18 @@ export default function Editor( { isLoading } ) {
 									) }
 								</>
 							}
+							contentProps={ contentProps }
 							secondarySidebar={
 								isEditMode &&
 								( ( shouldShowInserter && (
 									<InserterSidebar />
 								) ) ||
 									( shouldShowListView && (
-										<ListViewSidebar />
+										<ListViewSidebar
+											listViewToggleElement={
+												listViewToggleElement
+											}
+										/>
 									) ) )
 							}
 							sidebar={

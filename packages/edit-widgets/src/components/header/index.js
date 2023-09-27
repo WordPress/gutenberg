@@ -27,7 +27,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
-function Header() {
+function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
@@ -140,6 +140,7 @@ function Header() {
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'List View' ) }
 									onClick={ toggleListView }
+									ref={ setListViewToggleElement }
 								/>
 							</>
 						) }

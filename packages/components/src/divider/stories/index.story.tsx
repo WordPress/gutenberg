@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { Text } from '../../text';
 import { Divider } from '..';
 import { Flex } from '../../flex';
 
-const meta: ComponentMeta< typeof Divider > = {
+const meta: Meta< typeof Divider > = {
 	component: Divider,
 	title: 'Components (Experimental)/Divider',
 	argTypes: {
@@ -26,12 +26,12 @@ const meta: ComponentMeta< typeof Divider > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof Divider > = ( args ) => (
+const Template: StoryFn< typeof Divider > = ( args ) => (
 	<div>
 		<Text>Some text before the divider</Text>
 		<Divider { ...args } />
@@ -39,19 +39,19 @@ const Template: ComponentStory< typeof Divider > = ( args ) => (
 	</div>
 );
 
-export const Horizontal: ComponentStory< typeof Divider > = Template.bind( {} );
+export const Horizontal: StoryFn< typeof Divider > = Template.bind( {} );
 Horizontal.args = {
 	margin: '2',
 };
 
-export const Vertical: ComponentStory< typeof Divider > = Template.bind( {} );
+export const Vertical: StoryFn< typeof Divider > = Template.bind( {} );
 Vertical.args = {
 	...Horizontal.args,
 	orientation: 'vertical',
 };
 
 // Inside a `flex` container, the divider will need to be `stretch` aligned in order to be visible.
-export const InFlexContainer: ComponentStory< typeof Divider > = ( args ) => {
+export const InFlexContainer: StoryFn< typeof Divider > = ( args ) => {
 	return (
 		<Flex align="stretch">
 			<Text>

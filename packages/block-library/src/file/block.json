@@ -69,7 +69,8 @@
 				"background": true,
 				"link": true
 			}
-		}
+		},
+		"interactivity": true
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",

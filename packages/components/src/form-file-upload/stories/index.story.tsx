@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
  */
 import FormFileUpload from '..';
 
-const meta: ComponentMeta< typeof FormFileUpload > = {
+const meta: Meta< typeof FormFileUpload > = {
 	title: 'Components/FormFileUpload',
 	component: FormFileUpload,
 	argTypes: {
@@ -23,12 +23,12 @@ const meta: ComponentMeta< typeof FormFileUpload > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof FormFileUpload > = ( props ) => {
+const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
 	return <FormFileUpload { ...props } />;
 };
 

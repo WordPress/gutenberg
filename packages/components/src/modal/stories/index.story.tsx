@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
 
-const meta: ComponentMeta< typeof Modal > = {
+const meta: Meta< typeof Modal > = {
 	component: Modal,
 	title: 'Components/Modal',
 	argTypes: {
@@ -28,7 +28,8 @@ const meta: ComponentMeta< typeof Modal > = {
 			control: { type: null },
 		},
 		focusOnMount: {
-			control: { type: 'boolean' },
+			options: [ true, false, 'firstElement', 'firstContentElement' ],
+			control: { type: 'select' },
 		},
 		role: {
 			control: { type: 'text' },
@@ -46,10 +47,7 @@ const meta: ComponentMeta< typeof Modal > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Modal > = ( {
-	onRequestClose,
-	...args
-} ) => {
+const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal: ModalProps[ 'onRequestClose' ] = ( event ) => {
@@ -91,7 +89,7 @@ const Template: ComponentStory< typeof Modal > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof Modal > = Template.bind( {} );
+export const Default: StoryFn< typeof Modal > = Template.bind( {} );
 Default.args = {
 	title: 'Title',
 };
@@ -114,9 +112,7 @@ const LikeButton = () => {
 	);
 };
 
-export const WithHeaderActions: ComponentStory< typeof Modal > = Template.bind(
-	{}
-);
+export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
 WithHeaderActions.args = {
 	...Default.args,
 	headerActions: <LikeButton />,

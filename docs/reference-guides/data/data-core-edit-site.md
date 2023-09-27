@@ -291,7 +291,7 @@ _Parameters_
 
 _Returns_
 
--   `number`: The resolved template ID for the page route.
+-   `Object`: Action object.
 
 ### setHasPageContentFocus
 
@@ -407,6 +407,10 @@ _Returns_
 ### switchEditorMode
 
 Undocumented declaration.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleFeature
 

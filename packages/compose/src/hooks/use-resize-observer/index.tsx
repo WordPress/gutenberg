@@ -336,7 +336,7 @@ function useResizeObserver< T extends HTMLElement >(
  */
 export default function useResizeAware(): [
 	WPElement,
-	{ width: number | null; height: number | null }
+	{ width: number | null; height: number | null },
 ] {
 	const { ref, width, height } = useResizeObserver();
 	const sizes = useMemo( () => {
