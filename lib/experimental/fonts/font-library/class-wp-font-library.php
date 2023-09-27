@@ -53,6 +53,18 @@ class WP_Font_Library {
 	}
 
 	/**
+	 * Unregister defaults font families.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param array $fonts List of font families in theme.json like format.
+	 * @return void
+	 */
+	public static function unregister_default_fonts( $fonts ) {
+		// Implement this method.
+	}
+
+	/**
 	 * Register a new font collection.
 	 *
 	 * @since 6.4.0
