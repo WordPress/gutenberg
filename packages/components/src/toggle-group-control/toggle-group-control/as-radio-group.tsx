@@ -15,7 +15,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import ToggleGroupControlContext from '../context';
 import { useComputeControlledOrUncontrolledValue } from './utils';
 import type {
