@@ -136,6 +136,12 @@ export function UnforwardedButton(
 			// Tooltip should not considered as a child
 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
+	const truthyAriaPressedValues: ( typeof ariaPressed )[] = [
+		true,
+		'true',
+		'mixed',
+	];
+
 	const classes = classnames( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
@@ -144,7 +150,7 @@ export function UnforwardedButton(
 		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
 
-		'is-pressed': ariaPressed && ariaPressed !== 'false',
+		'is-pressed': truthyAriaPressedValues.includes( ariaPressed ),
 		'is-pressed-mixed': ariaPressed === 'mixed',
 
 		'is-busy': isBusy,
