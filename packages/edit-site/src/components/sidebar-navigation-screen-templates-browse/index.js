@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
 
 const config = {
 	[ TEMPLATE_POST_TYPE ]: {
@@ -31,20 +33,26 @@ const config = {
 	},
 };
 
+const { useLocation } = unlock( routerPrivateApis );
+
 export default function SidebarNavigationScreenTemplatesBrowse() {
 	const {
 		params: { postType },
 	} = useNavigator();
+	const {
+		params: { didAccessPatternsPage },
+	} = useLocation();
 
 	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-
-		return !! settings.supportsTemplatePartsMode;
+		return !! select( editSiteStore ).getSettings()
+			.supportsTemplatePartsMode;
 	}, [] );
 
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
+			// If a classic theme that supports template parts has never
+			// accessed the Patterns page, return to the dashboard.
+			isRoot={ isTemplatePartsMode && ! didAccessPatternsPage }
 			title={ config[ postType ].title }
 			description={ config[ postType ].description }
 			backPath={ config[ postType ].backPath }
