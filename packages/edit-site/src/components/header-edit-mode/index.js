@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -19,7 +19,15 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
+import {
+	chevronUpDown,
+	external,
+	listView,
+	next,
+	plus,
+	previous,
+} from '@wordpress/icons';
+
 import {
 	__unstableMotion as motion,
 	Button,
@@ -69,6 +77,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		showIconLabels,
 		editorCanvasView,
 		hasFixedToolbar,
+		blockSelectionStart,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -78,7 +87,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { getBlockSelectionStart, __unstableGetEditorMode } =
+			select( blockEditorStore );
 
 		const postType = getEditedPostType();
 
@@ -114,6 +124,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 				editSiteStore.name,
 				'fixedToolbar'
 			),
+			blockSelectionStart: getBlockSelectionStart(),
 		};
 	}, [] );
 
@@ -126,6 +137,17 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const disableMotion = useReducedMotion();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+	const hasBlockSelected = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
 
 	const toggleInserter = useCallback( () => {
 		if ( isInserterOpen ) {
@@ -192,10 +214,10 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
-				<>
+				<div className="edit-site-header-edit-mode__start">
 					<NavigableToolbar
 						as={ motion.div }
-						className="edit-site-header-edit-mode__start"
+						className="edit-site-header-edit-mode__document-toolbar"
 						aria-label={ __( 'Document tools' ) }
 						shouldUseKeyboardFocusShortcut={
 							! blockToolbarCanBeFocused
@@ -300,15 +322,44 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						</div>
 					</NavigableToolbar>
 					<Slot
-						className="selected-block-toolbar-wrapper"
+						className={ classnames(
+							'selected-block-tools-wrapper',
+							{
+								'is-collapsed': isBlockToolsCollapsed,
+							}
+						) }
 						name="__experimentalSelectedBlockTools"
 						bubblesVirtually
 					/>
-				</>
+					{ isLargeViewport && hasBlockSelected && (
+						<Button
+							className="edit-site-header-edit-mode__block-tools-toggle"
+							icon={ isBlockToolsCollapsed ? next : previous }
+							onClick={ () => {
+								setIsBlockToolsCollapsed(
+									( collapsed ) => ! collapsed
+								);
+							} }
+							label={
+								isBlockToolsCollapsed
+									? __( 'Show block tools' )
+									: __( 'Hide block tools' )
+							}
+						/>
+					) }
+				</div>
 			) }
 
 			{ ! isDistractionFree && (
-				<div className="edit-site-header-edit-mode__center">
+				<div
+					className={ classnames(
+						'edit-site-header-edit-mode__center',
+						{
+							'is-collapsed':
+								! isBlockToolsCollapsed && isLargeViewport,
+						}
+					) }
+				>
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
