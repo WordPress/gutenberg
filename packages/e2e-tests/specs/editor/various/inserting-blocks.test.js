@@ -249,7 +249,7 @@ describe( 'Inserting blocks', () => {
 		await page.keyboard.type( 'First paragraph' );
 		await insertBlock( 'Image' );
 		const paragraphBlock = await canvas().$(
-			'p[aria-label="Paragraph block"]'
+			'p[aria-label="Block: Paragraph"]'
 		);
 		paragraphBlock.click();
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );

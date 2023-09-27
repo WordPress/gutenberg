@@ -4,6 +4,28 @@
 
 ### Enhancements
 
+-   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+-   `Button`: deprecating `isPressed` prop in favour of `aria-pressed` ([#54740](https://github.com/WordPress/gutenberg/pull/54740)).
+-   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
+
+### Bug Fix
+
+-   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+-   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+-   `FormTokenField`: Add `box-sizing` reset style and reset default padding ([#54734](https://github.com/WordPress/gutenberg/pull/54734)).
+
+### Internal
+
+-   Update `@ariakit/react` to version `0.3.3` ([#54818](https://github.com/WordPress/gutenberg/pull/54818))
+-   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+-   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
+-   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+
+## 25.8.0 (2023-09-20)
+
+### Enhancements
+
+-   Add new option `firstContentElement` to Modal's `focusOnMount` prop to allow consumers to focus the first element within the Modal's **contents** ([#54590](https://github.com/WordPress/gutenberg/pull/54590)).
 -   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
 -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
@@ -16,7 +38,7 @@
 -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
 -   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
 -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
--   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
+-   `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fix
 

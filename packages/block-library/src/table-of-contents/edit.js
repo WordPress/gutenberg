@@ -19,6 +19,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -50,6 +52,24 @@ export default function TableOfContentsEdit( {
 	useObserveHeadings( clientId );
 
 	const blockProps = useBlockProps();
+	const instanceId = useInstanceId(
+		TableOfContentsEdit,
+		'table-of-contents'
+	);
+
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Remove previous warning if any, to show one at a time per block.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -137,8 +157,12 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol inert="true">
-					<TableOfContentsList nestedHeadingList={ headingTree } />
+				<ol>
+					<TableOfContentsList
+						nestedHeadingList={ headingTree }
+						disableLinkActivation={ true }
+						onClick={ showRedirectionPreventedNotice }
+					/>
 				</ol>
 			</nav>
 			{ toolbarControls }

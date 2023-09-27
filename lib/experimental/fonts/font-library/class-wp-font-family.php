@@ -182,7 +182,7 @@ class WP_Font_Family {
 			// Seems mime type for files that are not images cannot be tested.
 			// See wp_check_filetype_and_ext().
 			'test_type'                => true,
-			'mimes'                    => WP_Font_Library::ALLOWED_FONT_MIME_TYPES,
+			'mimes'                    => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
 			'unique_filename_callback' => static function () use ( $filename ) {
 				// Keep the original filename.
 				return $filename;
@@ -599,6 +599,7 @@ class WP_Font_Family {
 		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
 		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		if ( ! $were_assets_written ) {
 			return new WP_Error(

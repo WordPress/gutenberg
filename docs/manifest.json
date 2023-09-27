@@ -84,12 +84,6 @@
 		"parent": "create-block"
 	},
 	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "getting-started"
-	},
-	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -498,7 +492,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Hooks",
+		"title": "Block Filters",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"

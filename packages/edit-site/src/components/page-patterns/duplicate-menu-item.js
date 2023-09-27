@@ -70,7 +70,7 @@ export default function DuplicateMenuItem( {
 
 			const result = await saveEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				{ slug, title, content, area },
 				{ throwOnError: true }
 			);
@@ -156,13 +156,13 @@ export default function DuplicateMenuItem( {
 			const title = sprintf(
 				/* translators: %s: Existing pattern title */
 				__( '%s (Copy)' ),
-				item.title
+				item.title || item.name
 			);
-			const categories = await getCategories( item.categories );
+			const categories = await getCategories( item.categories || [] );
 
 			const result = await saveEntityRecord(
 				'postType',
-				'wp_block',
+				PATTERN_TYPES.user,
 				{
 					content: isThemePattern
 						? item.content
@@ -179,7 +179,7 @@ export default function DuplicateMenuItem( {
 				sprintf(
 					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
 					__( '"%s" duplicated.' ),
-					item.title
+					item.title || item.name
 				),
 				{
 					type: 'snackbar',

@@ -115,12 +115,12 @@ export default function ReusableBlockConvertButton( {
 					! syncType
 						? sprintf(
 								// translators: %s: the name the user has given to the pattern.
-								__( 'Synced Pattern created: %s' ),
+								__( 'Synced pattern created: %s' ),
 								reusableBlockTitle
 						  )
 						: sprintf(
 								// translators: %s: the name the user has given to the pattern.
-								__( 'Unsynced Pattern created: %s' ),
+								__( 'Unsynced pattern created: %s' ),
 								reusableBlockTitle
 						  ),
 					{

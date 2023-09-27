@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
  * Internal dependencies
  */
 import { store as patternsStore } from '../store';
-import CategorySelector from './category-selector';
+import CategorySelector, { CATEGORY_SLUG } from './category-selector';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
@@ -34,13 +35,26 @@ export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
 } ) {
 	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
-	const [ categories, setCategories ] = useState( [] );
+	const [ categoryTerms, setCategoryTerms ] = useState( [] );
 	const [ title, setTitle ] = useState( '' );
+	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
-
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+
 	async function onCreate( patternTitle, sync ) {
+		if ( ! title || isSaving ) {
+			return;
+		}
+
 		try {
+			setIsSaving( true );
+			const categories = await Promise.all(
+				categoryTerms.map( ( termName ) =>
+					findOrCreateTerm( termName )
+				)
+			);
+
 			const newPattern = await createPattern(
 				patternTitle,
 				sync,
@@ -57,12 +71,35 @@ export default function CreatePatternModal( {
 				id: 'convert-to-pattern-error',
 			} );
 			onError();
+		} finally {
+			setIsSaving( false );
+			setCategoryTerms( [] );
+			setTitle( '' );
 		}
 	}
 
-	const handleCategorySelection = ( selectedCategories ) => {
-		setCategories( selectedCategories.map( ( cat ) => cat.id ) );
-	};
+	/**
+	 * @param {string} term
+	 * @return {Promise<number>} The pattern category id.
+	 */
+	async function findOrCreateTerm( term ) {
+		try {
+			const newTerm = await saveEntityRecord(
+				'taxonomy',
+				CATEGORY_SLUG,
+				{ name: term },
+				{ throwOnError: true }
+			);
+			invalidateResolution( 'getUserPatternCategories' );
+			return newTerm.id;
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return error.data.term_id;
+		}
+	}
 
 	return (
 		<Modal
@@ -77,7 +114,6 @@ export default function CreatePatternModal( {
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					onCreate( title, syncType );
-					setTitle( '' );
 				} }
 			>
 				<VStack spacing="5">
@@ -90,7 +126,8 @@ export default function CreatePatternModal( {
 						className="patterns-create-modal__name-input"
 					/>
 					<CategorySelector
-						onCategorySelection={ handleCategorySelection }
+						values={ categoryTerms }
+						onChange={ setCategoryTerms }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
@@ -117,7 +154,12 @@ export default function CreatePatternModal( {
 							{ __( 'Cancel' ) }
 						</Button>
 
-						<Button variant="primary" type="submit">
+						<Button
+							variant="primary"
+							type="submit"
+							aria-disabled={ ! title || isSaving }
+							isBusy={ isSaving }
+						>
 							{ __( 'Create' ) }
 						</Button>
 					</HStack>
