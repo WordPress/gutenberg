@@ -106,10 +106,6 @@ function wp_save_footnotes_meta( $revision_id ) {
 }
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	add_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
-} else {
-	if ( has_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' ) ) {
-		remove_action( 'wp_after_insert_post', 'wp_save_footnotes_meta' );
-	}
 }
 
 
@@ -129,10 +125,6 @@ function wp_keep_footnotes_revision_id( $revision_id ) {
 }
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	add_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
-} else {
-	if ( has_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' ) ) {
-		remove_action( '_wp_put_post_revision', 'wp_keep_footnotes_revision_id' );
-	}
 }
 
 /**
@@ -180,13 +172,6 @@ function wp_add_footnotes_revisions_to_post_meta( $post ) {
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	add_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' );
 	add_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' );
-} else {
-	if ( has_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' ) ) {
-		remove_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' );
-	}
-	if ( has_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' ) ) {
-		remove_action( 'rest_after_insert_page', 'wp_add_footnotes_revisions_to_post_meta' );
-	}
 }
 
 /**
@@ -209,10 +194,6 @@ function wp_restore_footnotes_from_revision( $post_id, $revision_id ) {
 }
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	add_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision', 10, 2 );
-} else {
-	if ( has_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision' ) ) {
-		remove_action( 'wp_restore_post_revision', 'wp_restore_footnotes_from_revision' );
-	}
 }
 
 /**
@@ -286,13 +267,6 @@ if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	// See https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L398.
 	// Then https://github.com/WordPress/wordpress-develop/blob/2103cb9966e57d452c94218bbc3171579b536a40/src/wp-includes/revision.php#L367.
 	add_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
-} else {
-	if ( has_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' ) ) {
-		remove_action( 'wp_creating_autosave', '_wp_rest_api_autosave_meta' );
-	}
-	if ( has_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' ) ) {
-		remove_action( '_wp_put_post_revision', '_wp_rest_api_autosave_meta' );
-	}
 }
 
 /**
@@ -330,8 +304,4 @@ function _wp_rest_api_force_autosave_difference( $prepared_post, $request ) {
 }
 if ( ! function_exists( 'wp_post_revision_meta_keys' ) ) {
 	add_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference', 10, 2 );
-} else {
-	if ( has_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference' ) ) {
-		remove_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference' );
-	}
 }
