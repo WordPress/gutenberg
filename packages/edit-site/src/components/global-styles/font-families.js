@@ -23,9 +23,10 @@ import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 
 function FontFamilies() {
-	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
+	const { modalTabOpen, toggleModal, themeFonts, customFonts, defaultFonts } =
 		useContext( FontLibraryContext );
 
+	const activeFamilies = [ ...customFonts, ...themeFonts, ...defaultFonts ];
 	return (
 		<>
 			{ !! modalTabOpen && (
@@ -52,11 +53,11 @@ function FontFamilies() {
 					</HStack>
 				</HStack>
 				<ItemGroup isBordered isSeparated>
-					{ customFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-					{ themeFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
+					{ activeFamilies.map( ( font, index ) => (
+						<FontFamilyItem
+							key={ `${ index } ${ font.slug }` }
+							font={ font }
+						/>
 					) ) }
 				</ItemGroup>
 			</VStack>
