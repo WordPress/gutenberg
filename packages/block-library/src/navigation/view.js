@@ -78,7 +78,14 @@ wpStore( {
 					return context.core.navigation.type === 'overlay' &&
 						selectors.core.navigation.isMenuOpen( store )
 						? 'dialog'
-						: '';
+						: null;
+				},
+				ariaModal: ( store ) => {
+					const { context, selectors } = store;
+					return context.core.navigation.type === 'overlay' &&
+						selectors.core.navigation.isMenuOpen( store )
+						? 'true'
+						: null;
 				},
 				isMenuOpen: ( { context } ) =>
 					// The menu is opened if either `click`, `hover` or `focus` is true.

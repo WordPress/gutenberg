@@ -71,7 +71,7 @@ class WP_Font_Family_Utils {
 		$unique_faces            = array_map( 'unserialize', $unique_serialized_faces );
 
 		$merged_font             = array_merge( $font1, $font2 );
-		$merged_font['fontFace'] = $unique_faces;
+		$merged_font['fontFace'] = array_values( $unique_faces );
 
 		return $merged_font;
 	}

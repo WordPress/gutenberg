@@ -59,13 +59,31 @@ function render_block_core_file( $attributes, $content, $block ) {
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '' );
 		$processor->next_tag( 'object' );
-		$processor->set_attribute( 'data-wp-bind--hidden', '!selectors.core.file.hasPdfPreview' );
-		$processor->set_attribute( 'hidden', true );
+		$processor->set_attribute( 'data-wp-style--display', 'selectors.core.file.hasPdfPreview' );
 		return $processor->get_updated_html();
 	}
 
 	return $content;
 }
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
+ */
+function block_core_file_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-file-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-file-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-file-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_file_ensure_interactivity_dependency' );
 
 /**
  * Registers the `core/file` block on server.

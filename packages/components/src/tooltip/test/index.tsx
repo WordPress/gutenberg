@@ -272,9 +272,9 @@ describe( 'Tooltip', () => {
 			</Modal>
 		);
 
-		const tooltip = await screen.findByRole( 'tooltip', { hidden: true } );
-
-		expect( tooltip ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /close/i } )
+		).not.toBeInTheDocument();
 
 		await user.hover(
 			screen.getByRole( 'button', {
@@ -282,7 +282,11 @@ describe( 'Tooltip', () => {
 			} )
 		);
 
-		await waitFor( () => expect( tooltip ).toBeVisible() );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'tooltip', { name: /close/i } )
+			).toBeVisible()
+		);
 
 		await user.keyboard( '[Escape]' );
 
@@ -291,11 +295,41 @@ describe( 'Tooltip', () => {
 		await cleanupTooltip( user );
 	} );
 
-	it( 'should associate the tooltip text with its anchor via the accessible description', async () => {
+	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
+		const user = userEvent.setup();
+
 		render( <Tooltip { ...props } /> );
 
+		await user.hover(
+			screen.getByRole( 'button', {
+				name: /Button/i,
+			} )
+		);
+
 		expect(
-			screen.getByRole( 'button', { description: 'tooltip text' } )
+			await screen.findByRole( 'button', { description: 'tooltip text' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'should not hide tooltip when the anchor is clicked if hideOnClick is false', async () => {
+		const user = userEvent.setup();
+
+		render( <Tooltip { ...props } hideOnClick={ false } /> );
+
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		await user.hover( button );
+
+		expect(
+			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
+
+		await user.click( button );
+
+		expect(
+			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+		).toBeVisible();
+
+		await cleanupTooltip( user );
 	} );
 } );

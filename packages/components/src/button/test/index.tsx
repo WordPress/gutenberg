@@ -194,7 +194,7 @@ describe( 'Button', () => {
 
 			render( <Button icon={ plusCircle } label="WordPress" /> );
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -231,7 +231,7 @@ describe( 'Button', () => {
 				/>
 			);
 
-			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -242,6 +242,8 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					label="Label"
@@ -258,6 +260,16 @@ describe( 'Button', () => {
 					description: 'Description text',
 				} )
 			).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'tooltip', {
+					name: 'Description text',
+				} )
+			).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should allow tooltip disable', async () => {
@@ -290,7 +302,7 @@ describe( 'Button', () => {
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -326,7 +338,7 @@ describe( 'Button', () => {
 				</Button>
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();

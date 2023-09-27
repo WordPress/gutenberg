@@ -50,7 +50,7 @@ describe( 'Annotations', () => {
 		// Click add annotation button.
 		const addAnnotationButton = (
 			await page.$x( "//button[contains(text(), 'Add annotation')]" )
-		 )[ 0 ];
+		)[ 0 ];
 		await addAnnotationButton.click();
 		await canvas().evaluate( () =>
 			document.querySelector( '.wp-block-paragraph' ).focus()
@@ -66,7 +66,7 @@ describe( 'Annotations', () => {
 		// Click remove annotations button.
 		const addAnnotationButton = (
 			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
-		 )[ 0 ];
+		)[ 0 ];
 		await addAnnotationButton.click();
 		await canvas().evaluate( () =>
 			document.querySelector( '[contenteditable]' ).focus()

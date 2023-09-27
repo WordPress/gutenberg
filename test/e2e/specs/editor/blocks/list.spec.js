@@ -481,11 +481,9 @@ test.describe( 'List (@firefox)', () => {
 
 <!-- wp:list-item -->
 <li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- /wp:list-item -->
 
-<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -1347,7 +1345,9 @@ test.describe( 'List (@firefox)', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Multiple blocks selected' } )
+			.click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
