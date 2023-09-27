@@ -233,7 +233,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
             data-wp-effect="effects.core.image.initLightbox"
             data-wp-on--keydown="actions.core.image.handleKeydown"
-			data-wp-on--touchstart="actions.core.image.handleTouchStart"
+            data-wp-on--touchstart="actions.core.image.handleTouchStart"
             data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--touchend="actions.core.image.handleTouchEnd"
             data-wp-on--click="actions.core.image.hideLightbox"
