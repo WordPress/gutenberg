@@ -21,7 +21,7 @@ export default function Actions( { template } ) {
 
 	if (
 		! isRevertable &&
-		( !! availablePatterns.length || availablePatterns.length < 1 )
+		( ! availablePatterns.length || availablePatterns.length < 1 )
 	) {
 		return null;
 	}
