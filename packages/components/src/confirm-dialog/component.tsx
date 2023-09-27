@@ -122,4 +122,5 @@ function ConfirmDialog(
 	);
 }
 
-export default contextConnect( ConfirmDialog, 'ConfirmDialog' );
+const ConfirmDialogControl = contextConnect( ConfirmDialog, 'ConfirmDialog' );
+export default ConfirmDialogControl;
