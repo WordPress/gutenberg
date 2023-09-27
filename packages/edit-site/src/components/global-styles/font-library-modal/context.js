@@ -281,14 +281,16 @@ function FontLibraryProvider( { children } ) {
 		} );
 		// Add custom fonts to the browser.
 		fontsToAdd.forEach( ( font ) => {
-			font.fontFace.forEach( ( face ) => {
-				// Load font faces just in the iframe because they already are in the document.
-				loadFontFaceInBrowser(
-					face,
-					getDisplaySrcFromFontFace( face.src ),
-					'iframe'
-				);
-			} );
+			if ( font.fontFace ) {
+				font.fontFace.forEach( ( face ) => {
+					// Load font faces just in the iframe because they already are in the document.
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face.src ),
+						'iframe'
+					);
+				} );
+			}
 		} );
 	};
 
