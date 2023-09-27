@@ -6,10 +6,12 @@ Also, this tutorial will lean heavily on Redux concepts such as state, actions, 
 
 ## Creating a plugin
 
-We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create four files inside that directory:
+We'll do all the development inside of a WordPress plugin. Let's start by creating a `wp-content/plugins/my-first-gutenberg-app` directory in your local WordPress environment. We will need to create two directories and four files inside that directory:
 
 -   my-first-gutenberg-app.php – to create a new admin page
--   src/index.js – for our JavaScript application
+-   src – for our JavaScript application source
+-   src/index.js – for our JavaScript application source
+-   build – for our JavaScript application build
 -   style.css – for the minimal stylesheet
 -   package.json – for the build process
 
