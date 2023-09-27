@@ -155,9 +155,13 @@ const selectPatterns = createSelector(
 		];
 
 		if ( syncStatus ) {
-			patterns = patterns.filter(
-				( pattern ) => pattern.syncStatus === syncStatus
-			);
+			// User patterns can have their sync statuses checked directly
+			// Non-user patterns are all unsynced for the time being.
+			patterns = patterns.filter( ( pattern ) => {
+				return pattern.id
+					? pattern.syncStatus === syncStatus
+					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
+			} );
 		}
 
 		if ( categoryId ) {
