@@ -4,18 +4,12 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import {
-	PATTERN_CORE_SOURCES,
-	PATTERN_TYPES,
-	TEMPLATE_POST_TYPE,
-} from '../../../utils/constants';
-import { unlock } from '../../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
 export function useEditedPostContext() {
 	return useSelect(
@@ -91,84 +85,4 @@ export function useCurrentTemplateSlug() {
 	// to the current theme's default template.
 	return templates?.find( ( template ) => template.slug === entityTemplate )
 		?.slug;
-}
-
-// This is duplicated.
-const filterOutDuplicatesByName = ( currentItem, index, items ) =>
-	index === items.findIndex( ( item ) => currentItem.name === item.name );
-
-function injectThemeAttributeInBlockTemplateContent(
-	block,
-	currentThemeStylesheet
-) {
-	block.innerBlocks = block.innerBlocks.map( ( innerBlock ) => {
-		return injectThemeAttributeInBlockTemplateContent(
-			innerBlock,
-			currentThemeStylesheet
-		);
-	} );
-
-	if (
-		block.name === 'core/template-part' &&
-		block.attributes.theme === undefined
-	) {
-		block.attributes.theme = currentThemeStylesheet;
-	}
-	return block;
-}
-
-function preparePatterns( patterns, template, currentThemeStylesheet ) {
-	return (
-		patterns
-			.filter(
-				( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
-			)
-			.filter( filterOutDuplicatesByName )
-			// Filter only the patterns that are compatible with the current template.
-			.filter( ( pattern ) =>
-				pattern.templateTypes?.includes( template.slug )
-			)
-			.map( ( pattern ) => ( {
-				...pattern,
-				keywords: pattern.keywords || [],
-				type: PATTERN_TYPES.theme,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ).map( ( block ) =>
-					injectThemeAttributeInBlockTemplateContent(
-						block,
-						currentThemeStylesheet
-					)
-				),
-			} ) )
-	);
-}
-
-export function useAvailablePatterns( template ) {
-	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
-		useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const settings = getSettings();
-
-			return {
-				blockPatterns:
-					settings.__experimentalAdditionalBlockPatterns ??
-					settings.__experimentalBlockPatterns,
-				restBlockPatterns: select( coreStore ).getBlockPatterns(),
-				currentThemeStylesheet:
-					select( coreStore ).getCurrentTheme().stylesheet,
-			};
-		}, [] );
-
-	return useMemo( () => {
-		const mergedPatterns = [
-			...( blockPatterns || [] ),
-			...( restBlockPatterns || [] ),
-		];
-		return preparePatterns(
-			mergedPatterns,
-			template,
-			currentThemeStylesheet
-		);
-	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
 }

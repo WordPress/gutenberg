@@ -12,7 +12,8 @@ import { moreVertical } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
 import ReplaceTemplateButton from './replace-template-button';
-import { useAvailablePatterns } from '../page-panels/hooks';
+import { useAvailablePatterns } from './hooks';
+
 export default function Actions( { template } ) {
 	const availablePatterns = useAvailablePatterns( template );
 	const { revertTemplate } = useDispatch( editSiteStore );
