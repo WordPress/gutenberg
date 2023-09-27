@@ -1155,16 +1155,12 @@ class WP_Theme_JSON_Gutenberg {
 				if ( count( $part ) !== 2 ) {
 					continue;
 				}
-				$nested_selector    = $part[0];
-				$css_value          = $part[1];
-				$root_selectors     = explode( ',', $selector );
-				$combined_selectors = array_map(
-					static function ( $root_selector ) use ( $nested_selector ) {
-						return $root_selector . $nested_selector;
-					},
-					$root_selectors
-				);
-				$processed_css     .= implode( ',', $combined_selectors ) . '{' . trim( $css_value ) . '}';
+				$nested_selector = $part[0];
+				$css_value       = $part[1];
+				$part_selector   = str_starts_with( $nested_selector, ' ' )
+					? static::scope_selector( $selector, $nested_selector )
+					: static::append_to_selector( $selector, $nested_selector );
+				$processed_css  .= $part_selector . '{' . trim( $css_value ) . '}';
 			}
 		}
 		return $processed_css;
