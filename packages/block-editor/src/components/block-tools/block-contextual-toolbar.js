@@ -86,9 +86,15 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const isFullscreen =
 		document.body.classList.contains( 'is-fullscreen-mode' );
 
+	/**
+	 * The following code is a workaround to fix the width of the toolbar
+	 * it should be removed when the toolbar will be rendered inline
+	 * FIXME: remove this layout effect when the toolbar is no longer
+	 * 				absolutely positioned
+	 */
 	useLayoutEffect( () => {
 		// don't do anything if not fixed toolbar
-		if ( ! isFixed || ! blockType ) {
+		if ( ! isFixed ) {
 			return;
 		}
 
@@ -97,6 +103,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		);
 
 		if ( ! blockToolbar ) {
+			return;
+		}
+
+		if ( ! blockType ) {
+			blockToolbar.style.width = 'initial';
 			return;
 		}
 
@@ -116,7 +127,6 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		const pinnedItems = document.querySelector(
 			'.edit-post-header__settings, .edit-widgets-header__actions'
 		);
-
 		// get the width of the left header in the site editor
 		const leftHeader = document.querySelector(
 			'.edit-site-header-edit-mode__end'

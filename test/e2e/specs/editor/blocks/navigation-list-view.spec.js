@@ -140,9 +140,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		requestUtils,
 		linkControl,
 	} ) => {
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the
@@ -213,9 +212,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		const firstResult = await linkControl.getNthSearchResult( 0 );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText = await linkControl.getSearchResultText(
-			firstResult
-		);
+		const firstResultText =
+			await linkControl.getSearchResultText( firstResult );
 
 		// Create the link.
 		await firstResult.click();
@@ -274,7 +272,7 @@ test.describe( 'Navigation block - List view editing', () => {
 					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
 				} )
 				.getByText( 'Top Level Item 2' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( `can edit menu items`, async ( { page, editor, requestUtils } ) => {
@@ -454,9 +452,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		// inserted block even if the block had been deselected and then reselected.
 		// See: https://github.com/WordPress/gutenberg/issues/50601
 
-		const { id: menuId } = await requestUtils.createNavigationMenu(
-			navMenuBlocksFixture
-		);
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		// Insert x2 blocks as a stress test as several bugs have been found with inserting
 		// blocks into the navigation block when there are multiple blocks referencing the
@@ -525,7 +522,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Check that despite being the last inserted block, the Link UI is not displayed
 		// in this scenario because it was not **just** inserted into the List View (i.e.
 		// we have unmounted the list view and then remounted it).
-		await expect( linkControl.getSearchInput() ).not.toBeVisible();
+		await expect( linkControl.getSearchInput() ).toBeHidden();
 	} );
 } );
 
@@ -573,9 +570,7 @@ class LinkControl {
 		await expect( result ).toBeVisible();
 
 		return result
-			.locator(
-				'.components-menu-item__info-wrapper .components-menu-item__item'
-			) // this is the only way to get the label text without the URL.
+			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.innerText();
 	}
 }

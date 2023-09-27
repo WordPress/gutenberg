@@ -1,7 +1,5 @@
 <?php
 
-use PHP_CodeSniffer\Generators\HTML;
-
 /**
  * Tests for hooked blocks rendering.
  *
@@ -12,6 +10,16 @@ use PHP_CodeSniffer\Generators\HTML;
  * @group blocks
  */
 class Tests_Blocks_RenderHookedBlocks extends WP_UnitTestCase {
+	public function set_up() {
+		parent::set_up();
+		add_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks', 10, 2 );
+	}
+
+	public function tear_down() {
+		remove_filter( 'block_type_metadata_settings', 'gutenberg_add_hooked_blocks' );
+		parent::tear_down();
+	}
+
 	/**
 	 * @ticket 59313
 	 */

@@ -210,6 +210,10 @@ function Layout() {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
+
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
+
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -244,7 +248,11 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
+			return (
+				<ListViewSidebar
+					listViewToggleElement={ listViewToggleElement }
+				/>
+			);
 		}
 
 		return null;
@@ -285,6 +293,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }

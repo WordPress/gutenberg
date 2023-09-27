@@ -413,7 +413,7 @@ _Parameters_
 
 _Returns_
 
--   `UserPatternCategories`: User patterns category array and map keyed by id.
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 

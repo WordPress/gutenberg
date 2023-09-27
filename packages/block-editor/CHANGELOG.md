@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.10.0 (2023-09-20)
+
 - The Deprecated multiline prop on RichText will now fall back to using multiple
   rich text instances instead of a single multiline instance. The prop remains
   deprecated.

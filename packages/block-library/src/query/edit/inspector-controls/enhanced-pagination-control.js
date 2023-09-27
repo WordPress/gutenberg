@@ -15,7 +15,7 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		'Enhanced pagination requires all descendants to be Core blocks. If you want to enable it, you have to remove all third-party blocks contained inside the Query Loop block.'
+		"Enhanced pagination doesn't support plugin blocks yet. If you want to enable it, you have to remove all plugin blocks from the Query Loop."
 	);
 
 	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
@@ -36,11 +36,13 @@ export default function EnhancedPaginationControl( {
 				} }
 			/>
 			{ containsThirdPartyBlocks && (
-				<div>
-					<Notice status="warning" isDismissible={ false }>
-						{ enhancedPaginationNotice }
-					</Notice>
-				</div>
+				<Notice
+					status="warning"
+					isDismissible={ false }
+					className="wp-block-query__enhanced-pagination-notice"
+				>
+					{ enhancedPaginationNotice }
+				</Notice>
 			) }
 		</>
 	);

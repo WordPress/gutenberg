@@ -90,6 +90,13 @@ If true, the label will not be visible, but will be read by screen readers. Defa
 -   Type: `Boolean`
 -   Required: No
 
+#### `size`: `'default'` | `'compact'`
+
+The size of the component.
+
+-   Required: No
+-   Default: `'default'`
+
 ## Related components
 
 -   To offer users more constrained options for input, use TextControl, SelectControl, RadioControl, CheckboxControl, or RangeControl.

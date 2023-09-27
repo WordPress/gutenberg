@@ -15,7 +15,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { fetchInstallFonts, fetchUninstallFonts } from './resolvers';
+import {
+	fetchInstallFonts,
+	fetchUninstallFonts,
+	fetchFontCollections,
+	fetchFontCollection,
+} from './resolvers';
 import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import {
@@ -52,7 +57,7 @@ function FontLibraryProvider( { children } ) {
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	const refreshLibrary = () => {
-		setRefreshKey( ( prevKey ) => prevKey + 1 );
+		setRefreshKey( Date.now() );
 	};
 
 	const {
@@ -253,7 +258,7 @@ function FontLibraryProvider( { children } ) {
 	const deactivateFontFamily = ( font ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts = fontFamilies[ font.source ] || [];
+		const initialCustomFonts = fontFamilies?.[ font.source ] ?? [];
 		const newCustomFonts = initialCustomFonts.filter(
 			( f ) => f.slug !== font.slug
 		);
@@ -266,7 +271,7 @@ function FontLibraryProvider( { children } ) {
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
 		// Merge the existing custom fonts with the new fonts.
 		const newCustomFonts = mergeFontFamilies(
-			fontFamilies.custom,
+			fontFamilies?.custom,
 			fontsToAdd
 		);
 		// Activate the fonts by set the new custom fonts array.
@@ -276,21 +281,23 @@ function FontLibraryProvider( { children } ) {
 		} );
 		// Add custom fonts to the browser.
 		fontsToAdd.forEach( ( font ) => {
-			font.fontFace.forEach( ( face ) => {
-				// Load font faces just in the iframe because they already are in the document.
-				loadFontFaceInBrowser(
-					face,
-					getDisplaySrcFromFontFace( face.src ),
-					'iframe'
-				);
-			} );
+			if ( font.fontFace ) {
+				font.fontFace.forEach( ( face ) => {
+					// Load font faces just in the iframe because they already are in the document.
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face.src ),
+						'iframe'
+					);
+				} );
+			}
 		} );
 	};
 
 	const toggleActivateFont = ( font, face ) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialFonts = fontFamilies[ font.source ] || [];
+		const initialFonts = fontFamilies?.[ font.source ] ?? [];
 		// Toggles the received font family or font face
 		const newFonts = toggleFont( font, face, initialFonts );
 		// Updates the font families activated in global settings:
@@ -312,6 +319,30 @@ function FontLibraryProvider( { children } ) {
 		// Add the font to the loaded fonts list.
 		loadedFontUrls.add( src );
 	};
+
+	// Font Collections
+	const [ collections, setFontCollections ] = useState( [] );
+	const getFontCollections = async () => {
+		const response = await fetchFontCollections();
+		setFontCollections( response );
+	};
+	const getFontCollection = async ( id ) => {
+		const hasData = !! collections.find(
+			( collection ) => collection.id === id
+		)?.data;
+		if ( hasData ) return;
+		const response = await fetchFontCollection( id );
+		const updatedCollections = collections.map( ( collection ) =>
+			collection.id === id
+				? { ...collection, data: { ...response?.data } }
+				: collection
+		);
+		setFontCollections( updatedCollections );
+	};
+
+	useEffect( () => {
+		getFontCollections();
+	}, [] );
 
 	return (
 		<FontLibraryContext.Provider
@@ -337,6 +368,8 @@ function FontLibraryProvider( { children } ) {
 				isResolvingLibrary,
 				hasResolvedLibrary,
 				isInstalling,
+				collections,
+				getFontCollection,
 			} }
 		>
 			{ children }
