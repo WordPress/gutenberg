@@ -5,7 +5,10 @@
  * See https://github.com/WordPress/gutenberg/pull/52988.
  *
  * Once merged, this shim can be removed.
+ *
+ * @package gutenberg
  */
+
 if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 	if ( has_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' ) ) {
 		remove_action( 'rest_after_insert_post', 'wp_add_footnotes_revisions_to_post_meta' );
