@@ -19,7 +19,11 @@ export default function Actions( { template } ) {
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
 
-	if ( ! isRevertable && availablePatterns.length === 0 ) {
+	if (
+		! isRevertable &&
+		!! availablePatterns.length &&
+		availablePatterns.length < 1
+	) {
 		return null;
 	}
 
@@ -45,13 +49,14 @@ export default function Actions( { template } ) {
 							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
-					{ availablePatterns.length > 1 && (
-						<ReplaceTemplateButton
-							availableTemplates={ availablePatterns }
-							template={ template }
-							onClick={ onClose }
-						/>
-					) }
+					{ !! availablePatterns.length &&
+						availablePatterns.length > 1 && (
+							<ReplaceTemplateButton
+								availableTemplates={ availablePatterns }
+								template={ template }
+								onClick={ onClose }
+							/>
+						) }
 				</MenuGroup>
 			) }
 		</DropdownMenu>
