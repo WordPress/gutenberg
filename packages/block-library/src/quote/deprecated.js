@@ -169,7 +169,9 @@ const v3 = {
 		);
 	},
 	migrate( attributes ) {
-		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+		const [ v3Attributes, innerBlocks ] = migrateToQuoteV2( attributes );
+		const v4Attributes = migrateTextAlign( v3Attributes );
+		return [ v4Attributes, innerBlocks ];
 	},
 };
 
@@ -193,7 +195,9 @@ const v2 = {
 		},
 	},
 	migrate( attributes ) {
-		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+		const [ v2Attributes, innerBlocks ] = migrateToQuoteV2( attributes );
+		const v4Attributes = migrateTextAlign( v2Attributes );
+		return [ v4Attributes, innerBlocks ];
 	},
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
@@ -236,17 +240,22 @@ const v1 = {
 	migrate( attributes ) {
 		if ( attributes.style === 2 ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateTextAlign(
-				migrateToQuoteV2( {
-					...restAttributes,
-					className: attributes.className
-						? attributes.className + ' is-style-large'
-						: 'is-style-large',
-				} )
-			);
+			const [ v1Attributes, innerBlocks ] =
+				migrateToQuoteV2( restAttributes );
+			const v4Attributes = migrateTextAlign( v1Attributes );
+
+			return {
+				v4Attributes,
+				innerBlocks,
+				className: attributes.className
+					? attributes.className + ' is-style-large'
+					: 'is-style-large',
+			};
 		}
 
-		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+		const [ v1Attributes, innerBlocks ] = migrateToQuoteV2( attributes );
+		const v4Attributes = migrateTextAlign( v1Attributes );
+		return [ v4Attributes, innerBlocks ];
 	},
 
 	save( { attributes } ) {
@@ -293,14 +302,15 @@ const v0 = {
 	migrate( attributes ) {
 		if ( ! isNaN( parseInt( attributes.style ) ) ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateTextAlign(
-				migrateToQuoteV2( {
-					...restAttributes,
-				} )
-			);
+			const [ v0Attributes, innerBlocks ] =
+				migrateToQuoteV2( restAttributes );
+			const v4Attributes = migrateTextAlign( v0Attributes );
+			return [ v4Attributes, innerBlocks ];
 		}
 
-		return migrateTextAlign( migrateToQuoteV2( attributes ) );
+		const [ v0Attributes, innerBlocks ] = migrateToQuoteV2( attributes );
+		const v4Attributes = migrateTextAlign( v0Attributes );
+		return [ v4Attributes, innerBlocks ];
 	},
 
 	save( { attributes } ) {
