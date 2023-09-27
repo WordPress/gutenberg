@@ -37,10 +37,15 @@ class WP_Font_Library {
 	 * @var array
 	 */
 	private static $collections = array();
+	private static $default_fonts = array();
 	private static $fixed_fonts = array();
 
-	public static function register_fixed_font( $font ) {
-		self::$fixed_fonts[] = $font;
+	public static function register_default_fonts( $fonts ) {
+		self::$default_fonts = array_merge( self::$default_fonts, $fonts );
+	}
+
+	public static function register_fixed_fonts ( $fonts ) {
+		self::$fixed_fonts = array_merge( self::$fixed_fonts, $fonts );
 	}
 
 	/**
@@ -63,6 +68,33 @@ class WP_Font_Library {
 		return $new_collection;
 	}
 
+	public static function add_default_fonts_to_theme_json ( $theme_json ) {
+		$current_data = $theme_json->get_data();
+
+		if ( ! isset( $current_data['version'] ) || $current_data['version'] !== 2 ) {
+			return $theme_json;
+		}
+
+		// get currently available font families
+		$current_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? [];
+		$default_fonts = array_merge( $current_font_families, self::$default_fonts );
+		
+		// add font families to json structure
+		$new_data = array (
+			'version'  => 2,
+			'settings' => array (
+				'typography' => array (
+					'fontFamilies' => array  (
+						'default' => $default_fonts,
+						'fixed' => self::$fixed_fonts,
+					),
+				),
+			),
+		);
+
+		return $theme_json->update_with( $new_data );
+	}
+
 	public static function add_fixed_fonts_to_theme_json ( $theme_json ) {
 		$current_data = $theme_json->get_data();
 
@@ -72,8 +104,7 @@ class WP_Font_Library {
 
 		// get currently available font families
 		$current_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? [];
-
-		$font_families = array_merge( $current_font_families, self::$fixed_fonts );
+		$default_fonts = array_merge( $current_font_families, self::$fixed_fonts );
 		
 		// add font families to json structure
 		$new_data = array (
@@ -81,7 +112,7 @@ class WP_Font_Library {
 			'settings' => array (
 				'typography' => array (
 					'fontFamilies' => array  (
-						'default' => $font_families,
+						'fixed' => $default_fonts,
 					),
 				),
 			),

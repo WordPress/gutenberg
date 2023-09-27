@@ -33,19 +33,16 @@ function LibraryFontVariant( { face, font } ) {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const checked = font.source === 'default' ? true : isIstalled;
 
 	return (
 		<div className="font-library-modal__library-font-variant">
 			<Flex justify="space-between" align="center" gap="1rem">
 				<FontFaceDemo fontFace={ face } text={ displayName } />
-				{ font.source !== 'default' && ( 
 					<CheckboxControl
-						checked={ checked }
+						checked={ isIstalled }
 						onChange={ handleToggleActivation }
 						__nextHasNoMarginBottom={ true }
 					/>
-				) }
 			</Flex>
 		</div>
 	);
