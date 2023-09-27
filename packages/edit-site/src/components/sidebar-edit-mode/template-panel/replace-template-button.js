@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useAsyncList } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 
@@ -19,6 +19,7 @@ export default function ReplaceTemplateButton( {
 	onClick,
 	availableTemplates,
 } ) {
+	const { editEntityRecord } = useDispatch( coreStore );
 	const [ showModal, setShowModal ] = useState( false );
 	const onClose = () => {
 		setShowModal( false );
@@ -31,11 +32,10 @@ export default function ReplaceTemplateButton( {
 		};
 	}, [] );
 
-	const entity = useEntityRecord( 'postType', postType, postId );
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		onClose(); // Close the template suggestions modal first.
 		onClick();
-		await entity.edit( {
+		editEntityRecord( 'postType', postType, postId, {
 			blocks: selectedTemplate.blocks,
 			content: serialize( selectedTemplate.blocks ),
 		} );
