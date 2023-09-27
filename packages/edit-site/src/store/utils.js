@@ -49,8 +49,13 @@ function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
 			const templatePartId = `${ theme }//${ slug }`;
 			const templatePart = templatePartsById[ templatePartId ];
 
+			// Make sure we don't duplicate template parts.
+			const existingTemplatePart = result.find(
+				( e ) => e.templatePart.id === templatePartId
+			);
+
 			// Only add to output if the found template part block is in the list of available template parts.
-			if ( templatePart ) {
+			if ( templatePart && ! existingTemplatePart ) {
 				result.push( {
 					templatePart,
 					block,
