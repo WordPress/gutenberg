@@ -74,6 +74,7 @@ require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
