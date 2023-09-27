@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -20,9 +20,9 @@ export default function ReplaceTemplateButton( {
 	availableTemplates,
 } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	const onClose = useCallback( () => {
+	const onClose = () => {
 		setShowModal( false );
-	}, [] );
+	};
 
 	const { postId, postType } = useSelect( ( select ) => {
 		return {
