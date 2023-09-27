@@ -126,11 +126,12 @@ export default function HomeTemplateDetails() {
 	 */
 	const templateAreas = useMemo( () => {
 		return currentTemplateParts.length && templatePartAreas
-			? currentTemplateParts.map( ( { templatePart } ) => ( {
+			? currentTemplateParts.map( ( { templatePart, block } ) => ( {
 					...templatePartAreas?.find(
 						( { area } ) => area === templatePart?.area
 					),
 					...templatePart,
+					clientId: block.clientId,
 			  } ) )
 			: [];
 	}, [ currentTemplateParts, templatePartAreas ] );
@@ -214,9 +215,9 @@ export default function HomeTemplateDetails() {
 			>
 				<ItemGroup>
 					{ templateAreas.map(
-						( { label, icon, theme, slug, title } ) => (
+						( { clientId, label, icon, theme, slug, title } ) => (
 							<SidebarNavigationScreenDetailsPanelRow
-								key={ slug }
+								key={ clientId }
 							>
 								<TemplateAreaButton
 									postId={ `${ theme }//${ slug }` }
