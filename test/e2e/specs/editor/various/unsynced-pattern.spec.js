@@ -44,7 +44,7 @@ test.describe( 'Unsynced pattern', () => {
 <!-- /wp:paragraph -->`
 		);
 
-		// Check that the new pattern is availble in the inserter and that is gets inserted as
+		// Check that the new pattern is availble in the inserter and that it gets inserted as
 		// a plain paragraph block.
 		await page.getByLabel( 'Toggle block inserter' ).click();
 		await page
