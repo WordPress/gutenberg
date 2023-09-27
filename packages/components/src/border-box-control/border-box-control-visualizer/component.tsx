@@ -7,8 +7,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControlVisualizer } from './hook';
 
 import type { VisualizerProps } from '../types';

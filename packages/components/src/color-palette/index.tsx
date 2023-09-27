@@ -32,7 +32,7 @@ import type {
 	PaletteObject,
 	SinglePaletteProps,
 } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,

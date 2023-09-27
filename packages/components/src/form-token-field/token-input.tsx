@@ -12,7 +12,7 @@ import { forwardRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 
 export function UnForwardedTokenInput(

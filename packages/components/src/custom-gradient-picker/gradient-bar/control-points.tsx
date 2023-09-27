@@ -34,7 +34,7 @@ import {
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type {
 	ControlPointButtonProps,
 	ControlPointMoveState,

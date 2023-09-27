@@ -14,8 +14,8 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  */
 import Modal from '../modal';
 import type { OwnProps, DialogInputEvent } from './types';
-import type { WordPressComponentProps } from '../ui/context';
-import { useContextSystem, contextConnect } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem, contextConnect } from '../context';
 import { Flex } from '../flex';
 import Button from '../button';
 import { Text } from '../text';

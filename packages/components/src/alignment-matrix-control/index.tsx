@@ -18,7 +18,7 @@ import { Composite, CompositeGroup, useCompositeState } from '../composite';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type {
 	AlignmentMatrixControlProps,
 	AlignmentMatrixControlValue,

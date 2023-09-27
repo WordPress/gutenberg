@@ -28,7 +28,7 @@ import {
 } from './styles/focal-point-picker-style';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
