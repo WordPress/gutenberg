@@ -30,8 +30,11 @@ import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
 
-const createTemplatePartId = ( theme, slug ) =>
-	theme && slug ? theme + '//' + slug : null;
+const createTemplatePartId = ( theme, slug ) => {
+	// replace any single slashes in slug with hyphens
+	slug = slug.replace( /\//g, '-' );
+	return theme && slug ? theme + '//' + slug : null;
+};
 
 const templatePartToPattern = ( templatePart ) => ( {
 	blocks: parse( templatePart.content.raw, {

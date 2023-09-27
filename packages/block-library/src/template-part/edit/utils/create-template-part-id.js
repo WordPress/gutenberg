@@ -6,5 +6,7 @@
  * @return {string|null} the template part's Id.
  */
 export function createTemplatePartId( theme, slug ) {
+	// replace any single slashes in slug with hyphens
+	slug = slug.replace( /\//g, '-' );
 	return theme && slug ? theme + '//' + slug : null;
 }
