@@ -46,7 +46,7 @@ export default function QuickInserter( {
 		onInsertBlocks
 	);
 
-	const { patterns } = usePatternsState(
+	const [ patterns ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);

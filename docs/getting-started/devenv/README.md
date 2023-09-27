@@ -7,7 +7,7 @@ To contribute to the Gutenberg project itself, refer to the additional documenta
 A block development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential requirements are:
 
 1.  [Code editor](#code-editor)
-2.  [Node.js development tools](#nodejs-development-tools)
+2.  [Node.js development tools](#node-js-development-tools)
 3.  [Local WordPress environment (site)](#local-wordpress-environment)
 
 ## Code editor
@@ -32,10 +32,10 @@ The list goes on. While modern JavaScript development can be challenging, WordPr
 
 **The recommended Node.js version for block development is [Active LTS](https://nodejs.dev/en/about/releases/) (Long Term Support)**. However, there are times when you  need to to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 
-To install Node.js development tools and learn more about each, refer to the links below.
+To be able to use the Node.js tools and [packages provided by WordPress](https://github.com/WordPress/gutenberg/tree/trunk/packages) for block development, you'll need to set a proper Node.js runtime environment on your machine.. To learn more about how to do this, refer to the links below.
 
--   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-tools.md#mac-and-linux-installations)
--   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-tools.md#windows-or-alternative-installs)
+-   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-mac-and-linux-with-nvm)
+-   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-windows-and-others)
 
 ## Local WordPress environment
 

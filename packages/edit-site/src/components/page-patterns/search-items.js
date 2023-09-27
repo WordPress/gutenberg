@@ -7,7 +7,11 @@ import { noCase } from 'change-case';
 /**
  * Internal dependencies
  */
-import { PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -141,6 +145,8 @@ function getItemSearchRank( item, searchTerm, config ) {
 
 	let rank =
 		categoryId === PATTERN_DEFAULT_CATEGORY ||
+		( categoryId === PATTERN_USER_CATEGORY &&
+			item.type === PATTERN_TYPES.user ) ||
 		hasCategory( item, categoryId )
 			? 1
 			: 0;

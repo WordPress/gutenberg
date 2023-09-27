@@ -32,7 +32,7 @@ describe( 'Custom Taxonomies labels are used', () => {
 		// Get the classes from the panel.
 		const buttonClassName = await (
 			await openButton.getProperty( 'className' )
-		 ).jsonValue();
+		).jsonValue();
 
 		// Open the panel if needed.
 		if ( -1 === buttonClassName.indexOf( 'is-opened' ) ) {

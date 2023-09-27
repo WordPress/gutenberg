@@ -2,7 +2,7 @@
 
 The [@wp-now/wp-now](https://www.npmjs.com/package/@wordpress/env) package (`wp-now`) is a lightweight tool powered by [WordPress Playground](https://developer.wordpress.org/playground/) that streamlines setting up a local WordPress environment.
 
-Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#install-nodejs-development-tools) if you have not already done so. It's recommended that you use the latest version of `node`. `wp-now` requires at least `node` v18 and v20 if you intend to use its [Blueprints](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now#using-blueprints) feature. 
+Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so. It's recommended that you use the latest version of `node`. `wp-now` requires at least `node` v18 and v20 if you intend to use its [Blueprints](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now#using-blueprints) feature. 
 
 ## Quick start
  
@@ -29,7 +29,7 @@ wp-now start
 
 After the script runs, your default web browser will automatically open the new local site, and you'll be logged in with the username `admin` and the password `password`.
 
-<div class="callout-tip">
+<div class="callout callout-tip">
     If you encounter any errors when running <code>wp-now start</code>, make sure that you are using at least <code>node</code> v18, or v20 if you are using the Blueprint feature.
 </div>
 

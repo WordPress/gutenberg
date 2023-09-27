@@ -17,31 +17,13 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory, isPatternFiltered } from '../block-patterns-tab';
-import { BlockPatternsSyncFilter } from '../block-patterns-sync-filter';
-import {
-	PATTERN_TYPES,
-	PATTERN_SOURCE_FILTERS,
-} from '../block-patterns-source-filter';
+import { allPatternsCategory, myPatternsCategory } from '../block-patterns-tab';
 
-function PatternsListHeader( {
-	filterValue,
-	filteredBlockPatternsLength,
-	selectedCategory,
-	patternCategories,
-} ) {
+function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
 		return null;
 	}
-	let filter = filterValue;
-	if ( selectedCategory !== allPatternsCategory.name ) {
-		const category = patternCategories.find(
-			( patternCategory ) => patternCategory.name === selectedCategory
-		);
-		if ( category ) {
-			filter = `${ filter } - ${ category?.label }`;
-		}
-	}
+
 	return (
 		<Heading
 			level={ 2 }
@@ -49,32 +31,25 @@ function PatternsListHeader( {
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
-				/* translators: %d: number of patterns. %s: block pattern search query */
+				/* translators: %d: number of patterns. */
 				_n(
-					'%1$d pattern found for "%2$s"',
-					'%1$d patterns found for "%2$s"',
+					'%d pattern found',
+					'%d patterns found',
 					filteredBlockPatternsLength
 				),
-				filteredBlockPatternsLength,
-				filter
+				filteredBlockPatternsLength
 			) }
 		</Heading>
 	);
 }
 
-function PatternList( {
-	searchValue,
-	patternSourceFilter,
-	selectedCategory,
-	patternCategories,
-} ) {
-	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
+function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const { patterns: allPatterns, onClickPattern } = usePatternsState(
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -88,21 +63,13 @@ function PatternList( {
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
-		const filteredPatterns = allPatterns.filter( ( pattern ) => {
-			if (
-				isPatternFiltered(
-					pattern,
-					patternSourceFilter,
-					patternSyncFilter
-				)
-			) {
-				return false;
-			}
-
+		const filteredPatterns = patterns.filter( ( pattern ) => {
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
-
+			if ( selectedCategory === myPatternsCategory.name && pattern.id ) {
+				return true;
+			}
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory = pattern.categories.some(
 					( category ) =>
@@ -119,18 +86,12 @@ function PatternList( {
 			return filteredPatterns;
 		}
 
-		return searchItems(
-			filteredPatterns,
-			searchValue,
-			patternSourceFilter
-		);
+		return searchItems( filteredPatterns, searchValue );
 	}, [
 		searchValue,
-		patternSourceFilter,
-		allPatterns,
+		patterns,
 		selectedCategory,
 		registeredPatternCategories,
-		patternSyncFilter,
 	] );
 
 	// Announce search results on change.
@@ -150,9 +111,16 @@ function PatternList( {
 	const pagingProps = usePatternsPaging(
 		filteredBlockPatterns,
 		selectedCategory,
-		container,
-		patternSourceFilter
+		container
 	);
+
+	// Reset page when search value changes.
+	const [ previousSearchValue, setPreviousSearchValue ] =
+		useState( searchValue );
+	if ( searchValue !== previousSearchValue ) {
+		setPreviousSearchValue( searchValue );
+		pagingProps.changePage( 1 );
+	}
 
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
@@ -161,33 +129,23 @@ function PatternList( {
 			ref={ container }
 		>
 			<PatternsListHeader
-				filterValue={
-					searchValue || PATTERN_SOURCE_FILTERS[ patternSourceFilter ]
-				}
+				filterValue={ searchValue }
 				filteredBlockPatternsLength={ filteredBlockPatterns.length }
-				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
 			/>
 
 			<InserterListbox>
-				{ patternSourceFilter === PATTERN_TYPES.user &&
-					! searchValue && (
-						<BlockPatternsSyncFilter
-							patternSyncFilter={ patternSyncFilter }
-							setPatternSyncFilter={ setPatternSyncFilter }
-						/>
-					) }
-
 				{ hasItems && (
-					<BlockPatternsList
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
-						blockPatterns={ pagingProps.categoryPatterns }
-						onClickPattern={ onClickPattern }
-						isDraggable={ false }
-					/>
-				) }
-				{ pagingProps.numPages > 1 && (
-					<BlockPatternsPaging { ...pagingProps } />
+					<>
+						<BlockPatternsList
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							isDraggable={ false }
+						/>
+						<BlockPatternsPaging { ...pagingProps } />
+					</>
 				) }
 			</InserterListbox>
 		</div>

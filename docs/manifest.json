@@ -18,9 +18,9 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Node.js development tools",
-		"slug": "nodejs-development-tools",
-		"markdown_source": "../docs/getting-started/devenv/nodejs-development-tools.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
 		"parent": "devenv"
 	},
 	{
@@ -82,12 +82,6 @@
 		"slug": "submitting-to-block-directory",
 		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "getting-started"
 	},
 	{
 		"title": "Glossary",

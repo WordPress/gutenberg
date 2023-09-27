@@ -2,7 +2,7 @@
 
 The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-env`) lets you set up a local WordPress environment (site) for building and testing plugins and themes, without any additional configuration.
 
-Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#install-nodejs-development-tools) if you have not already done so.
+Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so.
 
 ## Quick start
  
@@ -44,7 +44,7 @@ wp-env start
 
 Once the script completes, you can access the local environment at: `http://localhost:8888`. Log into the WordPress dashboard using username `admin` and password `password`.
 
-<div class="callout-tip">
+<div class="callout callout-tip">
     Some projects, like Gutenberg, include their own specific <code>wp-env</code> configurations, and the documentation might prompt you to run <code>npm run start wp-env</code> instead.
 </div>
 

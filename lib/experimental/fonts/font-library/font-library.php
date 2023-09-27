@@ -22,7 +22,8 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
-		'public'       => true,
+		'public'       => false,
+		'_builtin'     => true,  /* internal use only. don't use this when registering your own post type. */
 		'label'        => 'Font Library',
 		'show_in_rest' => true,
 	);
@@ -46,7 +47,7 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *     Font collection associative array of configuration options.
 	 *
 	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $data_json_file The font collection's data JSON file.
+	 *     @type string $src The font collection's data JSON file.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
@@ -56,19 +57,11 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_register_fixed_font' ) ) {
-	function wp_register_fixed_font( $font ) {
-		return WP_Font_Library::register_fixed_font( $font );
-	}
-}
-
-add_filter( 'wp_theme_json_data_theme', array ( 'WP_Font_Library', 'add_fixed_fonts_to_theme_json' ) );
-
-
-// @core-merge: This code needs to be removed.
-add_action(
-	'enqueue_block_editor_assets',
-	function () {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalFontLibrary = true', 'before' );
-	}
+$default_font_collection = array(
+	'id'          => 'default-font-collection',
+	'name'        => 'Google Fonts',
+	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+	'src'         => 'https://s.w.org/images/fonts/16.7/collections/google-fonts-with-preview.json',
 );
+
+wp_register_font_collection( $default_font_collection );
