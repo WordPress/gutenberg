@@ -13,10 +13,6 @@ import { store as editSiteStore } from '../../../store';
 import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
-// This is duplicated.
-const filterOutDuplicatesByName = ( currentItem, index, items ) =>
-	index === items.findIndex( ( item ) => currentItem.name === item.name );
-
 function injectThemeAttributeInBlockTemplateContent(
 	block,
 	currentThemeStylesheet
@@ -38,30 +34,36 @@ function injectThemeAttributeInBlockTemplateContent(
 }
 
 function preparePatterns( patterns, template, currentThemeStylesheet ) {
-	return (
-		patterns
-			.filter(
-				( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
-			)
-			.filter( filterOutDuplicatesByName )
-			// Filter only the patterns that are compatible with the current template.
-			.filter( ( pattern ) =>
-				pattern.templateTypes?.includes( template.slug )
-			)
-			.map( ( pattern ) => ( {
-				...pattern,
-				keywords: pattern.keywords || [],
-				type: PATTERN_TYPES.theme,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ).map( ( block ) =>
-					injectThemeAttributeInBlockTemplateContent(
-						block,
-						currentThemeStylesheet
-					)
-				),
-			} ) )
-	);
+	// This is duplicated.
+	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
+		index === items.findIndex( ( item ) => currentItem.name === item.name );
+
+	const filterOutCorePatterns = ( pattern ) =>
+		! PATTERN_CORE_SOURCES.includes( pattern.source );
+
+	// Filter only the patterns that are compatible with the current template.
+	const filterCompatiblePatterns = ( pattern ) =>
+		pattern.templateTypes?.includes( template.slug );
+
+	return patterns
+		.filter(
+			filterOutCorePatterns &&
+				filterOutDuplicatesByName &&
+				filterCompatiblePatterns
+		)
+		.map( ( pattern ) => ( {
+			...pattern,
+			keywords: pattern.keywords || [],
+			type: PATTERN_TYPES.theme,
+			blocks: parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} ).map( ( block ) =>
+				injectThemeAttributeInBlockTemplateContent(
+					block,
+					currentThemeStylesheet
+				)
+			),
+		} ) );
 }
 
 export function useAvailablePatterns( template ) {
