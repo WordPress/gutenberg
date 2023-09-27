@@ -27,6 +27,11 @@ const focusableSelectors = [
 // feel free to do so.
 let scrollCallback;
 
+// We need to track whether a user is touching the screen so we
+// can handle the scroll override differently on mobile devices.
+let isTouching = false;
+let lastTouchTime = 0;
+
 // Using overflow: hidden to prevent scrolling while the lightbox
 // is open causes the content to shift and prevents the zoom
 // animation from working in some cases because we're unable to
@@ -35,13 +40,18 @@ let scrollCallback;
 // behavior. In the future, we may be able to use CSS or overflow: hidden
 // instead to not rely on JavaScript, but this seems to be the best approach
 // for now that provides the best visual experience.
-function handleScroll( context, actions, event ) {
-	event.preventDefault();
-	window.scrollTo(
-		context.core.image.lastScrollLeft,
-		context.core.image.lastScrollTop
-	);
-	actions.core.image.hideLightbox( { context, event } );
+function handleScroll( context ) {
+	// We can't override the scroll behavior on mobile devices
+	// because doing so breaks the pinch to zoom functionality, and we
+	// want to allow users to zoom in further on the high-res image.
+	if ( ! isTouching && Date.now() - lastTouchTime > 450 ) {
+		// We are unable to use event.preventDefault() to prevent scrolling
+		// because the scroll event can't be canceled, so we reset the position instead.
+		window.scrollTo(
+			context.core.image.lastScrollLeft,
+			context.core.image.lastScrollTop
+		);
+	}
 }
 
 store(
@@ -57,7 +67,7 @@ store(
 		actions: {
 			core: {
 				image: {
-					showLightbox: ( { context, event, actions } ) => {
+					showLightbox: ( { context, event } ) => {
 						// We can't initialize the lightbox until the reference
 						// image is loaded, otherwise the UX is broken.
 						if ( ! context.core.image.imageLoaded ) {
@@ -81,16 +91,12 @@ store(
 							window.pageXOffset ||
 							document.documentElement.scrollLeft;
 
-						// We define and bind the scroll callback here so that
-						// we can pass the context and actions as arguments.
+						// We define and bind the scroll callback here so
+						// that we can pass the context and as an argument.
 						// We may be able to change this in the future if we
 						// define the scroll callback in the store instead, but
 						// this approach seems to tbe clearest for now.
-						scrollCallback = handleScroll.bind(
-							null,
-							context,
-							actions
-						);
+						scrollCallback = handleScroll.bind( null, context );
 
 						// We need to add a scroll event listener to the window
 						// here because we are unable to otherwise access it via
@@ -166,17 +172,26 @@ store(
 							ref,
 						} );
 					},
+					handleTouchStart: () => {
+						isTouching = true;
+					},
 					handleTouchMove: ( { context, event } ) => {
 						// On mobile devices, we want to prevent triggering the
 						// scroll event because otherwise the page jumps around as
-						// we reset the scroll position. This also means that the
-						// lightbox will not close on touch move, and will require
-						// that a user perform a simple tap to close instead. This
+						// we reset the scroll position. This also means that closing
+						// the lightbox requires that a user perform a simple tap. This
 						// may be changed in the future if we find a better alternative
 						// to override or reset the scroll position during swipe actions.
 						if ( context.core.image.lightboxEnabled ) {
 							event.preventDefault();
 						}
+					},
+					handleTouchEnd: () => {
+						// We need to wait a few milliseconds before resetting
+						// to ensure that pinch to zoom works consistently
+						// on mobile devices when the lightbox is open.
+						lastTouchTime = Date.now();
+						isTouching = false;
 					},
 				},
 			},
