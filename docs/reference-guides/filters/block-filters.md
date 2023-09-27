@@ -1,4 +1,4 @@
-# Block Hooks
+# Block Filters
 
 To modify the behavior of existing blocks, WordPress exposes several APIs.
 
