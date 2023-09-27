@@ -28,6 +28,7 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 	useBlockCommands,
 } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -83,11 +84,13 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockSelected,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
 		);
 		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		const { getBlockSelectionStart } = unlock( select( blockEditorStore ) );
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
@@ -104,6 +107,7 @@ export default function Layout() {
 				'core/edit-site',
 				'distractionFree'
 			),
+			hasBlockSelected: !! getBlockSelectionStart(),
 		};
 	}, [] );
 	const isEditing = canvasMode === 'edit';
@@ -185,6 +189,7 @@ export default function Layout() {
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
+						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
