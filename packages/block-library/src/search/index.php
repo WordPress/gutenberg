@@ -40,8 +40,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$button              = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
-	$color_classes       = get_color_classes_for_block_core_search( $attributes );
-	$typography_classes  = get_typography_classes_for_block_core_search( $attributes );
+	$color_classes       = block_core_search_get_structured_color_classes_for_block_core_search( $attributes );
+	$typography_classes  = block_core_search_get_structured_typography_classes_for_block_core_search( $attributes );
 	$is_button_inside    = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -56,8 +56,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$label->set_attribute( 'for', $input_id );
 		$label->add_class( 'wp-block-search__label' );
 		if ( $show_label && ! empty( $attributes['label'] ) ) {
-			if ( ! empty( $typography_classes ) ) {
-				$label->add_class( $typography_classes );
+			foreach ( $typography_classes as $class_name ) {
+				$label->add_class( $class_name );
 			}
 		} else {
 			$label->add_class( 'screen-reader-text' );
@@ -69,8 +69,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 		$input_classes[] = $border_color_classes;
 	}
-	if ( ! empty( $typography_classes ) ) {
-		$input_classes[] = $typography_classes;
+	foreach ( $typography_classes as $class_name ) {
+		$input_classes[] = $class_name;
 	}
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
@@ -116,11 +116,11 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( $show_button ) {
 		$button_classes         = array( 'wp-block-search__button' );
 		$button_internal_markup = '';
-		if ( ! empty( $color_classes ) ) {
-			$button_classes[] = $color_classes;
+		foreach ( $color_classes as $class_name ) {
+			$button_classes[] = $class_name;
 		}
-		if ( ! empty( $typography_classes ) ) {
-			$button_classes[] = $typography_classes;
+		foreach ( $typography_classes as $class_name ) {
+			$button_classes[] = $class_name;
 		}
 
 		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
@@ -143,7 +143,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
 
 		if ( $button->next_tag() ) {
-			$button->add_class( implode( ' ', $button_classes ) );
+			foreach ( $button_classes as $class_name ) {
+				$button->add_class( $class_name );
+			}
 			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'data-wp-bind--aria-label', 'selectors.core.search.ariaLabel' );
 				$button->set_attribute( 'data-wp-bind--aria-controls', 'selectors.core.search.ariaControls' );
@@ -467,26 +469,43 @@ function styles_for_block_core_search( $attributes ) {
 }
 
 /**
- * Returns typography classnames depending on whether there are named font sizes/families .
+ * Returns an escaped class string containing typography class names as required
+ * by a block's font size and font family attributes, if they exist.
+ *
+ * @deprecated
  *
  * @param array $attributes The block attributes.
- *
- * @return string The typography color classnames to be applied to the block elements.
+ * @return string Escaped string containing the necessary class names to apply typographic styles.
  */
 function get_typography_classes_for_block_core_search( $attributes ) {
+	$class_names = block_core_search_get_structured_typography_classes_for_block_core_search( $attributes );
+
+	return count( $class_names ) > 0
+		? implode( ' ', array_map( 'esc_attr', $class_names ) )
+		: '';
+}
+
+/**
+ * Returns an array containing raw typography class names as required
+ * by a block's font size and font family attributes, if they exist.
+ *
+ * @param array $attributes The block attributes, possibly containing typography attributes.
+ * @return array Necessary class names to apply typographic styles, unescaped.
+ */
+function block_core_search_get_structured_typography_classes_for_block_core_search( $attributes ) {
 	$typography_classes    = array();
 	$has_named_font_family = ! empty( $attributes['fontFamily'] );
 	$has_named_font_size   = ! empty( $attributes['fontSize'] );
 
 	if ( $has_named_font_size ) {
-		$typography_classes[] = sprintf( 'has-%s-font-size', esc_attr( $attributes['fontSize'] ) );
+		$typography_classes[] = "has-{$attributes['fontSize']}-font-size";
 	}
 
 	if ( $has_named_font_family ) {
-		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontFamily'] ) );
+		$typography_classes[] = "has-{$attributes['fontFamily']}-font-family";
 	}
 
-	return implode( ' ', $typography_classes );
+	return $typography_classes;
 }
 
 /**
@@ -564,20 +583,36 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
 }
 
 /**
- * Returns color classnames depending on whether there are named or custom text and background colors.
+ * Returns an escaped string containing color class names as required by a block's
+ * named and custom text and background color attributes, if they exist.
+ *
+ * @deprecated
  *
  * @param array $attributes The block attributes.
- *
- * @return string The color classnames to be applied to the block elements.
+ * @return string Escaped string containing the necessary class names to apply color styles.
  */
 function get_color_classes_for_block_core_search( $attributes ) {
+	$class_names = block_core_search_get_structured_color_classes_for_block_core_search( $attributes );
+
+	return implode( ' ', array_map( 'esc_attr', $class_names ) );
+}
+
+/**
+ * Returns an array containing raw color class names as required by a block's
+ * named and custom text and background color attributes, if they exist.
+ *
+ * @param array $attributes The block attributes.
+ * @return array Necessary class names to apply color styles, unescaped.
+ */
+function block_core_search_get_structured_color_classes_for_block_core_search( $attributes ) {
 	$classnames = array();
 
 	// Text color.
 	$has_named_text_color  = ! empty( $attributes['textColor'] );
 	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_named_text_color ) {
-		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
+		$classnames[] = 'has-text-color';
+		$classnames[] = "has-{$attributes['textColor']}-color";
 	} elseif ( $has_custom_text_color ) {
 		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
 		$classnames[] = 'has-text-color';
@@ -597,11 +632,11 @@ function get_color_classes_for_block_core_search( $attributes ) {
 		$classnames[] = 'has-background';
 	}
 	if ( $has_named_background_color ) {
-		$classnames[] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+		$classnames[] = "has-{$attributes['backgroundColor']}-background-color";
 	}
 	if ( $has_named_gradient ) {
-		$classnames[] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+		$classnames[] = "has-{$attributes['gradient']}-gradient-background";
 	}
 
-	return implode( ' ', $classnames );
+	return $classnames;
 }
