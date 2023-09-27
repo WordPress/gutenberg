@@ -256,7 +256,11 @@ export default function PatternCategories( { post } ) {
 	);
 
 	return (
-		<PanelRow initialOpen={ true } title={ __( 'Categories' ) }>
+		<PanelRow
+			className="edit-site-template-panel__pattern-categories"
+			initialOpen={ true }
+			title={ __( 'Categories' ) }
+		>
 			<FormTokenField
 				__next40pxDefaultSize
 				value={ values }
