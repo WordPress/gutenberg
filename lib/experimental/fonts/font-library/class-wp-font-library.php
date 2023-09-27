@@ -48,6 +48,7 @@ class WP_Font_Library {
 	 * @return void
 	 */
 	public static function register_default_fonts( $fonts ) {
+		// TODO: Add logic to avoid repeated font faces.
 		self::$default_fonts = array_merge( self::$default_fonts, $fonts );
 	}
 
