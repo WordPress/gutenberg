@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * WordPress dependencies
