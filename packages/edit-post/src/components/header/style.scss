@@ -38,8 +38,8 @@
 	flex-shrink: 8;
 	// Take up the space of the toolbar so it can be justified to the left side of the toolbar.
 	flex-grow: 3;
-	// Scroll sideways. This needs to be on the container and the block toolbar child.
-	overflow-y: hidden;
+	// Hide the overflow so flex will limit its width. Block toolbar will allow scrolling on fixed toolbar.
+	overflow: hidden;
 
 	.table-of-contents {
 		display: none;
@@ -61,13 +61,17 @@
 			// remove the border
 			border: none;
 			flex-shrink: 2;
+			display: flex; // Allow for flex-shrink on the block toolbar
+		}
+
+		.block-editor-block-toolbar {
+			overflow-x: auto; // Allow only the block tools to overflow scroll to make room in the header.
 		}
 	}
 
 	.selected-block-toolbar-wrapper {
 		flex-shrink: 2;
-		// Scroll sideways.
-		overflow-y: scroll;
+		overflow-x: hidden;
 	}
 }
 
