@@ -163,7 +163,7 @@ const EmbedEdit = ( props ) => {
 
 	// Try a different provider in case the embed url is not supported.
 	useEffect( () => {
-		if ( ! cannotEmbed || fetching ) {
+		if ( ! cannotEmbed || fetching || ! url ) {
 			return;
 		}
 
