@@ -86,6 +86,7 @@ Note that we use an `import` statement inside index.js. This enables the plugin 
 Putting it together, we get the following code:
 
 ```js
+import { render } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
