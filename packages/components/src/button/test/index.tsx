@@ -72,20 +72,6 @@ describe( 'Button', () => {
 			expect( button ).toHaveClass( 'is-link' );
 		} );
 
-		it( 'should render a button element with is-pressed without button class', () => {
-			render( <Button aria-pressed /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
-		} );
-
-		it( 'should render a button element with is-pressed-mixed without button class', () => {
-			render( <Button aria-pressed="mixed" /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass(
-				'is-pressed is-pressed-mixed'
-			);
-		} );
-
 		it( 'should render a button element with has-text when children are passed', async () => {
 			const user = userEvent.setup();
 
@@ -354,6 +340,56 @@ describe( 'Button', () => {
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
 			await cleanupTooltip( user );
+		} );
+
+		describe( 'using `aria-pressed` prop', () => {
+			it( 'should render a button element with is-pressed when `true`', () => {
+				render( <Button aria-pressed /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed when `"true"`', () => {
+				render( <Button aria-pressed="true" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed/is-pressed-mixed when `"mixed"`', () => {
+				render( <Button aria-pressed="mixed" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed is-pressed-mixed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `undefined`', () => {
+				render( <Button aria-pressed={ undefined } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `false`', () => {
+				render( <Button aria-pressed={ false } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `"false"`', () => {
+				render( <Button aria-pressed="false" /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
 		} );
 	} );
 
