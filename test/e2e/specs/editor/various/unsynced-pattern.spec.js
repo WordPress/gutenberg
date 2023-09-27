@@ -52,7 +52,6 @@ test.describe( 'Unsynced pattern', () => {
 				name: 'Search for blocks and patterns',
 			} )
 			.fill( 'My unsynced pattern' );
-		await page.getByLabel( 'Search for blocks and patterns' ).click();
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
 		const updatedContent = await editor.getEditedPostContent();
