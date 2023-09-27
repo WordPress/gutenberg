@@ -211,6 +211,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			role="menubar"
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
+				'has-block-selected': hasBlockSelected,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (

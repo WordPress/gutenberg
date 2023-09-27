@@ -40,6 +40,15 @@
 	z-index: z-index(".edit-site-layout__header-container");
 }
 
+// Make room for the header when a block is selected.
+.is-block-toolbar-visible .edit-site-layout__header-container {
+	padding-bottom: $admin-bar-height-big + 1px;
+
+	@include break-medium() {
+		padding-bottom: 0;
+	}
+}
+
 .edit-site-layout__header {
 	height: $header-height;
 	display: flex;
