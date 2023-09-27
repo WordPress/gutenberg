@@ -21,6 +21,7 @@ import {
 	SidebarNavigationScreenDetailsPanelLabel,
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
@@ -106,7 +107,7 @@ export default function PageDetails( { id } ) {
 			const postContext = getEditedPostContext();
 			const templates = select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template',
+				TEMPLATE_POST_TYPE,
 				{ per_page: -1 }
 			);
 			// Template title.

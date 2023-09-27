@@ -176,7 +176,7 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 	 * Initialize $wp_fonts if it has not been set.
 	 *
 	 * @since X.X.X
-	 * @deprecated 16.3.0 Use Fonts Library and Font Face. Fonts API is not supported.
+	 * @deprecated 16.3.0 Use Font Library and Font Face. Fonts API is not supported.
 	 *
 	 * @global WP_Fonts $wp_fonts
 	 *
@@ -280,7 +280,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 	 * @since X.X.X
 	 * @deprecated 16.3.0 For classic themes, use wp_print_font_faces(). For all other sites,
 	 *                    Font Face will automatically print all fonts in theme.json merged data layer,
-	 *                    including in theme and user activated fonts from the Fonts Library.
+	 *                    including in theme and user activated fonts from the Font Library.
 	 *
 	 * @return array Empty array.
 	 */

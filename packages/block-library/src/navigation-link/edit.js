@@ -486,13 +486,8 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip position="top center" text={ tooltipText }>
-								<>
-									<span>{ missingText }</span>
-									<span className="wp-block-navigation-link__missing_text-tooltip">
-										{ tooltipText }
-									</span>
-								</>
+							<Tooltip text={ tooltipText }>
+								<span>{ missingText }</span>
 							</Tooltip>
 						</div>
 					) : (
@@ -548,35 +543,25 @@ export default function NavigationLinkEdit( {
 								isDraft ||
 								isLabelFieldFocused ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<Tooltip
-										position="top center"
-										text={ tooltipText }
-									>
-										<>
-											<span
-												aria-label={ __(
-													'Navigation link text'
-												) }
-											>
-												{
-													// Some attributes are stored in an escaped form. It's a legacy issue.
-													// Ideally they would be stored in a raw, unescaped form.
-													// Unescape is used here to "recover" the escaped characters
-													// so they display without encoding.
-													// See `updateAttributes` for more details.
-													`${ decodeEntities(
-														label
-													) } ${
-														isInvalid || isDraft
-															? placeholderText
-															: ''
-													}`.trim()
-												}
-											</span>
-											<span className="wp-block-navigation-link__missing_text-tooltip">
-												{ tooltipText }
-											</span>
-										</>
+									<Tooltip text={ tooltipText }>
+										<span
+											aria-label={ __(
+												'Navigation link text'
+											) }
+										>
+											{
+												// Some attributes are stored in an escaped form. It's a legacy issue.
+												// Ideally they would be stored in a raw, unescaped form.
+												// Unescape is used here to "recover" the escaped characters
+												// so they display without encoding.
+												// See `updateAttributes` for more details.
+												`${ decodeEntities( label ) } ${
+													isInvalid || isDraft
+														? placeholderText
+														: ''
+												}`.trim()
+											}
+										</span>
 									</Tooltip>
 								</div>
 							) }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, Story } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import type {
 	QueryControlsWithMultipleCategorySelectionProps,
 } from '../types';
 
-const meta: ComponentMeta< typeof QueryControls > = {
+const meta: Meta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
 	component: QueryControls,
 	argTypes: {
@@ -32,12 +32,12 @@ const meta: ComponentMeta< typeof QueryControls > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-export const Default: Story< typeof QueryControls > = ( args ) => {
+export const Default: StoryFn< typeof QueryControls > = ( args ) => {
 	const {
 		onAuthorChange,
 		onCategoryChange,
@@ -146,7 +146,7 @@ Default.args = {
 	selectedAuthorId: 1,
 };
 
-const SingleCategoryTemplate: Story< typeof QueryControls > = ( args ) => {
+const SingleCategoryTemplate: StoryFn< typeof QueryControls > = ( args ) => {
 	const {
 		onAuthorChange,
 		onCategoryChange,
@@ -184,8 +184,7 @@ const SingleCategoryTemplate: Story< typeof QueryControls > = ( args ) => {
 		/>
 	);
 };
-export const SelectSingleCategory: Story< typeof QueryControls > =
-	SingleCategoryTemplate.bind( {} );
+export const SelectSingleCategory = SingleCategoryTemplate.bind( {} );
 SelectSingleCategory.args = {
 	categoriesList: [
 		{

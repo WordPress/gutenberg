@@ -16,6 +16,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
 export default function RenameMenuItem( { template, onClose } ) {
 	const title = decodeEntities( template.title.rendered );
 	const [ editedTitle, setEditedTitle ] = useState( title );
@@ -28,7 +33,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( template.type === 'wp_template' && ! template.is_custom ) {
+	if ( template.type === TEMPLATE_POST_TYPE && ! template.is_custom ) {
 		return null;
 	}
 
@@ -56,14 +61,25 @@ export default function RenameMenuItem( { template, onClose } ) {
 				}
 			);
 
-			createSuccessNotice( __( 'Entity renamed.' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				template.type === TEMPLATE_POST_TYPE
+					? __( 'Template renamed.' )
+					: __( 'Template part renamed.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
+			const fallbackErrorMessage =
+				template.type === TEMPLATE_POST_TYPE
+					? __( 'An error occurred while renaming the template.' )
+					: __(
+							'An error occurred while renaming the template part.'
+					  );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while renaming the entity.' );
+					: fallbackErrorMessage;
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}

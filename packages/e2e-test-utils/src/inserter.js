@@ -238,7 +238,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 				await page.$x(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
 				)
-			 )[ 0 ];
+			)[ 0 ];
 		} catch ( error ) {
 			// noop
 		}
@@ -337,17 +337,6 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await insertFromGlobalInserter( 'Patterns', searchTerm );
-}
-
-/**
- * Inserts a reusable block matching a given search term via the global
- * inserter.
- *
- * @param {string} searchTerm The term by which to find the reusable block to
- *                            insert.
- */
-export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Synced patterns', searchTerm );
 }
 
 /**

@@ -57,6 +57,9 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		flex-shrink: 0;
 		// Ensure minimum input field width in small viewports.
 		max-width: calc(100% - 100px);
+		&.has-icon {
+			max-width: 100%;
+		}
 	}
 }
 

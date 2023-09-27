@@ -31,6 +31,7 @@ function ComplementaryAreaToggle( {
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
+			aria-controls={ identifier.replace( '/', ':' ) }
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
