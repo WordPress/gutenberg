@@ -21,6 +21,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
+import { PATTERN_SYNC_TYPES } from '../constants';
 
 /**
  * Menu control to convert block(s) to a pattern block.
@@ -96,23 +97,25 @@ export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	}
 
 	const handleSuccess = ( { pattern } ) => {
-		const newBlock = createBlock( 'core/block', {
-			ref: pattern.id,
-		} );
+		if ( pattern.wp_pattern_sync_status !== PATTERN_SYNC_TYPES.unsynced ) {
+			const newBlock = createBlock( 'core/block', {
+				ref: pattern.id,
+			} );
 
-		replaceBlocks( clientIds, newBlock );
-		setEditingPattern( newBlock.clientId, true );
+			replaceBlocks( clientIds, newBlock );
+			setEditingPattern( newBlock.clientId, true );
+		}
 
 		createSuccessNotice(
-			pattern.wp_pattern_sync_status === 'unsynced'
+			pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced
 				? sprintf(
 						// translators: %s: the name the user has given to the pattern.
-						__( 'Unsynced Pattern created: %s' ),
+						__( 'Unsynced pattern created: %s' ),
 						pattern.title.raw
 				  )
 				: sprintf(
 						// translators: %s: the name the user has given to the pattern.
-						__( 'Synced Pattern created: %s' ),
+						__( 'Synced pattern created: %s' ),
 						pattern.title.raw
 				  ),
 			{

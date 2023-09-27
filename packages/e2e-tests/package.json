@@ -34,7 +34,7 @@
 		"jest-message-util": "^29.6.2",
 		"jest-snapshot": "^29.6.2",
 		"puppeteer-testing-library": "^0.5.0",
-		"uuid": "^8.3.0"
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
 		"jest": ">=29",

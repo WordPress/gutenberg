@@ -43,9 +43,8 @@ function FontLibraryModal( {
 		<Modal
 			title={ __( 'Fonts' ) }
 			onRequestClose={ onRequestClose }
-			isFullScreen={ true }
+			isFullScreen
 			className="font-library-modal"
-			style={ { width: '65vw' } }
 		>
 			<TabPanel
 				className="font-library-modal__tab-panel"

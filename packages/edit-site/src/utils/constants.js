@@ -26,6 +26,7 @@ export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 export const {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
 	PATTERN_CORE_SOURCES,
 	PATTERN_SYNC_TYPES,
 } = unlock( patternPrivateApis );

@@ -64,7 +64,12 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	if ( $lightbox_enabled ) {
-		return block_core_image_render_lightbox( $processor->get_updated_html(), $block->parsed_block );
+		// This render needs to happen in a filter with priority 15 to ensure that it
+		// runs after the duotone filter and that duotone styles are applied to the image
+		// in the lightbox. We also need to ensure that the lightbox works with any plugins
+		// that might use filters as well. We can consider removing this in the future if the
+		// way the blocks are rendered changes, or if a new kind of filter is introduced.
+		add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 	}
 
 	return $processor->get_updated_html();
