@@ -61,13 +61,13 @@
 		// found elsewhere in the editor.
 		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
 		&.has-size-small {
-			max-width: 384px;
+			max-width: $modal-width-small;
 		}
 		&.has-size-medium {
-			max-width: 512px;
+			max-width: $modal-width-medium;
 		}
 		&.has-size-large {
-			max-width: 832px;
+			max-width: $modal-width-large;
 		}
 
 	}
