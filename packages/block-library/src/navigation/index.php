@@ -713,10 +713,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			tabindex="-1"
 		';
 		$responsive_dialog_directives    = '
-			data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
-			aria-modal="false"
+			data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
 			data-wp-bind--role="selectors.core.navigation.roleAttribute"
-			role=""
 			data-wp-effect="effects.core.navigation.focusFirstElement"
 		';
 		$close_button_directives         = '
@@ -815,6 +813,8 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  * Ensure that the view script has the `wp-interactivity` dependency.
  *
  * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
  */
 function block_core_navigation_ensure_interactivity_dependency() {
 	global $wp_scripts;

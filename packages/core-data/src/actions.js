@@ -385,12 +385,14 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			const objectId = entityConfig.getSyncObjectId( recordId );
-			getSyncProvider().update(
-				entityConfig.syncObjectType + '--edit',
-				objectId,
-				edit.edits
-			);
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				const objectId = entityConfig.getSyncObjectId( recordId );
+				getSyncProvider().update(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					edit.edits
+				);
+			}
 		} else {
 			if ( ! options.undoIgnore ) {
 				select.getUndoManager().addRecord(

@@ -64,8 +64,12 @@ function FontFamilies() {
 	);
 }
 
-export default ( { ...props } ) => (
+const FontFamiliesComponent = ( { ...props } ) => (
 	<FontLibraryProvider>
 		<FontFamilies { ...props } />
 	</FontLibraryProvider>
 );
+
+export default process.env.IS_GUTENBERG_PLUGIN
+	? FontFamiliesComponent
+	: undefined;

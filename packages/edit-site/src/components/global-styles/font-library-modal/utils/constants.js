@@ -1,15 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
-
-export const MODAL_TABS = [
-	{
-		name: 'installed-fonts',
-		title: __( 'Library' ),
-		className: 'installed-fonts',
-	},
-];
+import { _x } from '@wordpress/i18n';
 
 export const ALLOWED_FILE_EXTENSIONS = [ 'otf', 'ttf', 'woff', 'woff2' ];
 
