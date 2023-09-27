@@ -38,14 +38,9 @@ class WP_Font_Library {
 	 */
 	private static $collections = array();
 	private static $default_fonts = array();
-	private static $fixed_fonts = array();
 
 	public static function register_default_fonts( $fonts ) {
 		self::$default_fonts = array_merge( self::$default_fonts, $fonts );
-	}
-
-	public static function register_fixed_fonts ( $fonts ) {
-		self::$fixed_fonts = array_merge( self::$fixed_fonts, $fonts );
 	}
 
 	/**
@@ -86,33 +81,6 @@ class WP_Font_Library {
 				'typography' => array (
 					'fontFamilies' => array  (
 						'default' => $default_fonts,
-						'fixed' => self::$fixed_fonts,
-					),
-				),
-			),
-		);
-
-		return $theme_json->update_with( $new_data );
-	}
-
-	public static function add_fixed_fonts_to_theme_json ( $theme_json ) {
-		$current_data = $theme_json->get_data();
-
-		if ( ! isset( $current_data['version'] ) || $current_data['version'] !== 2 ) {
-			return $theme_json;
-		}
-
-		// get currently available font families
-		$current_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? [];
-		$default_fonts = array_merge( $current_font_families, self::$fixed_fonts );
-		
-		// add font families to json structure
-		$new_data = array (
-			'version'  => 2,
-			'settings' => array (
-				'typography' => array (
-					'fontFamilies' => array  (
-						'fixed' => $default_fonts,
 					),
 				),
 			),
