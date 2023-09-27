@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+import { contextConnect } from '../context';
 import { View } from '../view';
 import useText from './hook';
 
 /**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').ForwardedRef<any>}                                                forwardedRef
+ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
+ * @param {import('react').ForwardedRef<any>}                                             forwardedRef
  */
 function Text( props, forwardedRef ) {
 	const textProps = useText( props );

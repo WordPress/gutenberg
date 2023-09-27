@@ -14,7 +14,7 @@ import {
 	Point,
 } from './styles/alignment-matrix-control-styles';
 import type { AlignmentMatrixControlCellProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export default function Cell( {
 	isActive = false,

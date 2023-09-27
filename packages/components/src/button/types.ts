@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 
 export type ButtonProps =
 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >

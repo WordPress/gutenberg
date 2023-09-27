@@ -6,8 +6,8 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import { useContextSystem } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem } from '../context';
 import { space } from '../ui/utils/space';
 import { rtl, useCx } from '../utils';
 import type { SpacerProps } from './types';

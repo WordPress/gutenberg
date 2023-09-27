@@ -17,7 +17,7 @@ import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
 import type { ExternalLinkProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedExternalLink(
 	props: Omit<

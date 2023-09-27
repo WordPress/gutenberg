@@ -7,8 +7,8 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
