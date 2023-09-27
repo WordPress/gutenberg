@@ -2304,13 +2304,13 @@ function getUserPatterns( state ) {
 		return {
 			name: `core/block/${ userPattern.id }`,
 			id: userPattern.id,
-			title: userPattern.title?.raw,
+			title: userPattern.title.raw,
 			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )
 					? categories.get( catId ).slug
 					: catId
 			),
-			content: userPattern.content?.raw,
+			content: userPattern.content.raw,
 			syncStatus: userPattern.wp_pattern_sync_status,
 		};
 	} );
