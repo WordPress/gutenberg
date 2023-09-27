@@ -97,13 +97,11 @@ Default.parameters = {
 	},
 };
 
-export const WithcontentWidthSmall: StoryFn< typeof Modal > = Template.bind(
-	{}
-);
-WithcontentWidthSmall.args = {
-	contentWidth: 'small',
+export const WithsizeSmall: StoryFn< typeof Modal > = Template.bind( {} );
+WithsizeSmall.args = {
+	size: 'small',
 };
-WithcontentWidthSmall.storyName = 'With contentWidth: small';
+WithsizeSmall.storyName = 'With size: small';
 
 const LikeButton = () => {
 	const [ isLiked, setIsLiked ] = useState( false );

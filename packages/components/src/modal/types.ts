@@ -97,14 +97,13 @@ export type ModalProps = {
 	 */
 	isFullScreen?: boolean;
 	/**
-	 * If this property is added, it will constrain the `max-width` of the modal's
-	 * contents, preventing it from growing too wide. This prop only applies
-	 * when `isFullScreen` is `false`.
+	 * If this property is added it will cause the modal to render at a preset
+	 * width, or expand to fill the screen.
 	 *
 	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
-	 * modal's contents, or using the `style` prop to set a specific `max-width`.
+	 * modal's contents, or via CSS using the `style` prop.
 	 */
-	contentWidth?: 'small' | 'medium' | 'large' | 'fill';
+	size?: 'small' | 'medium' | 'large' | 'fill';
 	/**
 	 *  Handle the key down on the modal frame `div`.
 	 */

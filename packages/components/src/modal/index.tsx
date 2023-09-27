@@ -66,7 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
-		contentWidth,
+		size,
 		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
@@ -98,10 +98,7 @@ function UnforwardedModal(
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
 
-	const contentWidthClass =
-		contentWidth && contentWidth !== 'fill'
-			? `has-width-${ contentWidth }`
-			: '';
+	const sizeClass = size && size !== 'fill' ? `has-size-${ size }` : '';
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
@@ -237,14 +234,11 @@ function UnforwardedModal(
 						'components-modal__frame',
 						className,
 						{
-							'is-full-screen':
-								isFullScreen || contentWidth === 'fill',
+							'is-full-screen': isFullScreen || size === 'fill',
 						},
 						{
-							[ contentWidthClass ]:
-								! isFullScreen &&
-								contentWidth &&
-								contentWidth !== 'fill',
+							[ sizeClass ]:
+								! isFullScreen && size && size !== 'fill',
 						}
 					) }
 					style={ style }

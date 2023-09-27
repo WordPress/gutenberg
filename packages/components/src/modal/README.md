@@ -221,9 +221,9 @@ This property when set to `true` will render a full screen modal.
 -   Required: No
 -   Default: `false`
 
-#### `contentWidth`: `'small' | 'medium' | 'large'`
+#### `size`: `'small' | 'medium' | 'large'`
 
-If this property is added, it will constrain the `max-width` of the modal's contents, preventing it from growing too wide. This prop only applies when `isFullScreen` is `false`.
+If this property is added it will cause the modal to render at a preset width, or expand to fill the screen.
 
 -   Required: No
 
