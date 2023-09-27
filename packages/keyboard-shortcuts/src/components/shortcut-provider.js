@@ -20,7 +20,7 @@ const { Provider } = context;
  * @return {import('@wordpress/element').WPElement} Component.
  */
 export function ShortcutProvider( props ) {
-	const [ keyboardShortcuts ] = useState( new Set() );
+	const [ keyboardShortcuts ] = useState( () => new Set() );
 
 	function onKeyDown( event ) {
 		if ( props.onKeyDown ) props.onKeyDown( event );
