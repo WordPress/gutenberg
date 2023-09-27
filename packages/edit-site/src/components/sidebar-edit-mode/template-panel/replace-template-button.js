@@ -35,7 +35,7 @@ export default function ReplaceTemplateButton( {
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		onClose(); // Close the template suggestions modal first.
 		onClick();
-		editEntityRecord( 'postType', postType, postId, {
+		await editEntityRecord( 'postType', postType, postId, {
 			blocks: selectedTemplate.blocks,
 			content: serialize( selectedTemplate.blocks ),
 		} );
