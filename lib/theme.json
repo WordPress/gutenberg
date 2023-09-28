@@ -264,7 +264,6 @@
 			"lineHeight": false,
 			"textColumns": false,
 			"textDecoration": true,
-			"textOrientation": false,
 			"textTransform": true,
 			"writingMode": false
 		},
