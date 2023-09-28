@@ -46,7 +46,7 @@ function Tab( {
 			render={
 				<TabButton
 					icon={ icon }
-					label={ icon && title }
+					label={ icon ? title : undefined }
 					showTooltip={ true }
 				/>
 			}
