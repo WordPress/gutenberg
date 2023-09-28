@@ -28,17 +28,14 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		ref,
 		fillProps
 	) => {
-		const slot = slots.get( name ) || {
-			ref: undefined,
-			fillProps: undefined,
-		};
+		const slot = slots.get( name );
 
 		slots.set(
 			name,
 			valRef( {
 				...slot,
-				ref: ref || slot.ref,
-				fillProps: fillProps || slot.fillProps || {},
+				ref: ref || slot?.ref,
+				fillProps: fillProps || slot?.fillProps || {},
 			} )
 		);
 	};
