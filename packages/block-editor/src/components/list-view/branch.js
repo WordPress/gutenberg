@@ -128,6 +128,7 @@ function ListViewBranch( props ) {
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
+	const singleBlockSelection = selectedClientIds?.length === 1;
 
 	return (
 		<>
@@ -169,7 +170,10 @@ function ListViewBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
 				const showBlock =
-					isDragged || blockInView || isSelected || isBranchDragged;
+					isDragged ||
+					blockInView ||
+					isBranchDragged ||
+					( isSelected && singleBlockSelection );
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
