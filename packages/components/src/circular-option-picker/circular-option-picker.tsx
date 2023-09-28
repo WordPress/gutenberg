@@ -101,6 +101,7 @@ function ListboxCircularOptionPicker(
 			<CircularOptionPickerContext.Provider value={ compositeContext }>
 				<Composite
 					{ ...additionalProps }
+					id={ baseId }
 					store={ compositeStore }
 					role={ 'listbox' }
 				>
@@ -119,7 +120,7 @@ function ButtonsCircularOptionPicker(
 	const { actions, options, children, baseId, ...additionalProps } = props;
 
 	return (
-		<div { ...additionalProps }>
+		<div { ...additionalProps } id={ baseId }>
 			<CircularOptionPickerContext.Provider
 				value={ { isComposite: false, baseId } }
 			>
