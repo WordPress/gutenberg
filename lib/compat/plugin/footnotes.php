@@ -87,7 +87,7 @@ if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 		}
 	}
 
-	if ( ! function_exists( 'wp_add_footnotes_revisions_to_post_meta' ) {
+	if ( ! function_exists( 'wp_add_footnotes_revisions_to_post_meta' ) ) {
 
 		/**
 		 * This is a specific fix for the REST API. The REST API doesn't update
@@ -137,7 +137,7 @@ if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 		}
 	}
 
-	if ( ! function_exists( 'wp_restore_footnotes_from_revision' )  {
+	if ( ! function_exists( 'wp_restore_footnotes_from_revision' )  ) {
 
 		/**
 		 * Restores the footnotes meta value from the revision.
@@ -162,7 +162,7 @@ if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 		}
 	}
 
-		if ( ! function_exists( '_wp_rest_api_autosave_meta' ) ) {
+	if ( ! function_exists( '_wp_rest_api_autosave_meta' ) ) {
 
 		/**
 		 * The REST API autosave endpoint doesn't save meta, so we can use the
