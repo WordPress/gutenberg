@@ -65,12 +65,8 @@ test.describe( 'Unsynced pattern', () => {
 			.fill( 'My unsynced pattern' );
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		// Just compare the block name and content as the clientIDs will be different.
-		before.forEach( ( block ) => {
-			delete block.clientId;
-		} );
 		await expect
 			.poll( editor.getBlocks )
-			.toMatchObject( [ ...before, ...before ] );
+			.toEqual( [ ...before, ...before ] );
 	} );
 } );
