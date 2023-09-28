@@ -45,13 +45,12 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 	foreach ( $footnotes as $footnote ) {
 		// Translators: %d: Integer representing the number of return links on the page.
-		$aria_label     = sprintf( __( 'Back to footnote reference %1$d' ), $footnote_index );
+		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
-			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">%4$d ↩︎</a></li>',
+			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
 			$footnote['id'],
 			$footnote['content'],
-			$aria_label,
-			$footnote_index
+			$aria_label
 		);
 		++$footnote_index;
 	}
