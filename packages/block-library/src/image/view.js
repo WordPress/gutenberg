@@ -111,8 +111,7 @@ store(
 					hideLightbox: async ( { context } ) => {
 						context.core.image.hideAnimationEnabled = true;
 						if ( context.core.image.lightboxEnabled ) {
-							// The lightbox will close once it detects a scroll event,
-							// but we want to wait until the close animation is completed
+							// We want to wait until the close animation is completed
 							// before allowing a user to scroll again. The duration of this
 							// animation is defined in the styles.scss and depends on if the
 							// animation is 'zoom' or 'fade', but in any case we should wait
