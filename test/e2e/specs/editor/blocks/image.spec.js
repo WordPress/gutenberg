@@ -82,9 +82,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.type( '2' );
 
 		expect(
-			await editor.canvas.evaluate(
-				() => document.activeElement.innerHTML
-			)
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '12' );
 	} );
 
@@ -112,9 +112,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'Enter' );
 
 		expect(
-			await editor.canvas.evaluate(
-				() => document.activeElement.innerHTML
-			)
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 
@@ -166,9 +166,9 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowRight' );
 
 		expect(
-			await editor.canvas.evaluate(
-				() => document.activeElement.innerHTML
-			)
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '<strong>a</strong>' );
 	} );
 
@@ -392,7 +392,7 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-		await editor.canvas.focus( '.wp-block-image' );
+		await editor.canvas.locator( '.wp-block-image' ).focus();
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a

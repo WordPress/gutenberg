@@ -573,37 +573,42 @@ test.describe( 'Multi-block selection', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 
-		const [ coord1, coord2 ] = await editor.canvas.evaluate( () => {
-			const selection = window.getSelection();
+		const [ coord1, coord2 ] = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => {
+				const selection = window.getSelection();
 
-			if ( ! selection.rangeCount ) {
-				return;
-			}
+				if ( ! selection.rangeCount ) {
+					return;
+				}
 
-			const range = selection.getRangeAt( 0 );
-			const rect1 = range.getClientRects()[ 0 ];
-			const element = document.querySelector(
-				'[data-type="core/paragraph"]'
-			);
-			const rect2 = element.getBoundingClientRect();
-			const iframeOffset = window.frameElement.getBoundingClientRect();
+				const range = selection.getRangeAt( 0 );
+				const rect1 = range.getClientRects()[ 0 ];
+				const element = document.querySelector(
+					'[data-type="core/paragraph"]'
+				);
+				const rect2 = element.getBoundingClientRect();
+				const iframeOffset =
+					window.frameElement.getBoundingClientRect();
 
-			return [
-				{
-					x: iframeOffset.x + rect1.x,
-					y: iframeOffset.y + rect1.y + rect1.height / 2,
-				},
-				{
-					// Move a bit outside the paragraph.
-					x: iframeOffset.x + rect2.x - 5,
-					y: iframeOffset.y + rect2.y + rect2.height / 2,
-				},
-			];
-		} );
+				return [
+					{
+						x: iframeOffset.x + rect1.x,
+						y: iframeOffset.y + rect1.y + rect1.height / 2,
+					},
+					{
+						// Move a bit outside the paragraph.
+						x: iframeOffset.x + rect2.x - 5,
+						y: iframeOffset.y + rect2.y + rect2.height / 2,
+					},
+				];
+			} );
 
 		await page.mouse.click( coord1.x, coord1.y );
 		await page.mouse.down();
@@ -935,7 +940,9 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [] );
 		await expect
 			.poll( () =>
-				editor.canvas.evaluate( () => window.getSelection().toString() )
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'Post title' );
 	} );
@@ -1354,9 +1361,9 @@ class MultiBlockSelectionUtils {
 	 * Tests if the native selection matches the block selection.
 	 */
 	assertNativeSelection = async () => {
-		const selection = await this.#editor.canvas.evaluateHandle( () =>
-			window.getSelection()
-		);
+		const selection = await this.#editor.canvas
+			.locator( ':root' )
+			.evaluateHandle( () => window.getSelection() );
 
 		const { isMultiSelected, selectionStart, selectionEnd } =
 			await this.#page.evaluate( () => {

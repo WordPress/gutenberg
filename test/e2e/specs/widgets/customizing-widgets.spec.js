@@ -86,9 +86,11 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.click( 'role=option[name="Search"i]' );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
-		);
+		await editor.canvas
+			.locator(
+				'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
+			)
+			.focus();
 
 		await page.keyboard.type( 'My ' );
 

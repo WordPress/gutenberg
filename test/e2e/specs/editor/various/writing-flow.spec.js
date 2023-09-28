@@ -46,9 +46,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await editor.canvas.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
-		);
+		const activeElementBlockType = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			);
 		expect( activeElementBlockType ).toBe( 'core/columns' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -515,12 +517,12 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingTop = '100px';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingBottom = '100px';
 		} );
 		await page.keyboard.press( 'ArrowDown' );
@@ -544,7 +546,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.lineHeight = 'normal';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
@@ -745,7 +747,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingLeft = '100px';
 		} );
 		await page.keyboard.press( 'Enter' );
@@ -1015,9 +1017,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -1049,9 +1051,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -1084,9 +1086,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -1135,19 +1137,23 @@ class WritingFlowUtils {
 		await this.page.keyboard.press( 'Enter' );
 		await this.page.keyboard.type( '/columns' );
 		await this.page.keyboard.press( 'Enter' );
-		await this.editor.canvas.click(
-			'role=button[name="Two columns; equal split"i]'
-		);
-		await this.editor.canvas.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.click();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
-		await this.editor.canvas.focus(
-			'role=document[name="Block: Column (2 of 2)"i]'
-		);
-		await this.editor.canvas.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=document[name="Block: Column (2 of 2)"i]' )
+			.focus();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
