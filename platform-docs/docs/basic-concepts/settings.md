@@ -11,6 +11,8 @@ You can customize the block editor by providing a `settings` prop to the `BlockE
 The styles setting is an array of editor styles to enqueue in the iframe/canvas of the block editor. Each style is an object with a `css` property. Example:
 
 ```jsx
+import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
+
 export const editorStyles = [
 	{
 		css: `
@@ -18,19 +20,10 @@ export const editorStyles = [
 				font-family: Arial;
 				font-size: 16px;
 			}
+
 			p {
 				font-size: inherit;
 				line-height: inherit;
-			}
-			ul,
-			ol {
-				margin: 0;
-				padding: 0;
-			}
-
-			ul li,
-			ol li {
-				margin-bottom: initial;
 			}
 
 			ul {
@@ -40,25 +33,6 @@ export const editorStyles = [
 			ol {
 				list-style-type: decimal;
 			}
-
-			ul ul,
-			ol ul {
-				list-style-type: circle;
-			}
-
-			.wp-block {
-				max-width: 700px;
-				margin-left: auto;
-				margin-right: auto;
-			}
-			.wp-block[data-align="wide"],
-			.wp-block.alignwide {
-				max-width: 900px;
-			}
-			.wp-block[data-align="full"],
-			.wp-block.alignfull {
-				max-width: none;
-			}
 		`,
 	},
 ];
@@ -66,7 +40,7 @@ export const editorStyles = [
 export default function App() {
 	return (
 		<BlockEditorProvider settings={ { styles: editorStyles } }>
-			<Editor />
+			<BlockCanvas />
 		</BlockEditorProvider>
 	);
 }
@@ -74,7 +48,7 @@ export default function App() {
 
 ## mediaUpload
 
-Some core blocks like the image or video blocks allow users to render media within the block editor, by default you can use external URLs but if you want to allow users to upload media from their computer you need to provide a `mediaUpload` function. Here's a quick example of such function:
+Some core blocks, like the image or video blocks, allow users to render media within the block editor. By default, you can use external URLs but if you want to allow users to upload media from their computer, you need to provide a `mediaUpload` function. Here's a quick example of such function:
 
 ```jsx
 async function mediaUpload( {
@@ -114,7 +88,7 @@ Providing a `mediaUpload` function also enables drag and dropping files into the
 
 ## inserterMediaCategories
 
-The inserter media categories setting is an array of media categories to display in the inserter. Each category is an object with a `name`, `labels` a `fetch` function and a few extra keys. Example:
+The inserter media categories setting is an array of media categories to display in the inserter. Each category is an object with `name` and `labels` values, a `fetch` function and a few extra keys. Example:
 
 ```jsx
 {
@@ -131,7 +105,7 @@ The inserter media categories setting is an array of media categories to display
             license: 'pdm,cc0',
         };
         const finalQuery = { ...query, ...defaultArgs };
-        // Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
+        // Sometimes you might need to map the supported request params according to the `InserterMediaRequest`
         // interface. In this example the `search` query param is named `q`.
         const mapFromInserterMediaRequest = {
             per_page: 'page_size',
@@ -170,7 +144,7 @@ The inserter media categories setting is an array of media categories to display
 
 ## hasFixedToolbar
 
-Whether or not the `BlockTools` component renders the toolbar in a fixed position or if follows the position of the selected block. Defaults to `false`.
+Whether the `BlockTools` component renders the toolbar in a fixed position or if follows the position of the selected block. Defaults to `false`.
 
 ## focusMode
 
@@ -178,7 +152,7 @@ The focus mode is a special mode where any block that is not selected is shown w
 
 ## keepCaretInsideBlock
 
-By default arrow keys can be used to navigate accross blocks. You can turn off that behavior by and keep the caret inside the currently selected block using this setting. Defaults to `false`.
+By default, arrow keys can be used to navigate across blocks. You can turn off that behavior and keep the caret inside the currently selected block using this setting. Defaults to `false`.
 
 ## codeEditingEnabled
 
@@ -186,4 +160,4 @@ Allows the user to edit the currently selected block using an HTML code editor. 
 
 ## canLockBlocks
 
-Whether or not the user can lock blocks. Defaults to `true`.
+Whether the user can lock blocks. Defaults to `true`.
