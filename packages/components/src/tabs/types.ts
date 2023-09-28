@@ -126,8 +126,7 @@ export type TabPanelProps = {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * The id of the TabPanel, which is combined with the `Tabs` instanceId and
-	 * the suffix '-view'.
+	 * A unique identifier for the TabPanel, which is used to generate a unique `id` for the underlying element.
 	 */
 	id: string;
 	/**
