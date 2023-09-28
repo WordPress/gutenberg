@@ -62,7 +62,7 @@ export function AlignmentMatrixControl( {
 
 	const compositeStore = useCompositeStore( {
 		defaultActiveId: getItemId( baseId, defaultValue ),
-		activeId: getItemId( baseId, value ),
+		activeId: value && getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
 			onChange?.(
 				getItemValue(
@@ -83,17 +83,20 @@ export function AlignmentMatrixControl( {
 
 	return (
 		<Composite
-			{ ...props }
 			store={ compositeStore }
-			aria-label={ label }
-			as={ Root }
-			id={ baseId }
-			className={ classes }
-			role="grid"
-			size={ width }
+			render={
+				<Root
+					{ ...props }
+					aria-label={ label }
+					className={ classes }
+					id={ baseId }
+					role="grid"
+					size={ width }
+				/>
+			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<CompositeRow as={ Row } role="row" key={ index }>
+				<CompositeRow render={ <Row role="row" /> } key={ index }>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
 						const isActive = cellId === activeId;
