@@ -396,8 +396,8 @@ export function scopeSelector( scope, selector ) {
 /**
  * Appends a sub-selector to an existing one.
  *
- * Given the compounded $selector "h1, h2, h3"
- * and the $to_append selector ".some-class" the result will be
+ * Given the compounded `selector` "h1, h2, h3"
+ * and the `toAppend` selector ".some-class" the result will be
  * "h1.some-class, h2.some-class, h3.some-class".
  *
  * @param {string} selector Original selector.
