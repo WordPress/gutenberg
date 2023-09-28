@@ -18,6 +18,8 @@
 -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
 -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
 -   `ContextSystemProvider`: Move out of `ui/` ([#54847](https://github.com/WordPress/gutenberg/pull/54847)).
+-   `SlotFill`: Migrate to TypeScript and Convert to Functional Component `<Slot bubblesVirtually />`. ([#51350](https://github.com/WordPress/gutenberg/pull/51350)).
+
 
 ## 25.8.0 (2023-09-20)
 
@@ -130,6 +132,7 @@
 
 -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
 -   `MenuItemsChoice`, `MenuItem`: Support a `disabled` prop on a menu item ([#52737](https://github.com/WordPress/gutenberg/pull/52737)).
+-   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
 
 ### Bug Fix
 
