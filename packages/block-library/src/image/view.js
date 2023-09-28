@@ -17,29 +17,55 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
-// I've defined the scroll handling outside of the store
-// to prevent confusion as to how this logic is called.
-// This logic is not referenced directly by the directives
-// in the markup because the scroll event we need to listen
-// to is triggered on the window; so we define it outside of
-// the store to signal that the behavior here is different.
-// If we find a compelling reason to move it to the store,
-// feel free to do so.
+/*
+ * Stores a context-bound scroll handler.
+ *
+ * This callback could be defined inline inside of the store
+ * object but it's created externally to avoid confusion about
+ * how its logic is called. This logic is not referenced directly
+ * by the directives in the markup because the scroll event we
+ * need to listen to is triggered on the window; so by defining it
+ * outside of the store, we signal that the behavior here is different.
+ * If we find a compelling reason to move it to the store, feel free.
+ *
+ * @type {Function}
+ */
 let scrollCallback;
 
-// We need to track whether a user is touching the screen so we
-// can handle the scroll override differently on mobile devices.
+/*
+ * Tracks whether user is touching screen; used to
+ * differentiate behavior for touch and mouse input.
+ *
+ * @type {boolean}
+ */
 let isTouching = false;
+
+/*
+ * Tracks the last time the screen was touched; used to
+ * differentiate behavior for touch and mouse input.
+ *
+ * @type {number}
+ */
 let lastTouchTime = 0;
 
-// Using overflow: hidden to prevent scrolling while the lightbox
-// is open causes the content to shift and prevents the zoom
-// animation from working in some cases because we're unable to
-// account for the layout shift when doing the animation calculations.
-// Instead, here we use JavaScript to prevent and reset the scrolling
-// behavior. In the future, we may be able to use CSS or overflow: hidden
-// instead to not rely on JavaScript, but this seems to be the best approach
-// for now that provides the best visual experience.
+/*
+ * Lightbox page-scroll handler: prevents scrolling.
+ *
+ * This handler is added to prevent scrolling behaviors that
+ * trigger content shift while the lightbox is open.
+ *
+ * It would be better to accomplish this through CSS alone, but
+ * using overflow: hidden is currently the only way to do so, and
+ * that causes the layout to shift and prevents the zoom animation
+ * from working in some cases because we're unable to account for
+ * the layout shift when doing the animation calculations. Instead,
+ * here we use JavaScript to prevent and reset the scrolling
+ * behavior. In the future, we may be able to use CSS or overflow: hidden
+ * instead to not rely on JavaScript, but this seems to be the best approach
+ * for now that provides the best visual experience.
+ *
+ * @param {Object} context Interactivity page context?
+ */
 function handleScroll( context ) {
 	// We can't override the scroll behavior on mobile devices
 	// because doing so breaks the pinch to zoom functionality, and we
@@ -319,6 +345,13 @@ store(
 	}
 );
 
+/*
+ * Computes styles for the lightbox and adds them to the document.
+ *
+ * @function
+ * @param {Object} context - An Interactivity API context
+ * @param {Object} event - A triggering event
+ */
 function setStyles( context, event ) {
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
@@ -475,18 +508,25 @@ function setStyles( context, event ) {
 	// transformation. In any case, adding 1 pixel to the container width and height solves
 	// the problem, though this can be removed if the issue is fixed in the future.
 	styleTag.innerHTML = `
-		:root {
-			--wp--lightbox-initial-top-position: ${ screenPosY }px;
-			--wp--lightbox-initial-left-position: ${ screenPosX }px;
-			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
-			--wp--lightbox-scale: ${ containerScale };
-		}
-	`;
+			:root {
+				--wp--lightbox-initial-top-position: ${ screenPosY }px;
+				--wp--lightbox-initial-left-position: ${ screenPosX }px;
+				--wp--lightbox-container-width: ${ containerWidth + 1 }px;
+				--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+				--wp--lightbox-image-width: ${ lightboxImgWidth }px;
+				--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+				--wp--lightbox-scale: ${ containerScale };
+			}
+		`;
 }
 
+/*
+ * Debounces a function call.
+ *
+ * @function
+ * @param {Function} func - A function to be called
+ * @param {number} wait - The time to wait before calling the function
+ */
 function debounce( func, wait = 50 ) {
 	let timeout;
 	return () => {
