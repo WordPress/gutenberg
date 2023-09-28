@@ -30,6 +30,7 @@ import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
+import { useListViewContext } from './context';
 
 function ListViewBlockSelectButton(
 	{
@@ -64,10 +65,12 @@ function ListViewBlockSelectButton(
 		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { duplicateBlocks, removeBlocks } = useDispatch( blockEditorStore );
+	const { duplicateBlocks, multiSelect, removeBlocks } =
+		useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+	const { rootClientId } = useListViewContext();
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -183,6 +186,24 @@ function ListViewBlockSelectButton(
 					updateFocusAndSelection( updatedBlocks[ 0 ], false );
 				}
 			}
+		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const blockClientIds = getBlockOrder( rootClientId );
+			if ( ! blockClientIds.length ) {
+				return;
+			}
+
+			// Select all while passing `null` to skip focusing to the editor canvas,
+			// and retain focus within the list view.
+			multiSelect(
+				blockClientIds[ 0 ],
+				blockClientIds[ blockClientIds.length - 1 ],
+				null
+			);
 		}
 	}
 
