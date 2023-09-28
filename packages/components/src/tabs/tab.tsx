@@ -2,7 +2,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -32,15 +31,13 @@ function Tab( {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
-	const { store, instanceId, activeClass } = context;
+	const { store, instanceId } = context;
 	const instancedTabId = `${ instanceId }-${ id }`;
 	return (
 		<Ariakit.Tab
 			store={ store }
 			id={ instancedTabId }
-			className={ classnames( className, {
-				[ activeClass ]: instancedTabId === store.useState().activeId,
-			} ) }
+			className={ className }
 			style={ style }
 			disabled={ disabled }
 			render={

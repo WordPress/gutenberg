@@ -96,7 +96,7 @@ const MyControlledTabs = () => (
 Tabs is comprised of four individual components:
 - `Tabs`: a wrapper component and context provider. It is responsible for managing the state of the tabs and rendering the `TabList` and `TabPanels`.
 - `TabList`: a wrapper component for the `Tab` components. It is responsible for rendering the list of tabs.
-- `Tab`: renders a single tab.
+- `Tab`: renders a single tab. The currently active tab receives default styling that can be overridden with CSS targeting [aria-selected="true"].
 - `TabPanel`: renders the content to display for a single tab once that tab is selected.
 
 #### Tabs
@@ -108,13 +108,6 @@ Tabs is comprised of four individual components:
 The children elements, which should be at least a `Tabs.Tablist` component and a series of `Tabs.TabPanel` components.
 
 -   Required: Yes
-
-###### `activeClass`: `string`
-
-The class to add to the active tab
-
--   Required: No
--   Default: `is-active`
 
 ###### `selectOnMove`: `boolean`
 

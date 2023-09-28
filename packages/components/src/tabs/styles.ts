@@ -28,7 +28,7 @@ export const TabButton = styled( Button )`
 		border: none;
 		box-shadow: none;
 		cursor: pointer;
-		padding: 3px ${ space( 4 ) }; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
 		margin-left: 0;
 		font-weight: 500;
 
@@ -58,7 +58,7 @@ export const TabButton = styled( Button )`
 		}
 
 		// Active.
-		&.is-active::after {
+		&[aria-selected='true']::after {
 			height: calc( 1 * var( --wp-admin-border-width-focus ) );
 
 			// Windows high contrast mode.

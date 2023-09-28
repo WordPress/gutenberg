@@ -15,10 +15,6 @@ export type TabsContextProps =
 			 */
 			store: Ariakit.TabStore;
 			/**
-			 * The class name to add to the active tab.
-			 */
-			activeClass: string;
-			/**
 			 * The unique id string for this instance of the Tabs component.
 			 */
 			instanceId: string;
@@ -32,12 +28,6 @@ export type TabsProps = {
 	 * components.
 	 */
 	children: React.ReactNode;
-	/**
-	 * The class name to add to the active tab.
-	 *
-	 * @default 'is-active'
-	 */
-	activeClass?: string;
 	/**
 	 * When `true`, the tab will be selected when receiving focus (automatic tab
 	 * activation). When `false`, the tab will be selected only when clicked

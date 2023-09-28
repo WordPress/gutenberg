@@ -19,7 +19,6 @@ import TabList from './tablist';
 import TabPanel from './tabpanel';
 
 function Tabs( {
-	activeClass = 'is-active',
 	selectOnMove = true,
 	initialTabId,
 	orientation = 'horizontal',
@@ -145,7 +144,7 @@ function Tabs( {
 	] );
 
 	return (
-		<TabsContext.Provider value={ { store, instanceId, activeClass } }>
+		<TabsContext.Provider value={ { store, instanceId } }>
 			{ children }
 		</TabsContext.Provider>
 	);
