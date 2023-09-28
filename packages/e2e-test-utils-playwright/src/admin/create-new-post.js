@@ -34,14 +34,14 @@ export async function createNewPost( {
 	// currently available one is ready. To make this work, we need an inner
 	// legacy canvas selector that is unavailable directly when the canvas is
 	// iframed.
-	await Promise.any( [
-		this.page.locator( '.wp-block-post-content' ).waitFor(),
-		this.page
-			.frameLocator( '[name=editor-canvas]' )
-			.locator( 'body > *' )
-			.first()
-			.waitFor(),
-	] );
+	try {
+		await Promise.any( [
+			this.page.locator( '.wp-block-post-content' ).waitFor(),
+			this.editor.canvas.locator( 'body' ).waitFor(),
+		] );
+	} catch ( _error ) {
+		throw new Error( 'Could not find editor canvas' );
+	}
 
 	await this.page.evaluate( ( welcomeGuide ) => {
 		window.wp.data

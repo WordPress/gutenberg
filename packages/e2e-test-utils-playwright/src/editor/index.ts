@@ -42,7 +42,7 @@ export class Editor {
 	}
 
 	get canvas(): FrameLocator {
-		return this.page.frameLocator( 'editor-canvas' );
+		return this.page.frameLocator( '[name="editor-canvas"]' );
 	}
 
 	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
