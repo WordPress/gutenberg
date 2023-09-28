@@ -452,7 +452,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should hide UI when selection changes (by mouse)', async ( {
@@ -473,7 +473,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await editor.canvas.click( '[data-type="core/paragraph"] strong' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should allow speaking number of initial results', async ( {

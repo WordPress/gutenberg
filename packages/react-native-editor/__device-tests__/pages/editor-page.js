@@ -57,9 +57,8 @@ class EditorPage {
 		await launchApp( this.driver, { initialData } );
 
 		// Stores initial values from the editor for different helpers.
-		const addButton = await this.driver.elementsByAccessibilityId(
-			ADD_BLOCK_ID
-		);
+		const addButton =
+			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
 
 		if ( addButton.length !== 0 ) {
 			this.initialValues.addButtonLocation =
@@ -74,9 +73,8 @@ class EditorPage {
 	}
 
 	async getAddBlockButton() {
-		const elements = await this.driver.elementsByAccessibilityId(
-			ADD_BLOCK_ID
-		);
+		const elements =
+			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
 		return elements[ 0 ];
 	}
 
@@ -197,9 +195,8 @@ class EditorPage {
 			await swipeDown( this.driver );
 		}
 
-		const elements = await this.driver.elementsByAccessibilityId(
-			titleElement
-		);
+		const elements =
+			await this.driver.elementsByAccessibilityId( titleElement );
 
 		if (
 			elements.length === 0 ||
@@ -530,9 +527,8 @@ class EditorPage {
 	}
 
 	async clickToolBarButton( buttonName ) {
-		const toolBarButton = await this.driver.elementByAccessibilityId(
-			buttonName
-		);
+		const toolBarButton =
+			await this.driver.elementByAccessibilityId( buttonName );
 		await toolBarButton.click();
 	}
 
@@ -540,9 +536,8 @@ class EditorPage {
 		let navigateUpElements = [];
 		do {
 			await this.driver.sleep( 2000 );
-			navigateUpElements = await this.driver.elementsByAccessibilityId(
-				'Navigate Up'
-			);
+			navigateUpElements =
+				await this.driver.elementsByAccessibilityId( 'Navigate Up' );
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
 			}
@@ -784,9 +779,8 @@ class EditorPage {
 			this.driver,
 			'//XCUIElementTypeOther[@name="Media Add image or video"]'
 		);
-		const addMediaButton = await mediaSection.elementByAccessibilityId(
-			'Add image or video'
-		);
+		const addMediaButton =
+			await mediaSection.elementByAccessibilityId( 'Add image or video' );
 		await addMediaButton.click();
 	}
 
@@ -810,9 +804,8 @@ class EditorPage {
 			this.accessibilityIdKey
 		);
 		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
-		const imageBlockInnerElement = await this.driver.elementByXPath(
-			blockLocator
-		);
+		const imageBlockInnerElement =
+			await this.driver.elementByXPath( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 

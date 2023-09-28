@@ -13,7 +13,7 @@ import type { Icon } from '@wordpress/icons';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { CompositeState } from '../composite';
 
 type CommonCircularOptionPickerProps = {
@@ -69,7 +69,7 @@ type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 				'aria-label'?: never;
 				'aria-labelledby': string;
 		  }
-	 );
+	);
 
 export type ListboxCircularOptionPickerProps = WithBaseId &
 	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;

@@ -853,9 +853,8 @@ test.describe.skip( 'Image - interactivity', () => {
 					'.entry-content figure img'
 				);
 
-				const wpContext = await contentFigure.getAttribute(
-					'data-wp-context'
-				);
+				const wpContext =
+					await contentFigure.getAttribute( 'data-wp-context' );
 
 				const imageUploadedSrc =
 					JSON.parse( wpContext ).core.image.imageUploadedSrc;

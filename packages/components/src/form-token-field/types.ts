@@ -194,7 +194,7 @@ export interface FormTokenFieldProps
  * `T` can be either a `string` or an object which must have a `value` prop as a string.
  */
 export interface SuggestionsListProps<
-	T = string | ( Record< string, unknown > & { value: string } )
+	T = string | ( Record< string, unknown > & { value: string } ),
 > {
 	selectedIndex: number;
 	scrollIntoView: boolean;

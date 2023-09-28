@@ -36,7 +36,7 @@ import {
 } from './styles/range-control-styles';
 
 import type { RangeControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { space } from '../ui/utils/space';
 
 const noop = () => {};

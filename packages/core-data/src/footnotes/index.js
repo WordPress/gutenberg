@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { create, toHTMLString } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import getFootnotesOrder from './get-footnotes-order';
@@ -56,30 +61,24 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			// When we store rich text values, this would no longer
-			// require a regex.
-			const regex =
-				/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
+			const richTextValue = create( { html: value } );
 
-			attributes[ key ] = value.replace(
-				regex,
-				( match, opening, fnId ) => {
-					const index = newOrder.indexOf( fnId );
-					return `${ opening }${ index + 1 }</a></sup>`;
+			richTextValue.replacements.forEach( ( replacement ) => {
+				if ( replacement.type === 'core/footnote' ) {
+					const id = replacement.attributes[ 'data-fn' ];
+					const index = newOrder.indexOf( id );
+					// The innerHTML contains the count wrapped in a link.
+					const countValue = create( {
+						html: replacement.innerHTML,
+					} );
+					countValue.text = String( index + 1 );
+					replacement.innerHTML = toHTMLString( {
+						value: countValue,
+					} );
 				}
-			);
+			} );
 
-			const compatRegex = /<a[^>]+data-fn="([^"]+)"[^>]*>\*<\/a>/g;
-
-			attributes[ key ] = attributes[ key ].replace(
-				compatRegex,
-				( match, fnId ) => {
-					const index = newOrder.indexOf( fnId );
-					return `<sup data-fn="${ fnId }" class="fn"><a href="#${ fnId }" id="${ fnId }-link">${
-						index + 1
-					}</a></sup>`;
-				}
-			);
+			attributes[ key ] = toHTMLString( { value: richTextValue } );
 		}
 
 		return attributes;

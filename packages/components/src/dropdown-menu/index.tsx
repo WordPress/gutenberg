@@ -11,7 +11,7 @@ import { menu } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
@@ -22,7 +22,7 @@ import type {
 } from './types';
 
 function mergeProps<
-	T extends { className?: string; [ key: string ]: unknown }
+	T extends { className?: string; [ key: string ]: unknown },
 >( defaultProps: Partial< T > = {}, props: T = {} as T ) {
 	const mergedProps: T = {
 		...defaultProps,

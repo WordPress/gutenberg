@@ -8,7 +8,7 @@ import { createContext } from '@wordpress/element';
  */
 import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );

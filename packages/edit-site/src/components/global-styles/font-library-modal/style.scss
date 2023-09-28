@@ -1,4 +1,14 @@
 .font-library-modal {
+	// @todo: If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
 	.components-modal__header {
 		border-bottom: none;
 	}
@@ -109,5 +119,21 @@
 		width: 30vw;
 		height: 100%;
 		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.components-card {
+		width: 50%;
+		min-width: 250px;
+		max-width: 350px;
 	}
 }

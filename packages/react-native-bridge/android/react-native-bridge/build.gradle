@@ -35,7 +35,7 @@ android {
     // File reference: `react-native-bridge/android/react-native-bridge/src/main/AndroidManifest.xml`
     namespace "org.wordpress.mobile.ReactNativeGutenbergBridge"
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 24

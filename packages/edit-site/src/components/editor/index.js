@@ -44,6 +44,7 @@ import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
@@ -58,13 +59,6 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-const typeLabels = {
-	wp_template: __( 'Template' ),
-	wp_template_part: __( 'Template Part' ),
-	wp_block: __( 'Pattern' ),
-	wp_navigation: __( 'Navigation' ),
-};
-
 // Prevent accidental removal of certain blocks, asking the user for
 // confirmation.
 const blockRemovalRules = {
@@ -77,7 +71,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { isLoading } ) {
+export default function Editor( { listViewToggleElement, isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -171,7 +165,8 @@ export default function Editor( { isLoading } ) {
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			typeLabels[ editedPostType ] ?? typeLabels.wp_template
+			POST_TYPE_LABELS[ editedPostType ] ??
+				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
 
@@ -252,7 +247,11 @@ export default function Editor( { isLoading } ) {
 									<InserterSidebar />
 								) ) ||
 									( shouldShowListView && (
-										<ListViewSidebar />
+										<ListViewSidebar
+											listViewToggleElement={
+												listViewToggleElement
+											}
+										/>
 									) ) )
 							}
 							sidebar={

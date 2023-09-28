@@ -28,18 +28,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$styles = '';
-	if ( isset( $attributes['style']['typography']['writingMode'] ) ) {
-		$styles = "writing-mode: {$attributes['style']['typography']['writingMode']};";
-
-		if ( isset( $attributes['style']['typography']['textOrientation'] ) ) {
-			$styles .= " text-orientation: {$attributes['style']['typography']['textOrientation']};";
-		}
-	}
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $classes,
-			'style' => $styles,
 		)
 	);
 	// Set default values.
