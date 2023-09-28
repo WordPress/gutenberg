@@ -289,9 +289,9 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function uninstall_fonts( $request ) {
-		$fonts_param = $request->get_param( 'fontFamilies' );
+		$fonts_to_uninstall = $request->get_param( 'fontFamilies' );
 
-		if ( empty( $fonts_to_install ) ) {
+		if ( empty( $fonts_to_uninstall ) ) {
 			return new WP_Error(
 				'no_fonts_to_install',
 				__( 'No fonts to uninstall', 'gutenberg' ),
@@ -299,15 +299,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$needs_write_permission = $this->needs_write_permission( $fonts_to_install );
-		if ( $needs_write_permission ) {
-			$write_permission = $this->has_write_permission();
-			if ( is_wp_error( $write_permission ) ) {
-				return $write_permission;
-			}
-		}
-
-		foreach ( $fonts_param as $font_data ) {
+		foreach ( $fonts_to_uninstall as $font_data ) {
 			$font   = new WP_Font_Family( $font_data );
 			$result = $font->uninstall();
 
@@ -317,7 +309,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			}
 		}
 
-		return new WP_REST_Response( __( 'Font family uninstalled successfully.', 'gutenberg' ), 200 );
+		return new WP_REST_Response( __( 'Font families uninstalled successfully.', 'gutenberg' ), 200 );
 	}
 
 	/**
