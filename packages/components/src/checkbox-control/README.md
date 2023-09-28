@@ -85,7 +85,7 @@ If no prop is passed an empty label is rendered.
 
 -   Required: No
 
-#### `help`: `string|WPElement`
+#### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

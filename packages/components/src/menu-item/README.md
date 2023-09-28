@@ -29,7 +29,7 @@ MenuItem supports the following props. Any additional props are passed through t
 
 ### `children`
 
--   Type: `WPElement`
+-   Type: `Element`
 -   Required: No
 
 Element to render as child of button.
@@ -89,7 +89,7 @@ If shortcut is a string, it is expecting the display text. If shortcut is an obj
 
 ### `suffix`
 
--   Type: `WPElement`
+-   Type: `Element`
 -   Required: No
 
 Allows for markup other than icons or shortcuts to be added to the menu item.

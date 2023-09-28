@@ -76,7 +76,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginBlockSettingsMenuItem = ( {
 	allowedBlocks,

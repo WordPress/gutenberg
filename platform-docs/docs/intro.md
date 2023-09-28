@@ -26,7 +26,7 @@ To build a block editor, you need to install the following dependencies:
  - `@wordpress/block-library`
  - `@wordpress/components`
 
-## Setup vite to use JSX and @wordpress/element as a pragma
+## JSX
 
 We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling, By default vite supports JSX and and outputs the result as a React pragma. The Block editor uses React so there's no need to configure anything here but if you're using a different bundler/build tool, make sure the JSX transpilation is setup properly.
 

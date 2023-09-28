@@ -80,7 +80,7 @@ A function that receives the value of the input.
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 ### hideLabelFromVision

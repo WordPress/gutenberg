@@ -209,7 +209,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Position panel.
+ * @return {Element} Position panel.
  */
 export function PositionPanel( props ) {
 	const {

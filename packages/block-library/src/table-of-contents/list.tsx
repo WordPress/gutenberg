@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
-import type { WPElement } from '@wordpress/element';
+import type { MouseEvent, ReactElement } from 'react';
 
 /**
  * Internal dependencies
@@ -23,7 +18,7 @@ export default function TableOfContentsList( {
 	nestedHeadingList: NestedHeadingData[];
 	disableLinkActivation?: boolean;
 	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
-} ): WPElement {
+} ): ReactElement {
 	return (
 		<>
 			{ nestedHeadingList.map( ( node, index ) => {

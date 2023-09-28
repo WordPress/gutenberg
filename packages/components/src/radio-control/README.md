@@ -82,7 +82,7 @@ const MyRadioControl = () => {
 
 The component accepts the following props:
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

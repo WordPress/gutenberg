@@ -21,8 +21,8 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
-	'WPComponent',
-	'WPElement',
+	'Component',
+	'Element',
 	'WPIcon',
 ];
 

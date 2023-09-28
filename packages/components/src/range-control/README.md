@@ -113,7 +113,7 @@ const MyRangeControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-### `afterIcon`: `string|Function|WPComponent|null`
+### `afterIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered after the slider with the icon equal to `afterIcon`.
 
@@ -130,7 +130,7 @@ If this property is true, a button to reset the slider is rendered.
 -   Default: `false`
 -   Platform: Web | Mobile
 
-### `beforeIcon`: `string|Function|WPComponent|null`
+### `beforeIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered before the slider with the icon equal to `beforeIcon`.
 
@@ -161,7 +161,7 @@ Disables the `input`, preventing new values from being applied.
 -   Platform: Web
 
 
-### `help`: `string|WPElement`
+### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

@@ -38,7 +38,7 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
  * @param {( value: string ) => void } props.onChange Called when the height changes.
  * @param {string}                     props.value    The current height value.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default function HeightControl( {
 	label = __( 'Height' ),

@@ -61,7 +61,7 @@ const getPluginContext = memoize(
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function PluginArea( {
 	scope,

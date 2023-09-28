@@ -1,4 +1,8 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
 
 /**
  * WordPress dependencies
@@ -6,7 +10,6 @@
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 import type { IconType } from '@wordpress/components';
-import type { WPComponent } from '@wordpress/element';
 
 /**
  * Defined behavior of a plugin type.
@@ -27,7 +30,7 @@ export interface WPPlugin {
 	/**
 	 * A component containing the UI elements to be rendered.
 	 */
-	render: WPComponent;
+	render: ComponentType;
 
 	/**
 	 * The optional scope to be used when rendering inside a plugin area.

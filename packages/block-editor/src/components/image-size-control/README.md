@@ -36,7 +36,7 @@ The component accepts the following props:
 
 If this property is added, a help text will be generated for the image size control, using imageSizeHelp property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 ### slug

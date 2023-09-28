@@ -93,7 +93,7 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
  *
- * @param {Object}    props          Component properties.
- * @param {WPElement} props.children Children to be rendered.
+ * @param {Object}  props          Component properties.
+ * @param {Element} props.children Children to be rendered.
  */
 export default forwardRef( WritingFlow );

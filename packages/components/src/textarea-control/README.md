@@ -100,7 +100,7 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
