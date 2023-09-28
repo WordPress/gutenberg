@@ -137,7 +137,7 @@ if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 		}
 	}
 
-	if ( ! function_exists( 'wp_restore_footnotes_from_revision' )  ) {
+	if ( ! function_exists( 'wp_restore_footnotes_from_revision' ) ) {
 
 		/**
 		 * Restores the footnotes meta value from the revision.
