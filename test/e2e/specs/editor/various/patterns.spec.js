@@ -32,10 +32,9 @@ test.describe( 'Unsynced pattern', () => {
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My unsynced pattern' );
-		await createPatternDialog.getByRole(
-			'checkbox',
-			{ name: 'Synced' }
-		).setChecked( false );
+		await createPatternDialog
+			.getByRole( 'checkbox', { name: 'Synced' } )
+			.setChecked( false );
 
 		await page.keyboard.press( 'Enter' );
 
