@@ -20,7 +20,7 @@ import warn from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { useUpdateEffect } from '../../utils';
+import { useUpdateEffect } from '../utils';
 
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )

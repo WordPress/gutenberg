@@ -9,6 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -20,8 +21,15 @@ import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplatePart from './add-new-template-part';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function PageTemplateParts() {
+	const {
+		params: { didAccessPatternsPage },
+	} = useLocation();
+
 	const { records: templateParts } = useEntityRecords(
 		'postType',
 		TEMPLATE_PART_POST_TYPE,
@@ -40,8 +48,13 @@ export default function PageTemplateParts() {
 							params={ {
 								postId: templatePart.id,
 								postType: templatePart.type,
+								didAccessPatternsPage: !! didAccessPatternsPage
+									? 1
+									: undefined,
 							} }
-							state={ { backPath: '/wp_template_part/all' } }
+							state={ {
+								backPath: '/wp_template_part/all',
+							} }
 						>
 							{ decodeEntities(
 								templatePart.title?.rendered ||

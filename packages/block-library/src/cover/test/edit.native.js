@@ -11,6 +11,8 @@ import {
 	within,
 	getBlock,
 	openBlockSettings,
+	setupMediaPicker,
+	setupPicker,
 } from 'test/helpers';
 
 /**
@@ -68,6 +70,13 @@ const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'Take a Video',
+	'WordPress Media Library',
+];
+
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
@@ -124,6 +133,35 @@ describe( 'when no media is attached', () => {
 		fireEvent.press( mediaLibraryButton );
 
 		expect( requestMediaPicker ).toHaveBeenCalled();
+	} );
+} );
+
+describe( 'when no media is attached and overlay color is set', () => {
+	it( 'adds image', async () => {
+		const media = {
+			type: 'image',
+			id: 2000,
+			url: 'https://test.files.wordpress.com/local-image-1.mp4',
+		};
+		const { mediaPickerCallback } = setupMediaPicker();
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+		} );
+		const { getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		fireEvent.press( getByText( 'Add image or video' ) );
+		selectOption( 'WordPress Media Library' );
+		await mediaPickerCallback( media );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
 

@@ -10,13 +10,21 @@ import { useContext } from '@wordpress/element';
  */
 import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
+import UploadFonts from './upload-fonts';
 import { FontLibraryContext } from './context';
 
-const INSTALLED_FONTS_TAB = {
-	name: 'installed-fonts',
-	title: __( 'Library' ),
-	className: 'installed-fonts',
-};
+const DEFAULT_TABS = [
+	{
+		name: 'installed-fonts',
+		title: __( 'Library' ),
+		className: 'installed-fonts',
+	},
+	{
+		name: 'upload-fonts',
+		title: __( 'Upload' ),
+		className: 'upload-fonts',
+	},
+];
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { id, name } ) => ( {
@@ -35,7 +43,7 @@ function FontLibraryModal( {
 	const { collections } = useContext( FontLibraryContext );
 
 	const tabs = [
-		INSTALLED_FONTS_TAB,
+		...DEFAULT_TABS,
 		...tabsFromCollections( collections || [] ),
 	];
 
@@ -53,6 +61,8 @@ function FontLibraryModal( {
 			>
 				{ ( tab ) => {
 					switch ( tab.name ) {
+						case 'upload-fonts':
+							return <UploadFonts />;
 						case 'installed-fonts':
 							return <InstalledFonts />;
 						default:

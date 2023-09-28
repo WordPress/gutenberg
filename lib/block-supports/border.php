@@ -142,7 +142,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  */
 function gutenberg_has_border_feature_support( $block_type, $feature, $default_value = false ) {
 	// Check if all border support features have been opted into via `"__experimentalBorder": true`.
-	if ( property_exists( $block_type, 'supports' ) ) {
+	if ( $block_type instanceof WP_Block_Type ) {
 		$block_type_supports_border = $block_type->supports['__experimentalBorder'] ?? $default_value;
 		if ( true === $block_type_supports_border ) {
 			return true;
