@@ -347,18 +347,12 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
 	 */
-	private function has_write_permission () {
+	private function has_write_permission() {
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir   = get_temp_dir();
-		$upload_dir = wp_upload_dir()['basedir'];
+		$upload_dir = WP_Font_Library::get_fonts_dir();
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
-			return new WP_Error(
-				'rest_cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
-				array(
-					'status' => 550,
-				)
-			);
+			return false;
 		}
 		return true;
 	}
@@ -371,7 +365,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @param array[] $font_families Font families to install.
 	 * @return bool Whether the request needs write permissions.
 	 */
-	private function needs_write_permission ( $font_families ) {
+	private function needs_write_permission( $font_families ) {
 		foreach ( $font_families as $font ) {
 			if ( isset( $font['fontFace'] ) ) {
 				foreach ( $font['fontFace'] as $face ) {
@@ -416,12 +410,12 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$needs_write_permission = $this->needs_write_permission( $fonts_to_install );
-		if ( $needs_write_permission ) {
-			$write_permission = $this->has_write_permission();
-			if ( is_wp_error( $write_permission ) ) {
-				return $write_permission;
-			}
+		if ( $this->needs_write_permission( $fonts_to_install ) && ! $this->has_write_permission() ) {
+			return new WP_Error(
+				'cannot_write_fonts_folder',
+				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
+				array( 'status' => 500 )
+			);
 		}
 
 		// Get uploaded files (used when installing local fonts).
