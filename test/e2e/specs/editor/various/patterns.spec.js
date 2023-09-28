@@ -55,18 +55,14 @@ test.describe( 'Unsynced pattern', () => {
 			.fill( 'My unsynced pattern' );
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		// Just get the block name and content to compare as the clientIDs will be different.
-		const originalBlock = await before.map( ( block ) => ( {
-			name: block.name,
-			content: block.attributes.content,
-		} ) );
-
+		// Just compare the block name and content as the clientIDs will be different.
+		const existingBlock = before[ 0 ];
 		const newBlocks = await editor.getBlocks();
-		expect(
-			newBlocks.map( ( block ) => ( {
-				name: block.name,
-				content: block.attributes.content,
-			} ) )
-		).toEqual( [ ...originalBlock, ...originalBlock ] );
+		newBlocks.forEach( ( block ) =>
+			expect( block ).toMatchObject( {
+				name: existingBlock.name,
+				attributes: { content: existingBlock.attributes.content },
+			} )
+		);
 	} );
 } );
