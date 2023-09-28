@@ -48,8 +48,8 @@ function handleScroll( context ) {
 		// We are unable to use event.preventDefault() to prevent scrolling
 		// because the scroll event can't be canceled, so we reset the position instead.
 		window.scrollTo(
-			context.core.image.lastScrollLeft,
-			context.core.image.lastScrollTop
+			context.core.image.scrollLeftReset,
+			context.core.image.scrollTopReset
 		);
 	}
 }
@@ -81,13 +81,13 @@ store(
 						context.core.image.lightboxEnabled = true;
 						setStyles( context, event );
 
-						context.core.image.lastScrollTop =
+						context.core.image.scrollTopReset =
 							window.pageYOffset ||
 							document.documentElement.scrollTop;
 
 						// In most cases, this value will be 0, but this is included
 						// in case a user has created a page with horizontal scrolling.
-						context.core.image.lastScrollLeft =
+						context.core.image.scrollLeftReset =
 							window.pageXOffset ||
 							document.documentElement.scrollLeft;
 
