@@ -113,10 +113,14 @@ function UnforwardedModal(
 	}, [ contentRef ] );
 
 	useEffect( () => {
+		ariaHelper.modalize( ref.current );
+		return () => ariaHelper.unmodalize();
+	}, [] );
+
+	useEffect( () => {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
 			document.body.classList.add( bodyOpenClassName );
 		}
 
@@ -125,7 +129,6 @@ function UnforwardedModal(
 
 			if ( openModalCount === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
-				ariaHelper.showApp();
 			}
 		};
 	}, [ bodyOpenClassName ] );
