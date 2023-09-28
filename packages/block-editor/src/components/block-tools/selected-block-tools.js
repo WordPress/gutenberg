@@ -116,19 +116,41 @@ function SelectedBlockTools( {
 
 	if ( isFixed || ! isLargeViewport ) {
 		return (
-			<BlockContextualToolbar
-				// Needs to be passed as `true` so it can be set fixed smaller screens as well
-				isFixed={ true }
-				__experimentalInitialIndex={
-					initialToolbarItemIndexRef.current
-				}
-				__experimentalOnIndexChange={ ( index ) => {
-					initialToolbarItemIndexRef.current = index;
-				} }
-				// Resets the index whenever the active block changes so
-				// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-				key={ clientId }
-			/>
+			<>
+				<BlockContextualToolbar
+					// Needs to be passed as `true` so it can be set fixed smaller screens as well
+					isFixed={ true }
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
+					} }
+					// Resets the index whenever the active block changes so
+					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+					key={ clientId }
+				/>
+				{ shouldShowBreadcrumb && (
+					<BlockPopover
+						clientId={ capturingClientId || clientId }
+						bottomClientId={ lastClientId }
+						className={ classnames(
+							'block-editor-block-list__block-popover',
+							{
+								'is-insertion-point-visible':
+									isInsertionPointVisible,
+							}
+						) }
+						resize={ false }
+						{ ...popoverProps }
+					>
+						<BlockSelectionButton
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+						/>
+					</BlockPopover>
+				) }
+			</>
 		);
 	}
 
