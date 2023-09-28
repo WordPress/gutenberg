@@ -99,7 +99,7 @@ function _contextConnect<
 	}
 
 	// @ts-expect-error We can't rely on inferred types here because of the
-	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/9620bae6fef4fde7cc2b7833f416e240207cda29/packages/components/src/ui/context/wordpress-component.ts#L32-L33
+	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/4f3a11243c365f94892e479bff0b922ccc4ccda3/packages/components/src/context/wordpress-component.ts#L32-L33
 	return Object.assign( WrappedComponent, {
 		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
 		displayName: namespace,

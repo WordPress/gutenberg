@@ -88,13 +88,13 @@ test.describe( 'Patterns', () => {
 
 		await expect(
 			navigation.getByRole( 'button', { name: 'All patterns' } )
-		).toBeVisible();
+		).toContainText( '1' );
 		await expect(
 			navigation.getByRole( 'button', { name: 'My patterns' } )
-		).toBeVisible();
+		).toContainText( '1' );
 		await expect(
 			navigation.getByRole( 'button', { name: 'Uncategorized' } )
-		).toBeVisible();
+		).toContainText( '1' );
 
 		await expect(
 			patternsContent.getByRole( 'heading', {
@@ -102,13 +102,14 @@ test.describe( 'Patterns', () => {
 				level: 2,
 			} )
 		).toBeVisible();
+		const patternsList = patternsContent.getByRole( 'list', {
+			name: 'All patterns',
+		} );
+		await expect( patternsList.getByRole( 'listitem' ) ).toHaveCount( 1 );
 		await expect(
-			patternsContent
-				.getByRole( 'listbox', { name: 'All patterns' } )
-				// TODO: should be `getByRole( 'option', { name: 'My pattern' } )`
+			patternsList
+				.getByRole( 'heading', { name: 'My pattern' } )
 				.getByRole( 'button', { name: 'My pattern', exact: true } )
-				// TODO: Shouldn't need this.
-				.nth( 0 )
 		).toBeVisible();
 	} );
 } );

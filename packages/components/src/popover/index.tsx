@@ -53,7 +53,7 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
@@ -493,7 +493,6 @@ function PopoverSlot(
 ) {
 	return (
 		<Slot
-			// @ts-expect-error Need to type `SlotFill`
 			bubblesVirtually
 			name={ name }
 			className="popover-slot"

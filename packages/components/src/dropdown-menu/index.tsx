@@ -11,7 +11,7 @@ import { menu } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
