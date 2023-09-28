@@ -54,7 +54,7 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 		const { name, unregisterSlot, registerSlot } = this.props;
 
 		if ( prevProps.name !== name ) {
-			unregisterSlot( prevProps.name );
+			unregisterSlot( prevProps.name, this );
 			registerSlot( name, this );
 		}
 	}
