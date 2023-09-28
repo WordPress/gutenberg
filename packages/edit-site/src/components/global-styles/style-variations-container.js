@@ -113,13 +113,11 @@ export default function StyleVariationsContainer() {
 				title: __( 'Default' ),
 				settings: {},
 				styles: {},
-				behaviors: {},
 			},
 			...( variations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
-				behaviors: variation.behaviors ?? {},
 			} ) ),
 		];
 	}, [ variations ] );

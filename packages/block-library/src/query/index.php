@@ -8,7 +8,7 @@
 /**
  * Modifies the static `core/query` block on the server.
  *
- * @since X.X.X
+ * @since 6.4.0
  *
  * @param array  $attributes Block attributes.
  * @param string $content    Block default content.
@@ -23,9 +23,19 @@ function render_block_core_query( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', true );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
+			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',
-				wp_json_encode( array( 'core' => array( 'query' => (object) array() ) ) )
+				wp_json_encode(
+					array(
+						'core' => array(
+							'query' => array(
+								'loadingText' => __( 'Loading page, please wait.' ),
+								'loadedText'  => __( 'Page Loaded.' ),
+							),
+						),
+					)
+				)
 			);
 			$content = $p->get_updated_html();
 
@@ -48,20 +58,6 @@ function render_block_core_query( $attributes, $content, $block ) {
 				></div>',
 				$last_div_position,
 				0
-			);
-
-			// Use state to send translated strings.
-			wp_store(
-				array(
-					'state' => array(
-						'core' => array(
-							'query' => array(
-								'loadingText' => __( 'Loading page, please wait.' ),
-								'loadedText'  => __( 'Page Loaded.' ),
-							),
-						),
-					),
-				)
 			);
 		}
 	}
@@ -94,6 +90,25 @@ function render_block_core_query( $attributes, $content, $block ) {
 
 	return $content;
 }
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
+ */
+function block_core_query_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-query-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-query-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-query-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_query_ensure_interactivity_dependency' );
 
 /**
  * Registers the `core/query` block on the server.

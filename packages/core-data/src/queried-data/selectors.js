@@ -68,7 +68,7 @@ function getQueriedItemsUncached( state, query ) {
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 
 				setNestedValue( filteredItem, field, value );

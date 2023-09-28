@@ -473,11 +473,11 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `Array`: Array of blocks to inspect.
+-   _clientIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
--   `Array`: ids of descendants.
+-   `Array`: Client IDs of descendants.
 
 ### getClientIdsWithDescendants
 

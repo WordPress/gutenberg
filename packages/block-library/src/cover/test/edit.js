@@ -64,9 +64,9 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				screen.getByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
-				} )
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
+					'To edit this block, you need permission to upload media.'
+				)
 			).toBeInTheDocument();
 		} );
 

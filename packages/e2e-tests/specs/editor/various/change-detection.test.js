@@ -102,7 +102,7 @@ describe( 'Change detection', () => {
 
 		const postPendingReviewButton = (
 			await page.$x( "//label[contains(text(), 'Pending review')]" )
-		 )[ 0 ];
+		)[ 0 ];
 		await postPendingReviewButton.click( 'button' );
 
 		// Force autosave to occur immediately.

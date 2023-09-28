@@ -4,6 +4,15 @@
 import removeAccents from 'remove-accents';
 import { noCase } from 'change-case';
 
+/**
+ * Internal dependencies
+ */
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
+	PATTERN_TYPES,
+} from '../../utils/constants';
+
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;
@@ -84,7 +93,10 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
-	const onlyFilterByCategory = ! normalizedSearchTerms.length;
+	// Filter patterns by category: the default category indicates that all patterns will be shown.
+	const onlyFilterByCategory =
+		config.categoryId !== PATTERN_DEFAULT_CATEGORY &&
+		! normalizedSearchTerms.length;
 	const searchRankConfig = { ...config, onlyFilterByCategory };
 
 	// If we aren't filtering on search terms, matching on category is satisfactory.
@@ -131,7 +143,13 @@ function getItemSearchRank( item, searchTerm, config ) {
 		onlyFilterByCategory,
 	} = config;
 
-	let rank = hasCategory( item, categoryId ) ? 1 : 0;
+	let rank =
+		categoryId === PATTERN_DEFAULT_CATEGORY ||
+		( categoryId === PATTERN_USER_CATEGORY &&
+			item.type === PATTERN_TYPES.user ) ||
+		hasCategory( item, categoryId )
+			? 1
+			: 0;
 
 	// If an item doesn't belong to the current category or we don't have
 	// search terms to filter by, return the initial rank value.

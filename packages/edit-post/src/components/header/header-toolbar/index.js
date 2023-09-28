@@ -33,7 +33,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar() {
+function HeaderToolbar( { setListViewToggleElement } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
@@ -108,6 +108,7 @@ function HeaderToolbar() {
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
 				aria-expanded={ isListViewOpen }
+				ref={ setListViewToggleElement }
 			/>
 		</>
 	);

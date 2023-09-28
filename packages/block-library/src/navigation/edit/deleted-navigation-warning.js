@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 function DeletedNavigationWarning( { onCreateNew } ) {
 	return (
 		<Warning>
-			{ __( 'Navigation menu has been deleted or is unavailable. ' ) }
+			{ __( 'Navigation menu has been deleted or is unavailable.' ) }
 			<Button onClick={ onCreateNew } variant="link">
 				{ __( 'Create a new menu?' ) }
 			</Button>

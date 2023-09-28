@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -63,14 +63,24 @@ function InlineLinkUI( {
 		};
 	}, [] );
 
-	const linkValue = {
-		url: activeAttributes.url,
-		type: activeAttributes.type,
-		id: activeAttributes.id,
-		opensInNewTab: activeAttributes.target === '_blank',
-		nofollow: activeAttributes.rel?.includes( 'nofollow' ),
-		title: richTextText,
-	};
+	const linkValue = useMemo(
+		() => ( {
+			url: activeAttributes.url,
+			type: activeAttributes.type,
+			id: activeAttributes.id,
+			opensInNewTab: activeAttributes.target === '_blank',
+			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
+			title: richTextText,
+		} ),
+		[
+			activeAttributes.id,
+			activeAttributes.rel,
+			activeAttributes.target,
+			activeAttributes.type,
+			activeAttributes.url,
+			richTextText,
+		]
+	);
 
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );

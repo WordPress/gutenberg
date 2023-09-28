@@ -35,12 +35,28 @@ The amount of time in milliseconds to wait before showing the tooltip.
 -   Required: No
 -   Default: `700`
 
-#### `position`: `string`
+#### `hideOnClick`: `boolean`
 
-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+Option to hide the tooltip when the anchor is clicked.
 
 -   Required: No
--   Default: `"bottom"`
+-   Default: `true`
+
+#### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+
+Used to specify the tooltip's placement with respect to its anchor.
+
+-   Required: No
+-   Default: `'bottom'`
+
+#### `position`: `string`
+
+_Note: use the `placement` prop instead when possible._
+
+Legacy way to specify the popover's position with respect to its anchor. Specify y- and x-axis as a space-separated string. Supports `'top'`, `'middle'`, `'bottom'` y axis, and `'left'`, `'center'`, `'right'` x axis.
+
+-   Required: No
+-   Default: `'bottom'`
 
 #### `shortcut`: `string` | `object`
 
