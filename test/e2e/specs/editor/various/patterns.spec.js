@@ -16,6 +16,7 @@ test.describe( 'Unsynced pattern', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'A useful paragraph to reuse' },
 		} );
+		const before = await editor.getBlocks();
 
 		// Create an unsynced pattern from the paragraph block.
 		await editor.showBlockToolbar();
@@ -31,18 +32,18 @@ test.describe( 'Unsynced pattern', () => {
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My unsynced pattern' );
-		await page.getByLabel( 'Synced' ).click();
+		await createPatternDialog.getByRole( 'checkbox' ).setChecked( false );
 
 		await page.keyboard.press( 'Enter' );
-		const content = await editor.getEditedPostContent();
 
 		// Check that the block content is still the same. If the pattern was added as synced
 		// the content would be wrapped by a pattern block.
-		expect( content ).toBe(
-			`<!-- wp:paragraph -->
-<p>A useful paragraph to reuse</p>
-<!-- /wp:paragraph -->`
-		);
+		await expect
+			.poll(
+				editor.getBlocks,
+				'The block content should be the same after converting to an unsynced pattern'
+			)
+			.toEqual( before );
 
 		// Check that the new pattern is availble in the inserter and that it gets inserted as
 		// a plain paragraph block.
@@ -54,15 +55,18 @@ test.describe( 'Unsynced pattern', () => {
 			.fill( 'My unsynced pattern' );
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		const updatedContent = await editor.getEditedPostContent();
-		expect( updatedContent ).toBe(
-			`<!-- wp:paragraph -->
-<p>A useful paragraph to reuse</p>
-<!-- /wp:paragraph -->
+		// Just get the block name and content to compare as the clientIDs will be different.
+		const originalBlock = await before.map( ( block ) => ( {
+			name: block.name,
+			content: block.attributes.content,
+		} ) );
 
-<!-- wp:paragraph -->
-<p>A useful paragraph to reuse</p>
-<!-- /wp:paragraph -->`
-		);
+		const newBlocks = await editor.getBlocks();
+		expect(
+			newBlocks.map( ( block ) => ( {
+				name: block.name,
+				content: block.attributes.content,
+			} ) )
+		).toEqual( [ ...originalBlock, ...originalBlock ] );
 	} );
 } );
