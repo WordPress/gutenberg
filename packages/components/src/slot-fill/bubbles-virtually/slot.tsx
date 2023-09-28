@@ -19,7 +19,7 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type { SlotComponentProps } from '../types';
 
 function Slot(
