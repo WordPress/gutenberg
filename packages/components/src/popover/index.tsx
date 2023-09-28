@@ -60,6 +60,7 @@ import type {
 	PopoverAnchorRefTopBottom,
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
+import { StyleProvider } from '../style-provider';
 
 /**
  * Name of slot in which popover should fill.
@@ -447,7 +448,10 @@ const UnforwardedPopover = (
 	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	} else if ( ! inline ) {
-		content = createPortal( content, getPopoverFallbackContainer() );
+		content = createPortal(
+			<StyleProvider document={ document }>{ content }</StyleProvider>,
+			getPopoverFallbackContainer()
+		);
 	}
 
 	if ( hasAnchor ) {
