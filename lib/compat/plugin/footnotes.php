@@ -34,10 +34,4 @@ if ( function_exists( 'wp_post_revision_meta_keys' ) ) {
 	if ( has_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference' ) ) {
 		remove_filter( 'rest_pre_insert_post', '_wp_rest_api_force_autosave_difference' );
 	}
-	if ( has_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision' ) ) {
-		remove_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision' );
-	}
-	if ( has_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' ) ) {
-		remove_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
-	}
 }
