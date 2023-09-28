@@ -92,9 +92,22 @@
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	height: 100px;
+	height: 250px;
 	width: 100%;
 	background-color: #f0f0f0;
+}
+
+.font-library-modal__local-fonts {
+	margin: 0 auto;
+	width: 80%;
+
+	.font-library-modal__upload-area__text {
+		color: #6e6e6e;
+	}
+
+	.font-library-modal__upload-area__notice {
+		margin: 0;
+	}
 }
 
 .font-library-modal__font-name {
