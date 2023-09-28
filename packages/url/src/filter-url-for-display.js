@@ -21,7 +21,7 @@ export function filterURLForDisplay( url, maxLength = null ) {
 		filteredURL = filteredURL.replace( '/', '' );
 	}
 
-	const mediaRegexp = /([\w|:])*\.(?:jpg|jpeg|gif|png|svg)/;
+	const mediaRegexp = /\/([^\/?]+)\.(?:[\w]+)(?=\?|$)/;
 
 	if (
 		! maxLength ||
