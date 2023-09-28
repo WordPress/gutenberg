@@ -121,9 +121,13 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
+	".patterns-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
 	".block-editor-template-part__selection-modal": 1000001,
+	".block-editor-block-rename-modal": 1000001,
+	".edit-site-list__rename-modal": 1000001,
+	".edit-site-swap-template-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -163,9 +167,6 @@ $z-layers: (
 	// And block manager sticky disabled block count is higher still
 	".edit-post-block-manager__disabled-blocks-count": 2,
 
-	// Needs to be higher than any other element as this is an overlay to catch all events
-	".components-tooltip .event-catcher": 100002,
-
 	// Needs to appear below other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,
 
@@ -189,6 +190,7 @@ $z-layers: (
 	".edit-site-layout__hub": 3,
 	".edit-site-layout__header": 2,
 	".edit-site-page-header": 2,
+	".edit-site-page-content": 1,
 	".edit-site-patterns__header": 2,
 	".edit-site-patterns__grid-pagination": 2,
 	".edit-site-layout__canvas-container": 2,

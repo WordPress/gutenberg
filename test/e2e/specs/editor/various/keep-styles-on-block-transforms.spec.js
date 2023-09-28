@@ -16,7 +16,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 		await page.click( 'role=button[name="Color Text styles"i]' );
-		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
+		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
@@ -54,7 +54,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
-		await page.click( 'role=button[name="Paragraph"i]' );
+		await page.click( 'role=button[name="Multiple blocks selected"i]' );
 		await page.click( 'role=menuitem[name="Heading"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

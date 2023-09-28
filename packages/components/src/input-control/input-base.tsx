@@ -22,7 +22,8 @@ import {
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
-import { ContextSystemProvider, WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { ContextSystemProvider } from '../context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );

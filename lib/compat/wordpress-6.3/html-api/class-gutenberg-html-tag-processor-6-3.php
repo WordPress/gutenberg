@@ -242,6 +242,8 @@
  * unquoted values will appear in the output with double-quotes.
  *
  * @since 6.2.0
+ * @since 6.2.1 Fix: Support for various invalid comments; attribute updates are case-insensitive.
+ * @since 6.3.2 Fix: Skip HTML-like content inside rawtext elements such as STYLE.
  */
 class Gutenberg_HTML_Tag_Processor_6_3 {
 	/**
@@ -405,6 +407,16 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	private $attributes = array();
 
 	/**
+	 * Tracks spans of duplicate attributes on a given tag, used for removing
+	 * all copies of an attribute when calling `remove_attribute()`.
+	 *
+	 * @since 6.3.2
+	 *
+	 * @var (WP_HTML_Span[])[]|null
+	 */
+	private $duplicate_attributes = null;
+
+	/**
 	 * Which class names to add or remove from a tag.
 	 *
 	 * These are tracked separately from attribute updates because they are
@@ -546,6 +558,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			// Ensure that the tag closes before the end of the document.
+			if ( $this->bytes_already_parsed >= strlen( $this->html ) ) {
+				return false;
+			}
+
 			$tag_ends_at = strpos( $this->html, '>', $this->bytes_already_parsed );
 			if ( false === $tag_ends_at ) {
 				return false;
@@ -564,7 +580,14 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			 * of the tag name as a pre-check avoids a string allocation when it's not needed.
 			 */
 			$t = $this->html[ $this->tag_name_starts_at ];
-			if ( ! $this->is_closing_tag && ( 's' === $t || 'S' === $t || 't' === $t || 'T' === $t ) ) {
+			if (
+				! $this->is_closing_tag &&
+				(
+					'i' === $t || 'I' === $t ||
+					'n' === $t || 'N' === $t ||
+					's' === $t || 'S' === $t ||
+					't' === $t || 'T' === $t
+				) ) {
 				$tag_name = $this->get_tag();
 
 				if ( 'SCRIPT' === $tag_name && ! $this->skip_script_data() ) {
@@ -574,6 +597,25 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 					( 'TEXTAREA' === $tag_name || 'TITLE' === $tag_name ) &&
 					! $this->skip_rcdata( $tag_name )
 				) {
+					$this->bytes_already_parsed = strlen( $this->html );
+					return false;
+				} elseif (
+					(
+						'IFRAME' === $tag_name ||
+						'NOEMBED' === $tag_name ||
+						'NOFRAMES' === $tag_name ||
+						'NOSCRIPT' === $tag_name ||
+						'STYLE' === $tag_name
+					) &&
+					! $this->skip_rawtext( $tag_name )
+				) {
+					/*
+					 * "XMP" should be here too but its rules are more complicated and require the
+					 * complexity of the HTML Processor (it needs to close out any open P element,
+					 * meaning it can't be skipped here or else the HTML Processor will lose its
+					 * place). For now, it can be ignored as it's a rare HTML tag in practice and
+					 * any normative HTML should be using PRE instead.
+					 */
 					$this->bytes_already_parsed = strlen( $this->html );
 					return false;
 				}
@@ -706,15 +748,33 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		return true;
 	}
 
+	/**
+	 * Skips contents of generic rawtext elements.
+	 *
+	 * @since 6.3.2
+	 *
+	 * @see https://html.spec.whatwg.org/#generic-raw-text-element-parsing-algorithm
+	 *
+	 * @param string $tag_name The uppercase tag name which will close the RAWTEXT region.
+	 * @return bool Whether an end to the RAWTEXT region was found before the end of the document.
+	 */
+	private function skip_rawtext( $tag_name ) {
+		/*
+		 * These two functions distinguish themselves on whether character references are
+		 * decoded, and since functionality to read the inner markup isn't supported, it's
+		 * not necessary to implement these two functions separately.
+		 */
+		return $this->skip_rcdata( $tag_name );
+	}
 
 	/**
-	 * Skips contents of title and textarea tags.
+	 * Skips contents of RCDATA elements, namely title and textarea tags.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @see https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
 	 *
-	 * @param string $tag_name The lowercase tag name which will close the RCDATA region.
+	 * @param string $tag_name The uppercase tag name which will close the RCDATA region.
 	 * @return bool Whether an end to the RCDATA region was found before the end of the document.
 	 */
 	private function skip_rcdata( $tag_name ) {
@@ -1236,6 +1296,25 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				$attribute_end,
 				! $has_value
 			);
+
+			return true;
+		}
+
+		/*
+		 * Track the duplicate attributes so if we remove it, all disappear together.
+		 *
+		 * While `$this->duplicated_attributes` could always be stored as an `array()`,
+		 * which would simplify the logic here, storing a `null` and only allocating
+		 * an array when encountering duplicates avoids needless allocations in the
+		 * normative case of parsing tags with no duplicate attributes.
+		 */
+		$duplicate_span = new WP_HTML_Span( $attribute_start, $attribute_end );
+		if ( null === $this->duplicate_attributes ) {
+			$this->duplicate_attributes = array( $comparable_name => array( $duplicate_span ) );
+		} elseif ( ! array_key_exists( $comparable_name, $this->duplicate_attributes ) ) {
+			$this->duplicate_attributes[ $comparable_name ] = array( $duplicate_span );
+		} else {
+			$this->duplicate_attributes[ $comparable_name ][] = $duplicate_span;
 		}
 
 		return true;
@@ -1257,11 +1336,12 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 */
 	private function after_tag() {
 		$this->get_updated_html();
-		$this->tag_name_starts_at = null;
-		$this->tag_name_length    = null;
-		$this->tag_ends_at        = null;
-		$this->is_closing_tag     = null;
-		$this->attributes         = array();
+		$this->tag_name_starts_at   = null;
+		$this->tag_name_length      = null;
+		$this->tag_ends_at          = null;
+		$this->is_closing_tag       = null;
+		$this->attributes           = array();
+		$this->duplicate_attributes = null;
 	}
 
 	/**
@@ -2029,6 +2109,17 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			$this->attributes[ $name ]->end,
 			''
 		);
+
+		// Removes any duplicated attributes if they were also present.
+		if ( null !== $this->duplicate_attributes && array_key_exists( $name, $this->duplicate_attributes ) ) {
+			foreach ( $this->duplicate_attributes[ $name ] as $attribute_token ) {
+				$this->lexical_updates[] = new WP_HTML_Text_Replacement(
+					$attribute_token->start,
+					$attribute_token->end,
+					''
+				);
+			}
+		}
 
 		return true;
 	}

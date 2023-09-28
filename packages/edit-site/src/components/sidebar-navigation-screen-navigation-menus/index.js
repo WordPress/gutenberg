@@ -22,22 +22,23 @@ import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
-	if ( ! title?.rendered ) {
+	if ( ! title ) {
 		/* translators: %s is the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
 	if ( status === 'publish' ) {
-		return decodeEntities( title?.rendered );
+		return decodeEntities( title );
 	}
 
 	return sprintf(
 		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
 		__( '%1$s (%2$s)' ),
-		decodeEntities( title?.rendered ),
+		decodeEntities( title ),
 		status
 	);
 }
@@ -52,7 +53,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		hasResolved: hasResolvedNavigationMenus,
 	} = useEntityRecords(
 		'postType',
-		`wp_navigation`,
+		NAVIGATION_POST_TYPE,
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
@@ -124,7 +125,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 						withChevron
 						icon={ navigation }
 					>
-						{ buildMenuLabel( title, index + 1, status ) }
+						{ buildMenuLabel( title?.rendered, index + 1, status ) }
 					</NavMenuItem>
 				) ) }
 			</ItemGroup>
@@ -151,7 +152,7 @@ export function SidebarNavigationScreenWrapper( {
 const NavMenuItem = ( { postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postId,
-		postType: 'wp_navigation',
+		postType: NAVIGATION_POST_TYPE,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };

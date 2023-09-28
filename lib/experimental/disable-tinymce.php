@@ -61,14 +61,15 @@ function gutenberg_post_being_edited_requires_classic_block() {
 		return false;
 	}
 
-	// Handle the post editor.
-	if ( ! empty( $_GET['post'] ) && ! empty( $_GET['action'] ) && 'edit' === $_GET['action'] ) {
-		$current_post = get_post( intval( $_GET['post'] ) );
-		if ( ! $current_post || is_wp_error( $current_post ) ) {
-			return false;
-		}
+	// Continue only if we're in the post editor.
+	if ( empty( $_GET['post'] ) || empty( $_GET['action'] ) || 'edit' !== $_GET['action'] ) {
+		return false;
+	}
 
-		$content = $current_post->post_content;
+	// Bail if for some reason the post isn't found.
+	$current_post = get_post( absint( $_GET['post'] ) );
+	if ( ! $current_post ) {
+		return false;
 	}
 
 	// Check if block editor is disabled by "Classic Editor" or another plugin.
@@ -79,13 +80,15 @@ function gutenberg_post_being_edited_requires_classic_block() {
 		return true;
 	}
 
+	$content = $current_post->post_content;
 	if ( empty( $content ) ) {
 		return false;
 	}
 
 	$parsed_blocks = parse_blocks( $content );
 	foreach ( $parsed_blocks as $block ) {
-		if ( empty( $block['blockName'] ) && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
+		$is_freeform_block = empty( $block['blockName'] ) || 'core/freeform' === $block['blockName'];
+		if ( $is_freeform_block && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
 			return true;
 		}
 	}

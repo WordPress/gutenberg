@@ -14,7 +14,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import { StyledTextarea } from './styles/textarea-control-styles';
 import type { TextareaControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * TextareaControls are TextControls that allow for multiple lines of text, and

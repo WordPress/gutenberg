@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -76,10 +76,15 @@ function UnforwardedUnitControl(
 			unitsProp
 		);
 		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
-		const firstCharacters = rest.reduce( ( carry, { value } ) => {
-			const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
-			return carry.includes( first ) ? carry : `${ carry }|${ first }`;
-		}, escapeRegExp( firstUnitValue.substring( 0, 1 ) ) );
+		const firstCharacters = rest.reduce(
+			( carry, { value } ) => {
+				const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
+				return carry.includes( first )
+					? carry
+					: `${ carry }|${ first }`;
+			},
+			escapeRegExp( firstUnitValue.substring( 0, 1 ) )
+		);
 		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
 	}, [ nonNullValueProp, unitProp, unitsProp ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
@@ -223,7 +228,6 @@ function UnforwardedUnitControl(
  * `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
  *
  *
- * @example
  * ```jsx
  * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

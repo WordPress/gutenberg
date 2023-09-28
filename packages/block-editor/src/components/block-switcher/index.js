@@ -93,8 +93,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		clientId: Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds,
 		maximumLength: 35,
 	} );
-	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
-	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
+
+	const isSingleBlock = blocks.length === 1;
+	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
+	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
 
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
@@ -162,24 +164,21 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		);
 	}
 
-	const blockSwitcherLabel = blockTitle;
+	const blockSwitcherLabel = isSingleBlock
+		? blockTitle
+		: __( 'Multiple blocks selected' );
 
-	const blockSwitcherDescription =
-		1 === blocks.length
-			? sprintf(
-					/* translators: %s: block title. */
-					__( '%s: Change block type or style' ),
-					blockTitle
-			  )
-			: sprintf(
-					/* translators: %d: number of blocks. */
-					_n(
-						'Change type of %d block',
-						'Change type of %d blocks',
-						blocks.length
-					),
+	const blockSwitcherDescription = isSingleBlock
+		? __( 'Change block type or style' )
+		: sprintf(
+				/* translators: %d: number of blocks. */
+				_n(
+					'Change type of %d block',
+					'Change type of %d blocks',
 					blocks.length
-			  );
+				),
+				blocks.length
+		  );
 
 	const hasBlockOrBlockVariationTransforms =
 		hasPossibleBlockTransformations ||

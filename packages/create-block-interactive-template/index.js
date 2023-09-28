@@ -15,6 +15,7 @@ module.exports = {
 		},
 		render: 'file:./render.php',
 		viewScript: 'file:./view.js',
+		example: {},
 	},
 	variants: {
 		basic: {},

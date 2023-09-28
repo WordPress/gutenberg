@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -10,8 +14,6 @@ import {
 import {
 	Placeholder,
 	Spinner,
-	ToolbarGroup,
-	ToolbarButton,
 	TextControl,
 	PanelBody,
 } from '@wordpress/components';
@@ -21,16 +23,55 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
-	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { ungroup } from '@wordpress/icons';
+import { useRef, useMemo } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
+
+const useInferredLayout = ( blocks, parentLayout ) => {
+	const initialInferredAlignmentRef = useRef();
+
+	return useMemo( () => {
+		// Exit early if the pattern's blocks haven't loaded yet.
+		if ( ! blocks?.length ) {
+			return {};
+		}
+
+		let alignment = initialInferredAlignmentRef.current;
+
+		// Only track the initial alignment so that temporarily removed
+		// alignments can be reapplied.
+		if ( alignment === undefined ) {
+			const isConstrained = parentLayout?.type === 'constrained';
+			const hasFullAlignment = blocks.some( ( block ) =>
+				fullAlignments.includes( block.attributes.align )
+			);
+
+			alignment = isConstrained && hasFullAlignment ? 'full' : null;
+			initialInferredAlignmentRef.current = alignment;
+		}
+
+		const layout = alignment ? parentLayout : undefined;
+
+		return { alignment, layout };
+	}, [ blocks, parentLayout ] );
+};
+
+export default function ReusableBlockEdit( {
+	name,
+	attributes: { ref },
+	__unstableParentLayout: parentLayout,
+} ) {
+	const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -38,21 +79,6 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-
-	const { canRemove, innerBlockCount } = useSelect(
-		( select ) => {
-			const { canRemoveBlock, getBlockCount } =
-				select( blockEditorStore );
-			return {
-				canRemove: canRemoveBlock( clientId ),
-				innerBlockCount: getBlockCount( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
-		useDispatch( reusableBlocksStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -67,12 +93,20 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const layoutClasses = useLayoutClasses( { layout }, name );
+
 	const blockProps = useBlockProps( {
-		className: 'block-library-block__reusable-block-container',
+		className: classnames(
+			'block-library-block__reusable-block-container',
+			layout && layoutClasses,
+			{ [ `align${ alignment }` ]: alignment }
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
+		layout,
 		onInput,
 		onChange,
 		renderAppender: blocks?.length
@@ -112,22 +146,6 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ canRemove && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={
-								innerBlockCount > 1
-									? __( 'Detach patterns' )
-									: __( 'Detach pattern' )
-							}
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody>
 					<TextControl

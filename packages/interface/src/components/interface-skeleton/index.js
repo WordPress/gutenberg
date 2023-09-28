@@ -52,6 +52,7 @@ function InterfaceSkeleton(
 		secondarySidebar,
 		notices,
 		content,
+		contentProps,
 		actions,
 		labels,
 		className,
@@ -150,6 +151,7 @@ function InterfaceSkeleton(
 					<NavigableRegion
 						className="interface-interface-skeleton__content"
 						ariaLabel={ mergedLabels.body }
+						{ ...contentProps }
 					>
 						{ content }
 					</NavigableRegion>

@@ -9,7 +9,6 @@ import { typeInRichText } from './rich-text-type';
  * @param {import('react-test-renderer').ReactTestInstance} richText RichText test instance.
  * @param {number}                                          start    Selection start position.
  * @param {number}                                          end      Selection end position.
- *
  */
 export const selectRangeInRichText = ( richText, start, end = start ) => {
 	if ( typeof start !== 'number' ) {

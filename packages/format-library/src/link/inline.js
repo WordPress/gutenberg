@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import { useMemo, useRef, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { withSpokenMessages, Popover } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
+import { Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -30,13 +31,20 @@ import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import useLinkInstanceKey from './use-link-instance-key';
 
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: __( 'Mark as nofollow' ),
+	},
+];
+
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
 	addingLink,
 	value,
 	onChange,
-	speak,
 	stopAddingLink,
 	contentRef,
 } ) {
@@ -44,16 +52,6 @@ function InlineLinkUI( {
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
-
-	/**
-	 * Pending settings to be applied to the next link. When inserting a new
-	 * link, toggle values cannot be applied immediately, because there is not
-	 * yet a link for them to apply to. Thus, they are maintained in a state
-	 * value until the time that the link can be inserted or edited.
-	 *
-	 * @type {[Object|undefined,Function]}
-	 */
-	const [ nextLinkValue, setNextLinkValue ] = useState();
 
 	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -65,14 +63,24 @@ function InlineLinkUI( {
 		};
 	}, [] );
 
-	const linkValue = {
-		url: activeAttributes.url,
-		type: activeAttributes.type,
-		id: activeAttributes.id,
-		opensInNewTab: activeAttributes.target === '_blank',
-		title: richTextText,
-		...nextLinkValue,
-	};
+	const linkValue = useMemo(
+		() => ( {
+			url: activeAttributes.url,
+			type: activeAttributes.type,
+			id: activeAttributes.id,
+			opensInNewTab: activeAttributes.target === '_blank',
+			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
+			title: richTextText,
+		} ),
+		[
+			activeAttributes.id,
+			activeAttributes.rel,
+			activeAttributes.target,
+			activeAttributes.type,
+			activeAttributes.url,
+			richTextText,
+		]
+	);
 
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );
@@ -82,32 +90,17 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// Merge with values from state, both for the purpose of assigning the
-		// next state value, and for use in constructing the new link format if
-		// the link is ready to be applied.
-		nextValue = {
-			...nextLinkValue,
-			...nextValue,
-		};
-
 		// LinkControl calls `onChange` immediately upon the toggling a setting.
+		// Before merging the next value with the current link value, check if
+		// the setting was toggled.
 		const didToggleSetting =
 			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			linkValue.url === nextValue.url;
-
-		// If change handler was called as a result of a settings change during
-		// link insertion, it must be held in state until the link is ready to
-		// be applied.
-		const didToggleSettingForNewLink =
-			didToggleSetting && nextValue.url === undefined;
-
-		// If link will be assigned, the state value can be considered flushed.
-		// Otherwise, persist the pending changes.
-		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
-
-		if ( didToggleSettingForNewLink ) {
-			return;
-		}
+			nextValue.url === undefined;
+		// Merge the next value with the current link value.
+		nextValue = {
+			...linkValue,
+			...nextValue,
+		};
 
 		const newUrl = prependHTTP( nextValue.url );
 		const linkFormat = createLinkFormat( {
@@ -118,6 +111,7 @@ function InlineLinkUI( {
 					? String( nextValue.id )
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
+			nofollow: nextValue.nofollow,
 		} );
 
 		const newText = nextValue.title || newUrl;
@@ -185,6 +179,8 @@ function InlineLinkUI( {
 			}
 
 			newValue.start = newValue.end;
+
+			// Hides the Link UI.
 			newValue.activeFormats = [];
 			onChange( newValue );
 		}
@@ -220,7 +216,11 @@ function InlineLinkUI( {
 	// See https://github.com/WordPress/gutenberg/pull/34742.
 	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
-	// The focusOnMount prop shouldn't evolve during render of a Popover
+	// Focus should only be moved into the Popover when the Link is being created or edited.
+	// When the Link is in "preview" mode focus should remain on the rich text because at
+	// this point the Link dialog is informational only and thus the user should be able to
+	// continue editing the rich text.
+	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
 	// otherwise it causes a render of the content.
 	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
 
@@ -270,6 +270,7 @@ function InlineLinkUI( {
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
+				settings={ LINK_SETTINGS }
 			/>
 		</Popover>
 	);
@@ -299,4 +300,4 @@ function getRichTextValueFromSelection( value, isActive ) {
 	return slice( value, textStart, textEnd );
 }
 
-export default withSpokenMessages( InlineLinkUI );
+export default InlineLinkUI;

@@ -15,7 +15,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
 import { Select } from './styles/select-control-styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
 
@@ -151,7 +151,7 @@ function UnforwardedSelectControl(
  * `SelectControl` allows users to select from a single or multiple option menu.
  * It functions as a wrapper around the browser's native `<select>` element.
  *
- * @example
+ * ```jsx
  * import { SelectControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
@@ -171,6 +171,7 @@ function UnforwardedSelectControl(
  *     />
  *   );
  * };
+ * ```
  */
 export const SelectControl = forwardRef( UnforwardedSelectControl );
 

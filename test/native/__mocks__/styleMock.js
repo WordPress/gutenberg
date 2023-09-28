@@ -202,4 +202,10 @@ module.exports = {
 	embed__icon: {
 		fill: 'black',
 	},
+	picker: {},
+	pickerPointer: {},
+	columnsContainer: {
+		marginLeft: 16,
+		minWidth: 32,
+	},
 };

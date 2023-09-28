@@ -69,6 +69,8 @@ const plugins = [
 		// Inject the `IS_WORDPRESS_CORE` global, used for feature flagging.
 		'process.env.IS_WORDPRESS_CORE':
 			process.env.npm_package_config_IS_WORDPRESS_CORE,
+		// Inject the `SCRIPT_DEBUG` global, used for dev versions of JavaScript.
+		SCRIPT_DEBUG: mode === 'development',
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];

@@ -34,6 +34,7 @@ const predefinedPluginTemplates = {
 			editorStyle: null,
 			style: null,
 			viewScript: 'file:./view.js',
+			example: {},
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
@@ -55,6 +56,7 @@ const predefinedPluginTemplates = {
 				html: false,
 			},
 			viewScript: 'file:./view.js',
+			example: {},
 		},
 		variants: {
 			static: {},
@@ -200,9 +202,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
-				paths: [ tempCwd ],
-			} ) )
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
 		);
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {

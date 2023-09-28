@@ -65,7 +65,7 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10
  * WP_Directive_Processor.
  */
 function gutenberg_interactivity_process_directives( $tags, $prefix, $directives ) {
-	$context   = new WP_Directive_Context;
+	$context   = new WP_Directive_Context();
 	$tag_stack = array();
 
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
