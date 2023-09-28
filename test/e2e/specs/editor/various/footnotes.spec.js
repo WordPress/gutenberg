@@ -415,7 +415,7 @@ test.describe( 'Footnotes', () => {
 		await page.keyboard.press( 'End' );
 		// Test slashing.
 		// await page.keyboard.type( '3"' );
-		// await page.keyboard.type( '3' );
+		await page.keyboard.type( '3' );
 
 		const previewPage2 = await editor.openPreviewPage();
 
