@@ -37,32 +37,6 @@ class WP_Font_Library {
 	 * @var array
 	 */
 	private static $collections   = array();
-	private static $default_fonts = array();
-
-	/**
-	 * Register defaults font families.
-	 *
-	 * @since 6.4.0
-	 *
-	 * @param array $fonts List of font families in theme.json like format.
-	 * @return void
-	 */
-	public static function register_default_fonts( $fonts ) {
-		// TODO: Add logic to avoid repeated font faces.
-		self::$default_fonts = array_merge( self::$default_fonts, $fonts );
-	}
-
-	/**
-	 * Unregister defaults font families.
-	 *
-	 * @since 6.4.0
-	 *
-	 * @param array $fonts List of font families in theme.json like format.
-	 * @return void
-	 */
-	public static function unregister_default_fonts( $fonts ) {
-		// Implement this method.
-	}
 
 	/**
 	 * Register a new font collection.
@@ -93,6 +67,23 @@ class WP_Font_Library {
 	 * @return WP_Theme_JSON Modified theme JSON object.
 	 */
 	public static function add_default_fonts_to_theme_json( $theme_json ) {
+
+		$default_font_collection_data = array();
+
+		foreach ( self::get_font_collections() as $font_collection ) {
+			$collection_config = $font_collection->get_config();
+			if ( ! isset( $collection_config['default'] ) ) {
+				continue;
+			}
+			$collection_item = self::get_font_collection($collection_config['id']);
+			$collection_data = $collection_item->get_data()['data'];
+			$default_font_collection_data = array_merge( $default_font_collection_data, $collection_data['fontFamilies'] );
+		}
+
+		if ( empty( $default_font_collection_data) ) {
+			return $theme_json;
+		}
+
 		$current_data = $theme_json->get_data();
 
 		if ( ! isset( $current_data['version'] ) || $current_data['version'] !== 2 ) {
@@ -100,8 +91,8 @@ class WP_Font_Library {
 		}
 
 		// get currently available font families
-		$current_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? array();
-		$default_fonts         = array_merge( $current_font_families, self::$default_fonts );
+		$default_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? array();
+		$default_font_families = array_merge( $default_font_families,  $default_font_collection_data );
 
 		// add font families to json structure
 		$new_data = array(
@@ -109,7 +100,7 @@ class WP_Font_Library {
 			'settings' => array(
 				'typography' => array(
 					'fontFamilies' => array(
-						'default' => $default_fonts,
+						'default' => $default_font_families,
 					),
 				),
 			),

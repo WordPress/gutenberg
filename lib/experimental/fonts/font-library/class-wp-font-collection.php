@@ -55,6 +55,10 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config "src" option is required as a non-empty string.' );
 		}
 
+		if ( (isset( $config['default'] ) && true === $config['default'] ) && false !== strpos( $config['src'], 'http' ) ) {
+			throw new Exception( 'Font Collection config "src" option must be local file when collection is default.' );
+		}
+
 		$this->config = $config;
 	}
 
