@@ -985,7 +985,7 @@ describe( 'global styles renderer', () => {
 				'.foo{color: red; margin: auto;}.foo.one{color: blue;}.foo .two{color: green;}'
 			);
 		} );
-		it( 'should return a processed CSS with pseudo elements', () => {
+		it( 'should return processed CSS with pseudo elements', () => {
 			expect(
 				processCSSNesting(
 					'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;}',
