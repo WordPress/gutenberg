@@ -508,16 +508,16 @@ function setStyles( context, event ) {
 	// transformation. In any case, adding 1 pixel to the container width and height solves
 	// the problem, though this can be removed if the issue is fixed in the future.
 	styleTag.innerHTML = `
-			:root {
-				--wp--lightbox-initial-top-position: ${ screenPosY }px;
-				--wp--lightbox-initial-left-position: ${ screenPosX }px;
-				--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-				--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-				--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-				--wp--lightbox-image-height: ${ lightboxImgHeight }px;
-				--wp--lightbox-scale: ${ containerScale };
-			}
-		`;
+		:root {
+			--wp--lightbox-initial-top-position: ${ screenPosY }px;
+			--wp--lightbox-initial-left-position: ${ screenPosX }px;
+			--wp--lightbox-container-width: ${ containerWidth + 1 }px;
+			--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
+			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+			--wp--lightbox-scale: ${ containerScale };
+		}
+	`;
 }
 
 /*
