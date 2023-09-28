@@ -2,14 +2,18 @@
  * External dependencies
  */
 import { request } from '@playwright/test';
-import type { FullConfig } from '@playwright/test';
 
 /**
  * WordPress dependencies
  */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
-async function globalSetup( config: FullConfig ) {
+/**
+ *
+ * @param {import('@playwright/test').FullConfig} config
+ * @return {Promise<void>}
+ */
+async function globalSetup( config ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
 	const storageStatePath =
 		typeof storageState === 'string' ? storageState : undefined;

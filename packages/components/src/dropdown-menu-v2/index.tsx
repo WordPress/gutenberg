@@ -19,7 +19,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
+import { useContextSystem, contextConnectWithoutRef } from '../context';
 import { useSlot } from '../slot-fill';
 import Icon from '../icon';
 import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
