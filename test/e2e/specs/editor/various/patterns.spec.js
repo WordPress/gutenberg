@@ -45,7 +45,7 @@ test.describe( 'Unsynced pattern', () => {
 			)
 			.toEqual( before );
 
-		// Check that the new pattern is availble in the inserter and that it gets inserted as
+		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.
 		await page.getByLabel( 'Toggle block inserter' ).click();
 		await page
