@@ -37,7 +37,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
+		"className": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -68,7 +68,6 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSelector": "ol,ul",
 		"__experimentalOnMerge": true,
 		"__experimentalSlashInserter": true
 	},
