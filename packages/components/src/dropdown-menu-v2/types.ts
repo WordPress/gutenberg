@@ -261,5 +261,5 @@ export type DropdownMenuPrivateContext = Pick<
 	DropdownMenuInternalContext,
 	'variant'
 > & {
-	portalContainer: HTMLElement | null;
+	portalContainer?: HTMLElement | null;
 };

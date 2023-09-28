@@ -1,4 +1,8 @@
-// @ts-nocheck
+/**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
@@ -14,10 +18,19 @@ import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
 import SlotFillContext from './bubbles-virtually/slot-fill-context';
+import type { WordPressComponentProps } from '../context';
+
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+import type {
+	DistributiveOmit,
+	FillComponentProps,
+	SlotComponentProps,
+	SlotFillProviderProps,
+	SlotKey,
+} from './types';
 
-export function Fill( props ) {
+export function Fill( props: FillComponentProps ) {
 	// We're adding both Fills here so they can register themselves before
 	// their respective slot has been registered. Only the Fill that has a slot
 	// will render. The other one will return null.
@@ -28,20 +41,27 @@ export function Fill( props ) {
 		</>
 	);
 }
-export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
-	if ( bubblesVirtually ) {
-		return <BubblesVirtuallySlot { ...props } ref={ ref } />;
-	}
-	return <BaseSlot { ...props } />;
-} );
 
-export function Provider( { children, ...props } ) {
+export function UnforwardedSlot(
+	props: SlotComponentProps &
+		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
+	ref: ForwardedRef< any >
+) {
+	const { bubblesVirtually, ...restProps } = props;
+	if ( bubblesVirtually ) {
+		return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
+	}
+	return <BaseSlot { ...restProps } />;
+}
+export const Slot = forwardRef( UnforwardedSlot );
+
+export function Provider( { children }: SlotFillProviderProps ) {
 	const parent = useContext( SlotFillContext );
 	if ( ! parent.isDefault ) {
-		return children;
+		return <>{ children }</>;
 	}
 	return (
-		<SlotFillProvider { ...props }>
+		<SlotFillProvider>
 			<BubblesVirtuallySlotFillProvider>
 				{ children }
 			</BubblesVirtuallySlotFillProvider>
@@ -49,12 +69,16 @@ export function Provider( { children, ...props } ) {
 	);
 }
 
-export function createSlotFill( key ) {
+export function createSlotFill( key: SlotKey ) {
 	const baseName = typeof key === 'symbol' ? key.description : key;
-	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
+	const FillComponent = ( props: Omit< FillComponentProps, 'name' > ) => (
+		<Fill name={ key } { ...props } />
+	);
 	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = ( props ) => <Slot name={ key } { ...props } />;
+	const SlotComponent = (
+		props: DistributiveOmit< SlotComponentProps, 'name' >
+	) => <Slot name={ key } { ...props } />;
 	SlotComponent.displayName = `${ baseName }Slot`;
 	SlotComponent.__unstableName = key;
 
@@ -64,7 +88,7 @@ export function createSlotFill( key ) {
 	};
 }
 
-export const createPrivateSlotFill = ( name ) => {
+export const createPrivateSlotFill = ( name: string ) => {
 	const privateKey = Symbol( name );
 	const privateSlotFill = createSlotFill( privateKey );
 
