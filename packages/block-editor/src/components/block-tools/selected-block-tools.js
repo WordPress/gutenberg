@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { getScrollContainer } from '@wordpress/dom';
 
@@ -47,6 +48,7 @@ function SelectedBlockTools( {
 	isFixed,
 	capturingClientId,
 } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
 		selector,
 		[]
@@ -112,10 +114,11 @@ function SelectedBlockTools( {
 		clientId,
 	} );
 
-	if ( isFixed ) {
+	if ( isFixed || ! isLargeViewport ) {
 		return (
 			<BlockContextualToolbar
-				isFixed={ isFixed }
+				// Needs to be passed as `true` so it can be set fixed smaller screens as well
+				isFixed={ true }
 				__experimentalInitialIndex={
 					initialToolbarItemIndexRef.current
 				}
