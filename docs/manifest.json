@@ -492,7 +492,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Hooks",
+		"title": "Block Filters",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
