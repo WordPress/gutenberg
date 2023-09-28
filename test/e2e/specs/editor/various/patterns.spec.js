@@ -4,8 +4,16 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
 	} );
 
 	test( 'create a new unsynced pattern via the block options menu', async ( {
@@ -58,13 +66,11 @@ test.describe( 'Unsynced pattern', () => {
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
 		// Just compare the block name and content as the clientIDs will be different.
-		const existingBlock = before[ 0 ];
-		const newBlocks = await editor.getBlocks();
-		newBlocks.forEach( ( block ) =>
-			expect( block ).toMatchObject( {
-				name: existingBlock.name,
-				attributes: { content: existingBlock.attributes.content },
-			} )
-		);
+		before.forEach( ( block ) => {
+			delete block.clientId;
+		} );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ ...before, ...before ] );
 	} );
 } );
