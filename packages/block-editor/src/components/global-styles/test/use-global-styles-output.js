@@ -995,7 +995,7 @@ describe( 'global styles renderer', () => {
 				'.foo{color: red; margin: auto;}.foo::before{color: blue;}.foo ::before{color: green;}.foo.one::before{color: yellow;}.foo .two::before{color: purple;}'
 			);
 		} );
-		it( 'should return a processed CSS with multiple root selectors', () => {
+		it( 'should return processed CSS with multiple root selectors', () => {
 			expect(
 				processCSSNesting(
 					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;}',
