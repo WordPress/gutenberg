@@ -17,10 +17,10 @@ const getCell = ( name: string ) => {
 	return within( getControl() ).getByRole( 'gridcell', { name } );
 };
 
-const asyncRender = async ( jsx: any ) => {
+const asyncRender = async ( jsx: any, focusedCell = 'center center' ) => {
 	const view = render( jsx );
 	await waitFor( () => {
-		expect( getCell( 'top left' ) ).toHaveAttribute( 'tabindex', '-1' );
+		expect( getCell( focusedCell ) ).toHaveAttribute( 'tabindex', '0' );
 	} );
 	return view;
 };
