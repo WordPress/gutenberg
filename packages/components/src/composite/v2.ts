@@ -7,6 +7,8 @@
  *
  * @see https://ariakit.org/components/composite
  */
+
+/* eslint-disable-next-line no-restricted-imports */
 export {
 	Composite,
 	CompositeGroup,
@@ -14,3 +16,6 @@ export {
 	CompositeRow,
 	useCompositeStore,
 } from '@ariakit/react';
+
+/* eslint-disable-next-line no-restricted-imports */
+export type { CompositeStore } from '@ariakit/react';

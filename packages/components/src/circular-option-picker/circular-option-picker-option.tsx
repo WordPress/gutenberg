@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useContext, useEffect } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 
 /**
@@ -16,15 +16,13 @@ import { Icon, check } from '@wordpress/icons';
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
-import { CompositeItem } from '../composite';
+import { CompositeItem } from '../composite/v2';
 import Tooltip from '../tooltip';
 import type {
 	OptionProps,
-	CircularOptionPickerCompositeState,
+	CircularOptionPickerCompositeStore,
 	CircularOptionPickerContextProps,
 } from './types';
-
-const hasSelectedOption = new Map();
 
 function UnforwardedOptionAsButton(
 	props: {
@@ -40,7 +38,7 @@ function UnforwardedOptionAsButton(
 			{ ...additionalProps }
 			aria-pressed={ isPressed }
 			ref={ forwardedRef }
-		></Button>
+		/>
 	);
 }
 
@@ -56,33 +54,28 @@ function UnforwardedOptionAsOption(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { id, isSelected, context, ...additionalProps } = props;
-	const { isComposite, ..._compositeState } = context;
-	const compositeState =
-		_compositeState as CircularOptionPickerCompositeState;
-	const { baseId, currentId, setCurrentId } = compositeState;
+	const { isComposite, baseId, ..._compositeStore } = context;
+	const compositeStore =
+		_compositeStore as CircularOptionPickerCompositeStore;
+	const { setActiveId } = compositeStore;
+	const activeId = compositeStore.useState( 'activeId' );
 
-	useEffect( () => {
-		// If we call `setCurrentId` here, it doesn't update for other
-		// Option renders in the same pass. So we have to store our own
-		// map to make sure that we only set the first selected option.
-		// We still need to check `currentId` because the control will
-		// update this as the user moves around, and that state should
-		// be maintained as the group gains and loses focus.
-		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
-			hasSelectedOption.set( baseId, true );
-			setCurrentId( id );
-		}
-	}, [ baseId, currentId, id, isSelected, setCurrentId ] );
+	if ( isSelected && ! activeId ) {
+		setActiveId( id );
+	}
 
 	return (
 		<CompositeItem
-			{ ...additionalProps }
-			{ ...compositeState }
-			as={ Button }
+			render={
+				<Button
+					{ ...additionalProps }
+					role="option"
+					aria-selected={ !! isSelected }
+					ref={ forwardedRef }
+				/>
+			}
+			store={ compositeStore }
 			id={ id }
-			role="option"
-			aria-selected={ !! isSelected }
-			ref={ forwardedRef }
 		/>
 	);
 }
