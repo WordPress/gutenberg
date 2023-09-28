@@ -41,6 +41,35 @@ import type {
 	WPCompleter,
 } from './types';
 
+const getNodeText = ( node: React.ReactNode ): string => {
+	if ( node === null ) {
+		return '';
+	}
+
+	switch ( typeof node ) {
+		case 'string':
+		case 'number':
+			return node.toString();
+			break;
+		case 'boolean':
+			return '';
+			break;
+		case 'object': {
+			if ( node instanceof Array ) {
+				return node.map( getNodeText ).join( '' );
+			}
+			if ( 'props' in node ) {
+				return getNodeText( node.props.children );
+			}
+			break;
+		}
+		default:
+			return '';
+	}
+
+	return '';
+};
+
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
 export function useAutocomplete( {
@@ -176,7 +205,11 @@ export function useAutocomplete( {
 						: selectedIndex ) - 1;
 				setSelectedIndex( newIndex );
 				if ( isAppleOS() ) {
-					speak( filteredOptions[ newIndex ].textLabel, 'assertive' );
+					speak(
+						filteredOptions[ newIndex ].textLabel ||
+							getNodeText( filteredOptions[ newIndex ].label ),
+						'assertive'
+					);
 				}
 				break;
 
@@ -184,7 +217,11 @@ export function useAutocomplete( {
 				newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
 				setSelectedIndex( newIndex );
 				if ( isAppleOS() ) {
-					speak( filteredOptions[ newIndex ].textLabel, 'assertive' );
+					speak(
+						filteredOptions[ newIndex ].textLabel ||
+							getNodeText( filteredOptions[ newIndex ].label ),
+						'assertive'
+					);
 				}
 				break;
 

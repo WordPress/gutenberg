@@ -25,7 +25,7 @@ export type KeyedOption = {
 	key: string;
 	value: any;
 	label: OptionLabel;
-	textLabel: string;
+	textLabel?: string;
 	keywords: Array< string >;
 	isDisabled: boolean;
 };
