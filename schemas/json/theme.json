@@ -1583,7 +1583,7 @@
 							]
 						},
 						"writingMode": {
-							"description": "Sets the `writing-mode` and `text-orientation` CSS properties.",
+							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
 								{
 									"type": "string"
