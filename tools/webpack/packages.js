@@ -168,4 +168,10 @@ module.exports = {
 			endYear: 2040,
 		} ),
 	].filter( Boolean ),
+	resolve: {
+		fallback: {
+			fs: false,
+			zlib: false,
+		},
+	},
 };

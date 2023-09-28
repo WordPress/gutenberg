@@ -28,13 +28,12 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 ];
 
 export default function SaveHub() {
-	const saveNoticeId = 'site-edit-save-notice';
 	const { params } = useLocation();
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice, removeNotice } =
+	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
 	const { dirtyCurrentEntity, countUnsavedChanges, isDirty, isSaving } =
@@ -109,7 +108,6 @@ export default function SaveHub() {
 	const saveCurrentEntity = async () => {
 		if ( ! dirtyCurrentEntity ) return;
 
-		removeNotice( saveNoticeId );
 		const { kind, name, key, property } = dirtyCurrentEntity;
 
 		try {
@@ -135,7 +133,6 @@ export default function SaveHub() {
 
 			createSuccessNotice( __( 'Site updated.' ), {
 				type: 'snackbar',
-				id: saveNoticeId,
 			} );
 		} catch ( error ) {
 			createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` );
@@ -152,7 +149,6 @@ export default function SaveHub() {
 					disabled={ isSaving }
 					aria-disabled={ isSaving }
 					className="edit-site-save-hub__button"
-					__next40pxDefaultSize
 				>
 					{ label }
 				</Button>
@@ -162,8 +158,7 @@ export default function SaveHub() {
 					variant={ disabled ? null : 'primary' }
 					showTooltip={ false }
 					icon={ disabled && ! isSaving ? check : null }
-					defaultLabel={ label }
-					__next40pxDefaultSize
+					textForDefaultState={ label }
 				/>
 			) }
 		</HStack>
