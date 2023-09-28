@@ -81,6 +81,10 @@ export default function getDefaultUseItems( autocompleter: WPCompleter ) {
 								label: autocompleter.getOptionLabel(
 									optionData
 								),
+								textLabel:
+									autocompleter.getOptionTextLabel(
+										optionData
+									),
 								keywords: autocompleter.getOptionKeywords
 									? autocompleter.getOptionKeywords(
 											optionData

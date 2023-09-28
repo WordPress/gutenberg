@@ -95,6 +95,7 @@ function createBlockCompleter() {
 						return {
 							key: `block-${ blockItem.id }`,
 							value: blockItem,
+							textLabel: title,
 							label: (
 								<>
 									<BlockIcon

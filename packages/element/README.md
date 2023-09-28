@@ -268,6 +268,10 @@ _Changelog_
 
 `6.2.0` Introduced in WordPress core.
 
+### isAppleDevice
+
+Undocumented declaration.
+
 ### isEmptyElement
 
 Checks if the provided WP element is empty.
@@ -279,6 +283,22 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True when an element is considered empty.
+
+### isIOS
+
+Undocumented declaration.
+
+### isIPad
+
+Undocumented declaration.
+
+### isIPhone
+
+Undocumented declaration.
+
+### isMac
+
+Undocumented declaration.
 
 ### isValidElement
 

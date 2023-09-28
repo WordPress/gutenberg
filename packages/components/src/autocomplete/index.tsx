@@ -12,6 +12,7 @@ import {
 	useState,
 	useRef,
 	useMemo,
+	isAppleDevice,
 } from '@wordpress/element';
 import { __, _n } from '@wordpress/i18n';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
@@ -22,6 +23,7 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -163,19 +165,27 @@ export function useAutocomplete( {
 		) {
 			return;
 		}
+
+		let newIndex = 0;
+
 		switch ( event.key ) {
 			case 'ArrowUp':
-				setSelectedIndex(
+				newIndex =
 					( selectedIndex === 0
 						? filteredOptions.length
-						: selectedIndex ) - 1
-				);
+						: selectedIndex ) - 1;
+				setSelectedIndex( newIndex );
+				if ( isAppleDevice() ) {
+					speak( filteredOptions[ newIndex ].textLabel, 'assertive' );
+				}
 				break;
 
 			case 'ArrowDown':
-				setSelectedIndex(
-					( selectedIndex + 1 ) % filteredOptions.length
-				);
+				newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
+				setSelectedIndex( newIndex );
+				if ( isAppleDevice() ) {
+					speak( filteredOptions[ newIndex ].textLabel, 'assertive' );
+				}
 				break;
 
 			case 'Escape':
