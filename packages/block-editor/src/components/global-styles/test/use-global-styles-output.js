@@ -970,7 +970,7 @@ describe( 'global styles renderer', () => {
 	} );
 
 	describe( 'processCSSNesting', () => {
-		it( 'should return a processed CSS without any nested selectors', () => {
+		it( 'should return processed CSS without any nested selectors', () => {
 			expect(
 				processCSSNesting( 'color: red; margin: auto;', '.foo' )
 			).toEqual( '.foo{color: red; margin: auto;}' );
