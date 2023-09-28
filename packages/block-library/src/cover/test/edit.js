@@ -260,7 +260,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 			expect(
-				within( screen.queryByLabelText( 'Block: Cover' ) ).queryByRole(
+				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
 					'img'
 				)
 			).not.toBeInTheDocument();
