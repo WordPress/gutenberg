@@ -493,7 +493,6 @@ function PopoverSlot(
 ) {
 	return (
 		<Slot
-			// @ts-expect-error Need to type `SlotFill`
 			bubblesVirtually
 			name={ name }
 			className="popover-slot"
