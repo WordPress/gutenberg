@@ -51,7 +51,7 @@ function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
 
 			// Make sure we don't duplicate template parts.
 			const existingTemplatePart = result.find(
-				( e ) => e.templatePart.id === templatePartId
+				( oneResult ) => oneResult.templatePart.id === templatePartId
 			);
 
 			// Only add to output if the found template part block is in the list of available template parts.
