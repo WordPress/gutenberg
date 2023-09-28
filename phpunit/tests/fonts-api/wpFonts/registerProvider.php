@@ -19,12 +19,12 @@ class Tests_Fonts_WpFonts_RegisterProvider extends WP_Fonts_TestCase {
 	 * @dataProvider data_register_providers
 	 *
 	 * @param string $provider_id Provider ID.
-	 * @param string $class       Provider class name.
+	 * @param string $class_name  Provider class name.
 	 * @param array  $expected    Expected providers queue.
 	 */
-	public function test_should_register_provider( $provider_id, $class, $expected ) {
+	public function test_should_register_provider( $provider_id, $class_name, $expected ) {
 		$wp_fonts = new WP_Fonts();
-		$this->assertTrue( $wp_fonts->register_provider( $provider_id, $class ), 'WP_Fonts::register_provider() should return true' );
+		$this->assertTrue( $wp_fonts->register_provider( $provider_id, $class_name ), 'WP_Fonts::register_provider() should return true' );
 		$this->assertSame( $expected, $wp_fonts->get_providers(), 'Provider "' . $provider_id . '" should be registered in providers queue' );
 	}
 
@@ -83,12 +83,12 @@ class Tests_Fonts_WpFonts_RegisterProvider extends WP_Fonts_TestCase {
 	 * @dataProvider data_invalid_providers
 	 *
 	 * @param string $provider_id Provider ID.
-	 * @param string $class       Provider class name.
+	 * @param string $class_name  Provider class name.
 	 */
-	public function test_should_not_register( $provider_id, $class ) {
+	public function test_should_not_register( $provider_id, $class_name ) {
 		$wp_fonts = new WP_Fonts();
 
-		$this->assertFalse( $wp_fonts->register_provider( $provider_id, $class ), 'WP_Fonts::register_provider() should return false' );
+		$this->assertFalse( $wp_fonts->register_provider( $provider_id, $class_name ), 'WP_Fonts::register_provider() should return false' );
 		$this->assertArrayNotHasKey( $provider_id, $wp_fonts->get_providers(), 'Both local and mock providers should be registered' );
 	}
 

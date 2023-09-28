@@ -14,8 +14,8 @@
 		animation:
 			wp-block-query__enhanced-pagination-start-animation
 			30s
-			cubic-bezier(0, 1, 0, 1)
-			infinite;
+			cubic-bezier(0.03, 0.5, 0, 1)
+			forwards;
 	}
 
 	&.finish-animation {

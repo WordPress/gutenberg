@@ -7,9 +7,7 @@ import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
-	BlockSelectionClearer,
 	BlockInspector,
-	CopyHandler,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
@@ -114,19 +112,15 @@ export default function SidebarBlockEditor( {
 					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
-				<CopyHandler>
-					<BlockTools>
-						<BlockSelectionClearer>
-							<BlockCanvas
-								shouldIframe={ false }
-								styles={ settings.defaultEditorStyles }
-								height="100%"
-							>
-								<BlockList renderAppender={ BlockAppender } />
-							</BlockCanvas>
-						</BlockSelectionClearer>
-					</BlockTools>
-				</CopyHandler>
+				<BlockTools>
+					<BlockCanvas
+						shouldIframe={ false }
+						styles={ settings.defaultEditorStyles }
+						height="100%"
+					>
+						<BlockList renderAppender={ BlockAppender } />
+					</BlockCanvas>
+				</BlockTools>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

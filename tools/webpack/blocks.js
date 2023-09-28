@@ -32,6 +32,7 @@ const prefixFunctions = [
 	'wp_enqueue_block_support_styles',
 	'wp_get_typography_font_size_value',
 	'wp_style_engine_get_styles',
+	'wp_get_global_settings',
 ];
 
 /**

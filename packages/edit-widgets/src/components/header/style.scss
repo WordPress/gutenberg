@@ -3,7 +3,6 @@
 	align-items: center;
 	justify-content: space-between;
 	height: $header-height;
-	padding: 0 $grid-unit-20;
 	overflow: auto;
 	background: #fff;
 
@@ -16,6 +15,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding-left: $grid-unit-20;
 }
 
 .edit-widgets-header__title {
@@ -27,7 +27,7 @@
 .edit-widgets-header__actions {
 	display: flex;
 	align-items: center;
-
+	padding-right: $grid-unit-20;
 	gap: $grid-unit-05;
 
 	@include break-small() {
