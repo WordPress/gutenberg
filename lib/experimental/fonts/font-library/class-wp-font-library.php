@@ -50,7 +50,7 @@ class WP_Font_Library {
 	 *
 	 * @var array
 	 */
-	private static $collections = array();
+	private static $collections   = array();
 
 	/**
 	 * Register a new font collection.
@@ -70,6 +70,57 @@ class WP_Font_Library {
 
 		self::$collections[ $config['id'] ] = $new_collection;
 		return $new_collection;
+	}
+
+	/**
+	 * Adds fonts to theme.json as default font families.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param WP_Theme_JSON $theme_json Theme JSON object.
+	 * @return WP_Theme_JSON Modified theme JSON object.
+	 */
+	public static function add_default_fonts_to_theme_json( $theme_json ) {
+
+		$default_font_collection_data = array();
+
+		foreach ( self::get_font_collections() as $font_collection ) {
+			$collection_config = $font_collection->get_config();
+			if ( ! isset( $collection_config['default'] ) ) {
+				continue;
+			}
+			$collection_item = self::get_font_collection($collection_config['id']);
+			$collection_data = $collection_item->get_data()['data'];
+			$default_font_collection_data = array_merge( $default_font_collection_data, $collection_data['fontFamilies'] );
+		}
+
+		if ( empty( $default_font_collection_data) ) {
+			return $theme_json;
+		}
+
+		$current_data = $theme_json->get_data();
+
+		if ( ! isset( $current_data['version'] ) || $current_data['version'] !== 2 ) {
+			return $theme_json;
+		}
+
+		// get currently available font families
+		$default_font_families = $current_data['settings']['typography']['fontFamilies']['default'] ?? array();
+		$default_font_families = array_merge( $default_font_families,  $default_font_collection_data );
+
+		// add font families to json structure
+		$new_data = array(
+			'version'  => 2,
+			'settings' => array(
+				'typography' => array(
+					'fontFamilies' => array(
+						'default' => $default_font_families,
+					),
+				),
+			),
+		);
+
+		return $theme_json->update_with( $new_data );
 	}
 
 	/**

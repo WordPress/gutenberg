@@ -41,11 +41,14 @@ function LibraryFontVariant( { face, font } ) {
 		<div className="font-library-modal__library-font-variant">
 			<Flex justify="space-between" align="center" gap="1rem">
 				<FontFaceDemo fontFace={ face } text={ displayName } />
-				<CheckboxControl
-					checked={ isIstalled }
-					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
-				/>
+				{ font?.source &&
+				( font.source === 'custom' || font?.source === 'theme' ) ? (
+					<CheckboxControl
+						checked={ isIstalled }
+						onChange={ handleToggleActivation }
+						__nextHasNoMarginBottom={ true }
+					/>
+				) : null }
 			</Flex>
 		</div>
 	);

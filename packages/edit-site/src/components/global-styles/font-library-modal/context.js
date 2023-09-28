@@ -93,6 +93,18 @@ function FontLibraryProvider( { children } ) {
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
+	const baseDefaultFonts = baseFontFamilies?.default
+		? baseFontFamilies.default
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'default' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+
+	const defaultFonts = fontFamilies?.default
+		? fontFamilies.default
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'default' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+
 	const baseThemeFonts = baseFontFamilies?.theme
 		? baseFontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
@@ -175,6 +187,8 @@ function FontLibraryProvider( { children } ) {
 
 	const getActivatedFontsOutline = ( source ) => {
 		switch ( source ) {
+			case 'default':
+				return getAvailableFontsOutline( defaultFonts );
 			case 'theme':
 				return getAvailableFontsOutline( themeFonts );
 			case 'custom':
@@ -349,6 +363,8 @@ function FontLibraryProvider( { children } ) {
 			value={ {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
+				defaultFonts,
+				baseDefaultFonts,
 				themeFonts,
 				baseThemeFonts,
 				customFonts,

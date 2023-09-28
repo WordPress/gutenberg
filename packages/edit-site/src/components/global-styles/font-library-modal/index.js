@@ -19,14 +19,16 @@ const INSTALLED_FONTS_TAB = {
 };
 
 const tabsFromCollections = ( collections ) =>
-	collections.map( ( { id, name } ) => ( {
-		name: id,
-		title:
-			collections.length === 1 && id === 'default-font-collection'
-				? __( 'Install Fonts' )
-				: name,
-		className: 'collection',
-	} ) );
+	collections
+		.filter( ( collection ) => ! collection.default )
+		.map( ( { id, name } ) => ( {
+			name: id,
+			title:
+				collections.length === 1 && id === 'default-font-collection'
+					? __( 'Install Fonts' )
+					: name,
+			className: 'collection',
+		} ) );
 
 function FontLibraryModal( {
 	onRequestClose,

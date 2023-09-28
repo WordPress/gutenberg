@@ -33,6 +33,7 @@ function InstalledFonts() {
 		refreshLibrary,
 		uninstallFont,
 		isResolvingLibrary,
+		baseDefaultFonts,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
@@ -68,7 +69,7 @@ function InstalledFonts() {
 		: null;
 
 	const shouldDisplayDeleteButton =
-		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+		!! libraryFontSelected && libraryFontSelected?.source === 'custom';
 
 	useEffect( () => {
 		refreshLibrary();
@@ -118,6 +119,23 @@ function InstalledFonts() {
 						<>
 							<FontsGrid title={ __( 'Theme Fonts' ) }>
 								{ baseThemeFonts.map( ( font ) => (
+									<LibraryFontCard
+										font={ font }
+										key={ font.slug }
+										onClick={ () => {
+											handleSelectFont( font );
+										} }
+									/>
+								) ) }
+							</FontsGrid>
+						</>
+					) }
+
+					{ baseDefaultFonts.length > 0 && (
+						<>
+							<Spacer margin={ 8 } />
+							<FontsGrid title={ __( 'Default Fonts' ) }>
+								{ baseDefaultFonts.map( ( font ) => (
 									<LibraryFontCard
 										font={ font }
 										key={ font.slug }

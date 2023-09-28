@@ -57,12 +57,13 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
-
-$default_font_collection = array(
-	'id'          => 'default-font-collection',
+$google_font_collection = array(
+	'id'          => 'google-font-collection',
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	'src'         => 'https://s.w.org/images/fonts/16.7/collections/google-fonts-with-preview.json',
 );
 
-wp_register_font_collection( $default_font_collection );
+wp_register_font_collection( $google_font_collection );
+
+add_filter( 'wp_theme_json_data_default', array( 'WP_Font_Library', 'add_default_fonts_to_theme_json' ) );
