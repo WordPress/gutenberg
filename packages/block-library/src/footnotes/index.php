@@ -113,5 +113,3 @@ function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
 add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
-
-
