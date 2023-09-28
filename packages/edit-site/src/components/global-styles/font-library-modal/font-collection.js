@@ -12,6 +12,7 @@ import {
 	FlexItem,
 	Flex,
 	Button,
+	Notice,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -51,6 +52,7 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
+	const [ error, setError ] = useState( null );
 	const { collections, getFontCollection } = useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -68,8 +70,15 @@ function FontCollection( { id } ) {
 	}, [ id, requiresPermission ] );
 
 	useEffect( () => {
-		getFontCollection( id );
-		resetFilters();
+		const fetchFontCollection = async () => {
+			try {
+				await getFontCollection( id );
+				resetFilters();
+			} catch ( e ) {
+				setError( e );
+			}
+		};
+		fetchFontCollection();
 	}, [ id, getFontCollection ] );
 
 	useEffect( () => {
@@ -149,8 +158,19 @@ function FontCollection( { id } ) {
 				</>
 			) }
 
-			{ ! renderConfirmDialog && ! selectedCollection.data && (
+			{ ! renderConfirmDialog && ! selectedCollection.data && ! error && (
 				<Spinner />
+			) }
+
+			{ ! renderConfirmDialog && ! selectedCollection.data && error && (
+				<Notice
+					status="error"
+					isDismissible={ false }
+					className="font-library-modal__font-collection__notice"
+					message
+				>
+					{ error.message }
+				</Notice>
 			) }
 
 			{ ! renderConfirmDialog && ! selectedFont && (
@@ -195,7 +215,8 @@ function FontCollection( { id } ) {
 			<Spacer margin={ 4 } />
 
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies && <Spinner /> }
+				! selectedCollection?.data?.fontFamilies &&
+				! error && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
 				!! selectedCollection?.data?.fontFamilies?.length &&
