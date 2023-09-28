@@ -52,7 +52,6 @@ describe( 'AlignmentMatrixControl', () => {
 					'top center',
 					'top right',
 					'center left',
-					'center center',
 					'center right',
 					'bottom left',
 					'bottom center',
@@ -68,10 +67,31 @@ describe( 'AlignmentMatrixControl', () => {
 						/>
 					);
 
-					await user.click( getCell( alignment ) );
+					const cell = getCell( alignment );
 
-					expect( getCell( alignment ) ).toHaveFocus();
+					await user.click( cell );
+
+					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( alignment );
+				} );
+
+				it( 'unless already focused', async () => {
+					const user = userEvent.setup();
+					const spy = jest.fn();
+
+					await asyncRender(
+						<AlignmentMatrixControl
+							value="center"
+							onChange={ spy }
+						/>
+					);
+
+					const cell = getCell( 'center center' );
+
+					await user.click( cell );
+
+					expect( cell ).toHaveFocus();
+					expect( spy ).not.toHaveBeenCalled();
 				} );
 			} );
 		} );

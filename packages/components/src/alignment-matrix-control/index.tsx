@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,14 +16,13 @@ import Cell from './cell';
 import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
-import { GRID, getItemId, normalizeValue } from './utils';
+import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
 import type {
 	AlignmentMatrixControlProps,
 	AlignmentMatrixControlValue,
+	VoidableAlignmentMatrixControlValue,
 } from './types';
-
-const noop = () => {};
 
 /**
  *
@@ -52,30 +50,31 @@ export function AlignmentMatrixControl( {
 	label = __( 'Alignment Matrix Control' ),
 	defaultValue = 'center center',
 	value,
-	onChange = noop,
+	onChange,
 	width = 92,
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
-	const [ immutableDefaultValue ] = useState(
-		normalizeValue( value ?? defaultValue )
-	);
-	const currentCell = normalizeValue( value ?? immutableDefaultValue );
-
 	const baseId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control',
 		id
 	);
-	const defaultActiveId = getItemId( baseId, immutableDefaultValue );
-
-	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
-		onChange( nextValue );
-	};
 
 	const compositeStore = useCompositeStore( {
-		defaultActiveId,
+		defaultActiveId: getItemId( baseId, defaultValue ),
+		activeId: getItemId( baseId, value ),
+		setActiveId: ( nextActiveId ) => {
+			onChange?.(
+				getItemValue(
+					baseId,
+					nextActiveId as VoidableAlignmentMatrixControlValue
+				) as AlignmentMatrixControlValue
+			);
+		},
 		rtl: isRTL(),
 	} );
+
+	const activeId = compositeStore.useState( 'activeId' );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -97,7 +96,7 @@ export function AlignmentMatrixControl( {
 				<CompositeRow as={ Row } role="row" key={ index }>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
-						const isActive = cell === currentCell;
+						const isActive = cellId === activeId;
 
 						return (
 							<Cell
@@ -105,7 +104,6 @@ export function AlignmentMatrixControl( {
 								isActive={ isActive }
 								key={ cell }
 								value={ cell }
-								onFocus={ () => handleOnChange( cell ) }
 							/>
 						);
 					} ) }

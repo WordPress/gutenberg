@@ -10,6 +10,11 @@ export type AlignmentMatrixControlValue =
 	| 'bottom center'
 	| 'bottom right';
 
+export type VoidableAlignmentMatrixControlValue =
+	| AlignmentMatrixControlValue
+	| null
+	| undefined;
+
 export type AlignmentMatrixControlProps = {
 	/**
 	 * Accessible label. If provided, sets the `aria-label` attribute of the

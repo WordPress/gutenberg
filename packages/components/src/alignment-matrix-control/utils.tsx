@@ -2,10 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
-import type { AlignmentMatrixControlValue } from './types';
+import type {
+	AlignmentMatrixControlValue,
+	VoidableAlignmentMatrixControlValue,
+} from './types';
 
 export const GRID: AlignmentMatrixControlValue[][] = [
 	[ 'top left', 'top center', 'top right' ],
@@ -37,7 +41,7 @@ export const ALIGNMENTS = GRID.flat();
  *
  * @return The normalized value
  */
-export function normalizeValue( value: AlignmentMatrixControlValue ) {
+export function normalizeValue( value: VoidableAlignmentMatrixControlValue ) {
 	return value === 'center' ? 'center center' : value;
 }
 
@@ -48,11 +52,11 @@ export function normalizeValue( value: AlignmentMatrixControlValue ) {
  *
  * @return The parsed value.
  */
-export function transformValue( value: AlignmentMatrixControlValue ) {
-	return normalizeValue( value ).replace(
+export function transformValue( value: VoidableAlignmentMatrixControlValue ) {
+	return normalizeValue( value )?.replace(
 		'-',
 		' '
-	) as AlignmentMatrixControlValue;
+	) as VoidableAlignmentMatrixControlValue;
 }
 
 /**
@@ -65,11 +69,10 @@ export function transformValue( value: AlignmentMatrixControlValue ) {
  */
 export function getItemId(
 	prefixId: string,
-	value: AlignmentMatrixControlValue
+	value: VoidableAlignmentMatrixControlValue
 ) {
-	const valueId = transformValue( value ).replace( ' ', '-' );
-
-	return `${ prefixId }-${ valueId }`;
+	const valueId = transformValue( value )?.replace( ' ', '-' );
+	return valueId && `${ prefixId }-${ valueId }`;
 }
 
 /**
@@ -79,9 +82,12 @@ export function getItemId(
  * @param id       An item ID
  * @return         The item value
  */
-export function getItemValue( prefixId: string, id: string ) {
+export function getItemValue(
+	prefixId: string,
+	id: VoidableAlignmentMatrixControlValue
+) {
 	return transformValue(
-		id.replace( prefixId + '-', '' ) as AlignmentMatrixControlValue
+		id?.replace( prefixId + '-', '' ) as VoidableAlignmentMatrixControlValue
 	);
 }
 
@@ -93,10 +99,16 @@ export function getItemValue( prefixId: string, id: string ) {
  * @return The index of a matching alignment.
  */
 export function getAlignmentIndex(
-	alignment: AlignmentMatrixControlValue = 'center'
+	alignment: VoidableAlignmentMatrixControlValue = 'center'
 ) {
-	const item = transformValue( alignment );
-	const index = ALIGNMENTS.indexOf( item );
+	const transformedValue = transformValue(
+		alignment
+	) as AlignmentMatrixControlValue;
+
+	// `transformedValue` could come back as undefined or null,
+	// but `indexOf` will still return -1, so we can proceed
+	// without any problems.
+	const index = ALIGNMENTS.indexOf( transformedValue );
 
 	return index > -1 ? index : undefined;
 }
