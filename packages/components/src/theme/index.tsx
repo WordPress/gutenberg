@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import type { ThemeProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { colorVariables, Wrapper } from './styles';
 import { generateThemeVariables } from './color-algorithms';
 import { useCx } from '../utils';

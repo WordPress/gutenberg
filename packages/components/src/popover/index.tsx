@@ -53,7 +53,7 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,

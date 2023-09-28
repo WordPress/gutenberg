@@ -5,12 +5,14 @@
 ### Enhancements
 
 -   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+-   `Button`: deprecating `isPressed` prop in favour of `aria-pressed` ([#54740](https://github.com/WordPress/gutenberg/pull/54740)).
 
 ### Bug Fix
 
 -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
 -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
 -   `FormTokenField`: Add `box-sizing` reset style and reset default padding ([#54734](https://github.com/WordPress/gutenberg/pull/54734)).
+-   `SlotFill`: Pass `Component` instance to unregisterSlot ([#54765](https://github.com/WordPress/gutenberg/pull/54765)).
 
 ### Internal
 
@@ -18,6 +20,7 @@
 -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
 -   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
 -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+-   `ContextSystemProvider`: Move out of `ui/` ([#54847](https://github.com/WordPress/gutenberg/pull/54847)).
 
 ## 25.8.0 (2023-09-20)
 
