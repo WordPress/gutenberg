@@ -1986,7 +1986,7 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
-				content: reusableBlock.content.raw,
+				content: reusableBlock.content?.raw,
 				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
@@ -2294,8 +2294,12 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUserPatterns( state ) {
 	const userPatterns =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const { patternCategoriesMap: categories } =
-		state?.settings?.__experimentalUserPatternCategories ?? {};
+	const userPatternCategories =
+		state?.settings?.__experimentalUserPatternCategories ?? [];
+	const categories = new Map();
+	userPatternCategories.forEach( ( userCategory ) =>
+		categories.set( userCategory.id, userCategory )
+	);
 	return userPatterns.map( ( userPattern ) => {
 		return {
 			name: `core/block/${ userPattern.id }`,

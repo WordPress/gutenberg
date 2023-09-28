@@ -85,8 +85,9 @@ class WP_Font_Family_Utils {
 	 * @return bool True if the file has a font MIME type, false otherwise.
 	 */
 	public static function has_font_mime_type( $filepath ) {
-		$filetype = wp_check_filetype( $filepath, WP_Font_Library::ALLOWED_FONT_MIME_TYPES );
+		$allowed_mime_types = WP_Font_Library::get_expected_font_mime_types_per_php_version();
+		$filetype           = wp_check_filetype( $filepath, $allowed_mime_types );
 
-		return in_array( $filetype['type'], WP_Font_Library::ALLOWED_FONT_MIME_TYPES, true );
+		return in_array( $filetype['type'], $allowed_mime_types, true );
 	}
 }

@@ -12,7 +12,8 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../store';
+import { store as patternsStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 function PatternsManageButton( { clientId } ) {
 	const { canRemove, isVisible, innerBlockCount, managePatternsUrl } =
@@ -51,7 +52,11 @@ function PatternsManageButton( { clientId } ) {
 			[ clientId ]
 		);
 
-	const { convertSyncedPatternToStatic } = useDispatch( editorStore );
+	// Ignore reason: false positive of the lint rule.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { convertSyncedPatternToStatic } = unlock(
+		useDispatch( patternsStore )
+	);
 
 	if ( ! isVisible ) {
 		return null;

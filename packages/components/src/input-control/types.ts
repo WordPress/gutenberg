@@ -13,7 +13,7 @@ import type { useDrag } from '@use-gesture/react';
  * Internal dependencies
  */
 import type { StateReducer } from './reducer/state';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { FlexProps } from '../flex/types';
 import type { BaseControlProps } from '../base-control/types';
 
