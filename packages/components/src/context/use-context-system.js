@@ -9,7 +9,7 @@ import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @template TProps
