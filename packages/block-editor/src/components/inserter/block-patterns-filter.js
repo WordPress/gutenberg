@@ -99,7 +99,7 @@ export function BlockPatternsSyncFilter( {
 			},
 			{
 				value: PATTERN_TYPES.theme,
-				label: __( 'Theme' ),
+				label: __( 'Theme & Plugins' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
