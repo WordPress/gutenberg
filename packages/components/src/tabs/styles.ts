@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
 import Button from '../button';
 import { COLORS } from '../utils';
 import { space } from '../ui/utils/space';
+import { reduceMotion } from '../utils/reduce-motion';
 
 export const TabListWrapper = styled.div`
 	display: flex;
@@ -54,7 +55,7 @@ export const TabButton = styled( Button )`
 
 			// Animation
 			transition: all 0.1s linear;
-			@include reduce-motion( 'transition' );
+			${ reduceMotion( 'transition' ) };
 		}
 
 		// Active.
@@ -82,7 +83,7 @@ export const TabButton = styled( Button )`
 
 			// Animation
 			transition: all 0.1s linear;
-			@include reduce-motion( 'transition' );
+			${ reduceMotion( 'transition' ) };
 		}
 
 		&:focus-visible::before {
