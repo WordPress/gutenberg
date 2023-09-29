@@ -15,7 +15,12 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import {
+	PRESET_METADATA,
+	ROOT_BLOCK_SELECTOR,
+	scopeSelector,
+	appendToSelector,
+} from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import {
 	getTypographyFontSizeValue,
@@ -1124,18 +1129,33 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
-const processCSSNesting = ( css, blockSelector ) => {
+export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
-		processedCSS += ! part.includes( '{' )
-			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
-			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+		const isRootCss = ! part.includes( '{' );
+		if ( isRootCss ) {
+			// If the part doesn't contain braces, it applies to the root level.
+			processedCSS += `${ blockSelector }{${ part.trim() }}`;
+		} else {
+			// If the part contains braces, it's a nested CSS rule.
+			const splittedPart = part.replace( '}', '' ).split( '{' );
+			if ( splittedPart.length !== 2 ) {
+				return;
+			}
+
+			const [ nestedSelector, cssValue ] = splittedPart;
+			const combinedSelector = nestedSelector.startsWith( ' ' )
+				? scopeSelector( blockSelector, nestedSelector )
+				: appendToSelector( blockSelector, nestedSelector );
+
+			processedCSS += `${ combinedSelector }{${ cssValue.trim() }}`;
+		}
 	} );
 	return processedCSS;
-};
+}
 
 /**
  * Returns the global styles output using a global styles configuration.
