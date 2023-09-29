@@ -301,7 +301,7 @@ export const Tooltip = styled.span< TooltipProps >`
 `;
 
 // @todo: Refactor RangeControl with latest HStack configuration
-// @wordpress/components/ui/hstack.
+// @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
