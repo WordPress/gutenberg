@@ -291,25 +291,37 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	public function uninstall_fonts( $request ) {
 		$fonts_to_uninstall = $request->get_param( 'fontFamilies' );
 
+		$errors    = array();
+		$successes = array();
+
 		if ( empty( $fonts_to_uninstall ) ) {
-			return new WP_Error(
+			$errors[] = new WP_Error(
 				'no_fonts_to_install',
-				__( 'No fonts to uninstall', 'gutenberg' ),
-				array( 'status' => 400 )
+				__( 'No fonts to uninstall', 'gutenberg' )
 			);
+			$data     = array(
+				'successes' => $successes,
+				'errors'    => $errors,
+			);
+			$response = rest_ensure_response( $data );
+			$response->set_status( 400 );
+			return $response;
 		}
 
 		foreach ( $fonts_to_uninstall as $font_data ) {
 			$font   = new WP_Font_Family( $font_data );
 			$result = $font->uninstall();
-
-			// If there was an error uninstalling the font, return the error.
 			if ( is_wp_error( $result ) ) {
-				return $result;
+				$errors[] = $result;
+			} else {
+				$successes[] = $result;
 			}
 		}
-
-		return new WP_REST_Response( __( 'Font families uninstalled successfully.', 'gutenberg' ), 200 );
+		$data = array(
+			'successes' => $successes,
+			'errors'    => $errors,
+		);
+		return rest_ensure_response( $data );
 	}
 
 	/**
@@ -394,47 +406,52 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		 */
 		$fonts_to_install = json_decode( $fonts_param, true );
 
+		$successes       = array();
+		$errors          = array();
+		$response_status = 200;
+
 		if ( empty( $fonts_to_install ) ) {
-			return new WP_Error(
+			$errors[]        = new WP_Error(
 				'no_fonts_to_install',
-				__( 'No fonts to install', 'gutenberg' ),
-				array( 'status' => 400 )
+				__( 'No fonts to install', 'gutenberg' )
 			);
+			$response_status = 400;
 		}
 
 		if ( $this->needs_write_permission( $fonts_to_install ) && ! $this->has_write_permission() ) {
-			return new WP_Error(
+			$errors[]        = new WP_Error(
 				'cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
-				array( 'status' => 500 )
+				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
 			);
+			$response_status = 500;
+		}
+
+		if ( ! empty( $errors ) ) {
+			$data     = array(
+				'successes' => $successes,
+				'errors'    => $errors,
+			);
+			$response = rest_ensure_response( $data );
+			$response->set_status( $response_status );
+			return $response;
 		}
 
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
-
-		// Iterates the fonts data received and creates a new WP_Font_Family object for each one.
-		$fonts_installed = array();
-
 		foreach ( $fonts_to_install as $font_data ) {
-			$font = new WP_Font_Family( $font_data );
-			$font->install( $files );
-			$fonts_installed[] = $font;
+			$font   = new WP_Font_Family( $font_data );
+			$result = $font->install( $files );
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result;
+			} else {
+				$successes[] = $result;
+			}
 		}
 
-		if ( empty( $fonts_installed ) ) {
-			return new WP_Error(
-				'error_installing_fonts',
-				__( 'Error installing fonts. No font was installed.', 'gutenberg' ),
-				array( 'status' => 500 )
-			);
-		}
-
-		$response = array();
-		foreach ( $fonts_installed as $font ) {
-			$response[] = $font->get_data();
-		}
-
-		return new WP_REST_Response( $response );
+		$data = array(
+			'successes' => $successes,
+			'errors'    => $errors,
+		);
+		return rest_ensure_response( $data );
 	}
 }
