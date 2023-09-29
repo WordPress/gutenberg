@@ -23,6 +23,7 @@ const {
 	waitForVisible,
 	clickIfClickable,
 	launchApp,
+	tapStatusBariOS,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
@@ -192,7 +193,11 @@ class EditorPage {
 			: 'post-title';
 
 		if ( options.autoscroll ) {
-			await swipeDown( this.driver );
+			if ( isAndroid() ) {
+				await swipeDown( this.driver );
+			} else {
+				await tapStatusBariOS( this.driver );
+			}
 		}
 
 		const elements =
