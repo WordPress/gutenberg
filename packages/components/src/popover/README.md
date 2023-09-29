@@ -63,7 +63,7 @@ const MyPopover = () => {
 By default Popovers render at the end of the body of your document. If you want Popover elements to render to a specific location on the page, you must render a `Popover.Slot` further up the element tree:
 
 ```jsx
-import { createRoot } from 'react';
+import { createRoot } from 'react-dom/client';
 import { Popover } from '@wordpress/components';
 import Content from './Content';
 

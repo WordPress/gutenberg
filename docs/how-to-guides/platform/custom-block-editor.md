@@ -216,7 +216,7 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 // File: src/index.js
 
 // External dependencies.
-import { createRoot } from 'react';
+import { createRoot } from 'react-dom/client';
 
 // WordPress dependencies.
 import domReady from '@wordpress/dom-ready';

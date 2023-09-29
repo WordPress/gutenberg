@@ -211,7 +211,8 @@ The `searchTerm` is now used as a `search` query parameter when provided. Note t
 Finally, here’s how `MyFirstApp` looks once we wire it all together:
 
 ```js
-import { useState, render } from 'react';
+import { useState } from 'react';
+import { render } from 'react-dom';
 import { SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
