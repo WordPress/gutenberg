@@ -6,8 +6,8 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { useEffect, useLayoutEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,6 +46,14 @@ function Tabs( {
 	const { items, selectedId } = store.useState();
 	const { setSelectedId } = store;
 
+	// Keep track of whether tabs have been populated. This is used to prevent
+	// certain effects from firing too early while tab data and relevant
+	// variables are undefined during the initial render.
+	const tabsHavePopulated = useRef( false );
+	if ( items.length > 0 ) {
+		tabsHavePopulated.current = true;
+	}
+
 	const selectedTab = items.find( ( item ) => item.id === selectedId );
 	const firstEnabledTab = items.find( ( item ) => {
 		// Ariakit internally refers to disabled tabs as `dimmed`.
@@ -70,16 +78,22 @@ function Tabs( {
 		}
 
 		// If the currently selected tab is missing (i.e. removed from the DOM),
-		// fall back to the initial tab or the first enabled tab.
+		// fall back to the initial tab or the first enabled tab if there is
+		// one. Otherwise, no tab should be selected.
 		if ( ! items.find( ( item ) => item.id === selectedId ) ) {
 			if ( initialTab && ! initialTab.dimmed ) {
 				setSelectedId( initialTab?.id );
-			} else {
-				setSelectedId( firstEnabledTab?.id );
+				return;
+			}
+
+			if ( firstEnabledTab ) {
+				setSelectedId( firstEnabledTab.id );
+			} else if ( tabsHavePopulated.current ) {
+				setSelectedId( null );
 			}
 		}
 	}, [
-		firstEnabledTab?.id,
+		firstEnabledTab,
 		initialTab,
 		initialTabId,
 		isControlled,
@@ -121,22 +135,19 @@ function Tabs( {
 		setSelectedId,
 	] );
 
-	const previousSelectedId = usePrevious( selectedId );
 	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
 	useEffect( () => {
 		if ( ! isControlled ) {
 			return;
 		}
 
-		// If there was a previously selected tab (i.e. not 'undefined' as on the
-		// first render), and the `selectedTabId` can't be found, clear the
-		// selection.
-		if ( !! previousSelectedId && !! selectedTabId && ! selectedTab ) {
+		// Once the tabs have populated, if the `selectedTabId` still can't be
+		// found, clear the selection.
+		if ( tabsHavePopulated.current && !! selectedTabId && ! selectedTab ) {
 			setSelectedId( null );
 		}
 	}, [
 		isControlled,
-		previousSelectedId,
 		selectedId,
 		selectedTab,
 		selectedTabId,
