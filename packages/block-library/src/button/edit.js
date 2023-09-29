@@ -39,6 +39,7 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
+import { prependHTTP } from '@wordpress/url';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -139,7 +140,10 @@ function ButtonEdit( props ) {
 
 	// Defines how block attributes map to link value and vice versa.
 	const linkValueAttrsToDataMapping = {
-		url: 'url',
+		url: {
+			dataKey: 'url',
+			toData: ( value ) => prependHTTP( value ),
+		},
 		opensInNewTab: {
 			dataKey: 'linkTarget',
 			toLink: ( value ) => value === NEW_TAB_TARGET,
