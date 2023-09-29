@@ -13,7 +13,7 @@ test.describe( 'Site editor writing flow', () => {
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/41811.
-	test( 'allows shift tabbing to the block toolbar from the first block', async ( {
+	test( 'allows shift tabbing out of the editor canvas from the first block', async ( {
 		admin,
 		editor,
 		page,
@@ -32,11 +32,11 @@ test.describe( 'Site editor writing flow', () => {
 		await expect( siteTitleBlock ).toBeVisible();
 		await editor.selectBlocks( siteTitleBlock );
 
-		// Shift tab to the toolbar.
+		// Shift tab to the first tabstop outside of the editor canvas
 		await pageUtils.pressKeys( 'shift+Tab' );
-		const blockToolbarButton = page.locator(
-			'role=toolbar[name="Block tools"i] >> role=button[name="Site Title"i]'
-		);
+		const blockToolbarButton = page.getByRole( 'button', {
+			name: 'Open save panel',
+		} );
 		await expect( blockToolbarButton ).toBeFocused();
 	} );
 
