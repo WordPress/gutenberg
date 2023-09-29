@@ -6,6 +6,7 @@
 
 -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
 -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+-   `Popover`: Apply the CSS in JS styles properly for components used within popovers. ([#54912](https://github.com/WordPress/gutenberg/pull/54912))
 
 ### Internal
 
