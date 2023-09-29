@@ -98,7 +98,8 @@ export type ModalProps = {
 	isFullScreen?: boolean;
 	/**
 	 * If this property is added it will cause the modal to render at a preset
-	 * width, or expand to fill the screen.
+	 * width, or expand to fill the screen. This prop will be ignored if
+	 * `isFullScreen` is set to `true`.
 	 *
 	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
 	 * modal's contents, or via CSS using the `style` prop.

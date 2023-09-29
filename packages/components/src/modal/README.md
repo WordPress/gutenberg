@@ -223,7 +223,7 @@ This property when set to `true` will render a full screen modal.
 
 #### `size`: `'small' | 'medium' | 'large' | 'fill'`
 
-If this property is added it will cause the modal to render at a preset width, or expand to fill the screen.
+If this property is added it will cause the modal to render at a preset width, or expand to fill the screen. This prop will be ignored if `isFullScreen` is set to `true`.
 
 -   Required: No
 
