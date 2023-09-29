@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { __ } from '@wordpress/i18n';
 import { getScrollContainer } from '@wordpress/dom';
+import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -49,6 +51,8 @@ function SelectedBlockTools( {
 	capturingClientId,
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const instanceId = useInstanceId( SelectedBlockTools );
+	const descriptionId = `block-editor-block-contextual-toolbar--${ instanceId }`;
 	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
 		selector,
 		[]
@@ -114,10 +118,22 @@ function SelectedBlockTools( {
 		clientId,
 	} );
 
+	const KeyboardInstructions = () => {
+		return (
+			<VisuallyHidden id={ descriptionId }>
+				{ __(
+					'Press Tab or Shift+Tab to navigate to other toolbars, and press Escape to return focus to the editor.'
+				) }
+			</VisuallyHidden>
+		);
+	};
+
 	if ( isFixed || ! isLargeViewport ) {
 		return (
 			<>
+				<KeyboardInstructions />
 				<BlockContextualToolbar
+					aria-describedby={ descriptionId }
 					// Needs to be passed as `true` so it can be set fixed smaller screens as well
 					isFixed={ true }
 					__experimentalInitialIndex={
@@ -173,20 +189,24 @@ function SelectedBlockTools( {
 				{ ...popoverProps }
 			>
 				{ shouldShowContextualToolbar && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isToolbarForced.current }
-						__experimentalInitialIndex={
-							initialToolbarItemIndexRef.current
-						}
-						__experimentalOnIndexChange={ ( index ) => {
-							initialToolbarItemIndexRef.current = index;
-						} }
-						// Resets the index whenever the active block changes so
-						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-						key={ clientId }
-					/>
+					<>
+						<KeyboardInstructions />
+						<BlockContextualToolbar
+							aria-describedby={ descriptionId }
+							// If the toolbar is being shown because of being forced
+							// it should focus the toolbar right after the mount.
+							focusOnMount={ isToolbarForced.current }
+							__experimentalInitialIndex={
+								initialToolbarItemIndexRef.current
+							}
+							__experimentalOnIndexChange={ ( index ) => {
+								initialToolbarItemIndexRef.current = index;
+							} }
+							// Resets the index whenever the active block changes so
+							// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+							key={ clientId }
+						/>
+					</>
 				) }
 				{ shouldShowBreadcrumb && (
 					<BlockSelectionButton
