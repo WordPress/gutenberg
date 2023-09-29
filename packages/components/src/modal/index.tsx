@@ -98,7 +98,12 @@ function UnforwardedModal(
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
 
-	const sizeClass = size && size !== 'fill' ? `has-size-${ size }` : '';
+	let sizeClass;
+	if ( isFullScreen || size === 'fill' ) {
+		sizeClass = 'is-full-screen';
+	} else if ( size ) {
+		sizeClass = `has-size-${ size }`;
+	}
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
@@ -232,14 +237,8 @@ function UnforwardedModal(
 				<div
 					className={ classnames(
 						'components-modal__frame',
-						className,
-						{
-							'is-full-screen': isFullScreen || size === 'fill',
-						},
-						{
-							[ sizeClass ]:
-								! isFullScreen && size && size !== 'fill',
-						}
+						sizeClass,
+						className
 					) }
 					style={ style }
 					ref={ useMergeRefs( [
