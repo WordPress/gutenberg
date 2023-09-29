@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 
 /**
