@@ -221,6 +221,14 @@ This property when set to `true` will render a full screen modal.
 -   Required: No
 -   Default: `false`
 
+#### `size`: `'small' | 'medium' | 'large' | 'fill'`
+
+If this property is added it will cause the modal to render at a preset width, or expand to fill the screen. This prop will be ignored if `isFullScreen` is set to `true`.
+
+-   Required: No
+
+Note: `Modal`'s width can also be controlled by adjusting the width of the modal's contents via CSS.
+
 #### `onRequestClose`: ``
 
 This function is called to indicate that the modal should be closed.
