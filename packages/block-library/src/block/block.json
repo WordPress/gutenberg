@@ -16,6 +16,6 @@
 		"customClassName": false,
 		"html": false,
 		"inserter": false,
-		"__experimentalBlockRenaming": false
+		"blockRenaming": false
 	}
 }

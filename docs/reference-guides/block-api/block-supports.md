@@ -7,30 +7,29 @@ Opting into any of these features will register additional attributes on the blo
 In order for the attribute to get applied to the block the generated properties get added to the wrapping element of the block. They get added to the object you get returned from the `useBlockProps` hook.
 
 `BlockEdit` function:
+
 ```js
 function BlockEdit() {
 	const blockProps = useBlockProps();
 
-	return (
-		<div {...blockProps}>Hello World!</div>
-	);
+	return <div { ...blockProps }>Hello World!</div>;
 }
 ```
 
 `save` function:
+
 ```js
 function BlockEdit() {
 	const blockProps = useBlockProps.save();
 
-	return (
-		<div {...blockProps}>Hello World!</div>
-	);
+	return <div { ...blockProps }>Hello World!</div>;
 }
 ```
 
 For dynamic blocks that get rendered via a `render_callback` in PHP you can use the `get_block_wrapper_attributes()` function. It returns a string containing all the generated properties and needs to get output in the opening tag of the wrapping block element.
 
 `render_callback` function:
+
 ```php
 function render_block() {
 	$wrapper_attributes = get_block_wrapper_attributes();
@@ -53,7 +52,7 @@ Anchors let you link directly to a specific block on a page. This property adds 
 ```js
 // Declare support for anchor links.
 supports: {
-	anchor: true
+	anchor: true;
 }
 ```
 
@@ -69,14 +68,14 @@ supports: {
 	// Declare support for block's alignment.
 	// This adds support for all the options:
 	// left, center, right, wide, and full.
-	align: true
+	align: true;
 }
 ```
 
 ```js
 supports: {
 	// Declare support for specific alignment options.
-	align: [ 'left', 'right', 'full' ]
+	align: [ 'left', 'right', 'full' ];
 }
 ```
 
@@ -101,21 +100,21 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 ```js
 supports: {
 	// Remove the support for wide alignment.
-	alignWide: false
+	alignWide: false;
 }
 ```
 
 ## ariaLabel
 
-- Type: `boolean`
-- Default value: `false`
+-   Type: `boolean`
+-   Default value: `false`
 
 ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.
 
 ```js
 supports: {
 	// Add the support for aria label.
-	ariaLabel: true
+	ariaLabel: true;
 }
 ```
 
@@ -129,7 +128,7 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 ```js
 supports: {
 	// Remove the support for the generated className.
-	className: false
+	className: false;
 }
 ```
 
@@ -151,7 +150,7 @@ Note that the `background` and `text` keys have a default value of `true`, so if
 supports: {
 	color: {
 		// This also enables text and background UI controls.
-		gradients: true // Enable gradients UI control.
+		gradients: true; // Enable gradients UI control.
 	}
 }
 ```
@@ -175,7 +174,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background and text
+	color: true; // Enables background and text
 }
 ```
 
@@ -183,52 +182,52 @@ To disable background support while keeping other color supports enabled, set to
 
 ```js
 supports: {
-    color: {
-        // Disable background support. Text color support is still enabled.
-        background: false
-    }
+	color: {
+		// Disable background support. Text color support is still enabled.
+		background: false;
+	}
 }
 ```
 
 When the block declares support for `color.background`, the attributes definition is extended to include two new attributes: `backgroundColor` and `style`:
 
-- `backgroundColor`: attribute of `string` type with no default assigned.
+-   `backgroundColor`: attribute of `string` type with no default assigned.
 
-  When a user chooses from the list of preset background colors, the preset slug is stored in the `backgroundColor` attribute.
+    When a user chooses from the list of preset background colors, the preset slug is stored in the `backgroundColor` attribute.
 
-  Background color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+    Background color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
-  The block can apply a default preset background color by specifying its own attribute with a default e.g.:
+    The block can apply a default preset background color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      backgroundColor: {
-          type: 'string',
-          default: 'some-preset-background-slug',
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        backgroundColor: {
+            type: 'string',
+            default: 'some-preset-background-slug',
+        }
+    }
+    ```
 
-- `style`: attribute of `object` type with no default assigned.
+-   `style`: attribute of `object` type with no default assigned.
 
-  When a custom background color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.background` attribute.
+    When a custom background color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.background` attribute.
 
-  The block can apply a default custom background color by specifying its own attribute with a default e.g.:
+    The block can apply a default custom background color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  background: '#aabbcc',
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                color: {
+                    background: '#aabbcc',
+                }
+            }
+        }
+    }
+    ```
 
-### color.__experimentalDuotone
+### color.\_\_experimentalDuotone
 
 _**Note:** Deprecated since WordPress 6.3._
 
@@ -252,51 +251,49 @@ supports: {
 
 Gradient presets are sourced from `editor-gradient-presets` [theme support](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets).
 
-
 When the block declares support for `color.gradient`, the attributes definition is extended to include two new attributes: `gradient` and `style`:
 
-- `gradient`: attribute of `string` type with no default assigned.
+-   `gradient`: attribute of `string` type with no default assigned.
 
-  When a user chooses from the list of preset gradients, the preset slug is stored in the `gradient` attribute.
+    When a user chooses from the list of preset gradients, the preset slug is stored in the `gradient` attribute.
 
-  The block can apply a default preset gradient by specifying its own attribute with a default e.g.:
+    The block can apply a default preset gradient by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      gradient: {
-          type: 'string',
-          default: 'some-preset-gradient-slug',
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        gradient: {
+            type: 'string',
+            default: 'some-preset-gradient-slug',
+        }
+    }
+    ```
 
-- `style`: attribute of `object` type with no default assigned.
+-   `style`: attribute of `object` type with no default assigned.
 
-  When a custom gradient is selected (i.e. using the custom gradient picker), the custom gradient value is stored in the `style.color.gradient` attribute.
+    When a custom gradient is selected (i.e. using the custom gradient picker), the custom gradient value is stored in the `style.color.gradient` attribute.
 
-  The block can apply a default custom gradient by specifying its own attribute with a default e.g.:
+    The block can apply a default custom gradient by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                color: {
+                    gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+                }
+            }
+        }
+    }
+    ```
 
 ### color.link
 
 This property adds block controls which allow the user to set link color in a block, link color is disabled by default.
 
-
 ```js
 supports: {
-    color: true // Enables only background and text
+	color: true; // Enables only background and text
 }
 ```
 
@@ -304,39 +301,38 @@ To enable link color support, set to `true`.
 
 ```js
 supports: {
-    color: {
-        link: true
-    }
+	color: {
+		link: true;
+	}
 }
 ```
 
 Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
-
 When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
-- `style`: attribute of `object` type with no default assigned.
+-   `style`: attribute of `object` type with no default assigned.
 
-  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
+    When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
 
-  The block can apply a default link color by specifying its own attribute with a default e.g.:
+    The block can apply a default link color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              elements: {
-                  link: {
-                      color: {
-                          text: '#ff0000',
-                      }
-                  }
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                elements: {
+                    link: {
+                        color: {
+                            text: '#ff0000',
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ```
 
 ### color.text
 
@@ -346,7 +342,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background and text, but not link.
+	color: true; // Enables background and text, but not link.
 }
 ```
 
@@ -354,51 +350,50 @@ To disable text color support while keeping other color supports enabled, set to
 
 ```js
 supports: {
-    color: {
-        // Disable text color support.
-        text: false
-    }
+	color: {
+		// Disable text color support.
+		text: false;
+	}
 }
 ```
 
 Text color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
-
 When the block declares support for `color.text`, the attributes definition is extended to include two new attributes: `textColor` and `style`:
 
-- `textColor`: attribute of `string` type with no default assigned.
+-   `textColor`: attribute of `string` type with no default assigned.
 
-  When a user chooses from the list of preset text colors, the preset slug is stored in the `textColor` attribute.
+    When a user chooses from the list of preset text colors, the preset slug is stored in the `textColor` attribute.
 
-  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
+    The block can apply a default preset text color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      textColor: {
-          type: 'string',
-          default: 'some-preset-text-color-slug',
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        textColor: {
+            type: 'string',
+            default: 'some-preset-text-color-slug',
+        }
+    }
+    ```
 
-- `style`: attribute of `object` type with no default assigned.
+-   `style`: attribute of `object` type with no default assigned.
 
-  When a custom text color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.text` attribute.
+    When a custom text color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.text` attribute.
 
-  The block can apply a default custom text color by specifying its own attribute with a default e.g.:
+    The block can apply a default custom text color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  text: '#aabbcc',
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                color: {
+                    text: '#aabbcc',
+                }
+            }
+        }
+    }
+    ```
 
 ## customClassName
 
@@ -410,7 +405,7 @@ This property adds a field to define a custom className for the block's wrapper.
 ```js
 supports: {
 	// Remove the support for the custom className.
-	customClassName: false
+	customClassName: false;
 }
 ```
 
@@ -424,7 +419,7 @@ When the style picker is shown, the user can set a default style for a block typ
 ```js
 supports: {
 	// Remove the Default Style picker.
-	defaultStylePicker: false
+	defaultStylePicker: false;
 }
 ```
 
@@ -441,27 +436,28 @@ This value signals that a block supports some of the CSS style properties relate
 
 ```js
 supports: {
-    dimensions: {
-        minHeight: true // Enable min height control.
-    }
+	dimensions: {
+		minHeight: true; // Enable min height control.
+	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+-   `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
-    style: {
-        dimensions: {
-            minHeight: "50vh"
-        }
-    }
+	style: {
+		dimensions: {
+			minHeight: '50vh';
+		}
+	}
 }
 ```
 
 ## filter
+
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
@@ -495,25 +491,25 @@ Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-gu
 
 When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
 
-- `style`: attribute of `object` type with no default assigned.
+-   `style`: attribute of `object` type with no default assigned.
 
-  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
+    The block can apply a default duotone color by specifying its own attribute with a default e.g.:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  duotone: [
-                      '#FFF',
-                      '#000'
-                  ]
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                color: {
+                    duotone: [
+                        '#FFF',
+                        '#000'
+                    ]
+                }
+            }
+        }
+    }
+    ```
 
 ## html
 
@@ -525,7 +521,7 @@ By default, a block's markup can be edited individually. To disable this behavio
 ```js
 supports: {
 	// Remove support for an HTML mode.
-	html: false
+	html: false;
 }
 ```
 
@@ -539,7 +535,7 @@ By default, all blocks will appear in the inserter, block transforms menu, Style
 ```js
 supports: {
 	// Hide this block from the inserter.
-	inserter: false
+	inserter: false;
 }
 ```
 
@@ -615,7 +611,6 @@ For the `flex` layout type, determines display of the justification control in t
 
 For the `flex` layout type only, determines display of the orientation control in the block toolbar.
 
-
 ## multiple
 
 -   Type: `boolean`
@@ -626,7 +621,7 @@ A non-multiple block can be inserted into each post, one time only. For example,
 ```js
 supports: {
 	// Use the block just once per post
-	multiple: false
+	multiple: false;
 }
 ```
 
@@ -654,7 +649,7 @@ A block may want to disable the ability to toggle the lock state. It can be lock
 ```js
 supports: {
 	// Remove support for locking UI.
-	lock: false
+	lock: false;
 }
 ```
 
@@ -673,15 +668,15 @@ Note that sticky position controls are currently only available for blocks set a
 
 ```js
 supports: {
-    position: {
-        sticky: true // Enable selecting sticky position.
-    }
+	position: {
+		sticky: true; // Enable selecting sticky position.
+	}
 }
 ```
 
 When the block declares support for a specific position property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
+-   `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
@@ -717,7 +712,7 @@ supports: {
 
 When the block declares support for a specific spacing property, its attributes definition is extended to include the `style` attribute.
 
-- `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
+-   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
 attributes: {
@@ -751,8 +746,8 @@ supports: {
 -   Type: `Object`
 -   Default value: `null`
 -   Subproperties:
-    - `fontSize`: type `boolean`, default value `false`
-    - `lineHeight`: type `boolean`, default value `false`
+    -   `fontSize`: type `boolean`, default value `false`
+    -   `lineHeight`: type `boolean`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -768,6 +763,7 @@ supports: {
 ```
 
 ### typography.fontSize
+
 -   Type: `boolean`
 -   Default value: `false`
 
@@ -843,7 +839,7 @@ attributes: {
 }
 ```
 
-### __experimentalBlockRenaming
+### blockRenaming
 
 -   Type: `boolean`
 -   Default value: `true`

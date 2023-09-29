@@ -134,7 +134,7 @@
 			}
 		},
 		"interactivity": true,
-		"__experimentalBlockRenaming": false
+		"blockRenaming": false
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-editor",
