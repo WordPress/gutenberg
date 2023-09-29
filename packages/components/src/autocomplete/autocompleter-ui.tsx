@@ -129,7 +129,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		} ) => (
 			<Component
 				id={ listBoxId }
-				role="listbox"
+				role="combobox"
 				className="components-autocomplete__results"
 			>
 				{ items.map( ( option, index ) => (
