@@ -6,14 +6,13 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+import { NEW_TAB_TARGET, NOFOLLOW_REL, NEW_TAB_REL } from './constants';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -32,6 +31,8 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
+	buildLinkValueFromData,
+	buildDataFromLinkValue,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
@@ -133,9 +134,59 @@ function ButtonEdit( props ) {
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
-	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
-	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+
 	const isLinkTag = 'a' === TagName;
+
+	// Defines how block attributes map to link value and vice versa.
+	const linkValueAttrsToDataMapping = {
+		url: 'url',
+		opensInNewTab: {
+			dataKey: 'linkTarget',
+			toLink: ( value ) => value === NEW_TAB_TARGET,
+			toData: ( value ) => ( value ? NEW_TAB_TARGET : undefined ),
+		},
+		nofollow: {
+			dataKey: 'rel',
+			toLink: ( value ) => value?.includes( NOFOLLOW_REL ),
+			toData: ( value, { opensInNewTab: opensInNewTabValue } ) => {
+				// "rel" attribute can be effected by changes to
+				// "nofollow" and "opensInNewTab" attributes.
+				// In addition it is editable in plaintext via the UI
+				// so consider that it may already contain a value.
+				let updatedRel = '';
+
+				// Handle setting rel based on nofollow setting.
+				if ( value ) {
+					updatedRel = updatedRel?.includes( NOFOLLOW_REL )
+						? updatedRel
+						: updatedRel + ` ${ NOFOLLOW_REL }`;
+				} else {
+					const relRegex = new RegExp(
+						`\\b${ NOFOLLOW_REL }\\s*`,
+						'g'
+					);
+					updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+				}
+
+				// Handle setting rel based on opensInNewTab setting.
+				if ( opensInNewTabValue ) {
+					updatedRel = updatedRel?.includes( NEW_TAB_REL )
+						? updatedRel
+						: updatedRel + ` ${ NEW_TAB_REL }`;
+				} else {
+					const relRegex = new RegExp(
+						`\\b${ NEW_TAB_REL }\\s*`,
+						'g'
+					);
+					updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+				}
+
+				// Returning `undefined` here if there is no String-based rel value.
+				// ensures that the attribute is fully removed from the block.
+				return updatedRel || undefined;
+			},
+		},
+	};
 
 	function startEditing( event ) {
 		event.preventDefault();
@@ -157,12 +208,18 @@ function ButtonEdit( props ) {
 		}
 	}, [ isSelected ] );
 
+	// NOT NOT MERGE WITHOUT RE-INTSTAINTG THIS MEMOIZATION
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
-	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
+	const linkValue = buildLinkValueFromData(
+		{
+			url,
+			linkTarget,
+			rel,
+		},
+		linkValueAttrsToDataMapping
 	);
+	// NOT NOT MERGE WITHOUT RE-INTSTAINTG THIS MEMOIZATION
 
 	return (
 		<>
@@ -251,18 +308,12 @@ function ButtonEdit( props ) {
 				>
 					<LinkControl
 						value={ linkValue }
-						onChange={ ( {
-							url: newURL,
-							opensInNewTab: newOpensInNewTab,
-							nofollow: newNofollow,
-						} ) =>
+						onChange={ ( newLinkValue ) =>
 							setAttributes(
-								getUpdatedLinkAttributes( {
-									rel,
-									url: newURL,
-									opensInNewTab: newOpensInNewTab,
-									nofollow: newNofollow,
-								} )
+								buildDataFromLinkValue(
+									newLinkValue,
+									linkValueAttrsToDataMapping
+								)
 							)
 						}
 						onRemove={ () => {
