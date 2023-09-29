@@ -152,13 +152,7 @@ const UsingSlotFillTemplate: StoryFn< typeof Tabs > = ( props ) => {
 				<p>other stuff</p>
 				<p>this is fun!</p>
 				<p>other stuff</p>
-				<Slot
-					// ignore reason: slot-fill is not typed yet
-					//@ts-expect-error
-					bubblesVirtually
-					as="div"
-					name="tabs-are-fun"
-				/>
+				<Slot bubblesVirtually as="div" name="tabs-are-fun" />
 			</div>
 		</SlotFillProvider>
 	);
