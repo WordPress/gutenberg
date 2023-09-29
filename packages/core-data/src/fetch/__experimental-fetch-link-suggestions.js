@@ -101,10 +101,10 @@ const fetchLinkSuggestions = async (
 	const queries = [];
 
 	if ( isInitialSuggestions && initialSuggestionsOptions ) {
-		type = initialSuggestionsOptions.type;
-		subtype = initialSuggestionsOptions.subtype;
-		page = initialSuggestionsOptions.page;
-		perPage = initialSuggestionsOptions.perPage;
+		type = initialSuggestionsOptions.type || type;
+		subtype = initialSuggestionsOptions.subtype || subtype;
+		page = initialSuggestionsOptions.page || page;
+		perPage = initialSuggestionsOptions.perPage || perPage;
 	}
 
 	if ( ! type || type === 'post' ) {
