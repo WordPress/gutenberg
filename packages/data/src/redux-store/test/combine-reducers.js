@@ -55,4 +55,12 @@ describe( 'combineReducers', () => {
 			foo: 2,
 		} );
 	} );
+
+	it( 'supports a "unit" reducer with no subreducers', () => {
+		const reducer = combineReducers( {} );
+		const initialState = reducer( undefined, { type: 'INIT' } );
+		expect( initialState ).toEqual( {} );
+		const nextState = reducer( initialState, { type: 'INC' } );
+		expect( nextState ).toBe( initialState );
+	} );
 } );
