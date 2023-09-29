@@ -78,7 +78,8 @@ function InstalledFonts() {
 
 	useEffect( () => {
 		refreshLibrary();
-	}, [ refreshLibrary ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
