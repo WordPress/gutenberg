@@ -44,14 +44,14 @@ In addition to the default preset, there is also a SCSS preset. This preset exte
 
 Simply add a `"rules"` key to your config and add your overrides there.
 
-For example, to change the `indentation` to four spaces and turn off the `number-leading-zero` rule:
+For example, to change the `stylistic/indentation` to four spaces and turn off the `stylistic/number-leading-zero` rule:
 
 ```json
 {
 	"extends": "@wordpress/stylelint-config",
 	"rules": {
-		"indentation": 4,
-		"number-leading-zero": null
+		"stylistic/indentation": 4,
+		"stylistic/number-leading-zero": null
 	}
 }
 ```

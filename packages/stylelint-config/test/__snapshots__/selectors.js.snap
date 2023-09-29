@@ -54,9 +54,9 @@ exports[`flags warnings with invalid selectors css snapshot matches warnings 1`]
   {
     "column": 12,
     "line": 17,
-    "rule": "string-quotes",
+    "rule": "stylistic/string-quotes",
     "severity": "error",
-    "text": "Expected double quotes (string-quotes)",
+    "text": "Expected double quotes (stylistic/string-quotes)",
   },
 ]
 `;

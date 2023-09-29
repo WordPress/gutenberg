@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated: `stylelint` to `15.10.3`.
+-   Updated: `stylelint-config-recommended` to `13.0.0`.
+-   Updated: `stylelint-config-recommended-scss` to `13.0.0`.
+-   Added: `stylelint-stylistic` plugin for endangered stylelint stylistic rules.
+
 ## 21.25.0 (2023-09-20)
 
 ## 21.24.0 (2023-08-31)

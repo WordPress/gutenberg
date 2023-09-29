@@ -5,7 +5,6 @@
 		"at-rule-no-unknown": null,
 		"comment-empty-line-before": null,
 		"font-weight-notation": null,
-		"max-line-length": null,
 		"no-descending-specificity": null,
 		"rule-empty-line-before": null,
 		"selector-class-pattern": null,
@@ -20,6 +19,7 @@
 		"scss/at-if-closing-brace-newline-after": null,
 		"scss/at-else-empty-line-before": null,
 		"scss/at-if-closing-brace-space-after": null,
-		"no-invalid-position-at-import-rule": null
+		"no-invalid-position-at-import-rule": null,
+		"stylistic/max-line-length": null
 	}
 }

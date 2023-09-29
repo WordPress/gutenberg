@@ -5,9 +5,9 @@ exports[`flags warnings with invalid properties css snapshot matches warnings 1`
   {
     "column": 13,
     "line": 2,
-    "rule": "color-hex-case",
+    "rule": "stylistic/color-hex-case",
     "severity": "error",
-    "text": "Expected "#FFFFFF" to be "#ffffff" (color-hex-case)",
+    "text": "Expected "#FFFFFF" to be "#ffffff" (stylistic/color-hex-case)",
   },
   {
     "column": 13,
@@ -26,9 +26,9 @@ exports[`flags warnings with invalid properties css snapshot matches warnings 1`
   {
     "column": 13,
     "line": 2,
-    "rule": "declaration-colon-space-after",
+    "rule": "stylistic/declaration-colon-space-after",
     "severity": "error",
-    "text": "Expected single space after ":" with a single-line declaration (declaration-colon-space-after)",
+    "text": "Expected single space after ":" with a single-line declaration (stylistic/declaration-colon-space-after)",
   },
   {
     "column": 2,
@@ -40,9 +40,9 @@ exports[`flags warnings with invalid properties css snapshot matches warnings 1`
   {
     "column": 15,
     "line": 4,
-    "rule": "unit-case",
+    "rule": "stylistic/unit-case",
     "severity": "error",
-    "text": "Expected "PX" to be "px" (unit-case)",
+    "text": "Expected "PX" to be "px" (stylistic/unit-case)",
   },
   {
     "column": 11,
