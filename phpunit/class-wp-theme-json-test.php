@@ -2007,29 +2007,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_process_blocks_custom_css() {
 		return array(
-			// Simple CSS without any child selectors.
-			'no child selectors'                => array(
+			// Simple CSS without any nested selectors.
+			'no nested selectors'          => array(
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => 'color: red; margin: auto;',
 				),
 				'expected' => '.foo{color: red; margin: auto;}',
 			),
-			// CSS with child selectors.
-			'with children'                     => array(
+			// CSS with nested selectors.
+			'with nested selector'         => array(
 				'input'    => array(
 					'selector' => '.foo',
-					'css'      => 'color: red; margin: auto; & .bar{color: blue;}',
+					'css'      => 'color: red; margin: auto; &.one{color: blue;} & .two{color: green;}',
 				),
-				'expected' => '.foo{color: red; margin: auto;}.foo .bar{color: blue;}',
+				'expected' => '.foo{color: red; margin: auto;}.foo.one{color: blue;}.foo .two{color: green;}',
 			),
-			// CSS with child selectors and pseudo elements.
-			'with children and pseudo elements' => array(
+			// CSS with pseudo elements.
+			'with pseudo elements'         => array(
 				'input'    => array(
 					'selector' => '.foo',
-					'css'      => 'color: red; margin: auto; & .bar{color: blue;} &::before{color: green;}',
+					'css'      => 'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;}',
 				),
-				'expected' => '.foo{color: red; margin: auto;}.foo .bar{color: blue;}.foo::before{color: green;}',
+				'expected' => '.foo{color: red; margin: auto;}.foo::before{color: blue;}.foo ::before{color: green;}.foo.one::before{color: yellow;}.foo .two::before{color: purple;}',
+			),
+			// CSS with multiple root selectors.
+			'with multiple root selectors' => array(
+				'input'    => array(
+					'selector' => '.foo, .bar',
+					'css'      => 'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;}',
+				),
+				'expected' => '.foo, .bar{color: red; margin: auto;}.foo.one, .bar.one{color: blue;}.foo .two, .bar .two{color: green;}.foo::before, .bar::before{color: yellow;}.foo ::before, .bar ::before{color: purple;}.foo.three::before, .bar.three::before{color: orange;}.foo .four::before, .bar .four::before{color: skyblue;}',
 			),
 		);
 	}
