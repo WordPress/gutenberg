@@ -14,7 +14,7 @@ import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;

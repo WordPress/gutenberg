@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from 'react';
  * Internal dependencies
  */
 import type { ResponsiveCSSValue } from '../ui/utils/types';
-import type { SpaceInput } from '../ui/utils/space';
+import type { SpaceInput } from '../utils/space';
 
 export type FlexDirection = ResponsiveCSSValue<
 	CSSProperties[ 'flexDirection' ]

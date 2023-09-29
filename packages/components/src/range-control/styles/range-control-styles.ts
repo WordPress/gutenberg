@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 import type {
 	RangeMarkProps,
