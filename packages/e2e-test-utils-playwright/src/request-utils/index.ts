@@ -35,6 +35,7 @@ import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
+import { deleteAllPatternCategories } from './patterns';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -198,6 +199,8 @@ class RequestUtils {
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
 	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
 		getThemeGlobalStylesRevisions.bind( this );
+	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
+	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
 }
 
 export type { StorageState };
