@@ -12,6 +12,8 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import useNavigationMenu from './use-navigation-menu';
+import buildNavigationLabel from './build-navigation-label';
 
 const { name } = metadata;
 
@@ -49,6 +51,14 @@ export const settings = {
 				},
 			},
 		],
+	},
+	__experimentalLabel( { ref } ) {
+		const { navigationMenu } = useNavigationMenu( ref );
+		return buildNavigationLabel(
+			navigationMenu.title,
+			1, // This has to be 1 because in this context there is only one Navigation shown.
+			navigationMenu.status
+		);
 	},
 	edit,
 	save,
