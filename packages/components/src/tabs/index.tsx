@@ -118,14 +118,13 @@ function Tabs( {
 		// If the currently selected tab becomes disabled, fall back to the
 		// `initialTabId` if possible. Otherwise select the first
 		// enabled tab (if there is one).
-
 		if ( initialTab && ! initialTab.dimmed ) {
-			setSelectedId( initialTab?.id );
+			setSelectedId( initialTab.id );
 			return;
 		}
 
 		if ( firstEnabledTab ) {
-			setSelectedId( firstEnabledTab?.id );
+			setSelectedId( firstEnabledTab.id );
 		}
 	}, [
 		firstEnabledTab,
