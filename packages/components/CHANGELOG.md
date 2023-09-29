@@ -15,6 +15,7 @@
 -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
 -   `FormTokenField`: Add `box-sizing` reset style and reset default padding ([#54734](https://github.com/WordPress/gutenberg/pull/54734)).
 -   `SlotFill`: Pass `Component` instance to unregisterSlot ([#54765](https://github.com/WordPress/gutenberg/pull/54765)).
+-   `Button`: Remove `aria-selected` CSS selector from styling 'active' buttons ([#54931](https://github.com/WordPress/gutenberg/pull/54931)).
 
 ### Internal
 
