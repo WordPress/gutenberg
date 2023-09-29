@@ -139,6 +139,16 @@ class Gutenberg_HTTP_Signaling_Server {
 
 	/**
 	 * Handles a wp_ajax signaling server request of client that wants to retrieve its messages.
+	 *
+	 * It returns the client a response following the
+	 * {@link https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format Event stream format}.
+	 *
+	 * ```
+	 * id: <Event ID>
+	 * retry: <Reconnection time, in ms>
+	 * event: <The type of event>
+	 * data: <The message to be sent>
+	 * ```
 	 */
 	private static function handle_message_read_request() {
 		header( 'Content-Type: text/event-stream' );
