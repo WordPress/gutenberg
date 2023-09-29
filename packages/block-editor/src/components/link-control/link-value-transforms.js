@@ -5,7 +5,8 @@ export function buildLinkValueFromData( data, mapping ) {
 			linkValue[ attributeName ] = data[ valueGetter ];
 		} else {
 			linkValue[ attributeName ] = valueGetter.toLink(
-				data[ valueGetter.dataKey ]
+				data[ valueGetter.dataKey ],
+				data
 			);
 		}
 	}
@@ -20,7 +21,7 @@ export function buildDataFromLinkValue( linkValue, mapping ) {
 		} else {
 			data[ valueGetter.dataKey ] = valueGetter.toData(
 				linkValue[ attributeName ],
-				data[ valueGetter.dataKey ]
+				linkValue
 			);
 		}
 	}
