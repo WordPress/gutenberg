@@ -127,8 +127,8 @@ export default function useTabNav() {
 			// We want to constrain the tabbing to the block and its child blocks.
 			// If the preceding form element is within a different block,
 			// such as two sibling image blocks in the placeholder state,
-			// we want shift + tab from the first form element to move to the image
-			// block toolbar and not the previous image block's form element.
+			// we want shift + tab from the first form element to move to the block
+			// editor chrome.
 			const currentBlock = event.target.closest( '[data-block]' );
 			const isElementPartOfSelectedBlock =
 				currentBlock &&
