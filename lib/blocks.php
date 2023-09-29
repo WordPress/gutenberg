@@ -293,9 +293,10 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
-
+			wp_deregister_style( "wp-block-{$block_name}-theme" );
 			if ( file_exists( $stylesheet_path ) ) {
-				// If there is a main stylesheet for this block, append the theme styles to main styles.
+				// If there is a main stylesheet for this block, deregister the core theme
+				// styles and append the theme styles to main styles.
 				wp_add_inline_style(
 					"wp-block-{$block_name}",
 					file_get_contents( gutenberg_dir_path() . $theme_style_path )
@@ -303,7 +304,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			} else {
 				// If there is no main stylesheet for this block, register theme style.
 				wp_register_style(
-					"wp-block-{$block_name}",
+					"wp-block-{$block_name}-theme",
 					gutenberg_url( $theme_style_path ),
 					array(),
 					$default_version
