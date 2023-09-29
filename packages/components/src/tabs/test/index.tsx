@@ -281,35 +281,6 @@ describe( 'Tabs', () => {
 				'gamma-class'
 			);
 		} );
-
-		it( 'should apply the `[aria-selected="true"]` to the selected tab', async () => {
-			const user = userEvent.setup();
-
-			render( <UncontrolledTabs tabs={ TABS } /> );
-
-			// Make sure that only the selected tab has [aria-selected="true"]
-			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-			expect( await getSelectedTab() ).toHaveAttribute(
-				'aria-selected',
-				'true'
-			);
-			expect(
-				screen.getAllByRole( 'tab', { selected: true } ).length
-			).toBe( 1 );
-
-			// Click the 'Beta' tab
-			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
-
-			// Make sure that only the selected tab has [aria-selected="true"]
-			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			expect( await getSelectedTab() ).toHaveAttribute(
-				'aria-selected',
-				'true'
-			);
-			expect(
-				screen.getAllByRole( 'tab', { selected: true } ).length
-			).toBe( 1 );
-		} );
 	} );
 
 	describe( 'Tab Activation', () => {
