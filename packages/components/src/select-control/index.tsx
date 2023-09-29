@@ -18,6 +18,7 @@ import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
@@ -50,10 +51,14 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
 		...restProps
-	} = props;
+	} = useDeprecated36pxDefaultSizeProp(
+		props,
+		'wp.components.SelectControl',
+		'6.4'
+	);
 	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
@@ -107,11 +112,11 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
-				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
 					{ ...restProps }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }

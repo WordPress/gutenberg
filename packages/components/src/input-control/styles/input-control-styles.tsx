@@ -80,7 +80,7 @@ export const Container = styled.div< ContainerProps >`
 `;
 
 type InputProps = {
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -120,14 +120,14 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 
 export const getSizeConfig = ( {
 	inputSize: size,
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
-			height: 36,
+			height: 40,
 			lineHeight: 1,
-			minHeight: 36,
+			minHeight: 40,
 			paddingLeft: space( 4 ),
 			paddingRight: space( 4 ),
 		},
@@ -147,7 +147,7 @@ export const getSizeConfig = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
+	if ( ! __next40pxDefaultSize ) {
 		sizes.default = {
 			height: 30,
 			lineHeight: 1,

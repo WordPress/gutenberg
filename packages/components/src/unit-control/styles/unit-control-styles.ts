@@ -36,7 +36,7 @@ export const ValueInput = styled( NumberControl )`
 
 const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
-		default: css`
+		small: css`
 			box-sizing: border-box;
 			padding: 2px 1px;
 			width: 20px;
@@ -47,7 +47,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			text-transform: uppercase;
 			text-align-last: center;
 		`,
-		large: css`
+		default: css`
 			box-sizing: border-box;
 			min-width: 24px;
 			max-width: 48px;
@@ -64,7 +64,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 		`,
 	};
 
-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
+	return sizes[ selectSize ];
 };
 
 export const UnitLabel = styled.div< SelectProps >`
@@ -79,7 +79,7 @@ export const UnitLabel = styled.div< SelectProps >`
 
 const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
-		default: css`
+		small: css`
 			height: 100%;
 			border: 1px solid transparent;
 			transition:
@@ -101,7 +101,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 				z-index: 1;
 			}
 		`,
-		large: css`
+		default: css`
 			display: flex;
 			justify-content: center;
 			align-items: center;
@@ -121,7 +121,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		`,
 	};
 
-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
+	return sizes[ selectSize ];
 };
 
 export const UnitSelect = styled.select< SelectProps >`
