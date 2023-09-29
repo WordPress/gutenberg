@@ -85,16 +85,27 @@ const fetchLinkSuggestions = async (
 ) => {
 	const {
 		isInitialSuggestions = false,
+		initialSuggestionsOptions = undefined,
+	} = searchOptions;
+
+	const { disablePostFormats = false } = settings;
+
+	let {
 		type = undefined,
 		subtype = undefined,
 		page = undefined,
 		perPage = isInitialSuggestions ? 3 : 20,
 	} = searchOptions;
 
-	const { disablePostFormats = false } = settings;
-
 	/** @type {Promise<WPLinkSearchResult>[]} */
 	const queries = [];
+
+	if ( isInitialSuggestions && initialSuggestionsOptions ) {
+		type = initialSuggestionsOptions.type;
+		subtype = initialSuggestionsOptions.subtype;
+		page = initialSuggestionsOptions.page;
+		perPage = initialSuggestionsOptions.perPage;
+	}
 
 	if ( ! type || type === 'post' ) {
 		queries.push(
