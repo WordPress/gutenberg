@@ -44,6 +44,7 @@ export interface State {
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
+	userPatternCategories: Array< UserPatternCategory >;
 }
 
 type EntityRecordKey = string | number;
@@ -77,6 +78,14 @@ interface EntityConfig {
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
+}
+
+export interface UserPatternCategory {
+	id: number;
+	name: string;
+	label: string;
+	slug: string;
+	description: string;
 }
 
 type Optional< T > = T | undefined;
@@ -264,7 +273,7 @@ export interface GetEntityRecord {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -276,7 +285,7 @@ export interface GetEntityRecord {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -303,7 +312,7 @@ export const getEntityRecord = createSelector(
 	( <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -335,7 +344,7 @@ export const getEntityRecord = createSelector(
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 				setNestedValue( filteredItem, field, value );
 			}
@@ -367,7 +376,7 @@ export const getEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	EntityRecord extends ET.EntityRecord< any >
+	EntityRecord extends ET.EntityRecord< any >,
 >( state: State, kind: string, name: string, key: EntityRecordKey ) {
 	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
@@ -464,7 +473,7 @@ export interface GetEntityRecords {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -475,7 +484,7 @@ export interface GetEntityRecords {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -497,7 +506,7 @@ export interface GetEntityRecords {
 export const getEntityRecords = ( <
 	EntityRecord extends
 		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >
+		| Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -1220,6 +1229,20 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+/**
+ * Retrieve the registered user pattern categories.
+ *
+ * @param state Data state.
+ *
+ * @return User patterns category array.
+ */
+
+export function getUserPatternCategories(
+	state: State
+): Array< UserPatternCategory > {
+	return state.userPatternCategories;
 }
 
 /**

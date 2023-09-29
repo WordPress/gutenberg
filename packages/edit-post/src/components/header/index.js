@@ -32,7 +32,10 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( { setEntitiesSavedStatesCallback } ) {
+function Header( {
+	setEntitiesSavedStatesCallback,
+	setListViewToggleElement,
+} ) {
 	const isLargeViewport = useViewportMatch( 'large' );
 	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
 		useSelect(
@@ -61,7 +64,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar />
+				<HeaderToolbar
+					setListViewToggleElement={ setListViewToggleElement }
+				/>
 				<div className="edit-post-header__center">
 					<DocumentActions />
 				</div>

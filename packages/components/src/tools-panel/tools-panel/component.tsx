@@ -10,8 +10,8 @@ import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { Grid } from '../../grid';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import type { ToolsPanelProps } from '../types';
 
 const UnconnectedToolsPanel = (

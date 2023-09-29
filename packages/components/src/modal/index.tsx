@@ -71,11 +71,23 @@ function UnforwardedModal(
 	} = props;
 
 	const ref = useRef< HTMLDivElement >();
+
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+
+	// The focus hook does not support 'firstContentElement' but this is a valid
+	// value for the Modal's focusOnMount prop. The following code ensures the focus
+	// hook will focus the first focusable node within the element to which it is applied.
+	// When `firstContentElement` is passed as the value of the focusOnMount prop,
+	// the focus hook is applied to the Modal's content element.
+	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
+	// focus hook will focus the first element in the Modal's **content** when
+	// `firstContentElement` is passed.
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
@@ -101,10 +113,14 @@ function UnforwardedModal(
 	}, [ contentRef ] );
 
 	useEffect( () => {
+		ariaHelper.modalize( ref.current );
+		return () => ariaHelper.unmodalize();
+	}, [] );
+
+	useEffect( () => {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
 			document.body.classList.add( bodyOpenClassName );
 		}
 
@@ -113,7 +129,6 @@ function UnforwardedModal(
 
 			if ( openModalCount === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
-				ariaHelper.showApp();
 			}
 		};
 	}, [ bodyOpenClassName ] );
@@ -223,7 +238,9 @@ function UnforwardedModal(
 					ref={ useMergeRefs( [
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMountRef,
+						focusOnMount !== 'firstContentElement'
+							? focusOnMountRef
+							: null,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
@@ -283,7 +300,17 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						<div ref={ childrenContainerRef }>{ children }</div>
+
+						<div
+							ref={ useMergeRefs( [
+								childrenContainerRef,
+								focusOnMount === 'firstContentElement'
+									? focusOnMountRef
+									: null,
+							] ) }
+						>
+							{ children }
+						</div>
 					</div>
 				</div>
 			</StyleProvider>

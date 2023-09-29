@@ -22,7 +22,7 @@ import {
 	DropdownSubMenu as DropdownSubMenuV2,
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
-import { ComponentsContext } from './ui/context/context-system-provider';
+import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 
 export const { lock, unlock } =

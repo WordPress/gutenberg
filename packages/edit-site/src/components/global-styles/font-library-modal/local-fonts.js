@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	DropZone,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	FormFileUpload,
+	Notice,
+	FlexItem,
 } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +25,12 @@ import { loadFontFaceInBrowser } from './utils';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
+	const [ notice, setNotice ] = useState( null );
+	const supportedFormats =
+		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
+			.map( ( extension ) => `.${ extension }` )
+			.join( ', ' ) +
+		` ${ __( 'and' ) } .${ ALLOWED_FILE_EXTENSIONS.slice( -1 ) }`;
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -37,6 +46,7 @@ function LocalFonts() {
 	 * @return {void}
 	 */
 	const handleFilesUpload = ( files ) => {
+		setNotice( null );
 		const uniqueFilenames = new Set();
 		const selectedFiles = [ ...files ];
 		const allowedFiles = selectedFiles.filter( ( file ) => {
@@ -126,33 +136,58 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		await installFonts( fontFamilies );
+		const status = await installFonts( fontFamilies );
+		if ( status ) {
+			setNotice( {
+				type: 'success',
+				message: __( 'Upload successful.' ),
+			} );
+		}
 	};
 
 	return (
 		<>
-			<Text className="font-library-modal__subtitle">
-				{ __( 'Upload Fonts' ) }
-			</Text>
-			<Spacer margin={ 2 } />
+			<Spacer margin={ 16 } />
 			<DropZone onFilesDrop={ handleDropZone } />
-			<FormFileUpload
-				accept={ ALLOWED_FILE_EXTENSIONS.map(
-					( ext ) => `.${ ext }`
-				).join( ',' ) }
-				multiple={ true }
-				onChange={ onFilesUpload }
-				render={ ( { openFileDialog } ) => (
-					<Button
-						className="font-library-modal__upload-area"
-						onClick={ openFileDialog }
-					>
-						<span>
-							{ __( 'Drag and drop your font files here.' ) }
-						</span>
-					</Button>
+			<VStack className="font-library-modal__local-fonts">
+				<FormFileUpload
+					accept={ ALLOWED_FILE_EXTENSIONS.map(
+						( ext ) => `.${ ext }`
+					).join( ',' ) }
+					multiple={ true }
+					onChange={ onFilesUpload }
+					render={ ( { openFileDialog } ) => (
+						<Button
+							className="font-library-modal__upload-area"
+							onClick={ openFileDialog }
+						>
+							<span>{ __( 'Upload font' ) }</span>
+						</Button>
+					) }
+				/>
+				{ notice && (
+					<FlexItem>
+						<Spacer margin={ 2 } />
+						<Notice
+							isDismissible={ false }
+							status={ notice.type }
+							className="font-library-modal__upload-area__notice"
+						>
+							{ notice.message }
+						</Notice>
+					</FlexItem>
 				) }
-			/>
+				<Spacer margin={ 2 } />
+				<Text className="font-library-modal__upload-area__text">
+					{ sprintf(
+						/* translators: %s: supported font formats: ex: .ttf, .woff and .woff2 */
+						__(
+							'Uploaded fonts appear in your library and can be used in your theme. Supported formats: %s.'
+						),
+						supportedFormats
+					) }
+				</Text>
+			</VStack>
 		</>
 	);
 }

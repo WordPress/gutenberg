@@ -127,6 +127,8 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -256,7 +258,11 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<Header />
+								<Header
+									setListViewToggleElement={
+										setListViewToggleElement
+									}
+								/>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
@@ -369,6 +375,9 @@ export default function Layout() {
 													} }
 												>
 													<Editor
+														listViewToggleElement={
+															listViewToggleElement
+														}
 														isLoading={
 															isEditorLoading
 														}

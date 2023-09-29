@@ -15,7 +15,12 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import {
+	PRESET_METADATA,
+	ROOT_BLOCK_SELECTOR,
+	scopeSelector,
+	appendToSelector,
+} from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import {
 	getTypographyFontSizeValue,
@@ -792,9 +797,9 @@ export const toStyles = (
 		 */
 		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
+			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }
 			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
+			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }
 			.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
@@ -1124,18 +1129,33 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
-const processCSSNesting = ( css, blockSelector ) => {
+export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
-		processedCSS += ! part.includes( '{' )
-			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
-			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+		const isRootCss = ! part.includes( '{' );
+		if ( isRootCss ) {
+			// If the part doesn't contain braces, it applies to the root level.
+			processedCSS += `${ blockSelector }{${ part.trim() }}`;
+		} else {
+			// If the part contains braces, it's a nested CSS rule.
+			const splittedPart = part.replace( '}', '' ).split( '{' );
+			if ( splittedPart.length !== 2 ) {
+				return;
+			}
+
+			const [ nestedSelector, cssValue ] = splittedPart;
+			const combinedSelector = nestedSelector.startsWith( ' ' )
+				? scopeSelector( blockSelector, nestedSelector )
+				: appendToSelector( blockSelector, nestedSelector );
+
+			processedCSS += `${ combinedSelector }{${ cssValue.trim() }}`;
+		}
 	} );
 	return processedCSS;
-};
+}
 
 /**
  * Returns the global styles output using a global styles configuration.

@@ -27,3 +27,19 @@ export async function fetchUninstallFonts( fonts ) {
 	};
 	return apiFetch( config );
 }
+
+export async function fetchFontCollections() {
+	const config = {
+		path: '/wp/v2/fonts/collections',
+		method: 'GET',
+	};
+	return apiFetch( config );
+}
+
+export async function fetchFontCollection( id ) {
+	const config = {
+		path: `/wp/v2/fonts/collections/${ id }`,
+		method: 'GET',
+	};
+	return apiFetch( config );
+}

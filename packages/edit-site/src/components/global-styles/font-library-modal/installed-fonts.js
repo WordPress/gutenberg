@@ -19,7 +19,6 @@ import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
-import LocalFonts from './local-fonts';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
 import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
@@ -110,12 +109,12 @@ function InstalledFonts() {
 									/>
 								) ) }
 							</FontsGrid>
+							<Spacer margin={ 8 } />
 						</>
 					) }
 
 					{ baseThemeFonts.length > 0 && (
 						<>
-							<Spacer margin={ 8 } />
 							<FontsGrid title={ __( 'Theme Fonts' ) }>
 								{ baseThemeFonts.map( ( font ) => (
 									<LibraryFontCard
@@ -129,9 +128,6 @@ function InstalledFonts() {
 							</FontsGrid>
 						</>
 					) }
-
-					<Spacer margin={ 8 } />
-					<LocalFonts />
 				</>
 			) }
 
