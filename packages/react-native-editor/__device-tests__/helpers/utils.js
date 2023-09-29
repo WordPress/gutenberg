@@ -434,6 +434,9 @@ const tapStatusBariOS = async ( driver ) => {
 	const action = new wd.TouchAction();
 	action.tap( { x: 20, y: 20 } );
 	await driver.performTouchAction( action );
+
+	// Wait for the scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
