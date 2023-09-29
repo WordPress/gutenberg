@@ -327,8 +327,8 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		$upload_dir = wp_upload_dir()['basedir'];
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
 			return new WP_Error(
-				'rest_cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
+				'rest_cannot_write_fonts',
+				__( 'Error: WordPress does not have permission to write the fonts directory on your server.', 'gutenberg' ),
 				array(
 					'status' => 500,
 				)
@@ -373,26 +373,11 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		$files = $request->get_file_params();
 
 		// Iterates the fonts data received and creates a new WP_Font_Family object for each one.
-		$fonts_installed = array();
-		foreach ( $fonts_to_install as $font_data ) {
-			$font = new WP_Font_Family( $font_data );
-			$font->install( $files );
-			$fonts_installed[] = $font;
-		}
-
-		if ( empty( $fonts_installed ) ) {
-			return new WP_Error(
-				'error_installing_fonts',
-				__( 'Error installing fonts. No font was installed.', 'gutenberg' ),
-				array( 'status' => 500 )
-			);
-		}
-
 		$response = array();
-		foreach ( $fonts_installed as $font ) {
-			$response[] = $font->get_data();
+		foreach ( $fonts_to_install as $font_data ) {
+			$font       = new WP_Font_Family( $font_data );
+			$response[] = $font->install( $files );
 		}
-
 		return new WP_REST_Response( $response );
 	}
 }
