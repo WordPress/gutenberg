@@ -85,7 +85,7 @@ const fetchLinkSuggestions = async (
 ) => {
 	const {
 		isInitialSuggestions = false,
-		initialSuggestionsOptions = undefined,
+		initialSuggestionsSearchOptions = undefined,
 	} = searchOptions;
 
 	const { disablePostFormats = false } = settings;
@@ -100,11 +100,11 @@ const fetchLinkSuggestions = async (
 	/** @type {Promise<WPLinkSearchResult>[]} */
 	const queries = [];
 
-	if ( isInitialSuggestions && initialSuggestionsOptions ) {
-		type = initialSuggestionsOptions.type || type;
-		subtype = initialSuggestionsOptions.subtype || subtype;
-		page = initialSuggestionsOptions.page || page;
-		perPage = initialSuggestionsOptions.perPage || perPage;
+	if ( isInitialSuggestions && initialSuggestionsSearchOptions ) {
+		type = initialSuggestionsSearchOptions.type || type;
+		subtype = initialSuggestionsSearchOptions.subtype || subtype;
+		page = initialSuggestionsSearchOptions.page || page;
+		perPage = initialSuggestionsSearchOptions.perPage || perPage;
 	}
 
 	if ( ! type || type === 'post' ) {

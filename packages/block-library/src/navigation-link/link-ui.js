@@ -47,7 +47,7 @@ export function getSuggestionsQuery( type, kind ) {
 			return {
 				// for custom link which has no type
 				// always show pages as initial suggestions
-				initialSuggestionsOptions: {
+				initialSuggestionsSearchOptions: {
 					type: 'post',
 					subtype: 'page',
 					perPage: 20,

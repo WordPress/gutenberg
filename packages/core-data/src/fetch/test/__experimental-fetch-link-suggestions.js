@@ -256,7 +256,7 @@ describe( 'fetchLinkSuggestions', () => {
 				subtype: 'category',
 				page: 11,
 				isInitialSuggestions: true,
-				initialSuggestionsOptions: {
+				initialSuggestionsSearchOptions: {
 					type: 'post',
 					subtype: 'page',
 					perPage: 20,
@@ -282,7 +282,7 @@ describe( 'fetchLinkSuggestions', () => {
 				page: 11,
 				perPage: 20,
 				isInitialSuggestions: true,
-				initialSuggestionsOptions: {
+				initialSuggestionsSearchOptions: {
 					// intentionally missing.
 					// expected to default to those from the main search options.
 				},
