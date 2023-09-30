@@ -12,8 +12,14 @@ import { useState, useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DropdownMenu, DropdownMenuItem, DropdownMenuContext } from '..';
-import Icon from '../../icon';
+import {
+	DropdownMenu,
+	DropdownMenuItem,
+	DropdownMenuGroup,
+	DropdownMenuGroupLabel,
+	DropdownMenuContext,
+} from '..';
+import Button from '../../button';
 import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
@@ -55,18 +61,19 @@ const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
 );
 export const Default = Template.bind( {} );
 Default.args = {
-	trigger: <Icon icon={ menu } size={ 24 } />,
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 	children: (
 		<>
-			<DropdownMenuItem>Undo</DropdownMenuItem>
-			<DropdownMenuItem>Redo</DropdownMenuItem>
-			<DropdownMenu trigger="Find">
-				<DropdownMenuItem>Search the Web...</DropdownMenuItem>
-				<DropdownMenuItem>Find...</DropdownMenuItem>
-				<DropdownMenuItem>Find Next</DropdownMenuItem>
-				<DropdownMenuItem>Find Previous</DropdownMenuItem>
-			</DropdownMenu>
-			<DropdownMenu trigger="Speech">
+			<DropdownMenuItem>Single item</DropdownMenuItem>
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>Group</DropdownMenuGroupLabel>
+				<DropdownMenuItem>One</DropdownMenuItem>
+				<DropdownMenuItem>Two</DropdownMenuItem>
+				<DropdownMenuItem>Three</DropdownMenuItem>
+			</DropdownMenuGroup>
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
+			>
 				<DropdownMenuItem>Start Speaking</DropdownMenuItem>
 				<DropdownMenuItem disabled>Stop Speaking</DropdownMenuItem>
 			</DropdownMenu>
@@ -97,7 +104,7 @@ export const WithModalAsSiblingOfMenu: StoryFn< typeof DropdownMenu > = (
 	);
 };
 WithModalAsSiblingOfMenu.args = {
-	trigger: <Icon icon={ menu } size={ 24 } />,
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 };
 
 export const WithModalAsSiblingOfMenuItem: StoryFn< typeof DropdownMenu > = (
@@ -124,7 +131,7 @@ export const WithModalAsSiblingOfMenuItem: StoryFn< typeof DropdownMenu > = (
 	);
 };
 WithModalAsSiblingOfMenuItem.args = {
-	trigger: <Icon icon={ menu } size={ 24 } />,
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 };
 
 const ExampleSlotFill = createSlotFill( 'Example' );
@@ -179,7 +186,9 @@ export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
 		<SlotFillProvider>
 			<DropdownMenu { ...props }>
 				<DropdownMenuItem>Item</DropdownMenuItem>
-				<DropdownMenu trigger="Nested">
+				<DropdownMenu
+					trigger={ <DropdownMenuItem>Nested</DropdownMenuItem> }
+				>
 					<Slot />
 				</DropdownMenu>
 			</DropdownMenu>
@@ -188,7 +197,11 @@ export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
 				<DropdownMenuItem hideOnClick={ false }>
 					Item from fill
 				</DropdownMenuItem>
-				<DropdownMenu trigger="Nested in fill">
+				<DropdownMenu
+					trigger={
+						<DropdownMenuItem>Nested in fill</DropdownMenuItem>
+					}
+				>
 					<DropdownMenuItem hideOnClick={ false }>
 						Test
 					</DropdownMenuItem>
@@ -198,5 +211,5 @@ export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
 	);
 };
 AddItemsViaSlotFill.args = {
-	trigger: <Icon icon={ menu } size={ 24 } />,
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 };

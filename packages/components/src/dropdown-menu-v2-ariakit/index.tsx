@@ -12,32 +12,50 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	cloneElement,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	StyledAriakitMenu,
-	StyledAriakitMenuItem,
-	toggleButton,
-} from './styles';
-import { useCx } from '../utils';
+import type {
+	DropdownMenuContext as DropdownMenuContextType,
+	DropdownMenuProps,
+	DropdownMenuGroupProps,
+	DropdownMenuGroupLabelProps,
+	DropdownMenuItemProps,
+} from './types';
+import * as Styled from './styles';
 
 export const DropdownMenuContext = createContext<
-	{ store: Ariakit.MenuStore } | undefined
+	DropdownMenuContextType | undefined
 >( undefined );
-
-export interface DropdownMenuItemProps
-	extends Omit< Ariakit.MenuItemProps, 'store' > {}
 
 export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	DropdownMenuItemProps
->( function DropdownMenuItem( props, ref ) {
+>( function DropdownMenuItem( { prefix, suffix, children, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
-		<StyledAriakitMenuItem
+		<Styled.DropdownMenuItem
+			ref={ ref }
+			{ ...props }
+			store={ dropdownMenuContext?.store }
+		>
+			{ prefix }
+			{ children }
+			{ suffix }
+		</Styled.DropdownMenuItem>
+	);
+} );
+
+export const DropdownMenuGroup = forwardRef<
+	HTMLDivElement,
+	DropdownMenuGroupProps
+>( function DropdownMenuGroup( props, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	return (
+		<Styled.DropdownMenuGroup
 			ref={ ref }
 			{ ...props }
 			store={ dropdownMenuContext?.store }
@@ -45,24 +63,45 @@ export const DropdownMenuItem = forwardRef<
 	);
 } );
 
-export interface DropdownMenuProps extends Ariakit.MenuButtonProps {
-	trigger: React.ReactNode;
-	children?: React.ReactNode;
-}
+export const DropdownMenuGroupLabel = forwardRef<
+	HTMLDivElement,
+	DropdownMenuGroupLabelProps
+>( function DropdownMenuGroupLabel( props, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	return (
+		<Styled.DropdownMenuGroupLabel
+			ref={ ref }
+			{ ...props }
+			store={ dropdownMenuContext?.store }
+		/>
+	);
+} );
 
 export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
-	function DropdownMenu( { trigger, children, className, ...props }, ref ) {
+	function DropdownMenu(
+		{
+			// Menu trigger props
+			trigger,
+			// Menu props
+			children,
+			open,
+			defaultOpen,
+			onOpenChange,
+			...props
+		},
+		// Menu ref
+		ref
+	) {
 		const parentContext = useContext( DropdownMenuContext );
 
 		const dropdownMenuStore = Ariakit.useMenuStore( {
 			parent: parentContext?.store,
+			open,
+			defaultOpen,
+			setOpen( willBeOpen ) {
+				onOpenChange?.( willBeOpen );
+			},
 		} );
-
-		const cx = useCx();
-		const menuButtonClassName = useMemo(
-			() => cx( ! dropdownMenuStore.parent && toggleButton, className ),
-			[ cx, dropdownMenuStore.parent, className ]
-		);
 
 		const contextValue = useMemo(
 			() => ( { store: dropdownMenuStore } ),
@@ -74,31 +113,32 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 				{ /* Menu trigger */ }
 				<Ariakit.MenuButton
 					ref={ ref }
-					{ ...props }
 					store={ dropdownMenuStore }
-					className={ menuButtonClassName }
 					render={
-						dropdownMenuStore.parent ? (
-							<DropdownMenuItem render={ props.render } />
-						) : undefined
+						// Add arrow for submenus
+						dropdownMenuStore.parent
+							? cloneElement( trigger, {
+									// TODO: add prefix
+									suffix: trigger.props.suffix ?? (
+										<Ariakit.MenuButtonArrow />
+									),
+							  } )
+							: trigger
 					}
-				>
-					{ trigger }
-					<Ariakit.MenuButtonArrow />
-				</Ariakit.MenuButton>
+				/>
 
 				{ /* Menu popover */ }
-				<StyledAriakitMenu
+				<Styled.DropdownMenu
+					{ ...props }
 					store={ dropdownMenuStore }
 					gutter={ dropdownMenuStore.parent ? 16 : 8 }
 					shift={ dropdownMenuStore.parent ? -9 : 0 }
 					hideOnHoverOutside={ false }
-					modal
 				>
 					<DropdownMenuContext.Provider value={ contextValue }>
 						{ children }
 					</DropdownMenuContext.Provider>
-				</StyledAriakitMenu>
+				</Styled.DropdownMenu>
 			</>
 		);
 	}
