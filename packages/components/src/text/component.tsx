@@ -1,15 +1,20 @@
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useText from './hook';
+import type { Props } from './types';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
  * @param {import('react').ForwardedRef<any>}                                             forwardedRef
  */
-function Text( props, forwardedRef ) {
+function Text(
+	props: WordPressComponentProps< Props, 'span' >,
+	forwardedRef: React.ForwardedRef< any >
+) {
 	const textProps = useText( props );
 
 	return <View as="span" { ...textProps } ref={ forwardedRef } />;
