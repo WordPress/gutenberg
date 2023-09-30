@@ -23,10 +23,10 @@ import { VStack } from '../v-stack';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
-function ConfirmDialog(
-	props: WordPressComponentProps< OwnProps, 'div', false >,
+const ConfirmDialog = (
+	props: WordPressComponentProps< OwnProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
-) {
+) => {
 	const {
 		isOpen: isOpenProp,
 		onConfirm,
@@ -120,7 +120,7 @@ function ConfirmDialog(
 			) }
 		</>
 	);
-}
+};
 
-const ConfirmDialogControl = contextConnect( ConfirmDialog, 'ConfirmDialog' );
-export default ConfirmDialogControl;
+const ConnectedConfirmDialog = contextConnect( ConfirmDialog, 'ConfirmDialog' );
+export default ConnectedConfirmDialog;
