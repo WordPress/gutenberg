@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
+import type { FindAllArgs } from 'highlight-words-core';
 import { findAll } from 'highlight-words-core';
 
 /**
@@ -33,6 +34,23 @@ import { createElement } from '@wordpress/element';
  * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [unhighlightStyle]        Style to apply to unhighlighted text.
  */
 
+interface Options {
+	activeClassName?: string;
+	activeIndex?: number;
+	activeStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+	autoEscape?: boolean;
+	caseSensitive?: boolean;
+	children: string;
+	findChunks?: FindAllArgs[ 'findChunks' ];
+	highlightClassName?: string | Record< string, unknown >;
+	highlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+	highlightTag?: keyof JSX.IntrinsicElements;
+	sanitize?: FindAllArgs[ 'sanitize' ];
+	searchWords?: string[];
+	unhighlightClassName?: string;
+	unhighlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+}
+
 /**
  * Maps props to lowercase names.
  *
@@ -41,9 +59,10 @@ import { createElement } from '@wordpress/element';
  * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
  */
 /* eslint-enable jsdoc/valid-types */
-const lowercaseProps = ( object ) => {
-	/** @type {any} */
-	const mapped = {};
+const lowercaseProps = < T extends Record< string, unknown > >( object: T ) => {
+	// TODO: Replace with more specific types
+	//  { [ K in keyof T as Lowercase< string & K > ]: T[ K ] }
+	const mapped: Record< string, unknown > = {};
 	for ( const key in object ) {
 		mapped[ key.toLowerCase() ] = object[ key ];
 	}
@@ -71,7 +90,7 @@ export function createHighlighterText( {
 	searchWords = [],
 	unhighlightClassName = '',
 	unhighlightStyle,
-} ) {
+}: Options ) {
 	if ( ! children ) return null;
 	if ( typeof children !== 'string' ) return children;
 
@@ -122,8 +141,7 @@ export function createHighlighterText( {
 					? Object.assign( {}, highlightStyle, activeStyle )
 					: highlightStyle;
 
-			/** @type {Record<string, any>} */
-			const props = {
+			const props: Record< string, any > = {
 				children: text,
 				className: highlightClassNames,
 				key: index,
