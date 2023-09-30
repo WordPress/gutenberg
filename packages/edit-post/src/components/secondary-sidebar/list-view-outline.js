@@ -2,22 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	DocumentOutline,
-	WordCount,
-	TimeToRead,
-	CharacterCount,
-} from '@wordpress/editor';
+import { DocumentOutline } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	__experimentalText as Text,
-	Path,
-	SVG,
-	Line,
-	Rect,
-} from '@wordpress/components';
+import { Path, SVG, Line, Rect } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
 
 function EmptyOutlineIllustration() {
 	return (
@@ -64,36 +52,8 @@ export default function ListViewOutline() {
 			headingCount: getGlobalBlockCount( 'core/heading' ),
 		};
 	}, [] );
-	const instanceId = useInstanceId(
-		ListViewOutline,
-		'edit-post-editor-list-view-overview-outline'
-	);
 	return (
 		<div className="edit-post-editor__list-view-overview__container">
-			<p id={ instanceId }>{ __( 'Document outline' ) }</p>
-			<ul
-				className="edit-post-editor__list-view-overview"
-				aria-describedby={ instanceId }
-			>
-				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Characters:' ) }&nbsp;</Text>
-					<Text>
-						<CharacterCount />
-					</Text>
-				</li>
-				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Words:' ) }&nbsp;</Text>
-					<Text>
-						<WordCount />
-					</Text>
-				</li>
-				<li className="edit-post-editor__list-view-overview__item">
-					<Text>{ __( 'Time to read:' ) }&nbsp;</Text>
-					<Text>
-						<TimeToRead />
-					</Text>
-				</li>
-			</ul>
 			{ headingCount > 0 ? (
 				<DocumentOutline />
 			) : (
