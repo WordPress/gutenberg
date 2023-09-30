@@ -31,6 +31,18 @@ export interface DropdownMenuItemProps {
 	prefix?: React.ReactNode;
 	suffix?: React.ReactNode;
 	onClick?: React.MouseEventHandler;
+	// Default true
 	hideOnClick?: boolean;
 	disabled?: boolean;
+}
+
+export interface DropdownMenuCheckboxItemProps
+	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
+	// Default false
+	hideOnClick?: boolean;
+	name: string;
+	value: string;
+	checked?: boolean;
+	defaultChecked?: boolean;
+	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }

@@ -15,6 +15,7 @@ import { useState, useMemo, useContext } from '@wordpress/element';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
+	DropdownMenuCheckboxItem,
 	DropdownMenuGroup,
 	DropdownMenuGroupLabel,
 	DropdownMenuContext,
@@ -71,6 +72,18 @@ Default.args = {
 				<DropdownMenuItem>Two</DropdownMenuItem>
 				<DropdownMenuItem>Three</DropdownMenuItem>
 			</DropdownMenuGroup>
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>Checks</DropdownMenuGroupLabel>
+				<DropdownMenuCheckboxItem name="test-check" value="a">
+					A
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem name="test-check" value="b">
+					B
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem name="test-check" value="c">
+					C
+				</DropdownMenuCheckboxItem>
+			</DropdownMenuGroup>
 			<DropdownMenu
 				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
 			>
@@ -79,6 +92,43 @@ Default.args = {
 			</DropdownMenu>
 		</>
 	),
+};
+
+export const WithControlledCheckboxes: StoryFn< typeof DropdownMenu > = (
+	props
+) => {
+	const [ isAChecked, setAChecked ] = useState( false );
+	const [ isBChecked, setBChecked ] = useState( true );
+	return (
+		<DropdownMenu { ...props }>
+			<DropdownMenuCheckboxItem
+				name="checkbox-a"
+				value="a"
+				checked={ isAChecked }
+				onChange={ ( e ) => setAChecked( e.target.checked ) }
+			>
+				Checkbox item A (controlled)
+			</DropdownMenuCheckboxItem>
+			<DropdownMenuCheckboxItem
+				name="checkbox-b"
+				value="b"
+				checked={ isBChecked }
+				onChange={ ( e ) => setBChecked( e.target.checked ) }
+			>
+				Checkbox item B (controlled, checked by default)
+			</DropdownMenuCheckboxItem>
+			<DropdownMenuCheckboxItem
+				name="checkbox-c"
+				value="c"
+				defaultChecked
+			>
+				Checkbox item C (uncontrolled, checked by default)
+			</DropdownMenuCheckboxItem>
+		</DropdownMenu>
+	);
+};
+WithControlledCheckboxes.args = {
+	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 };
 
 export const WithModalAsSiblingOfMenu: StoryFn< typeof DropdownMenu > = (

@@ -24,6 +24,7 @@ import type {
 	DropdownMenuGroupProps,
 	DropdownMenuGroupLabelProps,
 	DropdownMenuItemProps,
+	DropdownMenuCheckboxItemProps,
 } from './types';
 import * as Styled from './styles';
 
@@ -46,6 +47,24 @@ export const DropdownMenuItem = forwardRef<
 			{ children }
 			{ suffix }
 		</Styled.DropdownMenuItem>
+	);
+} );
+
+export const DropdownMenuCheckboxItem = forwardRef<
+	HTMLDivElement,
+	DropdownMenuCheckboxItemProps
+>( function DropdownMenuCheckboxItem( { suffix, children, ...props }, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	return (
+		<Styled.DropdownMenuCheckboxItem
+			ref={ ref }
+			{ ...props }
+			store={ dropdownMenuContext?.store }
+		>
+			<Ariakit.MenuItemCheck store={ dropdownMenuContext?.store } />
+			{ children }
+			{ suffix }
+		</Styled.DropdownMenuCheckboxItem>
 	);
 } );
 

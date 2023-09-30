@@ -58,6 +58,6 @@ export const DropdownMenuItem = styled( Ariakit.MenuItem )`
 		color: currentColor;
 	}
 `;
-export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox );
-export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio );
-export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator );
+export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )``;
+export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )``;
+export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )``;
