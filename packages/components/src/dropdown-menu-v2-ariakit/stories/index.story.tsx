@@ -18,6 +18,7 @@ import {
 	DropdownMenuCheckboxItem,
 	DropdownMenuGroup,
 	DropdownMenuGroupLabel,
+	DropdownMenuSeparator,
 	DropdownMenuContext,
 } from '..';
 import Button from '../../button';
@@ -66,24 +67,26 @@ Default.args = {
 	children: (
 		<>
 			<DropdownMenuItem>Single item</DropdownMenuItem>
+			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
 				<DropdownMenuGroupLabel>Group</DropdownMenuGroupLabel>
 				<DropdownMenuItem>One</DropdownMenuItem>
 				<DropdownMenuItem>Two</DropdownMenuItem>
 				<DropdownMenuItem>Three</DropdownMenuItem>
 			</DropdownMenuGroup>
+			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>Checks</DropdownMenuGroupLabel>
-				<DropdownMenuCheckboxItem name="test-check" value="a">
-					A
+				<DropdownMenuGroupLabel>
+					Checks (separate)
+				</DropdownMenuGroupLabel>
+				<DropdownMenuCheckboxItem name="checkbox-a" value="a">
+					Checkbox item A
 				</DropdownMenuCheckboxItem>
-				<DropdownMenuCheckboxItem name="test-check" value="b">
-					B
-				</DropdownMenuCheckboxItem>
-				<DropdownMenuCheckboxItem name="test-check" value="c">
-					C
+				<DropdownMenuCheckboxItem name="checkbox-b" value="b">
+					Checkbox item B
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
+			<DropdownMenuSeparator />
 			<DropdownMenu
 				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
 			>

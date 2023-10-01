@@ -25,6 +25,7 @@ import type {
 	DropdownMenuGroupLabelProps,
 	DropdownMenuItemProps,
 	DropdownMenuCheckboxItemProps,
+	DropdownMenuSeparatorProps,
 } from './types';
 import * as Styled from './styles';
 
@@ -162,3 +163,16 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 		);
 	}
 );
+export const DropdownMenuSeparator = forwardRef<
+	HTMLHRElement,
+	DropdownMenuSeparatorProps
+>( function DropdownMenuSeparator( props, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	return (
+		<Styled.DropdownMenuSeparator
+			ref={ ref }
+			{ ...props }
+			store={ dropdownMenuContext?.store }
+		/>
+	);
+} );

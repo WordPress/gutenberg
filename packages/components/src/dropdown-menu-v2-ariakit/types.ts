@@ -46,3 +46,6 @@ export interface DropdownMenuCheckboxItemProps
 	defaultChecked?: boolean;
 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }
+
+export interface DropdownMenuSeparatorProps
+	extends Omit< Ariakit.MenuSeparatorProps, 'store' > {}
