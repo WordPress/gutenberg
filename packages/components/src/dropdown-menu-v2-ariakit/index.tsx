@@ -44,9 +44,13 @@ export const DropdownMenuItem = forwardRef<
 			{ ...props }
 			store={ dropdownMenuContext?.store }
 		>
-			{ prefix }
+			{ prefix && (
+				<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+			) }
 			{ children }
-			{ suffix }
+			{ suffix && (
+				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
+			) }
 		</Styled.DropdownMenuItem>
 	);
 } );

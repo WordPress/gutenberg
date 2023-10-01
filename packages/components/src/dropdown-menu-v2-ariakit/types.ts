@@ -7,6 +7,7 @@ import type { Placement } from '@floating-ui/react-dom';
 
 export interface DropdownMenuContext {
 	store: Ariakit.MenuStore;
+	variant?: 'toolbar';
 }
 
 // TODO: add support for standard HTML props
