@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
+import type { Placement } from '@floating-ui/react-dom';
 
 export interface DropdownMenuContext {
 	store: Ariakit.MenuStore;
@@ -18,6 +19,9 @@ export interface DropdownMenuProps {
 	open?: boolean;
 	defaultOpen?: boolean;
 	onOpenChange?: ( open: boolean ) => void;
+	placement?: Placement;
+	gutter?: number;
+	shift?: number;
 }
 
 export interface DropdownMenuGroupProps

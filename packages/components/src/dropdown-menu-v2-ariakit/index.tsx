@@ -107,6 +107,9 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			open,
 			defaultOpen,
 			onOpenChange,
+			placement,
+			gutter = 8,
+			shift = 0,
 			...props
 		},
 		// Menu ref
@@ -118,6 +121,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			parent: parentContext?.store,
 			open,
 			defaultOpen,
+			placement,
 			setOpen( willBeOpen ) {
 				onOpenChange?.( willBeOpen );
 			},
@@ -151,8 +155,8 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 				<Styled.DropdownMenu
 					{ ...props }
 					store={ dropdownMenuStore }
-					gutter={ dropdownMenuStore.parent ? 16 : 8 }
-					shift={ dropdownMenuStore.parent ? -9 : 0 }
+					gutter={ dropdownMenuStore.parent ? 16 : gutter }
+					shift={ dropdownMenuStore.parent ? -9 : shift }
 					hideOnHoverOutside={ false }
 				>
 					<DropdownMenuContext.Provider value={ contextValue }>
@@ -163,6 +167,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 		);
 	}
 );
+
 export const DropdownMenuSeparator = forwardRef<
 	HTMLHRElement,
 	DropdownMenuSeparatorProps
