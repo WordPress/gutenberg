@@ -31,7 +31,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -120,7 +119,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -175,7 +174,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -256,7 +254,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -307,10 +305,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		admin,
 		page,
 		editor,
-		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
 
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
