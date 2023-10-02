@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,8 +40,9 @@ import type { WordPressComponentProps } from '../context';
  * };
  * ```
  */
-export function TextareaControl(
-	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
+function UnforwardedTextareaControl(
+	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
+	ref: ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
 		__nextHasNoMarginBottom,
@@ -74,10 +76,13 @@ export function TextareaControl(
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				value={ value }
+				ref={ ref }
 				{ ...additionalProps }
 			/>
 		</BaseControl>
 	);
 }
+
+export const TextareaControl = forwardRef( UnforwardedTextareaControl );
 
 export default TextareaControl;
