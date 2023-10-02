@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 export async function fetchInstallFonts( data ) {
 	const config = {
-		path: '/wp/v2/fonts',
+		path: '/wp/v2/wp_font_family/batch',
 		method: 'POST',
 		body: data,
 	};
@@ -21,7 +21,7 @@ export async function fetchUninstallFonts( fonts ) {
 		font_families: fonts,
 	};
 	const config = {
-		path: '/wp/v2/fonts',
+		path: '/wp/v2/wp_font_family/batch',
 		method: 'DELETE',
 		data,
 	};

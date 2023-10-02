@@ -26,7 +26,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @since 6.4.0
 	 */
 	public function __construct() {
-		$this->rest_base = 'fonts';
+		$this->rest_base = 'wp_font_family';
 		$this->namespace = 'wp/v2';
 	}
 
@@ -38,10 +38,10 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base,
+			'/' . $this->rest_base . '/batch',
 			array(
 				array(
-					'methods'             => WP_REST_Server::EDITABLE,
+					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'install_fonts' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => array(
@@ -57,7 +57,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base,
+			'/' . $this->rest_base  . '/batch',
 			array(
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
@@ -70,7 +70,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/collections',
+			'/fonts/collections',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -82,7 +82,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/collections' . '/(?P<id>[\/\w-]+)',
+			'/fonts/collections' . '/(?P<id>[\/\w-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
