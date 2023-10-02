@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { rtl, useCx } from '../utils';
 import type { SpacerProps } from './types';
 
