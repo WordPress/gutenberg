@@ -60,4 +60,4 @@ const config = defineConfig( {
 	],
 } );
 
-export default config;
+module.exports = config;
