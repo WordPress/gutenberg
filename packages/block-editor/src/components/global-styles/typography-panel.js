@@ -575,6 +575,7 @@ export default function TypographyPanel( {
 					label={ __( 'Text orientation' ) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
 					panelId={ panelId }
 				>
 					<WritingModeControl
