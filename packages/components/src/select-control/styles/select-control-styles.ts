@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { COLORS, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 

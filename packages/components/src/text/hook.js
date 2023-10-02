@@ -13,10 +13,10 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
  */
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';
-import { getOptimalTextShade } from '../ui/utils';
+import { getOptimalTextShade } from '../utils/colors';
 import * as styles from './styles';
 import { createHighlighterText } from './utils';
-import { getFontSize } from '../ui/utils/font-size';
+import { getFontSize } from '../utils/font-size';
 import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
 import { useCx } from '../utils/hooks/use-cx';

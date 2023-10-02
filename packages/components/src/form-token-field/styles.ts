@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { Flex } from '../flex';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { boxSizingReset } from '../utils';
 
 type TokensAndInputWrapperProps = {

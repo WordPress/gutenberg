@@ -10,7 +10,7 @@ import { COLORS, CONFIG, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 import { BackdropUI } from '../../input-control/styles/input-control-styles';
 import type { SelectSize } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 // Using `selectSize` instead of `size` to avoid a type conflict with the
 // `size` HTML attribute of the `select` element.

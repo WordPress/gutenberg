@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 import {
 	Input,
 	BackdropUI,

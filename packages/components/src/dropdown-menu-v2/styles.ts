@@ -9,7 +9,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
  * Internal dependencies
  */
 import { COLORS, font, rtl, CONFIG } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import Icon from '../icon';
 import type { DropdownMenuInternalContext } from './types';
 
