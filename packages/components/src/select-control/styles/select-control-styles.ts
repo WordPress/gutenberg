@@ -15,7 +15,7 @@ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper'
 interface SelectProps
 	extends Pick<
 		SelectControlProps,
-		'__next36pxDefaultSize' | 'disabled' | 'multiple'
+		'__next40pxDefaultSize' | 'disabled' | 'multiple'
 	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
@@ -52,7 +52,7 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 };
 
 const sizeStyles = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
@@ -64,8 +64,8 @@ const sizeStyles = ( {
 
 	const sizes = {
 		default: {
-			height: 36,
-			minHeight: 36,
+			height: 40,
+			minHeight: 40,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
@@ -83,7 +83,7 @@ const sizeStyles = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
+	if ( ! __next40pxDefaultSize ) {
 		sizes.default = {
 			height: 30,
 			minHeight: 30,
@@ -100,7 +100,7 @@ const sizeStyles = ( {
 export const chevronIconSize = 18;
 
 const sizePaddings = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
@@ -110,7 +110,7 @@ const sizePaddings = ( {
 		'__unstable-large': 16,
 	};
 
-	if ( ! __next36pxDefaultSize ) {
+	if ( ! __next40pxDefaultSize ) {
 		padding.default = 8;
 	}
 

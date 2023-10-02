@@ -348,6 +348,7 @@ test.describe( 'Footnotes', () => {
 
 		await previewPage.close();
 		await editorPage.bringToFront();
+		await editor.canvas.click( 'p:text("first paragraph")' );
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
@@ -391,9 +392,10 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( '1' );
 
-		// Publish post.
-		await editor.publishPost();
+		// Publish post with the footnote set to "1".
+		const postId = await editor.publishPost();
 
+		// Test previewing changes to meta.
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( '2' );
@@ -408,8 +410,7 @@ test.describe( 'Footnotes', () => {
 		await previewPage.close();
 		await editorPage.bringToFront();
 
-		// Test again, this time with an existing revision (different code
-		// path).
+		// Test again, this time with an existing revision (different code path).
 		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
 		await page.keyboard.press( 'End' );
 		// Test slashing.
@@ -421,5 +422,22 @@ test.describe( 'Footnotes', () => {
 		await expect(
 			previewPage2.locator( 'ol.wp-block-footnotes li' )
 		).toHaveText( '123″  ↩︎' );
+
+		// Verify that the published post is unchanged after previewing changes to meta.
+		await previewPage2.close();
+		await editorPage.bringToFront();
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Post' } )
+			.click();
+
+		// Visit the published post.
+		await page.goto( `/?p=${ postId }` );
+
+		// Verify that the published post footnote still says "1".
+		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
+			'1 ↩︎'
+		);
 	} );
 } );

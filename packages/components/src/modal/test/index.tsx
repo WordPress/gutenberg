@@ -167,8 +167,7 @@ describe( 'Modal', () => {
 		expect( onRequestClose ).not.toHaveBeenCalled();
 	} );
 
-	// TODO enable once nested modals hide outer modals.
-	it.skip( 'should accessibly hide and show siblings including outer modals', async () => {
+	it( 'should accessibly hide and show siblings including outer modals', async () => {
 		const user = userEvent.setup();
 
 		const AriaDemo = () => {

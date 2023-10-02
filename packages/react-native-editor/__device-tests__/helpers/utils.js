@@ -210,6 +210,9 @@ const typeStringIos = async ( driver, element, str, clear ) => {
 		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+
+	// Wait for the list auto-scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const clearTextBox = async ( driver, element ) => {
@@ -425,6 +428,15 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
 	}
+};
+
+const tapStatusBariOS = async ( driver ) => {
+	const action = new wd.TouchAction();
+	action.tap( { x: 20, y: 20 } );
+	await driver.performTouchAction( action );
+
+	// Wait for the scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
@@ -802,6 +814,7 @@ module.exports = {
 	tapCopyAboveElement,
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
+	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
 	toggleHtmlMode,
