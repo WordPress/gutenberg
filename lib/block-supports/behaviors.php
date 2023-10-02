@@ -84,6 +84,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$aria_label = __( 'Enlarge image', 'gutenberg' );
 
+	$processor->next_tag( 'img' );
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	// An empty alt attribute `alt=""` is valid for decorative images.
@@ -96,7 +97,9 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		/* translators: %s: Image alt text. */
 		$aria_label = sprintf( __( 'Enlarge image: %s', 'gutenberg' ), $alt_attribute );
 	}
-	$content = $processor->get_updated_html();
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$content   = $processor->get_updated_html();
 
 	// If we don't set a default, it won't work if Lightbox is set to enabled by default.
 	$lightbox_animation = 'zoom';

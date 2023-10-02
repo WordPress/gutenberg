@@ -124,6 +124,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$aria_label = __( 'Enlarge image' );
 
+	$processor->next_tag( 'img' );
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	// An empty alt attribute `alt=""` is valid for decorative images.
@@ -136,7 +137,9 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		/* translators: %s: Image alt text. */
 		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
 	}
-	$content = $processor->get_updated_html();
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$content   = $processor->get_updated_html();
 
 	// Currently, we are only enabling the zoom animation.
 	$lightbox_animation = 'zoom';
