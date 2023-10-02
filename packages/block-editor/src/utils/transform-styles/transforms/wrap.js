@@ -27,7 +27,8 @@ const wrap =
 				return selector;
 			}
 
-			if ( selector.trim().startsWith( namespace ) ) {
+			// Skip the update when a selector already has a namespace + space (" ").
+			if ( selector.trim().startsWith( `${ namespace } ` ) ) {
 				return selector;
 			}
 
