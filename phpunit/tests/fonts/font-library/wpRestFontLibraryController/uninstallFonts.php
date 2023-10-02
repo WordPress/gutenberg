@@ -51,7 +51,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 			),
 		);
 
-		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
+		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/wp_font_family/batch' );
 		$font_families_json = json_encode( $mock_families );
 		$install_request->set_param( 'font_families', $font_families_json );
 		rest_get_server()->dispatch( $install_request );
@@ -67,7 +67,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 			),
 		);
 
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/wp_font_family/batch' );
 		$uninstall_request->set_param( 'font_families', $font_families_to_uninstall );
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
@@ -75,7 +75,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 
 
 	public function test_uninstall_non_existing_fonts() {
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/wp_font_family/batch' );
 
 		$non_existing_font_data = array(
 			array(
