@@ -27,6 +27,10 @@ const wrap =
 				return selector;
 			}
 
+			if ( selector.trim().startsWith( namespace ) ) {
+				return selector;
+			}
+
 			// Anything other than a root tag is always prefixed.
 			{
 				if ( ! selector.match( IS_ROOT_TAG ) ) {
