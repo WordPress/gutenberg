@@ -85,7 +85,8 @@
 			"type": "string"
 		},
 		"imageFill": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		},
 		"focalPoint": {
 			"type": "object"
