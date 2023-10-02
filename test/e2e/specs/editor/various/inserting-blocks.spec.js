@@ -108,7 +108,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -119,7 +119,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -243,7 +243,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await insertingBlocksUtils.runWithoutIframe();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -254,7 +254,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -385,17 +385,5 @@ class InsertingBlocksUtils {
 		this.draggableChip = this.page.locator(
 			'data-testid=block-draggable-chip >> visible=true'
 		);
-	}
-
-	async runWithoutIframe() {
-		/**
-		 * @todo Some drag an drop tests are failing, so run them without iframe for now.
-		 */
-		return await this.page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 	}
 }
