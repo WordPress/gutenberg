@@ -36,7 +36,7 @@ class WP_Font_Library {
 		$php_7_ttf_mime_type = $php_version_id >= 70300 ? 'application/font-sfnt' : 'application/x-font-ttf';
 
 		return array(
-			'otf'   => 'font/otf',
+			'otf'   => 'application/vnd.ms-opentype',
 			'ttf'   => $php_version_id >= 70400 ? 'font/sfnt' : $php_7_ttf_mime_type,
 			'woff'  => $php_version_id >= 80100 ? 'font/woff' : 'application/font-woff',
 			'woff2' => $php_version_id >= 80100 ? 'font/woff2' : 'application/font-woff2',

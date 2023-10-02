@@ -80,7 +80,7 @@ module.exports = ( api ) => {
 				{
 					scopeVariable: 'createElement',
 					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
+					source: 'react',
 					isDefault: false,
 				},
 			],
