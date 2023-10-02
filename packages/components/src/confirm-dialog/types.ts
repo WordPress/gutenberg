@@ -13,21 +13,11 @@ export type DialogInputEvent =
 	| KeyboardEvent< HTMLDivElement >
 	| MouseEvent< HTMLButtonElement >;
 
-type BaseProps = {
+export type ConfirmDialogProps = {
 	children: ReactNode;
 	onConfirm: ( event: DialogInputEvent ) => void;
 	confirmButtonText?: string;
 	cancelButtonText?: string;
-};
-
-type ControlledProps = BaseProps & {
-	onCancel: ( event: DialogInputEvent ) => void;
-	isOpen: boolean;
-};
-
-type UncontrolledProps = BaseProps & {
 	onCancel?: ( event: DialogInputEvent ) => void;
-	isOpen?: never;
+	isOpen?: boolean;
 };
-
-export type OwnProps = ControlledProps | UncontrolledProps;

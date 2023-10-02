@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Meta, StoryFn } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -8,8 +13,9 @@ import { useState } from '@wordpress/element';
  */
 import Button from '../../button';
 import { ConfirmDialog } from '..';
+import type { ConfirmDialogProps, DialogInputEvent } from '../types';
 
-const meta = {
+const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
@@ -38,16 +44,20 @@ const meta = {
 
 export default meta;
 
-const Template = ( { onConfirm, onCancel, ...args } ) => {
+const Template: StoryFn< typeof ConfirmDialog > = ( {
+	onConfirm,
+	onCancel,
+	...args
+}: ConfirmDialogProps ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const handleConfirm = ( ...confirmArgs ) => {
-		onConfirm( ...confirmArgs );
+	const handleConfirm = ( confirmArgs: DialogInputEvent ) => {
+		onConfirm( confirmArgs );
 		setIsOpen( false );
 	};
 
-	const handleCancel = ( ...cancelArgs ) => {
-		onCancel( ...cancelArgs );
+	const handleCancel = ( cancelArgs: DialogInputEvent ) => {
+		onCancel?.( cancelArgs );
 		setIsOpen( false );
 	};
 

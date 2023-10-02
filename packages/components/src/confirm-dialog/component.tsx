@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ForwardedRef, KeyboardEvent } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Modal from '../modal';
-import type { OwnProps, DialogInputEvent } from './types';
+import type { ConfirmDialogProps, DialogInputEvent } from './types';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem, contextConnect } from '../context';
 import { Flex } from '../flex';
@@ -23,9 +18,9 @@ import { VStack } from '../v-stack';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
-const ConfirmDialog = (
-	props: WordPressComponentProps< OwnProps, 'div' >,
-	forwardedRef: ForwardedRef< any >
+const UnconnectedConfirmDialog = (
+	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		isOpen: isOpenProp,
@@ -67,7 +62,7 @@ const ConfirmDialog = (
 	);
 
 	const handleEnter = useCallback(
-		( event: KeyboardEvent< HTMLDivElement > ) => {
+		( event: React.KeyboardEvent< HTMLDivElement > ) => {
 			// Avoid triggering the 'confirm' action when a button is focused,
 			// as this can cause a double submission.
 			const isConfirmOrCancelButton =
@@ -122,5 +117,8 @@ const ConfirmDialog = (
 	);
 };
 
-const ConnectedConfirmDialog = contextConnect( ConfirmDialog, 'ConfirmDialog' );
+const ConnectedConfirmDialog = contextConnect(
+	UnconnectedConfirmDialog,
+	'ConfirmDialog'
+);
 export default ConnectedConfirmDialog;
