@@ -68,7 +68,7 @@ export default function useText(
 
 		content = createHighlighterText( {
 			autoEscape: highlightEscape,
-			children: children as string,
+			children,
 			caseSensitive: highlightCaseSensitive,
 			searchWords: highlightWords,
 			sanitize: highlightSanitize,
