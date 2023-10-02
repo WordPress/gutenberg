@@ -16,11 +16,12 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'permits tabbing through paragraph blocks in the expected order', async ( {
+	test( 'permits arrowing through paragraph blocks in the expected order', async ( {
 		editor,
-		KeyboardNavigableBlocks,
 		page,
 	} ) => {
+		// Add a title
+		await page.keyboard.type( 'Post Title' );
 		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
 
 		// Create 3 paragraphs blocks with some content.
@@ -29,16 +30,28 @@ test.describe( 'Order of block keyboard navigation', () => {
 			await page.keyboard.type( paragraphBlock );
 		}
 
-		// Select the middle block.
-		await page.keyboard.press( 'ArrowUp' );
-		await editor.showBlockToolbar();
-		await KeyboardNavigableBlocks.navigateToContentEditorTop();
-		await KeyboardNavigableBlocks.tabThroughParagraphBlock( 'Paragraph 1' );
+		// Focus should be on the last pargraph block.
+		const activeElement = editor.canvas.locator( ':focus' );
+		await expect( activeElement ).toHaveText( 'Paragraph 2' );
 
-		// Repeat the same steps to ensure that there is no change introduced in how the focus is handled.
-		// This prevents the previous regression explained in: https://github.com/WordPress/gutenberg/issues/11773.
-		await KeyboardNavigableBlocks.navigateToContentEditorTop();
-		await KeyboardNavigableBlocks.tabThroughParagraphBlock( 'Paragraph 1' );
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( activeElement ).toHaveText( 'Paragraph 1' );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( activeElement ).toHaveText( 'Paragraph 0' );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( activeElement ).toHaveText( 'Post Title' );
+
+		// Go back down
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( activeElement ).toHaveText( 'Paragraph 0' );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( activeElement ).toHaveText( 'Paragraph 1' );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( activeElement ).toHaveText( 'Paragraph 2' );
 	} );
 
 	test( 'allows tabbing in navigation mode if no block is selected', async ( {
