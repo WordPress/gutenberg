@@ -15,7 +15,6 @@ import { createElement } from '@wordpress/element';
  * https://github.com/bvaughn/react-highlight-words/blob/HEAD/src/Highlighter.js
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef Options
  * @property {string}                                                     [activeClassName='']      Classname for active highlighted areas.
@@ -54,25 +53,20 @@ interface Options {
 /**
  * Maps props to lowercase names.
  *
- * @template {Record<string, unknown>} T
- * @param {T} object Props to map.
- * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
+ * @param object Props to map.
+ * @return The mapped props.
  */
-/* eslint-enable jsdoc/valid-types */
 const lowercaseProps = < T extends Record< string, unknown > >( object: T ) => {
-	// TODO: Replace with more specific types
-	//  { [ K in keyof T as Lowercase< string & K > ]: T[ K ] }
 	const mapped: Record< string, unknown > = {};
 	for ( const key in object ) {
 		mapped[ key.toLowerCase() ] = object[ key ];
 	}
-	return mapped;
+	return mapped as { [ K in keyof T as Lowercase< string & K > ]: T[ K ] };
 };
 
 const memoizedLowercaseProps = memoize( lowercaseProps );
 
 /**
- *
  * @param {Options} options
  */
 export function createHighlighterText( {
