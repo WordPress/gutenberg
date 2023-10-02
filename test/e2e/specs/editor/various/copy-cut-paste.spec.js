@@ -34,12 +34,8 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
