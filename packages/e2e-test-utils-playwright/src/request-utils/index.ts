@@ -9,7 +9,7 @@ import type { APIRequestContext, Cookie } from '@playwright/test';
 /**
  * Internal dependencies
  */
-import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
+import { WP_USERNAME, WP_PASSWORD, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
@@ -105,7 +105,7 @@ class RequestUtils {
 	constructor(
 		requestContext: APIRequestContext,
 		{
-			user = WP_ADMIN_USER,
+			user = { username: WP_USERNAME, password: WP_PASSWORD },
 			storageState,
 			storageStatePath,
 			baseURL = WP_BASE_URL,
