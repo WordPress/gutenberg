@@ -1,11 +1,13 @@
+/* eslint-disable playwright/expect-expect */
+
 /**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	KeyboardNavigableBlocks: async ( { page, pageUtils }, use ) => {
-		await use( new KeyboardNavigableBlocks( { page, pageUtils } ) );
+	KeyboardNavigableBlocks: async ( { editor, page, pageUtils }, use ) => {
+		await use( new KeyboardNavigableBlocks( { editor, page, pageUtils } ) );
 	},
 } );
 
@@ -196,7 +198,8 @@ test.describe( 'Order of block keyboard navigation', () => {
 } );
 
 class KeyboardNavigableBlocks {
-	constructor( { page, pageUtils } ) {
+	constructor( { editor, page, pageUtils } ) {
+		this.editor = editor;
 		this.page = page;
 		this.pageUtils = pageUtils;
 	}
@@ -216,11 +219,7 @@ class KeyboardNavigableBlocks {
 
 	async navigateToContentEditorTop() {
 		// Use 'Ctrl+`' to return to the top of the editor.
-		await this.pageUtils.pressKeys( 'ctrl+`' );
-		await this.pageUtils.pressKeys( 'ctrl+`' );
-		await this.pageUtils.pressKeys( 'ctrl+`' );
-		await this.pageUtils.pressKeys( 'ctrl+`' );
-		await this.pageUtils.pressKeys( 'ctrl+`' );
+		await this.pageUtils.pressKeys( 'ctrl+`', { times: 5 } );
 	}
 
 	async tabThroughParagraphBlock( paragraphText ) {
@@ -229,13 +228,9 @@ class KeyboardNavigableBlocks {
 		await this.page.keyboard.press( 'Tab' );
 		await this.expectLabelToHaveFocus( 'Block: Paragraph' );
 
-		const blockText = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return activeElement.innerHTML;
-		} );
+		const activeElement = this.editor.canvas.locator( ':focus' );
 
-		expect( blockText ).toBe( paragraphText );
+		await expect( activeElement ).toHaveText( paragraphText );
 
 		await this.page.keyboard.press( 'Tab' );
 		await this.expectLabelToHaveFocus( 'Post' );
@@ -277,3 +272,5 @@ class KeyboardNavigableBlocks {
 		await this.expectLabelToHaveFocus( 'Paragraph' );
 	}
 }
+
+/* eslint-enable playwright/expect-expect */
