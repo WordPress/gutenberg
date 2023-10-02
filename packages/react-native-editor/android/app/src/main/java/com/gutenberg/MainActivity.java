@@ -167,13 +167,22 @@ public class MainActivity extends ReactActivity {
 
         // Parse initial props from launch arguments
         String initialData = null;
+        String rawStyles = null;
+        String rawFeatures = null;
         Bundle extrasBundle = getIntent().getExtras();
+
         if(extrasBundle != null) {
             String initialProps = extrasBundle.getString(EXTRAS_INITIAL_PROPS, "{}");
             try {
                 JSONObject jsonObject = new JSONObject(initialProps);
                 if (jsonObject.has(GutenbergProps.PROP_INITIAL_DATA)) {
                     initialData = jsonObject.getString(GutenbergProps.PROP_INITIAL_DATA);
+                }
+                if (jsonObject.has(GutenbergProps.PROP_STYLES)) {
+                    rawStyles = jsonObject.getString(GutenbergProps.PROP_STYLES);
+                }
+                if (jsonObject.has(GutenbergProps.PROP_FEATURES)) {
+                    rawFeatures = jsonObject.getString(GutenbergProps.PROP_FEATURES);
                 }
             } catch (final JSONException e) {
                 Log.e("MainActivity", "Json parsing error: " + e.getMessage());
@@ -202,6 +211,12 @@ public class MainActivity extends ReactActivity {
 
         if(initialData != null) {
             bundle.putString(GutenbergProps.PROP_INITIAL_DATA, initialData);
+        }
+        if(rawStyles != null) {
+            bundle.putString(GutenbergProps.PROP_STYLES, rawStyles);
+        }
+        if(rawFeatures != null) {
+            bundle.putString(GutenbergProps.PROP_FEATURES, rawFeatures);
         }
 
         return bundle;

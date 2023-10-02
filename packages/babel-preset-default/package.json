@@ -37,10 +37,10 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
-		"@wordpress/element": "file:../element",
 		"@wordpress/warning": "file:../warning",
 		"browserslist": "^4.21.10",
-		"core-js": "^3.31.0"
+		"core-js": "^3.31.0",
+		"react": "^18.2.0"
 	},
 	"publishConfig": {
 		"access": "public"

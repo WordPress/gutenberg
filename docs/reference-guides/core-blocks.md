@@ -270,7 +270,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 ## Footnotes
 
- ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+Display footnotes added to the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
 
 -	**Name:** core/footnotes
 -	**Category:** text
@@ -384,7 +384,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 
 -	**Name:** core/loginout
 -	**Category:** theme
--	**Supports:** className, typography (fontSize, lineHeight)
+-	**Supports:** className, spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
 ## Media & Text

@@ -649,7 +649,7 @@ class WP_Duotone_Gutenberg {
 	private static function get_selector( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
-		if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		if ( $block_type && $block_type instanceof WP_Block_Type ) {
 			// Backwards compatibility with `supports.color.__experimentalDuotone`
 			// is provided via the `block_type_metadata_settings` filter. If
 			// `supports.filter.duotone` has not been set and the experimental
@@ -747,7 +747,7 @@ class WP_Duotone_Gutenberg {
 	 */
 	public static function register_duotone_support( $block_type ) {
 		$has_duotone_support = false;
-		if ( property_exists( $block_type, 'supports' ) ) {
+		if ( $block_type instanceof WP_Block_Type ) {
 			// Previous `color.__experimentalDuotone` support flag is migrated
 			// to `filter.duotone` via `block_type_metadata_settings` filter.
 			$has_duotone_support = $block_type->supports['filter']['duotone'] ?? null;
