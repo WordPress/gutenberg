@@ -110,7 +110,7 @@ test.describe( 'Template Part', () => {
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock }
+			{ hasText: paragraphText }
 		);
 
 		await expect( templatePartWithParagraph ).toBeVisible();
@@ -160,11 +160,11 @@ test.describe( 'Template Part', () => {
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph1 = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock1 }
+			{ hasText: paragraphText1 }
 		);
 		const templatePartWithParagraph2 = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock2 }
+			{ hasText: paragraphText2 }
 		);
 
 		// TODO: I couldn't find an easy way to assert that the same template
@@ -205,7 +205,7 @@ test.describe( 'Template Part', () => {
 		);
 		const templatePartWithParagraph = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraph }
+			{ hasText: paragraphText }
 		);
 		await expect( templatePartWithParagraph ).toBeVisible();
 
