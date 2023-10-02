@@ -55,7 +55,7 @@ export async function visitSiteEditor(
 		} );
 	}
 
-	// Check that if the current page has an editor canvas first.
+	// Check if the current page has an editor canvas first.
 	if ( ( await this.page.locator( CANVAS_SELECTOR ).count() ) > 0 ) {
 		// The site editor initially loads with an empty body,
 		// we need to wait for the editor canvas to be rendered.
