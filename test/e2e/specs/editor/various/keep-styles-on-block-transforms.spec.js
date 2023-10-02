@@ -39,13 +39,6 @@ test.describe( 'Keep styles on block transforms', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
