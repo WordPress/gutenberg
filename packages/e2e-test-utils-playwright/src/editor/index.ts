@@ -24,6 +24,7 @@ import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
+import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
@@ -34,6 +35,7 @@ export class Editor {
 	browser: Browser;
 	page: Page;
 	context: BrowserContext;
+	useLegacyCanvas = false;
 
 	constructor( { page }: EditorConstructorProps ) {
 		this.page = page;
@@ -41,7 +43,10 @@ export class Editor {
 		this.browser = this.context.browser()!;
 	}
 
-	get canvas(): FrameLocator {
+	get canvas(): FrameLocator | Page {
+		if ( this.useLegacyCanvas ) {
+			return this.page;
+		}
 		return this.page.frameLocator( '[name="editor-canvas"]' );
 	}
 
@@ -77,6 +82,9 @@ export class Editor {
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
+	/** @borrows switchToLegacyCanvas as this.switchToLegacyCanvas */
+	switchToLegacyCanvas: typeof switchToLegacyCanvas =
+		switchToLegacyCanvas.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
 }
