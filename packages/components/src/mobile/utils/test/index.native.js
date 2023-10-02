@@ -76,7 +76,6 @@ describe( 'isContainerRelated', () => {
 		'core/column',
 		'core/buttons',
 		'core/button',
-		'core/quote',
 	];
 
 	beforeAll( () => {
