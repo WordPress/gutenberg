@@ -23,12 +23,8 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		// On a new post, initial focus is set on the Post title.
 		await expect(
 			editor.canvas.locator( 'role=textbox[name=/Add title/i]' )
@@ -54,14 +50,11 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'should constrain tabbing within a modal', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		// Open keyboard shortcuts modal.
 		await pageUtils.pressKeys( 'access+h' );
 
