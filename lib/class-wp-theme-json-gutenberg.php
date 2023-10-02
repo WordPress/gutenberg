@@ -3317,7 +3317,7 @@ class WP_Theme_JSON_Gutenberg {
 				$items = array();
 				if ( isset( $preset['theme'] ) ) {
 					foreach ( $preset['theme'] as $item ) {
-						if ( is_array( $item ) ){
+						if ( is_array( $item ) ) {
 							$slug = $item['slug'];
 							unset( $item['slug'] );
 							$items[ $slug ] = $item;
@@ -3326,7 +3326,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				if ( isset( $preset['custom'] ) ) {
 					foreach ( $preset['custom'] as $item ) {
-						if ( is_array( $item ) ){
+						if ( is_array( $item ) ) {
 							$slug = $item['slug'];
 							unset( $item['slug'] );
 							$items[ $slug ] = $item;
