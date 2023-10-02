@@ -182,7 +182,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			].includes( newUnit ) &&
 			quantity > 100
 		) {
-			// When converting to `%` or viewport-relativew units, cap the new value at 100.
+			// When converting to `%` or viewport-relative units, cap the new value at 100.
 			newValue = 100 + newUnit;
 		}
 
