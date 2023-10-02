@@ -126,10 +126,12 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
+	// An empty alt attribute `alt=""` is valid for decorative images.
 	if ( null !== $alt_attribute ) {
 		$alt_attribute = trim( $alt_attribute );
 	}
 
+	// It only makes sense to append the alt text to the button aria-label when the alt text is non-empty.
 	if ( $alt_attribute ) {
 		/* translators: %s: Image alt text. */
 		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
@@ -200,19 +202,20 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// Wrap the image in the body content with a button.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
-	$button       =
-				'<button
-					type="button"
-					aria-haspopup="dialog"
-					aria-label="' . esc_attr( $aria_label ) . '"
-					data-wp-on--click="actions.core.image.showLightbox"
-					data-wp-style--width="context.core.image.imageButtonWidth"
-					data-wp-style--height="context.core.image.imageButtonHeight"
-					data-wp-style--left="context.core.image.imageButtonLeft"
-					data-wp-style--top="context.core.image.imageButtonTop"
-				>
-				</button>'
-				. $img[0];
+
+	$button =
+		$img[0]
+		. '<button
+			type="button"
+			aria-haspopup="dialog"
+			aria-label="' . esc_attr( $aria_label ) . '"
+			data-wp-on--click="actions.core.image.showLightbox"
+			data-wp-style--width="context.core.image.imageButtonWidth"
+			data-wp-style--height="context.core.image.imageButtonHeight"
+			data-wp-style--left="context.core.image.imageButtonLeft"
+			data-wp-style--top="context.core.image.imageButtonTop"
+		></button>';
+
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
 	// We need both a responsive image and an enlarged image to animate

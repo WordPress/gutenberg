@@ -154,6 +154,8 @@
 
 .wp-lightbox-container {
 	position: relative;
+	display: flex;
+	flex-direction: column;
 
 	button {
 		border: none;

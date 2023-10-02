@@ -360,9 +360,9 @@ function setStyles( context, event ) {
 		naturalHeight,
 		offsetWidth: originalWidth,
 		offsetHeight: originalHeight,
-	} = event.target.nextElementSibling;
+	} = event.target.previousElementSibling;
 	let { x: screenPosX, y: screenPosY } =
-		event.target.nextElementSibling.getBoundingClientRect();
+		event.target.previousElementSibling.getBoundingClientRect();
 
 	// Natural ratio of the image clicked to open the lightbox.
 	const naturalRatio = naturalWidth / naturalHeight;
