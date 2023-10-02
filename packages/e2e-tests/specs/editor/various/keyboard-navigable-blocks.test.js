@@ -35,7 +35,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
+	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 	await expect(
 		await page.evaluate( () => {
 			const { activeElement } =
@@ -49,7 +49,7 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 
 	// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
 	await pressKeyWithModifier( 'shift', 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
+	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
 };
 
 const tabThroughBlockToolbar = async () => {

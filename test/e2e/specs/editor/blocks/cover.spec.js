@@ -119,7 +119,7 @@ test.describe( 'Cover', () => {
 		// Activate the paragraph block inside the Cover block.
 		// The name of the block differs depending on whether text has been entered or not.
 		const coverBlockParagraph = coverBlock.getByRole( 'document', {
-			name: /Paragraph block|Empty block; start writing or type forward slash to choose a block/,
+			name: /Block: Paragraph|Empty block; start writing or type forward slash to choose a block/,
 		} );
 		await expect( coverBlockParagraph ).toBeEditable();
 

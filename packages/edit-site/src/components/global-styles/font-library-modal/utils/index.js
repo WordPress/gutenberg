@@ -109,6 +109,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 }
 
 export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+	if ( ! input ) {
+		return;
+	}
+
 	let src;
 	if ( Array.isArray( input ) ) {
 		src = input[ 0 ];
