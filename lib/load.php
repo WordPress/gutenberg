@@ -176,6 +176,7 @@ if (
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
 	}
+	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-gutenberg-font-face-resolver-6-4.php';
 
 	/*
 	 * As _gutenberg_get_iframed_editor_assets_6_4() overrides Core's _wp_get_iframed_editor_assets(),

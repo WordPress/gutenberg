@@ -1,17 +1,10 @@
 <?php
 /**
- * WP_Font_Face_Resolver class.
+ * Gutenberg_Font_Face_Resolver_6_4 class.
  *
- * @package    WordPress
+ * @package    Gutenberg
  * @subpackage Fonts
- * @since      6.4.0
- *
- * @core-merge: this file is located in `wp-includes/fonts/`.
  */
-
-if ( class_exists( 'WP_Font_Face_Resolver' ) ) {
-	return;
-}
 
 /**
  * The Font Face Resolver abstracts the processing of different data sources
@@ -22,7 +15,7 @@ if ( class_exists( 'WP_Font_Face_Resolver' ) ) {
  *
  * @access private
  */
-class WP_Font_Face_Resolver {
+class Gutenberg_Font_Face_Resolver_6_4 {
 
 	/**
 	 * Gets fonts defined in theme.json.
@@ -50,7 +43,7 @@ class WP_Font_Face_Resolver {
 	 * @param array $settings Font settings to parse.
 	 * @return array Returns an array of fonts, grouped by font-family.
 	 */
-	protected static function parse_settings( array $settings ) {
+	private static function parse_settings( array $settings ) {
 		$fonts = array();
 
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
