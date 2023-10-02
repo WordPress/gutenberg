@@ -248,12 +248,8 @@ test.describe( 'Multi-block selection', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -300,12 +296,8 @@ test.describe( 'Multi-block selection', () => {
 		pageUtils,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
@@ -317,14 +309,10 @@ test.describe( 'Multi-block selection', () => {
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
 				.filter( { hasText: 'Draft saved' } )
 		).toBeVisible();
+
 		await page.reload();
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -1191,12 +1179,8 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },
