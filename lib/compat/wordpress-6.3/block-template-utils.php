@@ -152,11 +152,11 @@ add_filter( 'default_template_types', 'gutenberg_get_default_block_template_type
 /*
 	Override Core get_block_templates using pre_get_block_templates filter.
 */
-function gutenberg_get_block_templates( $query_result = null, $query = array(), $template_type = 'wp_template' ) {
+function gutenberg_get_block_templates( $query_result = null, $query = array(), $template_type = 'wp_template_part' ) {
 	$post_type     = isset( $query['post_type'] ) ? $query['post_type'] : '';
 	$wp_query_args = array(
 		'post_status'         => array( 'auto-draft', 'draft', 'publish' ),
-		'post_type'           => $template_type,
+		'post_type'           => $post_type,
 		'posts_per_page'      => -1,
 		'no_found_rows'       => true,
 		'lazy_load_term_meta' => false,
@@ -191,18 +191,19 @@ function gutenberg_get_block_templates( $query_result = null, $query = array(), 
 	}
 
 	$template_query = new WP_Query( $wp_query_args );
+
 	$query_result   = array();
 	foreach ( $template_query->posts as $post ) {
+		
 		$template = _build_block_template_result_from_post( $post );
-
+		
 		if ( is_wp_error( $template ) ) {
 			continue;
 		}
-
+		
 		if ( $post_type && ! $template->is_custom ) {
 			continue;
 		}
-
 		if (
 			$post_type &&
 			isset( $template->post_types ) &&
@@ -210,8 +211,11 @@ function gutenberg_get_block_templates( $query_result = null, $query = array(), 
 		) {
 			continue;
 		}
-
 		$query_result[] = $template;
+	}
+
+	if ( count($query_result) === 0  ) {
+		print_r( 'query_result is empty' );
 	}
 
 	if ( ! isset( $query['wp_id'] ) ) {
@@ -221,12 +225,14 @@ function gutenberg_get_block_templates( $query_result = null, $query = array(), 
 		 */
 		$query['slug__not_in'] = wp_list_pluck( $query_result, 'slug' );
 		$template_files        = _get_block_templates_files( $template_type, $query );
-		print_r($template_files);
+
 		foreach ( $template_files as $template_file ) {
 			$query_result[] = _build_block_template_result_from_file( $template_file, $template_type );
 		}
 	}
+	print_r( 'total count: ' . count( $query_result ) );
 
+	return $query_result;
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
@@ -243,6 +249,6 @@ function gutenberg_get_block_templates( $query_result = null, $query = array(), 
 	 * }
 	 * @param string              $template_type wp_template or wp_template_part.
 	 */
-	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
+	// return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
-add_filter( 'pre_get_block_templates', 'gutenberg_get_block_templates', 10, 2 );
+add_filter( 'get_block_templates', 'gutenberg_get_block_templates', 10, 2 );
