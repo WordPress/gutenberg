@@ -53,7 +53,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $mock_families );
-		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_param( 'font_families', $font_families_json );
 		rest_get_server()->dispatch( $install_request );
 	}
 
@@ -68,7 +68,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 		);
 
 		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
-		$uninstall_request->set_param( 'fontFamilies', $font_families_to_uninstall );
+		$uninstall_request->set_param( 'font_families', $font_families_to_uninstall );
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 	}
@@ -88,7 +88,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 			),
 		);
 
-		$uninstall_request->set_param( 'fontFamilies', $non_existing_font_data );
+		$uninstall_request->set_param( 'font_families', $non_existing_font_data );
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		$data     = $response->get_data();
 		$this->assertCount( 2, $data['errors'], 'The response should have 2 errors, one for each font family uninstall failure.' );
