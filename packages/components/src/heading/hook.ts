@@ -4,7 +4,7 @@
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';
-import { getHeadingFontSize } from '../ui/utils/font-size';
+import { getHeadingFontSize } from '../utils/font-size';
 import { CONFIG, COLORS } from '../utils';
 import type { HeadingProps } from './types';
 

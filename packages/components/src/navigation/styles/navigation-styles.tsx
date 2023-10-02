@@ -16,7 +16,7 @@ import Button from '../../button';
 import { Text } from '../../text';
 import { Heading } from '../../heading';
 import { reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 import SearchControl from '../../search-control';
 
 export const NavigationUI = styled.div`
