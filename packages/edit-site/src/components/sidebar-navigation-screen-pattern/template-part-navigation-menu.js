@@ -19,7 +19,9 @@ export default function TemplatePartNavigationMenu( { id } ) {
 		id
 	);
 
-	if ( ! id ) return null;
+	if ( ! id || title === undefined ) {
+		return null;
+	}
 
 	return (
 		<>
