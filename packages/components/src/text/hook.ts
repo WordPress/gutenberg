@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 
 /**
@@ -78,8 +79,7 @@ export default function useText(
 	const cx = useCx();
 
 	const classes = useMemo( () => {
-		// TODO: Make more specific?
-		const sx: Record< string, any > = {};
+		const sx: Record< string, SerializedStyles | null > = {};
 
 		const lineHeight = getLineHeight(
 			adjustLineHeightForInnerControls,
@@ -90,10 +90,7 @@ export default function useText(
 			color,
 			display,
 			fontSize: getFontSize( size ),
-			/* eslint-disable jsdoc/valid-types */
-			fontWeight:
-				/** @type {import('react').CSSProperties['fontWeight']} */ weight,
-			/* eslint-enable jsdoc/valid-types */
+			fontWeight: weight,
 			lineHeight,
 			letterSpacing,
 			textAlign: align,

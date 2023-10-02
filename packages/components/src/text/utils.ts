@@ -141,7 +141,7 @@ export function createHighlighterText( {
 					? Object.assign( {}, highlightStyle, activeStyle )
 					: highlightStyle;
 
-			const props: Record< string, any > = {
+			const props: Record< string, unknown > = {
 				children: text,
 				className: highlightClassNames,
 				key: index,
