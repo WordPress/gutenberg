@@ -23,8 +23,7 @@ import {
 import ListView from './list-view';
 import { Pagination } from './pagination';
 import ViewActions from './view-actions';
-import GlobalSearchInput from './global-search-input';
-import DataViewsContext from './context';
+import TextFilter from './text-filter';
 
 export default function DataViews( {
 	data,
@@ -43,18 +42,19 @@ export default function DataViews( {
 		getPaginationRowModel: getPaginationRowModel(),
 	} );
 	return (
-		<DataViewsContext.Provider value={ { ...dataView } }>
-			<div className="dataviews-wrapper">
-				<VStack spacing={ 4 }>
-					<HStack justify="space-between">
-						<GlobalSearchInput />
-						<ViewActions />
-					</HStack>
-					{ /* This component will be selected based on viewConfigs. Now we only have the list view. */ }
-					<ListView isLoading={ isLoading } />
-					<Pagination totalItems={ paginationInfo?.totalItems } />
-				</VStack>
-			</div>
-		</DataViewsContext.Provider>
+		<div className="dataviews-wrapper">
+			<VStack spacing={ 4 }>
+				<HStack justify="space-between">
+					<TextFilter onChange={ dataView.setGlobalFilter } />
+					<ViewActions dataView={ dataView } />
+				</HStack>
+				{ /* This component will be selected based on viewConfigs. Now we only have the list view. */ }
+				<ListView dataView={ dataView } isLoading={ isLoading } />
+				<Pagination
+					dataView={ dataView }
+					totalItems={ paginationInfo?.totalItems }
+				/>
+			</VStack>
+		</div>
 	);
 }

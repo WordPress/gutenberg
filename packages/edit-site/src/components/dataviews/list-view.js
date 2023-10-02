@@ -12,11 +12,6 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { useDataViewsContext } from './context';
-
 const sortIcons = { asc: chevronUp, desc: chevronDown };
 function Header( { header } ) {
 	if ( header.isPlaceholder ) {
@@ -41,8 +36,7 @@ function Header( { header } ) {
 	);
 }
 
-function ListView( { className, isLoading = false }, ref ) {
-	const dataView = useDataViewsContext();
+function ListView( { dataView, className, isLoading = false }, ref ) {
 	const { rows } = dataView.getRowModel();
 	const hasRows = !! rows?.length;
 	if ( isLoading ) {

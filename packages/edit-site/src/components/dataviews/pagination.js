@@ -13,17 +13,16 @@ import { sprintf, __, _x, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useDataViewsContext } from './context';
 import { PageSizeControl } from './view-actions';
 
 // For now this is copied from the patterns list Pagination component, because
 // the datatable pagination starts from index zero(`0`). Eventually all lists will be
 // using this one.
 export function Pagination( {
+	dataView,
 	// If passed, use it, as it's for controlled pagination.
 	totalItems = 0,
 } ) {
-	const dataView = useDataViewsContext();
 	const currentPage = dataView.getState().pagination.pageIndex + 1;
 	const numPages = dataView.getPageCount();
 	const _totalItems = totalItems || dataView.getCoreRowModel().rows.length;
@@ -113,7 +112,7 @@ export function Pagination( {
 					</Button>
 				</HStack>
 			) }
-			<PageSizeControl />
+			<PageSizeControl dataView={ dataView } />
 		</HStack>
 	);
 }

@@ -20,7 +20,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useDataViewsContext } from './context';
 
 const {
 	DropdownMenuV2,
@@ -32,8 +31,7 @@ const {
 
 export const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
 
-export function PageSizeControl() {
-	const dataView = useDataViewsContext();
+export function PageSizeControl( { dataView } ) {
 	const label = __( 'Rows per page:' );
 	return (
 		<SelectControl
@@ -60,8 +58,7 @@ export function PageSizeControl() {
 	);
 }
 
-function PageSizeMenu() {
-	const dataView = useDataViewsContext();
+function PageSizeMenu( { dataView } ) {
 	const currenPageSize = dataView.getState().pagination.pageSize;
 	return (
 		<DropdownSubMenuV2
@@ -102,8 +99,7 @@ function PageSizeMenu() {
 	);
 }
 
-function FieldsVisibilityMenu() {
-	const dataView = useDataViewsContext();
+function FieldsVisibilityMenu( { dataView } ) {
 	const hideableFields = dataView
 		.getAllColumns()
 		.filter( ( columnn ) => columnn.getCanHide() );
@@ -141,7 +137,7 @@ function FieldsVisibilityMenu() {
 	);
 }
 
-export default function ViewActions( { className } ) {
+export default function ViewActions( { dataView, className } ) {
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
@@ -154,8 +150,8 @@ export default function ViewActions( { className } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
-				<FieldsVisibilityMenu />
-				<PageSizeMenu />
+				<FieldsVisibilityMenu dataView={ dataView } />
+				<PageSizeMenu dataView={ dataView } />
 			</DropdownMenuGroupV2>
 		</DropdownMenuV2>
 	);
