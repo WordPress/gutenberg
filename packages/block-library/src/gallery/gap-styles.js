@@ -40,10 +40,7 @@ export default function GapStyles( { blockGap, clientId } ) {
 		gap: ${ gapValue }
 	}`;
 
-	useStyleOverride( {
-		id: `gallery-gap-${ clientId }`,
-		css: gap,
-	} );
+	useStyleOverride( { css: gap } );
 
 	return null;
 }

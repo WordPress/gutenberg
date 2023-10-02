@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useId } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
@@ -400,7 +400,9 @@ const elementTypes = [
  */
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useId() }`;
+		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+			BlockListBlock
+		) }`;
 
 		// The .editor-styles-wrapper selector is required on elements styles. As it is
 		// added to all other editor styles, not providing it causes reset and global
@@ -481,10 +483,7 @@ const withElementsStyles = createHigherOrderComponent(
 				: undefined;
 		}, [ baseElementSelector, blockElementStyles, props.name ] );
 
-		useStyleOverride( {
-			id: blockElementsContainerIdentifier,
-			css: styles,
-		} );
+		useStyleOverride( { css: styles } );
 
 		return (
 			<BlockListBlock

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useId } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -118,17 +118,19 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	return skipSerialization;
 }
 
-export function useStyleOverride( { id, css } ) {
+export function useStyleOverride( style ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const fallbackId = useId();
 	useEffect( () => {
-		if ( ! id || ! css ) return;
-		setStyleOverride( id, { css } );
+		if ( ! style ) return;
+		const id = style.id || fallbackId;
+		setStyleOverride( id, style );
 		return () => {
 			deleteStyleOverride( id );
 		};
-	}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+	}, [ fallbackId, style, setStyleOverride, deleteStyleOverride ] );
 }
 
 /**
