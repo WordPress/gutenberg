@@ -822,15 +822,14 @@ class WP_Theme_JSON_Gutenberg {
 		// For settings.typography.fontFamilies, make the $schema have all indexes present in the $input.
 		if ( isset( $input['settings']['typography']['fontFamilies'] ) ) {
 			// Do not handle the cases where the sanitization is called before font families are merged, since it will be handled again later.
-			if ( isset( $input['settings']['typography']['fontFamilies']['theme'] ) || isset( $input['settings']['typography']['fontFamilies']['custom'] ) ) {
-				return $output;
-			}
-			foreach ( $input['settings']['typography']['fontFamilies'] as $font_family_key => $value ) {
-				$schema['settings']['typography']['fontFamilies'][ $font_family_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0];
-				// Do the same for fontFace.
-				if ( isset( $input['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'] ) ) {
-					foreach ( $input['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'] as $font_face_key => $value2 ) {
-						$schema['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'][ $font_face_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0]['fontFace'][0];
+			if ( ! isset( $input['settings']['typography']['fontFamilies']['theme'] ) || ! isset( $input['settings']['typography']['fontFamilies']['custom'] ) ) {
+				foreach ( $input['settings']['typography']['fontFamilies'] as $font_family_key => $value ) {
+					$schema['settings']['typography']['fontFamilies'][ $font_family_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0];
+					// Do the same for fontFace.
+					if ( isset( $input['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'] ) ) {
+						foreach ( $input['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'] as $font_face_key => $value2 ) {
+							$schema['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'][ $font_face_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0]['fontFace'][0];
+						}
 					}
 				}
 			}
@@ -3318,16 +3317,20 @@ class WP_Theme_JSON_Gutenberg {
 				$items = array();
 				if ( isset( $preset['theme'] ) ) {
 					foreach ( $preset['theme'] as $item ) {
-						$slug = $item['slug'];
-						unset( $item['slug'] );
-						$items[ $slug ] = $item;
+						if ( is_array( $item ) ){
+							$slug = $item['slug'];
+							unset( $item['slug'] );
+							$items[ $slug ] = $item;
+						}
 					}
 				}
 				if ( isset( $preset['custom'] ) ) {
 					foreach ( $preset['custom'] as $item ) {
-						$slug = $item['slug'];
-						unset( $item['slug'] );
-						$items[ $slug ] = $item;
+						if ( is_array( $item ) ){
+							$slug = $item['slug'];
+							unset( $item['slug'] );
+							$items[ $slug ] = $item;
+						}
 					}
 				}
 				$flattened_preset = array();

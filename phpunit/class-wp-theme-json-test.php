@@ -904,6 +904,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'typography' => array(
 						'fontFamilies' => array(
 							'badKey' => 'I am invalid',
+							'theme'  => array(
+								'name'       => 'Inter',
+								'slug'       => 'inter',
+								'badKey'     => 'I am invalid',
+								'fontFamily' => 'Inter',
+								'fontFace'   => array(
+									array(
+										'anotherKey' => 'I am invalid',
+										'fontFamily' => 'Inter',
+										'fontStyle'  => 'normal',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/inter.ttf',
+									),
+								),
+							),
 							array(
 								'name'       => 'Piazzolla',
 								'slug'       => 'piazzolla',
@@ -932,6 +947,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'typography' => array(
 					'fontFamilies' => array(
+						array(
+							'fontFace'   => array(
+								array(
+									'fontFamily' => 'Inter',
+									'fontStyle'  => 'normal',
+									'fontWeight' => '400',
+									'src'        => 'https://example.com/inter.ttf',
+								),
+							),
+							'fontFamily' => 'Inter',
+							'name'       => 'Inter',
+							'slug'       => 'inter',
+						),
 						array(
 							'fontFace'   => array(
 								array(
