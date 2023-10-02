@@ -29,7 +29,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_
 	public function test_should_return_empty_array_when_no_fonts_defined_in_theme() {
 		switch_theme( 'block-theme' );
 
-		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		$fonts = Gutenberg_Font_Face_Resolver_6_4::get_fonts_from_theme_json();
 		$this->assertIsArray( $fonts, 'Should return an array data type' );
 		$this->assertEmpty( $fonts, 'Should return an empty array' );
 	}
@@ -37,7 +37,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_
 	public function test_should_return_all_fonts_from_theme() {
 		switch_theme( static::FONTS_THEME );
 
-		$actual   = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		$actual   = Gutenberg_Font_Face_Resolver_6_4::get_fonts_from_theme_json();
 		$expected = $this->get_expected_fonts_for_fonts_block_theme( 'fonts' );
 		$this->assertSame( $expected, $actual );
 	}
@@ -52,7 +52,7 @@ class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_
 	public function test_should_replace_src_file_placeholder( $font_name, $font_index, $expected ) {
 		switch_theme( static::FONTS_THEME );
 
-		$fonts = WP_Font_Face_Resolver::get_fonts_from_theme_json();
+		$fonts = Gutenberg_Font_Face_Resolver_6_4::get_fonts_from_theme_json();
 
 		$actual   = $fonts[ $font_name ][ $font_index ]['src'][0];
 		$expected = get_stylesheet_directory_uri() . $expected;
