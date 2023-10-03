@@ -379,7 +379,7 @@ export default function SearchEdit( {
 								showLabel: ! showLabel,
 							} );
 						} }
-						className={ showLabel ? 'is-pressed' : undefined }
+						isPressed={ showLabel }
 					/>
 					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
@@ -395,9 +395,7 @@ export default function SearchEdit( {
 									buttonUseIcon: ! buttonUseIcon,
 								} );
 							} }
-							className={
-								buttonUseIcon ? 'is-pressed' : undefined
-							}
+							isPressed={ buttonUseIcon }
 						/>
 					) }
 				</ToolbarGroup>
