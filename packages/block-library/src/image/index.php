@@ -255,6 +255,17 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// If the current theme does NOT have a `theme.json`, or the colors are not defined,
 	// we need to set the background color & close button color to some default values
 	// because we can't get them from the Global Styles.
+	$background_color   = '#fff';
+	$close_button_color = '#000';
+	if ( wp_theme_has_theme_json() ) {
+		$global_styles_color = wp_get_global_styles( array( 'color' ) );
+		if ( ! empty( $global_styles_color['background'] ) ) {
+			$background_color = esc_attr( $global_styles_color['background'] );
+		}
+		if ( ! empty( $global_styles_color['text'] ) ) {
+			$close_button_color = esc_attr( $global_styles_color['text'] );
+		}
+	}
 	$global_styles_color  = wp_get_global_styles( array( 'color' ) );
 	$has_background_color = ! empty( $global_styles_color['background'] );
 	$has_text_color       = ! empty( $global_styles_color['text'] );
