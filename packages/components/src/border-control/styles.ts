@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
