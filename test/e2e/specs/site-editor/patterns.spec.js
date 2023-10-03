@@ -45,7 +45,7 @@ test.describe( 'Patterns', () => {
 				level: 1,
 			} )
 		).toBeVisible();
-		await expect( patterns.content ).toContainText( 'No patterns found.' );
+		await expect( patterns.content ).toContainText( 'Create a pattern' );
 
 		await patterns.navigation
 			.getByRole( 'button', { name: 'Create pattern' } )
@@ -184,7 +184,7 @@ test.describe( 'Patterns', () => {
 		} );
 
 		await searchBox.fill( 'no match' );
-		await expect( patterns.content ).toContainText( 'No patterns found.' );
+		await expect( patterns.content ).toContainText( 'Create a pattern' );
 
 		await patterns.content
 			.getByRole( 'button', { name: 'Reset search' } )
