@@ -277,7 +277,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	}
 
 	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
+	$dialog_label       = esc_attr__( 'Enlarged image' );
 	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
