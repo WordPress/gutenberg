@@ -67,7 +67,21 @@ const lowercaseProps = < T extends Record< string, unknown > >( object: T ) => {
 const memoizedLowercaseProps = memoize( lowercaseProps );
 
 /**
- * @param {Options} options
+ * @param options
+ * @param options.activeClassName
+ * @param options.activeIndex
+ * @param options.activeStyle
+ * @param options.autoEscape
+ * @param options.caseSensitive
+ * @param options.children
+ * @param options.findChunks
+ * @param options.highlightClassName
+ * @param options.highlightStyle
+ * @param options.highlightTag
+ * @param options.sanitize
+ * @param options.searchWords
+ * @param options.unhighlightClassName
+ * @param options.unhighlightStyle
  */
 export function createHighlighterText( {
 	activeClassName = '',
