@@ -356,7 +356,7 @@ test.describe( 'Footnotes', () => {
 
 		await previewPage.close();
 		await editorPage.bringToFront();
-		await editor.canvas.click( 'p:text("first paragraph")' );
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
