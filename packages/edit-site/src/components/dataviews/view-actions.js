@@ -13,6 +13,8 @@ import {
 	check,
 	blockTable,
 	chevronDown,
+	arrowUp,
+	arrowDown,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -67,7 +69,7 @@ function PageSizeMenu( { dataView } ) {
 					suffix={
 						<>
 							{ currenPageSize }
-							<Icon icon={ chevronRightSmall } />{ ' ' }
+							<Icon icon={ chevronRightSmall } />
 						</>
 					}
 				>
@@ -116,21 +118,106 @@ function FieldsVisibilityMenu( { dataView } ) {
 				</DropdownSubMenuTriggerV2>
 			}
 		>
-			{ hideableFields?.map( ( column ) => {
+			{ hideableFields?.map( ( field ) => {
 				return (
 					<DropdownMenuItemV2
-						key={ column.id }
+						key={ field.id }
 						prefix={
-							column.getIsVisible() && <Icon icon={ check } />
+							field.getIsVisible() && <Icon icon={ check } />
 						}
 						onSelect={ ( event ) => {
 							event.preventDefault();
-							column.getToggleVisibilityHandler()( event );
+							field.getToggleVisibilityHandler()( event );
 						} }
 						role="menuitemcheckbox"
 					>
-						{ column.columnDef.header }
+						{ field.columnDef.header }
 					</DropdownMenuItemV2>
+				);
+			} ) }
+		</DropdownSubMenuV2>
+	);
+}
+
+// This object is used to construct the sorting options per sortable field.
+const sortingItemsInfo = {
+	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
+	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
+};
+function SortMenu( { dataView } ) {
+	const sortableFields = dataView
+		.getAllColumns()
+		.filter( ( columnn ) => columnn.getCanSort() );
+	if ( ! sortableFields?.length ) {
+		return null;
+	}
+	const currentSortedField = sortableFields.find( ( field ) =>
+		field.getIsSorted()
+	);
+	return (
+		<DropdownSubMenuV2
+			trigger={
+				<DropdownSubMenuTriggerV2
+					suffix={
+						<>
+							{ currentSortedField?.columnDef.header }
+							<Icon icon={ chevronRightSmall } />
+						</>
+					}
+				>
+					{ __( 'Sort by' ) }
+				</DropdownSubMenuTriggerV2>
+			}
+		>
+			{ sortableFields?.map( ( field ) => {
+				const sortedDirection = field.getIsSorted();
+				return (
+					<DropdownSubMenuV2
+						key={ field.id }
+						trigger={
+							<DropdownSubMenuTriggerV2
+								suffix={ <Icon icon={ chevronRightSmall } /> }
+							>
+								{ field.columnDef.header }
+							</DropdownSubMenuTriggerV2>
+						}
+						side="left"
+					>
+						{ Object.entries( sortingItemsInfo ).map(
+							( [ direction, info ] ) => {
+								return (
+									<DropdownMenuItemV2
+										key={ direction }
+										prefix={ <Icon icon={ info.icon } /> }
+										suffix={
+											sortedDirection === direction && (
+												<Icon icon={ check } />
+											)
+										}
+										onSelect={ ( event ) => {
+											event.preventDefault();
+											if (
+												sortedDirection === direction
+											) {
+												dataView.resetSorting();
+											} else {
+												dataView.setSorting( [
+													{
+														id: field.id,
+														desc:
+															direction ===
+															'desc',
+													},
+												] );
+											}
+										} }
+									>
+										{ info.label }
+									</DropdownMenuItemV2>
+								);
+							}
+						) }
+					</DropdownSubMenuV2>
 				);
 			} ) }
 		</DropdownSubMenuV2>
@@ -150,6 +237,7 @@ export default function ViewActions( { dataView, className } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
+				<SortMenu dataView={ dataView } />
 				<FieldsVisibilityMenu dataView={ dataView } />
 				<PageSizeMenu dataView={ dataView } />
 			</DropdownMenuGroupV2>
