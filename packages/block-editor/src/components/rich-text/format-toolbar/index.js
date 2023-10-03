@@ -44,7 +44,7 @@ const FormatToolbar = () => {
 									toggleProps={ {
 										...toggleProps,
 										className: toggleProps.className,
-										isPressed: hasActive,
+										'aria-pressed': hasActive,
 										describedBy: __(
 											'Displays more block tools'
 										),
