@@ -118,19 +118,33 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	return skipSerialization;
 }
 
-export function useStyleOverride( style ) {
+export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const fallbackId = useId();
 	useEffect( () => {
-		if ( ! style ) return;
-		const id = style.id || fallbackId;
-		setStyleOverride( id, style );
+		// Unmount if there is CSS and assets are empty.
+		if ( ! css && ! assets ) return;
+		const _id = id || fallbackId;
+		setStyleOverride( _id, {
+			id,
+			css,
+			assets,
+			__unstableType,
+		} );
 		return () => {
-			deleteStyleOverride( id );
+			deleteStyleOverride( _id );
 		};
-	}, [ fallbackId, style, setStyleOverride, deleteStyleOverride ] );
+	}, [
+		id,
+		css,
+		assets,
+		__unstableType,
+		fallbackId,
+		setStyleOverride,
+		deleteStyleOverride,
+	] );
 }
 
 /**
