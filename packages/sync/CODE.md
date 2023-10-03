@@ -17,7 +17,7 @@ The experiment can be enabled in the "Guteberg > Experiments" page. When it is e
 
 ## The data flow
 
-The current experiment uses the YJS library to synchronize and merge changes, replacing `core-data` role which no longer does the fetching itself. Each core-data entity record represents a YJS document and updates to the `--edit` record are broadcasted among peers.
+The current experiment updates `core-data` to leverage the YJS library for synchronization and merging changes. Each core-data entity record represents a YJS document and updates to the `--edit` record are broadcasted among peers.
 
 These are the specific checkpoints:
 
