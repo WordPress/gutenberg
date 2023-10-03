@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { RefCallback, RefObject, ReactElement } from 'react';
+import type { ReactElement, RefCallback, RefObject } from 'react';
 
 /**
  * WordPress dependencies

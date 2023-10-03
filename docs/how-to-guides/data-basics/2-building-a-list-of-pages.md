@@ -361,6 +361,7 @@ All the pieces are in place, great! Here’s the complete JavaScript code of our
 
 ```js
 import { useState } from 'react';
+import { render } from 'react-dom';
 import { SearchControl, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
