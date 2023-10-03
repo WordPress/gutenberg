@@ -212,7 +212,7 @@ Finally, here’s how `MyFirstApp` looks once we wire it all together:
 
 ```js
 import { useState } from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom';
 import { SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -361,7 +361,7 @@ All the pieces are in place, great! Here’s the complete JavaScript code of our
 
 ```js
 import { useState } from 'react';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom';
 import { SearchControl, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -423,12 +423,14 @@ function PagesList( { hasResolved, pages } ) {
 	);
 }
 
+const root = createRoot(
+	document.querySelector( '#my-first-gutenberg-app' )
+);
 window.addEventListener(
 	'load',
 	function () {
-		render(
-			<MyFirstApp />,
-			document.querySelector( '#my-first-gutenberg-app' )
+		root.render(
+			<MyFirstApp />
 		);
 	},
 	false
