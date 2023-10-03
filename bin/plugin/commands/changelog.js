@@ -75,7 +75,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Automated Testing': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
-	'[Type] Accessibility (a11y)': 'Accessibility',
+	'[Focus] Accessibility (a11y)': 'Accessibility',
 	'[Type] Performance': 'Performance',
 	'[Type] Security': 'Security',
 	'[Feature] Navigation Screen': 'Experiments',

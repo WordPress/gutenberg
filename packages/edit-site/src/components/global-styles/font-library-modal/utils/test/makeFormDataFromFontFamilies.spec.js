@@ -55,7 +55,7 @@ describe( 'makeFormDataFromFontFamilies', () => {
 				fontFamily: 'Bebas',
 			},
 		];
-		expect( JSON.parse( formData.get( 'fontFamilies' ) ) ).toEqual(
+		expect( JSON.parse( formData.get( 'font_families' ) ) ).toEqual(
 			expectedFontFamilies
 		);
 	} );

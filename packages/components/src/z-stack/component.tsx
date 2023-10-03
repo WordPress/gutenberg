@@ -11,7 +11,7 @@ import { isValidElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValidChildren } from '../ui/utils/get-valid-children';
+import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
 import { ZStackView, ZStackChildView } from './styles';
 import type { ZStackProps } from './types';
