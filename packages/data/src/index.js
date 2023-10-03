@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import turboCombineReducers from 'turbo-combine-reducers';
-
-/**
  * Internal dependencies
  */
 import defaultRegistry from './default-registry';
@@ -80,7 +75,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export const combineReducers = turboCombineReducers;
+export { combineReducers } from './redux-store';
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

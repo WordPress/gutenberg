@@ -23,6 +23,7 @@ const {
 	waitForVisible,
 	clickIfClickable,
 	launchApp,
+	tapStatusBariOS,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
@@ -53,8 +54,8 @@ class EditorPage {
 		}
 	}
 
-	async initializeEditor( { initialData } = {} ) {
-		await launchApp( this.driver, { initialData } );
+	async initializeEditor( { initialData, rawStyles, rawFeatures } = {} ) {
+		await launchApp( this.driver, { initialData, rawStyles, rawFeatures } );
 
 		// Stores initial values from the editor for different helpers.
 		const addButton =
@@ -192,7 +193,11 @@ class EditorPage {
 			: 'post-title';
 
 		if ( options.autoscroll ) {
-			await swipeDown( this.driver );
+			if ( isAndroid() ) {
+				await swipeDown( this.driver );
+			} else {
+				await tapStatusBariOS( this.driver );
+			}
 		}
 
 		const elements =

@@ -66,6 +66,7 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		size,
 		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
@@ -97,6 +98,13 @@ function UnforwardedModal(
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
 
+	let sizeClass;
+	if ( isFullScreen || size === 'fill' ) {
+		sizeClass = 'is-full-screen';
+	} else if ( size ) {
+		sizeClass = `has-size-${ size }`;
+	}
+
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
 		if ( ! contentRef.current ) {
@@ -113,10 +121,14 @@ function UnforwardedModal(
 	}, [ contentRef ] );
 
 	useEffect( () => {
+		ariaHelper.modalize( ref.current );
+		return () => ariaHelper.unmodalize();
+	}, [] );
+
+	useEffect( () => {
 		openModalCount++;
 
 		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
 			document.body.classList.add( bodyOpenClassName );
 		}
 
@@ -125,7 +137,6 @@ function UnforwardedModal(
 
 			if ( openModalCount === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
-				ariaHelper.showApp();
 			}
 		};
 	}, [ bodyOpenClassName ] );
@@ -226,10 +237,8 @@ function UnforwardedModal(
 				<div
 					className={ classnames(
 						'components-modal__frame',
-						className,
-						{
-							'is-full-screen': isFullScreen,
-						}
+						sizeClass,
+						className
 					) }
 					style={ style }
 					ref={ useMergeRefs( [

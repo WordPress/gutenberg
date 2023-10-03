@@ -231,22 +231,73 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'initial search suggestions limits results', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'post',
-			subtype: 'page',
-			isInitialSuggestions: true,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 11,
-					title: 'Limit Case',
-					url: 'http://wordpress.local/limit-case/',
-					type: 'page',
-					kind: 'post-type',
+	describe( 'Initial search suggestions', () => {
+		it( 'initial search suggestions limits results', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				isInitialSuggestions: true,
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 11,
+						title: 'Limit Case',
+						url: 'http://wordpress.local/limit-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should allow custom search options for initial suggestions', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'term',
+				subtype: 'category',
+				page: 11,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					type: 'post',
+					subtype: 'page',
+					perPage: 20,
+					page: 11,
 				},
-			] )
-		);
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should default any missing initial search options to those from the main search options', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				page: 11,
+				perPage: 20,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					// intentionally missing.
+					// expected to default to those from the main search options.
+				},
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
 	} );
 	it( 'allows searching from a page', () => {
 		return fetchLinkSuggestions( '', {
