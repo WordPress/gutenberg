@@ -33,11 +33,7 @@ export default function EditorFullPage() {
 	} );
 
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className="playground"
-			onKeyDown={ ( event ) => event.stopPropagation() }
-		>
+		<div className="playground">
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ updateBlocks }

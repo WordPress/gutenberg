@@ -27,11 +27,7 @@ export default function EditorWithUndoRedo() {
 	}, [] );
 
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className="editor-with-undo-redo"
-			onKeyDown={ ( event ) => event.stopPropagation() }
-		>
+		<div className="editor-with-undo-redo">
 			<BlockEditorProvider
 				value={ value.blocks }
 				selection={ value.selection }

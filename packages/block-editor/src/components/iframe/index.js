@@ -34,10 +34,12 @@ import { store as blockEditorStore } from '../../store';
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
+	const ignoredProperties = [ 'bubbles' ];
 	for ( const key in event ) {
-		init[ key ] = event[ key ];
+		if ( ! ignoredProperties.includes( key ) ) {
+			init[ key ] = event[ key ];
+		}
 	}
-
 	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
 		const rect = frame.getBoundingClientRect();
 		init.clientX += rect.left;
