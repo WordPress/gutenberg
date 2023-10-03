@@ -103,7 +103,7 @@ Pass in a description that will be shown to screen readers associated with the s
 
 The options that can be chosen from.
 
--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
+-   Type: `Array<{ key: String, name: String | ReactNode, style: ?{}, className: ?String, ...rest }>`
 -   Required: Yes
 
 #### onChange
@@ -152,6 +152,13 @@ A handler for onFocus events.
 #### onBlur
 
 A handler for onBlur events.
+
+-   Type: `Function`
+-   Required: No
+
+#### itemToString
+
+Function called with a given dropdown option. The return value will be used by aria live to inform users of updated selections and for selection/highlight by character keys
 
 -   Type: `Function`
 -   Required: No

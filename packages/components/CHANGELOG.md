@@ -8,6 +8,7 @@
 -   Allow using CSS level 4 viewport-relative units ([54415](https://github.com/WordPress/gutenberg/pull/54415))
 -   `ToolsPanel`: do not apply the `className` to prop to `ToolsPanelItem` components when rendered as placeholders ([#55207](https://github.com/WordPress/gutenberg/pull/55207)).
 -   `ColorPalette`/`ToggleGroupControl/ToggleGroupControlOptionBase`: add `type="button"` attribute to native `<button>`s ([#55125](https://github.com/WordPress/gutenberg/pull/55125)).
+-   `CustomSelectControl`: Add `itemToString` prop to allow passing custom react components instead of strings as dropdown options ([#55015](https://github.com/WordPress/gutenberg/pull/55015)).
 
 ### Bug Fix
 

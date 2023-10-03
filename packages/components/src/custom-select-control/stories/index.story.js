@@ -47,6 +47,44 @@ Default.args = {
 	],
 };
 
+export const WithCustomOptions = CustomSelectControl.bind( {} );
+WithCustomOptions.args = {
+	...Default.args,
+	options: [
+		{
+			key: 'thumbnail',
+			name: (
+				<div>
+					<span className="title">Thumbnail </span>
+					<span clasName="size">50px </span>
+				</div>
+			),
+			selectionMessage: 'Thumbnail',
+		},
+		{
+			key: 'medium',
+			name: (
+				<div>
+					<span className="title">Medium </span>
+					<span clasName="size">100px</span>
+				</div>
+			),
+			selectionMessage: 'Medium',
+		},
+		{
+			key: 'large',
+			name: (
+				<div>
+					<span className="title">Large </span>
+					<span clasName="size">200px </span>
+				</div>
+			),
+			selectionMessage: 'Large',
+		},
+	],
+	itemToString: ( item ) => item.selectionMessage,
+};
+
 export const WithLongLabels = CustomSelectControl.bind( {} );
 WithLongLabels.args = {
 	...Default.args,
