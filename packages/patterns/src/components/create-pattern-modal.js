@@ -36,6 +36,7 @@ export default function CreatePatternModal( {
 } ) {
 	const [ syncType, setSyncType ] = useState( PATTERN_SYNC_TYPES.full );
 	const [ categoryTerms, setCategoryTerms ] = useState( [] );
+	const [ selectedCategory, setSelectedCategory ] = useState( '' );
 	const [ title, setTitle ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
@@ -50,7 +51,7 @@ export default function CreatePatternModal( {
 		try {
 			setIsSaving( true );
 			const categories = await Promise.all(
-				categoryTerms.map( ( termName ) =>
+				[ ...categoryTerms, selectedCategory ].map( ( termName ) =>
 					findOrCreateTerm( termName )
 				)
 			);
@@ -126,8 +127,10 @@ export default function CreatePatternModal( {
 						className="patterns-create-modal__name-input"
 					/>
 					<CategorySelector
-						values={ categoryTerms }
-						onChange={ setCategoryTerms }
+						newCategoryValues={ categoryTerms }
+						onChangeNewCategories={ setCategoryTerms }
+						onChangeSelectedCategory={ setSelectedCategory }
+						selectedCategoryValue={ selectedCategory }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
