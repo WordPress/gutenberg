@@ -9,10 +9,11 @@
  * Renders the `core/image` block on the server,
  * adding a data-id attribute to the element if core/gallery has added on pre-render.
  *
- * @param  array    $attributes The block attributes.
- * @param  string   $content    The block content.
- * @param  WP_Block $block      The block object.
- * @return string Returns the block content with the data-id attribute added.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      The block object.
+ *
+ * @return string The block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
 
@@ -76,12 +77,13 @@ function render_block_core_image( $attributes, $content, $block ) {
 }
 
 /**
- * Add the lightboxEnabled flag to the block data.
+ * Adds the lightboxEnabled flag to the block data.
  *
  * This is used to determine whether the lightbox should be rendered or not.
  *
- * @param  array $block Block data.
- * @return array        Filtered block data.
+ * @param array $block Block data.
+ *
+ * @return array Filtered block data.
  */
 function block_core_image_get_lightbox_settings( $block ) {
 	// Get the lightbox setting from the block attributes.
@@ -113,11 +115,12 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
- * Add the directives and layout needed for the lightbox behavior.
+ * Adds the directives and layout needed for the lightbox behavior.
  *
- * @param  string $block_content        Rendered block content.
- * @param  array  $block                Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ *
+ * @return string Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $block_content );
@@ -308,11 +311,13 @@ HTML;
 }
 
 /**
- * Ensure that the view script has the `wp-interactivity` dependency.
+ * Ensures that the view script has the `wp-interactivity` dependency.
  *
  * @since 6.4.0
  *
  * @global WP_Scripts $wp_scripts
+ *
+ * @return void
  */
 function block_core_image_ensure_interactivity_dependency() {
 	global $wp_scripts;
@@ -328,6 +333,8 @@ add_action( 'wp_print_scripts', 'block_core_image_ensure_interactivity_dependenc
 
 /**
  * Registers the `core/image` block on server.
+ *
+ * @return void
  */
 function register_block_core_image() {
 	register_block_type_from_metadata(
