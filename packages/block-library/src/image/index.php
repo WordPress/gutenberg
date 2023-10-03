@@ -124,6 +124,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$aria_label = __( 'Enlarge image' );
 
+	$processor->next_tag( 'img' );
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	if ( null !== $alt_attribute ) {
