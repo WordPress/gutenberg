@@ -4,11 +4,11 @@ sidebar_position: 6
 
 # Block Library
 
-The block editor relies on a registry of block types in order to render and edit blocks. The `@wordpress/block-library` package provides a set of core blocks that you can register in your application.
+The block editor relies on a registry of block types to render and edit blocks. The `@wordpress/block-library` package provides a set of core blocks that you can register in your application.
 
 ## Registring all block types
 
-Registering blocks require both loading the JavaScript code that make the block type available for use and including the corresponding stylesheets.
+Registering blocks requires both loading the JavaScript code that makes the block type available for use and including the corresponding stylesheets.
 
 To register all blocks from the block library, you can use the `registerCoreBlocks` function:
 
@@ -28,7 +28,7 @@ import "@wordpress/block-library/build-style/editor.css";
 
 ## Registering individual blocks
 
-That said, by default the block library includes a very big number of blocks and some of them may contain some WordPress specific logic. For this reason, if you're building a third-party block editor, it's recommended to only register the blocks that you need.
+That said, by default the block library includes a very big number of blocks and some of them may contain some WordPress-specific logic. For this reason, if you're building a third-party block editor, it's recommended to only register the blocks that you need.
 
 ### The paragraph block type
 
@@ -40,7 +40,7 @@ import '@wordpress/block-library/build-style/paragraph/style.css';
 import '@wordpress/block-library/build-style/paragraph/editor.css';
 ```
 
-Also, the paragraph block is often used as the "default block" in the block editor. The default block have multiple purposes:
+Also, the paragraph block is often used as the "default block" in the block editor. The default block has multiple purposes:
 
  - It's the block that is selected when the user starts typing or hits Enter.
  - It's the block that is inserted when the user clicks on the "Add block" button.
@@ -56,9 +56,9 @@ setDefaultBlockName( 'core/paragraph' );
 
 ### The HTML block type
 
-Another important block type that most block editors would want to use is the HTML block. This block allows users to insert arbitrary HTML code in the block editor. It's often used to insert embeds or external content.
+Another important block type that most block editors would want to use is the HTML block. This block allows users to insert arbitrary HTML code in the block editor and is often used to insert embeds or external content.
 
-It is also used by the block editor to render blocks that are not registered in the block editor or as a fallback block type for random HTML content that can't be parsed properly into blocks.
+It is also used by the block editor to render blocks that are not registered in the block editor or as a fallback block type for random HTML content that can't be properly parsed into blocks.
 
 You can register the HTML block with the following code:
 
@@ -104,7 +104,7 @@ In addition to these two default blocks, here's a non-exhaustive list of blocks 
  - **Button block**: `buttons` and `button`
  - **Social links block**: `social-links` and `social-link`
 
-For each block, you'll need to load the JavaScript code and the stylesheets, some blocks have two stylesheets (`style.css` and `editor.css`). For example, to register the heading block, you can use the following code:
+For each block, you'll need to load the JavaScript code and stylesheets. Some blocks have two stylesheets (`style.css` and `editor.css`). For example, to register the heading block, you can use the following code:
 
 ```js
 import '@wordpress/block-library/build-module/heading/init';
