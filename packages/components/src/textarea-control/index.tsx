@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ChangeEvent, ForwardedRef } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -42,7 +37,7 @@ import type { WordPressComponentProps } from '../context';
  */
 function UnforwardedTextareaControl(
 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
-	ref: ForwardedRef< HTMLTextAreaElement >
+	ref: React.ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
 		__nextHasNoMarginBottom,
@@ -57,7 +52,7 @@ function UnforwardedTextareaControl(
 	} = props;
 	const instanceId = useInstanceId( TextareaControl );
 	const id = `inspector-textarea-control-${ instanceId }`;
-	const onChangeValue = ( event: ChangeEvent< HTMLTextAreaElement > ) =>
+	const onChangeValue = ( event: React.ChangeEvent< HTMLTextAreaElement > ) =>
 		onChange( event.target.value );
 
 	return (
