@@ -171,7 +171,8 @@
 		}
 
 		&:hover,
-		&:focus {
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
 		}
@@ -199,7 +200,8 @@
 		z-index: 5000000;
 
 		&:hover,
-		&:focus {
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
 		}
