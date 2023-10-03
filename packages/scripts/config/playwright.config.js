@@ -25,7 +25,7 @@ const config = defineConfig( {
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
 	globalSetup: fileURLToPath(
-		new URL( './playwright/global-setup.ts', 'file:' + __filename ).href
+		new URL( './playwright/global-setup.js', 'file:' + __filename ).href
 	),
 	use: {
 		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
@@ -60,4 +60,4 @@ const config = defineConfig( {
 	],
 } );
 
-export default config;
+module.exports = config;
