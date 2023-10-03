@@ -35,12 +35,13 @@ export class Editor {
 	browser: Browser;
 	page: Page;
 	context: BrowserContext;
-	useLegacyCanvas = false;
+	useLegacyCanvas: boolean;
 
 	constructor( { page }: EditorConstructorProps ) {
 		this.page = page;
 		this.context = page.context();
 		this.browser = this.context.browser()!;
+		this.useLegacyCanvas = false;
 	}
 
 	get canvas(): FrameLocator | Page {
