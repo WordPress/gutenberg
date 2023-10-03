@@ -23,7 +23,7 @@ import { InputBaseWithBackCompatMinWidth } from './styles';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
-const itemToString = ( item ) => item?.name;
+const itemToStringDefault = ( item ) => item?.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
@@ -73,6 +73,7 @@ export default function CustomSelectControl( props ) {
 		hideLabelFromVision,
 		label,
 		describedBy,
+		itemToString = itemToStringDefault,
 		options: items,
 		onChange: onSelectedItemChange,
 		/** @type {import('../select-control/types').SelectControlProps.size} */
@@ -211,7 +212,7 @@ export default function CustomSelectControl( props ) {
 						describedBy: getDescribedBy(),
 					} ) }
 				>
-					{ itemToString( selectedItem ) }
+					{ selectedItem?.name }
 					{ __experimentalShowSelectedHint &&
 						selectedItem.__experimentalHint && (
 							<span className="components-custom-select-control__hint">
