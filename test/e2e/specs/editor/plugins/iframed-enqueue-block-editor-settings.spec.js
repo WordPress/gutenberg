@@ -50,6 +50,7 @@ test.describe( 'iframed block editor settings styles', () => {
 			} );
 		} );
 
+		// Expect a 2px border (added in JS).
 		await expect( defaultBlock ).toHaveCSS( 'border-width', '2px' );
 	} );
 
@@ -92,6 +93,7 @@ test.describe( 'iframed block editor settings styles', () => {
 				.toggleFeature( 'themeStyles' );
 		} );
 
+		// Expect a 2px border because theme styles are enabled.
 		await expect( defaultBlock ).toHaveCSS( 'border-width', '2px' );
 	} );
 } );
