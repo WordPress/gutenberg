@@ -8,10 +8,10 @@ import useText from './hook';
 import type { Props } from './types';
 
 /**
- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').ForwardedRef<any>}                                             forwardedRef
+ * @param props
+ * @param forwardedRef
  */
-function Text(
+function UnconnectedText(
 	props: WordPressComponentProps< Props, 'span' >,
 	forwardedRef: React.ForwardedRef< any >
 ) {
@@ -36,6 +36,5 @@ function Text(
  * }
  * ```
  */
-const ConnectedText = contextConnect( Text, 'Text' );
-
-export default ConnectedText;
+const Text = contextConnect( UnconnectedText, 'Text' );
+export default Text;
