@@ -936,6 +936,9 @@ export function hasRedo( state: State ): boolean {
  * @return The current theme.
  */
 export function getCurrentTheme( state: State ): any {
+	if ( ! state.currentTheme ) {
+		return null;
+	}
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 

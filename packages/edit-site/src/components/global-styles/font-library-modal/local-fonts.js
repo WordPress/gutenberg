@@ -12,7 +12,7 @@ import {
 	Notice,
 	FlexItem,
 } from '@wordpress/components';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
+import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -38,6 +39,16 @@ function LocalFonts() {
 	const onFilesUpload = ( event ) => {
 		handleFilesUpload( event.target.files );
 	};
+
+	// Reset notice after 5 seconds
+	useEffect( () => {
+		if ( notice ) {
+			const timeout = setTimeout( () => {
+				setNotice( null );
+			}, 5000 );
+			return () => clearTimeout( timeout );
+		}
+	}, [ notice ] );
 
 	/**
 	 * Filters the selected files to only allow the ones with the allowed extensions
@@ -136,13 +147,9 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		const status = await installFonts( fontFamilies );
-		if ( status ) {
-			setNotice( {
-				type: 'success',
-				message: __( 'Upload successful.' ),
-			} );
-		}
+		const response = await installFonts( fontFamilies );
+		const installNotice = getNoticeFromInstallResponse( response );
+		setNotice( installNotice );
 	};
 
 	return (

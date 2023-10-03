@@ -19,7 +19,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ToggleControlProps } from './types';
 import { HStack } from '../h-stack';
 import { useCx } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 
 /**
  * ToggleControl is used to generate a toggle user interface.
