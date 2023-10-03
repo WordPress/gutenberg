@@ -227,7 +227,7 @@ store(
 					roleAttribute: ( { context } ) => {
 						return context.core.image.lightboxEnabled
 							? 'dialog'
-							: '';
+							: null;
 					},
 					lightboxObjectFit: ( { context } ) => {
 						if ( context.core.image.initialized ) {
