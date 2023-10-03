@@ -13,6 +13,7 @@
  */
 function gutenberg_safe_style_attrs_6_4( $attrs ) {
 	$attrs[] = 'writing-mode';
+	$attrs[] = 'text-orientation';
 	return $attrs;
 }
 add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_4' );
