@@ -324,11 +324,13 @@ class PreviewUtils {
 	}
 
 	async toggleCustomFieldsOption( shouldBeChecked ) {
-		// Open preferences dialog.
-
-		await this.page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-		);
+		// Open preferences dialog. We need the `.last()` because if a block is selected, there are multiple Options buttons within the header.
+		await this.page
+			.locator(
+				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
+			)
+			.last()
+			.click();
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
 		// Navigate to panels section.
