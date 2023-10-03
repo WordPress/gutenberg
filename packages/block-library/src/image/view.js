@@ -229,6 +229,11 @@ store(
 							? 'dialog'
 							: null;
 					},
+					ariaModal: ( { context } ) => {
+						return context.core.image.lightboxEnabled
+							? 'true'
+							: null;
+					},
 					lightboxObjectFit: ( { context } ) => {
 						if ( context.core.image.initialized ) {
 							return 'cover';
