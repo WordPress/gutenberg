@@ -334,9 +334,11 @@ _Related_
 
 ### CopyHandler
 
-_Related_
+> **Deprecated**
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
+_Parameters_
+
+-   _props_ `Object`:
 
 ### createCustomColorsHOC
 

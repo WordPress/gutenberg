@@ -126,10 +126,7 @@ export { default as BlockSettingsMenuControls } from './block-settings-menu-cont
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
-export {
-	default as CopyHandler,
-	useClipboardHandler as __unstableUseClipboardHandler,
-} from './copy-handler';
+export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
