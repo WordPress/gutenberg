@@ -53,4 +53,4 @@ This is the data flow when the peer A makes a local change:
 	- One of them (A) leaves the document. Then, the remaining user (B) makes changes.
 	- When A comes back to the document, the changes B made are not visible to A.
 - Entities
-	- Not all entities can be synced. For example, global styles are not.
+	- Not all entities are synced. For example, global styles are not. Look at the `base` entity config for an example (it declares `syncConfig` and `syncObjectType` properties).
