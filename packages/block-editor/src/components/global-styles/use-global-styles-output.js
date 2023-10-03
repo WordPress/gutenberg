@@ -507,16 +507,16 @@ export function getLayoutStyles( {
 								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(.${ className }${
+										? `.editor-styles-wrapper :where(.${ className }${
 												spacingStyle?.selector || ''
 										  })`
-										: `:where(${ selector }.${ className }${
+										: `.editor-styles-wrapper :where(${ selector }.${ className }${
 												spacingStyle?.selector || ''
 										  })`;
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(${ selector } .${ className })${
+										? `.editor-styles-wrapper :where(${ selector } .${ className })${
 												spacingStyle?.selector || ''
 										  }`
 										: `${ selector }-${ className }${
