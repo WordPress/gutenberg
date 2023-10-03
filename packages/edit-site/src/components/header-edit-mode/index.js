@@ -263,14 +263,18 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 										as={ UndoButton }
 										showTooltip={ ! showIconLabels }
 										variant={
-											showIconLabels ? 'tertiary' : undefined
+											showIconLabels
+												? 'tertiary'
+												: undefined
 										}
 									/>
 									<ToolbarItem
 										as={ RedoButton }
 										showTooltip={ ! showIconLabels }
 										variant={
-											showIconLabels ? 'tertiary' : undefined
+											showIconLabels
+												? 'tertiary'
+												: undefined
 										}
 									/>
 									{ ! isDistractionFree && (
@@ -286,6 +290,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 											/* translators: button label text should, if possible, be under 16 characters. */
 											label={ __( 'List View' ) }
 											onClick={ toggleListView }
+											ref={ setListViewToggleElement }
 											shortcut={ listViewShortcut }
 											showTooltip={ ! showIconLabels }
 											variant={
