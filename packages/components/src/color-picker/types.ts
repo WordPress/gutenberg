@@ -50,6 +50,9 @@ export type ColorPickerProps = WordPressComponentProps<
 		 * The format to copy when clicking the displayed color format.
 		 */
 		copyFormat?: ColorType;
+		// TODO: consider better prop names
+		onPickerDragStart?: ( event: MouseEvent ) => void;
+		onPickerDragEnd?: ( event: MouseEvent ) => void;
 	},
 	'div',
 	false
@@ -59,6 +62,8 @@ export interface PickerProps {
 	color: Colord;
 	enableAlpha: boolean;
 	onChange: ( nextColor: Colord ) => void;
+	onDragStart?: ( event: MouseEvent ) => void;
+	onDragEnd?: ( event: MouseEvent ) => void;
 }
 
 export interface ColorInputProps {

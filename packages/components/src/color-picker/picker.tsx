@@ -7,57 +7,73 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import type { PickerProps } from './types';
 
-export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+export const Picker = ( {
+	color,
+	enableAlpha,
+	onChange,
+	onDragStart,
+	onDragEnd,
+}: PickerProps ) => {
 	const Component = enableAlpha
 		? RgbaStringColorPicker
 		: RgbStringColorPicker;
 	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
 
+	const isDragging = useRef( false );
+	const leftWhileDragging = useRef( false );
 	useEffect( () => {
-		const iframe = document.querySelector(
-			'iframe'
-		) as HTMLIFrameElement | null;
 		const picker = document.querySelector( '.react-colorful__saturation' );
-
-		if ( ! picker || ! iframe ) {
+		if ( ! picker ) {
 			return;
 		}
 
-		const restoreIframePointerEvents = () => {
-			iframe.style.pointerEvents = '';
-			window.removeEventListener(
-				'pointerup',
-				restoreIframePointerEvents
-			);
-		};
-		// iframe elements represent a separate window, and therefore any pointer
-		// event happening on top on an iframe is not registered correctly from the
-		// color picker. Disabling pointer events on the iframe prevents this
-		// issue from happening.
-		const disableIframePointerEvents = () => {
-			iframe.style.pointerEvents = 'none';
-			window.addEventListener( 'pointerup', restoreIframePointerEvents );
+		const doc = picker.ownerDocument;
+
+		const onPointerUp: EventListener = ( event ) => {
+			isDragging.current = false;
+			leftWhileDragging.current = false;
+			onDragEnd?.( event as MouseEvent );
 		};
 
-		picker.addEventListener( 'pointerdown', disableIframePointerEvents );
+		const onPointerDown: EventListener = ( event ) => {
+			isDragging.current = true;
+			onDragStart?.( event as MouseEvent );
+		};
+
+		const onPointerLeave: EventListener = () => {
+			leftWhileDragging.current = isDragging.current;
+		};
+
+		const onPointerEnter: EventListener = ( event ) => {
+			const noPointerButtonsArePressed =
+				( event as PointerEvent ).buttons === 0;
+
+			if ( leftWhileDragging.current && noPointerButtonsArePressed ) {
+				onPointerUp( event );
+			}
+		};
+
+		picker.addEventListener( 'pointerdown', onPointerDown );
+		doc.addEventListener( 'pointerup', onPointerUp );
+		doc.addEventListener( 'pointerenter', onPointerEnter );
+		doc.addEventListener( 'pointerleave', onPointerLeave );
 
 		return () => {
-			picker.removeEventListener(
-				'pointerdown',
-				disableIframePointerEvents
-			);
-			picker.removeEventListener(
-				'pointerup',
-				restoreIframePointerEvents
-			);
+			picker.removeEventListener( 'pointerdown', onPointerDown );
+			doc.removeEventListener( 'pointerup', onPointerUp );
+			doc.removeEventListener( 'pointerenter', onPointerEnter );
+			doc.removeEventListener( 'pointerleave', onPointerUp );
+
+			// Make sure that we don't get stuck with the iframe without pointer events
+			// if the component unmounts
 		};
-	}, [] );
+	}, [ onDragStart, onDragEnd ] );
 
 	return (
 		<Component
