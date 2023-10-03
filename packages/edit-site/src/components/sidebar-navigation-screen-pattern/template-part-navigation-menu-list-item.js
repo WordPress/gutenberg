@@ -24,7 +24,9 @@ export default function TemplatePartNavigationMenuListItem( { id } ) {
 		postType: NAVIGATION_POST_TYPE,
 	} );
 
-	if ( ! id ) return null;
+	if ( ! id || title === undefined ) {
+		return null;
+	}
 
 	return (
 		<SidebarNavigationItem withChevron { ...linkInfo }>
