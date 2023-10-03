@@ -133,7 +133,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
 		await pageUtils.pressKeys( 'Tab' );
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
 	} );
 
@@ -167,9 +167,9 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Move up' );
-		await this.pageUtils.pressKeys( 'Tab' );
+		await this.pageUtils.pressKeys( 'Escape' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
-		await this.pageUtils.pressKeys( 'shift+Tab' );
+		await this.pageUtils.pressKeys( 'alt+F10' );
 		await this.expectLabelToHaveFocus( 'Move up' );
 	}
 
@@ -200,7 +200,7 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( 'Block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
-		await this.pageUtils.pressKeys( 'shift+Tab' );
+		await this.pageUtils.pressKeys( 'alt+F10' );
 		await this.expectLabelToHaveFocus( 'Select Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
