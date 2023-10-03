@@ -42,8 +42,7 @@ This is the data flow when the peer A makes a local change:
 ## What works and what doesn't
 
 - Undo/redo does not work.
-- Changes can be persisted.
-	- When changes are persisted (publish/update a post), the other peers don't have a visual hint (publish/update button is still enabled).
+- Changes can be persisted and the publish/update button should react accordingly for all peers.
 - Offline.
 	- Changes are stored in the browser's local storage (indexedDB) for each user/peer. Users can navigate away from the document and they'll see the changes when they come back.
 	- Visually, there is no hint that they are seeing local/offline changes vs published ones.
