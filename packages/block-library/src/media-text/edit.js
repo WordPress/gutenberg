@@ -168,8 +168,12 @@ function MediaTextEdit( {
 		[ featuredImage ]
 	);
 
-	const featuredImageURL = featuredImageMedia?.source_url;
-	const featuredImageAlt = featuredImageMedia?.alt_text;
+	const featuredImageURL = useFeaturedImage
+		? featuredImageMedia?.source_url
+		: '';
+	const featuredImageAlt = useFeaturedImage
+		? featuredImageMedia?.alt_text
+		: '';
 
 	const toggleUseFeaturedImage = () => {
 		setAttributes( {
@@ -305,7 +309,7 @@ function MediaTextEdit( {
 						onDrag={ imperativeFocalPointPreview }
 					/>
 				) }
-			{ mediaType === 'image' && (
+			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
 				<TextareaControl
 					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
