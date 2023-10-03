@@ -45,7 +45,6 @@ This is the data flow when the peer A makes a local change:
 - Changes can be persisted and the publish/update button should react accordingly for all peers.
 - Offline.
 	- Changes are stored in the browser's local storage (indexedDB) for each user/peer. Users can navigate away from the document and they'll see the changes when they come back.
-	- Visually, there is no hint that they are seeing local/offline changes vs published ones.
 	- Offline changes can be deleted via visiting the browser's database in all peers, then reload the document.
 - Documents can get out of sync. For example:
 	- Two peers open the same document.
