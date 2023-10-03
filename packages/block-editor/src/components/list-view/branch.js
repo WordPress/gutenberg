@@ -128,7 +128,6 @@ function ListViewBranch( props ) {
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
-	const isSingleBlockSelection = selectedClientIds?.length === 1;
 
 	return (
 		<>
@@ -170,17 +169,17 @@ function ListViewBranch( props ) {
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
 
-				// To avoid performance issues, we only render blocks that are
-				// in view, or blocks that are selected or dragged.
-				// If a block is selected, it is only counted if it is the only
-				// block selected. This prevents the entire tree from being
-				// rendered when a branch is selected, or a user selects all blocks,
-				// while still enabling scroll into view behavior when selecting a block.
+				// To avoid performance issues, we only render blocks that are in view,
+				// or blocks that are selected or dragged. If a block is selected,
+				// it is only counted if it is the first of the block selection.
+				// This prevents the entire tree from being rendered when a branch is
+				// selected, or a user selects all blocks, while still enabling scroll
+				// into view behavior when selecting a block or opening the list view.
 				const showBlock =
 					isDragged ||
 					blockInView ||
 					isBranchDragged ||
-					( isSelected && isSingleBlockSelection );
+					( isSelected && clientId === selectedClientIds[ 0 ] );
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
