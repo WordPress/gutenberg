@@ -31,6 +31,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -174,6 +175,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
