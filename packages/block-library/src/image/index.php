@@ -287,8 +287,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-class--initialized="context.core.image.initialized"
             data-wp-class--active="context.core.image.lightboxEnabled"
             data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
-            data-wp-bind--aria-hidden="!context.core.image.lightboxEnabled"
-            aria-hidden="true"
             data-wp-bind--aria-modal="context.core.image.lightboxEnabled"
             aria-modal="false"
             data-wp-effect="effects.core.image.initLightbox"
