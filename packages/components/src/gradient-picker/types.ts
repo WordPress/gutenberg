@@ -108,6 +108,8 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type PickerProps< TOriginType extends GradientObject | OriginObject > =

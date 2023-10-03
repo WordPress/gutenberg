@@ -19,10 +19,11 @@ const meta: Meta< typeof ColorPalette > = {
 	component: ColorPalette,
 	argTypes: {
 		as: { control: { type: null } },
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

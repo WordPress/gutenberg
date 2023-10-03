@@ -102,6 +102,9 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+	// TODO: consider better prop names
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 } & (
 		| {
 				/**

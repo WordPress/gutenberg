@@ -191,6 +191,8 @@ function UnforwardedColorPalette(
 		headingLevel = 2,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
+		onPickerDragStart,
+		onPickerDragEnd,
 		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -221,6 +223,8 @@ function UnforwardedColorPalette(
 				color={ normalizedColorValue }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
+				onPickerDragStart={ onPickerDragStart }
+				onPickerDragEnd={ onPickerDragEnd }
 			/>
 		</DropdownContentWrapper>
 	);

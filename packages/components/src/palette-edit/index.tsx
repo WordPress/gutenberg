@@ -115,6 +115,8 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	onChange,
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
+	onPickerDragStart,
+	onPickerDragEnd,
 }: ColorPickerPopoverProps< T > ) {
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
@@ -143,6 +145,8 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 							color: newColor,
 						} );
 					} }
+					onPickerDragStart={ onPickerDragStart }
+					onPickerDragEnd={ onPickerDragEnd }
 				/>
 			) }
 			{ isGradient && (
@@ -175,6 +179,8 @@ function Option< T extends Color | Gradient >( {
 	popoverProps: receivedPopoverProps,
 	slugPrefix,
 	isGradient,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: OptionProps< T > ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
@@ -251,6 +257,8 @@ function Option< T extends Color | Gradient >( {
 					onChange={ onChange }
 					element={ element }
 					popoverProps={ popoverProps }
+					onPickerDragStart={ onPickerDragStart }
+					onPickerDragEnd={ onPickerDragEnd }
 				/>
 			) }
 		</PaletteItem>
@@ -392,6 +400,8 @@ export function PaletteEdit( {
 	canReset,
 	slugPrefix = '',
 	popoverProps,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
@@ -606,6 +616,8 @@ export function PaletteEdit( {
 							} }
 							element={ elements[ editingElement ?? -1 ] }
 							popoverProps={ popoverProps }
+							onPickerDragStart={ onPickerDragStart }
+							onPickerDragEnd={ onPickerDragEnd }
 						/>
 					) }
 					{ ! isEditing &&
@@ -616,6 +628,8 @@ export function PaletteEdit( {
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
+								onPickerDragStart={ onPickerDragStart }
+								onPickerDragEnd={ onPickerDragEnd }
 							/>
 						) : (
 							<ColorPalette
@@ -623,6 +637,8 @@ export function PaletteEdit( {
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
+								onPickerDragStart={ onPickerDragStart }
+								onPickerDragEnd={ onPickerDragEnd }
 							/>
 						) ) }
 				</>

@@ -30,6 +30,8 @@ export type CustomGradientPickerProps = {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type GradientAnglePickerProps = {
@@ -56,6 +58,10 @@ export type CustomGradientBarProps = {
 	disableInserter?: boolean;
 	disableAlpha?: boolean;
 	__experimentalIsRenderedInSidebar?: boolean;
+
+	// TODO: consider better prop names
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type CustomGradientBarIdleState = { id: 'IDLE' };
@@ -99,6 +105,8 @@ export type ControlPointsProps = {
 	onStartControlPointChange: () => void;
 	onStopControlPointChange: () => void;
 	__experimentalIsRenderedInSidebar: boolean;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type ControlPointMoveState = {
@@ -116,4 +124,6 @@ export type InsertPointProps = {
 	insertPosition: number;
 	disableAlpha: boolean;
 	__experimentalIsRenderedInSidebar: boolean;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };

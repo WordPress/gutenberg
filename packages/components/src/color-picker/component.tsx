@@ -49,6 +49,8 @@ const UnconnectedColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+		onPickerDragStart,
+		onPickerDragEnd,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
@@ -82,6 +84,8 @@ const UnconnectedColorPicker = (
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
+				onDragStart={ onPickerDragStart }
+				onDragEnd={ onPickerDragEnd }
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">

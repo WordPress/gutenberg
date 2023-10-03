@@ -146,6 +146,8 @@ export function CustomGradientPicker( {
 	value,
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: CustomGradientPickerProps ) {
 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
 
@@ -201,6 +203,8 @@ export function CustomGradientPicker( {
 						)
 					);
 				} }
+				onPickerDragStart={ onPickerDragStart }
+				onPickerDragEnd={ onPickerDragEnd }
 			/>
 			<Flex
 				gap={ 3 }

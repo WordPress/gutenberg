@@ -122,6 +122,8 @@ function ControlPoints( {
 	onStartControlPointChange,
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: ControlPointsProps ) {
 	const controlPointMoveState = useRef< ControlPointMoveState >();
 
@@ -286,6 +288,8 @@ function ControlPoints( {
 												)
 											);
 										} }
+										onPickerDragStart={ onPickerDragStart }
+										onPickerDragEnd={ onPickerDragEnd }
 									/>
 									{ ! disableRemove &&
 										controlPoints.length > 2 && (
@@ -333,6 +337,8 @@ function InsertPoint( {
 	insertPosition,
 	disableAlpha,
 	__experimentalIsRenderedInSidebar,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: InsertPointProps ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -382,6 +388,8 @@ function InsertPoint( {
 							);
 						}
 					} }
+					onPickerDragStart={ onPickerDragStart }
+					onPickerDragEnd={ onPickerDragEnd }
 				/>
 			) }
 			style={

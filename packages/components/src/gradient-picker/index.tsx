@@ -221,6 +221,8 @@ export function GradientPicker( {
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
 	headingLevel = 2,
+	onPickerDragStart,
+	onPickerDragEnd,
 	...additionalProps
 }: GradientPickerComponentProps ) {
 	const clearGradient = useCallback(
@@ -255,6 +257,8 @@ export function GradientPicker( {
 						}
 						value={ value }
 						onChange={ onChange }
+						onPickerDragStart={ onPickerDragStart }
+						onPickerDragEnd={ onPickerDragEnd }
 					/>
 				) }
 				{ ( gradients.length || clearable ) && (

@@ -86,6 +86,8 @@ export default function CustomGradientBar( {
 	disableInserter = false,
 	disableAlpha = false,
 	__experimentalIsRenderedInSidebar = false,
+	onPickerDragStart,
+	onPickerDragEnd,
 }: CustomGradientBarProps ) {
 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
 
@@ -172,6 +174,8 @@ export default function CustomGradientBar( {
 									type: 'CLOSE_INSERTER',
 								} );
 							} }
+							onPickerDragStart={ onPickerDragStart }
+							onPickerDragEnd={ onPickerDragEnd }
 						/>
 					) }
 				<ControlPoints
@@ -198,6 +202,8 @@ export default function CustomGradientBar( {
 							type: 'STOP_CONTROL_CHANGE',
 						} );
 					} }
+					onPickerDragStart={ onPickerDragStart }
+					onPickerDragEnd={ onPickerDragEnd }
 				/>
 			</div>
 		</div>

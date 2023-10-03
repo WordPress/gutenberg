@@ -66,6 +66,8 @@ export type BasePaletteEdit = {
 		React.ComponentPropsWithoutRef< typeof Popover >,
 		'children'
 	>;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 type PaletteEditColors = {
@@ -103,6 +105,8 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	isGradient?: T extends Gradient ? true : false;
 	onClose?: () => void;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type NameInputProps = {
@@ -123,6 +127,8 @@ export type OptionProps< T extends Color | Gradient > = {
 	onStopEditing: () => void;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	slugPrefix: string;
+	onPickerDragStart?: ( event: MouseEvent ) => void;
+	onPickerDragEnd?: ( event: MouseEvent ) => void;
 };
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
