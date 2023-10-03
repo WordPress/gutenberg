@@ -647,7 +647,7 @@ test.describe( 'RichText', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Navigate to the block.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Escape' );
 
 		// Copy the colored text.
 		await pageUtils.pressKeys( 'primary+c' );
