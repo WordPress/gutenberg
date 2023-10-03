@@ -113,7 +113,7 @@ describe( 'Confirm', () => {
 				expect( onCancel ).toHaveBeenCalled();
 			} );
 
-			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
+			it( 'should be dismissible even if an `onCancel` callback is not provided', async () => {
 				const user = userEvent.setup();
 
 				render(
@@ -142,20 +142,9 @@ describe( 'Confirm', () => {
 
 				const confirmDialog = screen.getByRole( 'dialog' );
 
-				// TODO: Is there a better way you'd like this checked?
-				// const parent = screen.findByParent( confirmDialog );
-				// expect( parent ).toBeDefined();
-				// eslint-disable-next-line testing-library/no-node-access
-				if ( confirmDialog.parentElement === null ) {
-					// fail( 'Expected confirmDialog.parentElement not found' );
-					throw new Error(
-						'Expected confirmDialog.parentElement not found'
-					);
-				}
-
 				// Disable reason: Semantic queries can’t reach the overlay.
 				// eslint-disable-next-line testing-library/no-node-access
-				await user.click( confirmDialog.parentElement );
+				await user.click( confirmDialog.parentElement! );
 
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
@@ -334,18 +323,9 @@ describe( 'Confirm', () => {
 
 			const confirmDialog = screen.getByRole( 'dialog' );
 
-			// TODO: Is there a better way you'd like this checked?
-			// eslint-disable-next-line testing-library/no-node-access
-			if ( confirmDialog.parentElement === null ) {
-				// fail( 'Expected confirmDialog.parentElement not found' );
-				throw new Error(
-					'Expected confirmDialog.parentElement not found'
-				);
-			}
-
 			// Disable reason: Semantic queries can’t reach the overlay.
 			// eslint-disable-next-line testing-library/no-node-access
-			await user.click( confirmDialog.parentElement );
+			await user.click( confirmDialog.parentElement! );
 
 			expect( onCancel ).toHaveBeenCalled();
 		} );
