@@ -698,7 +698,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( $should_load_view_script ) {
 		$nav_element_directives          = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "", "ariaLabel": "' . __( 'Menu' ) . '" } } }\'
+			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "", "ariaLabel": "' . esc_attr__( 'Menu' ) . '" } } }\'
 		';
 		$open_button_directives          = '
 			data-wp-on--click="actions.core.navigation.openMenuOnClick"
