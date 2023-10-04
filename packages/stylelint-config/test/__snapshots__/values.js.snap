@@ -5,16 +5,16 @@ exports[`flags warnings with invalid values css snapshot matches warnings 1`] = 
   {
     "column": 16,
     "line": 2,
-    "rule": "declaration-block-trailing-semicolon",
+    "rule": "stylistic/declaration-block-trailing-semicolon",
     "severity": "error",
-    "text": "Expected a trailing semicolon (declaration-block-trailing-semicolon)",
+    "text": "Expected a trailing semicolon (stylistic/declaration-block-trailing-semicolon)",
   },
   {
     "column": 13,
     "line": 2,
-    "rule": "declaration-colon-space-after",
+    "rule": "stylistic/declaration-colon-space-after",
     "severity": "error",
-    "text": "Expected single space after ":" with a single-line declaration (declaration-colon-space-after)",
+    "text": "Expected single space after ":" with a single-line declaration (stylistic/declaration-colon-space-after)",
   },
   {
     "column": 15,

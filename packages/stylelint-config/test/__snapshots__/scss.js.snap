@@ -40,9 +40,9 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   {
     "column": 5,
     "line": 14,
-    "rule": "block-opening-brace-space-before",
+    "rule": "stylistic/block-opening-brace-space-before",
     "severity": "error",
-    "text": "Expected single space before "{" (block-opening-brace-space-before)",
+    "text": "Expected single space before "{" (stylistic/block-opening-brace-space-before)",
   },
   {
     "column": 15,
@@ -54,9 +54,9 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   {
     "column": 7,
     "line": 31,
-    "rule": "number-leading-zero",
+    "rule": "stylistic/number-leading-zero",
     "severity": "error",
-    "text": "Expected a leading zero (number-leading-zero)",
+    "text": "Expected a leading zero (stylistic/number-leading-zero)",
   },
 ]
 `;

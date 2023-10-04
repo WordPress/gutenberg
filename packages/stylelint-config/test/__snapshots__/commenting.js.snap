@@ -19,9 +19,9 @@ exports[`flags warnings with invalid commenting css snapshot matches warnings 1`
   {
     "column": 131,
     "line": 24,
-    "rule": "max-line-length",
+    "rule": "stylistic/max-line-length",
     "severity": "error",
-    "text": "Expected line length to be no more than 80 characters (max-line-length)",
+    "text": "Expected line length to be no more than 80 characters (stylistic/max-line-length)",
   },
 ]
 `;

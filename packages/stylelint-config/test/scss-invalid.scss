@@ -24,9 +24,9 @@ b {
 
 p {
 
-	/* Test `stylelint-config-recommended` inherited `no-extra-semicolons` rule */
+	/* Test `stylelint-config-recommended` inherited `stylistic/no-extra-semicolons` rule */
 	@include foo;;
 
-	/* Test `@wordpress/stylelint-config` inherited `number-leading-zero` rule */
+	/* Test `@wordpress/stylelint-config` inherited `stylistic/number-leading-zero` rule */
 	top: .2em;
 }
