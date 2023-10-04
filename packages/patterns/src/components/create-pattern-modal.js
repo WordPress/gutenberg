@@ -65,6 +65,8 @@ export default function CreatePatternModal( {
 					( existingCategory ) =>
 						existingCategory.label === category.label
 				) &&
+				// There are two core categories with `Post` label so explictily remove the one with
+				// the `query` slug to avoid any confusion.
 				category.name !== 'query'
 			) {
 				// We need to store the name separately as this is used as the slug in the
