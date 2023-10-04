@@ -1893,9 +1893,10 @@ export const registerInserterMediaCategory =
 			);
 			return;
 		}
-		const { inserterMediaCategories = [] } = select.getSettings();
+		const registeredInserterMediaCategories =
+			select.getRegisteredInserterMediaCategories();
 		if (
-			inserterMediaCategories.some(
+			registeredInserterMediaCategories.some(
 				( { name } ) => name === category.name
 			)
 		) {
@@ -1905,8 +1906,8 @@ export const registerInserterMediaCategory =
 			return;
 		}
 		if (
-			inserterMediaCategories.some(
-				( { labels: { name } } ) => name === category.labels?.name
+			registeredInserterMediaCategories.some(
+				( { labels: { name } = {} } ) => name === category.labels?.name
 			)
 		) {
 			console.error(
@@ -1919,13 +1920,8 @@ export const registerInserterMediaCategory =
 		// private, so extenders can only add new inserter media categories and don't have any
 		// control over the core media categories.
 		dispatch( {
-			type: 'UPDATE_SETTINGS',
-			settings: {
-				inserterMediaCategories: [
-					...inserterMediaCategories,
-					{ ...category, isExternalResource: true },
-				],
-			},
+			type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+			category: { ...category, isExternalResource: true },
 		} );
 	};
 
