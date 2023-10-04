@@ -165,17 +165,12 @@
 // This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
 .components-placeholder.has-illustration {
 	color: inherit;
-	display: flex;
 	box-shadow: none;
 
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
 	backdrop-filter: blur(100px);
 	background-color: transparent;
-
-	// Fix a flickering that happens in the blur when transforms are applied.
-	margin: 1px;
-	width: auto;
 
 	// This appears to fix an occasional Chrome bug where the blurred background would have an incorrect color.
 	backface-visibility: hidden;
@@ -186,7 +181,11 @@
 	}
 
 	.components-placeholder__fieldset {
-		width: auto;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		justify-content: center;
 
 		// Unset intrinsic margins.
 		margin-left: 0;
@@ -216,6 +215,16 @@
 	// By painting the borders here, we enable them to be replaced by the Border control.
 	@include placeholder-style();
 	overflow: auto;
+
+	// Fix a flickering that happens in the blur when transforms are applied.
+	// This hack would be good to remove in case https://bugs.chromium.org/p/chromium/issues/detail?id=986206 gets fixed.
+	&.has-illustration {
+		display: inline-block;
+		width: calc(100% - 3px);
+		height: auto;
+		margin: 1.5px;
+		vertical-align: bottom;
+	}
 }
 
 // Position the spinner.
