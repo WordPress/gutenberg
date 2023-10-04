@@ -177,7 +177,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		'<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -187,7 +187,7 @@ describe( 'Blocks raw handling', () => {
 
 		<!-- wp:list-item -->
 		<li>three</li>
-		<!-- /wp:list-item --></ul>"
+		<!-- /wp:list-item --></ul>'
 	` );
 		expect( console ).toHaveLogged();
 	} );
@@ -202,7 +202,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		'<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -212,7 +212,7 @@ describe( 'Blocks raw handling', () => {
 
 		<!-- wp:list-item -->
 		<li>three</li>
-		<!-- /wp:list-item --></ul>"
+		<!-- /wp:list-item --></ul>'
 	` );
 		expect( console ).toHaveLogged();
 	} );
@@ -318,7 +318,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		'<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -328,7 +328,7 @@ describe( 'Blocks raw handling', () => {
 
 		<!-- wp:list-item -->
 		<li>Three</li>
-		<!-- /wp:list-item --></ul>"
+		<!-- /wp:list-item --></ul>'
 	` );
 		expect( console ).toHaveLogged();
 	} );

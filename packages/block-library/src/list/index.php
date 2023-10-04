@@ -10,12 +10,12 @@
  *
  * For example, the following block content:
  * <ol>
- * 	<li>Test</li>
+ *    <li>Test</li>
  * </ol>
  *
  * Would be transformed to:
  * <ol class="wp-block-list">
- * 	<li>Test</li>
+ *    <li>Test</li>
  * </ol>
  *
  * @param array  $attributes Attributes of the block being rendered.
