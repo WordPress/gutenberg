@@ -348,6 +348,7 @@ function register_block_core_navigation_link_variation( $variation ) {
 function register_block_core_navigation_link() {
 	// This will only handle post types and taxonomies registered until this point (init on priority 9).
 	// See action hooks at the end of this function for other post types and taxonomies.
+	// See https://github.com/WordPress/gutenberg/issues/53826 for details.
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 
@@ -387,9 +388,9 @@ function register_block_core_navigation_link() {
 		)
 	);
 
-	// Register actions for all post types and taxonomies not registered until now.
-	// This needs to happen in this function, because otherwise for post types/taxonomies
-	// registered before this block, those functions would add variations to a block that don't exist.
+	// Register actions for all post types and taxonomies that may not yet be registered.
+	// This needs to happen in this function, because otherwise any post types/taxonomies
+	// registered **before** this block will attempt to register on a block that does not yet exist.
 	add_action( 'registered_post_type', 'register_block_core_navigation_link_post_type_variation', 10, 2 );
 	add_action( 'registered_taxonomy', 'register_block_core_navigation_link_taxonomy_variation', 10, 3 );
 }
