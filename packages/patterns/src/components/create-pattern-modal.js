@@ -126,7 +126,7 @@ export default function CreatePatternModal( {
 	async function findOrCreateTerm( term ) {
 		try {
 			// We need to match any existing term to the correct slug to prevent duplicates, eg.
-			// the core `Headers` category uses a the singular `header` as the slug.
+			// the core `Headers` category uses the singular `header` as the slug.
 			const existingTerm = categoryOptions.find(
 				( cat ) => cat.label === term
 			);
