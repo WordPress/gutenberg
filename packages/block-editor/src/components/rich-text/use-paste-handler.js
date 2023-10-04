@@ -43,9 +43,7 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			const { clipboardData } = event;
-			const { plainText, html, files } =
-				getPasteEventData( clipboardData );
+			const { plainText, html, files } = getPasteEventData( event );
 
 			event.preventDefault();
 
@@ -78,7 +76,8 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
+			const isInternal =
+				event.clipboardData.getData( 'rich-text' ) === 'true';
 
 			// If the data comes from a rich text instance, we can directly use it
 			// without filtering the data. The filters are only meant for externally
