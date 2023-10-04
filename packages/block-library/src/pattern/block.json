@@ -8,7 +8,7 @@
 	"supports": {
 		"html": false,
 		"inserter": false,
-		"blockRenaming": false
+		"renaming": false
 	},
 	"textdomain": "default",
 	"attributes": {

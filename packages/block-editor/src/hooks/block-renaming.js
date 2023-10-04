@@ -19,7 +19,7 @@ export function addLabelCallback( settings ) {
 
 	const supportsBlockNaming = hasBlockSupport(
 		settings,
-		'blockRenaming',
+		'renaming',
 		true // default value
 	);
 
