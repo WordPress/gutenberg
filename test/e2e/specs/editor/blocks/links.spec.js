@@ -116,7 +116,10 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Link' } )
+			.click();
 		const urlInput = await page
 			.getByPlaceholder( 'Search or type url' )
 			.inputValue();
@@ -173,7 +176,10 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', { times: 7 } );
 
 		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Link' } )
+			.click();
 
 		// A link with the selected URL as its href should have been inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -202,7 +208,10 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Link' } )
+			.click();
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -291,7 +300,10 @@ test.describe( 'Links', () => {
 			name: 'core/paragraph',
 		} );
 		await page.keyboard.type( 'Text' );
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Link' } )
+			.click();
 
 		// Typing "left" should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
@@ -934,7 +946,10 @@ test.describe( 'Links', () => {
 			} );
 
 			// Click on the Link button.
-			await page.getByRole( 'button', { name: 'Link' } ).click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+				.click();
 
 			// Type a URL.
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -1078,7 +1093,10 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 			// Click on the Link button.
-			await page.getByRole( 'button', { name: 'Link' } ).click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+				.click();
 
 			// Type a URL.
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -1154,7 +1172,10 @@ test.describe( 'Links', () => {
 			} );
 
 			// Click on the Link button.
-			await page.getByRole( 'button', { name: 'Link' } ).click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+				.click();
 
 			// Type a URL.
 			await page.keyboard.type( linkTwoURL );
@@ -1171,7 +1192,10 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 			// Click on the Link button.
-			await page.getByRole( 'button', { name: 'Link' } ).click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+				.click();
 
 			// Type a URL.
 			await page.keyboard.type( linkOneURL );
@@ -1222,7 +1246,10 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shift+ArrowLeft' );
 
 			// Click on the Link button.
-			await page.getByRole( 'button', { name: 'Link' } ).click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Link' } )
+				.click();
 
 			// Type a URL.
 			await page.keyboard.type( 'www.wordpress.org' );
