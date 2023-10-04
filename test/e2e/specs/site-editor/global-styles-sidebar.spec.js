@@ -17,7 +17,7 @@ test.describe( 'Global styles sidebar', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {
