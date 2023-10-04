@@ -35,7 +35,7 @@ const getPluginContext = memoize(
  * @example
  * ```js
  * // Using ES5 syntax
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var PluginArea = wp.plugins.PluginArea;
  *
  * function Layout() {
@@ -61,7 +61,7 @@ const getPluginContext = memoize(
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function PluginArea( {
 	scope,

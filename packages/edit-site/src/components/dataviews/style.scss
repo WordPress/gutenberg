@@ -1,0 +1,36 @@
+.dataviews-wrapper {
+	width: 100%;
+	padding: $grid-unit-40;
+}
+
+.dataviews-list-view {
+	width: 100%;
+	text-indent: 0;
+	border-color: inherit;
+	border-collapse: collapse;
+	position: relative;
+	a {
+		text-decoration: none;
+	}
+	th {
+		text-align: left;
+		font-weight: normal;
+		padding: 0 $grid-unit-20 $grid-unit-20;
+		color: $gray-700;
+	}
+	td,
+	th {
+		padding: $grid-unit-15;
+		&:last-child {
+			text-align: right;
+		}
+	}
+	tr {
+		border-bottom: 1px solid $gray-100;
+	}
+}
+
+.dataviews__per-page-control-prefix {
+	color: $gray-700;
+	text-wrap: nowrap;
+}

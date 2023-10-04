@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
 -   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
 -   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
 
 ## 1.104.0
 -   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]

@@ -7,12 +7,12 @@
 Wrap your original component with `withConstrainedTabbing`.
 
 ```jsx
+import { useState } from 'react';
 import {
 	withConstrainedTabbing,
 	TextControl,
 	Button,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const ConstrainedTabbing = withConstrainedTabbing(
 	( { children } ) => children
