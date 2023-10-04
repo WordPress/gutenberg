@@ -10,10 +10,11 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useState, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -41,6 +42,44 @@ export default function CreatePatternModal( {
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const { corePatternCategories, userPatternCategories } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const { getUserPatternCategories } = select( coreStore );
+
+			return {
+				corePatternCategories:
+					getSettings().__experimentalBlockPatternCategories,
+				userPatternCategories: getUserPatternCategories(),
+			};
+		}
+	);
+
+	const categoryOptions = useMemo( () => {
+		// We need to store the name separately as this is used as the slug in the
+		// taxonomy and may vary from the label.
+		const categories = userPatternCategories.map( ( category ) => ( {
+			label: category.label,
+			value: category.label,
+			name: category.name,
+		} ) );
+
+		corePatternCategories.forEach( ( category ) => {
+			if (
+				! categories.find( ( cat ) => cat.label === category.label ) &&
+				category.name !== 'query'
+			) {
+				categories.push( {
+					label: category.label,
+					value: category.label,
+					name: category.name,
+				} );
+			}
+		} );
+
+		return categories.sort( ( a, b ) => a.label.localeCompare( b.label ) );
+	}, [ userPatternCategories, corePatternCategories ] );
 
 	async function onCreate( patternTitle, sync ) {
 		if ( ! title || isSaving ) {
@@ -84,10 +123,18 @@ export default function CreatePatternModal( {
 	 */
 	async function findOrCreateTerm( term ) {
 		try {
+			// We need to match any existing term to the correct slug to prevent duplicates, eg.
+			// the core `Headers` category uses a the singular `header` as the slug.
+			const existingTerm = categoryOptions.find(
+				( cat ) => cat.label === term
+			);
+			const termData = existingTerm
+				? { name: existingTerm.label, slug: existingTerm.name }
+				: { name: term };
 			const newTerm = await saveEntityRecord(
 				'taxonomy',
 				CATEGORY_SLUG,
-				{ name: term },
+				termData,
 				{ throwOnError: true }
 			);
 			invalidateResolution( 'getUserPatternCategories' );
@@ -128,6 +175,7 @@ export default function CreatePatternModal( {
 					<CategorySelector
 						categoryTerms={ categoryTerms }
 						onChange={ setCategoryTerms }
+						categoryOptions={ categoryOptions }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
