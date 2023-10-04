@@ -16,7 +16,7 @@ const unescapeString = ( arg ) => {
 
 export const CATEGORY_SLUG = 'wp_pattern_category';
 
-export default function CategorySelector( { categoryValues, onChange } ) {
+export default function CategorySelector( { categoryTerms, onChange } ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
@@ -83,7 +83,7 @@ export default function CategorySelector( { categoryValues, onChange } ) {
 	return (
 		<FormTokenField
 			className="patterns-menu-items__convert-modal-categories"
-			value={ categoryValues }
+			value={ categoryTerms }
 			suggestions={ suggestions }
 			onChange={ handleChange }
 			onInputChange={ debouncedSearch }

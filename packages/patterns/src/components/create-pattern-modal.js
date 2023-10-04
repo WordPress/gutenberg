@@ -126,7 +126,7 @@ export default function CreatePatternModal( {
 						className="patterns-create-modal__name-input"
 					/>
 					<CategorySelector
-						categoryValues={ categoryTerms }
+						categoryTerms={ categoryTerms }
 						onChange={ setCategoryTerms }
 					/>
 					<ToggleControl
