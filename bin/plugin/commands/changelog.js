@@ -117,6 +117,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] Block editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Post Editor',
+	'[Package] Edit Site': 'Site Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
