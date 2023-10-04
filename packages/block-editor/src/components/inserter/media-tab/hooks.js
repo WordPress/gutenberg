@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
@@ -50,67 +51,14 @@ export function useMediaResults( category, query = {} ) {
 	return { mediaList, isLoading };
 }
 
-function useInserterMediaCategories() {
-	const {
-		inserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-		registeredInserterMediaCategories,
-	} = useSelect( ( select ) => {
-		const { getSettings, getRegisteredInserterMediaCategories } =
-			select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			inserterMediaCategories: settings.inserterMediaCategories,
-			allowedMimeTypes: settings.allowedMimeTypes,
-			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
-			registeredInserterMediaCategories:
-				getRegisteredInserterMediaCategories(),
-		};
-	}, [] );
-	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
-	// some of them. In this case we shouldn't add the category to the available media
-	// categories list in the inserter.
-	const allowedCategories = useMemo( () => {
-		if (
-			( ! inserterMediaCategories &&
-				! registeredInserterMediaCategories.length ) ||
-			! allowedMimeTypes
-		) {
-			return;
-		}
-		const coreInserterMediaCategoriesNames =
-			inserterMediaCategories?.map( ( { name } ) => name ) || [];
-		const mergedCategories = [
-			...( inserterMediaCategories || [] ),
-			...( registeredInserterMediaCategories || [] ).filter(
-				( { name } ) =>
-					! coreInserterMediaCategoriesNames.includes( name )
-			),
-		];
-		return mergedCategories.filter( ( category ) => {
-			// Check if Openverse category is enabled.
-			if (
-				! enableOpenverseMediaCategory &&
-				category.name === 'openverse'
-			) {
-				return false;
-			}
-			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
-			);
-		} );
-	}, [
-		inserterMediaCategories,
-		registeredInserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-	] );
-	return allowedCategories;
-}
-
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
+
+	const inserterMediaCategories = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getInserterMediaCategories(),
+		[]
+	);
 	const { canInsertImage, canInsertVideo, canInsertAudio } = useSelect(
 		( select ) => {
 			const { canInsertBlockType } = select( blockEditorStore );
@@ -131,7 +79,6 @@ export function useMediaCategories( rootClientId ) {
 		},
 		[ rootClientId ]
 	);
-	const inserterMediaCategories = useInserterMediaCategories();
 	useEffect( () => {
 		( async () => {
 			const _categories = [];

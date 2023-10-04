@@ -3022,15 +3022,3 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
-
-/** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
-/**
- * Returns the registered inserter media categories through the public API.
- *
- * @param {Object} state Editor state.
- *
- * @return {InserterMediaCategory[]} Inserter media categories.
- */
-export function getRegisteredInserterMediaCategories( state ) {
-	return state.registeredInserterMediaCategories;
-}
