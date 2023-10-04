@@ -35,7 +35,7 @@ test.describe( 'Links', () => {
 		} );
 		await page.keyboard.type( 'Here comes a link: ' );
 
-		// Press Cmd+K to insert a link.
+		// Press Cmd+K to insert a link deliberating not selecting any text.
 		await pageUtils.pressKeys( 'primary+K' );
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
@@ -59,7 +59,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be created by selecting text and clicking Link`, async ( {
+	test( `can be created by selecting text and clicking link insertion button in block toolbar`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -149,7 +149,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be created instantly when a URL is selected`, async ( {
+	test( `will automatically create a link if selected text is a valid HTTP based URL`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -180,7 +180,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `is not created when we click away from the link input`, async ( {
+	test( `does not create link when link ui is closed without submission`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -215,7 +215,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be edited`, async ( { page, editor, pageUtils, LinkUtils } ) => {
+	test( `can edit existing links`, async ( { page, editor, pageUtils, LinkUtils } ) => {
 		await LinkUtils.createAndReselectLink();
 
 		// Click on the Edit button.
@@ -239,7 +239,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be removed`, async ( { page, editor, LinkUtils } ) => {
+	test( `can remove existing links`, async ( { page, editor, LinkUtils } ) => {
 		await LinkUtils.createAndReselectLink();
 
 		// Unlick via shortcut
@@ -331,7 +331,7 @@ test.describe( 'Links', () => {
 		await expect( popover ).not.toBeVisible();
 	} );
 
-	test( `can be edited with collapsed selection`, async ( {
+	test( `can be edited when within a link but no selection has been made ("collapsed")`, async ( {
 		page,
 		editor,
 		LinkUtils,
@@ -460,7 +460,7 @@ test.describe( 'Links', () => {
 		).not.toBeVisible();
 	} );
 
-	test( `can be modified using the keyboard once a link has been set`, async ( {
+	test( `can be created and modified using only the keyboard once a link has been set`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -892,7 +892,7 @@ test.describe( 'Links', () => {
 			await expect( textInput ).toHaveValue( 'Gutenberg' );
 		} );
 
-		test( 'should preserve trailing/leading whitespace from linked text in text input', async ( {
+		test( 'should show any trailing and/or leading whitespace from linked text within the text input', async ( {
 			page,
 			pageUtils,
 			editor,
@@ -1184,7 +1184,7 @@ test.describe( 'Links', () => {
 		} );
 
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
-		test( 'should correctly replace targetted links text within rich text value when multiple matching values exist', async ( {
+		test( 'should correctly replace active link's text value within rich text even when multiple matching text values exist' within the rich text, async ( {
 			page,
 			pageUtils,
 			editor,
