@@ -168,6 +168,10 @@
 	display: flex;
 	box-shadow: none;
 
+	// Fix an issue with blur flickering.
+	margin: 2px;
+	width: auto;
+
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
 	backdrop-filter: blur(100px);
