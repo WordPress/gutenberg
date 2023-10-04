@@ -51,3 +51,9 @@
 	margin-inline-start: 0;
 	margin-inline-end: 2em;
 }
+
+.wp-block-post-template-is-layout-constrained > li > .aligncenter,
+.wp-block-post-template-is-layout-flow > li > .aligncenter {
+	margin-inline-start: auto;
+	margin-inline-end: auto;
+}
