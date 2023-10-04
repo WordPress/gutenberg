@@ -23,10 +23,14 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		requestUtils,
 	} ) => {
 		const titleText = 'Post to create a link to';
-		await admin.createNewPost( { title: titleText } );
-		const postId = await editor.publishPost();
+		const { id: postId } = await requestUtils.createPost( {
+			title: titleText,
+			status: 'publish',
+		} );
+
 		await admin.createNewPost();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
