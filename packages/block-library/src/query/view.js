@@ -31,9 +31,6 @@ const animationEnd = ( animationName, dom ) =>
 		dom.addEventListener( 'animationcancel', handler );
 	} );
 
-const shouldReduceMotion = () =>
-	window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
-
 store( {
 	selectors: {
 		core: {
@@ -96,17 +93,7 @@ store( {
 
 						// Focus the first anchor of the Query block.
 						const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
-
-						if ( shouldReduceMotion() ) {
-							document.querySelector( firstAnchor )?.focus();
-						} else {
-							const { style } = document.scrollingElement;
-							const prevScrollBehavior = style.scrollBehavior;
-
-							style.scrollBehavior = 'smooth';
-							document.querySelector( firstAnchor )?.focus();
-							style.scrollBehavior = prevScrollBehavior;
-						}
+						document.querySelector( firstAnchor )?.focus();
 					}
 				},
 				prefetch: async ( { ref } ) => {
