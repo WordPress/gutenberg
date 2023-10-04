@@ -9,7 +9,8 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 
@@ -32,11 +33,10 @@ export default function PagePages() {
 		pageSize: PAGE_SIZE_VALUES[ 0 ],
 	} );
 	// Request post statuses to get the proper labels.
-	const [ postStatuses, setPostStatuses ] = useState( EMPTY_ARRAY );
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/statuses',
-		} ).then( setPostStatuses );
+	// TODO: we should probably use `useEntityRecords` here.
+	const postStatuses = useSelect( ( select ) => {
+		const { getPostStatuses } = select( coreStore );
+		return getPostStatuses();
 	}, [] );
 
 	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
