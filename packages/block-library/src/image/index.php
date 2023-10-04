@@ -131,7 +131,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	// An empty alt attribute `alt=""` is valid for decorative images.
-	if ( null !== $alt_attribute ) {
+	if ( is_string( $alt_attribute ) ) {
 		$alt_attribute = trim( $alt_attribute );
 	}
 
