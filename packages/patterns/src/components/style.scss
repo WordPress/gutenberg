@@ -3,6 +3,14 @@
 	.patterns-menu-items__convert-modal-categories {
 		max-width: 300px;
 	}
+	.components-form-token-field__suggestions-list {
+		position: absolute;
+		z-index: 1;
+		background-color: $white;
+		width: 295px;
+		min-width: initial;
+		border: 1px solid $gray-600;
+	}
 }
 
 .patterns-create-modal__name-input input[type="text"] {
