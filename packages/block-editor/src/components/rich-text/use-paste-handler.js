@@ -14,7 +14,7 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { addActiveFormats, isShortcode } from './utils';
+import { addActiveFormats } from './utils';
 import { splitValue } from './split-value';
 import { getPasteEventData } from '../../utils/pasting';
 
@@ -138,18 +138,6 @@ export function usePasteHandler( props ) {
 			}
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
-
-			// Force the blocks mode when the user is pasting
-			// on a new line & the content resembles a shortcode.
-			// Otherwise it's going to be detected as inline
-			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
-				mode = 'BLOCKS';
-			}
 
 			if (
 				__unstableEmbedURLOnPaste &&
