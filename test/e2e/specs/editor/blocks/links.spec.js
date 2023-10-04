@@ -77,8 +77,11 @@ test.describe( 'Links', () => {
 		// Select some text.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
-		// Click on the Link button.
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		// Click on the Link button in the Block Toolbar.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Link' } )
+			.click();
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
