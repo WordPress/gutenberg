@@ -196,7 +196,7 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table"
+		"__experimentalSelector": ".wp-block-table > table, .wp-block-table > table td"
 	},
 	"styles": [
 		{
