@@ -34,20 +34,25 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 	$footnotes = json_decode( $footnotes, true );
 
-	if ( count( $footnotes ) === 0 ) {
+	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$footnote_index     = 1;
 
 	$block_content = '';
 
 	foreach ( $footnotes as $footnote ) {
+		// Translators: %d: Integer representing the number of return links on the page.
+		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
-			'<li id="%1$s">%2$s <a href="#%1$s-link">↩︎</a></li>',
+			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
 			$footnote['id'],
-			$footnote['content']
+			$footnote['content'],
+			$aria_label
 		);
+		++$footnote_index;
 	}
 
 	return sprintf(
@@ -68,9 +73,10 @@ function register_block_core_footnotes() {
 			$post_type,
 			'footnotes',
 			array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'revisions_enabled' => true,
 			)
 		);
 	}
@@ -83,136 +89,32 @@ function register_block_core_footnotes() {
 }
 add_action( 'init', 'register_block_core_footnotes' );
 
-add_action(
-	'wp_after_insert_post',
-	/**
-	 * Saves the footnotes meta value to the revision.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param int $revision_id The revision ID.
-	 */
-	static function( $revision_id ) {
-		$post_id = wp_is_post_revision( $revision_id );
-
-		if ( $post_id ) {
-			$footnotes = get_post_meta( $post_id, 'footnotes', true );
-
-			if ( $footnotes ) {
-				// Can't use update_post_meta() because it doesn't allow revisions.
-				update_metadata( 'post', $revision_id, 'footnotes', $footnotes );
-			}
-		}
-	}
-);
-
-add_action(
-	'_wp_put_post_revision',
-	/**
-	 * Keeps track of the revision ID for "rest_after_insert_{$post_type}".
-	 *
-	 * @param int $revision_id The revision ID.
-	 */
-	static function( $revision_id ) {
-		global $_gutenberg_revision_id;
-		$_gutenberg_revision_id = $revision_id;
-	}
-);
-
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_action(
-		"rest_after_insert_{$post_type}",
-		/**
-		 * This is a specific fix for the REST API. The REST API doesn't update
-		 * the post and post meta in one go (through `meta_input`). While it
-		 * does fix the `wp_after_insert_post` hook to be called correctly after
-		 * updating meta, it does NOT fix hooks such as post_updated and
-		 * save_post, which are normally also fired after post meta is updated
-		 * in `wp_insert_post()`. Unfortunately, `wp_save_post_revision` is
-		 * added to the `post_updated` action, which means the meta is not
-		 * available at the time, so we have to add it afterwards through the
-		 * `"rest_after_insert_{$post_type}"` action.
-		 *
-		 * @since 6.3.0
-		 *
-		 * @param WP_Post $post The post object.
-		 */
-		static function( $post ) {
-			global $_gutenberg_revision_id;
-
-			if ( $_gutenberg_revision_id ) {
-				$revision = get_post( $_gutenberg_revision_id );
-				$post_id  = $revision->post_parent;
-
-				// Just making sure we're updating the right revision.
-				if ( $post->ID === $post_id ) {
-					$footnotes = get_post_meta( $post_id, 'footnotes', true );
-
-					if ( $footnotes ) {
-						// Can't use update_post_meta() because it doesn't allow revisions.
-						update_metadata( 'post', $_gutenberg_revision_id, 'footnotes', $footnotes );
-					}
-				}
-			}
-		}
-	);
+/**
+ * Adds the footnotes field to the revisions display.
+ *
+ * @since 6.3.0
+ *
+ * @param array $fields The revision fields.
+ * @return array The revision fields.
+ */
+function wp_add_footnotes_to_revision( $fields ) {
+	$fields['footnotes'] = __( 'Footnotes' );
+	return $fields;
 }
+add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
 
-add_action(
-	'wp_restore_post_revision',
-	/**
-	 * Restores the footnotes meta value from the revision.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param int $post_id      The post ID.
-	 * @param int $revision_id  The revision ID.
-	 */
-	static function( $post_id, $revision_id ) {
-		$footnotes = get_post_meta( $revision_id, 'footnotes', true );
-
-		if ( $footnotes ) {
-			update_post_meta( $post_id, 'footnotes', $footnotes );
-		} else {
-			delete_post_meta( $post_id, 'footnotes' );
-		}
-	},
-	10,
-	2
-);
-
-add_filter(
-	'_wp_post_revision_fields',
-	/**
-	 * Adds the footnotes field to the revision.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param array $fields The revision fields.
-	 * @return array The revision fields.
-	 */
-	static function( $fields ) {
-		$fields['footnotes'] = __( 'Footnotes' );
-		return $fields;
-	}
-);
-
-add_filter(
-	'wp_post_revision_field_footnotes',
-	/**
-	 * Gets the footnotes field from the revision.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param string $revision_field The field value, but $revision->$field
-	 *                               (footnotes) does not exist.
-	 * @param string $field          The field name, in this case "footnotes".
-	 * @param object $revision       The revision object to compare against.
-	 * @return string The field value.
-	 */
-	static function( $revision_field, $field, $revision ) {
-		return get_metadata( 'post', $revision->ID, $field, true );
-	},
-	10,
-	3
-);
+/**
+ * Gets the footnotes field from the revision for the revisions screen.
+ *
+ * @since 6.3.0
+ *
+ * @param string $revision_field The field value, but $revision->$field
+ *                               (footnotes) does not exist.
+ * @param string $field          The field name, in this case "footnotes".
+ * @param object $revision       The revision object to compare against.
+ * @return string The field value.
+ */
+function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
+	return get_metadata( 'post', $revision->ID, $field, true );
+}
+add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );

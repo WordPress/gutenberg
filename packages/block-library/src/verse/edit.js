@@ -20,8 +20,8 @@ export default function VerseEdit( {
 	setAttributes,
 	mergeBlocks,
 	onRemove,
-	style,
 	insertBlocksAfter,
+	style,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
@@ -58,7 +58,7 @@ export default function VerseEdit( {
 				textAlign={ textAlign }
 				{ ...blockProps }
 				__unstablePastePlainText
-				__unstableOnSplitAtEnd={ () =>
+				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
 			/>

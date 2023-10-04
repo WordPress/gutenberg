@@ -88,7 +88,7 @@ export function BlockPreview( {
  * @param {Array|Object} preview.blocks        A block instance (object) or an array of blocks to be previewed.
  * @param {number}       preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default memo( BlockPreview );
 
@@ -106,7 +106,6 @@ export default memo( BlockPreview );
  * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
  *                                   the ref if one is defined.
  * @param {Object}    options.layout Layout settings to be used in the preview.
- *
  */
 export function useBlockPreview( { blocks, props = {}, layout } ) {
 	const originalSettings = useSelect(

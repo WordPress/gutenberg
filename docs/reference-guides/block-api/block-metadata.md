@@ -464,7 +464,7 @@ Plugins and Themes can also register [custom block style](/docs/reference-guides
 
 It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
-See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
+See the [Example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 
 ### Variations
 
@@ -496,6 +496,25 @@ Block Variations is the API that allows a block to have similar versions of it, 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
 See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+
+### Block Hooks
+
+-   Type: `object`
+-   Optional
+-   Property: `blockHooks`
+-   Since: `WordPress 6.4.0`
+
+```json
+{
+	"blockHooks": {
+		"my-plugin/banner": "after"
+	}
+}
+```
+
+Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
+
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
 ### Editor Script
 
@@ -601,6 +620,16 @@ PHP file to use when rendering the block type on the server to show on the front
 -   `$content` (`string`): The block default content.
 -   `$block` (`WP_Block`): The block instance.
 
+An example implementation of the `render.php` file defined with `render` could look like:
+
+```php
+<div <?php echo get_block_wrapper_attributes(); ?>>
+	<?php echo esc_html( $attributes['label'] ); ?>
+</div>
+```
+
+_Note: This file loads for every instance of the block type when rendering the page HTML on the server. Accounting for that is essential when declaring functions or classes in the file. The simplest way to avoid the risk of errors is to consume that shared logic from another file._
+
 ## Assets
 
 ### `WPDefinedPath`
@@ -668,8 +697,8 @@ In `build/index.asset.php`:
 <?php
 return array(
 	'dependencies' => array(
+		'react',
 		'wp-blocks',
-		'wp-element',
 		'wp-i18n',
 	),
 	'version'      => '3be55b05081a63d8f9d0ecb466c42cfd',

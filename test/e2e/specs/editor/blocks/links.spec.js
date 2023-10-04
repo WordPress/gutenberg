@@ -145,4 +145,174 @@ test.describe( 'Links', () => {
 			},
 		] );
 	} );
+
+	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( 'This is Gutenberg WordPress' );
+
+		// Select "WordPress".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'w.org' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to edge of text "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' ); // If you just use Alt here it won't work on windows.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
+
+		// Select "Gutenberg".
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		// Create a link.
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://wordpress.org/plugins/gutenberg/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move back into the link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Toggle the Advanced settings to be open.
+		// This should set the editor preference to persist this
+		// UI state.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "WordPress" link to trigger
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'Alt+ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Check that the Advanced settings are still expanded/open
+		// and I can see the open in new tab checkbox. This verifies
+		// that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeVisible();
+
+		// Toggle the Advanced settings back to being closed.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// Move focus out of Link UI and into Paragraph block.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// Move caret back into the "Gutenberg" link and open
+		// the Link UI for that link.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Check that the Advanced settings are still closed.
+		// This verifies that the editor preference was persisted.
+		await expect( page.getByLabel( 'Open in new tab' ) ).toBeHidden();
+	} );
+
+	test( 'can toggle link settings and save', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="https://wordpress.org/gutenberg">Gutenberg</a>',
+			},
+		} );
+
+		// Move caret into the link.
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		// Switch Link UI to "edit" mode.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open Advanced Settings
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		// expect settings for `Open in new tab` and `No follow`
+		await expect( page.getByLabel( 'Open in new tab' ) ).not.toBeChecked();
+		await expect( page.getByLabel( 'nofollow' ) ).not.toBeChecked();
+
+		// Toggle both of the settings
+		await page.getByLabel( 'Open in new tab' ).click();
+		await page.getByLabel( 'nofollow' ).click();
+
+		// Save the link
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Expect correct attributes to be set on the underlying link.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener nofollow">Gutenberg</a>`,
+				},
+			},
+		] );
+
+		// Move caret back into the link.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Edit the link
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Toggle both the settings to be off.
+		// Note: no need to toggle settings again because the open setting should be persisted.
+		await page.getByLabel( 'Open in new tab' ).click();
+		await page.getByLabel( 'nofollow' ).click();
+
+		// Save the link
+		await page
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Expect correct attributes to be set on the underlying link.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: `<a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+				},
+			},
+		] );
+	} );
 } );

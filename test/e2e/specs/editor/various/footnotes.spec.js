@@ -291,7 +291,8 @@ test.describe( 'Footnotes', () => {
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.locator( 'button:text("Footnote")' ).click();
 
-		await page.keyboard.type( 'first footnote' );
+		// Check if content is correctly slashed on save and restore.
+		await page.keyboard.type( 'first footnote"' );
 
 		const id1 = await editor.canvas.evaluate( () => {
 			return document.activeElement.id;
@@ -316,7 +317,7 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
@@ -329,7 +330,7 @@ test.describe( 'Footnotes', () => {
 		// This also saves the post!
 		expect( await getFootnotes( page ) ).toMatchObject( [
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 			{
@@ -337,6 +338,17 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 		] );
+
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'first footnote” ↩︎second footnote ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
+		await editor.canvas.click( 'p:text("first paragraph")' );
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
@@ -355,9 +367,77 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'second footnote ↩︎first footnote” ↩︎' );
+
+		await previewPage2.close();
+		await editorPage.bringToFront();
+	} );
+
+	test( 'can be previewed when published', async ( { editor, page } ) => {
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( 'a' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( '1' );
+
+		// Publish post with the footnote set to "1".
+		const postId = await editor.publishPost();
+
+		// Test previewing changes to meta.
+		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '2' );
+
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '12 ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
+
+		// Test again, this time with an existing revision (different code path).
+		await editor.canvas.click( 'ol.wp-block-footnotes li span' );
+		await page.keyboard.press( 'End' );
+		// Test slashing.
+		await page.keyboard.type( '3"' );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		// Note: quote will get curled by wptexturize.
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '123″  ↩︎' );
+
+		// Verify that the published post is unchanged after previewing changes to meta.
+		await previewPage2.close();
+		await editorPage.bringToFront();
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Post' } )
+			.click();
+
+		// Visit the published post.
+		await page.goto( `/?p=${ postId }` );
+
+		// Verify that the published post footnote still says "1".
+		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
+			'1 ↩︎'
+		);
 	} );
 } );

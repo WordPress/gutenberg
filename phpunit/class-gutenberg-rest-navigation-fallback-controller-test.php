@@ -87,7 +87,6 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'Only a single Navigation menu should be present in the database.' );
-
 	}
 
 	/**
@@ -165,7 +164,7 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 	 * to the embedded Navigation Post, when the navigation fallback endpoint
 	 * is called with the `_embed` param.
 	 *
-	 * @covers wp_add_fields_to_navigation_fallback_embeded_links
+	 * @covers wp_add_fields_to_navigation_fallback_embedded_links
 	 */
 	public function test_embedded_navigation_post_contains_required_fields() {
 		// First we'll use the navigation fallback to get a link to the navigation endpoint.

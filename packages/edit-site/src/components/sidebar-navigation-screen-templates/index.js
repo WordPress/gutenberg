@@ -7,7 +7,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -18,8 +17,8 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
-import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -31,15 +30,10 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 
 export default function SidebarNavigationScreenTemplates() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'wp_template',
+		TEMPLATE_POST_TYPE,
 		{
 			per_page: -1,
 		}
@@ -51,18 +45,17 @@ export default function SidebarNavigationScreenTemplates() {
 	);
 
 	const browseAllLink = useLink( { path: '/wp_template/all' } );
-	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
+	const canCreate = ! isMobileViewport;
 	return (
 		<SidebarNavigationScreen
-			isRoot={ isTemplatePartsMode }
 			title={ __( 'Templates' ) }
 			description={ __(
-				'Express the layout of your site with templates'
+				'Express the layout of your site with templates.'
 			) }
 			actions={
 				canCreate && (
 					<AddNewTemplate
-						templateType={ 'wp_template' }
+						templateType={ TEMPLATE_POST_TYPE }
 						toggleProps={ {
 							as: SidebarButton,
 						} }
@@ -71,7 +64,7 @@ export default function SidebarNavigationScreenTemplates() {
 			}
 			content={
 				<>
-					{ isLoading && __( 'Loading templates' ) }
+					{ isLoading && __( 'Loading templates…' ) }
 					{ ! isLoading && (
 						<ItemGroup>
 							{ ! templates?.length && (
@@ -79,7 +72,7 @@ export default function SidebarNavigationScreenTemplates() {
 							) }
 							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
-									postType={ 'wp_template' }
+									postType={ TEMPLATE_POST_TYPE }
 									postId={ template.id }
 									key={ template.id }
 									withChevron

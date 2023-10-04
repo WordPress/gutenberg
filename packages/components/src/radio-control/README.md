@@ -58,7 +58,7 @@ Render a user interface to select the user type using radio inputs.
 
 ```jsx
 import { RadioControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
 
 const MyRadioControl = () => {
 	const [ option, setOption ] = useState( 'a' );
@@ -82,7 +82,7 @@ const MyRadioControl = () => {
 
 The component accepts the following props:
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

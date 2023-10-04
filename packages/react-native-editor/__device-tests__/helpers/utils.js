@@ -38,15 +38,11 @@ let appiumProcess;
 
 const backspace = '\u0008';
 
-// Used to map unicode and special values to keycodes on Android
-// Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
-const strToKeycode = {
-	'\n': 66,
-	[ backspace ]: 67,
-};
-
 // $block-edge-to-content value
 const blockEdgeToContent = 16;
+
+const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
+const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
@@ -63,11 +59,12 @@ const getIOSPlatformVersions = () => {
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
-	return runtimes
-		.reverse()
-		.filter(
-			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
-		);
+	return runtimes.reverse().filter(
+		( { name, isAvailable, version } ) =>
+			name.startsWith( 'iOS' ) &&
+			/15(\.\d+)+/.test( version ) && // Appium 1 does not support newer iOS versions
+			isAvailable
+	);
 };
 
 // Initialises the driver and desired capabilities for appium.
@@ -76,7 +73,9 @@ const setupDriver = async () => {
 	const safeBranchName = branch.replace( /\//g, '-' );
 	if ( isLocalEnvironment() ) {
 		try {
-			appiumProcess = await AppiumLocal.start( localAppiumPort );
+			appiumProcess = await AppiumLocal.start( {
+				port: localAppiumPort,
+			} );
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
@@ -124,7 +123,7 @@ const setupDriver = async () => {
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+					'No compatible iOS simulators available! Please verify that you have iOS 15 simulators installed.'
 				);
 			}
 			// eslint-disable-next-line no-console
@@ -195,6 +194,9 @@ const stopDriver = async ( driver ) => {
  * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
  */
 const typeString = async ( driver, element, str, clear ) => {
+	if ( isKeycode( str ) ) {
+		return await pressKeycode( driver, getKeycode( str ) );
+	}
 	if ( isAndroid() ) {
 		await typeStringAndroid( driver, element, str, clear );
 	} else {
@@ -208,6 +210,9 @@ const typeStringIos = async ( driver, element, str, clear ) => {
 		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+
+	// Wait for the list auto-scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const clearTextBox = async ( driver, element ) => {
@@ -236,9 +241,7 @@ const typeStringAndroid = async (
 	str,
 	clear = true // See comment above for why it is defaulted to true.
 ) => {
-	if ( str in strToKeycode ) {
-		return await driver.pressKeycode( strToKeycode[ str ] );
-	} else if ( clear ) {
+	if ( clear ) {
 		/*
 		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
 		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
@@ -267,9 +270,13 @@ const typeStringAndroid = async (
 		const paragraphs = str.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-			if ( paragraph in strToKeycode ) {
-				await driver.pressKeycode( strToKeycode[ paragraph ] );
-			} else {
+			if ( isKeycode( paragraph ) ) {
+				return await pressKeycode( driver, getKeycode( paragraph ) );
+			}
+			// Empty values passed in the `args` list of `execute` function are removed.
+			// In order to avoid an exception in `text` command due to passing fewer arguments, we don't
+			// execute the command with empty strings.
+			else if ( paragraph !== '' ) {
 				// Execute with adb shell input <text> since normal type auto clears field on Android
 				await driver.execute( 'mobile: shell', {
 					command: 'input',
@@ -277,10 +284,57 @@ const typeStringAndroid = async (
 				} );
 			}
 			if ( i !== paragraphs.length - 1 ) {
-				await driver.pressKeycode( strToKeycode[ '\n' ] );
+				await pressKeycode( driver, getKeycode( '\n' ) );
 			}
 		}
 	}
+};
+
+/**
+ * Returns the mapped keycode for a string to use in `pressKeycode` function.
+ *
+ * @param {string} str String associated to a keycode
+ */
+const getKeycode = ( str ) => {
+	if ( isAndroid() ) {
+		// On Android, we map keycodes using Android values.
+		// Reference: https://developer.android.com/reference/android/view/KeyEvent.html
+		return {
+			'\n': 66,
+			[ backspace ]: 67,
+		}[ str ];
+	}
+	// On iOS, we map keycodes using the special keys defined in WebDriver.
+	// Reference: https://github.com/admc/wd/blob/master/lib/special-keys.js
+	return {
+		'\n': wd.SPECIAL_KEYS.Enter,
+		[ backspace ]: wd.SPECIAL_KEYS[ 'Back space' ],
+	}[ str ];
+};
+
+/**
+ * Determines if the string is mapped to a keycode.
+ *
+ * @param {string} str String potentially associated to a keycode
+ */
+const isKeycode = ( str ) => {
+	return !! getKeycode( str );
+};
+
+/**
+ * Presses the specified keycode.
+ *
+ * @param {*} driver  WebDriver instance
+ * @param {*} keycode Keycode to press
+ */
+const pressKeycode = async ( driver, keycode ) => {
+	if ( isAndroid() ) {
+		// `pressKeycode` command is only implemented on Android
+		return await driver.pressKeycode( keycode );
+	}
+	// `keys` command only works on iOS. On Android, executing this
+	// results in typing a special character instead.
+	return await driver.keys( [ keycode ] );
 };
 
 // Calculates middle x,y and clicks that position
@@ -374,6 +428,15 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
 	}
+};
+
+const tapStatusBariOS = async ( driver ) => {
+	const action = new wd.TouchAction();
+	action.tap( { x: 20, y: 20 } );
+	await driver.performTouchAction( action );
+
+	// Wait for the scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
@@ -476,9 +539,8 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'More options'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'More options' );
 		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
@@ -486,9 +548,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 
 		await clickIfClickable(
@@ -498,9 +559,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
@@ -705,6 +765,30 @@ const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
 	await driver.setClipboard( '', contentType );
 };
 
+const launchApp = async ( driver, initialProps = {} ) => {
+	if ( isAndroid() ) {
+		await driver.execute( 'mobile: startActivity', {
+			component: ANDROID_COMPONENT_NAME,
+			stop: true,
+			extras: [
+				[
+					's',
+					'initialProps',
+					`'${ JSON.stringify( initialProps ) }'`,
+				],
+			],
+		} );
+	} else {
+		await driver.execute( 'mobile: terminateApp', {
+			bundleId: IOS_BUNDLE_ID,
+		} );
+		await driver.execute( 'mobile: launchApp', {
+			bundleId: IOS_BUNDLE_ID,
+			arguments: [ 'uitesting', JSON.stringify( initialProps ) ],
+		} );
+	}
+};
+
 module.exports = {
 	backspace,
 	clearClipboard,
@@ -718,10 +802,11 @@ module.exports = {
 	isEditorVisible,
 	isElementVisible,
 	isLocalEnvironment,
+	launchApp,
 	longPressMiddleOfElement,
+	selectTextFromElement,
 	setClipboard,
 	setupDriver,
-	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
@@ -729,6 +814,7 @@ module.exports = {
 	tapCopyAboveElement,
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
+	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
 	toggleHtmlMode,

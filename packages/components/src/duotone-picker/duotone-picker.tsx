@@ -55,6 +55,8 @@ import type { DuotonePickerProps } from './types';
  * ```
  */
 function DuotonePicker( {
+	asButtons,
+	loop,
 	clearable = true,
 	unsetable = true,
 	colorPalette,
@@ -63,6 +65,9 @@ function DuotonePicker( {
 	disableCustomDuotone,
 	value,
 	onChange,
+	'aria-label': ariaLabel,
+	'aria-labelledby': ariaLabelledby,
+	...otherProps
 }: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
@@ -70,13 +75,15 @@ function DuotonePicker( {
 	);
 
 	const isUnset = value === 'unset';
+	const unsetOptionLabel = __( 'Unset' );
 
 	const unsetOption = (
 		<CircularOptionPicker.Option
 			key="unset"
 			value="unset"
 			isSelected={ isUnset }
-			tooltipText={ __( 'Unset' ) }
+			tooltipText={ unsetOptionLabel }
+			aria-label={ unsetOptionLabel }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
 				onChange( isUnset ? undefined : 'unset' );
@@ -120,8 +127,38 @@ function DuotonePicker( {
 		);
 	} );
 
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
+	} else {
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
+	}
+
 	return (
 		<CircularOptionPicker
+			{ ...otherProps }
+			{ ...metaProps }
 			options={ unsetable ? [ unsetOption, ...options ] : options }
 			actions={
 				!! clearable && (

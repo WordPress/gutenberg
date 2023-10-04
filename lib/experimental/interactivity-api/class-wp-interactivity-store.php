@@ -34,7 +34,7 @@ class WP_Interactivity_Store {
 	 *
 	 * @return array
 	 */
-	static function get_data() {
+	public static function get_data() {
 		return self::$store;
 	}
 
@@ -43,35 +43,27 @@ class WP_Interactivity_Store {
 	 *
 	 * @param array $data The data that will be merged with the existing store.
 	 */
-	static function merge_data( $data ) {
+	public static function merge_data( $data ) {
 		self::$store = array_replace_recursive( self::$store, $data );
-	}
-
-	/**
-	 * Serialize store data to JSON.
-	 *
-	 * @return string|false Serialized JSON data.
-	 */
-	static function serialize() {
-		// TODO: Escape?
-		return wp_json_encode( self::$store );
 	}
 
 	/**
 	 * Reset the store data.
 	 */
-	static function reset() {
+	public static function reset() {
 		self::$store = array();
 	}
 
 	/**
 	 * Render the store data.
 	 */
-	static function render() {
+	public static function render() {
 		if ( empty( self::$store ) ) {
 			return;
 		}
-		$store = self::serialize();
-		echo "<script id=\"wp-interactivity-store-data\" type=\"application/json\">$store</script>";
+		echo sprintf(
+			'<script id="wp-interactivity-store-data" type="application/json">%s</script>',
+			wp_json_encode( self::$store, JSON_HEX_TAG | JSON_HEX_AMP )
+		);
 	}
 }

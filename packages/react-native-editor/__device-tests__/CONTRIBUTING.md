@@ -30,7 +30,7 @@ For Android, you can fire up the app and then within Android Studio select `Tool
 
 For iOS, you can also fire up and use the accessibility inspector, which is an app that should come available on your OSX machine. From there you can choose the process running your simulator and inspect various areas of the app.
 
-Alternative for both of these platforms and for an interface to simulate the commands I'd recommend [Appium Inspector](https://github.com/appium/appium-inspector/releases). A great tool for inspecting the view hierarchy and interacting with elements on screen as your test would.
+Alternative for both of these platforms and for an interface to simulate the commands I'd recommend [Appium Inspector](https://github.com/appium/appium-inspector/releases), a great tool for inspecting the view hierarchy and interacting with elements on screen as your test would. In order to connect the Appium Inspector, you'll need to start the Appium server manually by running `npm run native appium:start` and then configure Appium Inspector with the appropriate capabilities. You can find the capabilities in `__device-tests__/helpers/caps.js`.
 
 Using one or a combination of these tools will make it much easier to identify what locator strategy you're going to use or which elements need accessibility identifiers to ease the search process without affecting VoiceOver features.
 

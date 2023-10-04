@@ -110,7 +110,7 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
 		await editor.canvas.click(
-			'role=document[name="Paragraph block"i] >> text=one'
+			'role=document[name="Block: Paragraph"i] >> text=one'
 		);
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/quote' );

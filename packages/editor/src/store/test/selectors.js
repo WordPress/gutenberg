@@ -725,6 +725,31 @@ describe( 'selectors', () => {
 				b: 2,
 			} );
 		} );
+
+		it( 'should return the same value for mergeable properties when called multiple times', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toBe(
+				getEditedPostAttribute( state, 'meta' )
+			);
+		} );
 	} );
 
 	describe( 'getCurrentPostLastRevisionId', () => {

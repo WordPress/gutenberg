@@ -47,7 +47,7 @@ import WidthHeightTool from './width-height-tool';
  *
  * @param {DimensionsControlsProps} props The component props.
  *
- * @return {WPElement} The dimensions controls.
+ * @return {Element} The dimensions controls.
  */
 function DimensionsTool( {
 	panelId,
@@ -124,7 +124,7 @@ function DimensionsTool( {
 					}
 
 					// Auto-update width and height.
-					if ( nextAspectRatio && width && height ) {
+					if ( 'custom' !== nextAspectRatio && width && height ) {
 						delete nextValue.height;
 					}
 

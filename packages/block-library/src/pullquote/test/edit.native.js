@@ -5,6 +5,7 @@ import {
 	addBlock,
 	getBlock,
 	initializeEditor,
+	selectRangeInRichText,
 	setupCoreBlocks,
 	getEditorHtml,
 	fireEvent,
@@ -45,10 +46,13 @@ describe( 'Pullquote', () => {
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		typeInRichText( citationTextInput, 'A person', {
-			finalSelectionStart: 2,
-			finalSelectionEnd: 2,
+		typeInRichText( citationTextInput, 'A person' );
+		fireEvent( citationTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
 		} );
+		selectRangeInRichText( citationTextInput, 2 );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -59,7 +63,11 @@ describe( 'Pullquote', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
 		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
-		<!-- /wp:pullquote -->"
+		<!-- /wp:pullquote -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

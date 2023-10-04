@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +16,7 @@ import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,6 +29,8 @@ import {
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
 
+const { useLocation } = unlock( routerPrivateApis );
+
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
@@ -31,15 +39,17 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
-	backPath,
+	backPath: backPathProp,
 } ) {
-	const { dashboardLink } = useSelect( ( select ) => {
+	const { dashboardLink, dashboardLinkText } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 		return {
 			dashboardLink: getSettings().__experimentalDashboardLink,
+			dashboardLinkText: getSettings().__experimentalDashboardLinkText,
 		};
 	}, [] );
 	const { getTheme } = useSelect( coreStore );
+	const location = useLocation();
 	const navigator = useNavigator();
 	const theme = getTheme( currentlyPreviewingTheme() );
 	const icon = isRTL() ? chevronRight : chevronLeft;
@@ -47,7 +57,12 @@ export default function SidebarNavigationScreen( {
 	return (
 		<>
 			<VStack
-				className="edit-site-sidebar-navigation-screen__main"
+				className={ classnames(
+					'edit-site-sidebar-navigation-screen__main',
+					{
+						'has-footer': !! footer,
+					}
+				) }
 				spacing={ 0 }
 				justify="flex-start"
 			>
@@ -56,25 +71,19 @@ export default function SidebarNavigationScreen( {
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ ! isRoot && ! backPath && (
+					{ ! isRoot && (
 						<SidebarButton
 							onClick={ () => {
-								if ( navigator.location.isInitial ) {
-									navigator.goToParent( { replace: true } );
+								const backPath =
+									backPathProp ?? location.state?.backPath;
+								if ( backPath ) {
+									navigator.goTo( backPath, {
+										isBack: true,
+									} );
 								} else {
-									navigator.goBack();
+									navigator.goToParent();
 								}
 							} }
-							icon={ icon }
-							label={ __( 'Back' ) }
-							showTooltip={ false }
-						/>
-					) }
-					{ ! isRoot && backPath && (
-						<SidebarButton
-							onClick={ () =>
-								navigator.goTo( backPath, { isBack: true } )
-							}
 							icon={ icon }
 							label={ __( 'Back' ) }
 							showTooltip={ false }
@@ -84,15 +93,9 @@ export default function SidebarNavigationScreen( {
 						<SidebarButton
 							icon={ icon }
 							label={
-								! isPreviewingTheme()
-									? __( 'Go to the Dashboard' )
-									: __( 'Go back to the theme showcase' )
+								dashboardLinkText || __( 'Go to the Dashboard' )
 							}
-							href={
-								! isPreviewingTheme()
-									? dashboardLink || 'index.php'
-									: 'themes.php'
-							}
+							href={ dashboardLink || 'index.php' }
 						/>
 					) }
 					<Heading

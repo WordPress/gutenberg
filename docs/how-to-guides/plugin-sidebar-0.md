@@ -16,15 +16,15 @@ The tutorial assumes you have an existing plugin setup and are ready to add PHP 
 
 ### Step 1: Get a Sidebar up and Running
 
-The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/edit-post`, and `@wordpress/element` packages, respectively.
+The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/edit-post`, and `react` packages, respectively.
 
 Add the following code to a JavaScript file called `plugin-sidebar.js` and save it within your plugin's directory:
 
 ```js
-( function ( wp ) {
+( function ( wp, React ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function () {
@@ -39,10 +39,10 @@ Add the following code to a JavaScript file called `plugin-sidebar.js` and save 
 			);
 		},
 	} );
-} )( window.wp );
+} )( window.wp, window.React );
 ```
 
-For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-edit-post`, and `wp-element` as dependencies of your script.
+For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-edit-post`, and `react` as dependencies of your script.
 
 Here is the PHP code to register your script and specify the dependencies:
 
@@ -57,7 +57,7 @@ function sidebar_plugin_register() {
 	wp_register_script(
 		'plugin-sidebar-js',
 		plugins_url( 'plugin-sidebar.js', __FILE__ ),
-		array( 'wp-plugins', 'wp-edit-post', 'wp-element' )
+		array( 'wp-plugins', 'wp-edit-post', 'react' )
 	);
 }
 add_action( 'init', 'sidebar_plugin_register' );
@@ -80,9 +80,9 @@ To visualize and edit the meta field value you'll use an input component. The `@
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
 	var TextControl = wp.components.TextControl;
 
 	registerPlugin( 'my-plugin-sidebar', {
@@ -142,9 +142,9 @@ function sidebar_plugin_register() {
 		'plugin-sidebar-js',
 		plugins_url( 'plugin-sidebar.js', __FILE__ ),
 		array(
+			'react',
 			'wp-plugins',
 			'wp-edit-post',
-			'wp-element',
 			'wp-components'
 		)
 	);
@@ -200,9 +200,9 @@ With the field available in the editor store, it can now be surfaced to the UI. 
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
 	var TextControl = wp.components.TextControl;
 
 	var MetaBlockField = function () {
@@ -241,9 +241,9 @@ The `useSelect` function is used to fetch data when the component loads and will
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 
@@ -304,9 +304,9 @@ The `useDispatch` function takes a store name as its only argument and returns m
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useDispatch = wp.data.useDispatch;

@@ -32,6 +32,7 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
+import { focusListItem } from './utils';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -132,8 +133,6 @@ function ListViewComponent(
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
-	const isMounted = useRef( false );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -156,21 +155,14 @@ function ListViewComponent(
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
 	useEffect( () => {
-		isMounted.current = true;
-	}, [] );
-
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
-	const [ fixedListWindow ] = useFixedWindowList(
-		elementRef,
-		BLOCK_LIST_ITEM_HEIGHT,
-		visibleBlockCount,
-		{
-			useWindowing: true,
-			windowOverscan: 40,
+		// If a blocks are already selected when the list view is initially
+		// mounted, shift focus to the first selected block.
+		if ( selectedClientIds?.length ) {
+			focusListItem( selectedClientIds[ 0 ], elementRef );
 		}
-	);
+		// Disable reason: Only focus on the selected item when the list view is mounted.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -217,7 +209,6 @@ function ListViewComponent(
 
 	const contextValue = useMemo(
 		() => ( {
-			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
@@ -240,6 +231,25 @@ function ListViewComponent(
 			insertedBlock,
 			setInsertedBlock,
 		]
+	);
+
+	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		BLOCK_LIST_ITEM_HEIGHT,
+		visibleBlockCount,
+		{
+			// Ensure that the windowing logic is recalculated when the expanded state changes.
+			// This is necessary because expanding a collapsed block in a short list view can
+			// switch the list view to a tall list view with a scrollbar, and vice versa.
+			// When this happens, the windowing logic needs to be recalculated to ensure that
+			// the correct number of blocks are rendered, by rechecking for a scroll container.
+			expandedState,
+			useWindowing: true,
+			windowOverscan: 40,
+		}
 	);
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.

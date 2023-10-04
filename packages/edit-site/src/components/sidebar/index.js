@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
@@ -27,6 +28,7 @@ import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -53,6 +55,15 @@ function SidebarScreens() {
 			<NavigatorScreen path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</NavigatorScreen>
+			{ window?.__experimentalAdminViews && (
+				<NavigatorScreen path="/pages">
+					<SidebarNavigationScreen
+						title={ __( 'All Pages' ) }
+						description={ __( 'Manage your pages.' ) }
+						backPath="/page"
+					/>
+				</NavigatorScreen>
+			) }
 			<NavigatorScreen path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>

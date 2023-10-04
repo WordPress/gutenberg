@@ -19,7 +19,7 @@ test.describe( 'Block Locking', () => {
 
 		await expect(
 			page.locator( 'role=menuitem[name="Delete"]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'can disable movement', async ( { editor, page } ) => {
@@ -38,14 +38,12 @@ test.describe( 'Block Locking', () => {
 		await editor.clickBlockToolbarButton( 'Options' );
 
 		// Drag handle is hidden.
-		await expect(
-			page.locator( 'role=button[name="Drag"]' )
-		).not.toBeVisible();
+		await expect( page.locator( 'role=button[name="Drag"]' ) ).toBeHidden();
 
 		// Movers are hidden. No need to check for both.
 		await expect(
 			page.locator( 'role=button[name="Move up"]' )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'can lock everything', async ( { editor, page } ) => {
@@ -106,7 +104,7 @@ test.describe( 'Block Locking', () => {
 		} );
 
 		const paragraph = editor.canvas.getByRole( 'document', {
-			name: 'Paragraph block',
+			name: 'Block: Paragraph',
 		} );
 		await paragraph.click();
 
