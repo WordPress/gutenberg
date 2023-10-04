@@ -242,7 +242,7 @@ store(
 					enlargedImgSrc: ( { context } ) => {
 						return context.core.image.initialized
 							? context.core.image.imageUploadedSrc
-							: '';
+							: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 					},
 				},
 			},
