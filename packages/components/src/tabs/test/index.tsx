@@ -548,6 +548,43 @@ describe( 'Tabs', () => {
 				rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
+			it( 'should not load any tab if the active tab is removed and there are no enabled tabs', async () => {
+				const TABS_WITH_BETA_GAMMA_DISABLED = TABS.map( ( tabObj ) =>
+					tabObj.id !== 'alpha'
+						? {
+								...tabObj,
+								tab: {
+									...tabObj.tab,
+									disabled: true,
+								},
+						  }
+						: tabObj
+				);
+
+				const { rerender } = render(
+					<UncontrolledTabs tabs={ TABS_WITH_BETA_GAMMA_DISABLED } />
+				);
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+
+				// Remove alpha
+				rerender(
+					<UncontrolledTabs
+						tabs={ TABS_WITH_BETA_GAMMA_DISABLED.slice( 1 ) }
+					/>
+				);
+
+				// No tab should be selected i.e. it doesn't fall back to first tab.
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'tab', { selected: true } )
+					).not.toBeInTheDocument()
+				);
+
+				// No tabpanel should be rendered either
+				expect(
+					screen.queryByRole( 'tabpanel' )
+				).not.toBeInTheDocument();
+			} );
 		} );
 
 		describe( 'With `initialTabId`', () => {
