@@ -247,13 +247,6 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -299,13 +292,6 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
@@ -1183,13 +1169,6 @@ test.describe( 'Multi-block selection', () => {
 		page,
 		editor,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },
@@ -1206,7 +1185,7 @@ test.describe( 'Multi-block selection', () => {
 
 		await page.keyboard.press( 'ArrowLeft' );
 		const strongText = editor.canvas
-			.getByRole( 'region', { name: 'Editor content' } )
+			.getByRole( 'document', { name: 'Paragraph block' } )
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
