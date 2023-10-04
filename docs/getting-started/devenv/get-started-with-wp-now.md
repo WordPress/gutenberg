@@ -1,3 +1,7 @@
+<div class="callout callout-info">
+	`wp-now` is still experimental. For a more comprehensive overview of their current status and roadmap, please check <a href="https://github.com/WordPress/wordpress-playground"> WordPress Playground's repository </a> and <a href="https://developer.wordpress.org/block-editor/getting-started/create-block">wp-now's</a>.
+</div>
+
 # Get started with wp-now
 
 The [@wp-now/wp-now](https://www.npmjs.com/package/@wordpress/env) package (`wp-now`) is a lightweight tool powered by [WordPress Playground](https://developer.wordpress.org/playground/) that streamlines setting up a local WordPress environment.
