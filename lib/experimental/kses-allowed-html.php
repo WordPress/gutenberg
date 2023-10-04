@@ -14,7 +14,7 @@
  */
 function gutenberg_kses_allowed_html( $allowedtags ) {
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
-		return;
+		return $allowedtags;
 	}
 
 	$allowedtags['input'] = array(
