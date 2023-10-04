@@ -46,6 +46,10 @@ function render_block_core_form( $attributes, $content ) {
  * Additional data to add to the view.js script for this block.
  */
 function block_core_form_view_script() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return;
+	}
+
 	wp_localize_script(
 		'wp-block-form-view',
 		'wpBlockFormSettings',
