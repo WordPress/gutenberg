@@ -14,7 +14,6 @@ import { useState, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -45,12 +44,11 @@ export default function CreatePatternModal( {
 
 	const { corePatternCategories, userPatternCategories } = useSelect(
 		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const { getUserPatternCategories } = select( coreStore );
+			const { getUserPatternCategories, getBlockPatternCategories } =
+				select( coreStore );
 
 			return {
-				corePatternCategories:
-					getSettings().__experimentalBlockPatternCategories,
+				corePatternCategories: getBlockPatternCategories(),
 				userPatternCategories: getUserPatternCategories(),
 			};
 		}
