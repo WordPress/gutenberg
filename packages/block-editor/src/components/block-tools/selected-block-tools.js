@@ -25,68 +25,25 @@ import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-function selector( select ) {
-	const {
-		__unstableGetEditorMode,
-		hasMultiSelection,
-		isTyping,
-		getLastMultiSelectedBlockClientId,
-	} = select( blockEditorStore );
-
-	return {
-		editorMode: __unstableGetEditorMode(),
-		hasMultiSelection: hasMultiSelection(),
-		isTyping: isTyping(),
-		lastClientId: hasMultiSelection()
-			? getLastMultiSelectedBlockClientId()
-			: null,
-	};
-}
-
 function SelectedBlockTools( {
 	clientId,
 	rootClientId,
-	isEmptyDefaultBlock,
 	isFixed,
+	isInsertionPointVisible,
 	capturingClientId,
+	showEmptyBlockSideInserter,
+	shouldShowBreadcrumb,
+	lastClientId,
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const instanceId = useInstanceId( SelectedBlockTools );
 	const descriptionId = `block-editor-block-contextual-toolbar--${ instanceId }`;
-	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
-		selector,
-		[]
-	);
 
-	const isInsertionPointVisible = useSelect(
-		( select ) => {
-			const {
-				isBlockInsertionPointVisible,
-				getBlockInsertionPoint,
-				getBlockOrder,
-			} = select( blockEditorStore );
-
-			if ( ! isBlockInsertionPointVisible() ) {
-				return false;
-			}
-
-			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
-			return order[ insertionPoint.index ] === clientId;
-		},
-		[ clientId ]
-	);
 	const isToolbarForced = useRef( false );
 	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
 		useShouldContextualToolbarShow();
 
 	const { stopTyping } = useDispatch( blockEditorStore );
-
-	const showEmptyBlockSideInserter =
-		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
-	const shouldShowBreadcrumb =
-		! hasMultiSelection &&
-		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
@@ -221,50 +178,78 @@ function SelectedBlockTools( {
 	return null;
 }
 
-function wrapperSelector( select ) {
-	const {
-		getSelectedBlockClientId,
-		getFirstMultiSelectedBlockClientId,
-		getBlockRootClientId,
-		getBlock,
-		getBlockParents,
-		__experimentalGetBlockListSettingsForBlocks,
-	} = select( blockEditorStore );
-
-	const clientId =
-		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-	if ( ! clientId ) {
-		return;
-	}
-
-	const { name, attributes = {} } = getBlock( clientId ) || {};
-	const blockParentsClientIds = getBlockParents( clientId );
-
-	// Get Block List Settings for all ancestors of the current Block clientId.
-	const parentBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
-		blockParentsClientIds
-	);
-
-	// Get the clientId of the topmost parent with the capture toolbars setting.
-	const capturingClientId = blockParentsClientIds.find(
-		( parentClientId ) =>
-			parentBlockListSettings[ parentClientId ]
-				?.__experimentalCaptureToolbars
-	);
-
-	return {
-		clientId,
-		rootClientId: getBlockRootClientId( clientId ),
-		name,
-		isEmptyDefaultBlock:
-			name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		capturingClientId,
-	};
-}
-
 export default function WrappedSelectedBlockTools( { isFixed } ) {
-	const selected = useSelect( wrapperSelector, [] );
+	const selected = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getFirstMultiSelectedBlockClientId,
+			getBlockRootClientId,
+			getBlock,
+			getBlockParents,
+			__experimentalGetBlockListSettingsForBlocks,
+			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
+			getBlockOrder,
+			__unstableGetEditorMode, // showEmptyBlockSideInserter start
+			hasMultiSelection,
+			isTyping,
+			getLastMultiSelectedBlockClientId, // showEmptyBlockSideInserter end
+		} = select( blockEditorStore );
+
+		const clientId =
+			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+		if ( ! clientId ) {
+			return;
+		}
+
+		const { name, attributes = {} } = getBlock( clientId ) || {};
+		const blockParentsClientIds = getBlockParents( clientId );
+
+		// Get Block List Settings for all ancestors of the current Block clientId.
+		const parentBlockListSettings =
+			__experimentalGetBlockListSettingsForBlocks(
+				blockParentsClientIds
+			);
+
+		// Get the clientId of the topmost parent with the capture toolbars setting.
+		const capturingClientId = blockParentsClientIds.find(
+			( parentClientId ) =>
+				parentBlockListSettings[ parentClientId ]
+					?.__experimentalCaptureToolbars
+		);
+
+		let isInsertionPointVisible = false;
+
+		if ( isBlockInsertionPointVisible() ) {
+			const insertionPoint = getBlockInsertionPoint();
+			const order = getBlockOrder( insertionPoint.rootClientId );
+			isInsertionPointVisible =
+				order[ insertionPoint.index ] === clientId;
+		}
+
+		const isEmptyDefaultBlock =
+			name && isUnmodifiedDefaultBlock( { name, attributes } );
+		const editorMode = __unstableGetEditorMode();
+
+		return {
+			clientId,
+			rootClientId: getBlockRootClientId( clientId ),
+			name,
+			capturingClientId,
+			isInsertionPointVisible,
+			shouldShowBreadcrumb:
+				! hasMultiSelection() &&
+				( editorMode === 'navigation' || editorMode === 'zoom-out' ),
+			showEmptyBlockSideInserter:
+				! isTyping() &&
+				__unstableGetEditorMode() === 'edit' &&
+				isEmptyDefaultBlock,
+			lastClientId: hasMultiSelection()
+				? getLastMultiSelectedBlockClientId()
+				: null,
+		};
+	}, [] );
 
 	if ( ! selected ) {
 		return null;
@@ -274,8 +259,11 @@ export default function WrappedSelectedBlockTools( { isFixed } ) {
 		clientId,
 		rootClientId,
 		name,
-		isEmptyDefaultBlock,
 		capturingClientId,
+		isInsertionPointVisible,
+		lastClientId,
+		showEmptyBlockSideInserter,
+		shouldShowBreadcrumb,
 	} = selected;
 
 	if ( ! name ) {
@@ -286,9 +274,12 @@ export default function WrappedSelectedBlockTools( { isFixed } ) {
 		<SelectedBlockTools
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			isEmptyDefaultBlock={ isEmptyDefaultBlock }
-			isFixed={ isFixed }
 			capturingClientId={ capturingClientId }
+			isInsertionPointVisible={ isInsertionPointVisible }
+			isFixed={ isFixed }
+			lastClientId={ lastClientId }
+			showEmptyBlockSideInserter={ showEmptyBlockSideInserter }
+			shouldShowBreadcrumb={ shouldShowBreadcrumb }
 		/>
 	);
 }
