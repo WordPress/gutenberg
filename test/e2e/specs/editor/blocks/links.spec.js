@@ -375,11 +375,13 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		requestUtils,
 	} ) => {
-		// Todo - do this work via REST API not manually.
 		const titleText = 'Test post escape';
-		await admin.createNewPost( { title: titleText } );
-		await editor.publishPost();
+		await requestUtils.createPost( {
+			title: titleText,
+			status: 'publish',
+		} );
 
 		await admin.createNewPost();
 
