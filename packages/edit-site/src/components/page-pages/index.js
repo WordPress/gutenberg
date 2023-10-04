@@ -66,7 +66,7 @@ export default function PagePages() {
 			reset,
 		]
 	);
-	const { records, isResolving: isLoading } = useEntityRecords(
+	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
 		queryArgs
@@ -161,8 +161,8 @@ export default function PagePages() {
 		<Page title={ __( 'Pages' ) }>
 			<DataViews
 				paginationInfo={ paginationInfo }
-				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoading }
+				data={ pages || EMPTY_ARRAY }
+				isLoading={ isLoadingPages }
 				fields={ fields }
 				options={ {
 					manualSorting: true,
