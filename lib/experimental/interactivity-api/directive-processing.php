@@ -7,6 +7,9 @@
  * @subpackage Interactivity API
  */
 
+global $do_block_calls;
+$do_block_calls = 0;
+
 /**
  * Process directives in each block.
  *
@@ -16,23 +19,31 @@
  * @return string Filtered block content.
  */
 function gutenberg_interactivity_process_directives_in_root_blocks( $block_content, $block ) {
-	// Don't process inner blocks or root blocks that don't contain directives.
-	if ( ! WP_Directive_Processor::is_root_block( $block ) || strpos( $block_content, 'data-wp-' ) === false ) {
-		return $block_content;
+	global $do_block_calls;
+
+	if ( WP_Directive_Processor::is_root_block( $block ) ) {
+
+		if ( $do_block_calls === 1 ) {
+			$directives = array(
+				'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+				'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+				'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+				'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+				'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+			);
+
+			$tags = new WP_Directive_Processor( $block_content );
+			$tags = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
+
+			$do_block_calls -= 1;
+
+			return $tags->get_updated_html();
+		} else {
+			$do_block_calls -= 1;
+		}
 	}
 
-	// TODO: Add some directive/components registration mechanism.
-	$directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-	);
-
-	$tags = new WP_Directive_Processor( $block_content );
-	$tags = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
-	return $tags->get_updated_html();
+	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_blocks', 10, 2 );
 
@@ -47,9 +58,13 @@ add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_
  * @return array The parsed block.
  */
 function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
+	global $do_block_calls;
+
 	if ( ! isset( $parent_block ) ) {
 		WP_Directive_Processor::add_root_block( $parsed_block );
+		$do_block_calls += 1;
 	}
+
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10, 3 );
