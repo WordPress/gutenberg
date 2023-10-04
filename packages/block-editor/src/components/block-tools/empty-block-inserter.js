@@ -9,15 +9,18 @@ import classnames from 'classnames';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
+import useSelectedBlockToolProps from './use-selected-block-tool-props';
 
 export default function EmptyBlockInserter( {
 	clientId,
-	rootClientId,
-	lastClientId,
-	isInsertionPointVisible,
-	capturingClientId,
 	__unstableContentRef,
 } ) {
+	const {
+		capturingClientId,
+		isInsertionPointVisible,
+		lastClientId,
+		rootClientId,
+	} = useSelectedBlockToolProps( clientId );
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
@@ -26,7 +29,6 @@ export default function EmptyBlockInserter( {
 	return (
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
-			__unstableCoverTarget
 			bottomClientId={ lastClientId }
 			className={ classnames(
 				'block-editor-block-list__block-side-inserter-popover',

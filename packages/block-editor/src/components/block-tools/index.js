@@ -2,9 +2,14 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Popover } from '@wordpress/components';
+import {
+	Popover,
+	Fill,
+	__experimentalUseSlot as useSlot,
+} from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,17 +18,36 @@ import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
+import EmptyBlockInserter from './empty-block-inserter';
+import SelectedBlockTools from './selected-block-tools';
 
 function selector( select ) {
-	const { __unstableGetEditorMode, isTyping } = select( blockEditorStore );
+	const {
+		getSelectedBlockClientId,
+		getFirstMultiSelectedBlockClientId,
+		getBlock,
+		__unstableGetEditorMode,
+		isTyping,
+	} = select( blockEditorStore );
+
+	const clientId =
+		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+	const { name = '', attributes = {} } = getBlock( clientId ) || {};
 
 	return {
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		clientId,
+		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
+		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		showEmptyBlockSideInserter:
+			clientId &&
+			! isTyping() &&
+			__unstableGetEditorMode() === 'edit' &&
+			isUnmodifiedDefaultBlock( { name, attributes } ),
 	};
 }
 
@@ -41,10 +65,23 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { isZoomOutMode, isTyping } = useSelect( selector, [] );
+	const {
+		clientId,
+		hasSelectedBlock,
+		isTyping,
+		isZoomOutMode,
+		showEmptyBlockSideInserter,
+	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
+
+	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
+
+	// TODO: Import this from somewhere so it can be used in the post editor and site editor headers consistently.
+	const selectedBlockToolsSlotName = '__experimentalSelectedBlockTools';
+	const blockToolsSlot = useSlot( selectedBlockToolsSlotName );
+
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -129,10 +166,47 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
+				{ showEmptyBlockSideInserter && (
+					<EmptyBlockInserter
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
 
-				<SelectedBlockPopover
-					__unstableContentRef={ __unstableContentRef }
-				/>
+				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
+				{ blockToolsSlot?.ref?.current ? (
+					<Fill name="__experimentalSelectedBlockTools">
+						{ hasSelectedBlock && (
+							<SelectedBlockTools
+								clientId={ clientId }
+								showEmptyBlockSideInserter={
+									showEmptyBlockSideInserter
+								}
+							/>
+						) }
+						{ /* Used for the inline rich text toolbar. */ }
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					</Fill>
+				) : (
+					<>
+						{ hasSelectedBlock && (
+							<SelectedBlockTools
+								clientId={ clientId }
+								showEmptyBlockSideInserter={
+									showEmptyBlockSideInserter
+								}
+							/>
+						) }
+						{ /* Used for the inline rich text toolbar. */ }
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					</>
+				) }
 
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
