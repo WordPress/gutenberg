@@ -135,7 +135,12 @@ export default function SelectedBlockPopover( { __unstableContentRef } ) {
 		<>
 			{ showEmptyBlockSideInserter && (
 				<EmptyBlockInserter
+					clientId={ clientId }
+					rootClientId={ rootClientId }
+					isInsertionPointVisible={ isInsertionPointVisible }
+					capturingClientId={ capturingClientId }
 					__unstableContentRef={ __unstableContentRef }
+					lastClientId={ lastClientId }
 				/>
 			) }
 
