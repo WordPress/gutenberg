@@ -47,7 +47,7 @@ import WidthHeightTool from './width-height-tool';
  *
  * @param {DimensionsControlsProps} props The component props.
  *
- * @return {WPElement} The dimensions controls.
+ * @return {Element} The dimensions controls.
  */
 function DimensionsTool( {
 	panelId,

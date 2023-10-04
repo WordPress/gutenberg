@@ -91,11 +91,11 @@ export function ExperimentalBlockCanvas( {
  * }
  * ```
  *
- * @param {Object}    props          Component props.
- * @param {string}    props.height   Canvas height, defaults to 300px.
- * @param {Array}     props.styles   Content styles to inject into the iframe.
- * @param {WPElement} props.children Content of the canvas, defaults to the BlockList component.
- * @return {WPElement}               Block Breadcrumb.
+ * @param {Object}  props          Component props.
+ * @param {string}  props.height   Canvas height, defaults to 300px.
+ * @param {Array}   props.styles   Content styles to inject into the iframe.
+ * @param {Element} props.children Content of the canvas, defaults to the BlockList component.
+ * @return {Element}               Block Breadcrumb.
  */
 function BlockCanvas( { children, height, styles } ) {
 	return (

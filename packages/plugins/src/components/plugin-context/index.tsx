@@ -38,7 +38,7 @@ export function usePluginContext() {
  *                           expected to return object of props to
  *                           merge with the component's own props.
  *
- * @return {WPComponent} Enhanced component with injected context as props.
+ * @return {Component} Enhanced component with injected context as props.
  */
 export const withPluginContext = (
 	mapContextToProps: < T >(

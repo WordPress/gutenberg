@@ -94,7 +94,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.RichText, {
+		return React.createElement( wp.editor.RichText, {
 			tagName: 'h2',
 			className: props.className,
 			value: props.attributes.content,
@@ -105,7 +105,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( wp.editor.RichText.Content, {
+		return React.createElement( wp.editor.RichText.Content, {
 			tagName: 'h2', value: props.attributes.content
 		} );
 	}
@@ -160,7 +160,7 @@ Slot to extend the format toolbar. Use it in the edit function of a `registerFor
 wp.richText.registerFormatType( /* ... */, {
 	/* ... */
 	edit: function( props ) {
-		return wp.element.createElement(
+		return React.createElement(
 			wp.editor.RichTextToolbarButton, {
 				icon: 'editor-code',
 				title: 'My formatting button',
