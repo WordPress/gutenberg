@@ -52,7 +52,13 @@ const config = defineConfig( {
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices[ 'Desktop Chrome' ] },
+			use: {
+				...devices[ 'Desktop Chrome' ],
+				contextOptions: {
+					// Chromium-specific permissions for clipboard read/write.
+					permissions: [ 'clipboard-read', 'clipboard-write' ],
+				},
+			},
 		},
 	],
 } );

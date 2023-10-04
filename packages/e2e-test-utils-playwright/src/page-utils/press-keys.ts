@@ -38,7 +38,7 @@ let clipboardDataHolder: {
  * @param clipboardData.plainText
  * @param clipboardData.html
  */
-export function setClipboardData(
+export async function setClipboardData(
 	this: PageUtils,
 	{ plainText = '', html = '' }
 ) {
@@ -47,14 +47,25 @@ export function setClipboardData(
 		'text/html': html,
 		'rich-text': '',
 	};
+	await this.page.evaluate(
+		async ( data ) => {
+			const items: Record< string, Blob > = {};
+			for ( const [ type, text ] of Object.entries( data ) ) {
+				items[ type ] = new Blob( [ text ], { type } );
+			}
+			await navigator.clipboard.write( [ new ClipboardItem( items ) ] );
+		},
+		{ 'text/plain': plainText, 'text/html': html }
+	);
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	clipboardDataHolder = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const canvasDoc =
-				// @ts-ignore
-				document.activeElement?.contentDocument ?? document;
+				document.activeElement instanceof HTMLIFrameElement
+					? document.activeElement.contentDocument!
+					: document;
 			const clipboardDataTransfer = new DataTransfer();
 
 			if ( _type === 'paste' ) {
@@ -71,7 +82,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					_clipboardData[ 'rich-text' ]
 				);
 			} else {
-				const selection = canvasDoc.defaultView.getSelection()!;
+				const selection = canvasDoc.defaultView!.getSelection()!;
 				const plainText = selection.toString();
 				let html = plainText;
 				if ( selection.rangeCount ) {
@@ -152,29 +163,40 @@ export async function pressKeys(
 		this.page
 	);
 
-	let command: () => Promise< void >;
+	const keys = key.split( '+' ).flatMap( ( keyCode ) => {
+		if ( Object.prototype.hasOwnProperty.call( modifiers, keyCode ) ) {
+			return modifiers[ keyCode as keyof typeof modifiers ](
+				isAppleOS
+			).map( ( modifier ) =>
+				modifier === CTRL ? 'Control' : capitalCase( modifier )
+			);
+		} else if ( keyCode === 'Tab' && ! hasNaturalTabNavigation ) {
+			return [ 'Alt', 'Tab' ];
+		}
+		return keyCode;
+	} );
+	const normalizedKeys = keys.join( '+' );
+
+	let command = () => this.page.keyboard.press( normalizedKeys );
 
 	if ( key.toLowerCase() === 'primary+c' ) {
 		command = () => emulateClipboard( this.page, 'copy' );
 	} else if ( key.toLowerCase() === 'primary+x' ) {
 		command = () => emulateClipboard( this.page, 'cut' );
 	} else if ( key.toLowerCase() === 'primary+v' ) {
-		command = () => emulateClipboard( this.page, 'paste' );
-	} else {
-		const keys = key.split( '+' ).flatMap( ( keyCode ) => {
-			if ( Object.prototype.hasOwnProperty.call( modifiers, keyCode ) ) {
-				return modifiers[ keyCode as keyof typeof modifiers ](
-					isAppleOS
-				).map( ( modifier ) =>
-					modifier === CTRL ? 'Control' : capitalCase( modifier )
-				);
-			} else if ( keyCode === 'Tab' && ! hasNaturalTabNavigation ) {
-				return [ 'Alt', 'Tab' ];
-			}
-			return keyCode;
-		} );
-		const normalizedKeys = keys.join( '+' );
-		command = () => this.page.keyboard.press( normalizedKeys );
+		command = async () => {
+			/**
+			 * Do both the emulation and the actual key press for pasting.
+			 * If the element has a `paste` event handler that calls `event.preventDefault()`,
+			 * the `primary+v` key press will not work and be ignored.
+			 * On the other hand, if the element doesn't have a `paste` event handler,
+			 * then the clipboard emulation will not work and be ignored.
+			 * This doesn't work in *all* cases, but it works in most cases we support.
+			 * (The order matters here for unknown reasons.)
+			 */
+			await emulateClipboard( this.page, 'paste' );
+			await this.page.keyboard.press( normalizedKeys );
+		};
 	}
 
 	times = times ?? 1;
@@ -182,6 +204,8 @@ export async function pressKeys(
 		await command();
 
 		if ( times > 1 && pressOptions.delay ) {
+			// Disable reason: We explicitly want to wait for a specific amount of time.
+			// eslint-disable-next-line playwright/no-wait-for-timeout
 			await this.page.waitForTimeout( pressOptions.delay );
 		}
 	}
