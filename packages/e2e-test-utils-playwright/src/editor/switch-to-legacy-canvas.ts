@@ -9,16 +9,13 @@ import type { Editor } from './index';
  * @param this
  */
 export async function switchToLegacyCanvas( this: Editor ) {
-	await this.page.waitForFunction( () => {
-		if ( ! window?.wp?.blocks?.registerBlockType ) {
-			return false;
-		}
+	await this.page.waitForFunction( () => window?.wp?.blocks );
+
+	await this.page.evaluate( () => {
 		window.wp.blocks.registerBlockType( 'test/v2', {
 			apiVersion: '2',
 			title: 'test',
 		} );
-
-		return true;
 	} );
 
 	this.useLegacyCanvas = true;
