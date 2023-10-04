@@ -40,24 +40,18 @@
 
 	@keyframes wp-block-post-template__fade-out {
 		0% {
-			transform: translateX(0);
 			opacity: 1;
 		}
-
 		100% {
-			transform: translateX(-5px);
-			opacity: 0.7;
+			opacity: 0.3;
 		}
 	}
 
 	@keyframes wp-block-post-template__fade-in {
 		0% {
-			transform: translateX(5px);
-			opacity: 0.7;
+			opacity: 0.3;
 		}
-
 		100% {
-			transform: translateX(0);
 			opacity: 1;
 		}
 	}
@@ -67,17 +61,5 @@
 	// Temporary specificity bump until "wp-container" layout specificity is revisited.
 	.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid {
 		grid-template-columns: 1fr;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.wp-block-post-template {
-		&.fade-in,
-		&.fade-out {
-			transition-duration: 0s;
-			transition-delay: 0s;
-			animation-duration: 1ms;
-			animation-delay: -1ms;
-		}
 	}
 }
