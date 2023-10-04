@@ -30,12 +30,10 @@ test.describe( 'iframed masonry block', () => {
 		} );
 		await expect( masonry ).toBeVisible();
 
-		const masonryHeight = await masonry.evaluate( ( node ) =>
-			parseInt( node.style.height, 10 )
-		);
+		const masonryBox = await masonry.boundingBox();
 
 		// Expect Masonry to set a non-zero height.
-		expect( masonryHeight ).toBeGreaterThan( 0 );
+		expect( masonryBox.height ).toBeGreaterThan( 0 );
 
 		// Expect Masonry to absolute position items.
 		await expect( masonry.locator( '.grid-item' ).first() ).toHaveCSS(
