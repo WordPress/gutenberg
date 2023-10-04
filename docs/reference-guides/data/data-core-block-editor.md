@@ -590,7 +590,7 @@ _Properties_
 
 ### getLastFocus
 
-Returns the element of the last element that had focus when focus left the editor canvas.
+Returns the last element that had focus when focus left the editor canvas.
 
 _Parameters_
 
