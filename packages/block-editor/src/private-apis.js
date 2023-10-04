@@ -24,6 +24,7 @@ import {
 } from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
+import { useBlockCanvasContext as experimentalUseBlockCanvasContext } from './components/block-canvas/context';
 import { getDuotoneFilter } from './components/duotone/utils';
 
 /**
@@ -33,6 +34,7 @@ export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockCanvas,
+	experimentalUseBlockCanvasContext,
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,

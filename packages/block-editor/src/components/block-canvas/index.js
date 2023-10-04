@@ -13,6 +13,7 @@ import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useClipboardHandler } from '../copy-handler';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useBlockCanvasContext } from './context';
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -30,6 +31,8 @@ export function ExperimentalBlockCanvas( {
 		contentRefProp,
 		clearerRef,
 	] );
+
+	const { disableInteractions } = useBlockCanvasContext();
 
 	if ( ! shouldIframe ) {
 		return (
@@ -58,6 +61,7 @@ export function ExperimentalBlockCanvas( {
 			style={ {
 				width: '100%',
 				height,
+				pointerEvents: disableInteractions ? 'none' : '',
 				...iframeProps?.style,
 			} }
 			name="editor-canvas"

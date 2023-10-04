@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import { BlockCanvasContextProvider } from '../block-canvas/context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -47,7 +48,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		return (
 			<SlotFillProvider>
 				<KeyboardShortcuts.Register />
-				<BlockRefsProvider>{ children }</BlockRefsProvider>
+				<BlockRefsProvider>
+					<BlockCanvasContextProvider>
+						{ children }
+					</BlockCanvasContextProvider>
+				</BlockRefsProvider>
 			</SlotFillProvider>
 		);
 	}

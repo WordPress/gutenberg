@@ -72,6 +72,7 @@ function EditorCanvas( {
 	};
 
 	return (
+		// Site editor
 		<BlockCanvas
 			height="100%"
 			iframeProps={ {

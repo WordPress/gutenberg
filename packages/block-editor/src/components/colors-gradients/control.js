@@ -19,6 +19,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../use-setting';
+import { useBlockCanvasContext } from '../block-canvas/context';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -64,6 +65,8 @@ function ColorGradientControlInner( {
 		onGradientChange &&
 		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
 
+	const { setDisableInteractions } = useBlockCanvasContext();
+
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
 	}
@@ -87,6 +90,8 @@ function ColorGradientControlInner( {
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
 				headingLevel={ headingLevel }
+				onPickerDragStart={ () => setDisableInteractions( true ) }
+				onPickerDragEnd={ () => setDisableInteractions( false ) }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (
