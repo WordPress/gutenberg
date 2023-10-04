@@ -173,6 +173,10 @@
 	backdrop-filter: blur(100px);
 	background-color: transparent;
 
+	// Fix a flickering that happens in the blur when transforms are applied.
+	margin: 1px;
+	width: auto;
+
 	// This appears to fix an occasional Chrome bug where the blurred background would have an incorrect color.
 	backface-visibility: hidden;
 
