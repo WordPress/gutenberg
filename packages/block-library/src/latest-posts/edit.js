@@ -483,18 +483,27 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.split( ' ', excerptLength )
 								.join( ' ' ) }
 							{ createInterpolateElement(
-								/* translators: excerpt truncation character, default …  */
-								__( ' … <a>Read more</a>' ),
+								sprintf(
+									/* translators: accessibility text. %s: trimmed post title. */
+									__(
+										'… <a>Read more <span>of %s</span></a>'
+									),
+									titleTrimmed
+								),
 								{
 									a: (
 										// eslint-disable-next-line jsx-a11y/anchor-has-content
 										<a
+											className="wp-block-latest-posts__read-more"
 											href={ post.link }
 											rel="noopener noreferrer"
 											onClick={
 												showRedirectionPreventedNotice
 											}
 										/>
+									),
+									span: (
+										<span className="screen-reader-text" />
 									),
 								}
 							) }
