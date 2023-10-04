@@ -111,7 +111,7 @@ export function useInputAndSelection( props ) {
 
 				handleChange( change );
 			},
-			50,
+			1,
 			{ leading: true, trailing: false }
 		);
 
