@@ -14,7 +14,8 @@ import useClipboardHandler from '../writing-flow/use-clipboard-handler';
 export const __unstableUseClipboardHandler = () => {
 	deprecated( '__unstableUseClipboardHandler', {
 		alternative: 'BlockCanvas or WritingFlow',
-		version: '6.4',
+		since: '6.4',
+		version: '6.7',
 	} );
 	return useClipboardHandler();
 };
@@ -26,7 +27,8 @@ export const __unstableUseClipboardHandler = () => {
 export default function CopyHandler( props ) {
 	deprecated( 'CopyHandler', {
 		alternative: 'BlockCanvas or WritingFlow',
-		version: '6.4',
+		since: '6.4',
+		version: '6.7',
 	} );
 	return <div { ...props } ref={ useClipboardHandler() } />;
 }
