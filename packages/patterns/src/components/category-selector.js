@@ -56,7 +56,7 @@ export default function CategorySelector( {
 			suggestions={ suggestions }
 			onChange={ handleChange }
 			onInputChange={ debouncedSearch }
-			label={ __( 'Category' ) }
+			label={ __( 'Categories' ) }
 			tokenizeOnBlur={ true }
 			__experimentalExpandOnFocus={ true }
 		/>
