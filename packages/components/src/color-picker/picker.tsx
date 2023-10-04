@@ -72,6 +72,7 @@ export const Picker = ( {
 
 			// Make sure that we don't get stuck with the iframe without pointer events
 			// if the component unmounts
+			// Idea: timeout in the `onChange` function?
 		};
 	}, [ onDragStart, onDragEnd ] );
 
