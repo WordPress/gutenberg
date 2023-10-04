@@ -9,7 +9,7 @@ import * as Ariakit from '@ariakit/react';
  * Internal dependencies
  */
 import { COLORS } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { reduceMotion } from '../utils/reduce-motion';
 
 export const TabListWrapper = styled.div`
