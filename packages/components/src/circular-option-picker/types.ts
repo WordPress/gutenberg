@@ -126,7 +126,5 @@ export type OptionProps = Omit<
 export type CircularOptionPickerCompositeStore = CompositeStore;
 export type CircularOptionPickerContextProps = {
 	baseId?: string;
-} & (
-	| { isComposite?: false }
-	| ( { isComposite: true } & CircularOptionPickerCompositeStore )
-);
+	compositeStore?: CircularOptionPickerCompositeStore;
+};

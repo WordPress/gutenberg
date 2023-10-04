@@ -18,11 +18,7 @@ import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { CompositeItem } from '../composite/v2';
 import Tooltip from '../tooltip';
-import type {
-	OptionProps,
-	CircularOptionPickerCompositeStore,
-	CircularOptionPickerContextProps,
-} from './types';
+import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
 
 function UnforwardedOptionAsButton(
 	props: {
@@ -49,19 +45,15 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
-		context: CircularOptionPickerContextProps;
+		compositeStore: CircularOptionPickerCompositeStore;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { id, isSelected, context, ...additionalProps } = props;
-	const { isComposite, baseId, ..._compositeStore } = context;
-	const compositeStore =
-		_compositeStore as CircularOptionPickerCompositeStore;
-	const { setActiveId } = compositeStore;
+	const { id, isSelected, compositeStore, ...additionalProps } = props;
 	const activeId = compositeStore.useState( 'activeId' );
 
 	if ( isSelected && ! activeId ) {
-		setActiveId( id );
+		compositeStore.setActiveId( id );
 	}
 
 	return (
@@ -89,8 +81,9 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const compositeContext = useContext( CircularOptionPickerContext );
-	const { isComposite, baseId } = compositeContext;
+	const { baseId, compositeStore } = useContext(
+		CircularOptionPickerContext
+	);
 	const id = useInstanceId(
 		Option,
 		baseId || 'components-circular-option-picker__option'
@@ -102,10 +95,10 @@ export function Option( {
 		...additionalProps,
 	};
 
-	const optionControl = isComposite ? (
+	const optionControl = compositeStore ? (
 		<OptionAsOption
 			{ ...commonProps }
-			context={ compositeContext }
+			compositeStore={ compositeStore }
 			isSelected={ isSelected }
 		/>
 	) : (
