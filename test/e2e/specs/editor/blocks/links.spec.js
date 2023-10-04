@@ -39,7 +39,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+K' );
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
-		await page.keyboard.type( titleText.substr( 0, titleText.length - 2 ) );
+		await page.keyboard.type( 'Post to create a' );
 		await page.getByRole( 'option', { name: titleText } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
