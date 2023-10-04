@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # RichText and Format Library
 
-Several block types (like paragraph, heading and more) allow users to type and mainpulate rich text content. In order to do so, they use the `RichText` component and the `@wordpress/rich-text` package.
+Several block types (like paragraph, heading, and more) allow users to type and manipulate rich text content. In order to do so, they use the `RichText` component and the `@wordpress/rich-text` package.
 
 The `RichText` component is a wrapper around the `@wordpress/rich-text` package that provides a React-friendly API to manipulate rich text content. It allows the user to add and apply formats to the text content.
 
