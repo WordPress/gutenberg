@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { useContext } from '@wordpress/element';
+import { useContext, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,7 +12,10 @@ import warning from '@wordpress/warning';
 import { TabsContext } from './context';
 import { Tab as StyledTab } from './styles';
 
-function Tab( { children, id, className, disabled, render, style }: TabProps ) {
+export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
+	{ children, id, className, disabled, render, style },
+	ref
+) {
 	const context = useContext( TabsContext );
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
@@ -22,6 +25,7 @@ function Tab( { children, id, className, disabled, render, style }: TabProps ) {
 	const instancedTabId = `${ instanceId }-${ id }`;
 	return (
 		<StyledTab
+			ref={ ref }
 			store={ store }
 			id={ instancedTabId }
 			className={ className }
@@ -32,6 +36,4 @@ function Tab( { children, id, className, disabled, render, style }: TabProps ) {
 			{ children }
 		</StyledTab>
 	);
-}
-
-export default Tab;
+} );

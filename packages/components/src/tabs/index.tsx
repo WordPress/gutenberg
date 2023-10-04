@@ -15,9 +15,9 @@ import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import type { TabsProps } from './types';
 import { TabsContext } from './context';
-import Tab from './tab';
-import TabList from './tablist';
-import TabPanel from './tabpanel';
+import { Tab } from './tab';
+import { TabList } from './tablist';
+import { TabPanel } from './tabpanel';
 
 function Tabs( {
 	selectOnMove = true,
