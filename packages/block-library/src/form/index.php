@@ -201,6 +201,9 @@ add_action( 'wp', 'block_core_form_privacy_form' );
  * Registers the `core/form` block on server.
  */
 function register_block_core_form() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return;
+	}
 	register_block_type_from_metadata(
 		__DIR__ . '/form',
 		array(

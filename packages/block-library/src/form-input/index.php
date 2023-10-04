@@ -32,6 +32,9 @@ function render_block_core_form_input( $attributes, $content ) {
  * Registers the `core/form-input` block on server.
  */
 function register_block_core_form_input() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return;
+	}
 	register_block_type_from_metadata(
 		__DIR__ . '/form-input',
 		array(

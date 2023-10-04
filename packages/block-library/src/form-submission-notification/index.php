@@ -35,6 +35,9 @@ function render_block_core_form_submission_notification( $attributes, $content )
  * Registers the `core/form-submission-notification` block on server.
  */
 function register_block_core_form_submission_notification() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return;
+	}
 	register_block_type_from_metadata(
 		__DIR__ . '/form-submission-notification',
 		array(
