@@ -15,7 +15,6 @@ import { useState } from '@wordpress/element';
  */
 import Tabs from '..';
 import type { TabsProps } from '../types';
-import cleanupTooltip from '../../tooltip/test/utils';
 import type { IconType } from '../../icon';
 
 type Tab = {
@@ -75,7 +74,6 @@ const UncontrolledTabs = ( {
 					<Tabs.Tab
 						key={ tabObj.id }
 						id={ tabObj.id }
-						title={ tabObj.title }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
 						icon={ showTabIcons ? tabObj.tab.icon : undefined }
@@ -119,7 +117,6 @@ const ControlledTabs = ( {
 					<Tabs.Tab
 						key={ tabObj.id }
 						id={ tabObj.id }
-						title={ tabObj.title }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
 						icon={ showTabIcons ? tabObj.tab.icon : undefined }
@@ -185,85 +182,6 @@ describe( 'Tabs', () => {
 				'aria-labelledby',
 				allTabs[ 0 ].getAttribute( 'id' )
 			);
-		} );
-
-		it( 'should display a tooltip when hovering tabs provided with an icon', async () => {
-			const user = userEvent.setup();
-
-			render( <UncontrolledTabs tabs={ TABS } showTabIcons /> );
-			const allTabs = screen.getAllByRole( 'tab' );
-
-			for ( let i = 0; i < allTabs.length; i++ ) {
-				expect(
-					screen.queryByText( TABS[ i ].title )
-				).not.toBeInTheDocument();
-
-				await user.hover( allTabs[ i ] );
-
-				await waitFor( () =>
-					expect( screen.getByText( TABS[ i ].title ) ).toBeVisible()
-				);
-
-				await user.unhover( allTabs[ i ] );
-			}
-
-			await cleanupTooltip( user );
-		} );
-
-		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
-			const user = userEvent.setup();
-
-			const mockOnSelect = jest.fn();
-
-			render(
-				<UncontrolledTabs
-					tabs={ TABS }
-					showTabIcons
-					onSelect={ mockOnSelect }
-				/>
-			);
-
-			expect( await getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
-			expect( await getSelectedTab() ).not.toHaveFocus();
-
-			// Tab to focus the tablist. Make sure alpha is focused, and that the
-			// corresponding tooltip is shown.
-			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
-			await user.keyboard( '[Tab]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
-			expect( await getSelectedTab() ).toHaveFocus();
-
-			// Move selection with arrow keys. Make sure beta is focused, and that
-			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
-			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
-			expect( await getSelectedTab() ).toHaveFocus();
-
-			// Move selection with arrow keys. Make sure gamma is focused, and that
-			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
-			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
-			expect( await getSelectedTab() ).toHaveFocus();
-
-			// Move selection with arrow keys. Make sure beta is focused, and that
-			// the corresponding tooltip is shown.
-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
-			await user.keyboard( '[ArrowLeft]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
-			expect( await getSelectedTab() ).toHaveFocus();
-
-			await cleanupTooltip( user );
 		} );
 	} );
 

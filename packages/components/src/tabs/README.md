@@ -177,12 +177,6 @@ The id of the tab, which is prepended with the `Tabs` instance ID.
 
 - Required: Yes
 
-###### `title`: `string`
-
-The label for the tab.
-
-- Required: Yes
-
 ###### `style`: `React.CSSProperties`
 
 Custom CSS styles for the tab.
@@ -201,18 +195,18 @@ The class name to apply to the tab.
 
 - Required: No
 
-###### `icon`: `IconType`
-
-The icon used for the tab button.
-
-- Required: No
-
 ###### `disabled`: `boolean`
 
 Determines if the tab button should be disabled.
 
 - Required: No
 - Default: `false`
+
+###### `render`: `React.ReactNode`
+
+The type of component to render the tab button as. If this prop is not provided, the tab button will be rendered as a `button` element.
+
+- Required: No
 
 #### TabPanel
 

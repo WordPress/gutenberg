@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
-
-/**
  * WordPress dependencies
  */
 
@@ -16,17 +10,9 @@ import { useContext } from '@wordpress/element';
 import type { TabProps } from './types';
 import warning from '@wordpress/warning';
 import { TabsContext } from './context';
-import { TabButton } from './styles';
+import { Tab as StyledTab } from './styles';
 
-function Tab( {
-	children,
-	id,
-	className,
-	disabled,
-	icon,
-	title,
-	style,
-}: TabProps ) {
+function Tab( { children, id, className, disabled, render, style }: TabProps ) {
 	const context = useContext( TabsContext );
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
@@ -35,22 +21,16 @@ function Tab( {
 	const { store, instanceId } = context;
 	const instancedTabId = `${ instanceId }-${ id }`;
 	return (
-		<Ariakit.Tab
+		<StyledTab
 			store={ store }
 			id={ instancedTabId }
 			className={ className }
 			style={ style }
 			disabled={ disabled }
-			render={
-				<TabButton
-					icon={ icon }
-					label={ icon ? title : undefined }
-					showTooltip={ true }
-				/>
-			}
+			render={ render }
 		>
 			{ children }
-		</Ariakit.Tab>
+		</StyledTab>
 	);
 }
 

@@ -2,11 +2,12 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * Internal dependencies
  */
-import Button from '../button';
 import { COLORS } from '../utils';
 import { space } from '../ui/utils/space';
 import { reduceMotion } from '../utils/reduce-motion';
@@ -20,7 +21,7 @@ export const TabListWrapper = styled.div`
 	}
 `;
 
-export const TabButton = styled( Button )`
+export const Tab = styled( Ariakit.Tab )`
 	&& {
 		position: relative;
 		border-radius: 0;
@@ -32,6 +33,11 @@ export const TabButton = styled( Button )`
 		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
 		margin-left: 0;
 		font-weight: 500;
+
+		&[aria-disabled='true'] {
+			cursor: default;
+			opacity: 0.3;
+		}
 
 		&:focus:not( :disabled ) {
 			position: relative;

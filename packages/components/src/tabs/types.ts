@@ -94,10 +94,6 @@ export type TabProps = {
 	 */
 	id: string;
 	/**
-	 * The label for the tab.
-	 */
-	title: string;
-	/**
 	 * Custom CSS styles for the tab.
 	 */
 	style?: React.CSSProperties;
@@ -119,6 +115,11 @@ export type TabProps = {
 	 * @default false
 	 */
 	disabled?: boolean;
+	/**
+	 * The type of component to render the tab button as. If this prop is not
+	 * provided, the tab button will be rendered as a `button` element.
+	 */
+	render?: React.ReactElement;
 };
 
 export type TabPanelProps = {
