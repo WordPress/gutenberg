@@ -22,18 +22,21 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
+import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 export default function SelectedBlockTools( {
 	clientId,
-	rootClientId,
-	isFixed,
-	isInsertionPointVisible,
-	capturingClientId,
 	showEmptyBlockSideInserter,
-	shouldShowBreadcrumb,
-	lastClientId,
 } ) {
+	const {
+		capturingClientId,
+		isFixed,
+		isInsertionPointVisible,
+		lastClientId,
+		rootClientId,
+		shouldShowBreadcrumb,
+	} = useSelectedBlockToolProps( clientId );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const instanceId = useInstanceId( SelectedBlockTools );
 	const descriptionId = `block-editor-block-contextual-toolbar--${ instanceId }`;
