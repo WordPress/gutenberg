@@ -55,26 +55,28 @@ export default function CreatePatternModal( {
 	);
 
 	const categoryOptions = useMemo( () => {
-		// We need to store the name separately as this is used as the slug in the
-		// taxonomy and may vary from the label.
-		const categories = userPatternCategories.map( ( category ) => ( {
-			label: category.label,
-			value: category.label,
-			name: category.name,
-		} ) );
-
-		corePatternCategories.forEach( ( category ) => {
+		// Merge the user and core pattern categories and remove any duplicates.
+		const categories = [
+			...userPatternCategories,
+			...corePatternCategories,
+		].reduce( ( uniqueCategories, category ) => {
 			if (
-				! categories.find( ( cat ) => cat.label === category.label ) &&
+				! uniqueCategories.find(
+					( existingCategory ) =>
+						existingCategory.label === category.label
+				) &&
 				category.name !== 'query'
 			) {
-				categories.push( {
+				// We need to store the name separately as this is used as the slug in the
+				// taxonomy and may vary from the label.
+				uniqueCategories.push( {
 					label: category.label,
 					value: category.label,
 					name: category.name,
 				} );
 			}
-		} );
+			return uniqueCategories;
+		}, [] );
 
 		return categories.sort( ( a, b ) => a.label.localeCompare( b.label ) );
 	}, [ userPatternCategories, corePatternCategories ] );
