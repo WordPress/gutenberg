@@ -123,6 +123,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] Block Library': 'Block Library',
 	'[Package] Rich text': 'Block Editor',
 	'[Package] Data': 'Data Layer',
+	'[Package] Commands': 'Commands',
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
