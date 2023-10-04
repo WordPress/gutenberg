@@ -1,5 +1,5 @@
 <div class="callout callout-info">
-`wp-now` is still experimental. For a more comprehensive overview of their current status and roadmap, please check <a href="https://github.com/WordPress/wordpress-playground"> WordPress Playground's repository </a> and <a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now's</a>.
+<code>wp-now</code> is still experimental. For a more comprehensive overview of their current status and roadmap, please check <a href="https://github.com/WordPress/wordpress-playground"> WordPress Playground's repository </a> and <a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now's</a>.
 </div>
 
 # Get started with wp-now
