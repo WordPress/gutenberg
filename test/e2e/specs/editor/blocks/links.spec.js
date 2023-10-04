@@ -215,7 +215,12 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can edit existing links`, async ( { page, editor, pageUtils, LinkUtils } ) => {
+	test( `can edit existing links`, async ( {
+		page,
+		editor,
+		pageUtils,
+		LinkUtils,
+	} ) => {
 		await LinkUtils.createAndReselectLink();
 
 		// Click on the Edit button.
@@ -239,7 +244,11 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can remove existing links`, async ( { page, editor, LinkUtils } ) => {
+	test( `can remove existing links`, async ( {
+		page,
+		editor,
+		LinkUtils,
+	} ) => {
 		await LinkUtils.createAndReselectLink();
 
 		// Unlick via shortcut
@@ -293,7 +302,7 @@ test.describe( 'Links', () => {
 			.locator(
 				'.components-popover__content .block-editor-link-control'
 			);
-		await expect( popover ).not.toBeVisible();
+		await expect( popover ).toBeHidden();
 	} );
 
 	test( `allows Left to be pressed during creation in "Docked Toolbar" mode`, async ( {
@@ -328,7 +337,7 @@ test.describe( 'Links', () => {
 			.locator(
 				'.components-popover__content .block-editor-link-control'
 			);
-		await expect( popover ).not.toBeVisible();
+		await expect( popover ).toBeHidden();
 	} );
 
 	test( `can be edited when within a link but no selection has been made ("collapsed")`, async ( {
@@ -367,9 +376,11 @@ test.describe( 'Links', () => {
 		editor,
 		pageUtils,
 	} ) => {
+		// Todo - do this work via REST API not manually.
 		const titleText = 'Test post escape';
 		await admin.createNewPost( { title: titleText } );
-		const postId = await editor.publishPost();
+		await editor.publishPost();
+
 		await admin.createNewPost();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
@@ -394,9 +405,10 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( titleText );
 		await expect(
 			page.getByRole( 'option', {
-				name: titleText + ' localhost:8889/?p=' + postId + ' post',
+				name: `${ titleText } post`,
 			} )
 		).toBeVisible();
+
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the escape key to dismiss the popover when the autocomplete suggestion list is open.
@@ -405,7 +417,7 @@ test.describe( 'Links', () => {
 			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Confirm that selection is returned to where it was before launching
 		// the link editor, with "Gutenberg" as an uncollapsed selection.
@@ -436,7 +448,7 @@ test.describe( 'Links', () => {
 			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
@@ -457,7 +469,7 @@ test.describe( 'Links', () => {
 			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( `can be created and modified using only the keyboard once a link has been set`, async ( {
@@ -484,7 +496,7 @@ test.describe( 'Links', () => {
 			page.locator(
 				'.components-popover__content .block-editor-link-control'
 			)
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
@@ -499,7 +511,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'primary+K' );
 		const urlInput = page.getByPlaceholder( 'Search or type url' );
 		await urlInput.focus();
-		expect( await urlInput.inputValue() ).toBe( URL );
+		await expect( urlInput ).toHaveValue( URL );
 
 		// Confirm that submitting the input without any changes keeps the same
 		// value and moves focus back to the paragraph.
@@ -1084,7 +1096,7 @@ test.describe( 'Links', () => {
 				page.locator(
 					'.components-popover__content .block-editor-link-control'
 				)
-			).not.toBeVisible();
+			).toBeHidden();
 
 			// Cancel selection and move back within the Link.
 			await pageUtils.pressKeys( 'ArrowRight' );
@@ -1106,7 +1118,7 @@ test.describe( 'Links', () => {
 				page.locator(
 					'.components-popover__content .block-editor-link-control'
 				)
-			).not.toBeVisible();
+			).toBeHidden();
 		} );
 
 		test( 'should not show the Link UI when selection extends into another link', async ( {
@@ -1180,11 +1192,11 @@ test.describe( 'Links', () => {
 				page.locator(
 					'.components-popover__content .block-editor-link-control'
 				)
-			).not.toBeVisible();
+			).toBeHidden();
 		} );
 
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
-		test( 'should correctly replace active link's text value within rich text even when multiple matching text values exist' within the rich text, async ( {
+		test( `should correctly replace active link's text value within rich text even when multiple matching text values exist within the rich text`, async ( {
 			page,
 			pageUtils,
 			editor,
