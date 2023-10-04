@@ -22,7 +22,6 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
-		"@types/gradient-parser": "0.1.2",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -126,7 +125,6 @@
 		"@testing-library/user-event": "14.4.3",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
-		"@types/highlight-words-core": "1.2.1",
 		"@types/istanbul-lib-report": "3.0.0",
 		"@types/mime": "2.0.3",
 		"@types/npm-package-arg": "6.1.1",
