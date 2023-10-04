@@ -4,22 +4,33 @@ The [@wp-now/wp-now](https://www.npmjs.com/package/@wordpress/env) package (`wp-
 
 Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so. It's recommended that you use the latest version of `node`. `wp-now` requires at least `node` v18 and v20 if you intend to use its [Blueprints](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now#using-blueprints) feature. 
 
+
 ## Quick start
  
-1. Run `npm -g install @wp-now/wp-now` in the terminal to install `wp-now` globally.
-2. In the terminal, navigate to an existing plugin directory, theme directory, or a new working directory.
-3. Run `wp-now start` in the terminal to start the local WordPress environment.
-4. After the script runs, your default web browser will automatically open the new local site, and you'll be logged in with the username `admin` and the password `password`.
+1. In the terminal, navigate to an existing plugin directory, theme directory, or any directory.
+2. Run the following command to start the local WordPress environment.
+
+```bash
+npx @wp-now/wp-now start
+```
+
+3. A fully functional local WordPress site will be automatically opened in your default web browser. 
+
+![wp-now basics diagram](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/wp-now-basics-diagram.png)
 
 ## Install and run `wp-now`
 
-Under the hood, `wp-now` is powered by WordPress Playground and only requires Node.js, unlike `wp-env`, which also requires Docker. To install `wp-now`, open the terminal and run the command:
+Under the hood, `wp-now` is powered by WordPress Playground and only requires Node.js, unlike `wp-env`, which also requires Docker. 
+
+To run `wp-now` you can use [`npx`](https://docs.npmjs.com/cli/v10/commands/npx) (as shown above: `npx @wp-now/wp-now`).
+
+You can also install `wp-now` globally, to be able to just run `wp-now` from any directory.
 
 ```sh
 npm -g install @wp-now/wp-now
 ```
 
-This will install the `wp-now` globally, allowing the tool to be run from any directory. To confirm it's installed and available, run `wp-now --version`, and the version number should appear.
+To confirm it's installed and available, run `wp-now --version`, and the version number should appear.
 
 Next, navigate to an existing plugin directory, theme directory, or a new working directory in the terminal and run:
 
