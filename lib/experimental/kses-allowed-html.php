@@ -13,6 +13,10 @@
  * @return array The allowed tags.
  */
 function gutenberg_kses_allowed_html( $allowedtags ) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return;
+	}
+
 	$allowedtags['input'] = array(
 		'type'          => array(),
 		'name'          => array(),
