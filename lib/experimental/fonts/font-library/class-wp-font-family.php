@@ -182,7 +182,7 @@ class WP_Font_Family {
 			// Seems mime type for files that are not images cannot be tested.
 			// See wp_check_filetype_and_ext().
 			'test_type'                => true,
-			'mimes'                    => WP_Font_Library::ALLOWED_FONT_MIME_TYPES,
+			'mimes'                    => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
 			'unique_filename_callback' => static function () use ( $filename ) {
 				// Keep the original filename.
 				return $filename;

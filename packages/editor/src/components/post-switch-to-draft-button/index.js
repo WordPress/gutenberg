@@ -28,9 +28,7 @@ export default function PostSwitchToDraftButton() {
 		};
 	}, [] );
 
-	if ( ! isPublished && ! isScheduled ) {
-		return null;
-	}
+	const isDisabled = isSaving || ( ! isPublished && ! isScheduled );
 
 	let alertMessage;
 	if ( isPublished ) {
@@ -50,9 +48,11 @@ export default function PostSwitchToDraftButton() {
 			<Button
 				className="editor-post-switch-to-draft"
 				onClick={ () => {
-					setShowConfirmDialog( true );
+					if ( ! isDisabled ) {
+						setShowConfirmDialog( true );
+					}
 				} }
-				disabled={ isSaving }
+				aria-disabled={ isDisabled }
 				variant="secondary"
 				style={ { flexGrow: '1', justifyContent: 'center' } }
 			>

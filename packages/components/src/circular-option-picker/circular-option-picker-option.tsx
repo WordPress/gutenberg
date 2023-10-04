@@ -34,7 +34,14 @@ function UnforwardedOptionAsButton(
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	return <Button { ...props } ref={ forwardedRef }></Button>;
+	const { isPressed, ...additionalProps } = props;
+	return (
+		<Button
+			{ ...additionalProps }
+			aria-pressed={ isPressed }
+			ref={ forwardedRef }
+		></Button>
+	);
 }
 
 const OptionAsButton = forwardRef( UnforwardedOptionAsButton );
@@ -48,7 +55,7 @@ function UnforwardedOptionAsOption(
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { id, className, isSelected, context, ...additionalProps } = props;
+	const { id, isSelected, context, ...additionalProps } = props;
 	const { isComposite, ..._compositeState } = context;
 	const compositeState =
 		_compositeState as CircularOptionPickerCompositeState;
@@ -73,15 +80,6 @@ function UnforwardedOptionAsOption(
 			{ ...compositeState }
 			as={ Button }
 			id={ id }
-			// Ideally we'd let the underlying `Button` component
-			// handle this by passing `isPressed` as a prop.
-			// Unfortunately doing so also sets `aria-pressed` as
-			// an attribute on the element, which is incompatible
-			// with `role="option"`, and there is no way at this
-			// point to override that behaviour.
-			className={ classnames( className, {
-				'is-pressed': isSelected,
-			} ) }
 			role="option"
 			aria-selected={ !! isSelected }
 			ref={ forwardedRef }

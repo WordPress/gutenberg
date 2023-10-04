@@ -207,8 +207,15 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes, dimRatio );
-		onSelect( media );
+
+		const mediaAttributes = attributesFromMedia( media );
+		setAttributes( {
+			...mediaAttributes,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			isDark: undefined,
+		} );
 	};
 
 	const onMediaPressed = () => {

@@ -14,7 +14,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import BasePlaceholder from '../';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type { PlaceholderProps } from '../types';
 
 jest.mock( '@wordpress/compose', () => {

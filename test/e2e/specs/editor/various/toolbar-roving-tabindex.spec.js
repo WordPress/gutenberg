@@ -14,6 +14,10 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'First block' );
+
+		// Ensure the fixed toolbar option is off.
+		// See: https://github.com/WordPress/gutenberg/pull/54785.
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	test( 'ensures base block toolbars use roving tabindex', async ( {

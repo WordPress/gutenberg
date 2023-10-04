@@ -93,6 +93,7 @@ function Navigation( {
 	// navigation block settings.
 	hasSubmenuIndicatorSetting = true,
 	customPlaceholder: CustomPlaceholder = null,
+	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
 		openSubmenusOnClick,
@@ -293,23 +294,31 @@ function Navigation( {
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
-		className: classnames( className, {
-			'items-justified-right': justifyContent === 'right',
-			'items-justified-space-between': justifyContent === 'space-between',
-			'items-justified-left': justifyContent === 'left',
-			'items-justified-center': justifyContent === 'center',
-			'is-vertical': orientation === 'vertical',
-			'no-wrap': flexWrap === 'nowrap',
-			'is-responsive': isResponsive,
-			'has-text-color': !! textColor.color || !! textColor?.class,
-			[ getColorClassName( 'color', textColor?.slug ) ]:
-				!! textColor?.slug,
-			'has-background': !! backgroundColor.color || backgroundColor.class,
-			[ getColorClassName( 'background-color', backgroundColor?.slug ) ]:
-				!! backgroundColor?.slug,
-			[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-			'block-editor-block-content-overlay': hasBlockOverlay,
-		} ),
+		className: classnames(
+			className,
+			{
+				'items-justified-right': justifyContent === 'right',
+				'items-justified-space-between':
+					justifyContent === 'space-between',
+				'items-justified-left': justifyContent === 'left',
+				'items-justified-center': justifyContent === 'center',
+				'is-vertical': orientation === 'vertical',
+				'no-wrap': flexWrap === 'nowrap',
+				'is-responsive': isResponsive,
+				'has-text-color': !! textColor.color || !! textColor?.class,
+				[ getColorClassName( 'color', textColor?.slug ) ]:
+					!! textColor?.slug,
+				'has-background':
+					!! backgroundColor.color || backgroundColor.class,
+				[ getColorClassName(
+					'background-color',
+					backgroundColor?.slug
+				) ]: !! backgroundColor?.slug,
+				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
+				'block-editor-block-content-overlay': hasBlockOverlay,
+			},
+			layoutClassNames
+		),
 		style: {
 			color: ! textColor?.slug && textColor?.color,
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,

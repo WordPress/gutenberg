@@ -77,8 +77,8 @@ When text input isn’t accepted, an error message can display instructions on h
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { TextareaControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyTextareaControl = () => {
 	const [ text, setText ] = useState( '' );
@@ -100,7 +100,7 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

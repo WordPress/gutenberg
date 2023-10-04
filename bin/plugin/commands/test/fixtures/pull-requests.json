@@ -5750,7 +5750,7 @@
 				"id": 546517042,
 				"node_id": "MDU6TGFiZWw1NDY1MTcwNDI=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/Accessibility%20(a11y)",
-				"name": "[Type] Accessibility (a11y)",
+				"name": "[Focus] Accessibility (a11y)",
 				"color": "655104",
 				"default": false,
 				"description": "Changes that impact accessibility and need corresponding review (e.g. markup changes)."
@@ -12552,7 +12552,7 @@
 				"id": 546517042,
 				"node_id": "MDU6TGFiZWw1NDY1MTcwNDI=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/Accessibility%20(a11y)",
-				"name": "[Type] Accessibility (a11y)",
+				"name": "[Focus] Accessibility (a11y)",
 				"color": "655104",
 				"default": false,
 				"description": "Changes that impact accessibility and need corresponding review (e.g. markup changes)."

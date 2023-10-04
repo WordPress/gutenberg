@@ -41,8 +41,8 @@ registerBlockType( 'gutenberg-examples/example-06', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 
@@ -62,7 +62,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 			return el( 'div', blockProps, el( InnerBlocks.Content ) );
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}
@@ -241,8 +241,8 @@ registerBlockType( 'gutenberg-examples/example-06', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
@@ -265,7 +265,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 			return el( 'div', blockProps, el( 'div', innerBlocksProps ) );
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}
@@ -305,8 +305,8 @@ registerBlockType( 'gutenberg-examples/example-06', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
@@ -328,7 +328,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 			return el( 'div', innerBlocksProps );
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}
@@ -372,8 +372,8 @@ registerBlockType( 'gutenberg-examples/example-06', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
 	var useBlockProps = blockEditor.useBlockProps;
 	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
@@ -398,7 +398,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		},
 		// ...
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}

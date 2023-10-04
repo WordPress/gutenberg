@@ -36,7 +36,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 			'id'          => 'collection-with-url',
 			'name'        => 'Another Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
-			'src'         => 'https://localhost/fonts/mock-font-collection.json',
+			'src'         => 'https://wordpress.org/fonts/mock-font-collection.json',
 		);
 
 		wp_register_font_collection( $config_with_url );
@@ -62,7 +62,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 
 	public function mock_request( $preempt, $args, $url ) {
 		// Check if it's the URL you want to mock.
-		if ( 'https://localhost/fonts/mock-font-collection.json' === $url ) {
+		if ( 'https://wordpress.org/fonts/mock-font-collection.json' === $url ) {
 
 			// Mock the response body.
 			$mock_collection_data = array(

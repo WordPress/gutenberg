@@ -7,7 +7,7 @@ import type { RefAttributes } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponent } from '../ui/context/wordpress-component';
+import type { WordPressComponent } from '../context/wordpress-component';
 import type { ViewProps } from './types';
 
 /**

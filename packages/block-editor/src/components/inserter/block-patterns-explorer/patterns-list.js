@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -17,7 +17,7 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory } from '../block-patterns-tab';
+import { allPatternsCategory, myPatternsCategory } from '../block-patterns-tab';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
@@ -67,7 +67,9 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
-
+			if ( selectedCategory === myPatternsCategory.name && pattern.id ) {
+				return true;
+			}
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory = pattern.categories.some(
 					( category ) =>
@@ -112,6 +114,14 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 		container
 	);
 
+	// Reset page when search value changes.
+	const [ previousSearchValue, setPreviousSearchValue ] =
+		useState( searchValue );
+	if ( searchValue !== previousSearchValue ) {
+		setPreviousSearchValue( searchValue );
+		pagingProps.changePage( 1 );
+	}
+
 	const hasItems = !! filteredBlockPatterns?.length;
 	return (
 		<div
@@ -125,15 +135,17 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 
 			<InserterListbox>
 				{ hasItems && (
-					<BlockPatternsList
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
-						blockPatterns={ pagingProps.categoryPatterns }
-						onClickPattern={ onClickPattern }
-						isDraggable={ false }
-					/>
-				) }
-				{ pagingProps.numPages > 1 && (
-					<BlockPatternsPaging { ...pagingProps } />
+					<>
+						<BlockPatternsList
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							isDraggable={ false }
+						/>
+						<BlockPatternsPaging { ...pagingProps } />
+					</>
 				) }
 			</InserterListbox>
 		</div>

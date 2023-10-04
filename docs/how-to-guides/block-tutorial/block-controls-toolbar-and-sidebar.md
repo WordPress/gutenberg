@@ -95,8 +95,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 {% Plain %}
 
 ```js
-( function ( blocks, blockEditor, element ) {
-	var el = element.createElement;
+( function ( blocks, blockEditor, React ) {
+	var el = React.createElement;
 	var RichText = blockEditor.RichText;
 	var AlignmentToolbar = blockEditor.AlignmentToolbar;
 	var BlockControls = blockEditor.BlockControls;
@@ -176,7 +176,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			);
 		},
 	} );
-} )( window.wp.blocks, window.wp.blockEditor, window.wp.element );
+} )( window.wp.blocks, window.wp.blockEditor, window.React );
 ```
 
 {% end %}

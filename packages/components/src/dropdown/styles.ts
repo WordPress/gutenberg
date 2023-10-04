@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import type { DropdownContentWrapperProps } from './types';
 
 const padding = ( { paddingSize = 'small' }: DropdownContentWrapperProps ) => {
