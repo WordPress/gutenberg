@@ -308,8 +308,7 @@
 	}
 
 	// Toggled style.
-	&[aria-pressed="true"],
-	&[aria-pressed="mixed"] {
+	&.is-pressed {
 		color: $components-color-foreground-inverted;
 		background: $components-color-foreground;
 
