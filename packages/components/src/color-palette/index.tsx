@@ -193,6 +193,7 @@ function UnforwardedColorPalette(
 		'aria-labelledby': ariaLabelledby,
 		onPickerDragStart,
 		onPickerDragEnd,
+		onPopoverClose,
 		...additionalProps
 	} = props;
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
@@ -333,6 +334,7 @@ function UnforwardedColorPalette(
 							</VStack>
 						</VStack>
 					) }
+					onClose={ () => onPopoverClose?.() }
 				/>
 			) }
 			<CircularOptionPicker

@@ -92,6 +92,7 @@ function ColorGradientControlInner( {
 				headingLevel={ headingLevel }
 				onPickerDragStart={ () => setDisableInteractions( true ) }
 				onPickerDragEnd={ () => setDisableInteractions( false ) }
+				onPopoverClose={ () => setDisableInteractions( false ) }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (

@@ -105,6 +105,7 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	// TODO: consider better prop names
 	onPickerDragStart?: ( event: MouseEvent ) => void;
 	onPickerDragEnd?: ( event: MouseEvent ) => void;
+	onPopoverClose?: () => void;
 } & (
 		| {
 				/**
