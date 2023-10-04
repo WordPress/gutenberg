@@ -147,12 +147,17 @@ function render_block_core_latest_posts( $attributes ) {
 			 * Adds a "Read more" link with screen reader text.
 			 * [&hellip;] is the default excerpt ending from wp_trim_excerpt() in Core.
 			 */
-			if ( str_ends_with( $trimmed_excerpt, ' [&hellip;]' ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
+			if ( str_ends_with( $trimmed_excerpt, ' [&hellip;]' ) ) {
 				$excerpt_length = (int) apply_filters( 'excerpt_length', $block_core_latest_posts_excerpt_length );
 				if ( $excerpt_length <= $block_core_latest_posts_excerpt_length ) {
-					$trimmed_excerpt = substr( $trimmed_excerpt, 0, -11 );
-					/* translators: %1$s is a URL to a post, excerpt truncation character, %2$s is the post title. Only visible to screen readers. */
-					$trimmed_excerpt .= sprintf( __( '… <a href="%1$s" rel="noopener noreferrer">Read more <span class="screen-reader-text"> of %2$s</span></a>' ), esc_url( $post_link ), esc_html( $title ) );
+					$trimmed_excerpt  = substr( $trimmed_excerpt, 0, -11 );
+					$trimmed_excerpt .= sprintf(
+						/* translators: 1: A URL to a post, 2: The static string "Read more", 3: The post title only visible to screen readers. */
+						__( '… <a href="%1$s" rel="noopener noreferrer">%2$s<span class="screen-reader-text">: %3$s</span></a>' ),
+						esc_url( $post_link ),
+						__( 'Read more' ),
+						esc_html( $title )
+					);
 				}
 			}
 

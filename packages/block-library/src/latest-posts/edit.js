@@ -484,11 +484,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ createInterpolateElement(
 								sprintf(
-									/* translators: accessibility text. %s: trimmed post title. */
-									__(
-										'… <a>Read more <span>of %s</span></a>'
-									),
-									titleTrimmed
+									/* translators: 1: The static string "Read more", 2: The post title only visible to screen readers. */
+									__( '… <a>%1$s<span>: %2$s</span></a>' ),
+									__( 'Read more' ),
+									titleTrimmed || __( '(no title)' )
 								),
 								{
 									a: (
