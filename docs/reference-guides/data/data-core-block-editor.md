@@ -713,6 +713,18 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
+### getRegisteredInserterMediaCategories
+
+Returns the registered inserter media categories through the public API.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `InserterMediaCategory[]`: Inserter media categories.
+
 ### getSelectedBlock
 
 Returns the currently selected block, or null if there is no selected block.

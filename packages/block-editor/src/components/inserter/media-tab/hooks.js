@@ -9,8 +9,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../../store';
 
-/** @typedef {import('./api').InserterMediaRequest} InserterMediaRequest */
-/** @typedef {import('./api').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
 
 /**
  * Fetches media items based on the provided category.
@@ -55,22 +55,40 @@ function useInserterMediaCategories() {
 		inserterMediaCategories,
 		allowedMimeTypes,
 		enableOpenverseMediaCategory,
+		registeredInserterMediaCategories,
 	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+		const { getSettings, getRegisteredInserterMediaCategories } =
+			select( blockEditorStore );
+		const settings = getSettings();
 		return {
 			inserterMediaCategories: settings.inserterMediaCategories,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
+			registeredInserterMediaCategories:
+				getRegisteredInserterMediaCategories(),
 		};
 	}, [] );
 	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
 	// some of them. In this case we shouldn't add the category to the available media
 	// categories list in the inserter.
 	const allowedCategories = useMemo( () => {
-		if ( ! inserterMediaCategories || ! allowedMimeTypes ) {
+		if (
+			( ! inserterMediaCategories &&
+				! registeredInserterMediaCategories.length ) ||
+			! allowedMimeTypes
+		) {
 			return;
 		}
-		return inserterMediaCategories.filter( ( category ) => {
+		const coreInserterMediaCategoriesNames =
+			inserterMediaCategories?.map( ( { name } ) => name ) || [];
+		const mergedCategories = [
+			...( inserterMediaCategories || [] ),
+			...( registeredInserterMediaCategories || [] ).filter(
+				( { name } ) =>
+					! coreInserterMediaCategoriesNames.includes( name )
+			),
+		];
+		return mergedCategories.filter( ( category ) => {
 			// Check if Openverse category is enabled.
 			if (
 				! enableOpenverseMediaCategory &&
@@ -84,6 +102,7 @@ function useInserterMediaCategories() {
 		} );
 	}, [
 		inserterMediaCategories,
+		registeredInserterMediaCategories,
 		allowedMimeTypes,
 		enableOpenverseMediaCategory,
 	] );
