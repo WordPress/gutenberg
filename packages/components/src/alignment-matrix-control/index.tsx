@@ -18,11 +18,7 @@ import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
-import type {
-	AlignmentMatrixControlProps,
-	AlignmentMatrixControlValue,
-	VoidableAlignmentMatrixControlValue,
-} from './types';
+import type { AlignmentMatrixControlProps } from './types';
 
 /**
  *
@@ -62,14 +58,10 @@ export function AlignmentMatrixControl( {
 
 	const compositeStore = useCompositeStore( {
 		defaultActiveId: getItemId( baseId, defaultValue ),
-		activeId: value && getItemId( baseId, value ),
+		activeId: getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
-			onChange?.(
-				getItemValue(
-					baseId,
-					nextActiveId as VoidableAlignmentMatrixControlValue
-				) as AlignmentMatrixControlValue
-			);
+			const nextValue = getItemValue( baseId, nextActiveId );
+			if ( nextValue ) onChange?.( nextValue );
 		},
 		rtl: isRTL(),
 	} );
