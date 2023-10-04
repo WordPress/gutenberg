@@ -251,4 +251,4 @@ function gutenberg_get_block_templates( $query_result = null, $query = array(), 
 	 */
 	// return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
-add_filter( 'get_block_templates', 'gutenberg_get_block_templates', 10, 2 );
+// add_filter( 'get_block_templates', 'gutenberg_get_block_templates', 10, 2 );

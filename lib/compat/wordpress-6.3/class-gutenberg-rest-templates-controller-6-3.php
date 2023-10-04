@@ -65,4 +65,18 @@ class Gutenberg_REST_Templates_Controller_6_3 extends WP_REST_Templates_Controll
 		$response = $this->prepare_item_for_response( $fallback_template, $request );
 		return rest_ensure_response( $response );
 	}
+
+	/**
+	 * DRAFT: Returns a list of templates.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response
+	 */
+	public function get_items( $request ) {
+		$templates = array();
+
+		return rest_ensure_response( $templates );
+	}
 }
