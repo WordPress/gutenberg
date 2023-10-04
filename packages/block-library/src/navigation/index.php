@@ -696,9 +696,21 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$responsive_dialog_directives    = '';
 	$close_button_directives         = '';
 	if ( $should_load_view_script ) {
+		$nav_element_context             = wp_json_encode(
+			array(
+				'core' => array(
+					'navigation' => array(
+						'overlayOpenedBy' => array(),
+						'type'            => 'overlay',
+						'roleAttribute'   => '',
+						'ariaLabel'       => __( 'Menu' ),
+					),
+				),
+			)
+		);
 		$nav_element_directives          = '
 			data-wp-interactive
-			data-wp-context=\'{ "core": { "navigation": { "overlayOpenedBy": {}, "type": "overlay", "roleAttribute": "", "ariaLabel": "' . esc_attr__( 'Menu' ) . '" } } }\'
+			data-wp-context=\'' . $nav_element_context . '\'
 		';
 		$open_button_directives          = '
 			data-wp-on--click="actions.core.navigation.openMenuOnClick"
