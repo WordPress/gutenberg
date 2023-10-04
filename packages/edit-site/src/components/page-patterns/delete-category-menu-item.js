@@ -1,0 +1,95 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	MenuItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
+
+const { useHistory } = unlock( routerPrivateApis );
+
+export default function DeleteCategoryMenuItem( { category, onClose } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const history = useHistory();
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const { deleteEntityRecord, invalidateResolution } =
+		useDispatch( coreStore );
+
+	if ( ! category?.id ) {
+		return null;
+	}
+
+	const onDelete = async () => {
+		try {
+			await deleteEntityRecord(
+				'taxonomy',
+				'wp_pattern_category',
+				category.id,
+				{ force: true },
+				{ throwOnError: true }
+			);
+
+			invalidateResolution( 'getUserPatternCategories' );
+
+			createSuccessNotice(
+				sprintf(
+					/* translators: The pattern category's name */
+					__( '"%s" deleted.' ),
+					category.label
+				),
+				{ type: 'snackbar', id: 'pattern-category-delete' }
+			);
+
+			onClose?.();
+			history.push( {
+				path: `/patterns`,
+				categoryType: PATTERN_TYPES.theme,
+				categoryId: PATTERN_DEFAULT_CATEGORY,
+			} );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while deleting the pattern.' );
+
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+				id: 'pattern-category-delete',
+			} );
+		}
+	};
+
+	return (
+		<>
+			<MenuItem isDestructive onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Delete' ) }
+			</MenuItem>
+			<ConfirmDialog
+				isOpen={ isModalOpen }
+				onConfirm={ onDelete }
+				onCancel={ () => setIsModalOpen( false ) }
+			>
+				{ sprintf(
+					// translators: %s: The pattern category's name.
+					__( 'Are you sure you want to delete "%s"?' ),
+					decodeEntities( category.label )
+				) }
+			</ConfirmDialog>
+		</>
+	);
+}

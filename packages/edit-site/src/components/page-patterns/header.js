@@ -18,6 +18,7 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import RenameCategoryMenuItem from './rename-category-menu-item';
+import DeleteCategoryMenuItem from './delete-category-menu-item';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 import { TEMPLATE_PART_POST_TYPE, PATTERN_TYPES } from '../../utils/constants';
 
@@ -73,6 +74,10 @@ export default function PatternsHeader( {
 						{ ( { onClose } ) => (
 							<MenuGroup>
 								<RenameCategoryMenuItem
+									category={ patternCategory }
+									onClose={ onClose }
+								/>
+								<DeleteCategoryMenuItem
 									category={ patternCategory }
 									onClose={ onClose }
 								/>
