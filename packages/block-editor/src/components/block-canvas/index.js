@@ -11,7 +11,6 @@ import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
-import { useClipboardHandler } from '../copy-handler';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export function ExperimentalBlockCanvas( {
@@ -23,13 +22,8 @@ export function ExperimentalBlockCanvas( {
 	iframeProps,
 } ) {
 	const resetTypingRef = useMouseMoveTypingReset();
-	const copyHandler = useClipboardHandler();
 	const clearerRef = useBlockSelectionClearer();
-	const contentRef = useMergeRefs( [
-		copyHandler,
-		contentRefProp,
-		clearerRef,
-	] );
+	const contentRef = useMergeRefs( [ contentRefProp, clearerRef ] );
 
 	if ( ! shouldIframe ) {
 		return (
