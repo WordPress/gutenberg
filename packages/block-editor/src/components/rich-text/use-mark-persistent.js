@@ -9,6 +9,8 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
+let timeout;
+
 export function useMarkPersistent( { html, value } ) {
 	const previousText = useRef();
 	const hasActiveFormats =
@@ -27,7 +29,8 @@ export function useMarkPersistent( { html, value } ) {
 		// Text input, so don't create an undo level for every character.
 		// Create an undo level after 1 second of no input.
 		if ( previousText.current !== value.text ) {
-			const timeout = window.setTimeout( () => {
+			window.clearTimeout( timeout );
+			timeout = window.setTimeout( () => {
 				__unstableMarkLastChangeAsPersistent();
 			}, 1000 );
 			previousText.current = value.text;
