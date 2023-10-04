@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalUseSlot as useSlot,
-	Fill,
-	Popover,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 
@@ -17,19 +13,16 @@ import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import EmptyBlockInserter from './empty-block-inserter';
-import SelectedBlockTools from './selected-block-tools';
+import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
 function selector( select ) {
-	const { __unstableGetEditorMode, getSettings, isTyping } =
-		select( blockEditorStore );
+	const { __unstableGetEditorMode, isTyping } = select( blockEditorStore );
 
 	return {
 		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 	};
 }
@@ -48,10 +41,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
-		selector,
-		[]
-	);
+	const { isZoomOutMode, isTyping } = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -128,12 +118,7 @@ export default function BlockTools( {
 		}
 	}
 
-	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
-
-	// TODO: Import this from somewhere so it can be used in the post editor and site editor headers consistently.
-	const selectedBlockToolsSlotName = '__experimentalSelectedBlockTools';
-	const blockToolsSlot = useSlot( selectedBlockToolsSlotName );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -144,29 +129,10 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				<EmptyBlockInserter
+
+				<SelectedBlockPopover
 					__unstableContentRef={ __unstableContentRef }
 				/>
-				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-				{ blockToolsSlot?.ref?.current ? (
-					<Fill name="__experimentalSelectedBlockTools">
-						<SelectedBlockTools isFixed={ hasFixedToolbar } />
-						{ /* Used for the inline rich text toolbar. */ }
-						<Popover.Slot
-							name="block-toolbar"
-							ref={ blockToolbarRef }
-						/>
-					</Fill>
-				) : (
-					<>
-						<SelectedBlockTools isFixed={ hasFixedToolbar } />
-						{ /* Used for the inline rich text toolbar. */ }
-						<Popover.Slot
-							name="block-toolbar"
-							ref={ blockToolbarRef }
-						/>
-					</>
-				) }
 
 				{ children }
 				{ /* Used for inline rich text popovers. */ }

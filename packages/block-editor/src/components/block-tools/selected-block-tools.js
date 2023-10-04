@@ -7,8 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
@@ -25,7 +24,7 @@ import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-function SelectedBlockTools( {
+export default function SelectedBlockTools( {
 	clientId,
 	rootClientId,
 	isFixed,
@@ -176,110 +175,4 @@ function SelectedBlockTools( {
 	}
 
 	return null;
-}
-
-export default function WrappedSelectedBlockTools( { isFixed } ) {
-	const selected = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getFirstMultiSelectedBlockClientId,
-			getBlockRootClientId,
-			getBlock,
-			getBlockParents,
-			__experimentalGetBlockListSettingsForBlocks,
-			isBlockInsertionPointVisible,
-			getBlockInsertionPoint,
-			getBlockOrder,
-			__unstableGetEditorMode, // showEmptyBlockSideInserter start
-			hasMultiSelection,
-			isTyping,
-			getLastMultiSelectedBlockClientId, // showEmptyBlockSideInserter end
-		} = select( blockEditorStore );
-
-		const clientId =
-			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-		if ( ! clientId ) {
-			return;
-		}
-
-		const { name, attributes = {} } = getBlock( clientId ) || {};
-		const blockParentsClientIds = getBlockParents( clientId );
-
-		// Get Block List Settings for all ancestors of the current Block clientId.
-		const parentBlockListSettings =
-			__experimentalGetBlockListSettingsForBlocks(
-				blockParentsClientIds
-			);
-
-		// Get the clientId of the topmost parent with the capture toolbars setting.
-		const capturingClientId = blockParentsClientIds.find(
-			( parentClientId ) =>
-				parentBlockListSettings[ parentClientId ]
-					?.__experimentalCaptureToolbars
-		);
-
-		let isInsertionPointVisible = false;
-
-		if ( isBlockInsertionPointVisible() ) {
-			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
-			isInsertionPointVisible =
-				order[ insertionPoint.index ] === clientId;
-		}
-
-		const isEmptyDefaultBlock =
-			name && isUnmodifiedDefaultBlock( { name, attributes } );
-		const editorMode = __unstableGetEditorMode();
-
-		return {
-			clientId,
-			rootClientId: getBlockRootClientId( clientId ),
-			name,
-			capturingClientId,
-			isInsertionPointVisible,
-			shouldShowBreadcrumb:
-				! hasMultiSelection() &&
-				( editorMode === 'navigation' || editorMode === 'zoom-out' ),
-			showEmptyBlockSideInserter:
-				! isTyping() &&
-				__unstableGetEditorMode() === 'edit' &&
-				isEmptyDefaultBlock,
-			lastClientId: hasMultiSelection()
-				? getLastMultiSelectedBlockClientId()
-				: null,
-		};
-	}, [] );
-
-	if ( ! selected ) {
-		return null;
-	}
-
-	const {
-		clientId,
-		rootClientId,
-		name,
-		capturingClientId,
-		isInsertionPointVisible,
-		lastClientId,
-		showEmptyBlockSideInserter,
-		shouldShowBreadcrumb,
-	} = selected;
-
-	if ( ! name ) {
-		return null;
-	}
-
-	return (
-		<SelectedBlockTools
-			clientId={ clientId }
-			rootClientId={ rootClientId }
-			capturingClientId={ capturingClientId }
-			isInsertionPointVisible={ isInsertionPointVisible }
-			isFixed={ isFixed }
-			lastClientId={ lastClientId }
-			showEmptyBlockSideInserter={ showEmptyBlockSideInserter }
-			shouldShowBreadcrumb={ shouldShowBreadcrumb }
-		/>
-	);
 }
