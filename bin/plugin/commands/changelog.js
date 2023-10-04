@@ -114,7 +114,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
-	'[Package] Block Editor': 'Block Editor',
+	'[Package] Block editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Post Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
@@ -221,7 +221,9 @@ function getTypesByLabels( labels ) {
 		...new Set(
 			labels
 				.filter( ( label ) =>
-					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+					Object.keys( LABEL_TYPE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
 				)
 				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
 		),
@@ -239,7 +241,9 @@ function getTypesByLabels( labels ) {
 function mapLabelsToFeatures( labels ) {
 	return labels
 		.filter( ( label ) =>
-			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
+			Object.keys( LABEL_FEATURE_MAPPING )
+				.map( ( currentLabel ) => currentLabel.toLowerCase() )
+				.includes( label.toLowerCase() )
 		)
 		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
 }
