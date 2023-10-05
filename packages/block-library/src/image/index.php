@@ -141,23 +141,18 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
 	}
 
-	$processor = new WP_HTML_Tag_Processor( $block_content );
-	$content   = $processor->get_updated_html();
-
 	// Currently, we are only enabling the zoom animation.
 	$lightbox_animation = 'zoom';
 
-	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
-	$z = new WP_HTML_Tag_Processor( $content );
-	$z->next_tag( 'img' );
-
+	// Note: We want to store the `src` in the context so we
+	// can set it dynamically when the lightbox is opened.
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
 		$img_width        = $img_metadata['width'];
 		$img_height       = $img_metadata['height'];
 	} else {
-		$img_uploaded_src = $z->get_attribute( 'src' );
+		$img_uploaded_src = $processor->get_attribute( 'src' );
 		$img_width        = 'none';
 		$img_height       = 'none';
 	}
@@ -168,7 +163,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		$scale_attr = false;
 	}
 
-	$w = new WP_HTML_Tag_Processor( $content );
+	$w = new WP_HTML_Tag_Processor( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
@@ -231,7 +226,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// image is a copy of the one in the body, which animates immediately
 	// as the lightbox is opened, while the enlarged one is a full-sized
 	// version that will likely still be loading as the animation begins.
-	$m = new WP_HTML_Tag_Processor( $content );
+	$m = new WP_HTML_Tag_Processor( $block_content );
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
@@ -247,7 +242,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
-	$q = new WP_HTML_Tag_Processor( $content );
+	$q = new WP_HTML_Tag_Processor( $block_content );
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );
