@@ -35,7 +35,7 @@ export async function createNewPost(
 
 	await this.visitAdminPage( 'post-new.php', query );
 
-	await this.editor.setPreferences( {
+	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
 		fullscreenMode: false,
 	} );

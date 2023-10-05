@@ -34,7 +34,7 @@ export async function visitPostEditor(
 
 	await this.visitAdminPage( 'post.php', query );
 
-	await this.editor.setPreferences( {
+	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
 		fullscreenMode: false,
 	} );
