@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 
 /**
@@ -11,6 +12,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../utils/colors';
@@ -20,11 +22,15 @@ import { getFontSize } from '../utils/font-size';
 import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
 import { useCx } from '../utils/hooks/use-cx';
+import type { Props } from './types';
+import type React from 'react';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
-export default function useText( props ) {
+export default function useText(
+	props: WordPressComponentProps< Props, 'span' >
+) {
 	const {
 		adjustLineHeightForInnerControls,
 		align,
@@ -50,8 +56,7 @@ export default function useText( props ) {
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 
-	/** @type {import('react').ReactNode} */
-	let content = children;
+	let content: React.ReactNode = children;
 	const isHighlighter = Array.isArray( highlightWords );
 	const isCaption = size === 'caption';
 
@@ -64,9 +69,7 @@ export default function useText( props ) {
 
 		content = createHighlighterText( {
 			autoEscape: highlightEscape,
-			// Disable reason: We need to disable this otherwise it erases the cast
-			// eslint-disable-next-line object-shorthand
-			children: /** @type {string} */ ( children ),
+			children,
 			caseSensitive: highlightCaseSensitive,
 			searchWords: highlightWords,
 			sanitize: highlightSanitize,
@@ -76,7 +79,7 @@ export default function useText( props ) {
 	const cx = useCx();
 
 	const classes = useMemo( () => {
-		const sx = {};
+		const sx: Record< string, SerializedStyles | null > = {};
 
 		const lineHeight = getLineHeight(
 			adjustLineHeightForInnerControls,
@@ -87,12 +90,7 @@ export default function useText( props ) {
 			color,
 			display,
 			fontSize: getFontSize( size ),
-			/* eslint-disable jsdoc/valid-types */
-			fontWeight:
-				/** @type {import('react').CSSProperties['fontWeight']} */ (
-					weight
-				),
-			/* eslint-enable jsdoc/valid-types */
+			fontWeight: weight,
 			lineHeight,
 			letterSpacing,
 			textAlign: align,
@@ -143,8 +141,7 @@ export default function useText( props ) {
 		weight,
 	] );
 
-	/** @type {undefined | 'auto' | 'none'} */
-	let finalEllipsizeMode;
+	let finalEllipsizeMode: undefined | 'auto' | 'none';
 	if ( truncate === true ) {
 		finalEllipsizeMode = 'auto';
 	}

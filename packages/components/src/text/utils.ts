@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memoize from 'memize';
+import type { FindAllArgs } from 'highlight-words-core';
 import { findAll } from 'highlight-words-core';
 
 /**
@@ -14,7 +15,6 @@ import { createElement } from '@wordpress/element';
  * https://github.com/bvaughn/react-highlight-words/blob/HEAD/src/Highlighter.js
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef Options
  * @property {string}                                                     [activeClassName='']      Classname for active highlighted areas.
@@ -33,28 +33,55 @@ import { createElement } from '@wordpress/element';
  * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [unhighlightStyle]        Style to apply to unhighlighted text.
  */
 
+interface Options {
+	activeClassName?: string;
+	activeIndex?: number;
+	activeStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+	autoEscape?: boolean;
+	caseSensitive?: boolean;
+	children: string;
+	findChunks?: FindAllArgs[ 'findChunks' ];
+	highlightClassName?: string | Record< string, unknown >;
+	highlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+	highlightTag?: keyof JSX.IntrinsicElements;
+	sanitize?: FindAllArgs[ 'sanitize' ];
+	searchWords?: string[];
+	unhighlightClassName?: string;
+	unhighlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+}
+
 /**
  * Maps props to lowercase names.
  *
- * @template {Record<string, unknown>} T
- * @param {T} object Props to map.
- * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
+ * @param object Props to map.
+ * @return The mapped props.
  */
-/* eslint-enable jsdoc/valid-types */
-const lowercaseProps = ( object ) => {
-	/** @type {any} */
-	const mapped = {};
+const lowercaseProps = < T extends Record< string, unknown > >( object: T ) => {
+	const mapped: Record< string, unknown > = {};
 	for ( const key in object ) {
 		mapped[ key.toLowerCase() ] = object[ key ];
 	}
-	return mapped;
+	return mapped as { [ K in keyof T as Lowercase< string & K > ]: T[ K ] };
 };
 
 const memoizedLowercaseProps = memoize( lowercaseProps );
 
 /**
- *
- * @param {Options} options
+ * @param options
+ * @param options.activeClassName
+ * @param options.activeIndex
+ * @param options.activeStyle
+ * @param options.autoEscape
+ * @param options.caseSensitive
+ * @param options.children
+ * @param options.findChunks
+ * @param options.highlightClassName
+ * @param options.highlightStyle
+ * @param options.highlightTag
+ * @param options.sanitize
+ * @param options.searchWords
+ * @param options.unhighlightClassName
+ * @param options.unhighlightStyle
  */
 export function createHighlighterText( {
 	activeClassName = '',
@@ -71,7 +98,7 @@ export function createHighlighterText( {
 	searchWords = [],
 	unhighlightClassName = '',
 	unhighlightStyle,
-} ) {
+}: Options ) {
 	if ( ! children ) return null;
 	if ( typeof children !== 'string' ) return children;
 
@@ -122,8 +149,7 @@ export function createHighlighterText( {
 					? Object.assign( {}, highlightStyle, activeStyle )
 					: highlightStyle;
 
-			/** @type {Record<string, any>} */
-			const props = {
+			const props: Record< string, unknown > = {
 				children: text,
 				className: highlightClassNames,
 				key: index,

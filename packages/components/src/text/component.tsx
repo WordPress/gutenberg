@@ -1,15 +1,20 @@
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useText from './hook';
+import type { Props } from './types';
 
 /**
- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').ForwardedRef<any>}                                             forwardedRef
+ * @param props
+ * @param forwardedRef
  */
-function Text( props, forwardedRef ) {
+function UnconnectedText(
+	props: WordPressComponentProps< Props, 'span' >,
+	forwardedRef: React.ForwardedRef< any >
+) {
 	const textProps = useText( props );
 
 	return <View as="span" { ...textProps } ref={ forwardedRef } />;
@@ -31,6 +36,5 @@ function Text( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedText = contextConnect( Text, 'Text' );
-
-export default ConnectedText;
+export const Text = contextConnect( UnconnectedText, 'Text' );
+export default Text;
