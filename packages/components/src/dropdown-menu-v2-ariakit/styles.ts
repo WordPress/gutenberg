@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -13,6 +13,12 @@ import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import type { DropdownMenuContext } from './types';
+
+const ANIMATION_PARAMS = {
+	SLIDE_AMOUNT: '2px',
+	DURATION: '400ms',
+	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+};
 
 const CONTENT_WRAPPER_PADDING = space( 2 );
 const ITEM_PREFIX_WIDTH = space( 7 );
@@ -24,6 +30,38 @@ const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
+
+const slideUpAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideRightAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
+
+const slideDownAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideLeftAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
 
 // TODO: z-index from global vars
 export const DropdownMenu = styled( Ariakit.Menu )<
@@ -47,6 +85,26 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 
 	overscroll-behavior: contain;
 	overflow: visible;
+
+	/* Animation */
+	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+	will-change: transform, opacity;
+	/* Default animation.*/
+	animation-name: ${ slideDownAndFade };
+
+	&[data-side='right'] {
+		animation-name: ${ slideLeftAndFade };
+	}
+	&[data-side='bottom'] {
+		animation-name: ${ slideUpAndFade };
+	}
+	&[data-side='left'] {
+		animation-name: ${ slideRightAndFade };
+	}
+	@media ( prefers-reduced-motion ) {
+		animation-duration: 0s;
+	}
 `;
 
 const itemPrefix = css`

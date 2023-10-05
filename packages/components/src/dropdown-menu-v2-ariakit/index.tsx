@@ -216,6 +216,11 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 
 		const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
 
+		// Extract the side part from the placement (ie. top/bottom/left/start)
+		// It is useful to animate the opening of the menu in the right direction.
+		const computedPlacement = dropdownMenuStore.useState( 'placement' );
+		const side = computedPlacement.split( '-' )[ 0 ];
+
 		return (
 			<>
 				{ /* Menu trigger */ }
@@ -249,6 +254,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 						gutter={ dropdownMenuStore.parent ? 16 : gutter }
 						shift={ dropdownMenuStore.parent ? -8 : shift }
 						hideOnHoverOutside={ false }
+						data-side={ side }
 					>
 						<DropdownMenuContext.Provider value={ contextValue }>
 							{ children }
