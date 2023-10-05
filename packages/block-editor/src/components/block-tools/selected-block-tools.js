@@ -28,6 +28,7 @@ import { useShouldContextualToolbarShow } from '../../utils/use-should-contextua
 export default function SelectedBlockTools( {
 	clientId,
 	showEmptyBlockSideInserter,
+	shiftPadding = {},
 } ) {
 	const {
 		capturingClientId,
@@ -129,6 +130,7 @@ export default function SelectedBlockTools( {
 									isInsertionPointVisible,
 							}
 						) }
+						shiftPadding={ shiftPadding }
 						{ ...popoverProps }
 					>
 						<BlockSelectionButton
@@ -156,6 +158,7 @@ export default function SelectedBlockTools( {
 						'is-insertion-point-visible': isInsertionPointVisible,
 					}
 				) }
+				shiftPadding={ shiftPadding }
 				{ ...popoverProps }
 			>
 				{ shouldShowContextualToolbar && (

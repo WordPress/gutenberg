@@ -182,6 +182,9 @@ export default function BlockTools( {
 								showEmptyBlockSideInserter={
 									showEmptyBlockSideInserter
 								}
+								shiftPadding={ {
+									top: 61, // We only want this padding applied when we're rendering inside the fill to account for the toolbar. Using a magic number to avoid many extra computations and a layoutEffect.
+								} }
 							/>
 						) }
 						{ /* Used for the inline rich text toolbar. */ }
