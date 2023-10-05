@@ -301,7 +301,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
 				<div class="lightbox-image-container">$enlarged_image_content</div>
-                <div class="scrim" style="background-color: $background_color"></div>
+                <div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
         </div>
 HTML;
 
