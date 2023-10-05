@@ -263,17 +263,12 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can remove existing links`, async ( {
-		page,
-		editor,
-		LinkUtils,
-	} ) => {
+	test( `can remove existing links`, async ( { editor, LinkUtils } ) => {
 		await LinkUtils.createAndReselectLink();
 
-		await page
-			.locator( '.block-editor-link-control__search-item-top' )
-			.getByRole( 'button', { name: 'Unlink' } )
-			.click();
+		const linkPopover = LinkUtils.getLinkPopover();
+
+		await linkPopover.getByRole( 'button', { name: 'Unlink' } ).click();
 
 		// The link should have been removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -385,6 +380,7 @@ test.describe( 'Links', () => {
 		editor,
 		pageUtils,
 		requestUtils,
+		LinkUtils,
 	} ) => {
 		const titleText = 'Test post escape';
 		await requestUtils.createPost( {
@@ -427,11 +423,7 @@ test.describe( 'Links', () => {
 		// Expect the escape key to dismiss the popover when the autocomplete suggestion list is open.
 		// Note that these have their own keybindings thus why we need to assert on this behaviour.
 		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeHidden();
+		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
 
 		// Confirm that selection is returned to where it was before launching
 		// the link editor, with "Gutenberg" as an uncollapsed selection.
@@ -452,6 +444,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		const URL = 'https://wordpress.org/gutenberg';
 
@@ -468,20 +461,12 @@ test.describe( 'Links', () => {
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await pageUtils.pressKeys( 'End' );
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeHidden();
+		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeVisible();
+		await expect( LinkUtils.getLinkPopover() ).toBeVisible();
 
 		// Reopen the link popover and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
@@ -534,6 +519,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
@@ -585,12 +571,10 @@ test.describe( 'Links', () => {
 		await expect( checkbox ).toBeChecked();
 		await expect( checkbox ).toBeFocused();
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
 		// Tab back to the Submit and apply the link.
-		await page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
 		// The link should have been inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -608,6 +592,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		// Create a block with some text.
 		await editor.insertBlock( {
@@ -642,12 +627,10 @@ test.describe( 'Links', () => {
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
 		// Update the link.
-		await page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
 		// Navigate back to the popover.
 		await page.keyboard.press( 'ArrowLeft' );
@@ -767,6 +750,7 @@ test.describe( 'Links', () => {
 		page,
 		editor,
 		pageUtils,
+		LinkUtils,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -800,11 +784,10 @@ test.describe( 'Links', () => {
 		await page.getByLabel( 'Open in new tab' ).click();
 		await page.getByLabel( 'nofollow' ).click();
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
 		// Save the link
-		await page
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -829,10 +812,7 @@ test.describe( 'Links', () => {
 		await page.getByLabel( 'nofollow' ).click();
 
 		// Save the link
-		await page
-			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
+		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -1037,6 +1017,7 @@ test.describe( 'Links', () => {
 			page,
 			pageUtils,
 			editor,
+			LinkUtils,
 		} ) => {
 			const linkedText = `Gutenberg`;
 			const textBeyondLinkedText = ` and more text.`;
@@ -1072,11 +1053,9 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowLeft' );
 
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeVisible();
+			const linkPopover = LinkUtils.getLinkPopover();
+
+			await expect( linkPopover ).toBeVisible();
 
 			// Make selection starting within the link and moving beyond boundary to the left.
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', {
@@ -1084,21 +1063,13 @@ test.describe( 'Links', () => {
 			} );
 
 			// The Link UI should have disappeared (i.e. be inactive).
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeHidden();
+			await expect( linkPopover ).toBeHidden();
 
 			// Cancel selection and move back within the Link.
 			await pageUtils.pressKeys( 'ArrowRight' );
 
 			// We should see the Link UI displayed again.
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeVisible();
+			await expect( linkPopover ).toBeVisible();
 
 			// Make selection starting within the link and moving beyond boundary to the right.
 			await pageUtils.pressKeys( 'shift+ArrowRight', {
@@ -1106,17 +1077,14 @@ test.describe( 'Links', () => {
 			} );
 
 			// The Link UI should have disappeared (i.e. be inactive).
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeHidden();
+			await expect( linkPopover ).toBeHidden();
 		} );
 
 		test( 'should not show the Link UI when selection extends into another link', async ( {
 			page,
 			pageUtils,
 			editor,
+			LinkUtils,
 		} ) => {
 			const linkedTextOne = `Gutenberg`;
 			const linkedTextTwo = `Block Editor`;
@@ -1173,12 +1141,10 @@ test.describe( 'Links', () => {
 				times: 3,
 			} );
 
+			const linkPopover = LinkUtils.getLinkPopover();
+
 			// Link UI should activate for `linkTextOne`
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeVisible();
+			await expect( linkPopover ).toBeVisible();
 
 			// Expand selection so that it overlaps with `linkTextTwo`
 			await pageUtils.pressKeys( 'ArrowRight', {
@@ -1186,11 +1152,7 @@ test.describe( 'Links', () => {
 			} );
 
 			// Link UI should be inactive.
-			await expect(
-				page.locator(
-					'.components-popover__content .block-editor-link-control'
-				)
-			).toBeHidden();
+			await expect( linkPopover ).toBeHidden();
 		} );
 
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
