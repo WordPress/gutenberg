@@ -132,6 +132,15 @@ export type PopoverProps = {
 	 */
 	shift?: boolean;
 	/**
+	 * Sets the virtual padding around the boundary to check for overflow.
+	 */
+	shiftPadding?: {
+		top?: number;
+		right?: number;
+		bottom?: number;
+		left?: number;
+	};
+	/**
 	 * Specifies the popover's style.
 	 *
 	 * Leave undefined for the default style. Other values are:
