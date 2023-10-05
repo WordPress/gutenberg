@@ -3,15 +3,6 @@
  */
 import makeFamiliesFromFaces from '../make-families-from-faces';
 
-const getError = ( call ) => {
-	try {
-		call();
-		throw new Error( 'No error thrown' );
-	} catch ( error ) {
-		return error;
-	}
-};
-
 describe( 'makeFamiliesFromFaces', () => {
 	it( 'handles empty fontFaces list', () => {
 		const result = makeFamiliesFromFaces( [] );
@@ -40,10 +31,10 @@ describe( 'makeFamiliesFromFaces', () => {
 			{ fontFamily: 'Duper Super', file: { name: 'piazzolla.ttf' } },
 		];
 
-		const error = getError( () => makeFamiliesFromFaces( fontFaces ) );
-		expect( error ).toHaveProperty(
-			'message',
-			'You may only batch upload fonts from the same font family.'
+		expect( () => makeFamiliesFromFaces( fontFaces ) ).toThrow(
+			new Error(
+				'You may only batch upload fonts from the same font family.'
+			)
 		);
 	} );
 
