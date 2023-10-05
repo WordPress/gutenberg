@@ -31,25 +31,31 @@
 	}
 }
 
-.edit-post-header__background-style {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: -1px; // -1px to overlap the header border
-	right: 0;
-	background: $white;
-	border-bottom: $border-width solid $gray-200;
-	z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
-}
 
-// Every element in the header needs to have a higher Z index than the background, except the selected block popover
-.edit-post-header__toolbar > *:not(.selected-block-tools-wrapper),
-.edit-post-header > *:not(.edit-post-header__toolbar) {
-	z-index: 4;
-}
+// Hacks to allow the block toolbar popover to slide behind the header
+.edit-post-layout:not(.has-fixed-toolbar) {
+	// Create a full-width and height background that floats over the whole div
+	.edit-post-header__background-style {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: -1px; // -1px to overlap the header border
+		right: 0;
+		background: $white;
+		border-bottom: $border-width solid $gray-200;
+		z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
+	}
 
-.selected-block-tools-wrapper {
-	z-index: 2; // Needs to be lower than the background-style that covers the header so the block tools can scroll behind it
+	// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
+	.edit-post-header__toolbar > *:not(.selected-block-tools-wrapper),
+	.edit-post-header > *:not(.edit-post-header__toolbar) {
+		z-index: 4;
+	}
+
+	// The block tools slide behind our floating header background
+	.selected-block-tools-wrapper {
+		z-index: 2;
+	}
 }
 
 .edit-post-header__toolbar {
