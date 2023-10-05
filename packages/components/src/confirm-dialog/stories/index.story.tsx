@@ -12,32 +12,24 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import { ConfirmDialog } from '..';
-import type { ConfirmDialogProps, DialogInputEvent } from '../types';
+import { ConfirmDialog } from '../component';
 
 const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
-		children: {
-			control: { type: 'text' },
-		},
-		confirmButtonText: {
-			control: { type: 'text' },
-		},
-		cancelButtonText: {
-			control: { type: 'text' },
-		},
 		isOpen: {
 			control: { type: null },
 		},
-		onConfirm: { action: 'onConfirm' },
-		onCancel: { action: 'onCancel' },
 	},
 	args: {
 		children: 'Would you like to privately publish the post now?',
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
+		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
@@ -48,15 +40,15 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 	onConfirm,
 	onCancel,
 	...args
-}: ConfirmDialogProps ) => {
+} ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const handleConfirm = ( confirmArgs: DialogInputEvent ) => {
+	const handleConfirm: typeof onConfirm = ( confirmArgs ) => {
 		onConfirm( confirmArgs );
 		setIsOpen( false );
 	};
 
-	const handleCancel = ( cancelArgs: DialogInputEvent ) => {
+	const handleCancel: typeof onCancel = ( cancelArgs ) => {
 		onCancel?.( cancelArgs );
 		setIsOpen( false );
 	};
@@ -80,7 +72,7 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 };
 
 // Simplest usage: just declare the component with the required `onConfirm` prop. Note: the `onCancel` prop is optional here, unless you'd like to render the component in Controlled mode (see below)
-export const _default = Template.bind( {} );
+export const Default = Template.bind( {} );
 const _defaultSnippet = `() => {
   const [ isOpen, setIsOpen ] = useState( false );
   const [ confirmVal, setConfirmVal ] = useState('');
@@ -113,8 +105,10 @@ const _defaultSnippet = `() => {
     </>
   );
 };`;
-_default.args = {};
-_default.parameters = {
+Default.args = {
+	children: 'Would you like to privately publish the post now?',
+};
+Default.parameters = {
 	docs: {
 		source: {
 			code: _defaultSnippet,
@@ -127,6 +121,7 @@ _default.parameters = {
 // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
 export const WithCustomButtonLabels = Template.bind( {} );
 WithCustomButtonLabels.args = {
+	...Default.args,
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };

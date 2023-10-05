@@ -184,8 +184,8 @@ const UnconnectedConfirmDialog = (
  * }
  * ```
  */
-const ConnectedConfirmDialog = contextConnect(
+export const ConfirmDialog = contextConnect(
 	UnconnectedConfirmDialog,
 	'ConfirmDialog'
 );
-export default ConnectedConfirmDialog;
+export default ConfirmDialog;
