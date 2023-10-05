@@ -121,10 +121,8 @@ class PostEditorTemplateMode {
 
 	async disableTemplateWelcomeGuide() {
 		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuideTemplate', false );
+		await this.editor.setPreferences( 'core/edit-post', {
+			welcomeGuideTemplate: false,
 		} );
 	}
 

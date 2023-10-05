@@ -12,11 +12,17 @@ const {
  * @typedef {import('@playwright/test').FrameLocator} FrameLocator
  * @typedef {import('@wordpress/e2e-test-utils-playwright').PageUtils} PageUtils
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
+ * @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor
  */
 
 test.use( {
-	widgetsCustomizerPage: async ( { admin, page, pageUtils }, use ) => {
-		await use( new WidgetsCustomizerPage( { admin, page, pageUtils } ) );
+	widgetsCustomizerPage: async (
+		{ admin, page, pageUtils, editor },
+		use
+	) => {
+		await use(
+			new WidgetsCustomizerPage( { admin, page, pageUtils, editor } )
+		);
 	},
 } );
 
@@ -613,11 +619,13 @@ class WidgetsCustomizerPage {
 	 * @param {Admin}     config.admin
 	 * @param {Page}      config.page
 	 * @param {PageUtils} config.pageUtils
+	 * @param {Editor}    config.editor
 	 */
-	constructor( { admin, page, pageUtils } ) {
+	constructor( { admin, page, pageUtils, editor } ) {
 		this.admin = admin;
 		this.page = page;
 		this.pageUtils = pageUtils;
+		this.editor = editor;
 
 		/** @type {FrameLocator} */
 		this.previewFrame = this.page
@@ -631,10 +639,8 @@ class WidgetsCustomizerPage {
 		await this.admin.visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/customize-widgets', 'welcomeGuide', false );
+		await this.editor.setPreferences( 'core/customize-widgets', {
+			welcomeGuide: false,
 		} );
 	}
 

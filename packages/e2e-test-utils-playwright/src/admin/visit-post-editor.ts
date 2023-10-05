@@ -10,6 +10,7 @@ import type { Admin } from './';
 
 interface PostOptions {
 	postId?: string | number;
+	action?: string;
 	showWelcomeGuide?: boolean;
 }
 
@@ -29,7 +30,7 @@ export async function visitPostEditor(
 
 	const query = addQueryArgs( '', {
 		post: options.postId,
-		action: 'edit',
+		action: options.action,
 	} ).slice( 1 );
 
 	await this.visitAdminPage( 'post.php', query );

@@ -23,16 +23,15 @@ test.describe( 'Site Editor List View', () => {
 
 	test( 'should open by default when preference is enabled', async ( {
 		page,
+		editor,
 	} ) => {
 		await expect(
 			page.locator( 'role=region[name="List View"i]' )
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', true );
+		await editor.setPreferences( 'core/edit-site', {
+			showListViewByDefault: true,
 		} );
 
 		await page.reload();
@@ -42,10 +41,8 @@ test.describe( 'Site Editor List View', () => {
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', false );
+		await editor.setPreferences( 'core/edit-site', {
+			showListViewByDefault: false,
 		} );
 	} );
 
