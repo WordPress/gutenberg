@@ -209,7 +209,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			[ dropdownMenuStore ]
 		);
 
-		// const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
+		const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
 
 		return (
 			<>
@@ -237,18 +237,20 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 				/>
 
 				{ /* Menu popover */ }
-				<Styled.DropdownMenu
-					{ ...props }
-					modal={ modal }
-					store={ dropdownMenuStore }
-					gutter={ dropdownMenuStore.parent ? 16 : gutter }
-					shift={ dropdownMenuStore.parent ? -9 : shift }
-					hideOnHoverOutside={ false }
-				>
-					<DropdownMenuContext.Provider value={ contextValue }>
-						{ children }
-					</DropdownMenuContext.Provider>
-				</Styled.DropdownMenu>
+				{ shouldShowDropdownMenu && (
+					<Styled.DropdownMenu
+						{ ...props }
+						modal={ modal }
+						store={ dropdownMenuStore }
+						gutter={ dropdownMenuStore.parent ? 16 : gutter }
+						shift={ dropdownMenuStore.parent ? -9 : shift }
+						hideOnHoverOutside={ false }
+					>
+						<DropdownMenuContext.Provider value={ contextValue }>
+							{ children }
+						</DropdownMenuContext.Provider>
+					</Styled.DropdownMenu>
+				) }
 			</>
 		);
 	}
