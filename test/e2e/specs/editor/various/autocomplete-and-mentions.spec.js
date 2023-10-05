@@ -426,8 +426,8 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
-	}, testInfo ) => {
-		const typingDelay = testInfo.project.name === 'webkit' ? 100 : 0;
+	} ) => {
+		const typingDelay = 100;
 
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
