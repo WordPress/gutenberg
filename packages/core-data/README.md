@@ -839,8 +839,8 @@ via the `edit()` and `save()` mutation helpers provided by
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
--   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ./src/entities.js for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ./src/entities.js for a list of available names.
 -   _recordId_ `string | number`: ID of the requested entity record.
 -   _options_ `Options`: Optional hook options.
 
@@ -887,8 +887,8 @@ the store state using `getEntityRecords()`, or resolved if missing.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
--   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ./src/entities.js for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ./src/entities.js for a list of available names.
 -   _queryArgs_ `Record< string, unknown >`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
 -   _options_ `Options`: Optional hook options.
 
