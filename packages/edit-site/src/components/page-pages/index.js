@@ -9,8 +9,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 
@@ -23,6 +22,7 @@ import PageActions from '../page-actions';
 import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
 
 const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 export default function PagePages() {
 	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
@@ -33,11 +33,14 @@ export default function PagePages() {
 		pageSize: PAGE_SIZE_VALUES[ 0 ],
 	} );
 	// Request post statuses to get the proper labels.
-	// TODO: we should probably use `useEntityRecords` here.
-	const postStatuses = useSelect( ( select ) => {
-		const { getPostStatuses } = select( coreStore );
-		return getPostStatuses();
-	}, [] );
+	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const postStatuses =
+		statuses === null
+			? EMPTY_OBJECT
+			: statuses.reduce( ( acc, status ) => {
+					acc[ status.slug ] = status.name;
+					return acc;
+			  }, EMPTY_OBJECT );
 
 	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
 	const pagination = useMemo(
@@ -135,8 +138,7 @@ export default function PagePages() {
 			{
 				header: 'Status',
 				id: 'status',
-				cell: ( props ) =>
-					postStatuses[ props.row.original.status ]?.name,
+				cell: ( props ) => postStatuses[ props.row.original.status ],
 			},
 			{
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
