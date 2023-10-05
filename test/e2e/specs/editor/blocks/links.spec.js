@@ -426,7 +426,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can be created and modified using only the keyboard once a link has been set`, async ( {
+	test( `can be created and modified using only the keyboard`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -444,35 +444,55 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( URL );
 		await pageUtils.pressKeys( 'Enter' );
 
+		const linkPopover = LinkUtils.getLinkPopover();
+
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await pageUtils.pressKeys( 'End' );
-		await expect( LinkUtils.getLinkPopover() ).toBeHidden();
+		await expect( linkPopover ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect( LinkUtils.getLinkPopover() ).toBeVisible();
+		await expect( linkPopover ).toBeVisible();
 
-		// Reopen the link popover and check that the input has the correct value.
+		// Switch the Link UI into "Edit" mode via keyboard shortcut
+		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
 
 		await expect(
-			page.getByRole( 'combobox', {
+			linkPopover.getByRole( 'combobox', {
 				name: 'Link',
 			} )
 		).toHaveValue( URL );
 
 		// Confirm that submitting the input without any changes keeps the same
 		// value and moves focus back to the paragraph.
+
+		// Submit without changes - should return to preview mode.
 		await pageUtils.pressKeys( 'Enter' );
+
+		// Move back into the RichText.
+		await pageUtils.pressKeys( 'Escape' );
+
+		// ...but the Link Popover should still be active because we are within the link.
+		await expect( linkPopover ).toBeVisible();
+
+		// Move outside of the link entirely.
 		await pageUtils.pressKeys( 'ArrowRight' );
-		await page.keyboard.type( '.' );
+
+		// Link Popover should now disappear because we are no longer within the link.
+		await expect( linkPopover ).toBeHidden();
+
+		// Append some text to the paragraph to assert that focus has been returned
+		// to the correct location within the RichText.
+		await page.keyboard.type( ' and more!' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'This is <a href="' + URL + '">Gutenberg</a>',
+					content:
+						'This is <a href="' + URL + '">Gutenberg</a> and more!',
 				},
 			},
 		] );
