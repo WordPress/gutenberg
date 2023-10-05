@@ -383,14 +383,14 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
+		// Insert a link.
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		const urlInput = page.getByRole( 'combobox', {
 			name: 'Link',
 		} );
 
-		// expect the "Link" combobox to be visible and focused
+		// Expect the "Link" combobox to be visible and focused
 		await expect( urlInput ).toBeVisible();
 		await expect( urlInput ).toBeFocused();
 
@@ -398,6 +398,7 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( titleText );
 		await expect(
 			page.getByRole( 'option', {
+				// "post" disambiguates from the "Create page" option.
 				name: `${ titleText } post`,
 			} )
 		).toBeVisible();
@@ -413,13 +414,13 @@ test.describe( 'Links', () => {
 		// Confirm that selection is returned to where it was before launching
 		// the link editor, with "Gutenberg" as an uncollapsed selection.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( '.' );
+		await page.keyboard.type( ' and more!' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'This is Gutenberg.',
+					content: 'This is Gutenberg and more!',
 				},
 			},
 		] );
