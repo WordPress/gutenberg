@@ -17,7 +17,10 @@ const getCell = ( name: string ) => {
 	return within( getControl() ).getByRole( 'gridcell', { name } );
 };
 
-const asyncRender = async ( jsx: any, focusedCell = 'center center' ) => {
+const renderAndInitCompositeStore = async (
+	jsx: JSX.Element,
+	focusedCell = 'center center'
+) => {
 	const view = render( jsx );
 	await waitFor( () => {
 		expect( getCell( focusedCell ) ).toHaveAttribute( 'tabindex', '0' );
@@ -28,7 +31,7 @@ const asyncRender = async ( jsx: any, focusedCell = 'center center' ) => {
 describe( 'AlignmentMatrixControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', async () => {
-			await asyncRender( <AlignmentMatrixControl /> );
+			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
 
 			expect( getControl() ).toBeInTheDocument();
 		} );
@@ -36,7 +39,7 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should be centered by default', async () => {
 			const user = userEvent.setup();
 
-			await asyncRender( <AlignmentMatrixControl /> );
+			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
 
 			await user.tab();
 
@@ -60,7 +63,7 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					await asyncRender(
+					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl
 							value="center"
 							onChange={ spy }
@@ -79,7 +82,7 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					await asyncRender(
+					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl
 							value="center"
 							onChange={ spy }
@@ -107,7 +110,7 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					await asyncRender(
+					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
@@ -129,7 +132,7 @@ describe( 'AlignmentMatrixControl', () => {
 					const user = userEvent.setup();
 					const spy = jest.fn();
 
-					await asyncRender(
+					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
