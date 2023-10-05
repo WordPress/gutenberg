@@ -14,7 +14,7 @@ interface PreferencesRepresentation {
  * @param this
  * @param preferences Preferences to set.
  */
-async function setPreferences(
+export async function setPreferences(
 	this: Editor,
 	preferences: PreferencesRepresentation
 ) {
@@ -28,5 +28,3 @@ async function setPreferences(
 		}
 	}, preferences );
 }
-
-export { setPreferences };
