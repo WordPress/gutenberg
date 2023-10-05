@@ -23,6 +23,7 @@
 -   `Button`: Remove `aria-selected` CSS selector from styling 'active' buttons ([#54931](https://github.com/WordPress/gutenberg/pull/54931)).
 -   `Popover`: Apply the CSS in JS styles properly for components used within popovers. ([#54912](https://github.com/WordPress/gutenberg/pull/54912))
 -   `Button`: Remove hover styles when `aria-disabled` is set to `true` for the secondary variant. ([#54978](https://github.com/WordPress/gutenberg/pull/54978))
+-   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
 
 ### Internal
 
