@@ -16,7 +16,7 @@ setLocaleData( { 'Type / to choose a block': [ 'Taper / pour choisir un bloc' ] 
 
 # RTL Support
 
-By default, the Gutenberg UI is optimized for left-to-right (LTR) languages. But Gutenberg scripts and styles include support for right-to-left (RTL) languages as well. To enable RTL support, we need to perform to a few actions:
+By default, the Gutenberg UI is optimized for left-to-right (LTR) languages. But Gutenberg scripts and styles include support for right-to-left (RTL) languages as well. To enable RTL support, we need to perform a few actions:
 
 First, we need to define that our locale is RTL using `@wordpress/i18n`.
 
