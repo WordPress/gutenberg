@@ -56,28 +56,26 @@ export default function CreatePatternModal( {
 
 	const categoryMap = useMemo( () => {
 		// Merge the user and core pattern categories and remove any duplicates.
-		const categories = [
-			...userPatternCategories,
-			...corePatternCategories,
-		].reduce( ( uniqueCategories, category ) => {
-			if (
-				! uniqueCategories.has( category.label ) &&
-				// There are two core categories with `Post` label so explictily remove the one with
-				// the `query` slug to avoid any confusion.
-				category.name !== 'query'
-			) {
-				// We need to store the name separately as this is used as the slug in the
-				// taxonomy and may vary from the label.
-				uniqueCategories.set( category.label, {
-					label: category.label,
-					value: category.label,
-					name: category.name,
-				} );
+		const uniqueCategories = new Map();
+		[ ...userPatternCategories, ...corePatternCategories ].forEach(
+			( category ) => {
+				if (
+					! uniqueCategories.has( category.label ) &&
+					// There are two core categories with `Post` label so explictily remove the one with
+					// the `query` slug to avoid any confusion.
+					category.name !== 'query'
+				) {
+					// We need to store the name separately as this is used as the slug in the
+					// taxonomy and may vary from the label.
+					uniqueCategories.set( category.label, {
+						label: category.label,
+						value: category.label,
+						name: category.name,
+					} );
+				}
 			}
-			return uniqueCategories;
-		}, new Map() );
-
-		return categories;
+		);
+		return uniqueCategories;
 	}, [ userPatternCategories, corePatternCategories ] );
 
 	async function onCreate( patternTitle, sync ) {
