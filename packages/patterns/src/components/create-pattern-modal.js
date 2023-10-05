@@ -54,33 +54,30 @@ export default function CreatePatternModal( {
 		}
 	);
 
-	const categoryOptions = useMemo( () => {
+	const categoryMap = useMemo( () => {
 		// Merge the user and core pattern categories and remove any duplicates.
 		const categories = [
 			...userPatternCategories,
 			...corePatternCategories,
 		].reduce( ( uniqueCategories, category ) => {
 			if (
-				! uniqueCategories.find(
-					( existingCategory ) =>
-						existingCategory.label === category.label
-				) &&
+				! uniqueCategories.get( category.label ) &&
 				// There are two core categories with `Post` label so explictily remove the one with
 				// the `query` slug to avoid any confusion.
 				category.name !== 'query'
 			) {
 				// We need to store the name separately as this is used as the slug in the
 				// taxonomy and may vary from the label.
-				uniqueCategories.push( {
+				uniqueCategories.set( category.label, {
 					label: category.label,
 					value: category.label,
 					name: category.name,
 				} );
 			}
 			return uniqueCategories;
-		}, [] );
+		}, new Map() );
 
-		return categories.sort( ( a, b ) => a.label.localeCompare( b.label ) );
+		return categories;
 	}, [ userPatternCategories, corePatternCategories ] );
 
 	async function onCreate( patternTitle, sync ) {
@@ -127,9 +124,7 @@ export default function CreatePatternModal( {
 		try {
 			// We need to match any existing term to the correct slug to prevent duplicates, eg.
 			// the core `Headers` category uses the singular `header` as the slug.
-			const existingTerm = categoryOptions.find(
-				( cat ) => cat.label === term
-			);
+			const existingTerm = categoryMap.get( term );
 			const termData = existingTerm
 				? { name: existingTerm.label, slug: existingTerm.name }
 				: { name: term };
@@ -177,7 +172,7 @@ export default function CreatePatternModal( {
 					<CategorySelector
 						categoryTerms={ categoryTerms }
 						onChange={ setCategoryTerms }
-						categoryOptions={ categoryOptions }
+						categoryMap={ categoryMap }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }
