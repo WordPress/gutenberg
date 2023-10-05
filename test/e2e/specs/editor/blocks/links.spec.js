@@ -286,7 +286,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `allows Left to be pressed during creation when the toolbar is fixed to top`, async ( {
+	test( `allows arrow keys to be pressed during link creation when the toolbar is fixed to top`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -317,7 +317,7 @@ test.describe( 'Links', () => {
 		await expect( popover ).toBeHidden();
 	} );
 
-	test( `allows arrow keys to be pressed during creation in "Docked Toolbar" mode`, async ( {
+	test( `allows arrow keys to be pressed during link creation in "Docked Toolbar" mode`, async ( {
 		page,
 		editor,
 		pageUtils,
