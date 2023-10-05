@@ -214,6 +214,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 				'has-block-selected': hasBlockSelected,
 			} ) }
 		>
+			{ /* Floating header style to be able to hide the block popovers behind the header */ }
+			<div className="edit-site-header-edit-mode__background-style"></div>
 			{ hasDefaultEditorCanvasView && (
 				<div className="edit-site-header-edit-mode__start">
 					<NavigableToolbar
