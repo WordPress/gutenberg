@@ -36,5 +36,5 @@ function UnconnectedText(
  * }
  * ```
  */
-const Text = contextConnect( UnconnectedText, 'Text' );
+export const Text = contextConnect( UnconnectedText, 'Text' );
 export default Text;

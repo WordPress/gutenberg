@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import Text from '../component';
+import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
 	component: Text,
