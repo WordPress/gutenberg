@@ -61,7 +61,7 @@ export default function CreatePatternModal( {
 			( category ) => {
 				if (
 					! uniqueCategories.has( category.label ) &&
-					// There are two core categories with `Post` label so explictily remove the one with
+					// There are two core categories with `Post` label so explicitly remove the one with
 					// the `query` slug to avoid any confusion.
 					category.name !== 'query'
 				) {
