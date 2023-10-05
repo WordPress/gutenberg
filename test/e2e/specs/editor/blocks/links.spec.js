@@ -317,7 +317,7 @@ test.describe( 'Links', () => {
 		await expect( popover ).toBeHidden();
 	} );
 
-	test( `allows Left to be pressed during creation in "Docked Toolbar" mode`, async ( {
+	test( `allows arrow keys to be pressed during creation in "Docked Toolbar" mode`, async ( {
 		page,
 		editor,
 		pageUtils,
@@ -333,22 +333,17 @@ test.describe( 'Links', () => {
 
 		await editor.clickBlockToolbarButton( 'Link' );
 
-		// Typing "left" should not close the dialog.
+		const popover = LinkUtils.getLinkPopover();
+
+		await expect( popover ).toBeVisible();
+
+		// Pressing arrow key should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		let popover = page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator(
-				'.components-popover__content .block-editor-link-control'
-			);
 		await expect( popover ).toBeVisible();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		popover = page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator(
-				'.components-popover__content .block-editor-link-control'
-			);
+
 		await expect( popover ).toBeHidden();
 	} );
 
