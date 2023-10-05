@@ -42,22 +42,57 @@ function MyAuthorsListBase() {
 
 ## What's an entity?
 
-An entity represents a WordPress REST API endpoint. Each item within the entity is called entity record.
+An entity represents a WordPress REST API endpoint. Each item within the entity is called entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
 
-Available entities are defined in `rootEntitiesConfig` at ./src/entities.js and the follow this schema:
+What follows is a description of some of the properties of `rootEntitiesConfig`.
 
-- label
-- kind
-- name
-- baseURL
-- baseURLParams
-- key
-- getTitle
-- plural
-- rawAttributes
-- loadEntities
-- transientEdits
-- mergedEdits
+## baseURL
+
+- Type: string.
+- Example: `'/wp/v2/users'`.
+
+This property maps the entity to a given endpoint, representing its URL as defined in the [REST API handbook](https://developer.wordpress.org/rest-api/reference/#rest-api-developer-endpoint-reference).
+
+## baseURLParams
+
+- Type: `object`.
+- Example: `{ context: 'edit' }`.
+
+Additional parameters to the request, if the endpoint supports it. The additional arguments available to the request are listed under arguments section. As an example, see the user entity and the [users endpoint](https://developer.wordpress.org/rest-api/reference/users/#list-users). By providing `{ context: 'edit' }` the server response will include all the fields in the [user schema](https://developer.wordpress.org/rest-api/reference/users/#schema) that belong to the `edit` context.
+
+## key
+
+- Type: `string`.
+- Example: `'slug'`.
+
+The endpoint response may be in different formats. It can be a simple object, which maps to a single entity record. This is the case of the site entity (settings endpoint):
+
+```json
+{
+	"title": "...",
+	"description": "...",
+	"...": "..."
+}
+```
+
+The most common format is for the response to be a collection represented as an array, which maps to as many entity records as elements of the array. This is the case of the use entity (users endpoint):
+
+```json
+[
+	{ id: 1, "name": "...", "...": "..." },
+	{ id: 2, "name": "...", "...": "..." },
+	{ id: 3, "name": "...", "...": "..." },
+]
+```
+
+There's also cases in which a collection is represented as an object. In this case, for the entity records to be recognized by the entities engine, the entity configuration needs to provide which field is acting as `key` for the object. This is the case of the status entity, which sets `slug` as the collection's `key`:
+
+```json
+{
+	"publish": { "slug": "publish", "name": "Published", "...":  "..." },
+	"draft": { "slug": "draft", "name": "Draft", "...":  "..." }
+}
+```
 
 ## Actions
 
