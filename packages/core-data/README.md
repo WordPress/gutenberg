@@ -40,6 +40,25 @@ function MyAuthorsListBase() {
 }
 ```
 
+## What's an entity?
+
+An entity represents a WordPress REST API endpoint. Each item within the entity is called entity record.
+
+Available entities are defined in `rootEntitiesConfig` at ./src/entities.js and the follow this schema:
+
+- label
+- kind
+- name
+- baseURL
+- baseURLParams
+- key
+- getTitle
+- plural
+- rawAttributes
+- loadEntities
+- transientEdits
+- mergedEdits
+
 ## Actions
 
 The following set of dispatching action creators are available on the object returned by `wp.data.dispatch( 'core' )`:
