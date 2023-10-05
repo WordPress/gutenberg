@@ -37,8 +37,6 @@ export default function EmptyBlockInserter( {
 				}
 			) }
 			__unstableContentRef={ __unstableContentRef }
-			resize={ false }
-			shift={ false }
 			{ ...popoverProps }
 		>
 			<div className="block-editor-block-list__empty-block-inserter">
