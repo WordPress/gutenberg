@@ -427,6 +427,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 		editor,
 	} ) => {
+		// The autocomplete popup is flaky when typing too fast, so we need to
+		// slow it down until it's addressed in the component.
+		// See https://github.com/WordPress/gutenberg/pull/55081
 		const typingDelay = 100;
 
 		await editor.canvas
