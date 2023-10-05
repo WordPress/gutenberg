@@ -422,22 +422,44 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
-	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '@fr' );
+	}, testInfo ) => {
+		const typingDelay = testInfo.project.name === 'webkit' ? 100 : 0;
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+
+		await page.keyboard.type( '@fr', { delay: typingDelay } );
 		await expect(
-			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+			page.getByRole( 'option', {
+				name: 'Frodo Baggins',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		await page.keyboard.press( 'Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '@ringbearer' },
+			},
+		] );
+
+		await page.keyboard.type( ' +bi', { delay: typingDelay } );
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Bilbo Baggins',
+				selected: true,
+			} )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( ' +bi' );
-		await expect(
-			page.locator( 'role=option', { hasText: 'Bilbo Baggins' } )
-		).toBeVisible();
-		await page.keyboard.press( 'Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>@ringbearer +thebetterhobbit</p>
-<!-- /wp:paragraph -->` );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '@ringbearer +thebetterhobbit' },
+			},
+		] );
 	} );
 
 	test( 'should hide UI when selection changes (by keyboard)', async ( {
