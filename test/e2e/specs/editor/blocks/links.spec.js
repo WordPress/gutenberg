@@ -1040,10 +1040,7 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 			// Click on the Link button.
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Link' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -1106,10 +1103,7 @@ test.describe( 'Links', () => {
 			} );
 
 			// Click on the Link button.
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Link' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
 			await page.keyboard.type( linkTwoURL );
@@ -1126,10 +1120,7 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 			// Click on the Link button.
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Link' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
 			await page.keyboard.type( linkOneURL );
@@ -1159,8 +1150,9 @@ test.describe( 'Links', () => {
 		// Based on issue reported in https://github.com/WordPress/gutenberg/issues/41771/.
 		test( `should correctly replace active link's text value within rich text even when multiple matching text values exist within the rich text`, async ( {
 			page,
-			pageUtils,
 			editor,
+			pageUtils,
+			LinkUtils,
 		} ) => {
 			// Create a block with some text.
 			await editor.insertBlock( {
@@ -1174,10 +1166,7 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'shift+ArrowLeft' );
 
 			// Click on the Link button.
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Link' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
 			await page.keyboard.type( 'www.wordpress.org' );
@@ -1187,8 +1176,17 @@ test.describe( 'Links', () => {
 
 			await pageUtils.pressKeys( 'ArrowLeft' );
 
+			const linkPopover = LinkUtils.getLinkPopover();
+
 			// Click the "Edit" button in Link UI
-			await page.getByRole( 'button', { name: 'Edit' } ).click();
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Focus the "Text" field within the linkPopover
+			await linkPopover
+				.getByRole( 'textbox', {
+					name: 'Text',
+				} )
+				.focus();
 
 			// Delete existing value from "Text" field
 			await pageUtils.pressKeys( 'Backspace' );
