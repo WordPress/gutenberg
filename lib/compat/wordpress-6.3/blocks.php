@@ -118,5 +118,27 @@ function gutenberg_wp_block_register_post_meta() {
 			),
 		)
 	);
+
+	// Reigster new post meta for [ 'wp_template', 'wp_template_part ] post types, named it `template_file_path`
+	$post_types = array( 'wp_template', 'wp_template_part' );
+	foreach ( $post_types as $post_type ) {
+		register_post_meta(
+			$post_type,
+			'template_file_path',
+			array(
+				'auth_callback'     => function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'sanitize_callback' => 'sanitize_text_field',
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type' => 'string',
+					),
+				),
+			)
+		);
+	}
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );
