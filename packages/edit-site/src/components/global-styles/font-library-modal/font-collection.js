@@ -30,7 +30,6 @@ import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -54,7 +53,7 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts } =
+	const { collections, getFontCollection, installFont } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -134,6 +133,7 @@ function FontCollection( { id } ) {
 	};
 
 	const handleUnselectFont = () => {
+		setFontsToInstall( [] );
 		setSelectedFont( null );
 	};
 
@@ -149,10 +149,19 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
-		resetFontsToInstall();
+		try {
+			await installFont( fontsToInstall[ 0 ] );
+			resetFontsToInstall();
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
 	};
 
 	return (

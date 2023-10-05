@@ -7,30 +7,26 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 
-export async function fetchInstallFonts( data ) {
+export async function fetchInstallFont( data ) {
 	const config = {
-		path: '/wp/v2/fonts',
+		path: '/wp/v2/font-families',
 		method: 'POST',
 		body: data,
 	};
 	return apiFetch( config );
 }
 
-export async function fetchUninstallFonts( fonts ) {
-	const data = {
-		font_families: fonts,
-	};
+export async function fetchUninstallFont( fontFamily ) {
 	const config = {
-		path: '/wp/v2/fonts',
+		path: `/wp/v2/font-families/${ fontFamily.slug }`,
 		method: 'DELETE',
-		data,
 	};
 	return apiFetch( config );
 }
 
 export async function fetchFontCollections() {
 	const config = {
-		path: '/wp/v2/fonts/collections',
+		path: '/wp/v2/font-collections',
 		method: 'GET',
 	};
 	return apiFetch( config );
@@ -38,7 +34,7 @@ export async function fetchFontCollections() {
 
 export async function fetchFontCollection( id ) {
 	const config = {
-		path: `/wp/v2/fonts/collections/${ id }`,
+		path: `/wp/v2/font-collections/${ id }`,
 		method: 'GET',
 	};
 	return apiFetch( config );
