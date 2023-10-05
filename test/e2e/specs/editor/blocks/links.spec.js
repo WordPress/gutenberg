@@ -304,22 +304,16 @@ test.describe( 'Links', () => {
 			.getByRole( 'button', { name: 'Link' } )
 			.click();
 
-		// Typing "left" should not close the dialog.
-		await pageUtils.pressKeys( 'ArrowLeft' );
-		let popover = page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator(
-				'.components-popover__content .block-editor-link-control'
-			);
+		const popover = LinkUtils.getLinkPopover();
 		await expect( popover ).toBeVisible();
 
-		// Escape should close the dialog still.
+		// Pressing "left" should not close the dialog.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await expect( popover ).toBeVisible();
+
+		// Escape should close the dialog.
 		await page.keyboard.press( 'Escape' );
-		popover = page
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			.locator(
-				'.components-popover__content .block-editor-link-control'
-			);
+
 		await expect( popover ).toBeHidden();
 	} );
 
@@ -1300,5 +1294,19 @@ class LinkUtils {
 
 		// Reselect the link.
 		await this.pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+	}
+
+	/**
+	 * This method is used as a temporary workaround for retriveing the
+	 * LinkControl component. This is because it currently does not expose
+	 * any accessible attributes. In general we should avoid using this method
+	 * and instead rely on locating the sub elements of the component directly.
+	 * Remove / update method once the following PR has landed:
+	 * https://github.com/WordPress/gutenberg/pull/54063.
+	 */
+	getLinkPopover() {
+		return this.page.locator(
+			'.components-popover__content .block-editor-link-control'
+		);
 	}
 }
