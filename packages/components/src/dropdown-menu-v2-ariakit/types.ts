@@ -15,6 +15,9 @@ export interface DropdownMenuProps {
 	// TODO: do we need to support render props too?
 	trigger: React.ReactElement;
 	children?: React.ReactNode;
+	/**
+	 * @default true
+	 */
 	modal?: boolean;
 	className?: string;
 	open?: boolean;
@@ -23,6 +26,7 @@ export interface DropdownMenuProps {
 	placement?: Placement;
 	gutter?: number;
 	shift?: number;
+	defaultValues?: Ariakit.MenuStoreProps[ 'defaultValues' ];
 }
 
 export interface DropdownMenuGroupProps
@@ -42,6 +46,17 @@ export interface DropdownMenuItemProps {
 }
 
 export interface DropdownMenuCheckboxItemProps
+	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
+	// Default false
+	hideOnClick?: boolean;
+	name: string;
+	value: string;
+	checked?: boolean;
+	defaultChecked?: boolean;
+	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
+}
+
+export interface DropdownMenuRadioItemProps
 	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
 	// Default false
 	hideOnClick?: boolean;

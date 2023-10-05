@@ -14,10 +14,13 @@ import {
 	useMemo,
 	cloneElement,
 } from '@wordpress/element';
+import { check, chevronRightSmall } from '@wordpress/icons';
+import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
+import Icon from '../icon';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
 	DropdownMenuProps,
@@ -60,16 +63,83 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	DropdownMenuCheckboxItemProps
 >( function DropdownMenuCheckboxItem( { suffix, children, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+
+	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
+		props.onChange?.( {
+			...e,
+			target: Object.assign( e.target, { value: props.value } ),
+		} );
+	};
+
+	// This can't be currently done because of
+	// https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/menu/menu-item-check.ts
+	// But using `Ariakit.MenuItemCheck` works as expected.
+	// const isChecked = dropdownMenuContext?.store.useState( ( state ) => {
+	// 	// state.values doesn't have a property with key [props.name] when empty
+	// 	const checkedOrValues = state.values[ props.name ];
+	// 	return Array.isArray( checkedOrValues )
+	// 		? checkedOrValues.includes( props.value )
+	// 		: checkedOrValues;
+	// } );
+
 	return (
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }
 			{ ...props }
+			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
-			<Ariakit.MenuItemCheck store={ dropdownMenuContext?.store } />
+			<Ariakit.MenuItemCheck
+				store={ dropdownMenuContext?.store }
+				render={ <Styled.ItemPrefixWrapper /> }
+			>
+				<Icon icon={ check } size={ 24 } />
+			</Ariakit.MenuItemCheck>
+
+			{ /* <Styled.ItemPrefixWrapper>
+				{ isChecked ? <Icon icon={ check } size={ 24 } /> : null }
+			</Styled.ItemPrefixWrapper> */ }
+
+			{ children }
+			{ suffix && (
+				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
+			) }
+		</Styled.DropdownMenuCheckboxItem>
+	);
+} );
+
+export const DropdownMenuRadioItem = forwardRef<
+	HTMLDivElement,
+	DropdownMenuCheckboxItemProps
+>( function DropdownMenuRadioItem( { suffix, children, ...props }, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
+		props.onChange?.( {
+			...e,
+			target: Object.assign( e.target, { value: props.value } ),
+		} );
+	};
+
+	return (
+		<Styled.DropdownMenuRadioItem
+			ref={ ref }
+			{ ...props }
+			onChange={ onChangeWithTargetValue }
+			store={ dropdownMenuContext?.store }
+		>
+			<Ariakit.MenuItemCheck store={ dropdownMenuContext?.store }>
+				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<Circle
+						cx={ 12 }
+						cy={ 12 }
+						r={ 3 }
+						fill="currentColor"
+					></Circle>
+				</SVG>
+			</Ariakit.MenuItemCheck>
 			{ children }
 			{ suffix }
-		</Styled.DropdownMenuCheckboxItem>
+		</Styled.DropdownMenuRadioItem>
 	);
 } );
 
@@ -114,6 +184,8 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			placement,
 			gutter = 8,
 			shift = 0,
+			defaultValues,
+			modal = true,
 			...props
 		},
 		// Menu ref
@@ -126,6 +198,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			open,
 			defaultOpen,
 			placement,
+			defaultValues,
 			setOpen( willBeOpen ) {
 				onOpenChange?.( willBeOpen );
 			},
@@ -136,6 +209,8 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			[ dropdownMenuStore ]
 		);
 
+		// const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
+
 		return (
 			<>
 				{ /* Menu trigger */ }
@@ -145,10 +220,16 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 					render={
 						// Add arrow for submenus
 						dropdownMenuStore.parent
-							? cloneElement( trigger, {
+							? // TODO: check that `trigger` renders a `DropdownMenuItem`?
+							  cloneElement( trigger, {
 									// TODO: add prefix
 									suffix: trigger.props.suffix ?? (
-										<Ariakit.MenuButtonArrow />
+										<Ariakit.MenuButtonArrow>
+											<Icon
+												icon={ chevronRightSmall }
+												size={ 24 }
+											/>{ ' ' }
+										</Ariakit.MenuButtonArrow>
 									),
 							  } )
 							: trigger
@@ -158,6 +239,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 				{ /* Menu popover */ }
 				<Styled.DropdownMenu
 					{ ...props }
+					modal={ modal }
 					store={ dropdownMenuStore }
 					gutter={ dropdownMenuStore.parent ? 16 : gutter }
 					shift={ dropdownMenuStore.parent ? -9 : shift }
