@@ -127,7 +127,10 @@ export const DropdownMenuRadioItem = forwardRef<
 			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
-			<Ariakit.MenuItemCheck store={ dropdownMenuContext?.store }>
+			<Ariakit.MenuItemCheck
+				store={ dropdownMenuContext?.store }
+				render={ <Styled.ItemPrefixWrapper /> }
+			>
 				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<Circle
 						cx={ 12 }
@@ -198,7 +201,9 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 			open,
 			defaultOpen,
 			placement,
+			// TODO: can we remove this prop?
 			defaultValues,
+			focusLoop: true,
 			setOpen( willBeOpen ) {
 				onOpenChange?.( willBeOpen );
 			},
@@ -224,12 +229,11 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 							  cloneElement( trigger, {
 									// TODO: add prefix
 									suffix: trigger.props.suffix ?? (
-										<Ariakit.MenuButtonArrow>
-											<Icon
-												icon={ chevronRightSmall }
-												size={ 24 }
-											/>{ ' ' }
-										</Ariakit.MenuButtonArrow>
+										<Styled.SubmenuRtlChevronIcon
+											aria-hidden="true"
+											icon={ chevronRightSmall }
+											size={ 24 }
+										/>
 									),
 							  } )
 							: trigger
@@ -243,7 +247,7 @@ export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
 						modal={ modal }
 						store={ dropdownMenuStore }
 						gutter={ dropdownMenuStore.parent ? 16 : gutter }
-						shift={ dropdownMenuStore.parent ? -9 : shift }
+						shift={ dropdownMenuStore.parent ? -8 : shift }
 						hideOnHoverOutside={ false }
 					>
 						<DropdownMenuContext.Provider value={ contextValue }>

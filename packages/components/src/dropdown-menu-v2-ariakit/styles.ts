@@ -9,9 +9,9 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, font, CONFIG } from '../utils';
+import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../utils/space';
-// import Icon from '../icon';
+import Icon from '../icon';
 import type { DropdownMenuContext } from './types';
 
 const CONTENT_WRAPPER_PADDING = space( 2 );
@@ -48,11 +48,12 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	overscroll-behavior: contain;
 	overflow: visible;
 `;
-export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
-export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )``;
 
 const itemPrefix = css`
-	width: ${ ITEM_PREFIX_WIDTH };
+	/* !important is to override some inline styles set by Ariakit */
+	width: ${ ITEM_PREFIX_WIDTH } !important;
+	/* !important is to override some inline styles set by Ariakit */
+	height: auto !important;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -152,21 +153,23 @@ const baseItem = css`
 		outline: 2px solid transparent;
 	}
 
-	/* Active (ie. pressed) */
+	/* Active (ie. pressed, mouse down) */
 	&:active,
 	&[data-active] {
-		background-color: hsl( 204 100% 32% );
+		/* TODO: should there be a visual active state? */
 	}
 
-	/* When trigger or a submenu that is open */
+	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: hsl( 204 10% 10% / 0.1 );
-		color: currentColor;
-		outline: 1px solid red;
+		/* TODO: should we style submenu triggers any different? */
 	}
 
 	svg {
 		fill: currentColor;
+	}
+
+	&:not( :has( ${ ItemPrefixWrapper } ) ) {
+		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
 	}
 `;
 // TODO: add styles to item for adding extra space when there's no prefix
@@ -177,10 +180,56 @@ const baseItem = css`
 export const DropdownMenuItem = styled( Ariakit.MenuItem )`
 	${ baseItem }
 `;
+
 export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
 	${ baseItem }
 `;
+
 export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
 	${ baseItem }
 `;
-export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )``;
+
+export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
+
+export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	min-height: ${ space( 8 ) };
+
+	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+		${ ITEM_PREFIX_WIDTH };
+	/* TODO: color doesn't match available UI variables */
+	color: ${ COLORS.gray[ 700 ] };
+
+	/* TODO: font size doesn't match available ones via "font" utils */
+	font-size: 11px;
+	line-height: 1.4;
+	font-weight: 500;
+	text-transform: uppercase;
+`;
+
+export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
+	Pick< DropdownMenuContext, 'variant' >
+>`
+	border: none;
+	height: ${ CONFIG.borderWidth };
+	/* TODO: doesn't match border color from variables */
+	background-color: ${ ( props ) =>
+		props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BORDER_COLOR
+			: DEFAULT_BORDER_COLOR };
+	/* Negative horizontal margin to make separator go from side to side */
+	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
+`;
+
+export const SubmenuRtlChevronIcon = styled( Icon )`
+	${ rtl(
+		{
+			transform: `scaleX(1) translateX(${ space( 2 ) })`,
+		},
+		{
+			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
+		}
+	) }
+`;

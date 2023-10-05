@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { menu } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
 
 /**
@@ -22,6 +22,7 @@ import {
 	DropdownMenuContext,
 	DropdownMenuRadioItem,
 } from '..';
+import Icon from '../../icon';
 import Button from '../../button';
 import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
@@ -61,31 +62,39 @@ export default meta;
 
 export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
-		<DropdownMenuItem>Item</DropdownMenuItem>
+		<DropdownMenuItem>Default item</DropdownMenuItem>
 		<DropdownMenuItem hideOnClick={ false }>
-			Item (does not close the menu when clicked)
+			{ /* TODO: move this to description text */ }
+			Keep menu open on click
 		</DropdownMenuItem>
-		<DropdownMenuItem
-			disabled
-			prefix={ <span>Pre</span> }
-			suffix={ <span>Suf</span> }
-		>
-			Disabled item
-		</DropdownMenuItem>
+		<DropdownMenuItem disabled>Disabled</DropdownMenuItem>
 		<DropdownMenuSeparator />
 		<DropdownMenuGroup>
-			<DropdownMenuGroupLabel>Group Label</DropdownMenuGroupLabel>
-			<DropdownMenuItem prefix={ <span>Pre</span> }>
-				Item with prefix
+			<DropdownMenuGroupLabel>Prefix and suffix</DropdownMenuGroupLabel>
+			<DropdownMenuItem
+				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
+			>
+				With prefix
 			</DropdownMenuItem>
 			<DropdownMenuItem suffix={ <span>Suf</span> }>
-				Item with suffix
+				With suffix
+			</DropdownMenuItem>
+			<DropdownMenuItem
+				disabled
+				prefix={ <span>Pre</span> }
+				suffix={ <span>Suf</span> }
+			>
+				Disabled with both
 			</DropdownMenuItem>
 		</DropdownMenuGroup>
 	</DropdownMenu>
 );
 Default.args = {
-	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
+	trigger: (
+		<Button __next40pxDefaultSize variant="secondary">
+			Open menu
+		</Button>
+	),
 };
 
 export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
@@ -315,7 +324,7 @@ export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
 	);
 };
 WithModals.args = {
-	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
+	...Default.args,
 };
 
 const ExampleSlotFill = createSlotFill( 'Example' );
