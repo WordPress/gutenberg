@@ -45,6 +45,14 @@ function bubbleEvent( event, Constructor, frame ) {
 	}
 
 	const newEvent = new Constructor( event.type, init );
+	// This is a hacky way of keeping the original "target" of the event
+	// when calling dispatchEvent on the frame. This is needed because
+	// if the target is set to the iframe, some keyboard shortcuts may trigger
+	// inadvertantly (like global shortcuts when typing within inputs...)
+	Object.defineProperty( newEvent, 'target', {
+		writable: false,
+		value: event.target,
+	} );
 	if ( init.defaultPrevented ) {
 		newEvent.preventDefault();
 	}

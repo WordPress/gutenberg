@@ -23,11 +23,7 @@ export default function EditorBox() {
 	}, [] );
 
 	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className="editor-box"
-			onKeyDown={ ( event ) => event.stopPropagation() }
-		>
+		<div className="editor-box">
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ updateBlocks }
