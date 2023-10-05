@@ -1,5 +1,10 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 export default function makeFamilyFromFaces( fontFaces ) {
-	let fontFamilyObject;
+	let fontFamilyObject = null;
 	fontFaces.forEach( ( fontFace ) => {
 		if ( ! fontFamilyObject ) {
 			fontFamilyObject = {
@@ -10,7 +15,9 @@ export default function makeFamilyFromFaces( fontFaces ) {
 			};
 		} else if ( fontFamilyObject.name !== fontFace.fontFamily ) {
 			throw new Error(
-				'You may only batch upload fonts from the same font family.'
+				__(
+					'You may only batch upload fonts from the same font family.'
+				)
 			);
 		}
 		fontFamilyObject.fontFace.push( fontFace );
