@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
@@ -31,12 +31,25 @@ export default function SelectedBlockTools( {
 } ) {
 	const {
 		capturingClientId,
-		isFixed,
 		isInsertionPointVisible,
 		lastClientId,
 		rootClientId,
-		shouldShowBreadcrumb,
 	} = useSelectedBlockToolProps( clientId );
+
+	const { isFixed, shouldShowBreadcrumb } = useSelect( ( select ) => {
+		const { getSettings, hasMultiSelection, __unstableGetEditorMode } =
+			select( blockEditorStore );
+
+		const editorMode = __unstableGetEditorMode();
+
+		return {
+			isFixed: getSettings().hasFixedToolbar,
+			shouldShowBreadcrumb:
+				! hasMultiSelection() &&
+				( editorMode === 'navigation' || editorMode === 'zoom-out' ),
+		};
+	}, [] );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const instanceId = useInstanceId( SelectedBlockTools );
 	const descriptionId = `block-editor-block-contextual-toolbar--${ instanceId }`;

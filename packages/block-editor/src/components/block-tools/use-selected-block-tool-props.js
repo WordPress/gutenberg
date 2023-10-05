@@ -19,12 +19,10 @@ export default function useSelectedBlockToolProps( clientId ) {
 			const {
 				getBlockRootClientId,
 				getBlockParents,
-				getSettings,
 				__experimentalGetBlockListSettingsForBlocks,
 				isBlockInsertionPointVisible,
 				getBlockInsertionPoint,
 				getBlockOrder,
-				__unstableGetEditorMode,
 				hasMultiSelection,
 				getLastMultiSelectedBlockClientId,
 			} = select( blockEditorStore );
@@ -53,21 +51,13 @@ export default function useSelectedBlockToolProps( clientId ) {
 					order[ insertionPoint.index ] === clientId;
 			}
 
-			const editorMode = __unstableGetEditorMode();
-
 			return {
-				clientId,
-				rootClientId: getBlockRootClientId( clientId ),
 				capturingClientId,
-				isFixed: getSettings().hasFixedToolbar,
 				isInsertionPointVisible,
-				shouldShowBreadcrumb:
-					! hasMultiSelection() &&
-					( editorMode === 'navigation' ||
-						editorMode === 'zoom-out' ),
 				lastClientId: hasMultiSelection()
 					? getLastMultiSelectedBlockClientId()
 					: null,
+				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
