@@ -22,6 +22,7 @@ import PageActions from '../page-actions';
 import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
 
 const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 export default function PagePages() {
 	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
@@ -32,12 +33,14 @@ export default function PagePages() {
 		pageSize: PAGE_SIZE_VALUES[ 0 ],
 	} );
 	// Request post statuses to get the proper labels.
-	const [ postStatuses, setPostStatuses ] = useState( EMPTY_ARRAY );
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/statuses',
-		} ).then( setPostStatuses );
-	}, [] );
+	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const postStatuses =
+		statuses === null
+			? EMPTY_OBJECT
+			: statuses.reduce( ( acc, status ) => {
+					acc[ status.slug ] = status.name;
+					return acc;
+			  }, EMPTY_OBJECT );
 
 	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
 	const pagination = useMemo(
@@ -66,7 +69,7 @@ export default function PagePages() {
 			reset,
 		]
 	);
-	const { records, isResolving: isLoading } = useEntityRecords(
+	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
 		'page',
 		queryArgs
@@ -136,7 +139,8 @@ export default function PagePages() {
 				header: 'Status',
 				id: 'status',
 				cell: ( props ) =>
-					postStatuses[ props.row.original.status ]?.name,
+					postStatuses[ props.row.original.status ] ??
+					props.row.original.status,
 			},
 			{
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
@@ -161,8 +165,8 @@ export default function PagePages() {
 		<Page title={ __( 'Pages' ) }>
 			<DataViews
 				paginationInfo={ paginationInfo }
-				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoading }
+				data={ pages || EMPTY_ARRAY }
+				isLoading={ isLoadingPages }
 				fields={ fields }
 				options={ {
 					manualSorting: true,
