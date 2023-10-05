@@ -340,22 +340,24 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						name="__experimentalSelectedBlockTools"
 						bubblesVirtually
 					/>
-					{ isLargeViewport && hasBlockSelected && (
-						<Button
-							className="edit-site-header-edit-mode__block-tools-toggle"
-							icon={ isBlockToolsCollapsed ? next : previous }
-							onClick={ () => {
-								setIsBlockToolsCollapsed(
-									( collapsed ) => ! collapsed
-								);
-							} }
-							label={
-								isBlockToolsCollapsed
-									? __( 'Show block tools' )
-									: __( 'Hide block tools' )
-							}
-						/>
-					) }
+					{ hasFixedToolbar &&
+						isLargeViewport &&
+						hasBlockSelected && (
+							<Button
+								className="edit-site-header-edit-mode__block-tools-toggle"
+								icon={ isBlockToolsCollapsed ? next : previous }
+								onClick={ () => {
+									setIsBlockToolsCollapsed(
+										( collapsed ) => ! collapsed
+									);
+								} }
+								label={
+									isBlockToolsCollapsed
+										? __( 'Show block tools' )
+										: __( 'Hide block tools' )
+								}
+							/>
+						) }
 				</div>
 			) }
 
