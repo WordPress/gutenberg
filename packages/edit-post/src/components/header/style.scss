@@ -30,16 +30,9 @@
 		}
 	}
 
-	.selected-block-toolbar-wrapper {
-		z-index: z-index(".selected-block-toolbar-wrapper");
+	.selected-block-tools-wrapper {
+		z-index: 2; // Needs to be lower than the background-style that covers the header so the block tools can scroll behind it
 	}
-
-}
-
-// Every element in the header needs to have a higher Z index than the background, except the selected block popover
-.edit-post-header__toolbar > *,
-.edit-post-header__settings {
-	z-index: z-index(".edit-post-header__toolbar");
 }
 
 .edit-post-header__background-style {
@@ -50,7 +43,13 @@
 	right: 0;
 	background: $white;
 	border-bottom: $border-width solid $gray-200;
-	z-index: z-index(".edit-post-header__background-style"); // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
+	z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
+}
+
+// Every element in the header needs to have a higher Z index than the background, except the selected block popover
+.edit-post-header__toolbar > *,
+.edit-post-header__settings {
+	z-index: 4;
 }
 
 .edit-post-header__toolbar {
