@@ -66,6 +66,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
+
+	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
