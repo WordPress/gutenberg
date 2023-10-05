@@ -1188,10 +1188,17 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: ']2' },
 		} );
 		// Focus and move the caret to the end.
-		await page
+		const secondParagraphBlock = page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: ']2' } )
-			.click();
+			.filter( { hasText: ']2' } );
+		const secondParagraphBlockBox =
+			await secondParagraphBlock.boundingBox();
+		await secondParagraphBlock.click( {
+			position: {
+				x: secondParagraphBlockBox.width - 1,
+				y: secondParagraphBlockBox.height / 2,
+			},
+		} );
 
 		await page.keyboard.press( 'ArrowLeft' );
 		const strongText = page
