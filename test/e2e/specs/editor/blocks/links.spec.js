@@ -830,6 +830,7 @@ test.describe( 'Links', () => {
 			page,
 			editor,
 			pageUtils,
+			LinkUtils,
 		} ) => {
 			// Create a block with some text.
 			await editor.insertBlock( {
@@ -840,14 +841,18 @@ test.describe( 'Links', () => {
 			// Press Cmd+K to insert a link.
 			await pageUtils.pressKeys( 'primary+k' );
 
-			//Check that the HTML anchor input under Advanced is empty
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			const inputElement = page.getByLabel( 'HTML anchor' );
-			await expect( inputElement ).toHaveValue( '' );
+			const linkPopover = LinkUtils.getLinkPopover();
+
+			// Check the Link UI is open before asserting on presence of text input
+			// within that control.
+			await expect( linkPopover ).toBeVisible();
+
+			// Let's check we've focused a text input.
+			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toBeHidden();
 		} );
 
 		test( 'should display text input when the link has a valid URL value', async ( {
-			page,
 			pageUtils,
 			LinkUtils,
 		} ) => {
@@ -859,10 +864,13 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowRight' );
 
-			await page.getByRole( 'button', { name: 'Edit' } ).click();
+			const linkPopover = LinkUtils.getLinkPopover();
 
-			// Let's check we've focused a text input.
-			const textInput = page.getByLabel( 'Text', { exact: true } );
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Check Text input is visible and is the focused field.
+			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toBeVisible();
 			await expect( textInput ).toBeFocused();
 
 			// Link was created on text value "Gutenberg". We expect
