@@ -270,10 +270,6 @@ test.describe( 'Links', () => {
 	} ) => {
 		await LinkUtils.createAndReselectLink();
 
-		// Unlick via shortcut
-		// we do this to avoid an layout edge case whereby
-		// the rich link preview popover will obscure the block toolbar
-		// under very specific circumstances and screensizes.
 		await page
 			.locator( '.block-editor-link-control__search-item-top' )
 			.getByRole( 'button', { name: 'Unlink' } )
