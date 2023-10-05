@@ -98,16 +98,6 @@ const FLATTENED_BLOCKS = [
 	},
 ];
 
-const SINGLE_TEMPLATE_PART_BLOCK = {
-	clientId: '1',
-	name: 'core/template-part',
-	innerBlocks: [],
-	attributes: {
-		slug: 'aside',
-		theme: 'my-theme',
-	},
-};
-
 const TEMPLATE_PARTS = [
 	{
 		id: 'my-theme//header',
@@ -126,11 +116,32 @@ const TEMPLATE_PARTS = [
 	},
 ];
 
+const TEMPLATE_NESTED_BLOCKS = {
+	blocks: NESTED_BLOCKS,
+};
+
+const TEMAPLATE_SINGLE_BLOCK = {
+	blocks: [
+		{
+			clientId: '1',
+			name: 'core/template-part',
+			innerBlocks: [],
+			attributes: {
+				slug: 'aside',
+				theme: 'my-theme',
+			},
+		},
+	],
+};
+
 describe( 'utils', () => {
 	describe( 'getFilteredTemplatePartBlocks', () => {
 		it( 'returns a flattened list of filtered template parts preserving a depth-first order', () => {
 			const flattenedFilteredTemplateParts =
-				getFilteredTemplatePartBlocks( NESTED_BLOCKS, TEMPLATE_PARTS );
+				getFilteredTemplatePartBlocks(
+					TEMPLATE_NESTED_BLOCKS,
+					TEMPLATE_PARTS
+				);
 			expect( flattenedFilteredTemplateParts ).toEqual(
 				FLATTENED_BLOCKS
 			);
@@ -139,9 +150,15 @@ describe( 'utils', () => {
 		it( 'returns a cached result when passed the same params', () => {
 			// Clear the cache and call the function twice.
 			getFilteredTemplatePartBlocks.clear();
-			getFilteredTemplatePartBlocks( NESTED_BLOCKS, TEMPLATE_PARTS );
+			getFilteredTemplatePartBlocks(
+				TEMPLATE_NESTED_BLOCKS,
+				TEMPLATE_PARTS
+			);
 			expect(
-				getFilteredTemplatePartBlocks( NESTED_BLOCKS, TEMPLATE_PARTS )
+				getFilteredTemplatePartBlocks(
+					TEMPLATE_NESTED_BLOCKS,
+					TEMPLATE_PARTS
+				)
 			).toEqual( FLATTENED_BLOCKS );
 
 			// The function has been called twice with the same params, so the cache size should be 1.
@@ -157,7 +174,7 @@ describe( 'utils', () => {
 			// Call the function again, with different params.
 			expect(
 				getFilteredTemplatePartBlocks(
-					[ SINGLE_TEMPLATE_PART_BLOCK ],
+					TEMAPLATE_SINGLE_BLOCK,
 					TEMPLATE_PARTS
 				)
 			).toEqual( [
