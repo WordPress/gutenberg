@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalHeading as Heading } from '@wordpress/components';
-import { useEntityProp } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -12,11 +13,24 @@ import NavigationMenuEditor from '../sidebar-navigation-screen-navigation-menu/n
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 export default function TemplatePartNavigationMenu( { id } ) {
-	const [ title ] = useEntityProp(
-		'postType',
-		NAVIGATION_POST_TYPE,
-		'title',
-		id
+	const title = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return undefined;
+			}
+
+			const editedRecord = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				id
+			);
+
+			// Do not display a 'trashed' navigation menu.
+			return editedRecord.status === 'trash'
+				? undefined
+				: editedRecord.title;
+		},
+		[ id ]
 	);
 
 	if ( ! id || title === undefined ) {
