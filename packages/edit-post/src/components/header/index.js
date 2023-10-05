@@ -51,6 +51,7 @@ function Header( {
 
 	return (
 		<div role="menubar" className="edit-post-header">
+			<div className="edit-post-header__background-style"></div>
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }
