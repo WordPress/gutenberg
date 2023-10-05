@@ -899,10 +899,7 @@ test.describe( 'Links', () => {
 			} );
 
 			// Click on the Link button.
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Link' } )
-				.click();
+			await editor.clickBlockToolbarButton( 'Link' );
 
 			// Type a URL.
 			await page.keyboard.type( 'https://wordpress.org/gutenberg' );
