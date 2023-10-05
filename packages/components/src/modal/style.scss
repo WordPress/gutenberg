@@ -91,13 +91,12 @@
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid transparent;
 	padding: 0 $grid-unit-40;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-15;
+	height: $header-height + $grid-unit-10;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -120,7 +119,7 @@
 	}
 
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
-		border-bottom-color: $gray-300;
+		box-shadow: 0 0 0 1px rgba($black, 0.13);
 	}
 
 	& + p {
@@ -149,7 +148,7 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-15;
+	margin-top: $header-height + $grid-unit-10;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
 	padding: $grid-unit-05 * 0.5 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
