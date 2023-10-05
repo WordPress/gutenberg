@@ -22,7 +22,6 @@ test.describe( 'Links', () => {
 		admin,
 		page,
 		editor,
-		pageUtils,
 		requestUtils,
 	} ) => {
 		const titleText = 'Post to create a link to';
@@ -39,8 +38,8 @@ test.describe( 'Links', () => {
 		} );
 		await page.keyboard.type( 'Here comes a link: ' );
 
-		// Press Cmd+K to insert a link deliberating not selecting any text.
-		await pageUtils.pressKeys( 'primary+K' );
+		// Insert a link deliberating not selecting any text.
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
 		await page.keyboard.type( 'Post to create a' );
@@ -78,10 +77,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button in the Block Toolbar.
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Link' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -116,10 +112,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Link' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		await expect(
 			page.getByRole( 'combobox', {
@@ -177,10 +170,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft', { times: 7 } );
 
 		// Click on the Link button.
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Link' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		// A link with the selected URL as its href should have been inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -209,10 +199,7 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		// Click on the Link button.
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Link' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -294,10 +281,7 @@ test.describe( 'Links', () => {
 			name: 'core/paragraph',
 		} );
 		await page.keyboard.type( 'Text' );
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Link' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		const popover = LinkUtils.getLinkPopover();
 		await expect( popover ).toBeVisible();
