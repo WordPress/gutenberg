@@ -1206,14 +1206,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
-		await page
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: '1[' } )
-			.click( {
-				// Ensure clicking on the right half of the element.
-				position: { x: strongBox.width - 1, y: strongBox.height / 2 },
-				modifiers: [ 'Shift' ],
-			} );
+		await strongText.click( {
+			// Ensure clicking on the right half of the element.
+			position: { x: strongBox.width - 1, y: strongBox.height / 2 },
+			modifiers: [ 'Shift' ],
+		} );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
