@@ -55,7 +55,7 @@ export const settings = {
 	__experimentalLabel( { ref } ) {
 		const { navigationMenu } = useNavigationMenu( ref );
 		return buildNavigationLabel(
-			navigationMenu.title,
+			navigationMenu?.title,
 			1, // This has to be 1 because in this context there is only one Navigation shown.
 			navigationMenu.status
 		);
