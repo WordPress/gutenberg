@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
 
 ## 1.105.0
 -   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
