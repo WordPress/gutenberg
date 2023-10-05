@@ -8,11 +8,6 @@ type PreferencesContext =
 	| 'core/edit-site'
 	| 'core/customize-widgets';
 
-interface PreferencesRepresentation {
-	welcomeGuide?: boolean;
-	fullscreenMode?: boolean;
-}
-
 /**
  * Set the preferences of the editor.
  *
@@ -23,15 +18,18 @@ interface PreferencesRepresentation {
 export async function setPreferences(
 	this: Editor,
 	context: PreferencesContext,
-	preferences: PreferencesRepresentation
+	preferences: Record< string, any >
 ) {
 	await this.page.waitForFunction( () => window?.wp?.data );
 
-	await this.page.evaluate( async ( _preferences ) => {
-		for ( const [ key, value ] of Object.entries( _preferences ) ) {
-			await window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( context, key, value );
-		}
-	}, preferences );
+	await this.page.evaluate(
+		async ( [ _context, _preferences ] ) => {
+			for ( const [ key, value ] of Object.entries( _preferences ) ) {
+				await window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( _context, key, value );
+			}
+		},
+		[ context, preferences ]
+	);
 }
