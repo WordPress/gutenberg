@@ -46,7 +46,7 @@ import type { ModalProps } from './types';
 const level0Dismissers: MutableRefObject<
 	ModalProps[ 'onRequestClose' ] | undefined
 >[] = [];
-const context = createContext( level0Dismissers );
+const ModalContext = createContext( level0Dismissers );
 
 let isBodyOpenClassActive = false;
 
@@ -142,8 +142,10 @@ function UnforwardedModal(
 		refOnRequestClose.current = onRequestClose;
 	}, [ onRequestClose ] );
 
-	const dismissers = useContext( context );
-	const isLevel0 = dismissers === level0Dismissers;
+	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
+	// one should remain open at a time and the list enables closing prior ones.
+	const dismissers = useContext( ModalContext );
+	// Used for the tracking and dismissing any nested modals.
 	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
 
 	// Updates the stack tracking open modals at this level and calls
@@ -160,6 +162,7 @@ function UnforwardedModal(
 		};
 	}, [ dismissers ] );
 
+	const isLevel0 = dismissers === level0Dismissers;
 	// Adds/removes the value of bodyOpenClassName to body element.
 	useEffect( () => {
 		if ( ! isBodyOpenClassActive ) {
@@ -351,9 +354,9 @@ function UnforwardedModal(
 	);
 
 	return createPortal(
-		<context.Provider value={ nestedDismissers.current }>
+		<ModalContext.Provider value={ nestedDismissers.current }>
 			{ modal }
-		</context.Provider>,
+		</ModalContext.Provider>,
 		document.body
 	);
 }
