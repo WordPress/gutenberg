@@ -230,6 +230,7 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/statuses',
 		baseURLParams: { context: 'edit' },
 		plural: 'postStatuses',
+		key: 'slug',
 	},
 ];
 
