@@ -35,6 +35,7 @@ export default function PreviewOptions( {
 		disabled: ! isEnabled,
 		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
+		size: 'compact',
 	};
 	const menuProps = {
 		'aria-label': __( 'View options' ),
