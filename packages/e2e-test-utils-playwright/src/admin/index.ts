@@ -11,23 +11,27 @@ import { getPageError } from './get-page-error';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './visit-site-editor';
 import type { PageUtils } from '../page-utils';
+import type { Editor } from '../editor';
 
 type AdminConstructorProps = {
 	page: Page;
 	pageUtils: PageUtils;
+	editor: Editor;
 };
 
 export class Admin {
-	browser: Browser;
 	page: Page;
-	pageUtils: PageUtils;
 	context: BrowserContext;
+	browser: Browser;
+	pageUtils: PageUtils;
+	editor: Editor;
 
-	constructor( { page, pageUtils }: AdminConstructorProps ) {
+	constructor( { page, pageUtils, editor }: AdminConstructorProps ) {
 		this.page = page;
 		this.context = page.context();
 		this.browser = this.context.browser()!;
 		this.pageUtils = pageUtils;
+		this.editor = editor;
 	}
 
 	/** @borrows createNewPost as this.createNewPost */
