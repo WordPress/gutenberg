@@ -3,6 +3,11 @@
  */
 import { useState } from '@wordpress/element';
 
+/**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
 export default function useInternalValue( value ) {
 	const [ internalValue, setInternalValue ] = useState( value || {} );
 	const [ previousValue, setPreviousValue ] = useState( value );
@@ -11,11 +16,9 @@ export default function useInternalValue( value ) {
 	// See:
 	// - https://github.com/WordPress/gutenberg/pull/51387#issuecomment-1722927384.
 	// - https://react.dev/reference/react/useState#storing-information-from-previous-renders.
-	if ( value !== previousValue ) {
+	if ( ! fastDeepEqual( value, previousValue ) ) {
 		setPreviousValue( value );
-		if ( value !== internalValue ) {
-			setInternalValue( value );
-		}
+		setInternalValue( value );
 	}
 
 	const setInternalURLInputValue = ( nextValue ) => {
