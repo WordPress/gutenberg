@@ -48,25 +48,31 @@ $header-toolbar-min-width: 335px;
 	}
 }
 
-.edit-site-header-edit-mode__background-style {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: -1px; // -1px to overlap the header border
-	right: 0;
-	background: $white;
-	border-bottom: $border-width solid $gray-200;
-	z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
-}
+// Hacks to allow the block toolbar popover to slide behind the header
+.edit-site-layout:not(.has-fixed-toolbar) {
+	// Create a full-width and height background that floats over the whole div
+	.edit-site-header-edit-mode__background-style {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: -1px; // -1px to overlap the header border
+		right: 0;
+		background: $white;
+		border-bottom: $border-width solid $gray-200;
+		// This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
+		z-index: 3;
+	}
 
-// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
-.edit-site-header-edit-mode__start > *:not(.selected-block-tools-wrapper),
-.edit-site-header-edit-mode > *:not(.edit-site-header-edit-mode__start) {
-	z-index: 4;
-}
+	// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
+	.edit-site-header-edit-mode__start > *:not(.selected-block-tools-wrapper),
+	.edit-site-header-edit-mode > *:not(.edit-site-header-edit-mode__start) {
+		z-index: 4;
+	}
 
-.selected-block-tools-wrapper {
-	z-index: 2;
+	// The block tools slide behind our floating header background
+	.selected-block-tools-wrapper {
+		z-index: 2;
+	}
 }
 
 .edit-site-header-edit-mode__toolbar {
@@ -247,6 +253,10 @@ $header-toolbar-min-width: 335px;
 
 	.edit-site-header-edit-mode__center.is-collapsed {
 		display: none;
+	}
+
+	.edit-site-header-edit-mode__center.is-collapsed + .edit-site-header-edit-mode__end {
+		flex-grow: 2; // Allow it to take up the extra space, pushing the displayed block tools to the left
 	}
 }
 
