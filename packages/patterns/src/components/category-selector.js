@@ -58,8 +58,8 @@ export default function CategorySelector( {
 			onChange={ handleChange }
 			onInputChange={ debouncedSearch }
 			label={ __( 'Categories' ) }
-			tokenizeOnBlur={ true }
-			__experimentalExpandOnFocus={ true }
+			tokenizeOnBlur
+			__experimentalExpandOnFocus
 		/>
 	);
 }
