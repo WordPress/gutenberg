@@ -5,7 +5,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.35);
+	background-color: rgba($black, 0.4);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// backdrop-filter: blur($grid-unit);
@@ -45,8 +45,8 @@
 				max-height: none;
 			}
 			@include break-medium() {
-				width: calc(100% - #{ $grid-unit-50 * 2 });
-				height: calc(100% - #{ $grid-unit-50 * 2 });
+				width: calc(100% - #{ $header-height * 2 + $border-width });
+				height: calc(100% - #{ $header-height * 2 + $border-width });
 				max-width: none;
 			}
 		}
@@ -92,7 +92,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: $grid-unit-30 $grid-unit-40 $grid-unit-10;
+	padding: 0 $grid-unit-40;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -151,7 +151,7 @@
 	flex: 1;
 	margin-top: $header-height + $grid-unit-15;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
-	padding: $grid-unit-05 $grid-unit-40 $grid-unit-40;
+	padding: $grid-unit-05 * 0.5 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {
