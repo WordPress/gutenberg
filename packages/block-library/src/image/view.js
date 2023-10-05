@@ -234,6 +234,11 @@ store(
 							? 'true'
 							: null;
 					},
+					dialogLabel: ( { context } ) => {
+						return context.core.image.lightboxEnabled
+							? context.core.image.dialogLabel
+							: null;
+					},
 					lightboxObjectFit: ( { context } ) => {
 						if ( context.core.image.initialized ) {
 							return 'cover';
