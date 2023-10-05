@@ -1,6 +1,5 @@
 .edit-post-header {
 	height: $header-height;
-	background: $white;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -30,6 +29,28 @@
 			order: initial;
 		}
 	}
+
+	.selected-block-toolbar-wrapper {
+		z-index: z-index(".selected-block-toolbar-wrapper");
+	}
+
+}
+
+// Every element in the header needs to have a higher Z index than the background, except the selected block popover
+.edit-post-header__toolbar > *,
+.edit-post-header__settings {
+	z-index: z-index(".edit-post-header__toolbar");
+}
+
+.edit-post-header__background-style {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: -1px; // -1px to overlap the header border
+	right: 0;
+	background: $white;
+	border-bottom: $border-width solid $gray-200;
+	z-index: z-index(".edit-post-header__background-style"); // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
 }
 
 .edit-post-header__toolbar {
@@ -168,7 +189,7 @@
 	.edit-post-fullscreen-mode-close.has-icon {
 		width: $header-height;
 	}
-	// Don't hide MenuItemsChoice check icons
+	// Don"t hide MenuItemsChoice check icons
 	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
 		display: block;
 	}

@@ -149,45 +149,48 @@ export default function SelectedBlockTools( {
 
 	if ( shouldShowBreadcrumb || shouldShowContextualToolbar ) {
 		return (
-			<BlockPopover
-				clientId={ capturingClientId || clientId }
-				bottomClientId={ lastClientId }
-				className={ classnames(
-					'block-editor-block-list__block-popover',
-					{
-						'is-insertion-point-visible': isInsertionPointVisible,
-					}
-				) }
-				shiftPadding={ shiftPadding }
-				{ ...popoverProps }
-			>
-				{ shouldShowContextualToolbar && (
-					<>
-						<KeyboardInstructions />
-						<BlockContextualToolbar
-							aria-describedby={ descriptionId }
-							// If the toolbar is being shown because of being forced
-							// it should focus the toolbar right after the mount.
-							focusOnMount={ isToolbarForced.current }
-							__experimentalInitialIndex={
-								initialToolbarItemIndexRef.current
-							}
-							__experimentalOnIndexChange={ ( index ) => {
-								initialToolbarItemIndexRef.current = index;
-							} }
-							// Resets the index whenever the active block changes so
-							// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-							key={ clientId }
+			<>
+				<BlockPopover
+					clientId={ capturingClientId || clientId }
+					bottomClientId={ lastClientId }
+					className={ classnames(
+						'block-editor-block-list__block-popover',
+						{
+							'is-insertion-point-visible':
+								isInsertionPointVisible,
+						}
+					) }
+					shiftPadding={ shiftPadding }
+					{ ...popoverProps }
+				>
+					{ shouldShowContextualToolbar && (
+						<>
+							<KeyboardInstructions />
+							<BlockContextualToolbar
+								aria-describedby={ descriptionId }
+								// If the toolbar is being shown because of being forced
+								// it should focus the toolbar right after the mount.
+								focusOnMount={ isToolbarForced.current }
+								__experimentalInitialIndex={
+									initialToolbarItemIndexRef.current
+								}
+								__experimentalOnIndexChange={ ( index ) => {
+									initialToolbarItemIndexRef.current = index;
+								} }
+								// Resets the index whenever the active block changes so
+								// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+								key={ clientId }
+							/>
+						</>
+					) }
+					{ shouldShowBreadcrumb && (
+						<BlockSelectionButton
+							clientId={ clientId }
+							rootClientId={ rootClientId }
 						/>
-					</>
-				) }
-				{ shouldShowBreadcrumb && (
-					<BlockSelectionButton
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-					/>
-				) }
-			</BlockPopover>
+					) }
+				</BlockPopover>
+			</>
 		);
 	}
 
