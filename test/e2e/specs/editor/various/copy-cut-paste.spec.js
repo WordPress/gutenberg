@@ -36,9 +36,7 @@ test.describe( 'Copy/cut/paste', () => {
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
 
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );

@@ -17,6 +17,4 @@ export async function switchToLegacyCanvas( this: Editor ) {
 			title: 'test',
 		} );
 	} );
-
-	this.useLegacyCanvas = true;
 }

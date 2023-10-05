@@ -39,7 +39,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -120,7 +120,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -184,7 +184,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -256,7 +256,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = editor.canvas.locator(
+		const paragraphBlock = page.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 

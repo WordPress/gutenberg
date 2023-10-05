@@ -250,14 +250,12 @@ test.describe( 'Multi-block selection', () => {
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
 
-		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Add default block' } ).click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click( { modifiers: [ 'Shift' ] } );
@@ -274,11 +272,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Group' } )
 			.click();
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click();
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '2' } )
 			.click( { modifiers: [ 'Shift' ] } );
@@ -314,7 +312,7 @@ test.describe( 'Multi-block selection', () => {
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
 
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click( { modifiers: [ 'Shift' ] } );
 		await pageUtils.pressKeys( 'primary+a' );
@@ -1190,18 +1188,18 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: ']2' },
 		} );
 		// Focus and move the caret to the end.
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: ']2' } )
 			.click();
 
 		await page.keyboard.press( 'ArrowLeft' );
-		const strongText = editor.canvas
+		const strongText = page
 			.getByRole( 'region', { name: 'Editor content' } )
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
-		await editor.canvas
+		await page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1[' } )
 			.click( {
