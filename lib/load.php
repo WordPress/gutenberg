@@ -72,8 +72,10 @@ require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
+require __DIR__ . '/compat/plugin/footnotes.php';
 
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
+	require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
@@ -173,6 +175,16 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
+
+	// Disables the Font Library.
+	// @core-merge: this should not go to core.
+	add_action(
+		'enqueue_block_editor_assets',
+		function () {
+			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
+		}
+	);
+
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );

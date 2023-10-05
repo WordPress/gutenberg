@@ -31,7 +31,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/rich-text": "file:../rich-text",
 		"rememo": "^4.0.2",
-		"uuid": "^8.3.0"
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

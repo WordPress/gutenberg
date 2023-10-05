@@ -218,7 +218,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         <button
                           aria-label="Color: red"
                           aria-selected="true"
-                          class="components-button components-circular-option-picker__option is-pressed"
+                          class="components-button components-circular-option-picker__option"
                           id="components-circular-option-picker-0-0"
                           role="option"
                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"

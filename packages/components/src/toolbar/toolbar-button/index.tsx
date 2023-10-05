@@ -17,7 +17,7 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 import type { ToolbarButtonProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 
 function UnforwardedToolbarButton(
 	{

@@ -76,7 +76,7 @@ const DEFAULT_SCALE_OPTIONS = [
  *
  * @param {ScaleToolProps} props
  *
- * @return {import('@wordpress/element').WPElement} The scale tool.
+ * @return {import('react').ReactElement} The scale tool.
  */
 export default function ScaleTool( {
 	panelId,

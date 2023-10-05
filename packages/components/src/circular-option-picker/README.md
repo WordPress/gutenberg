@@ -9,8 +9,8 @@ This component is not exported, and therefore can only be used internally to the
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { CircularOptionPicker } from '../circular-option-picker';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ currentColor, setCurrentColor ] = useState();

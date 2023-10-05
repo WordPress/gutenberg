@@ -18,7 +18,7 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 export default function PagePatterns() {
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
-	const type = categoryType || PATTERN_TYPES.user;
+	const type = categoryType || PATTERN_TYPES.theme;
 	const category = categoryId || PATTERN_DEFAULT_CATEGORY;
 	const settings = usePatternSettings();
 

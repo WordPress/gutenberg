@@ -54,7 +54,7 @@
 		"remove-accents": "^0.5.0",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
-		"uuid": "^8.3.0"
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

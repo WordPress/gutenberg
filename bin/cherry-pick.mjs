@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
-	?.stderr?.toString()
+	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com as' );
 
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;

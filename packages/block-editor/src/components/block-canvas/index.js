@@ -11,7 +11,6 @@ import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
-import { useClipboardHandler } from '../copy-handler';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export function ExperimentalBlockCanvas( {
@@ -23,13 +22,8 @@ export function ExperimentalBlockCanvas( {
 	iframeProps,
 } ) {
 	const resetTypingRef = useMouseMoveTypingReset();
-	const copyHandler = useClipboardHandler();
 	const clearerRef = useBlockSelectionClearer();
-	const contentRef = useMergeRefs( [
-		copyHandler,
-		contentRefProp,
-		clearerRef,
-	] );
+	const contentRef = useMergeRefs( [ contentRefProp, clearerRef ] );
 
 	if ( ! shouldIframe ) {
 		return (
@@ -91,11 +85,11 @@ export function ExperimentalBlockCanvas( {
  * }
  * ```
  *
- * @param {Object}    props          Component props.
- * @param {string}    props.height   Canvas height, defaults to 300px.
- * @param {Array}     props.styles   Content styles to inject into the iframe.
- * @param {WPElement} props.children Content of the canvas, defaults to the BlockList component.
- * @return {WPElement}               Block Breadcrumb.
+ * @param {Object}  props          Component props.
+ * @param {string}  props.height   Canvas height, defaults to 300px.
+ * @param {Array}   props.styles   Content styles to inject into the iframe.
+ * @param {Element} props.children Content of the canvas, defaults to the BlockList component.
+ * @return {Element}               Block Breadcrumb.
  */
 function BlockCanvas( { children, height, styles } ) {
 	return (

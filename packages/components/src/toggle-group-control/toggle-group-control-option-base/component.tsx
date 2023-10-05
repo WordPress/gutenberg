@@ -3,7 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Radio } from '@ariakit/react/radio';
+import * as Ariakit from '@ariakit/react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -16,8 +16,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect, useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import type {
 	ToggleGroupControlOptionBaseProps,
 	WithToolTipProps,
@@ -140,7 +140,7 @@ function ToggleGroupControlOptionBase(
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
-					<Radio
+					<Ariakit.Radio
 						render={
 							<button
 								{ ...commonProps }
@@ -154,7 +154,7 @@ function ToggleGroupControlOptionBase(
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
-					</Radio>
+					</Ariakit.Radio>
 				) }
 			</WithToolTip>
 			{ /* Animated backdrop using framer motion's shared layout animation */ }

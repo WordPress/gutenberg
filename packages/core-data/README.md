@@ -782,8 +782,8 @@ application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
 
 ```js
+import { useCallback } from 'react';
 import { useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { store as noticeStore } from '@wordpress/notices';

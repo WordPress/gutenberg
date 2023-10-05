@@ -1949,6 +1949,22 @@ export function styleOverrides( state = new Map(), action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of the registered inserter media categories.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function registeredInserterMediaCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'REGISTER_INSERTER_MEDIA_CATEGORY':
+			return [ ...state, action.category ];
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1976,6 +1992,7 @@ const combinedReducers = combineReducers( {
 	removalPromptData,
 	blockRemovalRules,
 	openedBlockSettingsMenu,
+	registeredInserterMediaCategories,
 } );
 
 function withAutomaticChangeReset( reducer ) {

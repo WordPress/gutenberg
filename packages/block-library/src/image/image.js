@@ -372,10 +372,10 @@ export default function Image( {
 	const lightboxSetting = useSetting( 'lightbox' );
 
 	const showLightboxToggle =
-		lightboxSetting === true || lightboxSetting?.allowEditing === true;
+		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
-		lightbox?.enabled || ( ! lightbox && lightboxSetting?.enabled );
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
 	const dimensionsControl = (
 		<DimensionsTool

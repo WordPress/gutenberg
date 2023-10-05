@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import * as Ariakit from '@ariakit/react/tooltip';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -73,7 +74,6 @@ function Tooltip( props: TooltipProps ) {
 	return (
 		<>
 			<Ariakit.TooltipAnchor
-				onBlur={ tooltipStore.hide }
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
