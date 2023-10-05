@@ -266,11 +266,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			$close_button_color = esc_attr( $global_styles_color['text'] );
 		}
 	}
-	$global_styles_color  = wp_get_global_styles( array( 'color' ) );
-	$has_background_color = ! empty( $global_styles_color['background'] );
-	$has_text_color       = ! empty( $global_styles_color['text'] );
-	$background_color     = esc_attr( ( wp_theme_has_theme_json() && $has_background_color ) ? $global_styles_color['background'] : '#fff' );
-	$close_button_color   = esc_attr( ( wp_theme_has_theme_json() && $has_text_color ) ? $global_styles_color['text'] : '#000' );
 
 	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image' );
