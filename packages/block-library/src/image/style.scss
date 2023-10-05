@@ -169,6 +169,13 @@
 			outline: 5px auto -webkit-focus-ring-color;
 			outline-offset: 5px;
 		}
+
+		&:hover,
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
+			background: none;
+			border: none;
+		}
 	}
 }
 
@@ -191,6 +198,13 @@
 		padding: 0;
 		cursor: pointer;
 		z-index: 5000000;
+
+		&:hover,
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
+			background: none;
+			border: none;
+		}
 	}
 
 	.lightbox-image-container {
