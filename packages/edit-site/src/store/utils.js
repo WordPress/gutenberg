@@ -6,21 +6,30 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { isTemplatePart } from '@wordpress/blocks';
+import { isTemplatePart, parse } from '@wordpress/blocks';
 
-const EMPTY_ARRAY = [];
+function getBlocksFromRecord( record ) {
+	if ( record?.blocks ) {
+		return record?.blocks;
+	}
+
+	return record?.content && typeof record.content !== 'function'
+		? parse( record.content )
+		: [];
+}
 
 /**
  * Get a flattened and filtered list of template parts and the matching block for that template part.
  *
- * Takes a list of blocks defined within a template, and a list of template parts, and returns a
+ * Takes a template, and a list of template parts, and returns a
  * flattened list of template parts and the matching block for that template part.
  *
- * @param {Array}  blocks        Blocks to flatten.
+ * @param {Object} template      Current template.
  * @param {?Array} templateParts Available template parts.
  * @return {Array} An array of template parts and their blocks.
  */
-function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
+function getFilteredTemplatePartBlocks( template, templateParts ) {
+	const blocks = getBlocksFromRecord( template );
 	const templatePartsById = templateParts
 		? // Key template parts by their ID.
 		  templateParts.reduce(

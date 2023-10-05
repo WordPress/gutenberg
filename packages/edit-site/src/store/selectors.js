@@ -307,7 +307,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			{ per_page: -1 }
 		);
 
-		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
+		return getFilteredTemplatePartBlocks( template, templateParts );
 	}
 );
 
