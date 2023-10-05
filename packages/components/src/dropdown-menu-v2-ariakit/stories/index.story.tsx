@@ -20,6 +20,7 @@ import {
 	DropdownMenuGroupLabel,
 	DropdownMenuSeparator,
 	DropdownMenuContext,
+	DropdownMenuRadioItem,
 } from '..';
 import Button from '../../button';
 import Modal from '../../modal';
@@ -58,97 +59,254 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
-	<DropdownMenu { ...props } />
+export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
+	<DropdownMenu { ...props }>
+		<DropdownMenuItem>Item</DropdownMenuItem>
+		<DropdownMenuItem hideOnClick={ false }>
+			Item (does not close the menu when clicked)
+		</DropdownMenuItem>
+		<DropdownMenuItem
+			disabled
+			prefix={ <span>Pre</span> }
+			suffix={ <span>Suf</span> }
+		>
+			Disabled item
+		</DropdownMenuItem>
+		<DropdownMenuSeparator />
+		<DropdownMenuGroup>
+			<DropdownMenuGroupLabel>Group Label</DropdownMenuGroupLabel>
+			<DropdownMenuItem prefix={ <span>Pre</span> }>
+				Item with prefix
+			</DropdownMenuItem>
+			<DropdownMenuItem suffix={ <span>Suf</span> }>
+				Item with suffix
+			</DropdownMenuItem>
+		</DropdownMenuGroup>
+	</DropdownMenu>
 );
-export const Default = Template.bind( {} );
 Default.args = {
 	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
-	children: (
-		<>
-			<DropdownMenuItem>Single item</DropdownMenuItem>
-			<DropdownMenuSeparator />
+};
+
+export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
+	<DropdownMenu { ...props }>
+		<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+		<DropdownMenu
+			trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+		>
+			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+			>
+				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
+				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
+			</DropdownMenu>
+		</DropdownMenu>
+	</DropdownMenu>
+);
+WithSubmenu.args = {
+	...Default.args,
+};
+
+export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ isAChecked, setAChecked ] = useState( false );
+	const [ isBChecked, setBChecked ] = useState( true );
+	const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] = useState<
+		string[]
+	>( [ 'b' ] );
+
+	const onMultipleCheckboxesCheckedChange: React.ComponentProps<
+		typeof DropdownMenuCheckboxItem
+	>[ 'onChange' ] = ( e ) => {
+		setMultipleCheckboxesValue( ( prevValues ) => {
+			if ( prevValues.includes( e.target.value ) ) {
+				return prevValues.filter( ( val ) => val !== e.target.value );
+			}
+			return [ ...prevValues, e.target.value ];
+		} );
+	};
+
+	return (
+		<DropdownMenu { ...props }>
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>Group</DropdownMenuGroupLabel>
-				<DropdownMenuItem>One</DropdownMenuItem>
-				<DropdownMenuItem>Two</DropdownMenuItem>
-				<DropdownMenuItem>Three</DropdownMenuItem>
+				<DropdownMenuGroupLabel>
+					Individual, uncontrolled checkboxes
+				</DropdownMenuGroupLabel>
+				<DropdownMenuCheckboxItem
+					name="checkbox-individual-uncontrolled-a"
+					value="a"
+				>
+					Checkbox item A (initially unchecked)
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem
+					name="checkbox-individual-uncontrolled-b"
+					value="b"
+					defaultChecked
+				>
+					{ /*
+					 * TODO: default checked doesn't work yet
+					 * https://github.com/ariakit/ariakit/issues/2913
+					 */ }
+					Checkbox item B (initially checked)
+				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
 				<DropdownMenuGroupLabel>
-					Checks (separate)
+					Individual, controlled checkboxes
 				</DropdownMenuGroupLabel>
-				<DropdownMenuCheckboxItem name="checkbox-a" value="a">
+				<DropdownMenuCheckboxItem
+					name="checkbox-individual-controlled-a"
+					value="a"
+					checked={ isAChecked }
+					onChange={ ( e ) => setAChecked( e.target.checked ) }
+				>
 					Checkbox item A
 				</DropdownMenuCheckboxItem>
-				<DropdownMenuCheckboxItem name="checkbox-b" value="b">
-					Checkbox item B
+				<DropdownMenuCheckboxItem
+					name="checkbox-individual-controlled-b"
+					value="b"
+					checked={ isBChecked }
+					onChange={ ( e ) => setBChecked( e.target.checked ) }
+				>
+					Checkbox item B (initially checked)
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
-			<DropdownMenu
-				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
-			>
-				<DropdownMenuItem>Start Speaking</DropdownMenuItem>
-				<DropdownMenuItem disabled>Stop Speaking</DropdownMenuItem>
-			</DropdownMenu>
-		</>
-	),
-};
-
-export const WithControlledCheckboxes: StoryFn< typeof DropdownMenu > = (
-	props
-) => {
-	const [ isAChecked, setAChecked ] = useState( false );
-	const [ isBChecked, setBChecked ] = useState( true );
-	return (
-		<DropdownMenu { ...props }>
-			<DropdownMenuCheckboxItem
-				name="checkbox-a"
-				value="a"
-				checked={ isAChecked }
-				onChange={ ( e ) => setAChecked( e.target.checked ) }
-			>
-				Checkbox item A (controlled)
-			</DropdownMenuCheckboxItem>
-			<DropdownMenuCheckboxItem
-				name="checkbox-b"
-				value="b"
-				checked={ isBChecked }
-				onChange={ ( e ) => setBChecked( e.target.checked ) }
-			>
-				Checkbox item B (controlled, checked by default)
-			</DropdownMenuCheckboxItem>
-			<DropdownMenuCheckboxItem
-				name="checkbox-c"
-				value="c"
-				defaultChecked
-			>
-				Checkbox item C (uncontrolled, checked by default)
-			</DropdownMenuCheckboxItem>
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>
+					{ /* TODO: can this be done using `defaultChecked` on the single item,
+					 * instead of using `defaultValues` on the menu component? */ }
+					Multiple, uncontrolled checkboxes
+				</DropdownMenuGroupLabel>
+				<DropdownMenuCheckboxItem
+					name="checkbox-multiple-uncontrolled"
+					value="a"
+				>
+					Checkbox item A (initially unchecked)
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem
+					name="checkbox-multiple-uncontrolled"
+					value="b"
+				>
+					Checkbox item B (initially checked)
+				</DropdownMenuCheckboxItem>
+			</DropdownMenuGroup>
+			<DropdownMenuSeparator />
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>
+					Multiple, controlled checkboxes
+				</DropdownMenuGroupLabel>
+				<DropdownMenuCheckboxItem
+					name="checkbox-multiple-controlled"
+					value="a"
+					checked={ multipleCheckboxesValue.includes( 'a' ) }
+					onChange={ onMultipleCheckboxesCheckedChange }
+				>
+					Checkbox item A (initially unchecked)
+				</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem
+					name="checkbox-multiple-controlled"
+					value="b"
+					checked={ multipleCheckboxesValue.includes( 'b' ) }
+					onChange={ onMultipleCheckboxesCheckedChange }
+				>
+					Checkbox item B (initially checked)
+				</DropdownMenuCheckboxItem>
+			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
 };
-WithControlledCheckboxes.args = {
-	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
+WithCheckboxes.args = {
+	...Default.args,
+	defaultValues: { 'checkbox-multiple-uncontrolled': [ 'b' ] },
 };
 
-export const WithModalAsSiblingOfMenu: StoryFn< typeof DropdownMenu > = (
-	props
-) => {
-	const [ isModalOpen, setModalOpen ] = useState( false );
+export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ radioValue, setRadioValue ] = useState( 'two' );
+	const onRadioChange: React.ComponentProps<
+		typeof DropdownMenuRadioItem
+	>[ 'onChange' ] = ( e ) => setRadioValue( e.target.value );
+
+	return (
+		<DropdownMenu { ...props }>
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>
+					Uncontrolled radios
+				</DropdownMenuGroupLabel>
+				<DropdownMenuRadioItem name="radio-uncontrolled" value="one">
+					Radio item 1
+				</DropdownMenuRadioItem>
+				<DropdownMenuRadioItem
+					name="radio-uncontrolled"
+					value="two"
+					defaultChecked
+				>
+					Radio item 2 (initially checked)
+				</DropdownMenuRadioItem>
+			</DropdownMenuGroup>
+			<DropdownMenuSeparator />
+			<DropdownMenuGroup>
+				<DropdownMenuGroupLabel>
+					Controlled radios
+				</DropdownMenuGroupLabel>
+				<DropdownMenuRadioItem
+					name="radio-controlled"
+					value="one"
+					checked={ radioValue === 'one' }
+					onChange={ onRadioChange }
+				>
+					Radio item 1
+				</DropdownMenuRadioItem>
+				<DropdownMenuRadioItem
+					name="radio-controlled"
+					value="two"
+					checked={ radioValue === 'two' }
+					onChange={ onRadioChange }
+				>
+					Radio item 2 (initially checked)
+				</DropdownMenuRadioItem>
+			</DropdownMenuGroup>
+		</DropdownMenu>
+	);
+};
+WithRadios.args = {
+	...Default.args,
+};
+
+// For more examples with `Modal`, check https://ariakit.org/examples/menu-wordpress-modal
+export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
+	const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
 	return (
 		<>
 			<DropdownMenu { ...props }>
-				<DropdownMenuItem onClick={ () => setModalOpen( true ) }>
-					Open modal
+				<DropdownMenuItem
+					onClick={ () => setOuterModalOpen( true ) }
+					hideOnClick={ false }
+				>
+					Open outer modal
 				</DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={ () => setInnerModalOpen( true ) }
+					hideOnClick={ false }
+				>
+					Open inner modal
+				</DropdownMenuItem>
+				{ isInnerModalOpen && (
+					<Modal onRequestClose={ () => setInnerModalOpen( false ) }>
+						Modal&apos;s contents
+						<button onClick={ () => setInnerModalOpen( false ) }>
+							Close
+						</button>
+					</Modal>
+				) }
 			</DropdownMenu>
-			{ isModalOpen && (
-				<Modal onRequestClose={ () => setModalOpen( false ) }>
+			{ isOuterModalOpen && (
+				<Modal onRequestClose={ () => setOuterModalOpen( false ) }>
 					Modal&apos;s contents
-					<button onClick={ () => setModalOpen( false ) }>
+					<button onClick={ () => setOuterModalOpen( false ) }>
 						Close
 					</button>
 				</Modal>
@@ -156,34 +314,7 @@ export const WithModalAsSiblingOfMenu: StoryFn< typeof DropdownMenu > = (
 		</>
 	);
 };
-WithModalAsSiblingOfMenu.args = {
-	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
-};
-
-export const WithModalAsSiblingOfMenuItem: StoryFn< typeof DropdownMenu > = (
-	props
-) => {
-	const [ isModalOpen, setModalOpen ] = useState( false );
-	return (
-		<DropdownMenu { ...props }>
-			<DropdownMenuItem
-				hideOnClick={ false }
-				onClick={ () => setModalOpen( true ) }
-			>
-				Open modal
-			</DropdownMenuItem>
-			{ isModalOpen && (
-				<Modal onRequestClose={ () => setModalOpen( false ) }>
-					Yo!
-					<button onClick={ () => setModalOpen( false ) }>
-						Modal&apos;s contents
-					</button>
-				</Modal>
-			) }
-		</DropdownMenu>
-	);
-};
-WithModalAsSiblingOfMenuItem.args = {
+WithModals.args = {
 	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
 };
 
@@ -232,9 +363,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 	);
 };
 
-export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
-	props
-) => {
+export const WithSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<DropdownMenu { ...props }>
@@ -263,6 +392,6 @@ export const AddItemsViaSlotFill: StoryFn< typeof DropdownMenu > = (
 		</SlotFillProvider>
 	);
 };
-AddItemsViaSlotFill.args = {
-	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
+WithSlotFill.args = {
+	...Default.args,
 };
