@@ -509,8 +509,9 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		// Select some text.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
+
+		// Insert a Link.
+		await editor.clickBlockToolbarButton( 'Link' );
 
 		await page.keyboard.type( 'http://#test.com' );
 		await pageUtils.pressKeys( 'Enter' );
