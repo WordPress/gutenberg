@@ -129,7 +129,6 @@ export default function SelectedBlockTools( {
 									isInsertionPointVisible,
 							}
 						) }
-						resize={ false }
 						{ ...popoverProps }
 					>
 						<BlockSelectionButton
@@ -157,7 +156,6 @@ export default function SelectedBlockTools( {
 						'is-insertion-point-visible': isInsertionPointVisible,
 					}
 				) }
-				resize={ false }
 				{ ...popoverProps }
 			>
 				{ shouldShowContextualToolbar && (
