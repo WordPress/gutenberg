@@ -390,7 +390,7 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `allows use of escape key to dismiss the url popover`, async ( {
+	test( `escape dismisses the Link UI popover and returns focus`, async ( {
 		admin,
 		page,
 		editor,
@@ -416,14 +416,15 @@ test.describe( 'Links', () => {
 		// Press Cmd+K to insert a link.
 		await pageUtils.pressKeys( 'primary+K' );
 
-		await expect(
-			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeVisible();
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
 
-		// Trigger the autocomplete suggestion list and select the first suggestion.
+		// expect the "Link" combobox to be visible and focused
+		await expect( urlInput ).toBeVisible();
+		await expect( urlInput ).toBeFocused();
+
+		// Trigger the autocomplete suggestion list.
 		await page.keyboard.type( titleText );
 		await expect(
 			page.getByRole( 'option', {
@@ -431,9 +432,11 @@ test.describe( 'Links', () => {
 			} )
 		).toBeVisible();
 
+		// Move into the suggestions list.
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the escape key to dismiss the popover when the autocomplete suggestion list is open.
+		// Note that these have their own keybindings thus why we need to assert on this behaviour.
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator(
@@ -454,44 +457,6 @@ test.describe( 'Links', () => {
 				},
 			},
 		] );
-
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
-
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeVisible();
-
-		// Expect the escape key to dismiss the popover normally.
-		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeHidden();
-
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
-
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeVisible();
-
-		// Tab to the "Open in new tab" toggle.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-
-		// Expect the escape key to dismiss the popover normally.
-		await pageUtils.pressKeys( 'Escape' ); //page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'.components-popover__content .block-editor-link-control'
-			)
-		).toBeHidden();
 	} );
 
 	test( `can be created and modified using only the keyboard once a link has been set`, async ( {
