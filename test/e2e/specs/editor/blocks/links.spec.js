@@ -283,17 +283,17 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'Text' );
 		await editor.clickBlockToolbarButton( 'Link' );
 
-		const popover = LinkUtils.getLinkPopover();
-		await expect( popover ).toBeVisible();
+		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
 
 		// Pressing "left" should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect( popover ).toBeVisible();
+		await expect( linkPopover ).toBeVisible();
 
 		// Escape should close the dialog.
 		await page.keyboard.press( 'Escape' );
 
-		await expect( popover ).toBeHidden();
+		await expect( linkPopover ).toBeHidden();
 	} );
 
 	test( `allows arrow keys to be pressed during link creation in "Docked Toolbar" mode`, async ( {
@@ -312,18 +312,18 @@ test.describe( 'Links', () => {
 
 		await editor.clickBlockToolbarButton( 'Link' );
 
-		const popover = LinkUtils.getLinkPopover();
+		const linkPopover = LinkUtils.getLinkPopover();
 
-		await expect( popover ).toBeVisible();
+		await expect( linkPopover ).toBeVisible();
 
 		// Pressing arrow key should not close the dialog.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect( popover ).toBeVisible();
+		await expect( linkPopover ).toBeVisible();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
 
-		await expect( popover ).toBeHidden();
+		await expect( linkPopover ).toBeHidden();
 	} );
 
 	test( `can be edited when within a link but no selection has been made ("collapsed")`, async ( {
@@ -336,8 +336,9 @@ test.describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
-		await editor.showBlockToolbar();
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
