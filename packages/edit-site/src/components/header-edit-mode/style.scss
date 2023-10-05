@@ -59,13 +59,13 @@ $header-toolbar-min-width: 335px;
 	z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
 }
 
-.edit-site-header-edit-mode__start > *:not(.selected-block-tools-wrapper), // This is the level of the selected block tools popover is, so every child of this needs to have a higher z-index
-.edit-site-header-edit-mode__center,
-.edit-site-header-edit-mode__end {
+// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
+.edit-site-header-edit-mode__start > *:not(.selected-block-tools-wrapper),
+.edit-site-header-edit-mode > *:not(.edit-site-header-edit-mode__start) {
 	z-index: 4;
 }
 
-.edit-site-header-edit-mode__start .selected-block-tools-wrapper {
+.selected-block-tools-wrapper {
 	z-index: 2;
 }
 

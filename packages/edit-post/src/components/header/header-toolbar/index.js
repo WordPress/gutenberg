@@ -186,7 +186,7 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 				</div>
 			</NavigableToolbar>
 			<Slot
-				className="selected-block-toolbar-wrapper"
+				className="selected-block-tools-wrapper"
 				name="__experimentalSelectedBlockTools"
 				bubblesVirtually
 			/>

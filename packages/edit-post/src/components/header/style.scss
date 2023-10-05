@@ -29,10 +29,6 @@
 			order: initial;
 		}
 	}
-
-	.selected-block-tools-wrapper {
-		z-index: 2; // Needs to be lower than the background-style that covers the header so the block tools can scroll behind it
-	}
 }
 
 .edit-post-header__background-style {
@@ -47,9 +43,13 @@
 }
 
 // Every element in the header needs to have a higher Z index than the background, except the selected block popover
-.edit-post-header__toolbar > *,
-.edit-post-header__settings {
+.edit-post-header__toolbar > *:not(.selected-block-tools-wrapper),
+.edit-post-header > *:not(.edit-post-header__toolbar) {
 	z-index: 4;
+}
+
+.selected-block-tools-wrapper {
+	z-index: 2; // Needs to be lower than the background-style that covers the header so the block tools can scroll behind it
 }
 
 .edit-post-header__toolbar {
@@ -89,7 +89,7 @@
 		}
 	}
 
-	.selected-block-toolbar-wrapper {
+	.selected-block-tools-wrapper {
 		flex-shrink: 2;
 		overflow-x: hidden;
 	}

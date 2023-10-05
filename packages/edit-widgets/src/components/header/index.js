@@ -95,6 +95,8 @@ function Header( { setListViewToggleElement } ) {
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
+					{ /* Floating header style to be able to hide the block popovers behind the header */ }
+					<div className="edit-widgets-header__background-style"></div>
 					{ isMediumViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }
@@ -155,7 +157,7 @@ function Header( { setListViewToggleElement } ) {
 							) }
 						</NavigableToolbar>
 						<Slot
-							className="selected-block-toolbar-wrapper"
+							className="selected-block-tools-wrapper"
 							name="__experimentalSelectedBlockTools"
 							bubblesVirtually
 						/>
