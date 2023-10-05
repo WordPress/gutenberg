@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fix
-
--   Fix lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
-
 ## 2.4.0 (2023-10-05)
 
 ## 2.3.0 (2023-09-20)
