@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.9.0 (2023-10-05)
+
 ### Enhancements
 
 -   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).

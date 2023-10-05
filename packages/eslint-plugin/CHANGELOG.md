@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.0.0 (2023-10-05)
+
 ### Breaking Changes
 
 -   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
