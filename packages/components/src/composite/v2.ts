@@ -12,6 +12,7 @@
 export {
 	Composite,
 	CompositeGroup,
+	CompositeGroupLabel,
 	CompositeItem,
 	CompositeRow,
 	useCompositeStore,
