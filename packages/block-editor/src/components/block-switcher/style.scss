@@ -125,6 +125,10 @@
 		margin: $grid-unit-20 0;
 		// Use padding to prevent the pattern previews focus style from being cut-off.
 		padding: 0 $grid-unit-20;
+
+		&.is-single-pattern-preview {
+			overflow: hidden;
+		}
 	}
 }
 

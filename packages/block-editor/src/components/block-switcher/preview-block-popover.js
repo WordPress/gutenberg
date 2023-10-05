@@ -18,7 +18,7 @@ export default function PreviewBlockPopover( { blocks } ) {
 					placement="bottom-start"
 					focusOnMount={ false }
 				>
-					<div className="block-editor-block-switcher__preview">
+					<div className="block-editor-block-switcher__preview is-single-pattern-preview">
 						<div className="block-editor-block-switcher__preview-title">
 							{ __( 'Preview' ) }
 						</div>
