@@ -22,7 +22,7 @@ export default function CategorySelector( {
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
 	const suggestions = useMemo( () => {
-		return ( Array.from( categoryMap.values() ) ?? [] )
+		return Array.from( categoryMap.values() )
 			.map( ( category ) => unescapeString( category.label ) )
 			.filter( ( category ) => {
 				if ( search !== '' ) {
