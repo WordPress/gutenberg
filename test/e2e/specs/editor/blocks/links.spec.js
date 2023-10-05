@@ -678,6 +678,9 @@ test.describe( 'Links', () => {
 
 		// Edit link.
 		await pageUtils.pressKeys( 'primary+k' );
+
+		// getByPlaceholder required in order to handle Link Control component
+		// managing focus onto other inputs within the control.
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
@@ -694,10 +697,14 @@ test.describe( 'Links', () => {
 
 		// Navigate back to inputs to verify appears as changed.
 		await pageUtils.pressKeys( 'primary+k' );
-		const urlInputValue = await page
-			.getByPlaceholder( 'Search or type url' )
-			.inputValue();
-		expect( urlInputValue ).toContain( 'wordpress.org' );
+
+		expect(
+			await page
+				.getByRole( 'combobox', {
+					name: 'Link',
+				} )
+				.inputValue()
+		).toContain( 'wordpress.org' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
