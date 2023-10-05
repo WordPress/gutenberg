@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.20.0 (2023-10-05)
+
 ## Breaking Changes
 
 -   Remove the WPElement, WPComponent, and WPSyntheticEvent types.

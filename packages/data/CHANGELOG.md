@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.13.0 (2023-10-05)
+
 ### Enhancements
 
 -  Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
