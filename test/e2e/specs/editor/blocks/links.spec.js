@@ -120,11 +120,12 @@ test.describe( 'Links', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Link' } )
 			.click();
-		const urlInput = await page
-			.getByPlaceholder( 'Search or type url' )
-			.inputValue();
 
-		expect( urlInput ).toBe( '' );
+		await expect(
+			page.getByRole( 'combobox', {
+				name: 'Link',
+			} )
+		).toHaveValue( '' );
 	} );
 
 	test( `can be created without any text selected`, async ( {
@@ -243,6 +244,8 @@ test.describe( 'Links', () => {
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Change the URL.
+		// getByPlaceholder required in order to handle Link Control component
+		// managing focus onto other inputs within the control.
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
@@ -373,6 +376,8 @@ test.describe( 'Links', () => {
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
 
 		// Change the URL.
+		// getByPlaceholder required in order to handle Link Control component
+		// managing focus onto other inputs within the control.
 		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
@@ -530,9 +535,12 @@ test.describe( 'Links', () => {
 
 		// Reopen the link popover and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
-		const urlInput = page.getByPlaceholder( 'Search or type url' );
-		await urlInput.focus();
-		await expect( urlInput ).toHaveValue( URL );
+
+		await expect(
+			page.getByRole( 'combobox', {
+				name: 'Link',
+			} )
+		).toHaveValue( URL );
 
 		// Confirm that submitting the input without any changes keeps the same
 		// value and moves focus back to the paragraph.
@@ -543,7 +551,7 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'This is <a href="' + URL + '">Gutenberg</a>.',
+					content: 'This is <a href="' + URL + '">Gutenberg</a>',
 				},
 			},
 		] );
