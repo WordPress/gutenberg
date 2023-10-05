@@ -60,7 +60,7 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 					className="block-editor-block-switcher__preview__popover"
 					position="bottom right"
 				>
-					<div className="block-editor-block-switcher__preview">
+					<div className="block-editor-block-switcher__preview is-pattern-list-preview">
 						<div className="block-editor-block-switcher__preview-title">
 							{ __( 'Preview' ) }
 						</div>
