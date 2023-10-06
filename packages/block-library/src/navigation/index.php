@@ -706,7 +706,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 						'ariaLabel'       => __( 'Menu' ),
 					),
 				),
-			)
+			),
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);
 		$nav_element_directives          = '
 			data-wp-interactive
