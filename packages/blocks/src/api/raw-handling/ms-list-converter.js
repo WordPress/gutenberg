@@ -32,7 +32,9 @@ export default function msListConverter( node, doc ) {
 	let level = parseInt( matches[ 1 ], 10 ) - 1 || 0;
 
 	const prevNode = node.previousElementSibling;
-	const listInfoElement = node.querySelector( 'span[style*="mso-list"]' );
+	const listInfoElement = node.querySelector(
+		'span[style*="mso-list:Ignore"]'
+	);
 
 	// Add new list if no previous.
 	if ( ! prevNode || ! isList( prevNode ) ) {
