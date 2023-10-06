@@ -60,7 +60,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await titleElement.click();
 
 		// Wait for editor to finish scrolling to the title
-		await editorPage.driver.sleep( 2000 );
+		await editorPage.driver.pause( 2000 );
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const emptyParagraphBlock = await editorPage.getBlockAtPosition(
@@ -107,20 +107,11 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 
 		// Remove / character.
-		if ( isAndroid() ) {
-			await editorPage.typeTextToTextBlock(
-				paragraphBlockElement,
-				`${ shortText }`,
-				true
-			);
-		} else {
-			await paragraphBlockElement.type( '\b' );
-			await editorPage.typeTextToTextBlock(
-				paragraphBlockElement,
-				`${ shortText }`,
-				false
-			);
-		}
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			`${ shortText }`,
+			true
+		);
 
 		// Check if the slash inserter UI no longer exists.
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
@@ -141,8 +132,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 
 		// Find Image block button.
-		const imageButtonElement =
-			await editorPage.driver.elementByAccessibilityId( 'Image block' );
+		const imageButtonElement = await editorPage.driver.$( '~Image block' );
 		expect( imageButtonElement ).toBeTruthy();
 
 		// Add image block.
@@ -166,7 +156,12 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
-			'/img\n',
+			'/img',
+			false
+		);
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			'\n',
 			false
 		);
 		expect(
