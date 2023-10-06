@@ -506,14 +506,27 @@ const swipeFromTo = async (
 	from = defaultCoordinates,
 	to = defaultCoordinates,
 	delay
-) => {
-	const action = await new wd.TouchAction( driver );
-	action.press( from );
-	action.wait( delay );
-	action.moveTo( to );
-	action.release();
-	await action.perform();
-};
+) =>
+	driver.touchPerform( [
+		{
+			action: 'press',
+			options: from,
+		},
+		{
+			action: 'wait',
+			options: {
+				ms: delay,
+			},
+		},
+		{
+			action: 'moveTo',
+			options: to,
+		},
+		{
+			action: 'release',
+			options: {},
+		},
+	] );
 
 // Starts from the middle of the screen and swipes downwards
 const swipeDown = async ( driver, delay = 3000 ) => {
