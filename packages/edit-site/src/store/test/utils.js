@@ -120,7 +120,7 @@ const TEMPLATE_NESTED_BLOCKS = {
 	blocks: NESTED_BLOCKS,
 };
 
-const TEMAPLATE_SINGLE_BLOCK = {
+const TEMPLATE_SINGLE_BLOCK = {
 	blocks: [
 		{
 			clientId: '1',
