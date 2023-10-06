@@ -50,7 +50,7 @@ const mapping = {
 	},
 };
 
-describe( 'buildLinkValueFromData', () => {
+describe( 'building a link value from data', () => {
 	it.each( [
 		[
 			{
@@ -117,7 +117,7 @@ describe( 'buildLinkValueFromData', () => {
 	} );
 } );
 
-describe( 'buildDataFromLinkValue', () => {
+describe( 'building data from a link value', () => {
 	it( 'build a valid data object from supplied link value mapping', () => {
 		const linkValue = {
 			url: 'https://www.wordpress.org',
