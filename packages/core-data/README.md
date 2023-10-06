@@ -42,7 +42,7 @@ function MyAuthorsListBase() {
 
 ## What's an entity?
 
-An entity represents a data source. Each item within the entity is called entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
+An entity represents a data source. Each item within the entity is called an entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
 
 As of right now, the default entities defined by this package map to the [REST API handbook](https://developer.wordpress.org/rest-api/reference/), though there is nothing in the design that prevents it from being used to interact with any other API.
 
