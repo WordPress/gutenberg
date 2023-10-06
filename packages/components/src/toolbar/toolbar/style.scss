@@ -7,13 +7,13 @@
 	& > .components-toolbar-group:last-child {
 		border-right: none;
 	}
-}
 
-.components-accessible-toolbar.is-unstyled {
-	border: none;
-
-	& > .components-toolbar-group {
+	&.is-unstyled {
 		border: none;
+
+		& > .components-toolbar-group {
+			border-right: none;
+		}
 
 	}
 }
