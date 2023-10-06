@@ -3,7 +3,8 @@
  */
 const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies
-const wd = require( 'wd' );
+// TODO: Replace usage of wd in favor of WebdriverIO
+const wd = null;
 const crypto = require( 'crypto' );
 const path = require( 'path' );
 /**
