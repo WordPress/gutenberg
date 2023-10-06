@@ -7,9 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -19,48 +19,44 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
-	const {
-		blockType,
-		blockEditingMode,
-		lastFocus,
-		hasParents,
-		showParentSelector,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockParents,
-			getLastFocus,
-			getSelectedBlockClientIds,
-			getBlockEditingMode,
-		} = select( blockEditorStore );
-		const { getBlockType } = select( blocksStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( _selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
-		const parentBlockType = getBlockType( parentBlockName );
+function UnforwardBlockContextualToolbar(
+	{ focusOnMount, isFixed, ...props },
+	ref
+) {
+	const { blockType, blockEditingMode, hasParents, showParentSelector } =
+		useSelect( ( select ) => {
+			const {
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientIds,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const parents = getBlockParents( _selectedBlockClientId );
+			const firstParentClientId = parents[ parents.length - 1 ];
+			const parentBlockName = getBlockName( firstParentClientId );
+			const parentBlockType = getBlockType( parentBlockName );
 
-		return {
-			blockType:
-				_selectedBlockClientId &&
-				getBlockType( getBlockName( _selectedBlockClientId ) ),
-			blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
-			lastFocus: getLastFocus(),
-			hasParents: parents.length,
-			showParentSelector:
-				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
-				hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				) &&
-				selectedBlockClientIds.length <= 1 &&
-				getBlockEditingMode( _selectedBlockClientId ) === 'default',
-		};
-	}, [] );
+			return {
+				blockType:
+					_selectedBlockClientId &&
+					getBlockType( getBlockName( _selectedBlockClientId ) ),
+				blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
+				hasParents: parents.length,
+				showParentSelector:
+					parentBlockType &&
+					getBlockEditingMode( firstParentClientId ) === 'default' &&
+					hasBlockSupport(
+						parentBlockType,
+						'__experimentalParentSelector',
+						true
+					) &&
+					selectedBlockClientIds.length <= 1 &&
+					getBlockEditingMode( _selectedBlockClientId ) === 'default',
+			};
+		}, [] );
 
 	const isToolbarEnabled =
 		! blockType ||
@@ -81,6 +77,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	return (
 		<NavigableToolbar
+			ref={ ref }
 			focusOnMount={ focusOnMount }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
@@ -92,6 +89,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					lastFocus.current.focus();
 				}
 			} }
+			focusEditorOnEscape
 			{ ...props }
 		>
 			<BlockToolbar hideDragHandle={ isFixed } />
@@ -99,4 +97,4 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	);
 }
 
-export default BlockContextualToolbar;
+export default forwardRef( UnforwardBlockContextualToolbar );

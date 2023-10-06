@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -25,11 +25,10 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-export default function SelectedBlockTools( {
-	clientId,
-	showEmptyBlockSideInserter,
-	shiftPadding = {},
-} ) {
+function UnforwardSelectedBlockTools(
+	{ clientId, showEmptyBlockSideInserter, shiftPadding = {} },
+	ref
+) {
 	const {
 		capturingClientId,
 		isInsertionPointVisible,
@@ -52,7 +51,7 @@ export default function SelectedBlockTools( {
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const instanceId = useInstanceId( SelectedBlockTools );
+	const instanceId = useInstanceId( UnforwardSelectedBlockTools );
 	const descriptionId = `block-editor-block-contextual-toolbar--${ instanceId }`;
 
 	const isToolbarForced = useRef( false );
@@ -106,6 +105,7 @@ export default function SelectedBlockTools( {
 			<>
 				<KeyboardInstructions />
 				<BlockContextualToolbar
+					ref={ ref }
 					aria-describedby={ descriptionId }
 					// Needs to be passed as `true` so it can be set fixed smaller screens as well
 					isFixed={ true }
@@ -167,6 +167,7 @@ export default function SelectedBlockTools( {
 						<>
 							<KeyboardInstructions />
 							<BlockContextualToolbar
+								ref={ ref }
 								aria-describedby={ descriptionId }
 								// If the toolbar is being shown because of being forced
 								// it should focus the toolbar right after the mount.
@@ -196,3 +197,5 @@ export default function SelectedBlockTools( {
 
 	return null;
 }
+
+export default forwardRef( UnforwardSelectedBlockTools );
