@@ -31,8 +31,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
-	buildLinkValueFromData,
-	buildDataFromLinkValue,
+	getLinkValueTransforms,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
@@ -192,6 +191,10 @@ function ButtonEdit( props ) {
 		},
 	};
 
+	const { toLink, toData } = getLinkValueTransforms(
+		linkValueAttrsToDataMapping
+	);
+
 	function startEditing( event ) {
 		event.preventDefault();
 		setIsEditingURL( true );
@@ -215,14 +218,11 @@ function ButtonEdit( props ) {
 	// NOT NOT MERGE WITHOUT RE-INTSTAINTG THIS MEMOIZATION
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
-	const linkValue = buildLinkValueFromData(
-		{
-			url,
-			linkTarget,
-			rel,
-		},
-		linkValueAttrsToDataMapping
-	);
+	const linkValue = toLink( {
+		url,
+		linkTarget,
+		rel,
+	} );
 	// NOT NOT MERGE WITHOUT RE-INTSTAINTG THIS MEMOIZATION
 
 	return (
@@ -313,12 +313,7 @@ function ButtonEdit( props ) {
 					<LinkControl
 						value={ linkValue }
 						onChange={ ( newLinkValue ) =>
-							setAttributes(
-								buildDataFromLinkValue(
-									newLinkValue,
-									linkValueAttrsToDataMapping
-								)
-							)
+							setAttributes( toData( newLinkValue ) )
 						}
 						onRemove={ () => {
 							unlink();
