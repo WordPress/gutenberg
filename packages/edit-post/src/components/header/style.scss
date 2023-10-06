@@ -68,6 +68,8 @@
 	flex-grow: 3;
 	// Hide the overflow so flex will limit its width. Block toolbar will allow scrolling on fixed toolbar.
 	overflow: hidden;
+	// Leave enough room for the focus ring to show.
+	padding: 2px 0;
 
 	.table-of-contents {
 		display: none;
