@@ -32,11 +32,12 @@ export default function msListConverter( node, doc ) {
 	let level = parseInt( matches[ 1 ], 10 ) - 1 || 0;
 
 	const prevNode = node.previousElementSibling;
+	const listInfoElement = node.querySelector( 'span[style*="mso-list"]' );
 
 	// Add new list if no previous.
 	if ( ! prevNode || ! isList( prevNode ) ) {
 		// See https://html.spec.whatwg.org/multipage/grouping-content.html#attr-ol-type.
-		const type = node.textContent.trim().slice( 0, 1 );
+		const type = listInfoElement ? listInfoElement.textContent.trim() : '';
 		const isNumeric = /[1iIaA]/.test( type );
 		const newListNode = doc.createElement( isNumeric ? 'ol' : 'ul' );
 
@@ -53,8 +54,10 @@ export default function msListConverter( node, doc ) {
 
 	let receivingNode = listNode;
 
-	// Remove the first span with list info.
-	node.removeChild( node.firstChild );
+	// Remove the list info element.
+	if ( listInfoElement ) {
+		listInfoElement.remove();
+	}
 
 	// Add content.
 	while ( node.firstChild ) {
