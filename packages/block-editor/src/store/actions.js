@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1009,6 +1010,12 @@ export const mergeBlocks =
 
 		const [ clientIdA, clientIdB ] = blocks;
 		const blockA = select.getBlock( clientIdA );
+
+		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+			dispatch.removeBlock( clientIdA, false );
+			return;
+		}
+
 		const blockAType = getBlockType( blockA.name );
 
 		if ( ! blockAType ) return;
