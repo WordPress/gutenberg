@@ -2,7 +2,8 @@
  * External dependencies
  */
 const childProcess = require( 'child_process' );
-// eslint-disable-next-line import/no-extraneous-dependencies
+// eslint-disable-next-line import/no-extraneous-dependencies, import/named
+import { remote } from 'webdriverio';
 // TODO: Replace usage of wd in favor of WebdriverIO
 const wd = null;
 const crypto = require( 'crypto' );
@@ -11,7 +12,13 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const serverConfigs = require( './serverConfigs' );
-const { iosServer, iosLocal, android } = require( './caps' );
+const {
+	iosServer,
+	iosLocal,
+	android,
+	sauceOptions,
+	prefixKeysWithAppium,
+} = require( './caps' );
 const AppiumLocal = require( './appium-local' );
 
 // Platform setup.
@@ -44,6 +51,7 @@ const blockEdgeToContent = 16;
 
 const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
 const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
+const SAUCE_LABS_TIMEOUT = 240;
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
@@ -71,6 +79,8 @@ const getIOSPlatformVersions = ( { requiredVersion } ) => {
 		);
 };
 
+const PLATFORM_NAME = isAndroid() ? 'Android' : 'iOS';
+
 // Initialises the driver and desired capabilities for appium.
 const setupDriver = async () => {
 	const branch = process.env.CIRCLE_BRANCH || '';
@@ -89,11 +99,6 @@ const setupDriver = async () => {
 			);
 		}
 	}
-
-	const serverConfig = isLocalEnvironment()
-		? serverConfigs.local
-		: serverConfigs.sauce;
-	const driver = wd.promiseChainRemote( serverConfig );
 
 	let desiredCaps;
 	if ( isAndroid() ) {
@@ -116,11 +121,13 @@ const setupDriver = async () => {
 				// Ignore error.
 			}
 		} else {
-			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
+			desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
+			desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		}
 	} else {
 		desiredCaps = iosServer( { iPadDevice } );
-		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
+		desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
+		desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
 			desiredCaps = iosLocal( { iPadDevice } );
 
@@ -152,17 +159,29 @@ const setupDriver = async () => {
 		}
 	}
 
-	if ( ! isLocalEnvironment() ) {
-		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`;
-		desiredCaps.tags = [ 'Gutenberg', branch ];
-	}
+	const sauceOptionsConfig = ! isLocalEnvironment()
+		? {
+				'sauce:options': {
+					...sauceOptions,
+					name: `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`,
+					tags: [ 'Gutenberg', branch ],
+					idleTimeout: SAUCE_LABS_TIMEOUT,
+				},
+		  }
+		: {};
+	const serverConfig = isLocalEnvironment()
+		? serverConfigs.local
+		: serverConfigs.sauce;
 
-	await driver.init( desiredCaps );
-
-	const status = await driver.status();
-	// Display the driver status
-	// eslint-disable-next-line no-console
-	console.log( status );
+	const driver = await remote( {
+		...serverConfig,
+		logLevel: 'error',
+		capabilities: {
+			platformName: PLATFORM_NAME,
+			...prefixKeysWithAppium( desiredCaps ),
+			...sauceOptionsConfig,
+		},
+	} );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
