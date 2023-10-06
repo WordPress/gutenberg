@@ -763,6 +763,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
+### StarterPatternsModal
+
+Undocumented declaration.
+
 ### store
 
 Store definition for the block editor namespace.
