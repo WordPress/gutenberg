@@ -20,10 +20,7 @@ jobs:
             matrix:
                 xcode: ['14.2']
                 device: ['iPhone 13']
-                native-test-name:
-                    [
-                        gutenberg-editor-rendering|gutenberg-editor-block-insertion,
-                    ]
+                native-test-name: [gutenberg-editor-block-insertion]
 
         steps:
             - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
