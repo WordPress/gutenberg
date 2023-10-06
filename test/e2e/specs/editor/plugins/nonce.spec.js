@@ -12,12 +12,13 @@ test.describe( 'Nonce', () => {
 		page,
 		admin,
 		requestUtils,
+		editor,
 	} ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
-		// Wait until the network is idle.
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
 		await page.keyboard.type( 'test' );
 
 		/**

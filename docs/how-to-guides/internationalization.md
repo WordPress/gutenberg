@@ -24,7 +24,7 @@ function myguten_block_init() {
     wp_register_script(
         'myguten-script',
         plugins_url( 'block.js', __FILE__ ),
-        array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor' )
+        array( 'wp-blocks', 'react', 'wp-i18n', 'wp-block-editor' )
     );
 
     register_block_type( 'myguten/simple', array(
@@ -67,8 +67,8 @@ registerBlockType( 'myguten/simple', {
 {% Plain %}
 
 ```js
+const el = React.createElement;
 const { __ } = wp.i18n;
-const el = wp.element.createElement;
 const { registerBlockType } = wp.blocks;
 const { useBlockProps } = wp.blockEditor;
 

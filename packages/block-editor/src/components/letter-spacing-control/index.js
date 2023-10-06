@@ -20,7 +20,7 @@ import useSetting from '../../components/use-setting';
  * @param {Function}                props.onChange             Handles change in letter-spacing selection.
  * @param {string|number|undefined} props.__unstableInputWidth Input width to pass through to inner UnitControl. Should be a valid CSS value.
  *
- * @return {WPElement} Letter-spacing control.
+ * @return {Element} Letter-spacing control.
  */
 export default function LetterSpacingControl( {
 	value,

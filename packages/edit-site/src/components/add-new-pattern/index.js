@@ -51,7 +51,7 @@ export default function AddNewPattern() {
 		history.push( {
 			postId: pattern.id,
 			postType: PATTERN_TYPES.user,
-			categoryType: PATTERN_TYPES.user,
+			categoryType: PATTERN_TYPES.theme,
 			categoryId,
 			canvas: 'edit',
 		} );

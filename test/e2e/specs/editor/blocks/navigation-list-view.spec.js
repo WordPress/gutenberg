@@ -195,8 +195,8 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
 
 		// Select the Page Link option.
-		const pageLinkResult = blockResultOptions.nth( 0 );
-		await pageLinkResult.click();
+		const customLinkResult = blockResultOptions.nth( 1 );
+		await customLinkResult.click();
 
 		// Expect to see the Link creation UI be focused.
 		const linkUIInput = linkControl.getSearchInput();
@@ -209,7 +209,26 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
+		// Provides test coverage for feature whereby Custom Link type
+		// should default to `Pages` when displaying the "initial suggestions"
+		// in the Link UI.
+		// See https://github.com/WordPress/gutenberg/pull/54622.
 		const firstResult = await linkControl.getNthSearchResult( 0 );
+		const secondResult = await linkControl.getNthSearchResult( 1 );
+		const thirdResult = await linkControl.getNthSearchResult( 2 );
+
+		const firstResultType =
+			await linkControl.getSearchResultType( firstResult );
+
+		const secondResultType =
+			await linkControl.getSearchResultType( secondResult );
+
+		const thirdResultType =
+			await linkControl.getSearchResultType( thirdResult );
+
+		expect( firstResultType ).toBe( 'Page' );
+		expect( secondResultType ).toBe( 'Page' );
+		expect( thirdResultType ).toBe( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
 		const firstResultText =
@@ -571,6 +590,14 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
+			.innerText();
+	}
+
+	async getSearchResultType( result ) {
+		await expect( result ).toBeVisible();
+
+		return result
+			.locator( '.components-menu-item__shortcut' ) // this is the only way to get the type text.
 			.innerText();
 	}
 }

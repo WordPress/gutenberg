@@ -23,7 +23,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 import Button from '../button';
 import type { TabPanelProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 // Separate the actual tab name from the instance ID. This is
 // necessary because Ariakit internally uses the element ID when

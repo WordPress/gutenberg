@@ -383,12 +383,12 @@ class ColorControl {
 		await customLink.click();
 
 		// Submenu elements.
-		const submenuLink = this.editor.canvas
-			.locator( 'a' )
-			.filter( { hasText: 'Submenu Link' } );
 		const submenuWrapper = this.editor.canvas
 			.getByRole( 'document', { name: 'Block: Custom Link' } )
-			.filter( { has: submenuLink } );
+			.filter( { hasText: 'Submenu Link' } );
+		const submenuLink = submenuWrapper
+			.locator( 'a' )
+			.filter( { hasText: 'Submenu Link' } );
 
 		// Submenu link color.
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );

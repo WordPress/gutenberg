@@ -34,6 +34,7 @@ function useDeprecatedProps( {
 	isSecondary,
 	isTertiary,
 	isLink,
+	isPressed,
 	isSmall,
 	size,
 	variant,
@@ -41,6 +42,11 @@ function useDeprecatedProps( {
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedSize = size;
 	let computedVariant = variant;
+
+	const newProps: { 'aria-pressed'?: boolean } = {
+		// @TODO Mark `isPressed` as deprecated
+		'aria-pressed': isPressed,
+	};
 
 	if ( isSmall ) {
 		computedSize ??= 'small';
@@ -73,6 +79,7 @@ function useDeprecatedProps( {
 	}
 
 	return {
+		...newProps,
 		...otherProps,
 		size: computedSize,
 		variant: computedVariant,
@@ -85,7 +92,6 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
-		isPressed,
 		isBusy,
 		isDestructive,
 		className,
@@ -106,10 +112,16 @@ export function UnforwardedButton(
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
-	const { href, target, ...additionalProps } =
-		'href' in buttonOrAnchorProps
-			? buttonOrAnchorProps
-			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
+	const {
+		href,
+		target,
+		'aria-checked': ariaChecked,
+		'aria-pressed': ariaPressed,
+		'aria-selected': ariaSelected,
+		...additionalProps
+	} = 'href' in buttonOrAnchorProps
+		? buttonOrAnchorProps
+		: { href: undefined, target: undefined, ...buttonOrAnchorProps };
 
 	const instanceId = useInstanceId(
 		Button,
@@ -124,6 +136,12 @@ export function UnforwardedButton(
 			// Tooltip should not considered as a child
 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
+	const truthyAriaPressedValues: ( typeof ariaPressed )[] = [
+		true,
+		'true',
+		'mixed',
+	];
+
 	const classes = classnames( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
@@ -131,7 +149,10 @@ export function UnforwardedButton(
 		'is-small': size === 'small',
 		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
-		'is-pressed': isPressed,
+
+		'is-pressed': truthyAriaPressedValues.includes( ariaPressed ),
+		'is-pressed-mixed': ariaPressed === 'mixed',
+
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
@@ -146,7 +167,9 @@ export function UnforwardedButton(
 			? {
 					type: 'button',
 					disabled: trulyDisabled,
-					'aria-pressed': isPressed,
+					'aria-checked': ariaChecked,
+					'aria-pressed': ariaPressed,
+					'aria-selected': ariaSelected,
 			  }
 			: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =

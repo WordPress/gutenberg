@@ -1,17 +1,6 @@
 # Element
 
-Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
-
-You may find yourself asking, "Why an abstraction layer?". For a few reasons:
-
--   In many applications, especially those extended by a rich plugin ecosystem as is the case with WordPress, it's wise to create interfaces to underlying third-party code. The thinking is that if ever a need arises to change or even replace the underlying implementation, it can be done without catastrophic rippling effects to dependent code, so long as the interface stays the same.
--   It provides a mechanism to shield implementers by omitting features with uncertain futures (`createClass`, `PropTypes`).
--   It helps avoid incompatibilities between versions by ensuring that every plugin operates on a single centralized version of the code.
-
-On the `wp.element` global object, you will find the following, ordered roughly by the likelihood you'll encounter it in your code:
-
--   [`createElement`](https://reactjs.org/docs/react-api.html#createelement)
--   [`render`](https://reactjs.org/docs/react-dom.html#render)
+Element is a package that builds on top of [React](https://reactjs.org/) and provide a set of utilities to work with React components and React elements.
 
 ## Installation
 
@@ -23,39 +12,6 @@ npm install @wordpress/element --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
-## Usage
-
-Let's render a customized greeting into an empty element.
-
-**Note:** `createRoot` was introduced with React 18, which is bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
-
-Assuming the following root element is present in the page:
-
-```html
-<div id="greeting"></div>
-```
-
-We can mount our app:
-
-```js
-import { createRoot, render, createElement } from '@wordpress/element';
-
-function Greeting( props ) {
-	return createElement( 'span', null, 'Hello ' + props.toWhom + '!' );
-}
-
-const domElement = document.getElementById( 'greeting' );
-const uiElement = createElement( Greeting, { toWhom: 'World' } );
-
-if ( createRoot ) {
-	createRoot( domElement ).render( uiElement );
-} else {
-	render( uiElement, domElement );
-}
-```
-
-Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
-
 ## Why React?
 
 At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md), we observe the following technical requirements:
@@ -66,27 +22,6 @@ At the risk of igniting debate surrounding any single "best" front-end framework
 At its most basic, React provides a simple input / output mechanism. **Given a set of inputs ("props"), a developer describes the output to be shown on the page.** This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
 
 The offerings of any framework necessarily become more complex as these requirements increase; many front-end frameworks prescribe ideas around page routing, retrieving and updating data, and managing layout. React is not immune to this, but the introduced complexity is rarely caused by React itself, but instead managing an arrangement of supporting tools. By moving these concerns out of sight to the internals of the system (WordPress core code), we can minimize the responsibilities of plugin authors to a small, clear set of touch points.
-
-## JSX
-
-While not at all a requirement to use React, [JSX](https://reactjs.org/docs/introducing-jsx.html) is a recommended syntax extension to compose elements more expressively. Through a build process, JSX is converted back to the `createElement` syntax you see earlier in this document.
-
-If you've configured [Babel](http://babeljs.io/) for your project, you can opt in to JSX syntax by specifying the `pragma` option of the [`transform-react-jsx` plugin](https://www.npmjs.com/package/babel-plugin-transform-react-jsx) in your [`.babelrc` configuration](http://babeljs.io/docs/usage/babelrc/).
-
-```json
-{
-	"plugins": [
-		[
-			"transform-react-jsx",
-			{
-				"pragma": "createElement"
-			}
-		]
-	]
-}
-```
-
-This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
 
 ## API
 
@@ -102,12 +37,12 @@ Creates a copy of an element with extended props.
 
 _Parameters_
 
--   _element_ `WPElement`: Element
+-   _element_ `Element`: Element
 -   _props_ `?Object`: Props to apply to cloned element
 
 _Returns_
 
--   `WPElement`: Cloned element.
+-   `Element`: Cloned element.
 
 ### Component
 
@@ -145,11 +80,11 @@ _Parameters_
 
 -   _type_ `?(string|Function)`: Tag name or element creator
 -   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   _children_ `...WPElement`: Descendant elements
+-   _children_ `...Element`: Descendant elements
 
 _Returns_
 
--   `WPElement`: Element.
+-   `Element`: Element.
 
 ### createInterpolateElement
 
@@ -175,11 +110,11 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record<string, WPElement>`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `WPElement`: A wp element.
+-   `Element`: A wp element.
 
 ### createPortal
 
@@ -191,7 +126,7 @@ _Related_
 
 _Parameters_
 
--   _child_ `import('./react').WPElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 ### createRef
@@ -220,7 +155,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `import('./react').WPComponent`: Component's instance.
+-   _component_ `import('react').ComponentType`: Component's instance.
 
 ### flushSync
 
@@ -240,7 +175,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
 ### Fragment
 
@@ -282,7 +217,7 @@ _Returns_
 
 ### isValidElement
 
-Checks if an object is a valid WPElement.
+Checks if an object is a valid React Element.
 
 _Parameters_
 
@@ -290,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: true if objectToTest is a valid WPElement and false otherwise.
+-   `boolean`: true if objectToTest is a valid React Element and false otherwise.
 
 ### lazy
 

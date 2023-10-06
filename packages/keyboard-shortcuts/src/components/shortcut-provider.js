@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,15 +17,15 @@ const { Provider } = context;
  *
  * @param {Object} props Props to pass to `div`.
  *
- * @return {import('@wordpress/element').WPElement} Component.
+ * @return {Element} Component.
  */
 export function ShortcutProvider( props ) {
-	const keyboardShortcuts = useRef( new Set() );
+	const [ keyboardShortcuts ] = useState( () => new Set() );
 
 	function onKeyDown( event ) {
 		if ( props.onKeyDown ) props.onKeyDown( event );
 
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+		for ( const keyboardShortcut of keyboardShortcuts ) {
 			keyboardShortcut( event );
 		}
 	}
