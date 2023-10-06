@@ -25,5 +25,13 @@ describe( 'Toolbar', () => {
 				screen.getByLabelText( 'control2', { selector: 'button' } )
 			).toBeInTheDocument();
 		} );
+
+		it( 'should render a toolbar without styles if variant has been defined', () => {
+			render( <Toolbar label="blocks" variant="unstyled" /> );
+
+			expect( screen.getByRole( 'toolbar' ) ).toHaveClass(
+				'is-unstyled'
+			);
+		} );
 	} );
 } );
