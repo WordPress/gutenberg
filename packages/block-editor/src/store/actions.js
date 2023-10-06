@@ -1012,7 +1012,20 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 
 		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock( clientIdA, false );
+			dispatch.removeBlock(
+				clientIdA,
+				select.isBlockSelected( clientIdA )
+			);
+			return;
+		}
+
+		const blockB = select.getBlock( clientIdB );
+
+		if ( isUnmodifiedDefaultBlock( blockB ) ) {
+			dispatch.removeBlock(
+				clientIdB,
+				select.isBlockSelected( clientIdB )
+			);
 			return;
 		}
 
@@ -1027,8 +1040,6 @@ export const mergeBlocks =
 			dispatch.selectBlock( blockA.clientId );
 			return;
 		}
-
-		const blockB = select.getBlock( clientIdB );
 
 		if ( ! blockAType.merge ) {
 			// If there's no merge function defined, attempt merging inner
