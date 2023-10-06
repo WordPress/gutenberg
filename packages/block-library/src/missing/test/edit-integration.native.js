@@ -96,7 +96,7 @@ describe( 'Unsupported block', () => {
 		} );
 	} );
 
-	it( 'show edit block option when UBE is available', async () => {
+	it( 'requests web editor when UBE is available', async () => {
 		await initializeEditor( {
 			initialHtml: TABLE_BLOCK_HTML,
 			capabilities: {
@@ -114,7 +114,7 @@ describe( 'Unsupported block', () => {
 		const actionButton = screen.getByText( 'Edit using web editor' );
 		expect( actionButton ).toBeVisible();
 
-		// UBE is requested after the modal hides and a timeout is ran
+		// UBE is requested after the modal hides and running a timeout
 		await withFakeTimers( async () => {
 			fireEvent.press( actionButton );
 			fireEvent(
@@ -126,7 +126,7 @@ describe( 'Unsupported block', () => {
 		expect( requestUnsupportedBlockFallback ).toHaveBeenCalled();
 	} );
 
-	it( 'does not show edit block option when UBE is not available', async () => {
+	it( 'does not show web editor option when UBE is not available', async () => {
 		await initializeEditor( {
 			initialHtml: TABLE_BLOCK_HTML,
 			capabilities: {
@@ -147,9 +147,9 @@ describe( 'Unsupported block', () => {
 		expect( actionButton ).toBeNull();
 	} );
 
-	it( 'does not show edit block option when block is incompatible with UBE', async () => {
+	it( 'does not show web editor option when block is incompatible with UBE', async () => {
 		await initializeEditor( {
-			// Reusable blocks/Patterns is the only block type unsupported in UBE.
+			// Reusable blocks/Patterns is a block type unsupported by UBE
 			initialHtml: '<!-- wp:block {"ref":7387} /-->',
 			capabilities: {
 				unsupportedBlockEditor: true,
