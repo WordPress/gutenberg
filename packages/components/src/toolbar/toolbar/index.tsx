@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -19,21 +19,6 @@ import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 import { ContextSystemProvider } from '../../context';
 
-const CONTEXT_SYSTEM_VALUE = ( variant: string | undefined ) => {
-	if ( variant !== undefined ) {
-		return {};
-	}
-
-	return {
-		DropdownMenu: {
-			variant: 'toolbar',
-		},
-		Dropdown: {
-			variant: 'toolbar',
-		},
-	};
-};
-
 function UnforwardedToolbar(
 	{
 		className,
@@ -43,6 +28,21 @@ function UnforwardedToolbar(
 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
+	const CONTEXT_SYSTEM_VALUE = useMemo( () => {
+		if ( variant !== undefined ) {
+			return {};
+		}
+
+		return {
+			DropdownMenu: {
+				variant: 'toolbar',
+			},
+			Dropdown: {
+				variant: 'toolbar',
+			},
+		};
+	}, [ variant ] );
+
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			since: '5.6',
@@ -67,7 +67,7 @@ function UnforwardedToolbar(
 	);
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE( variant ) }>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
 			<ToolbarContainer
 				className={ finalClassName }
 				label={ label }
