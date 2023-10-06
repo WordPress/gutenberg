@@ -941,10 +941,6 @@ class EditorPage {
 		await stopDriver( this.driver );
 	}
 
-	async sauceJobStatus( allPassed ) {
-		await this.driver.sauceJobStatus( allPassed );
-	}
-
 	// =========================
 	// Shortcode Block functions
 	// =========================

@@ -8,10 +8,7 @@ const childProcess = require( 'child_process' );
 /**
  * Internal dependencies
  */
-const {
-	isAndroid,
-	isLocalEnvironment,
-} = require( './__device-tests__/helpers/utils' );
+const { isAndroid } = require( './__device-tests__/helpers/utils' );
 
 jest.setTimeout( 1000000 ); // In milliseconds.
 
@@ -132,11 +129,6 @@ jasmine.getEnv().addReporter( {
 
 		if ( fs.existsSync( oldPath ) ) {
 			fs.renameSync( oldPath, newPath );
-		}
-	},
-	suiteDone() {
-		if ( ! isLocalEnvironment() ) {
-			global.editorPage.sauceJobStatus( allPassed );
 		}
 	},
 } );
