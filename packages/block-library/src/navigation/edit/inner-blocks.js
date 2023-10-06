@@ -59,17 +59,6 @@ export default function NavigationInnerBlocks( {
 		'wp_navigation'
 	);
 
-	const shouldDirectInsert = useMemo(
-		() =>
-			blocks.every(
-				( { name } ) =>
-					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu' ||
-					name === 'core/page-list'
-			),
-		[ blocks ]
-	);
-
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
 	// appender.
@@ -99,7 +88,7 @@ export default function NavigationInnerBlocks( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
-			directInsert: shouldDirectInsert,
+			directInsert: false,
 			orientation,
 			templateLock,
 
