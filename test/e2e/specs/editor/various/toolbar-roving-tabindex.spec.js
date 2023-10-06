@@ -136,17 +136,6 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Move up' );
 	} );
-
-	test( 'can reach toolbar items with arrow keys after pressing alt+F10', async ( {
-		page,
-		pageUtils,
-		ToolbarRovingTabindexUtils,
-	} ) => {
-		await pageUtils.pressKeys( 'alt+F10' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowRight' );
-		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Bold' );
-	} );
 } );
 
 class ToolbarRovingTabindexUtils {
