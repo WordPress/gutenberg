@@ -58,8 +58,7 @@ class EditorPage {
 		await launchApp( this.driver, { initialData, rawStyles, rawFeatures } );
 
 		// Stores initial values from the editor for different helpers.
-		const addButton =
-			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+		const addButton = await this.driver.$$( `~${ ADD_BLOCK_ID }` );
 
 		if ( addButton.length !== 0 ) {
 			this.initialValues.addButtonLocation =
@@ -230,7 +229,7 @@ class EditorPage {
 	// renders blocks, it won't need to scroll down as it would find
 	// the block right away.
 	async scrollAndReturnElementByAccessibilityId( id ) {
-		const elements = await this.driver.elementsByAccessibilityId( id );
+		const elements = await this.driver.$$( `~${ id }` );
 
 		if ( elements.length === 0 ) {
 			await swipeUp( this.driver, undefined, 100, 1 );
@@ -240,7 +239,7 @@ class EditorPage {
 	}
 
 	async getLastElementByXPath( accessibilityLabel ) {
-		const elements = await this.driver.elementsByXPath(
+		const elements = await this.driver.$$(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		return elements[ elements.length - 1 ];
