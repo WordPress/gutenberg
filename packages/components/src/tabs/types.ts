@@ -53,9 +53,8 @@ export type TabsProps = {
 	 * The function called when a tab has been selected.
 	 * It is passed the `instanceId`-prefixed `tabId` as an argument.
 	 */
-	onSelect?:
-		| ( ( selectedId: string | null | undefined ) => void )
-		| undefined;
+	onSelect?: ( selectedId: string | null | undefined ) => void;
+
 	/**
 	 * The orientation of the tablist.
 	 *

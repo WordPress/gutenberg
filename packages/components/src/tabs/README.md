@@ -138,10 +138,11 @@ The orientation of the `tablist` (`vertical` or `horizontal`)
 -   Required: No
 -   Default: `horizontal`
 
-###### `selectedTabId`: `string | null | undefined`
+###### `selectedTabId`: `string | null`
 
 The ID of the tab to display. This id is prepended with the `Tabs` instanceId internally.
-This prop puts the component into controlled mode. A value of `null` will result in no tab being selected.
+If left `undefined`, the component assumes it is being used in uncontrolled mode. Consequently, any value different than `undefined` will set the component in `controlled` mode. When in controlled mode, the `null` value will result in no tab being selected.
+
 - Required: No
 
 #### TabList
