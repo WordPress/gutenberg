@@ -21,8 +21,8 @@ export function filterURLForDisplay( url, maxLength = null ) {
 		filteredURL = filteredURL.replace( '/', '' );
 	}
 
-	const mediaRegexp =
-		/([\w|:])*\.(?:jpg|jpeg|gif|png|svg|ico|webp|mp3|m4a|ogg|wav|mp4|m4v|mov|wmv|avi|mpg|ogv|3gp|3g2)/;
+	const mediaRegexp = /\/([^\/?]+)\.(?:[\w]+)(?=\?|$)/;
+
 	if (
 		! maxLength ||
 		filteredURL.length <= maxLength ||
