@@ -62,15 +62,17 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * Handles a wp_ajax signaling server request.
 	 */
 	public static function do_wp_ajax_action() {
-		static::initialize_paths();
-
 		if ( empty( $_REQUEST ) || empty( $_REQUEST['subscriber_id'] ) ) {
 			die( 'no identifier' );
 		}
+
+		static::initialize_paths();
+
+
 		static::$subscriber_id = $_REQUEST['subscriber_id'];
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
-			static::handle_message_read_request();
+			static::handle_read_pending_messages( static::$subscriber_id, static::$subscriber_to_messages_path );
 		} else {
 			if ( empty( $_POST ) || empty( $_POST['message'] ) ) {
 				die( 'no message' );
@@ -79,7 +81,63 @@ class Gutenberg_HTTP_Signaling_Server {
 			if ( ! $message ) {
 				die( 'no message' );
 			}
-			static::handle_message_operation( $message );
+
+			$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
+			if ( ! $fd_topics_subscriber ) {
+				die( 'Could not open required file.' );
+			}
+
+			flock( $fd_topics_subscriber, LOCK_EX );
+			$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
+	
+			switch ( $message['type'] ) {
+				case 'subscribe':
+					static::handle_subscribe_to_topics( static::$topics_to_subscribers_path, $subscriber_id, $message['topics'] );
+					break;
+				case 'unsubscribe':
+					static::handle_unsubscribe_from_topics( static::$topics_to_subscribers_path, $subscriber_id, $message['topics'] );
+					break;
+				case 'publish':
+					$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+					if( ! $fd_subscriber_messages ) {
+						die( 'Could not open required file.' );
+					}
+					flock( $fd_subscriber_messages, LOCK_EX );
+					$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
+					$topic                  = $message['topic'];
+					$receivers              = $topics_to_subscribers[ $topic ];
+					if ( $receivers ) {
+						$message['clients'] = count( $receivers );
+						foreach ( $receivers as $receiver ) {
+							if ( ! $subscriber_to_messages[ $receiver ] ) {
+								$subscriber_to_messages[ $receiver ] = array();
+							}
+							$subscriber_to_messages[ $receiver ][] = $message;
+						}
+						static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
+					}
+					flock( $fd_subscriber_messages, LOCK_UN );
+					fclose( $fd_subscriber_messages );
+					break;
+				case 'ping':
+					$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+					if( ! $fd_subscriber_messages ) {
+						die( 'Could not open required file.' );
+					}
+					flock( $fd_subscriber_messages, LOCK_EX );
+					$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
+					if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
+						$subscriber_to_messages[ static::$subscriber_id ] = array();
+					}
+					$subscriber_to_messages[ static::$subscriber_id ][] = array( 'type' => 'pong' );
+					static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
+					flock( $fd_subscriber_messages, LOCK_UN );
+					fclose( $fd_subscriber_messages );
+					break;
+			}
+			flock( $fd_topics_subscriber, LOCK_UN );
+			fclose( $fd_topics_subscriber );
+			echo wp_json_encode( array( 'result' => 'ok' ) ), PHP_EOL, PHP_EOL;
 		}
 
 		static::clean_up_old_connections();
@@ -98,6 +156,21 @@ class Gutenberg_HTTP_Signaling_Server {
 
 		static::$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
 		// Example: array( 2323232121 => 34343433323(timestamp) ).
+	}
+
+	private static function get_contents_and_lock_file( $path ) {
+		$fd = fopen( $path, 'c+' );
+		if ( ! $fd ) {
+			return array( $fd, null );
+		}
+		flock( $fd, LOCK_EX );
+		return array( $fd, static::get_contents_from_file_descriptor( $fd ) );
+	}
+
+	private static function save_contents_and_unlock_file( $fd, $content ) {
+		static::save_contents_to_file_descriptor( $fd, $content );
+		flock( $fd, LOCK_UN );
+		fclose( $fd );
 	}
 
 	/**
@@ -150,21 +223,21 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * data: <The message to be sent>
 	 * ```
 	 */
-	private static function handle_message_read_request() {
+	private static function handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path ) {
 		header( 'Content-Type: text/event-stream' );
 		header( 'Cache-Control: no-cache' );
 		echo 'retry: 3000' . PHP_EOL;
-		$fd = fopen( static::$subscriber_to_messages_path, 'c+' );
-		if( ! $fd ) {
+		$fd = fopen( $subscriber_to_messages_path, 'c+' );
+		if ( ! $fd ) {
 			die( 'Could not open required file.' );
 		}
 		flock( $fd, LOCK_EX );
 		$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd );
-		if ( isset( $subscriber_to_messages[ static::$subscriber_id ] ) && count( $subscriber_to_messages[ static::$subscriber_id ] ) > 0 ) {
+		if ( isset( $subscriber_to_messages[ $subscriber_id ] ) && count( $subscriber_to_messages[ $subscriber_id ] ) > 0 ) {
 			echo 'id: ' . time() . PHP_EOL;
 			echo 'event: message' . PHP_EOL;
-			echo 'data: ' . wp_json_encode( $subscriber_to_messages[ static::$subscriber_id ] ) . PHP_EOL . PHP_EOL;
-			$subscriber_to_messages[ static::$subscriber_id ] = array();
+			echo 'data: ' . wp_json_encode( $subscriber_to_messages[ $subscriber_id ] ) . PHP_EOL . PHP_EOL;
+			$subscriber_to_messages[ $subscriber_id ] = array();
 			static::save_contents_to_file_descriptor( $fd, $subscriber_to_messages );
 		} else {
 			echo PHP_EOL;
@@ -183,15 +256,19 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
 	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
-	private static function subscribe_to_topics( $topics_to_subscribers, $topics ) {
+	private static function handle_subscribe_to_topics( $topics_to_subscribers_path, $subscriber_id, $topics ) {
+		list( $fd, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
+		if ( ! $fd ) {
+			die( 'Could not open required file.' );
+		}
 		foreach ( $topics as $topic ) {
 			if ( ! $topics_to_subscribers[ $topic ] ) {
 				$topics_to_subscribers[ $topic ] = array();
 			}
 			$topics_to_subscribers[ $topic ][] = static::$subscriber_id;
-			$topics_to_subscribers[ $topic ]    = array_unique( $topics_to_subscribers[ $topic ] ); 
+			$topics_to_subscribers[ $topic ]   = array_unique( $topics_to_subscribers[ $topic ] ); 
 		}
-		return $topics_to_subscribers;
+		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
 	}
 
 	/**
@@ -204,78 +281,19 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
 	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
-	private static function unsubscribe_from_topics( $topics_to_subscribers, $topics ) {
+	private static function handle_unsubscribe_from_topics( $topics_to_subscribers_path, $subscriber_id, $topics ) {
+		list( $fd, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
+		if ( ! $fd ) {
+			die( 'Could not open required file.' );
+		}
 		foreach ( $topics as $topic ) {
 			if ( $topics_to_subscribers[ $topic ] ) {
 				$topics_to_subscribers[ $topic ] = array_diff( $topics_to_subscribers[ $topic ], array( static::$subscriber_id ) );
 			}
 		}
-		return $topics_to_subscribers;
+		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
 	}
 
-	/**
-	 * Handles a wp_ajax signaling server request of client that is performing an operation.
-	 * An operation can be a ping to say the client is alive, sending a message, or subscribing/unscribing to a set of topics.
-	 *
-	 * @param array $message                 An array of topics e.g: array( 'doc1', 'doc2' ).
-	 */
-	private static function handle_message_operation( $message ) {
-		$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
-		if( ! $fd_topics_subscriber ) {
-			die( 'Could not open required file.' );
-		}
-		flock( $fd_topics_subscriber, LOCK_EX );
-		$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
-
-		switch ( $message['type'] ) {
-			case 'subscribe':
-				static::save_contents_to_file_descriptor( $fd_topics_subscriber, static::subscribe_to_topics( $topics_to_subscribers, $message['topics'] ) );
-				break;
-			case 'unsubscribe':
-				static::save_contents_to_file_descriptor( $fd_topics_subscriber, static::unsubscribe_from_topics( $topics_to_subscribers, $message['topics'] ) );
-				break;
-			case 'publish':
-				$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
-				if( ! $fd_subscriber_messages ) {
-					die( 'Could not open required file.' );
-				}
-				flock( $fd_subscriber_messages, LOCK_EX );
-				$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
-				$topic                  = $message['topic'];
-				$receivers              = $topics_to_subscribers[ $topic ];
-				if ( $receivers ) {
-					$message['clients'] = count( $receivers );
-					foreach ( $receivers as $receiver ) {
-						if ( ! $subscriber_to_messages[ $receiver ] ) {
-							$subscriber_to_messages[ $receiver ] = array();
-						}
-						$subscriber_to_messages[ $receiver ][] = $message;
-					}
-					static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
-				}
-				flock( $fd_subscriber_messages, LOCK_UN );
-				fclose( $fd_subscriber_messages );
-				break;
-			case 'ping':
-				$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
-				if( ! $fd_subscriber_messages ) {
-					die( 'Could not open required file.' );
-				}
-				flock( $fd_subscriber_messages, LOCK_EX );
-				$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
-				if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
-					$subscriber_to_messages[ static::$subscriber_id ] = array();
-				}
-				$subscriber_to_messages[ static::$subscriber_id ][] = array( 'type' => 'pong' );
-				static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
-				flock( $fd_subscriber_messages, LOCK_UN );
-				fclose( $fd_subscriber_messages );
-				break;
-		}
-		flock( $fd_topics_subscriber, LOCK_UN );
-		fclose( $fd_topics_subscriber );
-		echo wp_json_encode( array( 'result' => 'ok' ) ), PHP_EOL, PHP_EOL;
-	}
 
 	/**
 	 * Deletes messages and subcriber information of clients that have not interacted with the signaling server in a long time.
