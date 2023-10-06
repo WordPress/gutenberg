@@ -273,6 +273,21 @@ describe( 'getFilename', () => {
 		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
 	} );
 
+	it( 'returns the filename for a variety of formats', () => {
+		expect( getFilename( 'https://wordpress.org/file.pdf' ) ).toBe(
+			'file.pdf'
+		);
+		expect(
+			getFilename( 'https://wordpress.org/image.webp?query=test' )
+		).toBe( 'image.webp' );
+		expect( getFilename( 'https://wordpress.org/video.mov#anchor' ) ).toBe(
+			'video.mov'
+		);
+		expect(
+			getFilename( 'http://localhost:8080/a/path/to/audio.mp3' )
+		).toBe( 'audio.mp3' );
+	} );
+
 	it( 'returns undefined when the provided value does not contain a filename', () => {
 		expect( getFilename( 'http://localhost:8080/' ) ).toBe( undefined );
 		expect( getFilename( 'http://localhost:8080/a/path/' ) ).toBe(
