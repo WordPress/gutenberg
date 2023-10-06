@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	buildLinkValueFromData,
-	buildDataFromLinkValue,
-} from '../link-value-transforms';
+import getLinkValueTransforms from '../link-value-transforms';
 
 /**
  * Maps the standard LinkControl values to a given data object.
@@ -88,7 +85,9 @@ describe( 'buildLinkValueFromData', () => {
 	] )(
 		'build a valid link value from supplied data mapping',
 		( data, expected ) => {
-			const linkValue = buildLinkValueFromData( data, mapping );
+			const { toLink } = getLinkValueTransforms( mapping );
+
+			const linkValue = toLink( data );
 
 			expect( linkValue ).toEqual( expected );
 		}
@@ -106,7 +105,10 @@ describe( 'buildDataFromLinkValue', () => {
 			sponsored: true,
 		};
 
-		const data = buildDataFromLinkValue( linkValue, mapping );
+		// const data = buildDataFromLinkValue( linkValue, mapping );
+
+		const { toData } = getLinkValueTransforms( mapping );
+		const data = toData( linkValue );
 
 		expect( data ).toEqual( {
 			href: 'https://www.google.com',

@@ -1,4 +1,4 @@
-export function buildLinkValueFromData( data, mapping ) {
+function buildLinkValueFromData( data, mapping ) {
 	const linkValue = {};
 	for ( const [ attributeName, valueGetter ] of Object.entries( mapping ) ) {
 		if ( typeof valueGetter === 'string' ) {
@@ -13,7 +13,7 @@ export function buildLinkValueFromData( data, mapping ) {
 	return linkValue;
 }
 
-export function buildDataFromLinkValue( linkValue, mapping ) {
+function buildDataFromLinkValue( linkValue, mapping ) {
 	const data = {};
 	for ( const [ attributeName, valueGetter ] of Object.entries( mapping ) ) {
 		if ( typeof valueGetter === 'string' ) {
@@ -26,4 +26,11 @@ export function buildDataFromLinkValue( linkValue, mapping ) {
 		}
 	}
 	return data;
+}
+
+export default function getLinkValueTransforms( mapping ) {
+	return {
+		toLink: ( data ) => buildLinkValueFromData( data, mapping ),
+		toData: ( linkValue ) => buildDataFromLinkValue( linkValue, mapping ),
+	};
 }
