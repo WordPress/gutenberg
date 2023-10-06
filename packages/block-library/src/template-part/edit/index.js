@@ -10,8 +10,11 @@ import {
 	RecursionProvider,
 	useHasRecursion,
 	InspectorControls,
+	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { parse } from '@wordpress/blocks';
+import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
+import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
@@ -43,7 +46,6 @@ function ReplaceButton( {
 		templatePartId
 	);
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const canReplace =
 		isEntityAvailable &&
@@ -64,6 +66,23 @@ function ReplaceButton( {
 		>
 			{ __( 'Replace' ) }
 		</MenuItem>
+	);
+}
+
+function TemplatesList( { availableTemplates, onSelect } ) {
+	const shownTemplates = useAsyncList( availableTemplates );
+
+	if ( ! availableTemplates || availableTemplates?.length < 2 ) {
+		return null;
+	}
+
+	return (
+		<BlockPatternsList
+			label={ __( 'Templates' ) }
+			blockPatterns={ availableTemplates }
+			shownPatterns={ shownTemplates }
+			onClickPattern={ onSelect }
+		/>
 	);
 }
 
@@ -117,11 +136,22 @@ export default function TemplatePartEdit( {
 		[ templatePartId, attributes.area, clientId ]
 	);
 
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
+
+	const canReplace =
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -153,6 +183,33 @@ export default function TemplatePartEdit( {
 			</TagName>
 		);
 	}
+
+	const partsAsPatterns = templateParts.map( ( templatePart ) => ( {
+		name: createTemplatePartId( templatePart.theme, templatePart.slug ),
+		title: templatePart.title.rendered,
+		blocks: parse( templatePart.content.raw ),
+		templatePart,
+	} ) );
+	const patternsAndParts = [ ...blockPatterns, ...partsAsPatterns ];
+
+	// TODO - de dupe
+	const onTemplatePartSelect = ( { templatePart } ) => {
+		setAttributes( {
+			slug: templatePart.slug,
+			theme: templatePart.theme,
+			area: templatePart.area,
+		} );
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: template part title. */
+				__( 'Template Part "%s" inserted.' ),
+				templatePart.title?.rendered || templatePart.slug
+			),
+			{
+				type: 'snackbar',
+			}
+		);
+	};
 
 	return (
 		<>
@@ -207,6 +264,18 @@ export default function TemplatePartEdit( {
 						);
 					} }
 				</BlockSettingsMenuControls>
+
+				{ canReplace && patternsAndParts.length && (
+					<InspectorControls>
+						<PanelBody title={ __( 'Replace' ) }>
+							<TemplatesList
+								availableTemplates={ patternsAndParts }
+								onSelect={ onTemplatePartSelect }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				) }
+
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						tagName={ TagName }
