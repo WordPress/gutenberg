@@ -174,7 +174,7 @@ describe( 'utils', () => {
 			// Call the function again, with different params.
 			expect(
 				getFilteredTemplatePartBlocks(
-					TEMAPLATE_SINGLE_BLOCK,
+					TEMPLATE_SINGLE_BLOCK,
 					TEMPLATE_PARTS
 				)
 			).toEqual( [
