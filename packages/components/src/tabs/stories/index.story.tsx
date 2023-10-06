@@ -18,7 +18,7 @@ import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Tabs',
+	title: 'Components (Experimental)/Tabs',
 	component: Tabs,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
