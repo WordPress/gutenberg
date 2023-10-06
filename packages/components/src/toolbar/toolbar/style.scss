@@ -9,6 +9,15 @@
 	}
 }
 
+.components-accessible-toolbar.is-unstyled {
+	border: none;
+
+	& > .components-toolbar-group {
+		border: none;
+
+	}
+}
+
 .components-accessible-toolbar,
 .components-toolbar {
 	.components-button {

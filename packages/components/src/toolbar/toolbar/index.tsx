@@ -19,19 +19,26 @@ import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 import { ContextSystemProvider } from '../../context';
 
-const CONTEXT_SYSTEM_VALUE = {
-	DropdownMenu: {
-		variant: 'toolbar',
-	},
-	Dropdown: {
-		variant: 'toolbar',
-	},
+const CONTEXT_SYSTEM_VALUE = ( variant: string | undefined ) => {
+	if ( variant !== undefined ) {
+		return {};
+	}
+
+	return {
+		DropdownMenu: {
+			variant: 'toolbar',
+		},
+		Dropdown: {
+			variant: 'toolbar',
+		},
+	};
 };
 
 function UnforwardedToolbar(
 	{
 		className,
 		label,
+		variant,
 		...props
 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
@@ -55,10 +62,12 @@ function UnforwardedToolbar(
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(
 		'components-accessible-toolbar',
-		className
+		className,
+		variant === undefined ? undefined : `is-${ variant }`
 	);
+
 	return (
-		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE( variant ) }>
 			<ToolbarContainer
 				className={ finalClassName }
 				label={ label }
