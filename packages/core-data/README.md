@@ -75,7 +75,7 @@ The endpoint response may be in different formats. It can be a simple object, wh
 }
 ```
 
-The most common format is for the response to be a collection represented as an array, which maps to as many entity records as elements of the array. This is the case of the use entity (users endpoint):
+The most common format is for the response to be a collection represented as an array, which maps to as many entity records as elements of the array. This is the case for the user entity (users endpoint):
 
 ```json
 [
