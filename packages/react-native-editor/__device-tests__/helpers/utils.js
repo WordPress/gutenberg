@@ -55,17 +55,20 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
-const getIOSPlatformVersions = () => {
+const getIOSPlatformVersions = ( { requiredVersion } ) => {
 	const { runtimes = [] } = JSON.parse(
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
-	return runtimes.reverse().filter(
-		( { name, isAvailable, version } ) =>
-			name.startsWith( 'iOS' ) &&
-			/15(\.\d+)+/.test( version ) && // Appium 1 does not support newer iOS versions
-			isAvailable
-	);
+	const majorVersion = requiredVersion.split( '.' )[ 0 ];
+	return runtimes
+		.reverse()
+		.filter(
+			( { name, isAvailable, version } ) =>
+				name.startsWith( 'iOS' ) &&
+				new RegExp( `^${ majorVersion }(\\.\\d+)*$` ).test( version ) &&
+				isAvailable
+		);
 };
 
 // Initialises the driver and desired capabilities for appium.
@@ -121,10 +124,12 @@ const setupDriver = async () => {
 		if ( isLocalEnvironment() ) {
 			desiredCaps = iosLocal( { iPadDevice } );
 
-			const iosPlatformVersions = getIOSPlatformVersions();
+			const iosPlatformVersions = getIOSPlatformVersions( {
+				requiredVersion: desiredCaps.platformVersion,
+			} );
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No compatible iOS simulators available! Please verify that you have iOS 15 simulators installed.'
+					`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
 				);
 			}
 			// eslint-disable-next-line no-console
