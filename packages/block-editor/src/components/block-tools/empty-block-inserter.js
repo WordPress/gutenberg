@@ -29,6 +29,7 @@ export default function EmptyBlockInserter( {
 	return (
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
+			__unstableCoverTarget
 			bottomClientId={ lastClientId }
 			className={ classnames(
 				'block-editor-block-list__block-side-inserter-popover',
