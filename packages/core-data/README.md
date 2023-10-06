@@ -65,7 +65,7 @@ Additional parameters to the request, if the endpoint supports it. The additiona
 - Type: `string`.
 - Example: `'slug'`.
 
-The endpoint response may be in different formats. It can be a simple object, which maps to a single entity record. This is the case of the site entity (settings endpoint):
+The endpoint response may be in different formats. It can be a simple object, which maps to a single entity record. This is the case for the site entity (settings endpoint):
 
 ```json
 {
