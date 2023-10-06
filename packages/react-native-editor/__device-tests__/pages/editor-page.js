@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const wd = require( 'wd' );
+const wd = null; // TODO: Replace this
 
 /**
  * Internal dependencies
