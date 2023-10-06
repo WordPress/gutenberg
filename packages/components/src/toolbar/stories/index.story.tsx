@@ -52,6 +52,10 @@ const meta: Meta< typeof Toolbar > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		variant: {
+			options: [ undefined, 'unstyled' ],
+			control: { type: 'radio' },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -178,6 +182,45 @@ WithoutGroup.args = {
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />
+		</>
+	),
+};
+
+/**
+ * Set the variant to `unstyled` to remove default border styles.
+ * Otherwise, leave it as `undefined` for default styles.
+ */
+
+export const WithoutStyles = Template.bind( {} );
+WithoutStyles.args = {
+	label: 'Options',
+	id: 'options-toolbar-without-styles',
+	variant: 'unstyled',
+	children: (
+		<>
+			<ToolbarGroup>
+				<ToolbarButton icon={ paragraph } text="Paragraph" />
+			</ToolbarGroup>
+			<ToolbarGroup>
+				<ToolbarButton>Text</ToolbarButton>
+				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
+				<ToolbarButton icon={ formatItalic } label="Italic" />
+				<ToolbarButton icon={ link } label="Link" />
+			</ToolbarGroup>
+			<ToolbarGroup
+				icon={ chevronDown }
+				title="Align"
+				isCollapsed
+				controls={ [
+					{
+						icon: alignLeft,
+						title: 'Align left',
+						isActive: true,
+					},
+					{ icon: alignCenter, title: 'Align center' },
+					{ icon: alignRight, title: 'Align right' },
+				] }
+			/>
 		</>
 	),
 };
