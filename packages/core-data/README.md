@@ -58,7 +58,7 @@ This property maps the entity to a given endpoint, representing its URL as defin
 - Type: `object`.
 - Example: `{ context: 'edit' }`.
 
-Additional parameters to the request, if the endpoint supports it. The additional arguments available to the request are listed under arguments section. As an example, see the user entity and the [users endpoint](https://developer.wordpress.org/rest-api/reference/users/#list-users). By providing `{ context: 'edit' }` the server response will include all the fields in the [user schema](https://developer.wordpress.org/rest-api/reference/users/#schema) that belong to the `edit` context.
+Additional parameters to the request, if the endpoint supports it. The additional arguments available to the request are listed under the arguments section. As an example, see the user entity and the [users endpoint](https://developer.wordpress.org/rest-api/reference/users/#list-users). By providing `{ context: 'edit' }` the server response will include all the fields in the [user schema](https://developer.wordpress.org/rest-api/reference/users/#schema) that belong to the `edit` context.
 
 ## key
 
