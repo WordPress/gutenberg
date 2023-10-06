@@ -188,7 +188,8 @@ class Gutenberg_HTTP_Signaling_Server {
 			if ( ! $topics_to_subscribers[ $topic ] ) {
 				$topics_to_subscribers[ $topic ] = array();
 			}
-			$topics_to_subscribers[ $topic ] = array_unique( array_merge( $topics_to_subscribers[ $topic ], array( static::$subscriber_id ) ) );
+			$topics_to_subscribers[ $topic ][] = static::$subscriber_id;
+			$topics_to_subscribers[ $topic ]    = array_unique( $topics_to_subscribers[ $topic ] ); 
 		}
 		return $topics_to_subscribers;
 	}
