@@ -22,9 +22,6 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: { type: null },
 		},
 	},
-	args: {
-		children: 'Would you like to privately publish the post now?',
-	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: {
