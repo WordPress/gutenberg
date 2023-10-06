@@ -3,6 +3,10 @@
  */
 import getLinkValueTransforms from '../link-value-transforms';
 
+function identity( value ) {
+	return value;
+}
+
 /**
  * Maps the standard LinkControl values to a given data object.
  * Complex mappings may supply an object with a `getter` and `setter` function
@@ -50,7 +54,7 @@ describe( 'buildLinkValueFromData', () => {
 	it.each( [
 		[
 			{
-				href: 'https://www.google.com',
+				href: 'https://www.wordpress.org',
 				postType: 'post',
 				id: 123,
 				linkTarget: '_blank',
@@ -58,7 +62,7 @@ describe( 'buildLinkValueFromData', () => {
 				keyToIgnore: 'valueToIgnore',
 			},
 			{
-				url: 'https://www.google.com',
+				url: 'https://www.wordpress.org',
 				type: 'post',
 				id: 123,
 				opensInNewTab: true,
@@ -68,13 +72,13 @@ describe( 'buildLinkValueFromData', () => {
 		],
 		[
 			{
-				href: 'https://www.google.com',
+				href: 'https://www.wordpress.org',
 				postType: 'post',
 				id: 123,
 				linkRel: 'sponsored neyfollow',
 			},
 			{
-				url: 'https://www.google.com',
+				url: 'https://www.wordpress.org',
 				type: 'post',
 				id: 123,
 				opensInNewTab: false,
@@ -92,12 +96,31 @@ describe( 'buildLinkValueFromData', () => {
 			expect( linkValue ).toEqual( expected );
 		}
 	);
+
+	it( 'returns raw data attribute value when toLink transform is not callable', () => {
+		const { toLink } = getLinkValueTransforms( {
+			url: {
+				dataKey: 'href',
+				// allows toLink to be ommitted in case of simple mapping
+				// but still allows toData to be defined.
+				toData: identity,
+			},
+		} );
+
+		const linkValue = toLink( {
+			href: 'https://www.wordpress.org',
+		} );
+
+		expect( linkValue ).toEqual( {
+			url: 'https://www.wordpress.org',
+		} );
+	} );
 } );
 
 describe( 'buildDataFromLinkValue', () => {
 	it( 'build a valid data object from supplied link value mapping', () => {
 		const linkValue = {
-			url: 'https://www.google.com',
+			url: 'https://www.wordpress.org',
 			type: 'post',
 			id: 123,
 			opensInNewTab: true,
@@ -105,17 +128,34 @@ describe( 'buildDataFromLinkValue', () => {
 			sponsored: true,
 		};
 
-		// const data = buildDataFromLinkValue( linkValue, mapping );
-
 		const { toData } = getLinkValueTransforms( mapping );
 		const data = toData( linkValue );
 
 		expect( data ).toEqual( {
-			href: 'https://www.google.com',
+			href: 'https://www.wordpress.org',
 			postType: 'post',
 			id: 123,
 			linkTarget: '_blank',
 			linkRel: 'nofollow sponsored',
+		} );
+	} );
+
+	it( 'returns raw link value attribute when toData transform is not callable', () => {
+		const { toData } = getLinkValueTransforms( {
+			url: {
+				dataKey: 'href',
+				// allows toData to be ommitted in case of simple mapping
+				// but still allows toLink to be defined.
+				toLink: identity, // added for example purposes.
+			},
+		} );
+
+		const data = toData( {
+			url: 'https://www.wordpress.org',
+		} );
+
+		expect( data ).toEqual( {
+			href: 'https://www.wordpress.org',
 		} );
 	} );
 } );

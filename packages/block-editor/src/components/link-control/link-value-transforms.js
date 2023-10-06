@@ -1,13 +1,19 @@
+function isCallable( value ) {
+	return value && typeof value === 'function';
+}
+
 function buildLinkValueFromData( data, mapping ) {
 	const linkValue = {};
 	for ( const [ attributeName, valueGetter ] of Object.entries( mapping ) ) {
 		if ( typeof valueGetter === 'string' ) {
 			linkValue[ attributeName ] = data[ valueGetter ];
-		} else {
+		} else if ( isCallable( valueGetter.toLink ) ) {
 			linkValue[ attributeName ] = valueGetter.toLink(
 				data[ valueGetter.dataKey ],
 				data
 			);
+		} else {
+			linkValue[ attributeName ] = data[ valueGetter.dataKey ];
 		}
 	}
 	return linkValue;
@@ -18,12 +24,14 @@ function buildDataFromLinkValue( linkValue, mapping ) {
 	for ( const [ attributeName, valueGetter ] of Object.entries( mapping ) ) {
 		if ( typeof valueGetter === 'string' ) {
 			data[ valueGetter ] = linkValue[ attributeName ];
-		} else {
+		} else if ( isCallable( valueGetter.toData ) ) {
 			data[ valueGetter.dataKey ] = valueGetter.toData(
 				linkValue[ attributeName ],
 				linkValue,
 				data
 			);
+		} else {
+			data[ valueGetter.dataKey ] = linkValue[ attributeName ];
 		}
 	}
 	return data;
