@@ -120,8 +120,8 @@ The modal is used to create an accessible modal over an application.
 The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Modal } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyModal = () => {
 	const [ isOpen, setOpen ] = useState( false );
@@ -220,6 +220,14 @@ This property when set to `true` will render a full screen modal.
 
 -   Required: No
 -   Default: `false`
+
+#### `size`: `'small' | 'medium' | 'large' | 'fill'`
+
+If this property is added it will cause the modal to render at a preset width, or expand to fill the screen. This prop will be ignored if `isFullScreen` is set to `true`.
+
+-   Required: No
+
+Note: `Modal`'s width can also be controlled by adjusting the width of the modal's contents via CSS.
 
 #### `onRequestClose`: ``
 

@@ -72,12 +72,6 @@ describe( 'Button', () => {
 			expect( button ).toHaveClass( 'is-link' );
 		} );
 
-		it( 'should render a button element with is-pressed without button class', () => {
-			render( <Button isPressed /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
-		} );
-
 		it( 'should render a button element with has-text when children are passed', async () => {
 			const user = userEvent.setup();
 
@@ -347,6 +341,56 @@ describe( 'Button', () => {
 
 			await cleanupTooltip( user );
 		} );
+
+		describe( 'using `aria-pressed` prop', () => {
+			it( 'should render a button element with is-pressed when `true`', () => {
+				render( <Button aria-pressed /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed when `"true"`', () => {
+				render( <Button aria-pressed="true" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed/is-pressed-mixed when `"mixed"`', () => {
+				render( <Button aria-pressed="mixed" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed is-pressed-mixed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `undefined`', () => {
+				render( <Button aria-pressed={ undefined } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `false`', () => {
+				render( <Button aria-pressed={ false } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `"false"`', () => {
+				render( <Button aria-pressed="false" /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+		} );
 	} );
 
 	describe( 'with href property', () => {
@@ -433,6 +477,23 @@ describe( 'Button', () => {
 				'is-small'
 			);
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-compact' );
+		} );
+
+		it( 'should not break when the legacy isPressed prop is passed', () => {
+			render( <Button isPressed /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-pressed',
+				'true'
+			);
+		} );
+
+		it( 'should prioritize the `aria-pressed` prop over `isPressed`', () => {
+			render( <Button isPressed aria-pressed="mixed" /> );
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-pressed',
+				'mixed'
+			);
 		} );
 	} );
 

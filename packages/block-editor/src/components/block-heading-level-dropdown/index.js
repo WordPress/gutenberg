@@ -15,7 +15,7 @@ const POPOVER_PROPS = {
 	className: 'block-library-heading-level-dropdown',
 };
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.
@@ -33,7 +33,7 @@ const POPOVER_PROPS = {
  *
  * @param {WPHeadingLevelDropdownProps} props Component props.
  *
- * @return {WPComponent} The toolbar.
+ * @return {ComponentType} The toolbar.
  */
 export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,

@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../../store';
  * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
- * @return {WPComponent} Parent block selector.
+ * @return {Component} Parent block selector.
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );

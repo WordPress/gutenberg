@@ -67,6 +67,7 @@ function DuotonePicker( {
 	onChange,
 	'aria-label': ariaLabel,
 	'aria-labelledby': ariaLabelledby,
+	...otherProps
 }: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
@@ -74,13 +75,15 @@ function DuotonePicker( {
 	);
 
 	const isUnset = value === 'unset';
+	const unsetOptionLabel = __( 'Unset' );
 
 	const unsetOption = (
 		<CircularOptionPicker.Option
 			key="unset"
 			value="unset"
 			isSelected={ isUnset }
-			tooltipText={ __( 'Unset' ) }
+			tooltipText={ unsetOptionLabel }
+			aria-label={ unsetOptionLabel }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
 				onChange( isUnset ? undefined : 'unset' );
@@ -154,6 +157,7 @@ function DuotonePicker( {
 
 	return (
 		<CircularOptionPicker
+			{ ...otherProps }
 			{ ...metaProps }
 			options={ unsetable ? [ unsetOption, ...options ] : options }
 			actions={

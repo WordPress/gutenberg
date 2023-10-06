@@ -5,7 +5,6 @@
 .wp-block-navigation {
 	// This wraps just the innermost text for custom menu items.
 	.wp-block-navigation-item__label {
-		word-break: normal;
 		overflow-wrap: break-word;
 	}
 

@@ -42,7 +42,7 @@ const noop = () => {};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All Patterns' ),
+	label: __( 'All patterns' ),
 };
 
 export const myPatternsCategory = {
@@ -321,9 +321,6 @@ export function BlockPatternsCategoryPanel( {
 						category={ category }
 					/>
 				</HStack>
-				{ category.description && (
-					<Text>{ category.description }</Text>
-				) }
 				{ ! currentCategoryPatterns.length && (
 					<Text
 						variant="muted"

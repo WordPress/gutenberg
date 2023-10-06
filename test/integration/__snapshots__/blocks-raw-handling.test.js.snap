@@ -68,7 +68,7 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a><br>a new linea new paragraph<br>another new lineanother paragraph"`;
+exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
 
 exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a>."`;
 
