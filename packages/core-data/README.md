@@ -85,7 +85,7 @@ The most common format is for the response to be a collection represented as an 
 ]
 ```
 
-There's also cases in which a collection is represented as an object. In this case, for the entity records to be recognized by the entities engine, the entity configuration needs to provide which field is acting as `key` for the object. This is the case of the status entity, which sets `slug` as the collection's `key`:
+There are also cases in which a collection is represented as an object. In this case, for the entity records to be recognized by the entities engine, the entity configuration must provide which field is acting as the `key` for the object. This is the case for the status entity, which sets `slug` as the collection's `key`:
 
 ```json
 {
