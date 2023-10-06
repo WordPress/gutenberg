@@ -50,22 +50,22 @@ What follows is a description of some of the properties of `rootEntitiesConfig`.
 
 ## baseURL
 
-- Type: string.
-- Example: `'/wp/v2/users'`.
+-   Type: string.
+-   Example: `'/wp/v2/users'`.
 
 This property maps the entity to a given endpoint, taking its relative URL as value.
 
 ## baseURLParams
 
-- Type: `object`.
-- Example: `{ context: 'edit' }`.
+-   Type: `object`.
+-   Example: `{ context: 'edit' }`.
 
 Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
 
 ## key
 
-- Type: `string`.
-- Example: `'slug'`.
+-   Type: `string`.
+-   Example: `'slug'`.
 
 The entity engine aims to convert the API response into a number of entity records. Responses can come in different shapes, which are processed differently.
 
@@ -83,9 +83,9 @@ Responses that represent a collection shaped as an array, map to as many entity 
 
 ```json
 [
-	{ id: 1, "name": "...", "...": "..." },
-	{ id: 2, "name": "...", "...": "..." },
-	{ id: 3, "name": "...", "...": "..." },
+	{ "id": 1, "name": "...", "...": "..." },
+	{ "id": 2, "name": "...", "...": "..." },
+	{ "id": 3, "name": "...", "...": "..." }
 ]
 ```
 
@@ -93,9 +93,9 @@ There are also cases in which a response represents a collection shaped as an ob
 
 ```json
 {
-	"publish": { "slug": "publish", "name": "Published", "...":  "..." },
-	"draft": { "slug": "draft", "name": "Draft", "...":  "..." },
-	"future": { "slug": "future", "name": "Future", "...":  "..." }
+	"publish": { "slug": "publish", "name": "Published", "...": "..." },
+	"draft": { "slug": "draft", "name": "Draft", "...": "..." },
+	"future": { "slug": "future", "name": "Future", "...": "..." }
 }
 ```
 
@@ -898,8 +898,8 @@ via the `edit()` and `save()` mutation helpers provided by
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ./src/entities.js for a list of available kinds.
--   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ./src/entities.js for a list of available names.
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
 -   _recordId_ `string | number`: ID of the requested entity record.
 -   _options_ `Options`: Optional hook options.
 
@@ -946,8 +946,8 @@ the store state using `getEntityRecords()`, or resolved if missing.
 
 _Parameters_
 
--   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ./src/entities.js for a list of available kinds.
--   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ./src/entities.js for a list of available names.
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
 -   _queryArgs_ `Record< string, unknown >`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
 -   _options_ `Options`: Optional hook options.
 
