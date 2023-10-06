@@ -1,5 +1,11 @@
 .patterns-menu-items__convert-modal {
 	z-index: z-index(".patterns-menu-items__convert-modal");
+
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
 	.patterns-menu-items__convert-modal-categories {
 		max-width: 300px;
 	}
@@ -14,5 +20,8 @@
 }
 
 .patterns-create-modal__name-input input[type="text"] {
-	min-height: 34px;
+	// Match the minimal height of the category selector.
+	min-height: 40px;
+	// Override the default 1px margin-x.
+	margin: 0;
 }
