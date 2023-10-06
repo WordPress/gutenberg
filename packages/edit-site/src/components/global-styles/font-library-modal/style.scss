@@ -1,11 +1,12 @@
 .font-library-modal {
-	// @todo: If a new prop is added to the Modal component that constrains
-	// the content width, we should use that prop instead of this style.
-	// see https://github.com/WordPress/gutenberg/issues/54471.
+	// @todo: If a new prop is added to the Modal component that fixes the height
+	// and/or constrains the origin, we should use that instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/55062.
 	&.font-library-modal {
 
 		@include break-medium() {
-			width: 65vw;
+			height: calc(100% - #{ $grid-unit-50 * 2 }); /* match full-screen `Modal` height */
+			max-height: none;
 		}
 	}
 
