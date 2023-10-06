@@ -95,9 +95,9 @@ test.describe( 'Block Toolbar', () => {
 				delay: 50,
 			} );
 			expect(
-				await editor.canvas.evaluate( () =>
-					window.getSelection().toString()
-				)
+				await editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
 			).toBe( 'raph' );
 
 			// Go back to the toolbar and apply a formatting option
@@ -106,9 +106,9 @@ test.describe( 'Block Toolbar', () => {
 			await page.keyboard.press( 'Enter' );
 			// Should focus the selected text again
 			expect(
-				await editor.canvas.evaluate( () =>
-					window.getSelection().toString()
-				)
+				await editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
 			).toBe( 'raph' );
 		} );
 	} );
