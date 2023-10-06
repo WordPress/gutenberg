@@ -42,7 +42,9 @@ function MyAuthorsListBase() {
 
 ## What's an entity?
 
-An entity represents a WordPress REST API endpoint. Each item within the entity is called entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
+An entity represents a data source. Each item within the entity is called entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
+
+As of right now, the default entities defined by this package map to the [REST API handbook](https://developer.wordpress.org/rest-api/reference/), though there is nothing in the design that prevents it from being used to interact with any other API.
 
 What follows is a description of some of the properties of `rootEntitiesConfig`.
 
@@ -51,21 +53,23 @@ What follows is a description of some of the properties of `rootEntitiesConfig`.
 - Type: string.
 - Example: `'/wp/v2/users'`.
 
-This property maps the entity to a given endpoint, representing its URL as defined in the [REST API handbook](https://developer.wordpress.org/rest-api/reference/#rest-api-developer-endpoint-reference).
+This property maps the entity to a given endpoint, taking its relative URL as value.
 
 ## baseURLParams
 
 - Type: `object`.
 - Example: `{ context: 'edit' }`.
 
-Additional parameters to the request, if the endpoint supports it. The additional arguments available to the request are listed under the arguments section. As an example, see the user entity and the [users endpoint](https://developer.wordpress.org/rest-api/reference/users/#list-users). By providing `{ context: 'edit' }` the server response will include all the fields in the [user schema](https://developer.wordpress.org/rest-api/reference/users/#schema) that belong to the `edit` context.
+Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
 
 ## key
 
 - Type: `string`.
 - Example: `'slug'`.
 
-The endpoint response may be in different formats. It can be a simple object, which maps to a single entity record. This is the case for the site entity (settings endpoint):
+The entity engine aims to convert the API response into a number of entity records. Responses can come in different shapes, which are processed differently.
+
+Responses that represent a single object map to a single entity record. For example:
 
 ```json
 {
@@ -75,7 +79,7 @@ The endpoint response may be in different formats. It can be a simple object, wh
 }
 ```
 
-The most common format is for the response to be a collection represented as an array, which maps to as many entity records as elements of the array. This is the case for the user entity (users endpoint):
+Responses that represent a collection shaped as an array, map to as many entity records as elements of the array. For example:
 
 ```json
 [
@@ -85,12 +89,13 @@ The most common format is for the response to be a collection represented as an 
 ]
 ```
 
-There are also cases in which a collection is represented as an object. In this case, for the entity records to be recognized by the entities engine, the entity configuration must provide which field is acting as the `key` for the object. This is the case for the status entity, which sets `slug` as the collection's `key`:
+There are also cases in which a response represents a collection shaped as an object, whose key is one of the property's values. Each of the nested objects should be its own entity record. For this case not to be confused with single object/entities, the entity configuration must provide the property key that holds the value acting as the object key. In the following example, the `slug` property's value is acting as the object key, hence the entity config must declare `key: 'slug'` for each nested object to be processed as an individual entity record:
 
 ```json
 {
 	"publish": { "slug": "publish", "name": "Published", "...":  "..." },
-	"draft": { "slug": "draft", "name": "Draft", "...":  "..." }
+	"draft": { "slug": "draft", "name": "Draft", "...":  "..." },
+	"future": { "slug": "future", "name": "Future", "...":  "..." }
 }
 ```
 
