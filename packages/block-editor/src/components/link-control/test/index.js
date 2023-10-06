@@ -2056,6 +2056,26 @@ describe( 'Addition Settings UI', () => {
 			} )
 		);
 	} );
+
+	it( 'should show tooltip with full URL alongside filtered display', async () => {
+		const user = userEvent.setup();
+		const url = 'https://example.com';
+		render( <LinkControl value={ { url } } /> );
+
+		const link = screen.getByRole( 'link' );
+
+		expect( screen.getByRole( 'link' ) ).toHaveTextContent(
+			/example.com/i
+		);
+
+		await user.hover( link );
+
+		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent( url );
+
+		await user.unhover( link );
+
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+	} );
 } );
 
 describe( 'Post types', () => {
