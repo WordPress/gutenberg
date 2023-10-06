@@ -6,6 +6,7 @@ import { Popover, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalLinkControl as LinkControl,
+	getLinkValueTransforms,
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -17,6 +18,8 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { escapeHTML } from '@wordpress/escape-html';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -177,14 +180,82 @@ export function LinkUI( props ) {
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
-	const link = useMemo(
-		() => ( {
-			url,
-			opensInNewTab,
-			title: label && stripHTML( label ),
-		} ),
-		[ label, opensInNewTab, url ]
-	);
+	// const link = useMemo(
+	// 	() => ( {
+	// 		url,
+	// 		opensInNewTab,
+	// 		title: label && stripHTML( label ),
+	// 	} ),
+	// 	[ label, opensInNewTab, url ]
+	// );
+
+	// ...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
+	// ...( label && { label } ),
+	// ...( undefined !== opensInNewTab && { opensInNewTab } ),
+	// ...( id && Number.isInteger( id ) && { id } ),
+	// ...( kind && { kind } ),
+	// ...( type && type !== 'URL' && { type } ),
+
+	const { toLink, toData } = getLinkValueTransforms( {
+		url: {
+			dataKey: 'url',
+			toData: ( value ) => encodeURI( safeDecodeURI( value ) ),
+		},
+		title: {
+			dataKey: 'label',
+			toLink: ( value ) => stripHTML( value ),
+			toData: (
+				newLabel = '',
+				{ url: newUrl = '' },
+				{ label: originalLabel = '' }
+			) => {
+				const newLabelWithoutHttp = newLabel.replace(
+					/http(s?):\/\//gi,
+					''
+				);
+				const newUrlWithoutHttp = newUrl.replace(
+					/http(s?):\/\//gi,
+					''
+				);
+
+				const useNewLabel =
+					newLabel &&
+					newLabel !== originalLabel &&
+					// LinkControl without the title field relies
+					// on the check below. Specifically, it assumes that
+					// the URL is the same as a title.
+					// This logic a) looks suspicious and b) should really
+					// live in the LinkControl and not here. It's a great
+					// candidate for future refactoring.
+					newLabelWithoutHttp !== newUrlWithoutHttp;
+
+				// Unfortunately this causes the escaping model to be inverted.
+				// The escaped content is stored in the block attributes (and ultimately in the database),
+				// and then the raw data is "recovered" when outputting into the DOM.
+				// It would be preferable to store the **raw** data in the block attributes and escape it in JS.
+				// Why? Because there isn't one way to escape data. Depending on the context, you need to do
+				// different transforms. It doesn't make sense to me to choose one of them for the purposes of storage.
+				// See also:
+				// - https://github.com/WordPress/gutenberg/pull/41063
+				// - https://github.com/WordPress/gutenberg/pull/18617.
+				return useNewLabel
+					? escapeHTML( newLabel )
+					: originalLabel || escapeHTML( newUrlWithoutHttp );
+			},
+		},
+		opensInNewTab: 'opensInNewTab',
+	} );
+
+	const link = toLink( {
+		url,
+		label,
+		opensInNewTab,
+	} );
+
+	function handleOnChange( newValue ) {
+		// Todo: `title` is undefined when adding a new link. Why????
+		return props.onChange( toData( newValue ) );
+	}
 
 	return (
 		<Popover
@@ -221,7 +292,7 @@ export function LinkUI( props ) {
 				noDirectEntry={ !! type }
 				noURLSuggestion={ !! type }
 				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-				onChange={ props.onChange }
+				onChange={ handleOnChange }
 				onRemove={ props.onRemove }
 				onCancel={ props.onCancel }
 				renderControlBottom={

@@ -575,11 +575,7 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
+								setAttributes( updatedValue );
 							} }
 						/>
 					) }
