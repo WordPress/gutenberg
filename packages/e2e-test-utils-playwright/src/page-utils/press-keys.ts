@@ -194,8 +194,26 @@ export async function pressKeys(
 			 * This doesn't work in *all* cases, but it works in most cases we support.
 			 * (The order matters here for unknown reasons.)
 			 */
-			await emulateClipboard( this.page, 'paste' );
+			const promise = this.page.evaluate( () => {
+				return new Promise( ( resolve ) => {
+					const timeout = setTimeout( () => {
+						resolve( false );
+					}, 500 );
+					document.addEventListener(
+						'paste',
+						( event ) => {
+							clearTimeout( timeout );
+							resolve( !! event.defaultPrevented );
+						},
+						{ once: true }
+					);
+				} );
+			} );
 			await this.page.keyboard.press( normalizedKeys );
+			const isDefaultPrevented = await promise;
+			if ( ! isDefaultPrevented ) {
+				await emulateClipboard( this.page, 'paste' );
+			}
 		};
 	}
 
