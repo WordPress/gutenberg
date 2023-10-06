@@ -21,11 +21,11 @@ const mapping = {
 	noFollow: {
 		dataKey: 'linkRel',
 		toLink: ( value ) => value.includes( 'nofollow' ),
-		toData: ( value, currentVal ) => {
+		toData: ( value, _, { linkRel: currentLinkRel } ) => {
 			// if the value is truthy and the current value is set
 			// then append otherwise just add the value
-			if ( value && currentVal ) {
-				return `${ currentVal } nofollow`;
+			if ( value && currentLinkRel ) {
+				return `${ currentLinkRel } nofollow`;
 			} else if ( value ) {
 				return 'nofollow';
 			}
@@ -34,11 +34,11 @@ const mapping = {
 	sponsored: {
 		dataKey: 'linkRel',
 		toLink: ( value ) => value.includes( 'sponsored' ),
-		toData: ( value, currentVal ) => {
+		toData: ( value, _, { linkRel: currentLinkRel } ) => {
 			// if the value is truthy and the current value is set
 			// then append otherwise just add the value
-			if ( value && currentVal ) {
-				return `${ currentVal } sponsored`;
+			if ( value && currentLinkRel ) {
+				return `${ currentLinkRel } sponsored`;
 			} else if ( value ) {
 				return 'sponsored';
 			}

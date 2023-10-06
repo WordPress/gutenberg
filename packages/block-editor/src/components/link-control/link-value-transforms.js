@@ -21,7 +21,8 @@ function buildDataFromLinkValue( linkValue, mapping ) {
 		} else {
 			data[ valueGetter.dataKey ] = valueGetter.toData(
 				linkValue[ attributeName ],
-				linkValue
+				linkValue,
+				data
 			);
 		}
 	}
