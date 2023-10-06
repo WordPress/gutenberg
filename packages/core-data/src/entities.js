@@ -223,6 +223,15 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
 	},
+	{
+		label: __( 'Post status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'postStatuses',
+		key: 'slug',
+	},
 ];
 
 export const additionalEntityConfigLoaders = [
