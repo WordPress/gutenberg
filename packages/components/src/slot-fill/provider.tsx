@@ -16,7 +16,7 @@ import type {
 	SlotKey,
 } from './types';
 
-function createSlotRegistry(): BaseSlotFillContext {
+export function createSlotRegistry(): BaseSlotFillContext {
 	const slots: Record< SlotKey, Component< BaseSlotComponentProps > > = {};
 	const fills: Record< SlotKey, FillComponentProps[] > = {};
 	let listeners: Array< () => void > = [];
