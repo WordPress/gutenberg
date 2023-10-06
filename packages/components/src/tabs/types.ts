@@ -66,8 +66,10 @@ export type TabsProps = {
 	 * The Id of the tab to display. This id is prepended with the `Tabs`
 	 * instanceId internally.
 	 *
-	 * This prop puts the component into controlled mode. A value of
-	 * `null` will result in no tab being selected.
+	 * If left `undefined`, the component assumes it is being used in
+	 * uncontrolled mode. Consequently, any value different than `undefined`
+	 * will set the component in `controlled` mode.
+	 * When in controlled mode, the `null` value will result in no tab being selected.
 	 */
 	selectedTabId?: string | null;
 };
