@@ -36,6 +36,7 @@
 -   `Modal`: add a new `size` prop to support preset widths, including a `fill` option to eventually replace the `isFullScreen` prop ([#54471](https://github.com/WordPress/gutenberg/pull/54471)).
 -   Wrapped `TextareaControl` in a `forwardRef` call ([#54975](https://github.com/WordPress/gutenberg/pull/54975)).
 -   `Composite`/`AlignmentMatrixControl`/`CircularOptionPicker`: Starts the `Composite` migration from `reakit` to `ariakit` ([#54225](https://github.com/WordPress/gutenberg/pull/54225)).
+-   `Popover`: add `shiftPadding` prop to allow granular positioning of the popover shift behavior ([#54513](https://github.com/WordPress/gutenberg/pull/54513/)).
 
 ### Bug Fix
 
