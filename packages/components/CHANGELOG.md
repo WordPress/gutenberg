@@ -42,6 +42,10 @@
 -   Ensure `@types/` dependencies used by final type files are included in the main dependency field ([#50231](https://github.com/WordPress/gutenberg/pull/50231)).
 -   `Text`: Migrate to TypeScript. ([#54953](https://github.com/WordPress/gutenberg/pull/54953)).
 
+### Experimental
+
+- Introduce `Tabs`, an experimental v2 of `TabPanel`: ([#53960](https://github.com/WordPress/gutenberg/pull/53960)).
+
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements
