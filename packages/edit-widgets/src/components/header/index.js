@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -18,6 +23,7 @@ import { PinnedItems } from '@wordpress/interface';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -36,6 +42,15 @@ function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
+	const { isFixedToolbarActive } = useSelect(
+		( select ) => ( {
+			isFixedToolbarActive: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+		} ),
+		[]
+	);
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
 			select( editWidgetsStore ).getIsWidgetAreaOpen(
@@ -93,10 +108,14 @@ function Header( { setListViewToggleElement } ) {
 
 	return (
 		<>
-			<div className="edit-widgets-header">
+			<div
+				className={ classnames( 'edit-widgets-header', {
+					'has-fixed-toolbar': isFixedToolbarActive,
+				} ) }
+			>
+				{ /* Floating header style to be able to hide the block popovers behind the header */ }
+				<div className="edit-widgets-header__background-style"></div>
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					{ /* Floating header style to be able to hide the block popovers behind the header */ }
-					<div className="edit-widgets-header__background-style"></div>
 					{ isMediumViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }

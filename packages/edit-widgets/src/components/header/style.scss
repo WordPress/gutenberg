@@ -9,6 +9,33 @@
 	@include break-small {
 		overflow: visible;
 	}
+
+	.edit-widgets-header__background-style {
+		position: absolute; // Remove it from the flex calculations so space-between works appropriately
+	}
+
+	&:not(.has-fixed-toolbar) {
+		.edit-widgets-header__background-style {
+			top: 0;
+			left: 0;
+			bottom: -1px; // -1px to overlap the header border
+			right: 0;
+			background: $white;
+			border-bottom: $border-width solid $gray-200;
+			z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
+		}
+
+		// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
+		& > *:not(.edit-widgets-header__navigable-toolbar-wrapper),
+		.edit-widgets-header__navigable-toolbar-wrapper > *:not(.edit-widgets-header__menubar),
+		.edit-widgets-header__menubar > *:not(.selected-block-tools-wrapper) {
+			z-index: 4;
+		}
+
+		.selected-block-tools-wrapper {
+			z-index: 2;
+		}
+	}
 }
 
 .edit-widgets-header__navigable-toolbar-wrapper {
@@ -16,27 +43,6 @@
 	align-items: center;
 	justify-content: center;
 	padding-left: $grid-unit-20;
-}
-
-.edit-widgets-header__background-style {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: -1px; // -1px to overlap the header border
-	right: 0;
-	background: $white;
-	border-bottom: $border-width solid $gray-200;
-	z-index: 3; // This z-index needs to be higher than the block popover but lower than the other items within the block toolbar
-}
-
-// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
-.edit-widgets-header__menubar > *:not(.selected-block-tools-wrapper),
-.edit-widgets-header > *:not(.edit-widgets-header__menubar) {
-	z-index: 4;
-}
-
-.selected-block-tools-wrapper {
-	z-index: 2;
 }
 
 .edit-widgets-header__title {
