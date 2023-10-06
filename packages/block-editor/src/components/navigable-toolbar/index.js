@@ -99,15 +99,15 @@ function useIsAccessibleToolbar( toolbarRef ) {
 	return isAccessibleToolbar;
 }
 
-function useToolbarFocus(
+function useToolbarFocus( {
 	toolbarRef,
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
 	onIndexChange,
 	shouldUseKeyboardFocusShortcut,
-	focusEditorOnEscape = true
-) {
+	focusEditorOnEscape = true,
+} ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
@@ -216,15 +216,15 @@ function UnforwardNavigableToolbar(
 	const toolbarRef = ref || maybeRef;
 	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
 
-	useToolbarFocus(
+	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		focusEditorOnEscape,
 		isAccessibleToolbar,
-		initialIndex,
+		defaultIndex: initialIndex,
 		onIndexChange,
-		shouldUseKeyboardFocusShortcut
-	);
+		shouldUseKeyboardFocusShortcut,
+		focusEditorOnEscape,
+	} );
 
 	if ( isAccessibleToolbar ) {
 		return (
