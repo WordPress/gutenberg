@@ -77,7 +77,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression(
 			$expected_markup,
 			$actual,
-			'Position block wrapper markup should be correct'
+			'Elements block wrapper markup should be correct'
 		);
 	}
 
