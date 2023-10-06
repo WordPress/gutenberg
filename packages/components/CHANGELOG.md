@@ -32,6 +32,10 @@
 -   `SlotFill`: Migrate to TypeScript and Convert to Functional Component `<Slot bubblesVirtually />`. ([#51350](https://github.com/WordPress/gutenberg/pull/51350)).
 -   `Components`: move `ui/utils` to `utils` and remove `ui/` folder ([#54922](https://github.com/WordPress/gutenberg/pull/54922)).
 
+### Experimental
+
+- Introduce `Tabs`, an experimental v2 of `TabPanel`: ([#53960](https://github.com/WordPress/gutenberg/pull/53960)).
+
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements
