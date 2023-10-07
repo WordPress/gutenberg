@@ -47,16 +47,35 @@ export async function setClipboardData(
 		'text/html': html,
 		'rich-text': '',
 	};
-	await this.page.evaluate(
-		async ( data ) => {
-			const items: Record< string, Blob > = {};
-			for ( const [ type, text ] of Object.entries( data ) ) {
-				items[ type ] = new Blob( [ text ], { type } );
-			}
-			await navigator.clipboard.write( [ new ClipboardItem( items ) ] );
-		},
-		{ 'text/plain': plainText, 'text/html': html }
+
+	const activeElement = await this.page.evaluateHandle( () =>
+		document.activeElement instanceof HTMLIFrameElement
+			? document.activeElement.contentDocument!.activeElement
+			: document.activeElement
 	);
+	const inputHandle = await this.page.evaluateHandle( ( data ) => {
+		const dummyInput = document.createElement( 'input' );
+		dummyInput.style.position = 'absolute';
+		dummyInput.style.top = '-9999px';
+		dummyInput.style.left = '-9999px';
+		dummyInput.ariaHidden = 'true';
+		dummyInput.addEventListener( 'copy', ( event ) => {
+			event.preventDefault();
+			Object.entries( data ).forEach( ( [ type, text ] ) => {
+				event.clipboardData?.setData( type, text );
+			} );
+		} );
+		document.body.appendChild( dummyInput );
+		return dummyInput;
+	}, clipboardDataHolder );
+	await inputHandle.focus();
+	await this.page.keyboard.press(
+		isAppleOS() ? 'Meta+KeyC' : 'Control+KeyC'
+	);
+	await inputHandle.evaluate( ( input ) => input.remove() );
+	await inputHandle.dispose();
+	await activeElement.asElement()?.focus();
+	await activeElement.dispose();
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
@@ -194,24 +213,11 @@ export async function pressKeys(
 			 * This doesn't work in *all* cases, but it works in most cases we support.
 			 * (The order matters here for unknown reasons.)
 			 */
-			const promise = this.page.evaluate( () => {
-				return new Promise( ( resolve ) => {
-					const timeout = setTimeout( () => {
-						resolve( false );
-					}, 500 );
-					document.addEventListener(
-						'paste',
-						( event ) => {
-							clearTimeout( timeout );
-							resolve( !! event.defaultPrevented );
-						},
-						{ once: true }
-					);
-				} );
-			} );
 			await this.page.keyboard.press( normalizedKeys );
-			const isDefaultPrevented = await promise;
-			if ( ! isDefaultPrevented ) {
+			if (
+				isAppleOS() &&
+				this.browser.browserType().name() === 'chromium'
+			) {
 				await emulateClipboard( this.page, 'paste' );
 			}
 		};

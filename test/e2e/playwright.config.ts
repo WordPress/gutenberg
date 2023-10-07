@@ -22,13 +22,7 @@ const config = defineConfig( {
 	projects: [
 		{
 			name: 'chromium',
-			use: {
-				...devices[ 'Desktop Chrome' ],
-				contextOptions: {
-					// Chromium-specific permissions for clipboard read/write.
-					permissions: [ 'clipboard-read', 'clipboard-write' ],
-				},
-			},
+			use: { ...devices[ 'Desktop Chrome' ] },
 			grepInvert: /-chromium/,
 		},
 		{
@@ -50,16 +44,7 @@ const config = defineConfig( {
 		},
 		{
 			name: 'firefox',
-			use: {
-				...devices[ 'Desktop Firefox' ],
-				launchOptions: {
-					// Firefox-specific permissions for clipboard read/write.
-					firefoxUserPrefs: {
-						'dom.events.asyncClipboard.clipboardItem': true,
-						'dom.events.asyncClipboard.read': true,
-					},
-				},
-			},
+			use: { ...devices[ 'Desktop Firefox' ] },
 			grep: /@firefox/,
 			grepInvert: /-firefox/,
 		},
