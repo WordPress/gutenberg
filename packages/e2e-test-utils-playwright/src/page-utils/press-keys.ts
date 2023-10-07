@@ -53,6 +53,14 @@ export async function setClipboardData(
 			? document.activeElement.contentDocument!.activeElement
 			: document.activeElement
 	);
+	const frame = await activeElement.asElement()!.ownerFrame();
+	const rangeHandle = await frame!.evaluateHandle( () => {
+		const selection = document.getSelection()!;
+		if ( ! selection.rangeCount ) {
+			return null;
+		}
+		return selection.getRangeAt( 0 );
+	} );
 	const inputHandle = await this.page.evaluateHandle( ( data ) => {
 		const dummyInput = document.createElement( 'input' );
 		dummyInput.style.position = 'absolute';
@@ -62,7 +70,9 @@ export async function setClipboardData(
 		dummyInput.addEventListener( 'copy', ( event ) => {
 			event.preventDefault();
 			Object.entries( data ).forEach( ( [ type, text ] ) => {
-				event.clipboardData?.setData( type, text );
+				if ( text ) {
+					event.clipboardData?.setData( type, text );
+				}
 			} );
 		} );
 		document.body.appendChild( dummyInput );
@@ -76,6 +86,14 @@ export async function setClipboardData(
 	await inputHandle.dispose();
 	await activeElement.asElement()?.focus();
 	await activeElement.dispose();
+	await frame!.evaluate( ( range ) => {
+		const selection = document.getSelection()!;
+		if ( range ) {
+			selection.removeAllRanges();
+			selection.addRange( range );
+		}
+	}, rangeHandle );
+	await rangeHandle.dispose();
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
@@ -213,11 +231,10 @@ export async function pressKeys(
 			 * This doesn't work in *all* cases, but it works in most cases we support.
 			 * (The order matters here for unknown reasons.)
 			 */
-			await this.page.keyboard.press( normalizedKeys );
-			if (
-				isAppleOS() &&
-				this.browser.browserType().name() === 'chromium'
-			) {
+			if ( isAppleOS() ) {
+				await this.page.keyboard.press( normalizedKeys );
+			}
+			if ( this.browser.browserType().name() === 'chromium' ) {
 				await emulateClipboard( this.page, 'paste' );
 			}
 		};
