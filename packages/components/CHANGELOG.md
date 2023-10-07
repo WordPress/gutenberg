@@ -6,6 +6,10 @@
 
 -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
 
+### Internal
+
+-   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
+
 ## 25.9.0 (2023-10-05)
 
 ### Enhancements

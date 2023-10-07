@@ -113,7 +113,7 @@ describe( 'Confirm', () => {
 				expect( onCancel ).toHaveBeenCalled();
 			} );
 
-			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
+			it( 'should be dismissible even if an `onCancel` callback is not provided', async () => {
 				const user = userEvent.setup();
 
 				render(
@@ -144,7 +144,7 @@ describe( 'Confirm', () => {
 
 				// Disable reason: Semantic queries can’t reach the overlay.
 				// eslint-disable-next-line testing-library/no-node-access
-				await user.click( confirmDialog.parentElement );
+				await user.click( confirmDialog.parentElement! );
 
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
@@ -325,7 +325,7 @@ describe( 'Confirm', () => {
 
 			// Disable reason: Semantic queries can’t reach the overlay.
 			// eslint-disable-next-line testing-library/no-node-access
-			await user.click( confirmDialog.parentElement );
+			await user.click( confirmDialog.parentElement! );
 
 			expect( onCancel ).toHaveBeenCalled();
 		} );
