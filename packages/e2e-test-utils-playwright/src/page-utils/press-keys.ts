@@ -82,10 +82,6 @@ export async function setClipboardData(
 	await this.page.keyboard.press(
 		isAppleOS() ? 'Meta+KeyC' : 'Control+KeyC'
 	);
-	await inputHandle.evaluate( ( input ) => input.remove() );
-	await inputHandle.dispose();
-	await activeElement.asElement()?.focus();
-	await activeElement.dispose();
 	await frame!.evaluate( ( range ) => {
 		const selection = document.getSelection()!;
 		if ( range ) {
@@ -93,6 +89,10 @@ export async function setClipboardData(
 			selection.addRange( range );
 		}
 	}, rangeHandle );
+	await activeElement.asElement()?.focus();
+	await activeElement.dispose();
+	await inputHandle.evaluate( ( input ) => input.remove() );
+	await inputHandle.dispose();
 	await rangeHandle.dispose();
 }
 

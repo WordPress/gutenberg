@@ -467,11 +467,12 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		await page.keyboard.type( 'ab' );
-		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.setClipboardData( {
 			html: '<span style="border: 1px solid black">x</span>',
 		} );
+
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
 		// Ensure the selection is correct.
 		await page.keyboard.type( 'y' );
