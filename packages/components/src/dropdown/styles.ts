@@ -36,3 +36,17 @@ export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps
 
 	${ padding };
 `;
+
+export const DropdownPointerEventsCapture = styled.div`
+	// TODO: understand if there's a better way to cover the whole viewport
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 300vw;
+	height: 300vh;
+	transform: translate( -50%, -50% );
+	// TODO: remove following background color
+	background-color: rgba( 255, 0, 0, 0.3 );
+	// TODO: justify this number
+	z-index: 1000000;
+`;

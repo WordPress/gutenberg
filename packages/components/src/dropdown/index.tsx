@@ -7,16 +7,21 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, useMemo } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../context';
+import {
+	contextConnect,
+	useContextSystem,
+	ContextSystemProvider,
+} from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
+import { DropdownPointerEventsCapture } from './styles';
 import type { DropdownProps, DropdownInternalContext } from './types';
 
 const UnconnectedDropdown = (
@@ -109,6 +114,21 @@ const UnconnectedDropdown = (
 		!! popoverProps?.getAnchorRect ||
 		!! popoverProps?.anchorRect;
 
+	const [ showBackdrop, setShowBackdrop ] = useState( false );
+	const contextValue = useMemo(
+		() => ( {
+			ColorPicker: {
+				onPickerDragStart() {
+					setShowBackdrop( true );
+				},
+				onPickerDragEnd() {
+					setShowBackdrop( false );
+				},
+			},
+		} ),
+		[]
+	);
+
 	return (
 		<div
 			className={ className }
@@ -123,34 +143,41 @@ const UnconnectedDropdown = (
 			tabIndex={ -1 }
 			style={ style }
 		>
-			{ renderToggle( args ) }
-			{ isOpen && (
-				<Popover
-					position={ position }
-					onClose={ close }
-					onFocusOutside={ closeIfFocusOutside }
-					expandOnMobile={ expandOnMobile }
-					headerTitle={ headerTitle }
-					focusOnMount={ focusOnMount }
-					// This value is used to ensure that the dropdowns
-					// align with the editor header by default.
-					offset={ 13 }
-					anchor={
-						! popoverPropsHaveAnchor
-							? fallbackPopoverAnchor
-							: undefined
-					}
-					variant={ variant }
-					{ ...popoverProps }
-					className={ classnames(
-						'components-dropdown__content',
-						popoverProps?.className,
-						contentClassName
-					) }
-				>
-					{ renderContent( args ) }
-				</Popover>
-			) }
+			{ isOpen && showBackdrop ? (
+				<DropdownPointerEventsCapture
+					onClick={ () => setShowBackdrop( false ) }
+				/>
+			) : null }
+			<ContextSystemProvider value={ contextValue }>
+				{ renderToggle( args ) }
+				{ isOpen && (
+					<Popover
+						position={ position }
+						onClose={ close }
+						onFocusOutside={ closeIfFocusOutside }
+						expandOnMobile={ expandOnMobile }
+						headerTitle={ headerTitle }
+						focusOnMount={ focusOnMount }
+						// This value is used to ensure that the dropdowns
+						// align with the editor header by default.
+						offset={ 13 }
+						anchor={
+							! popoverPropsHaveAnchor
+								? fallbackPopoverAnchor
+								: undefined
+						}
+						variant={ variant }
+						{ ...popoverProps }
+						className={ classnames(
+							'components-dropdown__content',
+							popoverProps?.className,
+							contentClassName
+						) }
+					>
+						{ renderContent( args ) }
+					</Popover>
+				) }
+			</ContextSystemProvider>
 		</div>
 	);
 };
