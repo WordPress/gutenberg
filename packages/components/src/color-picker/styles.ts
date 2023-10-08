@@ -81,7 +81,6 @@ export const ColorfulWrapper = styled.div`
 		align-items: center;
 		width: 216px;
 		height: auto;
-		overflow: hidden;
 	}
 
 	.react-colorful__saturation {
