@@ -49,8 +49,17 @@ const UnconnectedColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+
+		// Context
+		onPickerDragStart,
+		onPickerDragEnd,
 		...divProps
-	} = useContextSystem( props, 'ColorPicker' );
+	} = useContextSystem<
+		ColorPickerProps & {
+			onPickerDragStart?: ( event: MouseEvent ) => void;
+			onPickerDragEnd?: ( event: MouseEvent ) => void;
+		}
+	>( props, 'ColorPicker' );
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
@@ -82,6 +91,8 @@ const UnconnectedColorPicker = (
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
+				onDragStart={ onPickerDragStart }
+				onDragEnd={ onPickerDragEnd }
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">

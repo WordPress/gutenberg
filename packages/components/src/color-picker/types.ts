@@ -59,6 +59,8 @@ export interface PickerProps {
 	color: Colord;
 	enableAlpha: boolean;
 	onChange: ( nextColor: Colord ) => void;
+	onDragStart?: ( event: MouseEvent ) => void;
+	onDragEnd?: ( event: MouseEvent ) => void;
 }
 
 export interface ColorInputProps {
