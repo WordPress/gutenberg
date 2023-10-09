@@ -38,7 +38,6 @@ export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps
 `;
 
 export const DropdownPointerEventsCapture = styled.div`
-	// TODO: understand if there's a better way to cover the whole viewport
 	position: fixed;
 	inset: 0;
 	// Hardcoded fallback to (popover-z-index - 1)
