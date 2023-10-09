@@ -43,7 +43,7 @@ export default function DataViews( {
 		enableRowSelection: true,
 		state: {
 			sorting: [
-				{ id: view.sort.column, desc: view.sort.direction === 'desc' },
+				{ id: view.sort.field, desc: view.sort.direction === 'desc' },
 			],
 			globalFilter: view.search,
 			pagination: {
@@ -57,14 +57,14 @@ export default function DataViews( {
 					typeof sortingUpdater === 'function'
 						? sortingUpdater( [
 								{
-									id: currentView.sort.column,
+									id: currentView.sort.field,
 									desc: currentView.sort.direction === 'desc',
 								},
 						  ] )
 						: sortingUpdater;
 				return {
 					...currentView,
-					sort: { column: id, direction: desc ? 'desc' : 'asc' },
+					sort: { field: id, direction: desc ? 'desc' : 'asc' },
 				};
 			} );
 		},
