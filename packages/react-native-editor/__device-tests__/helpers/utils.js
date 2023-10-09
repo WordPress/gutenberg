@@ -368,12 +368,25 @@ const tapPasteAboveElement = async ( driver, element ) => {
 };
 
 const tapStatusBariOS = async ( driver ) => {
-	const action = new wd.TouchAction();
-	action.tap( { x: 20, y: 20 } );
-	await driver.performTouchAction( action );
+	await driver.touchPerform( [
+		{
+			action: 'press',
+			options: { x: 20, y: 20 },
+		},
+		{
+			action: 'wait',
+			options: {
+				ms: 100,
+			},
+		},
+		{
+			action: 'release',
+			options: {},
+		},
+	] );
 
 	// Wait for the scroll animation to finish
-	await driver.sleep( 3000 );
+	await driver.pause( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
