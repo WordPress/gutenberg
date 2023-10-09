@@ -27,7 +27,7 @@ export default function RenameCategoryMenuItem( { category, onClose } ) {
 			</MenuItem>
 			{ isModalOpen && (
 				<RenamePatternCategoryModal
-					categoryId={ category.id }
+					category={ category }
 					onClose={ () => {
 						setIsModalOpen( false );
 						onClose();
