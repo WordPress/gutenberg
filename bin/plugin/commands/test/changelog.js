@@ -19,6 +19,7 @@ import {
 	getChangelog,
 	getContributorProps,
 	getContributorsList,
+	mapLabelsToFeatures,
 } from '../changelog';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
@@ -312,15 +313,32 @@ describe( 'sortGroup', () => {
 } );
 
 describe( 'getTypesByLabels', () => {
-	it( 'returns all normalized type candidates by type prefix', () => {
+	it( 'returns all normalized type candidates by type prefix. it is case insensitive', () => {
 		const result = getTypesByLabels( [
 			'[Type] Regression',
 			'[Type] Bug',
 			'[Package] Blocks',
-			'[Type] Performance',
+			'[Type] performance',
 		] );
 
 		expect( result ).toEqual( [ 'Bug Fixes', 'Performance' ] );
+	} );
+} );
+
+describe( 'mapLabelsToFeatures', () => {
+	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+		const result = mapLabelsToFeatures( [
+			'[Package] Commands',
+			'[Package] Block Library',
+			'[Feature] Link Editing',
+			'[Feature] block Multi Selection',
+		] );
+
+		expect( result ).toEqual( [
+			'Commands',
+			'Block Library',
+			'Block Editor',
+		] );
 	} );
 } );
 

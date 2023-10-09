@@ -226,7 +226,14 @@ function getTypesByLabels( labels ) {
 						.map( ( currentLabel ) => currentLabel.toLowerCase() )
 						.includes( label.toLowerCase() )
 				)
-				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_TYPE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_TYPE_MAPPING[ lowerCaseLabel ];
+				} )
 		),
 	];
 }
@@ -240,13 +247,24 @@ function getTypesByLabels( labels ) {
  * @return {string[]} Feature candidates.
  */
 function mapLabelsToFeatures( labels ) {
-	return labels
-		.filter( ( label ) =>
-			Object.keys( LABEL_FEATURE_MAPPING )
-				.map( ( currentLabel ) => currentLabel.toLowerCase() )
-				.includes( label.toLowerCase() )
-		)
-		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_FEATURE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
+				)
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_FEATURE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_FEATURE_MAPPING[ lowerCaseLabel ];
+				} )
+		),
+	];
 }
 
 /**
@@ -1076,4 +1094,5 @@ async function getReleaseChangelog( options ) {
 	getChangelog,
 	getUniqueByUsername,
 	skipCreatedByBots,
+	mapLabelsToFeatures,
 };
