@@ -18,6 +18,7 @@ import {
 	FoursquareIcon,
 	GoodreadsIcon,
 	GoogleIcon,
+	GooglepodcastsIcon,
 	GitHubIcon,
 	InstagramIcon,
 	LastfmIcon,
@@ -29,6 +30,7 @@ import {
 	PatreonIcon,
 	PinterestIcon,
 	PocketIcon,
+	PocketcastsIcon,
 	RedditIcon,
 	SkypeIcon,
 	SnapchatIcon,
@@ -155,6 +157,12 @@ const variations = [
 		icon: GoogleIcon,
 	},
 	{
+		name: 'googlepodcasts',
+		attributes: { service: 'googlepodcasts' },
+		title: 'Google Podcasts',
+		icon: GooglepodcastsIcon,
+	},
+	{
 		name: 'github',
 		attributes: { service: 'github' },
 		title: 'GitHub',
@@ -220,6 +228,12 @@ const variations = [
 		attributes: { service: 'pocket' },
 		title: 'Pocket',
 		icon: PocketIcon,
+	},
+	{
+		name: 'pocketcasts',
+		attributes: { service: 'pocketcasts' },
+		title: 'Pocketcasts',
+		icon: PocketcastsIcon,
 	},
 	{
 		name: 'reddit',
