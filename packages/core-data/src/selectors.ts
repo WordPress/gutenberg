@@ -527,6 +527,17 @@ export const getEntityRecords = ( <
 	return getQueriedItems( queriedState, query );
 } ) as GetEntityRecords;
 
+/**
+ * Returns the Entity's total available records for a given query (ignoring pagination).
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
 export const getEntityRecordsTotalItems = (
 	state: State,
 	kind: string,
@@ -543,6 +554,17 @@ export const getEntityRecordsTotalItems = (
 	return getQueriedTotalItems( queriedState, query );
 };
 
+/**
+ * Returns the number of available pages for the given query.
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
 export const getEntityRecordsTotalPages = (
 	state: State,
 	kind: string,
