@@ -1102,6 +1102,11 @@ export const mergeBlocks =
 			return;
 		}
 
+		if ( ! blockAType.merge ) {
+			dispatch.selectBlock( blockA.clientId );
+			return;
+		}
+
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = select.getSelectionStart();
 		const selectedBlockType =
