@@ -842,7 +842,7 @@ class EditorPage {
 		if ( isAndroid() ) {
 			// Get the child EditText element of the ViewGroup returned by
 			// elementByAccessibilityId.
-			return await child.elementByClassName( 'android.widget.EditText' );
+			return await child.$( 'android.widget.EditText' );
 		}
 
 		return child;
