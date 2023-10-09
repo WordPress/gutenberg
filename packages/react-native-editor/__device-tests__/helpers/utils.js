@@ -599,10 +599,10 @@ const waitForVisible = async (
 		return '';
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
-		await driver.sleep( timeout );
+		await driver.pause( timeout );
 	}
 
-	const elements = await driver.elementsByXPath( elementLocator );
+	const elements = await driver.$$( elementLocator );
 	if ( elements.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(
