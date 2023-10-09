@@ -26,7 +26,7 @@ const EMPTY_OBJECT = {};
 
 export default function PagePages() {
 	const [ view, setView ] = useState( {
-		type: 'table',
+		type: 'list',
 		search: '',
 		page: 0,
 		perPage: 5,
