@@ -321,9 +321,6 @@ export function BlockPatternsCategoryPanel( {
 						category={ category }
 					/>
 				</HStack>
-				{ category.description && (
-					<Text>{ category.description }</Text>
-				) }
 				{ ! currentCategoryPatterns.length && (
 					<Text
 						variant="muted"

@@ -24,7 +24,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 	public function test_install_fonts( $font_families, $files, $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
-		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_param( 'font_families', $font_families_json );
 		$install_request->set_file_params( $files );
 		$response = rest_get_server()->dispatch( $install_request );
 		$data     = $response->get_data();
@@ -309,7 +309,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 	public function test_install_with_improper_inputs( $font_families, $files = array() ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
 		$font_families_json = json_encode( $font_families );
-		$install_request->set_param( 'fontFamilies', $font_families_json );
+		$install_request->set_param( 'font_families', $font_families_json );
 		$install_request->set_file_params( $files );
 
 		$response = rest_get_server()->dispatch( $install_request );
