@@ -843,7 +843,7 @@ class EditorPage {
 	// =============================
 
 	async getSearchBlockTextElement( testID ) {
-		const child = await this.driver.elementByAccessibilityId( testID );
+		const child = await this.driver.$( `~${ testID }` );
 
 		if ( isAndroid() ) {
 			// Get the child EditText element of the ViewGroup returned by
