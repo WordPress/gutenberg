@@ -151,7 +151,7 @@ const verifySearchElementText = async ( testId, expected ) => {
 
 	if ( isAndroid() ) {
 		const input = await editorPage.getSearchBlockTextElement( testId );
-		const inputValue = await input.text();
+		const inputValue = await input.getText();
 		actual = inputValue.trim();
 	} else {
 		actual = await editorPage.getHtmlContent();
