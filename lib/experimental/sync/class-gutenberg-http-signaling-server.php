@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 /**
  * Gutenberg_HTTP_Signaling_Server class
  *
@@ -13,43 +16,6 @@
  */
 class Gutenberg_HTTP_Signaling_Server {
 
-	/**
-	 * Contains the path of the subscriber to messages file.
-	 * The file contains a data-structure similar to the following example:
-	 * array( 2323232121 => array( 'message hello','handshake message' ) ).
-	 *
-	 * @access private
-	 * @var array
-	 */
-	private static $subscriber_to_messages_path;
-
-	/**
-	 * Contains the path of the topics to subscriber file.
-	 * The file contains a data-structure similar to the following example:
-	 * array( 'doc1: array( 2323232121 ), 'doc2: array( 2323232123, 2323232121 ) ).
-	 *
-	 * @access private
-	 * @var array
-	 */
-	private static $topics_to_subscribers_path;
-
-	/**
-	 * Contains the path of the subscribers to last connection file.
-	 * The file contains a data-structure similar to the following example:
-	 * array( 2323232121 => 34343433323(timestamp) ).
-	 *
-	 * @access private
-	 * @var array
-	 */
-	private static $subscribers_to_last_connection_path;
-
-	/**
-	 * Contains the subscriber id of the client reading or sending messages.
-	 *
-	 * @access private
-	 * @var Integer
-	 */
-	private static $subscriber_id;
 
 	/**
 	 * Adds a wp_ajax action to handle the signaling server requests.
@@ -66,13 +32,18 @@ class Gutenberg_HTTP_Signaling_Server {
 			die( 'no identifier' );
 		}
 
-		static::initialize_paths();
+		// Contains the subscriber id of the client reading or sending messages.
+		$subscriber_id = $_REQUEST['subscriber_id'];
 
+		// Example inside file: array( 2323232121 => array( 'message hello','handshake message' ) ).
+		$subscriber_to_messages_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_messages.txt';
+		
+		// Example inside file: array( 'doc1: array( 2323232121 ), 'doc2: array( 2323232123, 2323232121 ) ).
+		$topics_to_subscribers_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
 
-		static::$subscriber_id = $_REQUEST['subscriber_id'];
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
-			static::handle_read_pending_messages( static::$subscriber_id, static::$subscriber_to_messages_path );
+			static::handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path );
 		} else {
 			if ( empty( $_POST ) || empty( $_POST['message'] ) ) {
 				die( 'no message' );
@@ -82,95 +53,25 @@ class Gutenberg_HTTP_Signaling_Server {
 				die( 'no message' );
 			}
 
-			$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
-			if ( ! $fd_topics_subscriber ) {
-				die( 'Could not open required file.' );
-			}
-
-			flock( $fd_topics_subscriber, LOCK_EX );
-			$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
-	
 			switch ( $message['type'] ) {
 				case 'subscribe':
-					static::handle_subscribe_to_topics( static::$topics_to_subscribers_path, $subscriber_id, $message['topics'] );
+					static::handle_subscribe_to_topics( $topics_to_subscribers_path, $subscriber_id, $message['topics'] );
 					break;
 				case 'unsubscribe':
-					static::handle_unsubscribe_from_topics( static::$topics_to_subscribers_path, $subscriber_id, $message['topics'] );
+					static::handle_unsubscribe_from_topics( $topics_to_subscribers_path, $subscriber_id, $message['topics'] );
 					break;
 				case 'publish':
-					$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
-					if( ! $fd_subscriber_messages ) {
-						die( 'Could not open required file.' );
-					}
-					flock( $fd_subscriber_messages, LOCK_EX );
-					$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
-					$topic                  = $message['topic'];
-					$receivers              = $topics_to_subscribers[ $topic ];
-					if ( $receivers ) {
-						$message['clients'] = count( $receivers );
-						foreach ( $receivers as $receiver ) {
-							if ( ! $subscriber_to_messages[ $receiver ] ) {
-								$subscriber_to_messages[ $receiver ] = array();
-							}
-							$subscriber_to_messages[ $receiver ][] = $message;
-						}
-						static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
-					}
-					flock( $fd_subscriber_messages, LOCK_UN );
-					fclose( $fd_subscriber_messages );
+					static::handle_publish_message( static::$topics_to_subscribers_path, $subscriber_id, $message );
 					break;
 				case 'ping':
-					$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
-					if( ! $fd_subscriber_messages ) {
-						die( 'Could not open required file.' );
-					}
-					flock( $fd_subscriber_messages, LOCK_EX );
-					$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
-					if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
-						$subscriber_to_messages[ static::$subscriber_id ] = array();
-					}
-					$subscriber_to_messages[ static::$subscriber_id ][] = array( 'type' => 'pong' );
-					static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
-					flock( $fd_subscriber_messages, LOCK_UN );
-					fclose( $fd_subscriber_messages );
+					static::handle_ping( $subscriber_to_messages_path, $subscriber_id );
 					break;
 			}
-			flock( $fd_topics_subscriber, LOCK_UN );
-			fclose( $fd_topics_subscriber );
 			echo wp_json_encode( array( 'result' => 'ok' ) ), PHP_EOL, PHP_EOL;
 		}
 
-		static::clean_up_old_connections();
+		static::clean_up_old_connections( $subscriber_id, $subscriber_to_messages_path, $topics_to_subscribers_path );
 		exit;
-	}
-
-	/**
-	 * Initializes the paths of the temporary files used.
-	 */
-	private static function initialize_paths() {
-		static::$subscriber_to_messages_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_messages.txt';
-		// Example: array( 2323232121 => array( 'message hello','handshake message' ) ).
-
-		static::$topics_to_subscribers_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
-		// Example: array( 'doc1: array( 2323232121 ), 'doc2: array( 2323232123, 2323232121 ) ).
-
-		static::$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
-		// Example: array( 2323232121 => 34343433323(timestamp) ).
-	}
-
-	private static function get_contents_and_lock_file( $path ) {
-		$fd = fopen( $path, 'c+' );
-		if ( ! $fd ) {
-			return array( $fd, null );
-		}
-		flock( $fd, LOCK_EX );
-		return array( $fd, static::get_contents_from_file_descriptor( $fd ) );
-	}
-
-	private static function save_contents_and_unlock_file( $fd, $content ) {
-		static::save_contents_to_file_descriptor( $fd, $content );
-		flock( $fd, LOCK_UN );
-		fclose( $fd );
 	}
 
 	/**
@@ -192,6 +93,20 @@ class Gutenberg_HTTP_Signaling_Server {
 		return $result;
 	}
 
+	private static function get_contents_and_lock_file( $path ) {
+		$fd = fopen( $path, 'c+' );
+		if ( ! $fd ) {
+			return array( $fd, null );
+		}
+		flock( $fd, LOCK_EX );
+		return array( $fd, static::get_contents_from_file_descriptor( $fd ) );
+	}
+
+	private static function save_contents_and_unlock_file( $fd, $content ) {
+		static::save_contents_to_file_descriptor( $fd, $content );
+		flock( $fd, LOCK_UN );
+		fclose( $fd );
+	}
 
 	/**
 	 * Makes the file descriptor content of $fd equal to the serialization of content.
@@ -294,18 +209,77 @@ class Gutenberg_HTTP_Signaling_Server {
 		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
 	}
 
+	/**
+	 * Receives a $topics_to_subscribers data-structure and an array of topics,
+	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is subscribed to the topics.
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
+	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
+	 */
+	private static function handle_publish_message( $topics_to_subscribers_path, $subscriber_to_messages_path, $subscriber_id, $message ) {
+		list( $fd_topics_subscriber, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
+		list( $fd_subscriber_to_messages, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
+		if ( ! $fd_topics_subscriber || ! $fd_subscriber_to_messages ) {
+			die( 'Could not open required file.' );
+		}
+		$topic     = $message['topic'];
+		$receivers = $topics_to_subscribers[ $topic ];
+		if ( $receivers && count( $receivers ) > 0 ) {
+			$message['clients'] = count( $receivers );
+			foreach ( $receivers as $receiver ) {
+				if ( ! $subscriber_to_messages[ $receiver ] ) {
+					$subscriber_to_messages[ $receiver ] = array();
+				}
+				$subscriber_to_messages[ $receiver ][] = $message;
+			}
+			static::save_contents_to_file_descriptor( $fd_subscriber_to_messages, $subscriber_to_messages );
+		}
+		flock( $fd_subscriber_messages, LOCK_UN );
+		fclose( $fd_subscriber_messages );
+		flock( $fd_topics_subscriber, LOCK_UN );
+		fclose( $fd_topics_subscriber );
+	}
 
 	/**
-	 * Deletes messages and subcriber information of clients that have not interacted with the signaling server in a long time.
+	 * Receives a $topics_to_subscribers data-structure and an array of topics,
+	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is subscribed to the topics.
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
+	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
-	private static function clean_up_old_connections() {
-		$fd_subscribers_last_connection = fopen( static::$subscribers_to_last_connection_path, 'c+' );
+	private static function handle_ping( $subscriber_to_messages_path, $subscriber_id ) {
+		list( $fd_subscriber_to_messages, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
+		if ( ! $fd_subscriber_to_messages ) {
+			die( 'Could not open required file.' );
+		}
+		if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
+			$subscriber_to_messages[ $subscriber_id ] = array();
+		}
+		$subscriber_to_messages[ $subscriber_id ][] = array( 'type' => 'pong' );
+		static::save_contents_and_unlock_file( $fd_subscriber_to_messages, $subscriber_to_messages );
+	}
+
+
+	/**
+	 * Deletes messages and subscriber information of clients that have not interacted with the signaling server in a long time.
+	 */
+	private static function clean_up_old_connections( $connected_subscriber_id, $subscriber_to_messages_path, $topics_to_subscribers_path ) {
+		$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
+		// Example: array( 2323232121 => 34343433323(timestamp) ).
+
+		$fd_subscribers_last_connection = fopen( $subscribers_to_last_connection_path, 'c+' );
 		if( ! $fd_subscribers_last_connection ) {
 			die( 'Could not open required file.' );
 		}
 		flock( $fd_subscribers_last_connection, LOCK_EX );
 		$subscribers_to_last_connection_time                           = static::get_contents_from_file_descriptor( $fd_subscribers_last_connection );
-		$subscribers_to_last_connection_time[ static::$subscriber_id ] = time();
+		$subscribers_to_last_connection_time[ $connected_subscriber_id ] = time();
 		$needs_cleanup = false;
 		foreach ( $subscribers_to_last_connection_time as $subscriber_id => $last_connection_time ) {
 			// cleanup connections older than 24 hours.
@@ -317,20 +291,20 @@ class Gutenberg_HTTP_Signaling_Server {
 		static::save_contents_to_file_descriptor( $fd_subscribers_last_connection, $subscribers_to_last_connection_time );
 
 		if ( $needs_cleanup ) {
-			$fd_subscriber_messages = fopen( static::$subscriber_to_messages_path, 'c+' );
+			$fd_subscriber_messages = fopen( $subscriber_to_messages_path, 'c+' );
 			if( ! $fd_subscriber_messages ) {
 				die( 'Could not open required file.' );
 			}
 			flock( $fd_subscriber_messages, LOCK_EX );
 			$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd_subscriber_messages );
 			foreach ( $subscriber_to_messages as $subscriber_id => $messages ) {
-				if ( ! isset( $subscribers_to_last_connection_time[ static::$subscriber_id ] ) ) {
+				if ( ! isset( $subscribers_to_last_connection_time[ $subscriber_id ] ) ) {
 					unset( $subscriber_to_messages[ $subscriber_id ] );
 				}
 			}
 			static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
 
-			$fd_topics_subscriber = fopen( static::$topics_to_subscribers_path, 'c+' );
+			$fd_topics_subscriber = fopen( $topics_to_subscribers_path, 'c+' );
 			if( ! $fd_topics_subscriber ) {
 				die( 'Could not open required file.' );
 			}
@@ -338,8 +312,8 @@ class Gutenberg_HTTP_Signaling_Server {
 			$topics_to_subscribers = static::get_contents_from_file_descriptor( $fd_topics_subscriber );
 			foreach ( $topics_to_subscribers as $topic => $subscribers ) {
 				foreach ( $subscribers as $subscriber_id ) {
-					if ( ! isset( $subscribers_to_last_connection_time[ static::$subscriber_id ] ) ) {
-						$topics_to_subscribers[ $topic ] = array_diff( $topics_to_subscribers[ $topic ], array( static::$subscriber_id ) );
+					if ( ! isset( $subscribers_to_last_connection_time[ $subscriber_id ] ) ) {
+						$topics_to_subscribers[ $topic ] = array_diff( $topics_to_subscribers[ $topic ], array( $subscriber_id ) );
 					}
 				}
 			}
