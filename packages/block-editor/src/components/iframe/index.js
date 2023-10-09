@@ -103,15 +103,13 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, url } = useSelect( ( select ) => {
+	const { isPreviewMode, url } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.__unstableIsPreviewMode,
 			url: settings.__unstablePreviewUrl,
 		};
 	}, [] );
-	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const compatStyles = useCompatibilityStyles();
@@ -213,8 +211,6 @@ function Iframe( {
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
 		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
-		${ styles }
-		${ scripts }
 	</head>
 	<body>
 		<script>document.currentScript.parentElement.remove()</script>

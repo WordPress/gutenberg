@@ -74,7 +74,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'widgetTypesToHideFromLegacyWidgetBlock',
 	'__unstableHasCustomAppender',
 	'__unstableIsPreviewMode',
-	'__unstableResolvedAssets',
 	'__unstablePreviewUrl',
 	'__unstableIsBlockBasedTheme',
 ];
