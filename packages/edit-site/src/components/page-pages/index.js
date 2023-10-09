@@ -33,7 +33,7 @@ export default function PagePages() {
 		pageSize: PAGE_SIZE_VALUES[ 0 ],
 	} );
 	// Request post statuses to get the proper labels.
-	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const { records: statuses } = useEntityRecords( 'root', 'postStatus' );
 	const postStatuses =
 		statuses === null
 			? EMPTY_OBJECT

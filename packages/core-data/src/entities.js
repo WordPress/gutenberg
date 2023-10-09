@@ -225,7 +225,7 @@ export const rootEntitiesConfig = [
 	},
 	{
 		label: __( 'Post status' ),
-		name: 'status',
+		name: 'postStatus',
 		kind: 'root',
 		baseURL: '/wp/v2/statuses',
 		baseURLParams: { context: 'edit' },
