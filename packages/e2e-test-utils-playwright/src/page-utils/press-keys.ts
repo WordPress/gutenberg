@@ -218,13 +218,13 @@ export async function pressKeys(
 						? document.activeElement.contentDocument!.activeElement
 						: document.activeElement;
 				return new Promise( ( resolve ) => {
-					const animationFrame = requestAnimationFrame( () => {
+					const timeout = setTimeout( () => {
 						resolve( false );
-					} );
+					}, 50 );
 					activeElement?.ownerDocument.addEventListener(
 						'paste',
 						( event ) => {
-							cancelAnimationFrame( animationFrame );
+							clearTimeout( timeout );
 							resolve( !! event.defaultPrevented );
 						},
 						{ once: true }
