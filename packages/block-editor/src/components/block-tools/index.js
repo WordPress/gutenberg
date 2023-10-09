@@ -216,6 +216,7 @@ export default function BlockTools( {
 									showEmptyBlockSideInserter
 								}
 								hasFixedToolbar={ hasFixedToolbar }
+								__unstableContentRef={ __unstableContentRef }
 							/>
 						) }
 						{ /* Used for the inline rich text toolbar. */ }

@@ -26,7 +26,12 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function UnforwardSelectedBlockTools(
-	{ clientId, hasFixedToolbar, showEmptyBlockSideInserter },
+	{
+		clientId,
+		hasFixedToolbar,
+		showEmptyBlockSideInserter,
+		__unstableContentRef,
+	},
 	ref
 ) {
 	const {
@@ -85,7 +90,9 @@ function UnforwardSelectedBlockTools(
 	}, [ clientId ] );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
-		contentElement: getScrollContainer(), // This is what useBlockToolbarPopoverProps does when the contentRef is undefined. This likely works by accident. It was being passed in via the BlockTools
+		contentElement: hasFixedToolbar
+			? getScrollContainer()
+			: __unstableContentRef?.current,
 		clientId,
 	} );
 
