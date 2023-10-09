@@ -10,17 +10,22 @@ import { __ } from '@wordpress/i18n';
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
-import { USER_PATTERNS, ALL_PATTERNS_CATEGORY } from '../page-patterns/utils';
+import {
+	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+} from '../../utils/constants';
 
 export default function usePatternCategories() {
 	const defaultCategories = useDefaultPatternCategories();
 	defaultCategories.push( {
-		name: 'uncategorized',
+		name: TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 		label: __( 'Uncategorized' ),
 	} );
 	const themePatterns = useThemePatterns();
 	const { patterns: userPatterns, categories: userPatternCategories } =
-		usePatterns( USER_PATTERNS );
+		usePatterns( PATTERN_TYPES.user );
 
 	const patternCategories = useMemo( () => {
 		const categoryMap = {};
@@ -80,12 +85,20 @@ export default function usePatternCategories() {
 		const sortedCategories = categoriesWithCounts.sort( ( a, b ) =>
 			a.label.localeCompare( b.label )
 		);
+
 		sortedCategories.unshift( {
-			name: ALL_PATTERNS_CATEGORY,
-			label: __( 'All Patterns' ),
+			name: PATTERN_USER_CATEGORY,
+			label: __( 'My patterns' ),
+			count: userPatterns.length,
+		} );
+
+		sortedCategories.unshift( {
+			name: PATTERN_DEFAULT_CATEGORY,
+			label: __( 'All patterns' ),
 			description: __( 'A list of all patterns from all sources' ),
 			count: themePatterns.length + userPatterns.length,
 		} );
+
 		return sortedCategories;
 	}, [
 		defaultCategories,

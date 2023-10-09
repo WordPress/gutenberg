@@ -54,29 +54,6 @@ async function dragFiles(
 		} )
 	);
 
-	const dataTransfer = await this.page.evaluateHandle(
-		async ( _fileObjects ) => {
-			const dt = new DataTransfer();
-			const fileInstances = await Promise.all(
-				_fileObjects.map( async ( fileObject ) => {
-					const blob = await fetch(
-						`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
-					).then( ( res ) => res.blob() );
-					return new File( [ blob ], fileObject.name, {
-						type: fileObject.mimeType ?? undefined,
-					} );
-				} )
-			);
-
-			fileInstances.forEach( ( file ) => {
-				dt.items.add( file );
-			} );
-
-			return dt;
-		},
-		fileObjects
-	);
-
 	// CDP doesn't actually support dragging files, this is only a _good enough_
 	// dummy data so that it will correctly send the relevant events.
 	const dragData = {
@@ -158,6 +135,29 @@ async function dragFiles(
 			if ( ! locator ) {
 				throw new Error( 'Element not found.' );
 			}
+
+			const dataTransfer = await locator.evaluateHandle(
+				async ( _node, _fileObjects ) => {
+					const dt = new DataTransfer();
+					const fileInstances = await Promise.all(
+						_fileObjects.map( async ( fileObject: any ) => {
+							const blob = await fetch(
+								`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
+							).then( ( res ) => res.blob() );
+							return new File( [ blob ], fileObject.name, {
+								type: fileObject.mimeType ?? undefined,
+							} );
+						} )
+					);
+
+					fileInstances.forEach( ( file ) => {
+						dt.items.add( file );
+					} );
+
+					return dt;
+				},
+				fileObjects
+			);
 
 			await locator.dispatchEvent( 'drop', { dataTransfer } );
 

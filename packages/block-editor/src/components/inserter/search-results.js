@@ -81,7 +81,7 @@ function InserterSearchResults( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
-	const { patterns, onClickPattern } = usePatternsState(
+	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
@@ -184,7 +184,7 @@ function InserterSearchResults( {
 	const patternsUI = !! filteredBlockPatterns.length && (
 		<InserterPanel
 			title={
-				<VisuallyHidden>{ __( 'Block Patterns' ) }</VisuallyHidden>
+				<VisuallyHidden>{ __( 'Block patterns' ) }</VisuallyHidden>
 			}
 		>
 			<div className="block-editor-inserter__quick-inserter-patterns">

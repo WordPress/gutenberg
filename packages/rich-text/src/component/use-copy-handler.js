@@ -28,17 +28,10 @@ export function useCopyHandler( props ) {
 
 			const selectedRecord = slice( record.current );
 			const plainText = getTextContent( selectedRecord );
-			const tagName = element.tagName.toLowerCase();
-
-			let html = toHTMLString( {
+			const html = toHTMLString( {
 				value: selectedRecord,
 				preserveWhiteSpace,
 			} );
-
-			if ( tagName && tagName !== 'span' && tagName !== 'div' ) {
-				html = `<${ tagName }>${ html }</${ tagName }>`;
-			}
-
 			event.clipboardData.setData( 'text/plain', plainText );
 			event.clipboardData.setData( 'text/html', html );
 			event.clipboardData.setData( 'rich-text', 'true' );

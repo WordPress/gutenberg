@@ -137,6 +137,11 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 } ) {
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		settings,
+	} );
+
 	/*
 	 As you change the text color by typing a HEX value into a field,
 	 the return value of document.getSelection jumps to the field you're editing,
@@ -144,12 +149,8 @@ export default function InlineColorUI( {
 	 it will return null, since it can't find the <mark> element within the HEX input.
 	 This caches the last truthy value of the selection anchor reference.
 	 */
-	const popoverAnchor = useCachedTruthy(
-		useAnchor( {
-			editableContentElement: contentRef.current,
-			settings,
-		} )
-	);
+	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
+	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
 	return (
 		<Popover

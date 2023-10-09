@@ -22,6 +22,7 @@ import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
@@ -52,7 +53,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		hasResolved: hasResolvedNavigationMenus,
 	} = useEntityRecords(
 		'postType',
-		`wp_navigation`,
+		NAVIGATION_POST_TYPE,
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
@@ -151,7 +152,7 @@ export function SidebarNavigationScreenWrapper( {
 const NavMenuItem = ( { postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postId,
-		postType: 'wp_navigation',
+		postType: NAVIGATION_POST_TYPE,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };

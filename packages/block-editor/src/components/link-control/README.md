@@ -59,6 +59,29 @@ The resulting default properties of `value` include:
 -   `title` (`string`, optional): Link title.
 -   `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab. This value is only assigned when not providing a custom `settings` prop.
 
+Note: `<LinkControl>` maintains an internal state tracking temporary user edits to the link `value` prior to submission. To avoid unwanted synchronization of this internal value, it is advised that the `value` prop is stablized (likely via memozation) before it is passed to the component. This will avoid unwanted loss of any changes users have may made whilst interacting with the control.
+
+```jsx
+const memoizedValue = useMemo(
+	() => ( {
+		url: attributes.url,
+		type: attributes.type,
+		opensInNewTab: attributes.target === '_blank',
+		title: attributes.text,
+	} ),
+	[
+		attributes.url,
+		attributes.type,
+		attributes.target,
+		attributes.text,
+	]
+);
+
+<LinkControl
+	value={ memoizedValue }
+>
+```
+
 ### settings
 
 -   Type: `Array`

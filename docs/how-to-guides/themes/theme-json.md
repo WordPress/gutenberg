@@ -968,7 +968,7 @@ You can use `ref: "styles.color.background"`  to re-use the style for a block:
 ```JSON
 {
 	"color": {
-		"text": { ref: "styles.color.background" }
+		"text": { "ref": "styles.color.background" }
 	}
 }
 ```

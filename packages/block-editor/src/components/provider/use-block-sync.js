@@ -293,7 +293,7 @@ export default function useBlockSync( {
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
-		} );
+		}, blockEditorStore );
 
 		return () => {
 			subscribed.current = false;

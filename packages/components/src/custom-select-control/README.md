@@ -17,11 +17,8 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 ### Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
+import { useState } from 'react';
 import { CustomSelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const options = [
 	{

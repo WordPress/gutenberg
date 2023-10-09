@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { View } from '../../view';
 
 function UnconnectedItem(

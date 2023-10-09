@@ -42,5 +42,6 @@ export * from './vimeo';
 export * from './vk';
 export * from './whatsapp';
 export * from './wordpress';
+export * from './x';
 export * from './yelp';
 export * from './youtube';
