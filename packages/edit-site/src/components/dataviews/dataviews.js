@@ -42,9 +42,14 @@ export default function DataViews( {
 		manualPagination: true,
 		enableRowSelection: true,
 		state: {
-			sorting: [
-				{ id: view.sort.field, desc: view.sort.direction === 'desc' },
-			],
+			sorting: view.sort
+				? [
+						{
+							id: view.sort.field,
+							desc: view.sort.direction === 'desc',
+						},
+				  ]
+				: [],
 			globalFilter: view.search,
 			pagination: {
 				pageIndex: view.page,
@@ -53,14 +58,26 @@ export default function DataViews( {
 		},
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
+				if ( ! sortingUpdater || sortingUpdater.length === 0 ) {
+					return {
+						...currentView,
+						sort: {},
+					};
+				}
 				const [ { id, desc } ] =
 					typeof sortingUpdater === 'function'
-						? sortingUpdater( [
-								{
-									id: currentView.sort.field,
-									desc: currentView.sort.direction === 'desc',
-								},
-						  ] )
+						? sortingUpdater(
+								currentView.sort
+									? [
+											{
+												id: currentView.sort.field,
+												desc:
+													currentView.sort
+														.direction === 'desc',
+											},
+									  ]
+									: []
+						  )
 						: sortingUpdater;
 				return {
 					...currentView,
