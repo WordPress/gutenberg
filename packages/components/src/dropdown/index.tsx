@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useMemo } from '@wordpress/element';
+import { useRef, useState, useMemo, createPortal } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
@@ -129,6 +129,30 @@ const UnconnectedDropdown = (
 		[]
 	);
 
+	const [ popoverRef, setPopoverRef ] = useState< HTMLDivElement | null >(
+		null
+	);
+	// Set the backdrop's z-index dynamically to the popover's z-index minus 1.
+	// A hardcoded fallback z-index is provided in the backdrop's styles.
+	const computedBackdropZIndexStyles = useMemo( () => {
+		if ( ! popoverRef ) {
+			return;
+		}
+
+		const popoverZIndex =
+			popoverRef.ownerDocument.defaultView?.getComputedStyle( popoverRef )
+				.zIndex;
+
+		if (
+			! popoverZIndex ||
+			Number.isNaN( Number.parseInt( popoverZIndex ) )
+		) {
+			return;
+		}
+
+		return { zIndex: Number.parseInt( popoverZIndex ) - 1 };
+	}, [ popoverRef ] );
+
 	return (
 		<div
 			className={ className }
@@ -143,15 +167,25 @@ const UnconnectedDropdown = (
 			tabIndex={ -1 }
 			style={ style }
 		>
-			{ isOpen && showBackdrop ? (
-				<DropdownPointerEventsCapture
-					onClick={ () => setShowBackdrop( false ) }
-				/>
-			) : null }
+			{ containerRef.current && isOpen && showBackdrop
+				? /* The backdrop is rendered via portal because otherwise its fixed
+				   * position would be often affected by parent containers acting as
+				   * containing blocks.
+				   * See https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block
+				   */
+				  createPortal(
+						<DropdownPointerEventsCapture
+							onClick={ () => setShowBackdrop( false ) }
+							style={ computedBackdropZIndexStyles }
+						/>,
+						containerRef.current.ownerDocument.body
+				  )
+				: null }
 			<ContextSystemProvider value={ contextValue }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
+						ref={ ( node ) => setPopoverRef( node ) }
 						position={ position }
 						onClose={ close }
 						onFocusOutside={ closeIfFocusOutside }

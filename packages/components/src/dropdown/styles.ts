@@ -40,13 +40,9 @@ export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps
 export const DropdownPointerEventsCapture = styled.div`
 	// TODO: understand if there's a better way to cover the whole viewport
 	position: fixed;
-	top: 0;
-	left: 0;
-	width: 300vw;
-	height: 300vh;
-	transform: translate( -50%, -50% );
+	inset: 0;
+	// Hardcoded fallback to (popover-z-index - 1)
+	z-index: 999999;
 	// TODO: remove following background color
-	background-color: rgba( 255, 0, 0, 0.3 );
-	// TODO: justify this number
-	z-index: 1000000;
+	background-color: rgba( 0, 0, 0, 0.4 );
 `;
