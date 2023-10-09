@@ -203,110 +203,28 @@ const stopDriver = async ( driver ) => {
 	}
 };
 
-/*
- * Problems about the 'clear' parameter:
- *
- * On Android: "clear" is defaulted to true because not clearing the text requires Android to use ADB, which
- * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
- * have to append the new text and, in that case, append fewest number of characters possible.
- *
- * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
- */
 const typeString = async ( driver, element, str, clear ) => {
 	if ( isKeycode( str ) ) {
-		return await pressKeycode( driver, getKeycode( str ) );
+		const keyCode = isAndroid() ? getKeycode( str ) : str;
+		return await pressKeycode( driver, keyCode );
 	}
-	if ( isAndroid() ) {
-		await typeStringAndroid( driver, element, str, clear );
-	} else {
-		await typeStringIos( driver, element, str, clear );
-	}
-};
 
-const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		// await element.clear(); This was not working correctly on iOS so need a custom implementation
-		await clearTextBox( driver, element );
+		await element.clearValue();
 	}
-	await element.type( str );
 
-	// Wait for the list auto-scroll animation to finish
-	await driver.sleep( 3000 );
-};
+	await element.addValue( str );
 
-const clearTextBox = async ( driver, element ) => {
-	await element.click();
-	let originalText = await element.text();
-	let text = originalText;
-	// We are double tapping on the text field and pressing backspace until all content is removed.
-	do {
-		originalText = await element.text();
-		await doubleTap( driver, element );
-		await element.type( '\b' );
-		text = await element.text();
-		// We compare with the original content and not empty because text always return any hint set on the element.
-	} while ( originalText !== text );
+	if ( ! isAndroid() ) {
+		// Wait for the list auto-scroll animation to finish
+		await driver.pause( 3000 );
+	}
 };
 
 const doubleTap = async ( driver, element ) => {
 	const action = new wd.TouchAction( driver );
 	action.tap( { el: element, count: 2 } );
 	await action.perform();
-};
-
-const typeStringAndroid = async (
-	driver,
-	element,
-	str,
-	clear = true // See comment above for why it is defaulted to true.
-) => {
-	if ( clear ) {
-		/*
-		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
-		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
-		 * long text along these lines:
-		 *         await driver.execute( 'mobile: shell', { command: 'input',
-		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
-		 * but using adb in this way proved to be very flaky (frequently all of the text would not get entered,
-		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
-		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
-		 *
-		 * Note that this approach does not allow appending text to the text in a block on account
-		 * of `type` always clearing the block (on Android).
-		 */
-
-		await driver.execute( 'mobile: shell', {
-			command: 'input',
-			args: [ 'text', '%s' ],
-		} );
-		await element.type( str );
-	} else {
-		// eslint-disable-next-line no-console
-		console.log(
-			'Warning: Using `adb shell input text` on Android which is rather flaky.'
-		);
-
-		const paragraphs = str.split( '\n' );
-		for ( let i = 0; i < paragraphs.length; i++ ) {
-			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-			if ( isKeycode( paragraph ) ) {
-				return await pressKeycode( driver, getKeycode( paragraph ) );
-			}
-			// Empty values passed in the `args` list of `execute` function are removed.
-			// In order to avoid an exception in `text` command due to passing fewer arguments, we don't
-			// execute the command with empty strings.
-			else if ( paragraph !== '' ) {
-				// Execute with adb shell input <text> since normal type auto clears field on Android
-				await driver.execute( 'mobile: shell', {
-					command: 'input',
-					args: [ 'text', paragraph ],
-				} );
-			}
-			if ( i !== paragraphs.length - 1 ) {
-				await pressKeycode( driver, getKeycode( '\n' ) );
-			}
-		}
-	}
 };
 
 /**
