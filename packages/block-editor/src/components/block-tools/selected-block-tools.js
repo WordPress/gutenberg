@@ -93,9 +93,13 @@ function UnforwardSelectedBlockTools(
 	const KeyboardInstructions = () => {
 		return (
 			<VisuallyHidden id={ descriptionId }>
-				{ __(
-					'Press Tab or Shift+Tab to navigate to other toolbars, and press Escape to return focus to the editor.'
-				) }
+				{ isFixed
+					? __(
+							'Press Tab or Shift+Tab to navigate to other toolbars, and press Escape to return focus to the editor.'
+					  )
+					: __(
+							'Use the Top Toolbar mode in the Options menu of the header to have document and block tools unified in a single menubar.'
+					  ) }
 			</VisuallyHidden>
 		);
 	};
