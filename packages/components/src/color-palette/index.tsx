@@ -307,7 +307,7 @@ function UnforwardedColorPalette(
 								<Truncate className="components-color-palette__custom-color-name">
 									{ value
 										? buttonLabelName
-										: 'No color selected' }
+										: __( 'No color selected' ) }
 								</Truncate>
 								{ /*
 								This `Truncate` is always rendered, even if
