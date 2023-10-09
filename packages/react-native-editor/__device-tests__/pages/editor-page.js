@@ -199,8 +199,7 @@ class EditorPage {
 			}
 		}
 
-		const elements =
-			await this.driver.elementsByAccessibilityId( titleElement );
+		const elements = await this.driver.$$( `~${ titleElement }` );
 
 		if (
 			elements.length === 0 ||
