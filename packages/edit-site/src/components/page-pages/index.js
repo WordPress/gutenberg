@@ -144,7 +144,7 @@ export default function PagePages() {
 				enableHiding: false,
 			},
 		],
-		[ postStatuses, setView ]
+		[ postStatuses ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
