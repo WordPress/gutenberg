@@ -266,9 +266,13 @@ const queries = ( state = {}, action ) => {
 							Object.entries( contextQueries ).map(
 								( [ query, queryItems ] ) => [
 									query,
-									queryItems.filter(
-										( queryId ) => ! removedItems[ queryId ]
-									),
+									{
+										...queryItems,
+										itemIds: queryItems.itemIds.filter(
+											( queryId ) =>
+												! removedItems[ queryId ]
+										),
+									},
 								]
 							)
 						),

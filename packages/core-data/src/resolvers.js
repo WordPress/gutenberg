@@ -242,7 +242,6 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
-				meta = {};
 			}
 
 			// If we request fields but the result doesn't contain the fields,
