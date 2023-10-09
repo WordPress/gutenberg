@@ -101,9 +101,9 @@ There are also cases in which a response represents a collection shaped as an ob
 }
 ```
 
-### Interacting with the entity
+### Interacting with entity records
 
-What follows is the list of properties that enable consumers to work with entities by leveraging the existing utilities.
+Entity records are unique. For entities that are collections, it's assumed that each record has an `id` property which serves as an identifier to manage it. If the entity defines a `key`, that property would be used as its identifier instead of the assumed `id`.
 
 #### name
 
@@ -119,16 +119,41 @@ The name of the entity. To be used in the utilities that interact with it (selec
 
 Entities can be grouped by `kind`. To be used in the utilities that interact with them (selectors, actions, hooks).
 
-The package provides general methods to interact with the entities (`getEntityRecords`, `getEntityRecord`, etc.) and it also dynamically creates nicer-looking alternatives for the selectors of the `root` kind, by leveraging the `name` property.
+The package provides general methods to interact with the entities (`getEntityRecords`, `getEntityRecord`, etc.) by leveraging the `kind` and `name` properties:
 
 ```js
 // Get the record collection for the user entity.
 wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
-wp.data.select( 'core' ).getUsers();
 
 // Get a single record for the user entity.
 wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+```
+
+#### plural
+
+- Type: `string`.
+- Example: `postStatuses`.
+
+In addition to the general utilites (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as it follows:
+
+```js
+// Collection
+wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getUsers();
+
+// Single record
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
 wp.data.select( 'core' ).getUser( recordId );
+```
+
+Sometimes, the pluralized form of an entity is not regular (it is not formed by adding a `-s` suffix). The `plural` property of the entity config allows to declare an alternative pluralized form for the dynamic methods created for the entity. For example, given the `status` entity that declares the `postStatuses` plural, there are the following methods created for it:
+
+```js
+// Collection
+wp.data.select( 'core' ).getPostStatuses();
+
+// Single record
+wp.data.select( 'core' ).getStatus( recordId );
 ```
 
 ## Actions
