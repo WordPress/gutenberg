@@ -48,52 +48,34 @@ export async function setClipboardData(
 		'rich-text': '',
 	};
 
-	const activeElement = await this.page.evaluateHandle( () =>
-		document.activeElement instanceof HTMLIFrameElement
-			? document.activeElement.contentDocument!.activeElement
-			: document.activeElement
-	);
-	const frame = await activeElement.asElement()!.ownerFrame();
-	const rangeHandle = await frame!.evaluateHandle( () => {
-		const selection = document.getSelection()!;
-		if ( ! selection.rangeCount ) {
-			return null;
-		}
-		return selection.getRangeAt( 0 );
-	} );
-	const inputHandle = await this.page.evaluateHandle( ( data ) => {
-		const dummyInput = document.createElement( 'input' );
-		dummyInput.style.position = 'absolute';
-		dummyInput.style.top = '-9999px';
-		dummyInput.style.left = '-9999px';
-		dummyInput.ariaHidden = 'true';
-		dummyInput.addEventListener( 'copy', ( event ) => {
-			event.preventDefault();
-			Object.entries( data ).forEach( ( [ type, text ] ) => {
-				if ( text ) {
-					event.clipboardData?.setData( type, text );
-				}
-			} );
-		} );
-		document.body.appendChild( dummyInput );
-		return dummyInput;
+	// Set the clipboard data for the keyboard press below.
+	// This is needed for the `paste` event to be fired in case of a real key press.
+	await this.page.evaluate( ( data ) => {
+		const activeElement =
+			document.activeElement instanceof HTMLIFrameElement
+				? document.activeElement.contentDocument!.activeElement
+				: document.activeElement;
+		activeElement?.addEventListener(
+			'copy',
+			( event ) => {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				Object.entries( data ).forEach( ( [ type, text ] ) => {
+					if ( text ) {
+						( event as ClipboardEvent ).clipboardData?.setData(
+							type,
+							text
+						);
+					}
+				} );
+			},
+			{ once: true, capture: true }
+		);
 	}, clipboardDataHolder );
-	await inputHandle.focus();
+
 	await this.page.keyboard.press(
 		isAppleOS() ? 'Meta+KeyC' : 'Control+KeyC'
 	);
-	await frame!.evaluate( ( range ) => {
-		const selection = document.getSelection()!;
-		if ( range ) {
-			selection.removeAllRanges();
-			selection.addRange( range );
-		}
-	}, rangeHandle );
-	await activeElement.asElement()?.focus();
-	await activeElement.dispose();
-	await inputHandle.evaluate( ( input ) => input.remove() );
-	await inputHandle.dispose();
-	await rangeHandle.dispose();
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
@@ -223,19 +205,36 @@ export async function pressKeys(
 	} else if ( key.toLowerCase() === 'primary+v' ) {
 		command = async () => {
 			/**
-			 * Do both the emulation and the actual key press for pasting.
-			 * If the element has a `paste` event handler that calls `event.preventDefault()`,
-			 * the `primary+v` key press will not work and be ignored.
-			 * On the other hand, if the element doesn't have a `paste` event handler,
-			 * then the clipboard emulation will not work and be ignored.
-			 * This doesn't work in *all* cases, but it works in most cases we support.
-			 * (The order matters here for unknown reasons.)
+			 * `emulateClipboard()` will not work if the element doesn't have a
+			 * `paste` event handler. In that case, we need to do a real key press.
+			 * We listen for the bubbled `paste` event on the active document to
+			 * determine if the element has a `paste` event handler. This won't work
+			 * if the event handler calls `event.stopPropagation()`, but it's good
+			 * enough for our use cases for now.
 			 */
-			if ( isAppleOS() ) {
+			const handledPromise = this.page.evaluate( () => {
+				const activeElement =
+					document.activeElement instanceof HTMLIFrameElement
+						? document.activeElement.contentDocument!.activeElement
+						: document.activeElement;
+				return new Promise( ( resolve ) => {
+					const animationFrame = requestAnimationFrame( () => {
+						resolve( false );
+					} );
+					activeElement?.ownerDocument.addEventListener(
+						'paste',
+						( event ) => {
+							cancelAnimationFrame( animationFrame );
+							resolve( !! event.defaultPrevented );
+						},
+						{ once: true }
+					);
+				} );
+			} );
+			await emulateClipboard( this.page, 'paste' );
+			const handled = await handledPromise;
+			if ( ! handled ) {
 				await this.page.keyboard.press( normalizedKeys );
-			}
-			if ( this.browser.browserType().name() === 'chromium' ) {
-				await emulateClipboard( this.page, 'paste' );
 			}
 		};
 	}
