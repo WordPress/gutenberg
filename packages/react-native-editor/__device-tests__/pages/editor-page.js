@@ -428,6 +428,8 @@ class EditorPage {
 				swipeRight: true,
 			} );
 			await addButton[ 0 ].click();
+			// Wait for Bottom sheet animation to finish
+			await this.driver.pause( 3000 );
 		}
 
 		// Click on block of choice.
