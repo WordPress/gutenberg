@@ -138,7 +138,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
-		shiftPadding = {},
+
 		// Deprecated props
 		__unstableForcePosition,
 		anchorRef,
@@ -213,15 +213,6 @@ const UnforwardedPopover = (
 		? positionToPlacement( position )
 		: placementProp;
 
-	// 1px padding necessary to avoid flickering at the edge of the viewport.
-	const shiftPaddingProp = {
-		top: 1,
-		bottom: 1,
-		left: 1,
-		right: 1,
-		...shiftPadding,
-	};
-
 	const middleware = [
 		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
 		offsetMiddleware( offsetProp ),
@@ -246,7 +237,7 @@ const UnforwardedPopover = (
 			shiftMiddleware( {
 				crossAxis: true,
 				limiter: limitShift(),
-				padding: shiftPaddingProp,
+				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			} ),
 		arrow( { element: arrowRef } ),
 	];

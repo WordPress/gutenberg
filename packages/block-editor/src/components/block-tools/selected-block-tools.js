@@ -26,7 +26,7 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function UnforwardSelectedBlockTools(
-	{ clientId, showEmptyBlockSideInserter, shiftPadding = {} },
+	{ clientId, showEmptyBlockSideInserter },
 	ref
 ) {
 	const {
@@ -130,7 +130,6 @@ function UnforwardSelectedBlockTools(
 									isInsertionPointVisible,
 							}
 						) }
-						shiftPadding={ shiftPadding }
 						{ ...popoverProps }
 					>
 						<BlockSelectionButton
@@ -160,7 +159,6 @@ function UnforwardSelectedBlockTools(
 								isInsertionPointVisible,
 						}
 					) }
-					shiftPadding={ shiftPadding }
 					{ ...popoverProps }
 				>
 					{ shouldShowContextualToolbar && (
