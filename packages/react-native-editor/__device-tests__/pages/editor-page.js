@@ -354,8 +354,8 @@ class EditorPage {
 
 		while ( locatorAttempts < maxLocatorAttempts ) {
 			element = byId
-				? await this.driver.elementsByAccessibilityId( elementSelector )
-				: await this.driver.elementsByXPath( elementSelector );
+				? await this.driver.$$( `~${ elementSelector }` )
+				: await this.driver.$$( elementSelector );
 			if ( await element[ 0 ]?.isDisplayed() ) {
 				break;
 			}
