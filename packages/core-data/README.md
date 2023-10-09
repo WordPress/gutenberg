@@ -132,7 +132,7 @@ wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
 #### plural
 
 -   Type: `string`.
--   Example: `postStatuses`.
+-   Example: `statuses`.
 
 In addition to the general utilites (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as it follows:
 
@@ -146,11 +146,11 @@ wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
 wp.data.select( 'core' ).getUser( recordId );
 ```
 
-Sometimes, the pluralized form of an entity is not regular (it is not formed by adding a `-s` suffix). The `plural` property of the entity config allows to declare an alternative pluralized form for the dynamic methods created for the entity. For example, given the `status` entity that declares the `postStatuses` plural, there are the following methods created for it:
+Sometimes, the pluralized form of an entity is not regular (it is not formed by adding a `-s` suffix). The `plural` property of the entity config allows to declare an alternative pluralized form for the dynamic methods created for the entity. For example, given the `status` entity that declares the `statuses` plural, there are the following methods created for it:
 
 ```js
 // Collection
-wp.data.select( 'core' ).getPostStatuses();
+wp.data.select( 'core' ).getStatuses();
 
 // Single record
 wp.data.select( 'core' ).getStatus( recordId );
