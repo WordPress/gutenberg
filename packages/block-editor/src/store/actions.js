@@ -1014,17 +1014,12 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
-		if (
-			! blockAType.merge &&
-			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
-		) {
-			dispatch.selectBlock( blockA.clientId );
-			return;
-		}
-
 		const blockB = select.getBlock( clientIdB );
 
-		if ( ! blockAType.merge ) {
+		if (
+			! blockAType.merge &&
+			getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
