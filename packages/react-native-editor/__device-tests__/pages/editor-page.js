@@ -712,10 +712,9 @@ class EditorPage {
 		const autocompleterElementId = isAndroid()
 			? 'Slash inserter results'
 			: 'autocompleter';
-		const autocompleterElement =
-			await this.driver.elementsByAccessibilityId(
-				autocompleterElementId
-			);
+		const autocompleterElement = await this.driver.$$(
+			`~${ autocompleterElementId }`
+		);
 
 		if ( autocompleterElement?.[ 0 ] ) {
 			isPresent = await autocompleterElement[ 0 ].isDisplayed();
