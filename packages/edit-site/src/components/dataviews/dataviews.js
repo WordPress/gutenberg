@@ -84,7 +84,6 @@ export default function DataViews( {
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		meta: { resetQuery: () => onChangeView( { ...view } ) },
 		pageCount,
 	} );
 	return (
