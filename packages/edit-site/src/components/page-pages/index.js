@@ -19,19 +19,23 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import Page from '../page';
 import Link from '../routes/link';
 import PageActions from '../page-actions';
-import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
+import { DataViews } from '../dataviews';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
 export default function PagePages() {
-	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
-	const [ globalFilter, setGlobalFilter ] = useState( '' );
-	const [ paginationInfo, setPaginationInfo ] = useState();
-	const [ { pageIndex, pageSize }, setPagination ] = useState( {
-		pageIndex: 0,
-		pageSize: PAGE_SIZE_VALUES[ 0 ],
+	const [ view, setView ] = useState( {
+		type: 'list',
+		search: '',
+		page: 0,
+		perPage: 5,
+		sort: {
+			field: 'date',
+			direction: 'desc',
+		},
 	} );
+	const [ paginationInfo, setPaginationInfo ] = useState();
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
 	const postStatuses =
@@ -42,32 +46,17 @@ export default function PagePages() {
 					return acc;
 			  }, EMPTY_OBJECT );
 
-	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
-	const pagination = useMemo(
-		() => ( { pageIndex, pageSize } ),
-		[ pageIndex, pageSize ]
-	);
-	const [ sorting, setSorting ] = useState( [
-		{ order: 'desc', orderby: 'date' },
-	] );
 	const queryArgs = useMemo(
 		() => ( {
-			per_page: pageSize,
-			page: pageIndex + 1, // tanstack starts from zero.
+			per_page: view.perPage,
+			page: view.page + 1, // tanstack starts from zero.
 			_embed: 'author',
-			order: sorting[ 0 ]?.desc ? 'desc' : 'asc',
-			orderby: sorting[ 0 ]?.id,
-			search: globalFilter,
+			order: view.sort.direction,
+			orderby: view.sort.field,
+			search: view.search,
 			status: [ 'publish', 'draft' ],
 		} ),
-		[
-			globalFilter,
-			sorting[ 0 ]?.id,
-			sorting[ 0 ]?.desc,
-			pageSize,
-			pageIndex,
-			reset,
-		]
+		[ view ]
 	);
 	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
 		'postType',
@@ -84,6 +73,9 @@ export default function PagePages() {
 			method: 'HEAD',
 			parse: false,
 		} ).then( ( res ) => {
+			// TODO: store this in core-data reducer and
+			// make sure it's returned as part of useEntityRecords
+			// (to avoid double requests).
 			const totalPages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
 			const totalItems = parseInt( res.headers.get( 'X-WP-Total' ) );
 			setPaginationInfo( {
@@ -92,7 +84,7 @@ export default function PagePages() {
 			} );
 		} );
 		// Status should not make extra request if already did..
-	}, [ globalFilter, pageSize, reset ] );
+	}, [ queryArgs ] );
 
 	const fields = useMemo(
 		() => [
@@ -147,12 +139,7 @@ export default function PagePages() {
 				id: 'actions',
 				cell: ( props ) => {
 					const page = props.row.original;
-					return (
-						<PageActions
-							postId={ page.id }
-							onRemove={ () => setResetQuery() }
-						/>
-					);
+					return <PageActions postId={ page.id } />;
 				},
 				enableHiding: false,
 			},
@@ -168,25 +155,10 @@ export default function PagePages() {
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
 				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
 				options={ {
-					manualSorting: true,
-					manualFiltering: true,
-					manualPagination: true,
-					enableRowSelection: true,
-					state: {
-						sorting,
-						globalFilter,
-						pagination,
-					},
 					pageCount: paginationInfo?.totalPages,
-					onSortingChange: setSorting,
-					onGlobalFilterChange: ( value ) => {
-						setGlobalFilter( value );
-						setPagination( { pageIndex: 0, pageSize } );
-					},
-					// TODO: check these callbacks and maybe reset the query when needed...
-					onPaginationChange: setPagination,
-					meta: { resetQuery: setResetQuery },
 				} }
 			/>
 		</Page>

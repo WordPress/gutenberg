@@ -28,18 +28,81 @@ import TextFilter from './text-filter';
 export default function DataViews( {
 	data,
 	fields,
+	view,
+	onChangeView,
 	isLoading,
 	paginationInfo,
-	options,
+	options: { pageCount },
 } ) {
 	const dataView = useReactTable( {
 		data,
 		columns: fields,
-		...options,
+		manualSorting: true,
+		manualFiltering: true,
+		manualPagination: true,
+		enableRowSelection: true,
+		state: {
+			sorting: view.sort
+				? [
+						{
+							id: view.sort.field,
+							desc: view.sort.direction === 'desc',
+						},
+				  ]
+				: [],
+			globalFilter: view.search,
+			pagination: {
+				pageIndex: view.page,
+				pageSize: view.perPage,
+			},
+		},
+		onSortingChange: ( sortingUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const sort =
+					typeof sortingUpdater === 'function'
+						? sortingUpdater(
+								currentView.sort
+									? [
+											{
+												id: currentView.sort.field,
+												desc:
+													currentView.sort
+														.direction === 'desc',
+											},
+									  ]
+									: []
+						  )
+						: sortingUpdater;
+				if ( ! sort.length ) {
+					return {
+						...currentView,
+						sort: {},
+					};
+				}
+				const [ { id, desc } ] = sort;
+				return {
+					...currentView,
+					sort: { field: id, direction: desc ? 'desc' : 'asc' },
+				};
+			} );
+		},
+		onGlobalFilterChange: ( value ) => {
+			onChangeView( { ...view, search: value, page: 0 } );
+		},
+		onPaginationChange: ( paginationUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const { pageIndex, pageSize } = paginationUpdater( {
+					pageIndex: currentView.page,
+					pageSize: currentView.perPage,
+				} );
+				return { ...view, page: pageIndex, perPage: pageSize };
+			} );
+		},
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
+		pageCount,
 	} );
 	return (
 		<div className="dataviews-wrapper">
