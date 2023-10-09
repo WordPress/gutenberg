@@ -175,6 +175,7 @@ const UnconnectedDropdown = (
 				   */
 				  createPortal(
 						<DropdownPointerEventsCapture
+							aria-hidden="true"
 							onClick={ () => setShowBackdrop( false ) }
 							style={ computedBackdropZIndexStyles }
 						/>,
