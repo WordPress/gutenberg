@@ -3,7 +3,7 @@
  */
 const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
-import { remote } from 'webdriverio';
+import { remote, Key } from 'webdriverio';
 // TODO: Replace usage of wd in favor of WebdriverIO
 const wd = null;
 const path = require( 'path' );
@@ -241,11 +241,11 @@ const getKeycode = ( str ) => {
 			[ backspace ]: 67,
 		}[ str ];
 	}
-	// On iOS, we map keycodes using the special keys defined in WebDriver.
-	// Reference: https://github.com/admc/wd/blob/master/lib/special-keys.js
+	// On iOS, we map keycodes using the special keys defined in WebdriverIO.
+	// Reference: https://webdriver.io/docs/api/browser/action/#special-characters
 	return {
-		'\n': wd.SPECIAL_KEYS.Enter,
-		[ backspace ]: wd.SPECIAL_KEYS[ 'Back space' ],
+		'\n': Key.Enter,
+		[ backspace ]: Key.Backspace,
 	}[ str ];
 };
 
@@ -266,12 +266,12 @@ const isKeycode = ( str ) => {
  */
 const pressKeycode = async ( driver, keycode ) => {
 	if ( isAndroid() ) {
-		// `pressKeycode` command is only implemented on Android
-		return await driver.pressKeycode( keycode );
+		// `pressKeyCode` command is only implemented on Android
+		return await driver.pressKeyCode( keycode );
 	}
-	// `keys` command only works on iOS. On Android, executing this
+	// `sendKeys` command only works on iOS. On Android, executing this
 	// results in typing a special character instead.
-	return await driver.keys( [ keycode ] );
+	return await driver.sendKeys( [ keycode ] );
 };
 
 // Calculates middle x,y and clicks that position
