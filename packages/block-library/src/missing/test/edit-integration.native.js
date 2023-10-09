@@ -62,9 +62,7 @@ describe( 'Unsupported block', () => {
 				initialHtml: TABLE_BLOCK_HTML,
 			} );
 
-			const [ missingBlock ] = await screen.findAllByLabelText(
-				/Unsupported Block\. Row 1/
-			);
+			const missingBlock = getBlock( screen, 'Unsupported' );
 
 			const translatedTableTitle =
 				within( missingBlock ).getByText( 'Tabla' );
@@ -77,9 +75,7 @@ describe( 'Unsupported block', () => {
 				initialHtml: TABLE_BLOCK_HTML,
 			} );
 
-			const [ missingBlock ] = await screen.findAllByLabelText(
-				/Unsupported Block\. Row 1/
-			);
+			const missingBlock = getBlock( screen, 'Unsupported' );
 
 			fireEvent.press( missingBlock );
 
