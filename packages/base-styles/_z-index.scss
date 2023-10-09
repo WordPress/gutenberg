@@ -106,8 +106,9 @@ $z-layers: (
 	// Show interface skeleton footer above interface skeleton drawer
 	".interface-interface-skeleton__footer": 90,
 
-	// Below the header background so it can be hidden behind the header.
+	// Above the block list and the header.
 	".block-editor-block-popover": 31,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
