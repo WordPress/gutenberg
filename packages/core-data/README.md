@@ -48,21 +48,21 @@ As of right now, the default entities defined by this package map to the [REST A
 
 What follows is a description of some of the properties of `rootEntitiesConfig`.
 
-## baseURL
+### baseURL
 
 -   Type: string.
 -   Example: `'/wp/v2/users'`.
 
 This property maps the entity to a given endpoint, taking its relative URL as value.
 
-## baseURLParams
+### baseURLParams
 
 -   Type: `object`.
 -   Example: `{ context: 'edit' }`.
 
 Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
 
-## key
+### key
 
 -   Type: `string`.
 -   Example: `'slug'`.
