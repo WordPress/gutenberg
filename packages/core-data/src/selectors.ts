@@ -14,7 +14,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems } from './queried-data';
+import {
+	getQueriedItems,
+	getQueriedTotalItems,
+	getQueriedTotalPages,
+} from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
@@ -522,6 +526,38 @@ export const getEntityRecords = ( <
 	}
 	return getQueriedItems( queriedState, query );
 } ) as GetEntityRecords;
+
+export const getEntityRecordsTotalItems = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	return getQueriedTotalItems( queriedState, query );
+};
+
+export const getEntityRecordsTotalPages = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	return getQueriedTotalPages( queriedState, query );
+};
 
 type DirtyEntityRecord = {
 	title: string;

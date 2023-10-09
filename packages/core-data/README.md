@@ -160,6 +160,7 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
@@ -534,6 +535,14 @@ _Parameters_
 _Returns_
 
 -   `EntityRecord[] | null`: Records.
+
+### getEntityRecordsTotalItems
+
+Undocumented declaration.
+
+### getEntityRecordsTotalPages
+
+Undocumented declaration.
 
 ### getLastEntityDeleteError
 
