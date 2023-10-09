@@ -184,11 +184,13 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 					) }
 				</div>
 			</NavigableToolbar>
-			<Slot
-				className="selected-block-tools-wrapper"
-				name="__experimentalSelectedBlockTools"
-				bubblesVirtually
-			/>
+			{ hasFixedToolbar && (
+				<Slot
+					className="selected-block-tools-wrapper"
+					name="__experimentalSelectedBlockTools"
+					bubblesVirtually
+				/>
+			) }
 		</>
 	);
 }

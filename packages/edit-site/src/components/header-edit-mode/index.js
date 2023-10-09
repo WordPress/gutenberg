@@ -327,17 +327,20 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 							) }
 						</div>
 					</NavigableToolbar>
-					<Slot
-						className={ classnames(
-							'selected-block-tools-wrapper',
-							{
-								'is-collapsed':
-									isBlockToolsCollapsed && isLargeViewport,
-							}
-						) }
-						name="__experimentalSelectedBlockTools"
-						bubblesVirtually
-					/>
+					{ hasFixedToolbar && (
+						<Slot
+							className={ classnames(
+								'selected-block-tools-wrapper',
+								{
+									'is-collapsed':
+										isBlockToolsCollapsed &&
+										isLargeViewport,
+								}
+							) }
+							name="__experimentalSelectedBlockTools"
+							bubblesVirtually
+						/>
+					) }
 					{ hasFixedToolbar &&
 						isLargeViewport &&
 						hasBlockSelected && (

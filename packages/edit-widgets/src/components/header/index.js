@@ -42,9 +42,9 @@ function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
-	const { isFixedToolbarActive } = useSelect(
+	const { hasFixedToolbar } = useSelect(
 		( select ) => ( {
-			isFixedToolbarActive: !! select( preferencesStore ).get(
+			hasFixedToolbar: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'fixedToolbar'
 			),
@@ -108,11 +108,7 @@ function Header( { setListViewToggleElement } ) {
 
 	return (
 		<>
-			<div
-				className={ classnames( 'edit-widgets-header', {
-					'has-fixed-toolbar': isFixedToolbarActive,
-				} ) }
-			>
+			<div className={ classnames( 'edit-widgets-header' ) }>
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
 					{ isMediumViewport && (
 						<h1 className="edit-widgets-header__title">
@@ -173,11 +169,13 @@ function Header( { setListViewToggleElement } ) {
 								</>
 							) }
 						</NavigableToolbar>
-						<Slot
-							className="selected-block-tools-wrapper"
-							name="__experimentalSelectedBlockTools"
-							bubblesVirtually
-						/>
+						{ hasFixedToolbar && (
+							<Slot
+								className="selected-block-tools-wrapper"
+								name="__experimentalSelectedBlockTools"
+								bubblesVirtually
+							/>
+						) }
 					</div>
 				</div>
 				<div className="edit-widgets-header__actions">

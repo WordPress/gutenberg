@@ -31,6 +31,7 @@ function selector( select ) {
 		getBlock,
 		__unstableGetEditorMode,
 		isTyping,
+		getSettings,
 	} = select( blockEditorStore );
 
 	const clientId =
@@ -43,6 +44,7 @@ function selector( select ) {
 		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
 		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		hasFixedToolbar: getSettings().hasFixedToolbar,
 		showEmptyBlockSideInserter:
 			clientId &&
 			! isTyping() &&
@@ -70,6 +72,7 @@ export default function BlockTools( {
 		hasSelectedBlock,
 		isTyping,
 		isZoomOutMode,
+		hasFixedToolbar,
 		showEmptyBlockSideInserter,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
@@ -185,7 +188,7 @@ export default function BlockTools( {
 				) }
 
 				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-				{ blockToolsSlot?.ref?.current ? (
+				{ hasFixedToolbar && blockToolsSlot?.ref?.current ? (
 					<Fill name="__experimentalSelectedBlockTools">
 						{ hasSelectedBlock && (
 							<SelectedBlockTools
