@@ -38,7 +38,7 @@ test.describe( 'Links', () => {
 		} );
 		await page.keyboard.type( 'Here comes a link: ' );
 
-		// Insert a link deliberating not selecting any text.
+		// Insert a link deliberately not selecting any text.
 		await editor.clickBlockToolbarButton( 'Link' );
 
 		// Trigger the autocomplete suggestion list and select the first suggestion.
@@ -333,7 +333,7 @@ test.describe( 'Links', () => {
 		pageUtils,
 	} ) => {
 		await LinkUtils.createAndReselectLink();
-		// Make a collapsed selection inside the link
+		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
 
@@ -1038,7 +1038,7 @@ test.describe( 'Links', () => {
 				`This is ${ linkedText }${ textBeyondLinkedText }`
 			);
 
-			// Move cursor next to end of `linkedText`
+			// Move cursor next to end of `linkedText`.
 			await pageUtils.pressKeys( 'ArrowLeft', {
 				times: textBeyondLinkedText.length,
 			} );
