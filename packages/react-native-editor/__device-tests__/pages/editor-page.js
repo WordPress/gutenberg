@@ -115,7 +115,7 @@ class EditorPage {
 
 		await waitForVisible( this.driver, blockLocator );
 
-		const elements = await this.driver.elementsByXPath( blockLocator );
+		const elements = await this.driver.$$( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
 			const firstBlockVisible = await this.getFirstBlockVisible();
