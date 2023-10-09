@@ -134,7 +134,7 @@ wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
 -   Type: `string`.
 -   Example: `statuses`.
 
-In addition to the general utilites (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as it follows:
+In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as follows:
 
 ```js
 // Collection
