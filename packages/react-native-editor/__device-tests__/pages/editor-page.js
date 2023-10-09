@@ -259,7 +259,7 @@ class EditorPage {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
+		const text = await htmlContentView.getText();
 
 		await toggleHtmlMode( this.driver, false );
 		return text;
