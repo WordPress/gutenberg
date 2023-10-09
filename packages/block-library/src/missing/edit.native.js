@@ -129,10 +129,6 @@ export class UnsupportedBlockEdit extends Component {
 			__( 'We are working hard to add more blocks with each release.' ),
 			blockName
 		);
-		const actionButtonLabel = applyFilters(
-			'native.missing_block_action_button',
-			__( 'Edit using web editor' )
-		);
 
 		return (
 			<UnsupportedBlockDetails
@@ -142,7 +138,6 @@ export class UnsupportedBlockEdit extends Component {
 				customBlockTitle={ blockTitle }
 				title={ title }
 				description={ description }
-				actionButtonLabel={ actionButtonLabel }
 			/>
 		);
 	}
