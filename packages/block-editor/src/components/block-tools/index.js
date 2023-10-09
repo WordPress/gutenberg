@@ -194,6 +194,7 @@ export default function BlockTools( {
 							<SelectedBlockTools
 								ref={ selectedBlockToolsRef }
 								clientId={ clientId }
+								hasFixedToolbar={ hasFixedToolbar }
 								showEmptyBlockSideInserter={
 									showEmptyBlockSideInserter
 								}
@@ -214,6 +215,7 @@ export default function BlockTools( {
 								showEmptyBlockSideInserter={
 									showEmptyBlockSideInserter
 								}
+								hasFixedToolbar={ hasFixedToolbar }
 							/>
 						) }
 						{ /* Used for the inline rich text toolbar. */ }

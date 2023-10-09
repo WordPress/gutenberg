@@ -26,7 +26,7 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function UnforwardSelectedBlockTools(
-	{ clientId, showEmptyBlockSideInserter },
+	{ clientId, hasFixedToolbar, showEmptyBlockSideInserter },
 	ref
 ) {
 	const {
@@ -36,14 +36,13 @@ function UnforwardSelectedBlockTools(
 		rootClientId,
 	} = useSelectedBlockToolProps( clientId );
 
-	const { isFixed, shouldShowBreadcrumb } = useSelect( ( select ) => {
-		const { getSettings, hasMultiSelection, __unstableGetEditorMode } =
+	const { shouldShowBreadcrumb } = useSelect( ( select ) => {
+		const { hasMultiSelection, __unstableGetEditorMode } =
 			select( blockEditorStore );
 
 		const editorMode = __unstableGetEditorMode();
 
 		return {
-			isFixed: getSettings().hasFixedToolbar,
 			shouldShowBreadcrumb:
 				! hasMultiSelection() &&
 				( editorMode === 'navigation' || editorMode === 'zoom-out' ),
@@ -93,7 +92,7 @@ function UnforwardSelectedBlockTools(
 	const KeyboardInstructions = () => {
 		return (
 			<VisuallyHidden id={ descriptionId }>
-				{ isFixed
+				{ hasFixedToolbar
 					? __(
 							'Press Tab or Shift+Tab to navigate to other toolbars, and press Escape to return focus to the editor.'
 					  )
@@ -104,7 +103,7 @@ function UnforwardSelectedBlockTools(
 		);
 	};
 
-	if ( isFixed || ! isLargeViewport ) {
+	if ( hasFixedToolbar || ! isLargeViewport ) {
 		return (
 			<>
 				<KeyboardInstructions />
