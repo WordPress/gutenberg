@@ -469,12 +469,12 @@ class EditorPage {
 			const x = size.width / 2;
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
-				! ( await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabel
-				) ) &&
-				! ( await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-				) )
+				! ( await this.driver
+					.$( `~${ blockAccessibilityLabel }` )
+					.isDisplayed() ) &&
+				! ( await this.driver
+					.$( `~${ blockAccessibilityLabelNewBlock }` )
+					.isDisplayed() )
 			) {
 				swipeFromTo(
 					this.driver,
@@ -484,29 +484,23 @@ class EditorPage {
 			}
 
 			if (
-				await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-				)
+				await this.driver
+					.$( `~${ blockAccessibilityLabelNewBlock }` )
+					.isDisplayed()
 			) {
-				return await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
+				return await this.driver.$(
+					`~${ blockAccessibilityLabelNewBlock }`
 				);
 			}
 
-			return await this.driver.elementByAccessibilityId(
-				blockAccessibilityLabel
-			);
+			return await this.driver.$( `~${ blockAccessibilityLabel }` );
 		}
 
-		const blockButton = ( await this.driver.hasElementByAccessibilityId(
-			blockAccessibilityLabelNewBlock
-		) )
-			? await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-			  )
-			: await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabel
-			  );
+		const blockButton = ( await this.driver
+			.$( `~${ blockAccessibilityLabelNewBlock }` )
+			.isDisplayed() )
+			? await this.driver.$( `~${ blockAccessibilityLabelNewBlock }` )
+			: await this.driver.$( `~${ blockAccessibilityLabel }` );
 
 		const size = await this.driver.getWindowSize();
 		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
@@ -517,15 +511,14 @@ class EditorPage {
 			! ( await blockButton.isDisplayed() ) ||
 			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
 		) {
-			await this.driver.execute( 'mobile: dragFromToForDuration', {
-				fromX: 50,
-				fromY: height,
-				toX: 50,
-				toY: EditorPage.getInserterPageHeight( height ),
-				duration: 0.5,
-			} );
+			await swipeFromTo(
+				this.driver,
+				{ x: 50, y: height },
+				{ x: 50, y: EditorPage.getInserterPageHeight( height ) },
+				3000
+			);
 			// Wait for dragging gesture
-			await this.driver.sleep( 2000 );
+			await this.driver.pause( 2000 );
 		}
 
 		return blockButton;
