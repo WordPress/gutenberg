@@ -299,12 +299,12 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			{ per_page: -1 }
 		);
 
-		const clientIs =
+		const clientIds =
 			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
 				'core/template-part'
 			);
 		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIs );
+			select( blockEditorStore ).getBlocksByClientId( clientIds );
 
 		return getFilteredTemplatePartBlocks( blocks, templateParts );
 	}
