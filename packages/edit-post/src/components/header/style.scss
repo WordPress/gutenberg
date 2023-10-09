@@ -31,35 +31,6 @@
 	}
 }
 
-
-// Hacks to allow the block toolbar popover to slide behind the header
-.edit-post-header__background-style {
-	position: absolute; // Remove it from the flex calculations so space-between works appropriately
-}
-
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// Create a full-width and height background that floats over the whole div
-	.edit-post-header__background-style {
-		top: 0;
-		left: 0;
-		bottom: -1px; // -1px to overlap the header border
-		right: 0;
-		background: $white;
-		border-bottom: $border-width solid $gray-200;
-	}
-
-	// We want everything except the parent of the selected-block-tools-wrapper and the selected-block-tools-wrapper to have a higher z-index than the floating background-style
-	.edit-post-header__toolbar > *:not(.selected-block-tools-wrapper),
-	.edit-post-header > *:not(.edit-post-header__toolbar) {
-		z-index: 4;
-	}
-
-	// The block tools slide behind our floating header background
-	.selected-block-tools-wrapper {
-		z-index: 2;
-	}
-}
-
 .edit-post-header__toolbar {
 	display: flex;
 	// Allow this area to shrink to fit the toolbar buttons.

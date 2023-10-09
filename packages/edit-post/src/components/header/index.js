@@ -51,8 +51,6 @@ function Header( {
 
 	return (
 		<div role="menubar" className="edit-post-header">
-			{ /* Floating header style to be able to hide the block popovers behind the header */ }
-			<div className="edit-post-header__background-style"></div>
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }

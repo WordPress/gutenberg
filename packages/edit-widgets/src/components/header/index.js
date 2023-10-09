@@ -113,8 +113,6 @@ function Header( { setListViewToggleElement } ) {
 					'has-fixed-toolbar': isFixedToolbarActive,
 				} ) }
 			>
-				{ /* Floating header style to be able to hide the block popovers behind the header */ }
-				<div className="edit-widgets-header__background-style"></div>
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
 					{ isMediumViewport && (
 						<h1 className="edit-widgets-header__title">
