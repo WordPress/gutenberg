@@ -116,13 +116,17 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 	},
 	svi: {
 		value: 'svi',
-		label: isWeb ? 'svi' : __( 'Small viewport width or height (svi)' ),
+		label: isWeb
+			? 'svi'
+			: __( 'Viewport smallest size in the inline direction (svi)' ),
 		a11yLabel: __( 'Small viewport width or height (svi)' ),
 		step: 0.1,
 	},
 	svb: {
 		value: 'svb',
-		label: isWeb ? 'svb' : __( 'Small viewport width or height (svb)' ),
+		label: isWeb
+			? 'svb'
+			: __( 'Viewport smallest size in the block direction (svb)' ),
 		a11yLabel: __( 'Small viewport width or height (svb)' ),
 		step: 0.1,
 	},
