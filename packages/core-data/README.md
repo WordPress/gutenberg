@@ -107,15 +107,15 @@ Entity records are unique. For entities that are collections, it's assumed that 
 
 #### name
 
-- Type: `string`.
-- Example: `user`.
+-   Type: `string`.
+-   Example: `user`.
 
 The name of the entity. To be used in the utilities that interact with it (selectors, actions, hooks).
 
 #### kind
 
-- Type: `string`.
-- Example: `root`.
+-   Type: `string`.
+-   Example: `root`.
 
 Entities can be grouped by `kind`. To be used in the utilities that interact with them (selectors, actions, hooks).
 
@@ -131,8 +131,8 @@ wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
 
 #### plural
 
-- Type: `string`.
-- Example: `postStatuses`.
+-   Type: `string`.
+-   Example: `postStatuses`.
 
 In addition to the general utilites (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as it follows:
 
