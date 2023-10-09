@@ -58,13 +58,7 @@ export default function DataViews( {
 		},
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
-				if ( ! sortingUpdater || sortingUpdater.length === 0 ) {
-					return {
-						...currentView,
-						sort: {},
-					};
-				}
-				const [ { id, desc } ] =
+				const sort =
 					typeof sortingUpdater === 'function'
 						? sortingUpdater(
 								currentView.sort
@@ -79,6 +73,13 @@ export default function DataViews( {
 									: []
 						  )
 						: sortingUpdater;
+				if ( ! sort.length ) {
+					return {
+						...currentView,
+						sort: {},
+					};
+				}
+				const [ { id, desc } ] = sort;
 				return {
 					...currentView,
 					sort: { field: id, direction: desc ? 'desc' : 'asc' },
