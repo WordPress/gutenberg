@@ -103,11 +103,12 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+	const { resolvedAssets, isPreviewMode, url } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.__unstableIsPreviewMode,
+			url: settings.__unstablePreviewUrl,
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
@@ -221,11 +222,13 @@ function Iframe( {
 </html>`;
 
 	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
+		const _src =
+			url ??
+			URL.createObjectURL(
+				new window.Blob( [ html ], { type: 'text/html' } )
+			);
+		return [ _src, () => ! html && URL.revokeObjectURL( _src ) ];
+	}, [ html, url ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
 
