@@ -978,11 +978,14 @@ class EditorPage {
 	}
 
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
-		return await this.driver.waitForElementByAccessibilityId(
-			id,
-			wd.asserters.isDisplayed,
-			timeout
-		);
+		const element = await this.driver.$( `~${ id }` );
+
+		if ( element ) {
+			return element;
+		}
+
+		await element.waitForDisplayed( { timeout } );
+		return element;
 	}
 
 	async waitForElementToBeDisplayedByXPath( id, timeout = 2000 ) {
