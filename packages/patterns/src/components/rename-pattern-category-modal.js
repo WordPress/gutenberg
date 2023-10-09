@@ -65,7 +65,7 @@ export default function RenamePatternCategoryModal( { categoryId, onClose } ) {
 	async function onRename( event ) {
 		event.preventDefault();
 
-		if ( ! name || isSaving ) {
+		if ( ! name || name === category.name || isSaving ) {
 			return;
 		}
 		try {
@@ -126,7 +126,9 @@ export default function RenamePatternCategoryModal( { categoryId, onClose } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							aria-disabled={ ! name || isSaving }
+							aria-disabled={
+								! name || name === category.name || isSaving
+							}
 							isBusy={ isSaving }
 						>
 							{ __( 'Save' ) }
