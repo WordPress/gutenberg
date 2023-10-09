@@ -48,21 +48,23 @@ As of right now, the default entities defined by this package map to the [REST A
 
 What follows is a description of some of the properties of `rootEntitiesConfig`.
 
-### baseURL
+### Connecting the entity with the data source
+
+#### baseURL
 
 -   Type: string.
 -   Example: `'/wp/v2/users'`.
 
 This property maps the entity to a given endpoint, taking its relative URL as value.
 
-### baseURLParams
+#### baseURLParams
 
 -   Type: `object`.
 -   Example: `{ context: 'edit' }`.
 
 Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
 
-### key
+#### key
 
 -   Type: `string`.
 -   Example: `'slug'`.
@@ -97,6 +99,36 @@ There are also cases in which a response represents a collection shaped as an ob
 	"draft": { "slug": "draft", "name": "Draft", "...": "..." },
 	"future": { "slug": "future", "name": "Future", "...": "..." }
 }
+```
+
+### Interacting with the entity
+
+What follows is the list of properties that enable consumers to work with entities by leveraging the existing utilities.
+
+#### name
+
+- Type: `string`.
+- Example: `user`.
+
+The name of the entity. To be used in the utilities that interact with it (selectors, actions, hooks).
+
+#### kind
+
+- Type: `string`.
+- Example: `root`.
+
+Entities can be grouped by `kind`. To be used in the utilities that interact with them (selectors, actions, hooks).
+
+The package provides general methods to interact with the entities (`getEntityRecords`, `getEntityRecord`, etc.) and it also dynamically creates nicer-looking alternatives for the selectors of the `root` kind, by leveraging the `name` property.
+
+```js
+// Get the record collection for the user entity.
+wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getUsers();
+
+// Get a single record for the user entity.
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+wp.data.select( 'core' ).getUser( recordId );
 ```
 
 ## Actions
