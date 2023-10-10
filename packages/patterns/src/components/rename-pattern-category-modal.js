@@ -20,7 +20,11 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { CATEGORY_SLUG } from './category-selector';
 
-export default function RenamePatternCategoryModal( { category, onClose } ) {
+export default function RenamePatternCategoryModal( {
+	category,
+	onClose,
+	onSuccess,
+} ) {
 	// If the user created category has been retrieved via
 	// getUserPatternCategories the name value is assigned to the label property
 	// and `name` is overwritten with the slug value to match categories from
@@ -50,13 +54,18 @@ export default function RenamePatternCategoryModal( { category, onClose } ) {
 			// normalized for use alongside template part areas, core pattern
 			// categories etc. As a result we won't just destructure the passed
 			// category object.
-			await saveEntityRecord( 'taxonomy', CATEGORY_SLUG, {
-				id: category.id,
-				slug: category.slug,
-				name,
-			} );
+			const savedRecord = await saveEntityRecord(
+				'taxonomy',
+				CATEGORY_SLUG,
+				{
+					id: category.id,
+					slug: category.slug,
+					name,
+				}
+			);
 
 			invalidateResolution( 'getUserPatternCategories' );
+			onSuccess?.( savedRecord );
 
 			createSuccessNotice( __( 'Pattern category renamed.' ), {
 				type: 'snackbar',
