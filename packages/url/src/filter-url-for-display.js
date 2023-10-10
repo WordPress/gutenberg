@@ -21,12 +21,13 @@ export function filterURLForDisplay( url, maxLength = null ) {
 		filteredURL = filteredURL.replace( '/', '' );
 	}
 
-	const mediaRegexp = /\/([^\/?]+)\.(?:[\w]+)(?=\?|$)/;
+	// capture file name from URL
+	const fileRegexp = /\/([^\/?]+)\.(?:[\w]+)(?=\?|$)/;
 
 	if (
 		! maxLength ||
 		filteredURL.length <= maxLength ||
-		! filteredURL.match( mediaRegexp )
+		! filteredURL.match( fileRegexp )
 	) {
 		return filteredURL;
 	}
