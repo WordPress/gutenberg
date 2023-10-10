@@ -40,7 +40,7 @@ export default function RenamePatternCategoryModal( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	async function onRename( event ) {
+	const onRename = async ( event ) => {
 		event.preventDefault();
 
 		if ( ! name || name === category.name || isSaving ) {
@@ -83,10 +83,10 @@ export default function RenamePatternCategoryModal( {
 			setIsSaving( false );
 			setName( '' );
 		}
-	}
+	};
 
 	const onRequestClose = () => {
-		onClose();
+		onClose?.();
 		setName( '' );
 	};
 
