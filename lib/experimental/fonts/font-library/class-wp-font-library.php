@@ -59,11 +59,11 @@ class WP_Font_Library {
 	}
 
 	/**
-	 * Unregister a previously registered font collection.
+	 * Unregisters a previously registered font collection.
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param string $collection_id Font collection id.
+	 * @param string $collection_id Font collection ID.
 	 * @return bool True if the font collection was unregistered successfully and false otherwise.
 	 */
 	public static function unregister_font_collection( $collection_id ) {
