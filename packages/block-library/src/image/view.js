@@ -161,7 +161,7 @@ store(
 							event.target.parentElement.previousElementSibling
 						);
 					},
-					hideLightbox: async ( { context } ) => {
+					hideLightbox: async ( { context, event } ) => {
 						context.core.image.hideAnimationEnabled = true;
 						if ( context.core.image.lightboxEnabled ) {
 							// We want to wait until the close animation is completed
@@ -178,9 +178,12 @@ store(
 							}, 450 );
 
 							context.core.image.lightboxEnabled = false;
-							context.core.image.lastFocusedElement.focus( {
-								preventScroll: true,
-							} );
+
+							if ( event.pointerType !== 'mouse' ) {
+								context.core.image.lastFocusedElement.focus( {
+									preventScroll: true,
+								} );
+							}
 						}
 					},
 					handleMouseOver( { context } ) {
