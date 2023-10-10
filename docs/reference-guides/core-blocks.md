@@ -282,6 +282,7 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form))
 
 -	**Name:** core/form
+-	**Experimental:** true
 -	**Category:** common
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** action, email, method, submissionMethod
@@ -291,6 +292,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 The basic building block for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input))
 
 -	**Name:** core/form-input
+-	**Experimental:** true
 -	**Category:** common
 -	**Parent:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
@@ -301,6 +303,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 Provide a notification message after the form has been submitted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification))
 
 -	**Name:** core/form-submission-notification
+-	**Experimental:** true
 -	**Category:** common
 -	**Parent:** core/form
 -	**Supports:** 
@@ -311,6 +314,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submit-button))
 
 -	**Name:** core/form-submit-button
+-	**Experimental:** true
 -	**Category:** common
 -	**Parent:** core/form
 -	**Supports:** 
