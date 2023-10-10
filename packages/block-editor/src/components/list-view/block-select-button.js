@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Tooltip,
 } from '@wordpress/components';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useRef, useState } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -31,7 +31,6 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import ListViewBlockRenameUI from './block-rename-ui';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const SINGLE_CLICK = 1;
 
@@ -84,29 +83,12 @@ function ListViewBlockSelectButton(
 		  )
 		: '';
 
-	const { isRenamingBlock } = useSelect(
-		( select ) => {
-			const { isBlockBeingRenamed } = unlock(
-				select( blockEditorStore )
-			);
+	const [ isRenamingBlock, setBlockBeingRenamed ] = useState( false );
 
-			return {
-				isRenamingBlock: isBlockBeingRenamed( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { setBlockBeingRenamed } = unlock( useDispatch( blockEditorStore ) );
-
-	const metaDataSupport = getBlockSupport(
+	const supportsBlockNaming = hasBlockSupport(
 		blockName,
-		'__experimentalMetadata',
-		false
-	);
-
-	const supportsBlockNaming = !! (
-		true === metaDataSupport || metaDataSupport?.name
+		'renaming',
+		true // default value
 	);
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
@@ -241,7 +223,7 @@ function ListViewBlockSelectButton(
 					if ( ! supportsBlockNaming ) {
 						return;
 					}
-					setBlockBeingRenamed( clientId );
+					setBlockBeingRenamed( true );
 				} }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
@@ -317,13 +299,13 @@ function ListViewBlockSelectButton(
 				<ListViewBlockRenameUI
 					ref={ blockNameElementRef }
 					blockTitle={ blockTitle }
-					onCancel={ () => setBlockBeingRenamed( null ) }
+					onCancel={ () => setBlockBeingRenamed( false ) }
 					onSubmit={ ( newName ) => {
 						if ( newName === undefined ) {
-							setBlockBeingRenamed( null );
+							setBlockBeingRenamed( false );
 						}
 
-						setBlockBeingRenamed( null );
+						setBlockBeingRenamed( false );
 						updateBlockAttributes( clientId, {
 							// Include existing metadata (if present) to avoid overwriting existing.
 							metadata: {
