@@ -528,8 +528,7 @@ class EditorPage {
 		let navigateUpElements = [];
 		do {
 			await this.driver.pause( 2000 );
-			navigateUpElements =
-				await this.driver.elementsByAccessibilityId( 'Navigate Up' );
+			navigateUpElements = await this.driver.$$( `~Navigate Up` );
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
 			}
@@ -770,8 +769,7 @@ class EditorPage {
 			this.driver,
 			'//XCUIElementTypeOther[@name="Media Add image or video"]'
 		);
-		const addMediaButton =
-			await mediaSection.elementByAccessibilityId( 'Add image or video' );
+		const addMediaButton = await mediaSection.$( '~Add image or video' );
 		await addMediaButton.click();
 	}
 
