@@ -132,9 +132,7 @@ export default function QuoteEdit( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
-						{ ...( ! isWebPlatform
-							? { textAlign: attributes.textAlign }
-							: {} ) }
+						{ ...( ! isWebPlatform ? { textAlign } : {} ) }
 					/>
 				) }
 			</BlockQuotation>
