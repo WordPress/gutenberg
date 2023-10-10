@@ -335,7 +335,6 @@ function ListViewBlock( {
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
-							__unstableDisplayLocation="list-view"
 						/>
 					) }
 				</TreeGridCell>

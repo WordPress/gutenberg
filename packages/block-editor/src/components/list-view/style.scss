@@ -40,6 +40,18 @@ $list-view-item-content-height: 32px;
 
 		.block-editor-list-view-block-rename__action {
 			height: $list-view-item-content-height;
+
+			&:not(:focus) {
+				border: 0;
+				clip: rect(1px, 1px, 1px, 1px);
+				height: 1px;
+				margin: -1px;
+				overflow: hidden;
+				padding: 0;
+				position: absolute;
+				width: 1px;
+				word-wrap: normal;
+			}
 		}
 
 		.block-editor-list-view-block-rename__action--submit {
