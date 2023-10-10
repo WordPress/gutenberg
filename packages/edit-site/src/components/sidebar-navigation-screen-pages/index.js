@@ -136,6 +136,16 @@ export default function SidebarNavigationScreenPages() {
 		};
 	};
 
+	const pagesLink = useLink( { path: '/pages' } );
+	const manageAllPagesProps = window?.__experimentalAdminViews
+		? { ...pagesLink }
+		: {
+				href: 'edit.php?post_type=page',
+				onClick: () => {
+					document.location = 'edit.php?post_type=page';
+				},
+		  };
+
 	return (
 		<>
 			{ showAddPage && (
@@ -168,7 +178,7 @@ export default function SidebarNavigationScreenPages() {
 								) }
 								{ isHomePageBlog && homeTemplate && (
 									<PageItem
-										postType="wp_template"
+										postType={ TEMPLATE_POST_TYPE }
 										postId={ homeTemplate.id }
 										key={ homeTemplate.id }
 										icon={ home }
@@ -204,7 +214,7 @@ export default function SidebarNavigationScreenPages() {
 					<VStack spacing={ 0 }>
 						{ dynamicPageTemplates?.map( ( item ) => (
 							<PageItem
-								postType="wp_template"
+								postType={ TEMPLATE_POST_TYPE }
 								postId={ item.id }
 								key={ item.id }
 								icon={ layout }
@@ -220,10 +230,7 @@ export default function SidebarNavigationScreenPages() {
 						) ) }
 						<SidebarNavigationItem
 							className="edit-site-sidebar-navigation-screen-pages__see-all"
-							href="edit.php?post_type=page"
-							onClick={ () => {
-								document.location = 'edit.php?post_type=page';
-							} }
+							{ ...manageAllPagesProps }
 						>
 							{ __( 'Manage all pages' ) }
 						</SidebarNavigationItem>

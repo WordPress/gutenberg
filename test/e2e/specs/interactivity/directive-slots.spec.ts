@@ -108,7 +108,7 @@ test.describe( 'data-wp-slot', () => {
 		await page.getByTestId( 'slot-5-button' ).click();
 
 		await expect( fillContainer ).toBeEmpty();
-		await expect( slot5 ).not.toBeVisible();
+		await expect( slot5 ).toBeHidden();
 		await expect( slots.getByTestId( 'fill' ) ).toBeVisible();
 		await expect( slots.locator( 'css= > *' ) ).toHaveText( [
 			'[1]',

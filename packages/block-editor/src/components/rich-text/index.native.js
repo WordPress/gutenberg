@@ -21,6 +21,7 @@ import {
 	__unstableCreateElement,
 	isEmpty,
 	insert,
+	remove,
 	create,
 	split,
 	toHTMLString,
@@ -41,7 +42,6 @@ import {
 	addActiveFormats,
 	getMultilineTag,
 	getAllowedFormats,
-	isShortcode,
 	createLinkInParagraph,
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
@@ -71,6 +71,7 @@ function RichTextWrapper(
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -340,14 +341,28 @@ function RichTextWrapper(
 				splitStart === splitEnd &&
 				splitEnd === text.length;
 
-			if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+			if ( shiftKey ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( value, '\n' ) );
 				}
-			} else if ( ! canSplit && canSplitAtEnd ) {
-				onSplitAtEnd();
 			} else if ( canSplit ) {
 				splitValue( value );
+			} else if ( canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				value.start = value.end - 2;
+				onChange( remove( value ) );
+				onSplitAtDoubleLineEnd();
+			} else if ( ! disableLineBreaks ) {
+				onChange( insert( value, '\n' ) );
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -416,18 +431,6 @@ function RichTextWrapper(
 			}
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
-
-			// Force the blocks mode when the user is pasting
-			// on a new line & the content resembles a shortcode.
-			// Otherwise it's going to be detected as inline
-			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
-				mode = 'BLOCKS';
-			}
 
 			const isPastedURL = isURL( plainText.trim() );
 			const presentEmbedHandlerPicker = () =>

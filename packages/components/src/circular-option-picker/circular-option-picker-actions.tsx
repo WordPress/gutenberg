@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import type { DropdownLinkActionProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { ButtonAsButtonProps } from '../button/types';
 
 export function DropdownLinkAction( {

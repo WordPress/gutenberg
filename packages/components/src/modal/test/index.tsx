@@ -167,8 +167,36 @@ describe( 'Modal', () => {
 		expect( onRequestClose ).not.toHaveBeenCalled();
 	} );
 
-	// TODO enable once nested modals hide outer modals.
-	it.skip( 'should accessibly hide and show siblings including outer modals', async () => {
+	it( 'should request closing of nested modal when outer modal unmounts', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = jest.fn();
+
+		const RequestCloseOfNested = () => {
+			const [ isShown, setIsShown ] = useState( true );
+			return (
+				<>
+					{ isShown && (
+						<Modal
+							onKeyDown={ ( { key } ) => {
+								if ( key === 'o' ) setIsShown( false );
+							} }
+							onRequestClose={ noop }
+						>
+							<Modal onRequestClose={ onRequestClose }>
+								<p>Nested modal content</p>
+							</Modal>
+						</Modal>
+					) }
+				</>
+			);
+		};
+		render( <RequestCloseOfNested /> );
+
+		await user.keyboard( 'o' );
+		expect( onRequestClose ).toHaveBeenCalled();
+	} );
+
+	it( 'should accessibly hide and show siblings including outer modals', async () => {
 		const user = userEvent.setup();
 
 		const AriaDemo = () => {

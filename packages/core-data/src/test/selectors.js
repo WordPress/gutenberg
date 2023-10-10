@@ -135,6 +135,43 @@ describe.each( [
 			} )
 		).toEqual( { content: 'chicken' } );
 	} );
+
+	it( 'should work well for nested fields properties', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									default: {
+										post: {
+											foo: undefined,
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										post: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecord( state, 'root', 'postType', 'post', {
+				_fields: [ 'foo.bar' ],
+			} )
+		).toEqual( {
+			foo: {
+				bar: undefined,
+			},
+		} );
+	} );
 } );
 
 describe( 'hasEntityRecords', () => {
@@ -189,7 +226,7 @@ describe( 'hasEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -324,7 +361,7 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -362,7 +399,9 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'_fields=id%2Ccontent': [ 1 ],
+										'_fields=id%2Ccontent': {
+											itemIds: [ 1 ],
+										},
 									},
 								},
 							},

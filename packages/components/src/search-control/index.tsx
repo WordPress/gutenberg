@@ -16,7 +16,7 @@ import { forwardRef, useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 

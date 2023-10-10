@@ -79,39 +79,41 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				const objectId = entityConfig.getSyncObjectId( key );
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					const objectId = entityConfig.getSyncObjectId( key );
 
-				// Loads the persisted document.
-				await getSyncProvider().bootstrap(
-					entityConfig.syncObjectType,
-					objectId,
-					( record ) => {
-						dispatch.receiveEntityRecords(
-							kind,
-							name,
-							record,
-							query
-						);
-					}
-				);
+					// Loads the persisted document.
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType,
+						objectId,
+						( record ) => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								record,
+								query
+							);
+						}
+					);
 
-				// Boostraps the edited document as well (and load from peers).
-				await getSyncProvider().bootstrap(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					( record ) => {
-						dispatch( {
-							type: 'EDIT_ENTITY_RECORD',
-							kind,
-							name,
-							recordId: key,
-							edits: record,
-							meta: {
-								undo: undefined,
-							},
-						} );
-					}
-				);
+					// Boostraps the edited document as well (and load from peers).
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType + '--edit',
+						objectId,
+						( record ) => {
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits: record,
+								meta: {
+									undo: undefined,
+								},
+							} );
+						}
+					);
+				}
 			} else {
 				if ( query !== undefined && query._fields ) {
 					// If requesting specific fields, items and query association to said
@@ -226,7 +228,22 @@ export const getEntityRecords =
 				...query,
 			} );
 
-			let records = Object.values( await apiFetch( { path } ) );
+			let records, meta;
+			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
+				const response = await apiFetch( { path, parse: false } );
+				records = Object.values( await response.json() );
+				meta = {
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
+					totalItems: parseInt(
+						response.headers.get( 'X-WP-Total' )
+					),
+				};
+			} else {
+				records = Object.values( await apiFetch( { path } ) );
+			}
+
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
 			// that way we consider the query "fullfilled".
@@ -242,7 +259,15 @@ export const getEntityRecords =
 				} );
 			}
 
-			dispatch.receiveEntityRecords( kind, name, records, query );
+			dispatch.receiveEntityRecords(
+				kind,
+				name,
+				records,
+				query,
+				false,
+				undefined,
+				meta
+			);
 
 			// When requesting all fields, the list of results can be used to
 			// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.

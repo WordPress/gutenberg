@@ -50,7 +50,7 @@ A className passed to the header container.
 
 The icon to render.
 
--   Type: `Function|WPComponent|null`
+-   Type: `Function|Component|null`
 -   Required: No
 -   Default: `null`
 

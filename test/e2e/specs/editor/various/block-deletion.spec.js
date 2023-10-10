@@ -30,7 +30,7 @@ test.describe( 'Block deletion', () => {
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
-					name: 'Paragraph block',
+					name: 'Block: Paragraph',
 				} )
 				.last()
 		).toBeFocused();
@@ -78,7 +78,7 @@ test.describe( 'Block deletion', () => {
 
 		// Select the paragraph.
 		const paragraph = editor.canvas.getByRole( 'document', {
-			name: 'Paragraph block',
+			name: 'Block: Paragraph',
 		} );
 		await editor.selectBlocks( paragraph );
 
@@ -128,7 +128,7 @@ test.describe( 'Block deletion', () => {
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
-					name: 'Paragraph block',
+					name: 'Block: Paragraph',
 				} )
 				.last()
 		).toBeFocused();
@@ -307,7 +307,7 @@ test.describe( 'Block deletion', () => {
 		} );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
 
