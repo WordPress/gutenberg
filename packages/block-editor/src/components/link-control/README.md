@@ -4,6 +4,26 @@ Renders a link control. A link control is a controlled input which maintains a v
 
 It is designed to provide a standardized UI for the creation of a link throughout the Editor, see History section at bottom for further background.
 
+## Best Practices
+
+### Ensuring unique instances
+
+It is possible that a given editor may render multiple instances of the `<LinkControl>` component. As a result, it is important to ensure each instance is unique across the editor to avoid state "leaking" between components.
+
+Why would this happen?
+
+React's reconciliation algorithm means that if you return the same element from a component, it keeps the nodes around as an optimization, even if the props change. This means that if you render two (or more) `<LinkControl>`s, it is possible that the `value` from one will appear in the other as you move between them.
+
+As a result it is recommended that consumers provide a `key` prop to each instance of `<LinkControl>`:
+
+```jsx
+<LinkControl key="some-unique-key" { ...props } />
+```
+
+This will cause React to return the same component/element type but force remount a new instance, thus avoiding the issues described above.
+
+For more information see: https://github.com/WordPress/gutenberg/pull/34742.
+
 ## Relationship to `<URLInput>`
 
 As of Gutenberg 7.4, `<LinkControl>` became the default link creation interface within the Block Editor, replacing previous disparate uses of `<URLInput>` and standardizing the UI.

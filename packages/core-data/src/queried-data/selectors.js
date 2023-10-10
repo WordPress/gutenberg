@@ -33,7 +33,7 @@ function getQueriedItemsUncached( state, query ) {
 	let itemIds;
 
 	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ];
+		itemIds = state.queries[ context ][ stableKey ].itemIds;
 	}
 
 	if ( ! itemIds ) {
@@ -118,3 +118,15 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 	queriedItemsCache.set( query, items );
 	return items;
 } );
+
+export function getQueriedTotalItems( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}
+
+export function getQueriedTotalPages( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;
+}

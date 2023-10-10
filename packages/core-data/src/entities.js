@@ -120,6 +120,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -224,12 +225,12 @@ export const rootEntitiesConfig = [
 		key: 'plugin',
 	},
 	{
-		label: __( 'Post status' ),
+		label: __( 'Status' ),
 		name: 'status',
 		kind: 'root',
 		baseURL: '/wp/v2/statuses',
 		baseURLParams: { context: 'edit' },
-		plural: 'postStatuses',
+		plural: 'statuses',
 		key: 'slug',
 	},
 ];
@@ -326,6 +327,7 @@ async function loadPostTypeEntities() {
 			},
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
 		};
 	} );
 }

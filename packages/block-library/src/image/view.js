@@ -105,7 +105,10 @@ store(
 						context.core.image.scrollDelta = 0;
 
 						context.core.image.lightboxEnabled = true;
-						setStyles( context, event );
+						setStyles(
+							context,
+							event.target.previousElementSibling
+						);
 
 						context.core.image.scrollTopReset =
 							window.pageYOffset ||
@@ -227,7 +230,17 @@ store(
 					roleAttribute: ( { context } ) => {
 						return context.core.image.lightboxEnabled
 							? 'dialog'
-							: '';
+							: null;
+					},
+					ariaModal: ( { context } ) => {
+						return context.core.image.lightboxEnabled
+							? 'true'
+							: null;
+					},
+					dialogLabel: ( { context } ) => {
+						return context.core.image.lightboxEnabled
+							? context.core.image.dialogLabel
+							: null;
 					},
 					lightboxObjectFit: ( { context } ) => {
 						if ( context.core.image.initialized ) {
@@ -237,7 +250,7 @@ store(
 					enlargedImgSrc: ( { context } ) => {
 						return context.core.image.initialized
 							? context.core.image.imageUploadedSrc
-							: '';
+							: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 					},
 				},
 			},
@@ -328,6 +341,15 @@ store(
 							context.core.image.imageButtonHeight = offsetHeight;
 						}
 					},
+					setStylesOnResize: ( { state, context, ref } ) => {
+						if (
+							context.core.image.lightboxEnabled &&
+							( state.core.image.windowWidth ||
+								state.core.image.windowHeight )
+						) {
+							setStyles( context, ref );
+						}
+					},
 				},
 			},
 		},
@@ -352,7 +374,7 @@ store(
  * @param {Object} context - An Interactivity API context
  * @param {Object} event - A triggering event
  */
-function setStyles( context, event ) {
+function setStyles( context, ref ) {
 	// The reference img element lies adjacent
 	// to the event target button in the DOM.
 	let {
@@ -360,9 +382,8 @@ function setStyles( context, event ) {
 		naturalHeight,
 		offsetWidth: originalWidth,
 		offsetHeight: originalHeight,
-	} = event.target.nextElementSibling;
-	let { x: screenPosX, y: screenPosY } =
-		event.target.nextElementSibling.getBoundingClientRect();
+	} = ref;
+	let { x: screenPosX, y: screenPosY } = ref.getBoundingClientRect();
 
 	// Natural ratio of the image clicked to open the lightbox.
 	const naturalRatio = naturalWidth / naturalHeight;
