@@ -3,7 +3,7 @@
  */
 const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
-import { remote } from 'webdriverio';
+import { remote, Key } from 'webdriverio';
 // TODO: Replace usage of wd in favor of WebdriverIO
 const wd = null;
 const crypto = require( 'crypto' );
@@ -209,110 +209,28 @@ const stopDriver = async ( driver ) => {
 	}
 };
 
-/*
- * Problems about the 'clear' parameter:
- *
- * On Android: "clear" is defaulted to true because not clearing the text requires Android to use ADB, which
- * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
- * have to append the new text and, in that case, append fewest number of characters possible.
- *
- * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
- */
 const typeString = async ( driver, element, str, clear ) => {
 	if ( isKeycode( str ) ) {
-		return await pressKeycode( driver, getKeycode( str ) );
+		const keyCode = isAndroid() ? getKeycode( str ) : str;
+		return await pressKeycode( driver, keyCode );
 	}
-	if ( isAndroid() ) {
-		await typeStringAndroid( driver, element, str, clear );
-	} else {
-		await typeStringIos( driver, element, str, clear );
-	}
-};
 
-const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		// await element.clear(); This was not working correctly on iOS so need a custom implementation
-		await clearTextBox( driver, element );
+		await element.clearValue();
 	}
-	await element.type( str );
 
-	// Wait for the list auto-scroll animation to finish
-	await driver.sleep( 3000 );
-};
+	await element.addValue( str );
 
-const clearTextBox = async ( driver, element ) => {
-	await element.click();
-	let originalText = await element.text();
-	let text = originalText;
-	// We are double tapping on the text field and pressing backspace until all content is removed.
-	do {
-		originalText = await element.text();
-		await doubleTap( driver, element );
-		await element.type( '\b' );
-		text = await element.text();
-		// We compare with the original content and not empty because text always return any hint set on the element.
-	} while ( originalText !== text );
+	if ( ! isAndroid() ) {
+		// Await the completion of the scroll-to-text-input animation
+		await driver.pause( 3000 );
+	}
 };
 
 const doubleTap = async ( driver, element ) => {
 	const action = new wd.TouchAction( driver );
 	action.tap( { el: element, count: 2 } );
 	await action.perform();
-};
-
-const typeStringAndroid = async (
-	driver,
-	element,
-	str,
-	clear = true // See comment above for why it is defaulted to true.
-) => {
-	if ( clear ) {
-		/*
-		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
-		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
-		 * long text along these lines:
-		 *         await driver.execute( 'mobile: shell', { command: 'input',
-		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
-		 * but using adb in this way proved to be very flaky (frequently all of the text would not get entered,
-		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
-		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
-		 *
-		 * Note that this approach does not allow appending text to the text in a block on account
-		 * of `type` always clearing the block (on Android).
-		 */
-
-		await driver.execute( 'mobile: shell', {
-			command: 'input',
-			args: [ 'text', '%s' ],
-		} );
-		await element.type( str );
-	} else {
-		// eslint-disable-next-line no-console
-		console.log(
-			'Warning: Using `adb shell input text` on Android which is rather flaky.'
-		);
-
-		const paragraphs = str.split( '\n' );
-		for ( let i = 0; i < paragraphs.length; i++ ) {
-			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-			if ( isKeycode( paragraph ) ) {
-				return await pressKeycode( driver, getKeycode( paragraph ) );
-			}
-			// Empty values passed in the `args` list of `execute` function are removed.
-			// In order to avoid an exception in `text` command due to passing fewer arguments, we don't
-			// execute the command with empty strings.
-			else if ( paragraph !== '' ) {
-				// Execute with adb shell input <text> since normal type auto clears field on Android
-				await driver.execute( 'mobile: shell', {
-					command: 'input',
-					args: [ 'text', paragraph ],
-				} );
-			}
-			if ( i !== paragraphs.length - 1 ) {
-				await pressKeycode( driver, getKeycode( '\n' ) );
-			}
-		}
-	}
 };
 
 /**
@@ -329,11 +247,11 @@ const getKeycode = ( str ) => {
 			[ backspace ]: 67,
 		}[ str ];
 	}
-	// On iOS, we map keycodes using the special keys defined in WebDriver.
-	// Reference: https://github.com/admc/wd/blob/master/lib/special-keys.js
+	// On iOS, we map keycodes using the special keys defined in WebdriverIO.
+	// Reference: https://webdriver.io/docs/api/browser/action/#special-characters
 	return {
-		'\n': wd.SPECIAL_KEYS.Enter,
-		[ backspace ]: wd.SPECIAL_KEYS[ 'Back space' ],
+		'\n': Key.Enter,
+		[ backspace ]: Key.Backspace,
 	}[ str ];
 };
 
@@ -354,12 +272,12 @@ const isKeycode = ( str ) => {
  */
 const pressKeycode = async ( driver, keycode ) => {
 	if ( isAndroid() ) {
-		// `pressKeycode` command is only implemented on Android
-		return await driver.pressKeycode( keycode );
+		// `pressKeyCode` command is only implemented on Android
+		return await driver.pressKeyCode( keycode );
 	}
-	// `keys` command only works on iOS. On Android, executing this
+	// `sendKeys` command only works on iOS. On Android, executing this
 	// results in typing a special character instead.
-	return await driver.keys( [ keycode ] );
+	return await driver.sendKeys( [ keycode ] );
 };
 
 // Calculates middle x,y and clicks that position
@@ -456,12 +374,25 @@ const tapPasteAboveElement = async ( driver, element ) => {
 };
 
 const tapStatusBariOS = async ( driver ) => {
-	const action = new wd.TouchAction();
-	action.tap( { x: 20, y: 20 } );
-	await driver.performTouchAction( action );
+	await driver.touchPerform( [
+		{
+			action: 'press',
+			options: { x: 20, y: 20 },
+		},
+		{
+			action: 'wait',
+			options: {
+				ms: 100,
+			},
+		},
+		{
+			action: 'release',
+			options: {},
+		},
+	] );
 
 	// Wait for the scroll animation to finish
-	await driver.sleep( 3000 );
+	await driver.pause( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
@@ -577,8 +508,7 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		const moreOptionsButton =
-			await driver.elementByAccessibilityId( 'More options' );
+		const moreOptionsButton = await driver.$( '~More options' );
 		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
@@ -586,8 +516,7 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		const moreOptionsButton =
-			await driver.elementByAccessibilityId( 'editor-menu-button' );
+		const moreOptionsButton = await driver.$( '~editor-menu-button' );
 		await moreOptionsButton.click();
 
 		await clickIfClickable(
@@ -596,9 +525,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		);
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
-		await driver.sleep( 3000 );
-		const moreOptionsButton =
-			await driver.elementByAccessibilityId( 'editor-menu-button' );
+		await driver.pause( 3000 );
+		const moreOptionsButton = await driver.$( '~editor-menu-button' );
 		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
@@ -677,10 +605,10 @@ const waitForVisible = async (
 		return '';
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
-		await driver.sleep( timeout );
+		await driver.pause( timeout );
 	}
 
-	const elements = await driver.elementsByXPath( elementLocator );
+	const elements = await driver.$$( elementLocator );
 	if ( elements.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(

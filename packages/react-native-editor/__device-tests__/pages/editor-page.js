@@ -115,7 +115,7 @@ class EditorPage {
 
 		await waitForVisible( this.driver, blockLocator );
 
-		const elements = await this.driver.elementsByXPath( blockLocator );
+		const elements = await this.driver.$$( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
 			const firstBlockVisible = await this.getFirstBlockVisible();
@@ -199,8 +199,7 @@ class EditorPage {
 			}
 		}
 
-		const elements =
-			await this.driver.elementsByAccessibilityId( titleElement );
+		const elements = await this.driver.$$( `~${ titleElement }` );
 
 		if (
 			elements.length === 0 ||
@@ -260,7 +259,7 @@ class EditorPage {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		const text = await htmlContentView.text();
+		const text = await htmlContentView.getText();
 
 		await toggleHtmlMode( this.driver, false );
 		return text;
@@ -355,8 +354,8 @@ class EditorPage {
 
 		while ( locatorAttempts < maxLocatorAttempts ) {
 			element = byId
-				? await this.driver.elementsByAccessibilityId( elementSelector )
-				: await this.driver.elementsByXPath( elementSelector );
+				? await this.driver.$$( `~${ elementSelector }` )
+				: await this.driver.$$( elementSelector );
 			if ( await element[ 0 ]?.isDisplayed() ) {
 				break;
 			}
@@ -429,6 +428,8 @@ class EditorPage {
 				swipeRight: true,
 			} );
 			await addButton[ 0 ].click();
+			// Wait for Bottom sheet animation to finish
+			await this.driver.pause( 3000 );
 		}
 
 		// Click on block of choice.
@@ -468,12 +469,12 @@ class EditorPage {
 			const x = size.width / 2;
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
-				! ( await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabel
-				) ) &&
-				! ( await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-				) )
+				! ( await this.driver
+					.$( `~${ blockAccessibilityLabel }` )
+					.isDisplayed() ) &&
+				! ( await this.driver
+					.$( `~${ blockAccessibilityLabelNewBlock }` )
+					.isDisplayed() )
 			) {
 				swipeFromTo(
 					this.driver,
@@ -483,29 +484,23 @@ class EditorPage {
 			}
 
 			if (
-				await this.driver.hasElementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-				)
+				await this.driver
+					.$( `~${ blockAccessibilityLabelNewBlock }` )
+					.isDisplayed()
 			) {
-				return await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
+				return await this.driver.$(
+					`~${ blockAccessibilityLabelNewBlock }`
 				);
 			}
 
-			return await this.driver.elementByAccessibilityId(
-				blockAccessibilityLabel
-			);
+			return await this.driver.$( `~${ blockAccessibilityLabel }` );
 		}
 
-		const blockButton = ( await this.driver.hasElementByAccessibilityId(
-			blockAccessibilityLabelNewBlock
-		) )
-			? await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabelNewBlock
-			  )
-			: await this.driver.elementByAccessibilityId(
-					blockAccessibilityLabel
-			  );
+		const blockButton = ( await this.driver
+			.$( `~${ blockAccessibilityLabelNewBlock }` )
+			.isDisplayed() )
+			? await this.driver.$( `~${ blockAccessibilityLabelNewBlock }` )
+			: await this.driver.$( `~${ blockAccessibilityLabel }` );
 
 		const size = await this.driver.getWindowSize();
 		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
@@ -516,15 +511,14 @@ class EditorPage {
 			! ( await blockButton.isDisplayed() ) ||
 			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
 		) {
-			await this.driver.execute( 'mobile: dragFromToForDuration', {
-				fromX: 50,
-				fromY: height,
-				toX: 50,
-				toY: EditorPage.getInserterPageHeight( height ),
-				duration: 0.5,
-			} );
+			await swipeFromTo(
+				this.driver,
+				{ x: 50, y: height },
+				{ x: 50, y: EditorPage.getInserterPageHeight( height ) },
+				3000
+			);
 			// Wait for dragging gesture
-			await this.driver.sleep( 2000 );
+			await this.driver.pause( 2000 );
 		}
 
 		return blockButton;
@@ -718,10 +712,9 @@ class EditorPage {
 		const autocompleterElementId = isAndroid()
 			? 'Slash inserter results'
 			: 'autocompleter';
-		const autocompleterElement =
-			await this.driver.elementsByAccessibilityId(
-				autocompleterElementId
-			);
+		const autocompleterElement = await this.driver.$$(
+			`~${ autocompleterElementId }`
+		);
 
 		if ( autocompleterElement?.[ 0 ] ) {
 			isPresent = await autocompleterElement[ 0 ].isDisplayed();
@@ -985,11 +978,14 @@ class EditorPage {
 	}
 
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
-		return await this.driver.waitForElementByAccessibilityId(
-			id,
-			wd.asserters.isDisplayed,
-			timeout
-		);
+		const element = await this.driver.$( `~${ id }` );
+
+		if ( element ) {
+			return element;
+		}
+
+		await element.waitForDisplayed( { timeout } );
+		return element;
 	}
 
 	async waitForElementToBeDisplayedByXPath( id, timeout = 2000 ) {
