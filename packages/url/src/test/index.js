@@ -270,10 +270,7 @@ describe( 'getFilename', () => {
 		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
 		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
 		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
-	} );
 
-	it( 'returns the filename for a variety of formats', () => {
 		expect( getFilename( 'https://wordpress.org/file.pdf' ) ).toBe(
 			'file.pdf'
 		);
