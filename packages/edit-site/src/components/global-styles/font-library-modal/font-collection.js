@@ -54,7 +54,6 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const [ error, setError ] = useState( null );
 	const { collections, getFontCollection, installFonts } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
@@ -78,7 +77,11 @@ function FontCollection( { id } ) {
 				await getFontCollection( id );
 				resetFilters();
 			} catch ( e ) {
-				setError( e );
+				setNotice( {
+					type: 'error',
+					message: e?.message,
+					duration: 0, // Don't auto-hide.
+				} );
 			}
 		};
 		fetchFontCollection();
@@ -86,14 +89,15 @@ function FontCollection( { id } ) {
 
 	useEffect( () => {
 		setSelectedFont( null );
+		setNotice( null );
 	}, [ id ] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
-		if ( notice ) {
+		if ( notice && notice?.duration !== 0 ) {
 			const timeout = setTimeout( () => {
 				setNotice( null );
-			}, 5000 );
+			}, notice.duration ?? 5000 );
 			return () => clearTimeout( timeout );
 		}
 	}, [ notice ] );
@@ -175,10 +179,6 @@ function FontCollection( { id } ) {
 				</>
 			) }
 
-			{ ! renderConfirmDialog && ! selectedCollection.data && ! error && (
-				<Spinner />
-			) }
-
 			{ notice && (
 				<>
 					<FlexItem>
@@ -235,10 +235,9 @@ function FontCollection( { id } ) {
 			) }
 
 			<Spacer margin={ 4 } />
-
 			{ ! renderConfirmDialog &&
 				! selectedCollection?.data?.fontFamilies &&
-				! error && <Spinner /> }
+				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
 				!! selectedCollection?.data?.fontFamilies?.length &&
