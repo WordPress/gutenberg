@@ -199,6 +199,9 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
+	// We need to set an event callback on the `img` specifically
+	// because the `figure` element can also contain a caption, and
+	// we don't want to trigger the lightbox when the caption is clicked.
 	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.callShowLightboxFromImage' );
 	$w->set_attribute( 'data-wp-on--mouseover', 'actions.core.image.handleMouseOver' );
 	$w->set_attribute( 'data-wp-on--mouseout', 'actions.core.image.handleMouseOut' );

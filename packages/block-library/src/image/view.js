@@ -135,6 +135,9 @@ store(
 							false
 						);
 					},
+					// When opening the lightbox via clicking an image,
+					// we can use the event target directly and pass it to the
+					// showLightbox action, which uses it to create the styles.
 					callShowLightboxFromImage: ( {
 						context,
 						event,
@@ -148,6 +151,9 @@ store(
 							event.target
 						);
 					},
+					// When opening the lightbox via clicking the button,
+					// we need to reach into event target's parent element to
+					// get the image element needed to create the styles.
 					callShowLightboxFromButton: ( {
 						context,
 						event,
@@ -158,6 +164,9 @@ store(
 								context,
 								event,
 							},
+							// The event target we receive when clicking the button
+							// is the SVG element inside of it, so we need to go to
+							// the parent element's sibling to get the image.
 							event.target.parentElement.previousElementSibling
 						);
 					},
@@ -186,6 +195,9 @@ store(
 							}
 						}
 					},
+					// We need to use a handler to know whether the mouse is hovering
+					// so we know when to show the lightbox trigger button. We are unable
+					// to use just CSS for this because the button is not a child of the image.
 					handleMouseOver( { context } ) {
 						context.core.image.isHovering = true;
 					},
@@ -307,6 +319,12 @@ store(
 									focusableElements.length - 1
 								];
 
+							// We want to avoid drawing unnecessary attention to the
+							// close button for mouse users. Note that even if opening
+							// the lightbox via keyboard, the event fired is of type
+							// `pointerEvent`, so we need to rely on the `event.pointerType`
+							// property, which returns `mouse` for mouse events and
+							// as an empty string for keyboard events.
 							if ( context.core.image.pointerType !== 'mouse' ) {
 								ref.querySelector( '.close-button' ).focus();
 							}
