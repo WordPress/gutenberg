@@ -806,10 +806,13 @@ class EditorPage {
 	}
 
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath(
+		const imageBlockCaptionButton = await this.driver.$(
 			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
 		);
-		await imageBlockCaptionField.click();
+		await imageBlockCaptionButton.click();
+		const imageBlockCaptionField = await imageBlockCaptionButton.$(
+			'//XCUIElementTypeTextView'
+		);
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
 
