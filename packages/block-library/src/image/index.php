@@ -214,10 +214,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.core.image.showLightbox"
-			data-wp-style--width="context.core.image.imageButtonWidth"
-			data-wp-style--height="context.core.image.imageButtonHeight"
-			data-wp-style--left="context.core.image.imageButtonLeft"
-			data-wp-style--top="context.core.image.imageButtonTop"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>
