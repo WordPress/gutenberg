@@ -26,6 +26,7 @@ import Icon from '../../icon';
 import Button from '../../button';
 import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+import { ContextSystemProvider } from '../../context';
 
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2 ariakit',
@@ -402,5 +403,28 @@ export const WithSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => {
 	);
 };
 WithSlotFill.args = {
+	...Default.args,
+};
+
+const toolbarVariantContextValue = {
+	DropdownMenu: {
+		variant: 'toolbar',
+	},
+};
+export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
+	<ContextSystemProvider value={ toolbarVariantContextValue }>
+		<DropdownMenu { ...props }>
+			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+			<DropdownMenuSeparator />
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+			>
+				<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+			</DropdownMenu>
+		</DropdownMenu>
+	</ContextSystemProvider>
+);
+ToolbarVariant.args = {
 	...Default.args,
 };

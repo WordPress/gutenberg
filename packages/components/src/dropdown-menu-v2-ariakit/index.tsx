@@ -20,6 +20,7 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { useContextSystem, contextConnect } from '../context';
 import Icon from '../icon';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
@@ -174,96 +175,111 @@ export const DropdownMenuGroupLabel = forwardRef<
 	);
 } );
 
-export const DropdownMenu = forwardRef< HTMLDivElement, DropdownMenuProps >(
-	function DropdownMenu(
-		{
-			// Menu trigger props
-			trigger,
-			// Menu props
-			children,
-			open,
-			defaultOpen,
-			onOpenChange,
-			placement,
-			gutter = 8,
-			shift = 0,
-			defaultValues,
-			modal = true,
-			...props
+const UnconnectedDropdownMenu = (
+	props: DropdownMenuProps,
+	ref: React.ForwardedRef< HTMLDivElement >
+) => {
+	const {
+		// Store props
+		open,
+		defaultOpen,
+		onOpenChange,
+		placement,
+		// TODO: can we remove this prop?
+		defaultValues,
+
+		// Menu trigger props
+		trigger,
+
+		// Menu props
+		gutter = 8,
+		children,
+		shift = 0,
+		modal = true,
+		dir,
+
+		// From internal components context
+		variant,
+
+		// Rest
+		...otherProps
+	} = useContextSystem<
+		DropdownMenuProps & Pick< DropdownMenuContextType, 'variant' >
+	>( props, 'DropdownMenu' );
+
+	const parentContext = useContext( DropdownMenuContext );
+
+	const dropdownMenuStore = Ariakit.useMenuStore( {
+		parent: parentContext?.store,
+		open,
+		defaultOpen,
+		placement,
+		defaultValues,
+		focusLoop: true,
+		setOpen( willBeOpen ) {
+			onOpenChange?.( willBeOpen );
 		},
-		// Menu ref
-		ref
-	) {
-		const parentContext = useContext( DropdownMenuContext );
+	} );
 
-		const dropdownMenuStore = Ariakit.useMenuStore( {
-			parent: parentContext?.store,
-			open,
-			defaultOpen,
-			placement,
-			// TODO: can we remove this prop?
-			defaultValues,
-			focusLoop: true,
-			setOpen( willBeOpen ) {
-				onOpenChange?.( willBeOpen );
-			},
-		} );
+	const contextValue = useMemo(
+		() => ( { store: dropdownMenuStore, variant } ),
+		[ dropdownMenuStore, variant ]
+	);
 
-		const contextValue = useMemo(
-			() => ( { store: dropdownMenuStore } ),
-			[ dropdownMenuStore ]
-		);
+	const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
 
-		const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
+	// Extract the side part from the placement (ie. top/bottom/left/start)
+	// It is useful to animate the opening of the menu in the right direction.
+	const computedPlacement = dropdownMenuStore.useState( 'placement' );
+	const side = computedPlacement.split( '-' )[ 0 ];
 
-		// Extract the side part from the placement (ie. top/bottom/left/start)
-		// It is useful to animate the opening of the menu in the right direction.
-		const computedPlacement = dropdownMenuStore.useState( 'placement' );
-		const side = computedPlacement.split( '-' )[ 0 ];
+	return (
+		<>
+			{ /* Menu trigger */ }
+			<Ariakit.MenuButton
+				ref={ ref }
+				store={ dropdownMenuStore }
+				render={
+					// Add arrow for submenus
+					dropdownMenuStore.parent
+						? // TODO: check that `trigger` renders a `DropdownMenuItem`?
+						  cloneElement( trigger, {
+								// TODO: add prefix
+								suffix: trigger.props.suffix ?? (
+									<Styled.SubmenuRtlChevronIcon
+										aria-hidden="true"
+										icon={ chevronRightSmall }
+										size={ 24 }
+									/>
+								),
+						  } )
+						: trigger
+				}
+			/>
 
-		return (
-			<>
-				{ /* Menu trigger */ }
-				<Ariakit.MenuButton
-					ref={ ref }
+			{ /* Menu popover */ }
+			{ shouldShowDropdownMenu && (
+				<Styled.DropdownMenu
+					{ ...otherProps }
+					modal={ modal }
 					store={ dropdownMenuStore }
-					render={
-						// Add arrow for submenus
-						dropdownMenuStore.parent
-							? // TODO: check that `trigger` renders a `DropdownMenuItem`?
-							  cloneElement( trigger, {
-									// TODO: add prefix
-									suffix: trigger.props.suffix ?? (
-										<Styled.SubmenuRtlChevronIcon
-											aria-hidden="true"
-											icon={ chevronRightSmall }
-											size={ 24 }
-										/>
-									),
-							  } )
-							: trigger
-					}
-				/>
-
-				{ /* Menu popover */ }
-				{ shouldShowDropdownMenu && (
-					<Styled.DropdownMenu
-						{ ...props }
-						modal={ modal }
-						store={ dropdownMenuStore }
-						gutter={ dropdownMenuStore.parent ? 16 : gutter }
-						shift={ dropdownMenuStore.parent ? -8 : shift }
-						hideOnHoverOutside={ false }
-						data-side={ side }
-					>
-						<DropdownMenuContext.Provider value={ contextValue }>
-							{ children }
-						</DropdownMenuContext.Provider>
-					</Styled.DropdownMenu>
-				) }
-			</>
-		);
-	}
+					gutter={ dropdownMenuStore.parent ? 16 : gutter }
+					shift={ dropdownMenuStore.parent ? -8 : shift }
+					hideOnHoverOutside={ false }
+					data-side={ side }
+					variant={ variant }
+				>
+					<DropdownMenuContext.Provider value={ contextValue }>
+						{ children }
+					</DropdownMenuContext.Provider>
+				</Styled.DropdownMenu>
+			) }
+		</>
+	);
+};
+export const DropdownMenu = contextConnect(
+	UnconnectedDropdownMenu,
+	'DropdownMenu'
 );
 
 export const DropdownMenuSeparator = forwardRef<
@@ -276,6 +292,7 @@ export const DropdownMenuSeparator = forwardRef<
 			ref={ ref }
 			{ ...props }
 			store={ dropdownMenuContext?.store }
+			variant={ dropdownMenuContext?.variant }
 		/>
 	);
 } );
