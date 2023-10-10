@@ -216,7 +216,7 @@ const typeString = async ( driver, element, str, clear ) => {
 	await element.addValue( str );
 
 	if ( ! isAndroid() ) {
-		// Wait for the list auto-scroll animation to finish
+		// Await the completion of the scroll-to-text-input animation
 		await driver.pause( 3000 );
 	}
 };
