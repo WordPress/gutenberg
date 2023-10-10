@@ -21,7 +21,7 @@ export default function useMoveToTrashAction() {
 				try {
 					await deleteEntityRecord(
 						'postType',
-						post.postType,
+						post.type,
 						post.id,
 						{},
 						{ throwOnError: true }
