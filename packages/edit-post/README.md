@@ -215,6 +215,50 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
+### PluginPostExcerpt
+
+Renders a post excerpt panel in the post sidebar.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPostExcerpt = wp.editPost.PluginPostExcerpt;
+
+function MyPluginPostExcerpt() {
+	return React.createElement(
+		PluginPostExcerpt,
+		{
+			className: 'my-plugin-post-excerpt',
+		},
+		__( 'Post excerpt custom content' )
+	);
+}
+```
+
+```jsx
+// Using ESNext syntax
+import { __ } from '@wordpress/i18n';
+import { PluginPostExcerpt } from '@wordpress/edit-post';
+
+const MyPluginPostExcerpt = () => (
+	<PluginPostExcerpt className="my-plugin-post-excerpt">
+		{ __( 'Post excerpt custom content' ) }
+	</PluginPostExcerpt>
+);
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### PluginPostPublishPanel
 
 Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
