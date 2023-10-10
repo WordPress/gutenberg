@@ -65,9 +65,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 		add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
 	} else {
 		/*
-		* Remove the filter and the JavaScript view file if previously added by
-		* other Image blocks.
-		*/
+		 * Remove the filter and the JavaScript view file if previously added by
+		 * other Image blocks.
+		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
 		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
