@@ -687,7 +687,7 @@ class EditorPage {
 			position
 		);
 
-		return await blockLocator.text();
+		return await blockLocator.getText();
 	}
 
 	async getNumberOfParagraphBlocks() {
