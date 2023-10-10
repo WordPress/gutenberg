@@ -199,7 +199,6 @@ export function reinitializeEditor() {
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
-export { default as PluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
@@ -207,4 +206,5 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalPluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
 export { store } from './store';
