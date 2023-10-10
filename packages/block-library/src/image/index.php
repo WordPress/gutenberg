@@ -200,6 +200,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
 	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.callShowLightboxFromImage' );
+	$w->set_attribute( 'data-wp-on--mouseover', 'actions.core.image.handleMouseOver' );
+	$w->set_attribute( 'data-wp-on--mouseout', 'actions.core.image.handleMouseOut' );
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
@@ -214,6 +216,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.core.image.callShowLightboxFromButton"
+			data-wp-class--show="context.core.image.isHovering"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>

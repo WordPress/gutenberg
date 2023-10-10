@@ -156,12 +156,9 @@
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	cursor: zoom-in;
 
-	&:hover {
-		button {
-			opacity: 1;
-		}
+	img {
+		cursor: zoom-in;
 	}
 
 	button {
@@ -179,6 +176,10 @@
 		padding: 0;
 		border-radius: 10%;
 
+		&.show {
+			opacity: 1;
+		}
+
 		&:focus-visible {
 			outline: 5px auto #212121;
 			outline: 5px auto -webkit-focus-ring-color;
@@ -187,6 +188,7 @@
 
 		&:hover {
 			cursor: pointer;
+			opacity: 1;
 		}
 
 		&:focus {

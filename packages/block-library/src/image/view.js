@@ -182,6 +182,12 @@ store(
 							} );
 						}
 					},
+					handleMouseOver( { context } ) {
+						context.core.image.isHovering = true;
+					},
+					handleMouseOut( { context } ) {
+						context.core.image.isHovering = false;
+					},
 					handleKeydown: ( { context, actions, event } ) => {
 						if ( context.core.image.lightboxEnabled ) {
 							if ( event.key === 'Tab' || event.keyCode === 9 ) {
