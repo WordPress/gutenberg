@@ -1116,6 +1116,29 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			)
 		).toHaveText( /^.a+$/ );
 	} );
+
+	test( 'should select synced pattern', async ( { page, editor } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'synced' );
+
+		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'test' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/block"]' )
+		).toBeFocused();
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/block"]' )
+		).toBeFocused();
+	} );
 } );
 
 class WritingFlowUtils {
