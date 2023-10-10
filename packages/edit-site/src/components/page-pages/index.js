@@ -116,6 +116,7 @@ export default function PagePages() {
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				enableSorting: false,
 			},
 			{
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
