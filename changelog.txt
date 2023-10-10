@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 16.8.0-rc.2 =
+
+## Changelog
+This copies the commits from the 16.7.1 patch release into the 16.8.0 main release.
+ 
+### Tools
+
+#### Build Tooling
+- Fix incorrect resource URL in source map for sources coming from @wordpress packages. ([51401](https://github.com/WordPress/gutenberg/pull/51401))
+
+### Various
+
+- Add missing schema `type` attribute for in WP 6.4 compat's `block-hooks.php`. ([55138](https://github.com/WordPress/gutenberg/pull/55138))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine @torounit
+
+
 = 16.7.1 =
 
 ## Changelog
