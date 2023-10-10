@@ -520,6 +520,29 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should auto-link', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: '',
+			},
+		} );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
+				},
+			},
+		] );
+	} );
+
 	test( 'should not link selection for non http(s) protocol', async ( {
 		pageUtils,
 		editor,
