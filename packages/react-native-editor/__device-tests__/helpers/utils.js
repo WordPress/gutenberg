@@ -165,7 +165,6 @@ const setupDriver = async () => {
 					...sauceOptions,
 					name: `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`,
 					tags: [ 'Gutenberg', branch ],
-					idleTimeout: SAUCE_LABS_TIMEOUT,
 				},
 		  }
 		: {};
