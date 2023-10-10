@@ -527,7 +527,7 @@ class EditorPage {
 	async moveBlockSelectionUp( options = { toRoot: false } ) {
 		let navigateUpElements = [];
 		do {
-			await this.driver.sleep( 2000 );
+			await this.driver.pause( 2000 );
 			navigateUpElements =
 				await this.driver.elementsByAccessibilityId( 'Navigate Up' );
 			if ( navigateUpElements.length > 0 ) {
