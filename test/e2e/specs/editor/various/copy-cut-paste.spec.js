@@ -500,9 +500,7 @@ test.describe( 'Copy/cut/paste', () => {
 	test( 'should link selection', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: {
-				content: 'a',
-			},
+			attributes: { content: 'a' },
 		} );
 		await pageUtils.pressKeys( 'primary+a' );
 		pageUtils.setClipboardData( {
@@ -521,7 +519,10 @@ test.describe( 'Copy/cut/paste', () => {
 	} );
 
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
 		pageUtils.setClipboardData( {
 			plainText: 'https://wordpress.org/gutenberg',
 			html: 'https://wordpress.org/gutenberg',
@@ -532,7 +533,7 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
+						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>a',
 				},
 			},
 		] );
