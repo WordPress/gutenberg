@@ -72,20 +72,32 @@ function FontCollection( { id } ) {
 	}, [ id, requiresPermission ] );
 
 	useEffect( () => {
-		getFontCollection( id );
-		resetFilters();
+		const fetchFontCollection = async () => {
+			try {
+				await getFontCollection( id );
+				resetFilters();
+			} catch ( e ) {
+				setNotice( {
+					type: 'error',
+					message: e?.message,
+					duration: 0, // Don't auto-hide.
+				} );
+			}
+		};
+		fetchFontCollection();
 	}, [ id, getFontCollection ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
+		setNotice( null );
 	}, [ id ] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
-		if ( notice ) {
+		if ( notice && notice?.duration !== 0 ) {
 			const timeout = setTimeout( () => {
 				setNotice( null );
-			}, 5000 );
+			}, notice.duration ?? 5000 );
 			return () => clearTimeout( timeout );
 		}
 	}, [ notice ] );
@@ -167,10 +179,6 @@ function FontCollection( { id } ) {
 				</>
 			) }
 
-			{ ! renderConfirmDialog && ! selectedCollection.data && (
-				<Spinner />
-			) }
-
 			{ notice && (
 				<>
 					<FlexItem>
@@ -227,9 +235,9 @@ function FontCollection( { id } ) {
 			) }
 
 			<Spacer margin={ 4 } />
-
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies && <Spinner /> }
+				! selectedCollection?.data?.fontFamilies &&
+				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
 				!! selectedCollection?.data?.fontFamilies?.length &&
