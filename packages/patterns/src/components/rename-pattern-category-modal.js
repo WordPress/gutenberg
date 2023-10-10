@@ -23,6 +23,7 @@ import { CATEGORY_SLUG } from './category-selector';
 export default function RenamePatternCategoryModal( {
 	category,
 	onClose,
+	onError,
 	onSuccess,
 } ) {
 	// If the user created category has been retrieved via
@@ -72,6 +73,7 @@ export default function RenamePatternCategoryModal( {
 				id: 'pattern-category-update',
 			} );
 		} catch ( error ) {
+			onError?.();
 			createErrorNotice( error.message, {
 				type: 'snackbar',
 				id: 'pattern-category-update',
