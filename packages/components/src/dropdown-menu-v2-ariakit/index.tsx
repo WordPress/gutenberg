@@ -14,6 +14,7 @@ import {
 	useMemo,
 	cloneElement,
 } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
@@ -196,7 +197,6 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift = 0,
 		modal = true,
-		dir,
 
 		// From internal components context
 		variant,
@@ -209,16 +209,40 @@ const UnconnectedDropdownMenu = (
 
 	const parentContext = useContext( DropdownMenuContext );
 
+	const computedDirection = isRTL() ? 'rtl' : 'ltr';
+
+	// If an explicit value for the `placement` prop is not passed,
+	// apply a default placement of `bottom-start` for the root dropdown,
+	// and of `right-start` for nested dropdowns.
+	let computedPlacement =
+		props.placement ??
+		( parentContext?.store ? 'right-start' : 'bottom-start' );
+	// Swap left/right in case of RTL direction
+	if ( computedDirection === 'rtl' ) {
+		if ( /right/.test( computedPlacement ) ) {
+			computedPlacement = computedPlacement.replace(
+				'right',
+				'left'
+			) as typeof computedPlacement;
+		} else if ( /left/.test( computedPlacement ) ) {
+			computedPlacement = computedPlacement.replace(
+				'left',
+				'right'
+			) as typeof computedPlacement;
+		}
+	}
+
 	const dropdownMenuStore = Ariakit.useMenuStore( {
 		parent: parentContext?.store,
 		open,
 		defaultOpen,
-		placement,
+		placement: computedPlacement,
 		defaultValues,
 		focusLoop: true,
 		setOpen( willBeOpen ) {
 			onOpenChange?.( willBeOpen );
 		},
+		rtl: computedDirection === 'rtl',
 	} );
 
 	const contextValue = useMemo(
@@ -228,10 +252,10 @@ const UnconnectedDropdownMenu = (
 
 	const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
 
-	// Extract the side part from the placement (ie. top/bottom/left/start)
-	// It is useful to animate the opening of the menu in the right direction.
-	const computedPlacement = dropdownMenuStore.useState( 'placement' );
-	const side = computedPlacement.split( '-' )[ 0 ];
+	// Extract the side from the applied placement — useful for animations.
+	const appliedPlacementSide = dropdownMenuStore
+		.useState( 'placement' )
+		.split( '-' )[ 0 ];
 
 	return (
 		<>
@@ -246,7 +270,7 @@ const UnconnectedDropdownMenu = (
 						  cloneElement( trigger, {
 								// TODO: add prefix
 								suffix: trigger.props.suffix ?? (
-									<Styled.SubmenuRtlChevronIcon
+									<Styled.SubmenuChevronIcon
 										aria-hidden="true"
 										icon={ chevronRightSmall }
 										size={ 24 }
@@ -263,11 +287,12 @@ const UnconnectedDropdownMenu = (
 					{ ...otherProps }
 					modal={ modal }
 					store={ dropdownMenuStore }
-					gutter={ dropdownMenuStore.parent ? 16 : gutter }
-					shift={ dropdownMenuStore.parent ? -8 : shift }
+					gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 0 ) }
+					shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
 					hideOnHoverOutside={ false }
-					data-side={ side }
+					data-side={ appliedPlacementSide }
 					variant={ variant }
+					dir={ computedDirection }
 				>
 					<DropdownMenuContext.Provider value={ contextValue }>
 						{ children }

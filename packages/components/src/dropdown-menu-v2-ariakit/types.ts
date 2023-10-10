@@ -23,6 +23,7 @@ export interface DropdownMenuProps {
 	open?: boolean;
 	defaultOpen?: boolean;
 	onOpenChange?: ( open: boolean ) => void;
+	// default depends on root level or nested menu
 	placement?: Placement;
 	gutter?: number;
 	shift?: number;

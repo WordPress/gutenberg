@@ -281,7 +281,7 @@ export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
 `;
 
-export const SubmenuRtlChevronIcon = styled( Icon )`
+export const SubmenuChevronIcon = styled( Icon )`
 	${ rtl(
 		{
 			transform: `scaleX(1) translateX(${ space( 2 ) })`,
