@@ -191,14 +191,9 @@ store(
 							}
 						}
 					},
-					handleLoad: ( { state, context, effects, ref } ) => {
+					handleLoad: ( { context, ref } ) => {
 						context.core.image.imageLoaded = true;
 						context.core.image.imageCurrentSrc = ref.currentSrc;
-						effects.core.image.setButtonStyles( {
-							state,
-							context,
-							ref,
-						} );
 					},
 					handleTouchStart: () => {
 						isTouching = true;
@@ -280,65 +275,6 @@ store(
 								];
 
 							ref.querySelector( '.close-button' ).focus();
-						}
-					},
-					setButtonStyles: ( { state, context, ref } ) => {
-						const {
-							naturalWidth,
-							naturalHeight,
-							offsetWidth,
-							offsetHeight,
-						} = ref;
-
-						// If the image isn't loaded yet, we can't
-						// calculate how big the button should be.
-						if ( naturalWidth === 0 || naturalHeight === 0 ) {
-							return;
-						}
-
-						// Subscribe to the window dimensions so we can
-						// recalculate the styles if the window is resized.
-						if (
-							( state.core.image.windowWidth ||
-								state.core.image.windowHeight ) &&
-							context.core.image.scaleAttr === 'contain'
-						) {
-							// In the case of an image with object-fit: contain, the
-							// size of the img element can be larger than the image itself,
-							// so we need to calculate the size of the button to match.
-
-							// Natural ratio of the image.
-							const naturalRatio = naturalWidth / naturalHeight;
-							// Offset ratio of the image.
-							const offsetRatio = offsetWidth / offsetHeight;
-
-							if ( naturalRatio > offsetRatio ) {
-								// If it reaches the width first, keep
-								// the width and recalculate the height.
-								context.core.image.imageButtonWidth =
-									offsetWidth;
-								const buttonHeight = offsetWidth / naturalRatio;
-								context.core.image.imageButtonHeight =
-									buttonHeight;
-								context.core.image.imageButtonTop =
-									( offsetHeight - buttonHeight ) / 2;
-							} else {
-								// If it reaches the height first, keep
-								// the height and recalculate the width.
-								context.core.image.imageButtonHeight =
-									offsetHeight;
-								const buttonWidth = offsetHeight * naturalRatio;
-								context.core.image.imageButtonWidth =
-									buttonWidth;
-								context.core.image.imageButtonLeft =
-									( offsetWidth - buttonWidth ) / 2;
-							}
-						} else {
-							// In all other cases, we can trust that the size of
-							// the image is the right size for the button as well.
-
-							context.core.image.imageButtonWidth = offsetWidth;
-							context.core.image.imageButtonHeight = offsetHeight;
 						}
 					},
 					setStylesOnResize: ( { state, context, ref } ) => {

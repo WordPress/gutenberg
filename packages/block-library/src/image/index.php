@@ -167,6 +167,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
+	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.showLightbox' );
 
 	$w->set_attribute(
 		'data-wp-context',
@@ -199,7 +200,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
@@ -218,7 +218,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			data-wp-style--height="context.core.image.imageButtonHeight"
 			data-wp-style--left="context.core.image.imageButtonLeft"
 			data-wp-style--top="context.core.image.imageButtonTop"
-		></button>';
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>
+				<path d="M15 19L19 19L19 15" stroke="#FFFFFF" stroke-width="1.5"/>
+				<path d="M15 5H19V9" stroke="#FFFFFF" stroke-width="1.5"/>
+				<path d="M9 19L5 19L5 15" stroke="#FFFFFF" stroke-width="1.5"/>
+			</svg>
+		</button>';
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
