@@ -121,7 +121,7 @@ const ListViewBlockRenameUI = forwardRef(
 					<InputControl
 						ref={ inputRef }
 						value={ inputValue }
-						label={ __( 'Edit block name' ) }
+						label={ __( 'Block name' ) }
 						hideLabelFromVision
 						onChange={ ( nextValue ) => {
 							setInputValue( nextValue ?? '' );

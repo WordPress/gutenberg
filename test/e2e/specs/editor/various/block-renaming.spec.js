@@ -14,13 +14,6 @@ test.describe( 'Block Renaming', () => {
 			page,
 			pageUtils,
 		} ) => {
-			// Turn on block list view by default.
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-site', 'showListViewByDefault', true );
-			} );
-
 			const listView = page.getByRole( 'treegrid', {
 				name: 'Block navigation structure',
 			} );
@@ -165,6 +158,82 @@ test.describe( 'Block Renaming', () => {
 
 			// TODO: assert that the locator didn't find a DOM node at all.
 			await expect( renameMenuItem ).toBeHidden();
+		} );
+	} );
+
+	test.describe( 'List View renaming', () => {
+		test( 'should allow renaming via double click in List View', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			} );
+
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await expect( listView ).toBeVisible();
+
+			const listViewNode = listView.getByRole( 'link', {
+				name: 'Paragraph',
+			} );
+
+			// double click to trigger rename
+			await listViewNode.dblclick();
+
+			const renameModal = page.getByRole( 'dialog', {
+				name: 'Rename block',
+			} );
+
+			// Check the Modal is perceivable.
+			await expect( renameModal ).toBeVisible();
+
+			const nameInput = renameModal.getByRole( 'textbox', {
+				name: 'Block name',
+			} );
+
+			// Check focus is transferred into modal.
+			await expect( nameInput ).toBeFocused();
+
+			const saveButton = renameModal.getByRole( 'button', {
+				name: 'Save',
+				type: 'submit',
+			} );
+
+			// await expect( saveButton ).toBeDisabled();
+
+			await expect( nameInput ).toHaveValue( 'Paragraph' );
+
+			await nameInput.fill( 'My new name' );
+
+			await expect( saveButton ).toBeEnabled();
+
+			await saveButton.click();
+
+			await expect( renameModal ).toBeHidden();
+
+			// Check that focus is transferred back to original "Rename" menu item.
+			await expect(
+				listView.getByRole( 'link', {
+					name: 'My new name',
+				} )
+			).toBeFocused();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							name: 'My new name',
+						},
+					},
+				},
+			] );
 		} );
 	} );
 
