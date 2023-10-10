@@ -12,7 +12,7 @@ Every `@wordpress` package wanting to privately access or expose experimental AP
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
 		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
 		// (not the name of the package whose APIs you want to access)
 	);
@@ -22,7 +22,7 @@ Each package may only opt in once. The function name communicates that plugins a
 
 The function will throw an error if the following conditions are not met:
 
-1. The first argument must exactly match the required consent string: `'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.'`.
+1. The first argument must exactly match the required consent string: `'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.'`.
 2. The second argument must be a known `@wordpress` package that hasn't yet opted into `@wordpress/private-apis`
 
 Once the opt-in is complete, the obtained `lock()` and `unlock()` utilities enable hiding `__experimental` APIs from the naked eye:
