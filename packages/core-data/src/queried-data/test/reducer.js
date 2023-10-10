@@ -159,7 +159,7 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {
-				default: { 's=a': [ 1 ] },
+				default: { 's=a': { itemIds: [ 1 ] } },
 			},
 		} );
 	} );
@@ -200,8 +200,8 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2, 3, 4 ],
-					's=a': [ 1, 3 ],
+					'': { itemIds: [ 1, 2, 3, 4 ] },
+					's=a': { itemIds: [ 1, 3 ] },
 				},
 			},
 		} );
@@ -218,8 +218,8 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2, 4 ],
-					's=a': [ 1 ],
+					'': { itemIds: [ 1, 2, 4 ] },
+					's=a': { itemIds: [ 1 ] },
 				},
 			},
 		} );
@@ -238,8 +238,8 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 'foo//bar1', 'foo//bar2', 'foo//bar3' ],
-					's=2': [ 'foo//bar2' ],
+					'': { itemIds: [ 'foo//bar1', 'foo//bar2', 'foo//bar3' ] },
+					's=2': { itemIds: [ 'foo//bar2' ] },
 				},
 			},
 		} );
@@ -258,8 +258,8 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 'foo//bar1', 'foo//bar3' ],
-					's=2': [],
+					'': { itemIds: [ 'foo//bar1', 'foo//bar3' ] },
+					's=2': { itemIds: [] },
 				},
 			},
 		} );

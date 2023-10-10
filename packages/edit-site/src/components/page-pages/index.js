@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
@@ -11,7 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +33,6 @@ export default function PagePages() {
 			direction: 'desc',
 		},
 	} );
-	const [ paginationInfo, setPaginationInfo ] = useState();
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
 	const postStatuses =
@@ -58,33 +55,20 @@ export default function PagePages() {
 		} ),
 		[ view ]
 	);
-	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
-		'postType',
-		'page',
-		queryArgs
+	const {
+		records: pages,
+		isResolving: isLoadingPages,
+		totalItems,
+		totalPages,
+	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems,
+			totalPages,
+		} ),
+		[ totalItems, totalPages ]
 	);
-	useEffect( () => {
-		// Make extra request to handle controlled pagination.
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pages', {
-				...queryArgs,
-				_fields: 'id',
-			} ),
-			method: 'HEAD',
-			parse: false,
-		} ).then( ( res ) => {
-			// TODO: store this in core-data reducer and
-			// make sure it's returned as part of useEntityRecords
-			// (to avoid double requests).
-			const totalPages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
-			const totalItems = parseInt( res.headers.get( 'X-WP-Total' ) );
-			setPaginationInfo( {
-				totalPages,
-				totalItems,
-			} );
-		} );
-		// Status should not make extra request if already did..
-	}, [ queryArgs ] );
 
 	const fields = useMemo(
 		() => [
@@ -158,7 +142,7 @@ export default function PagePages() {
 				view={ view }
 				onChangeView={ setView }
 				options={ {
-					pageCount: paginationInfo?.totalPages,
+					pageCount: totalPages,
 				} }
 			/>
 		</Page>
