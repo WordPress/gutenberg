@@ -290,7 +290,7 @@ class EditorPage {
 		// On Android with the landspace orientation set, we use the
 		// driver functionality to hide the keyboard.
 		if ( isAndroid() && orientation === 'LANDSCAPE' ) {
-			return await this.driver.hideDeviceKeyboard();
+			return await this.driver.hideKeyboard();
 		}
 
 		const hideKeyboardButton = isAndroid()
