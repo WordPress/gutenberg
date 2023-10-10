@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+/**
+ * Internal dependencies
+ */
+import { hasBlockMetadataSupport } from './metadata';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
@@ -17,10 +20,10 @@ export function addLabelCallback( settings ) {
 		return settings;
 	}
 
-	const supportsBlockNaming = hasBlockSupport(
+	const supportsBlockNaming = hasBlockMetadataSupport(
 		settings,
-		'renaming',
-		true // default value
+		'name',
+		false // default value
 	);
 
 	// Check whether block metadata is supported before using it.

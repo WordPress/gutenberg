@@ -41,7 +41,7 @@ Create and save content to reuse across your site. Update the pattern, and the c
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~
 -	**Attributes:** ref
 
 ## Button
@@ -463,7 +463,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
+-	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
 
 ## Custom Link
@@ -530,7 +530,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** slug
 
 ## Author
@@ -911,7 +911,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
 ## Term Description
