@@ -93,7 +93,7 @@ store(
 		actions: {
 			core: {
 				image: {
-					showLightbox: ( { context, event } ) => {
+					showLightbox: ( { context }, image ) => {
 						// We can't initialize the lightbox until the reference
 						// image is loaded, otherwise the UX is broken.
 						if ( ! context.core.image.imageLoaded ) {
@@ -105,10 +105,7 @@ store(
 						context.core.image.scrollDelta = 0;
 
 						context.core.image.lightboxEnabled = true;
-						setStyles(
-							context,
-							event.target.previousElementSibling
-						);
+						setStyles( context, image );
 
 						context.core.image.scrollTopReset =
 							window.pageYOffset ||
@@ -135,6 +132,32 @@ store(
 							'scroll',
 							scrollCallback,
 							false
+						);
+					},
+					callShowLightboxFromImage: ( {
+						context,
+						event,
+						actions,
+					} ) => {
+						actions.core.image.showLightbox(
+							{
+								context,
+								event,
+							},
+							event.target
+						);
+					},
+					callShowLightboxFromButton: ( {
+						context,
+						event,
+						actions,
+					} ) => {
+						actions.core.image.showLightbox(
+							{
+								context,
+								event,
+							},
+							event.target.parentElement.previousElementSibling
 						);
 					},
 					hideLightbox: async ( { context } ) => {
