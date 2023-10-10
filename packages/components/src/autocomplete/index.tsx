@@ -195,11 +195,9 @@ export function useAutocomplete( {
 			return;
 		}
 
-		let newIndex = 0;
-
 		switch ( event.key ) {
-			case 'ArrowUp':
-				newIndex =
+			case 'ArrowUp': {
+				const newIndex =
 					( selectedIndex === 0
 						? filteredOptions.length
 						: selectedIndex ) - 1;
@@ -212,9 +210,10 @@ export function useAutocomplete( {
 					);
 				}
 				break;
+			}
 
-			case 'ArrowDown':
-				newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
+			case 'ArrowDown': {
+				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
 				setSelectedIndex( newIndex );
 				if ( isAppleOS() ) {
 					speak(
@@ -224,6 +223,7 @@ export function useAutocomplete( {
 					);
 				}
 				break;
+			}
 
 			case 'Escape':
 				setAutocompleter( null );

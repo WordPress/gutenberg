@@ -62,7 +62,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.EditableText, {
+		return React.createElement( wp.editor.EditableText, {
 			className: props.className,
 			value: props.attributes.content,
 			onChange: function( content ) {
@@ -72,7 +72,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( wp.editor.EditableText.Content, {
+		return React.createElement( wp.editor.EditableText.Content, {
 			value: props.attributes.content
 		} );
 	}

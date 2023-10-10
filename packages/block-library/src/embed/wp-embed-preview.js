@@ -4,7 +4,7 @@
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
 
 const attributeMap = {
 	class: 'className',

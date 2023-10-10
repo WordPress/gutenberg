@@ -7,8 +7,8 @@ ToggleControl is used to generate a toggle user interface.
 Render a user interface to change fixed background setting.
 
 ```jsx
+import { useState } from 'react';
 import { ToggleControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyToggleControl = () => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( false );
@@ -47,7 +47,7 @@ If this property is added, a help text will be generated using help property as 
 For controlled components the `help` prop can also be a function which will return a help text
 dynamically depending on the boolean `checked` parameter.
 
--   Type: `String|WPElement|Function`
+-   Type: `String|Element|Function`
 -   Required: No
 
 ### checked

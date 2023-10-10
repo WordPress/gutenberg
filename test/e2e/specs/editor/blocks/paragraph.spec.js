@@ -28,9 +28,11 @@ test.describe( 'Paragraph', () => {
 		} );
 		await page.keyboard.type( '1' );
 
-		const firstBlockTagName = await editor.canvas.evaluate( () => {
-			return document.querySelector( '[data-block]' ).tagName;
-		} );
+		const firstBlockTagName = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => {
+				return document.querySelector( '[data-block]' ).tagName;
+			} );
 
 		// The outer element should be a paragraph. Blocks should never have any
 		// additional div wrappers so the markup remains simple and easy to
@@ -61,14 +63,7 @@ test.describe( 'Paragraph', () => {
 			editor,
 			pageUtils,
 			draggingUtils,
-			page,
 		} ) => {
-			await page.evaluate( () => {
-				window.wp.blocks.registerBlockType( 'test/v2', {
-					apiVersion: '2',
-					title: 'test',
-				} );
-			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
 			const testImageName = '10x10_e2e_test_image_z9T8jK.png';
@@ -112,7 +107,7 @@ test.describe( 'Paragraph', () => {
 				attributes: { content: 'My Heading' },
 			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await editor.canvas.focus( 'text=My Heading' );
+			await editor.canvas.locator( 'text=My Heading' ).focus();
 			await editor.showBlockToolbar();
 
 			const dragHandle = page.locator(

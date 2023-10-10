@@ -152,6 +152,6 @@ export function makeFormDataFromFontFamilies( fontFamilies ) {
 		}
 		return family;
 	} );
-	formData.append( 'fontFamilies', JSON.stringify( newFontFamilies ) );
+	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
 	return formData;
 }

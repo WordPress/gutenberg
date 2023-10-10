@@ -38,7 +38,14 @@ function bubbleEvent( event, Constructor, frame ) {
 		init[ key ] = event[ key ];
 	}
 
-	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
+	// Check if the event is a MouseEvent generated within the iframe.
+	// If so, adjust the coordinates to be relative to the position of
+	// the iframe. This ensures that components such as Draggable
+	// receive coordinates relative to the window, instead of relative
+	// to the iframe. Without this, the Draggable event handler would
+	// result in components "jumping" position as soon as the user
+	// drags over the iframe.
+	if ( event instanceof frame.contentDocument.defaultView.MouseEvent ) {
 		const rect = frame.getBoundingClientRect();
 		init.clientX += rect.left;
 		init.clientY += rect.top;

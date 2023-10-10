@@ -6,6 +6,13 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 /**
  * Internal dependencies
  */
+import {
+	Composite as CompositeV2,
+	CompositeGroup as CompositeGroupV2,
+	CompositeItem as CompositeItemV2,
+	CompositeRow as CompositeRowV2,
+	useCompositeStore as useCompositeStoreV2,
+} from './composite/v2';
 import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { default as ProgressBar } from './progress-bar';
@@ -33,6 +40,11 @@ export const { lock, unlock } =
 
 export const privateApis = {};
 lock( privateApis, {
+	CompositeV2,
+	CompositeGroupV2,
+	CompositeItemV2,
+	CompositeRowV2,
+	useCompositeStoreV2,
 	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
