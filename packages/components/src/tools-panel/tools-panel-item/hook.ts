@@ -176,18 +176,16 @@ export function useToolsPanelItem(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const placeholderStyle =
-			shouldRenderPlaceholder &&
-			! isShown &&
-			styles.ToolsPanelItemPlaceholder;
+		const shouldApplyPlaceholderStyles =
+			shouldRenderPlaceholder && ! isShown;
 		const firstItemStyle =
 			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
 		const lastItemStyle =
 			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
 		return cx(
 			styles.ToolsPanelItem,
-			placeholderStyle,
-			className,
+			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
+			! shouldApplyPlaceholderStyles && className,
 			firstItemStyle,
 			lastItemStyle
 		);
