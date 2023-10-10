@@ -112,7 +112,6 @@ export default function useEntityRecords< RecordType >(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
-					// Avoiding returning a new reference on every execution.
 					totalItems: null,
 					totalPages: null,
 				};
