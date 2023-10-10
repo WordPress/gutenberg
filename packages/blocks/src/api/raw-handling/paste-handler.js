@@ -17,6 +17,7 @@ import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
+import msListIgnore from './ms-list-ignore';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -49,6 +50,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
 	] );
