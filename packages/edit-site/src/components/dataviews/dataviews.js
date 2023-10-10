@@ -43,9 +43,9 @@ export default function DataViews( {
 	options: { pageCount },
 } ) {
 	const columns = useMemo( () => {
-		const ret = [ ...fields ];
+		const _columns = [ ...fields ];
 		if ( actions && actions.length ) {
-			ret.push( {
+			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
@@ -80,7 +80,7 @@ export default function DataViews( {
 			} );
 		}
 
-		return ret;
+		return _columns;
 	}, [ fields, actions ] );
 
 	const dataView = useReactTable( {
