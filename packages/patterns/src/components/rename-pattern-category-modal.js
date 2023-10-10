@@ -25,6 +25,7 @@ export default function RenamePatternCategoryModal( {
 	onClose,
 	onError,
 	onSuccess,
+	...props
 } ) {
 	// If the user created category has been retrieved via
 	// getUserPatternCategories the name value is assigned to the label property
@@ -90,7 +91,11 @@ export default function RenamePatternCategoryModal( {
 	};
 
 	return (
-		<Modal title={ __( 'Rename' ) } onRequestClose={ onRequestClose }>
+		<Modal
+			title={ __( 'Rename' ) }
+			onRequestClose={ onRequestClose }
+			{ ...props }
+		>
 			<form onSubmit={ onRename }>
 				<VStack spacing="5">
 					<TextControl
