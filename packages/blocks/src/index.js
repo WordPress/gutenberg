@@ -11,3 +11,4 @@
 export { store } from './store';
 export * from './api';
 export * from './deprecated';
+export { privateApis } from './private-apis';

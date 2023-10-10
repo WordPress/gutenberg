@@ -4,7 +4,7 @@
 import {
 	serialize,
 	pasteHandler,
-	getClipboardEventData,
+	privateApis,
 	createBlock,
 	findTransform,
 	getBlockTransforms,
@@ -22,6 +22,9 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { unlock } from '../../lock-unlock';
+
+const { getClipboardEventData } = unlock( privateApis );
 
 export default function useClipboardHandler() {
 	const {

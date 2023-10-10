@@ -5,7 +5,7 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import {
 	pasteHandler,
-	getClipboardEventData,
+	privateApis,
 	findTransform,
 	getBlockTransforms,
 } from '@wordpress/blocks';
@@ -17,6 +17,9 @@ import { isURL } from '@wordpress/url';
  */
 import { addActiveFormats } from './utils';
 import { splitValue } from './split-value';
+import { unlock } from '../../lock-unlock';
+
+const { getClipboardEventData } = unlock( privateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 

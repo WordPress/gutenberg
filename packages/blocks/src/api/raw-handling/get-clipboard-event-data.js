@@ -4,37 +4,12 @@
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
- * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
- * comments and any preceding and trailing content.
- *
- * @param {string} html the html to be normalized
- * @return {string} the normalized html
+ * Internal dependencies
  */
-export function removeWindowsFragments( html ) {
-	// Strip Windows markers.
-	return html
-		.replace(
-			/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
-			''
-		)
-		.replace(
-			/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
-			''
-		);
-}
-
-/**
- * Removes the charset meta tag inserted by Chromium.
- * See:
- * - https://github.com/WordPress/gutenberg/issues/33585
- * - https://bugs.chromium.org/p/chromium/issues/detail?id=1264616#c4
- *
- * @param {string} html the html to be stripped of the meta tag.
- * @return {string} the cleaned html
- */
-export function removeMetaTags( html ) {
-	return html.replace( /<meta[^>]+>/gi, '' );
-}
+import { deepFilterHTML } from './utils';
+import wrapperRemover from './wrapper-remover';
+import msFragmentRemover from './ms-fragment-remover';
+import metaRemover from './meta-remover';
 
 export function getClipboardEventData( event ) {
 	const { clipboardData } = event;
@@ -58,8 +33,11 @@ export function getClipboardEventData( event ) {
 		}
 	}
 
-	html = removeWindowsFragments( html );
-	html = removeMetaTags( html );
+	html = deepFilterHTML( html, [
+		wrapperRemover,
+		msFragmentRemover,
+		metaRemover,
+	] );
 
 	const files = getFilesFromDataTransfer( clipboardData );
 

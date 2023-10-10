@@ -32,10 +32,9 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
-import {
-	removeMetaTags,
-	removeWindowsFragments,
-} from './get-clipboard-event-data';
+import wrapperRemover from './wrapper-remover';
+import msFragmentRemover from './ms-fragment-remover';
+import metaRemover from './meta-remover';
 
 /**
  * Browser dependencies
@@ -94,8 +93,11 @@ export function pasteHandler( {
 	tagName,
 	preserveWhiteSpace,
 } ) {
-	HTML = removeMetaTags( HTML );
-	HTML = removeWindowsFragments( HTML );
+	HTML = deepFilterHTML( HTML, [
+		wrapperRemover,
+		msFragmentRemover,
+		metaRemover,
+	] );
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {
