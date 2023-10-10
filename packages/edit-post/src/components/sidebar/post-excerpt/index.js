@@ -20,15 +20,11 @@ import { store as editPostStore } from '../../../store';
 const PANEL_NAME = 'post-excerpt';
 
 export default function PostExcerpt() {
-	const { isOpened, isRemoved, isEnabled } = useSelect( ( select ) => {
-		const {
-			isEditorPanelRemoved,
-			isEditorPanelOpened,
-			isEditorPanelEnabled,
-		} = select( editPostStore );
+	const { isOpened, isEnabled } = useSelect( ( select ) => {
+		const { isEditorPanelOpened, isEditorPanelEnabled } =
+			select( editPostStore );
 
 		return {
-			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 		};
@@ -36,10 +32,6 @@ export default function PostExcerpt() {
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const toggleExcerptPanel = () => toggleEditorPanelOpened( PANEL_NAME );
-
-	if ( isRemoved ) {
-		return null;
-	}
 
 	if ( ! isEnabled ) {
 		return null;
