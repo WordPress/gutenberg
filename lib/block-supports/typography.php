@@ -89,16 +89,16 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_font_family_support      = $typography_supports['__experimentalFontFamily'] ?? false;
-	$has_font_size_support        = $typography_supports['fontSize'] ?? false;
-	$has_font_style_support       = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_weight_support      = $typography_supports['__experimentalFontWeight'] ?? false;
-	$has_letter_spacing_support   = $typography_supports['__experimentalLetterSpacing'] ?? false;
-	$has_line_height_support      = $typography_supports['lineHeight'] ?? false;
-	$has_text_columns_support     = $typography_supports['textColumns'] ?? false;
-	$has_text_decoration_support  = $typography_supports['__experimentalTextDecoration'] ?? false;
-	$has_text_transform_support   = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_writing_mode_support     = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
+	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
+	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
+	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
+	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
+	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
