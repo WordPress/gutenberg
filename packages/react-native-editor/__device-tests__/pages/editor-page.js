@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line import/no-extraneous-dependencies
-const wd = null; // TODO: Replace this
-
-/**
  * Internal dependencies
  */
 const {
@@ -843,12 +837,12 @@ class EditorPage {
 	// =============================
 
 	async getSearchBlockTextElement( testID ) {
-		const child = await this.driver.elementByAccessibilityId( testID );
+		const child = await this.driver.$( `~${ testID }` );
 
 		if ( isAndroid() ) {
 			// Get the child EditText element of the ViewGroup returned by
 			// elementByAccessibilityId.
-			return await child.elementByClassName( 'android.widget.EditText' );
+			return await child.$( 'android.widget.EditText' );
 		}
 
 		return child;
@@ -989,11 +983,14 @@ class EditorPage {
 	}
 
 	async waitForElementToBeDisplayedByXPath( id, timeout = 2000 ) {
-		return await this.driver.waitForElementByXPath(
-			id,
-			wd.asserters.isDisplayed,
-			timeout
-		);
+		const element = await this.driver.$( `${ id }` );
+
+		if ( element ) {
+			return element;
+		}
+
+		await element.waitForDisplayed( { timeout } );
+		return element;
 	}
 }
 
