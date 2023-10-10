@@ -250,6 +250,7 @@ const UnconnectedDropdownMenu = (
 		[ dropdownMenuStore, variant ]
 	);
 
+	// TODO: could be done via the `unmountOnHide` prop when updating to a newer version
 	const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
 
 	// Extract the side from the applied placement — useful for animations.
