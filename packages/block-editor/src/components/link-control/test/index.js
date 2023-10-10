@@ -2059,14 +2059,13 @@ describe( 'Addition Settings UI', () => {
 
 	it( 'should show tooltip with full URL alongside filtered display', async () => {
 		const user = userEvent.setup();
-		const url = 'https://example.com';
+		const url =
+			'http://www.wordpress.org/wp-content/uploads/a-document.pdf';
 		render( <LinkControl value={ { url } } /> );
 
 		const link = screen.getByRole( 'link' );
 
-		expect( screen.getByRole( 'link' ) ).toHaveTextContent(
-			/example.com/i
-		);
+		expect( link ).toHaveTextContent( /a-document.pdf/i );
 
 		await user.hover( link );
 
