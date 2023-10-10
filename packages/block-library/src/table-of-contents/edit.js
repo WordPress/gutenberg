@@ -42,7 +42,7 @@ import { useObserveHeadings } from './hooks';
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
 	attributes: { headings = [], onlyIncludeCurrentPage },

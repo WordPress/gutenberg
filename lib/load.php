@@ -66,12 +66,15 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
+
+	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
+require __DIR__ . '/compat/plugin/footnotes.php';
 
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
@@ -244,3 +247,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
+require __DIR__ . '/block-supports/behaviors.php';

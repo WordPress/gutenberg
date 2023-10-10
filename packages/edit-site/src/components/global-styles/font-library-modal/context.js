@@ -9,8 +9,6 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -50,8 +48,6 @@ function FontLibraryProvider( { children } ) {
 	);
 	const fontFamiliesHasChanges =
 		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
-
-	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
@@ -202,7 +198,8 @@ function FontLibraryProvider( { children } ) {
 			// Prepare formData to install.
 			const formData = makeFormDataFromFontFamilies( fonts );
 			// Install the fonts (upload the font files to the server and create the post in the database).
-			const fontsInstalled = await fetchInstallFonts( formData );
+			const response = await fetchInstallFonts( formData );
+			const fontsInstalled = response?.successes || [];
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
 			const fontToBeActivated = getIntersectingFontFaces(
@@ -217,36 +214,40 @@ function FontLibraryProvider( { children } ) {
 			] );
 			refreshLibrary();
 			setIsInstalling( false );
-			return true;
-		} catch ( e ) {
+
+			return response;
+		} catch ( error ) {
 			setIsInstalling( false );
-			return false;
+			return {
+				errors: [ error ],
+			};
 		}
 	}
 
 	async function uninstallFont( font ) {
 		try {
 			// Uninstall the font (remove the font files from the server and the post from the database).
-			await fetchUninstallFonts( [ font ] );
+			const response = await fetchUninstallFonts( [ font ] );
 			// Deactivate the font family (remove the font family from the global styles).
-			deactivateFontFamily( font );
-			// Save the global styles to the database.
-			await saveSpecifiedEntityEdits(
-				'root',
-				'globalStyles',
-				globalStylesId,
-				[ 'settings.typography.fontFamilies' ]
-			);
+			if ( ! response.errors ) {
+				deactivateFontFamily( font );
+				// Save the global styles to the database.
+				await saveSpecifiedEntityEdits(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					[ 'settings.typography.fontFamilies' ]
+				);
+			}
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
-			return true;
-		} catch ( e ) {
+			return response;
+		} catch ( error ) {
 			// eslint-disable-next-line no-console
-			console.error( e );
-			createErrorNotice( __( 'Error uninstalling fonts.' ), {
-				type: 'snackbar',
-			} );
-			return false;
+			console.error( error );
+			return {
+				errors: [ error ],
+			};
 		}
 	}
 

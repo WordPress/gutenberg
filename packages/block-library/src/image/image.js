@@ -375,7 +375,7 @@ export default function Image( {
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
-		lightbox?.enabled || ( ! lightbox && lightboxSetting?.enabled );
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
 	const dimensionsControl = (
 		<DimensionsTool

@@ -47,9 +47,11 @@ test.describe( 'Block moving mode', () => {
 	test( 'can move block in the nested block', async ( { editor, page } ) => {
 		// Create two group blocks with some blocks.
 		await editor.insertBlock( { name: 'core/group' } );
-		await editor.canvas.click(
-			'role=button[name="Group: Gather blocks in a container."i]'
-		);
+		await editor.canvas
+			.locator(
+				'role=button[name="Group: Gather blocks in a container."i]'
+			)
+			.click();
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'option', { name: 'Paragraph' } ).click();
@@ -58,9 +60,11 @@ test.describe( 'Block moving mode', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		await editor.insertBlock( { name: 'core/group' } );
-		await editor.canvas.click(
-			'role=button[name="Group: Gather blocks in a container."i]'
-		);
+		await editor.canvas
+			.locator(
+				'role=button[name="Group: Gather blocks in a container."i]'
+			)
+			.click();
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'option', { name: 'Paragraph' } ).click();
@@ -122,9 +126,11 @@ test.describe( 'Block moving mode', () => {
 			attributes: { content: 'First Paragraph' },
 		} );
 		await editor.insertBlock( { name: 'core/group' } );
-		await editor.canvas.click(
-			'role=button[name="Group: Gather blocks in a container."i]'
-		);
+		await editor.canvas
+			.locator(
+				'role=button[name="Group: Gather blocks in a container."i]'
+			)
+			.click();
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'option', { name: 'Paragraph' } ).click();

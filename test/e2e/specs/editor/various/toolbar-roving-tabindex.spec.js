@@ -79,7 +79,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
-		await editor.canvas.click( `role=button[name="Create Table"i]` );
+		await editor.canvas
+			.locator( `role=button[name="Create Table"i]` )
+			.click();
 		await pageUtils.pressKeys( 'Tab' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Body cell text',
