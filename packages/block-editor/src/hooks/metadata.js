@@ -28,20 +28,8 @@ export function addMetaAttribute( blockTypeSettings ) {
 	return blockTypeSettings;
 }
 
-export function addSaveProps( extraProps, blockType, attributes ) {
-	extraProps[ META_ATTRIBUTE_NAME ] = attributes[ META_ATTRIBUTE_NAME ];
-
-	return extraProps;
-}
-
 addFilter(
 	'blocks.registerBlockType',
 	'core/metadata/addMetaAttribute',
 	addMetaAttribute
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/metadata/save-props',
-	addSaveProps
 );
