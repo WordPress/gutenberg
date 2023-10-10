@@ -1,7 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set( 'display_errors', 1 );
+ini_set( 'display_startup_errors', 1 );
+error_reporting( E_ALL );
 /**
  * Gutenberg_HTTP_Signaling_Server class
  *
@@ -37,10 +37,9 @@ class Gutenberg_HTTP_Signaling_Server {
 
 		// Example inside file: array( 2323232121 => array( 'message hello','handshake message' ) ).
 		$subscriber_to_messages_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_messages.txt';
-		
+
 		// Example inside file: array( 'doc1: array( 2323232121 ), 'doc2: array( 2323232123, 2323232121 ) ).
 		$topics_to_subscribers_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
-
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 			static::handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path );
@@ -75,14 +74,14 @@ class Gutenberg_HTTP_Signaling_Server {
 	}
 
 	/**
-	 * Reads the contents of $fd and returns them unserialized.
+	 * Reads the contents of $fd and returns them deserialized.
 	 *
 	 * @access private
 	 * @internal
 	 *
 	 * @param resource $fd  A file descriptor.
 	 *
-	 * @return array Unserialized contents of fd.
+	 * @return array Deserialized contents of fd.
 	 */
 	private static function get_contents_from_file_descriptor( $fd ) {
 		$contents_raw = stream_get_contents( $fd );
@@ -93,6 +92,16 @@ class Gutenberg_HTTP_Signaling_Server {
 		return $result;
 	}
 
+	/**
+	 * Locks a file with an exclusive lock and returns its contents deserialized.
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param string $path  The path of a file.
+	 *
+	 * @return array File descriptor as the first element of the array and the contents of the file as the second element.
+	 */
 	private static function get_contents_and_lock_file( $path ) {
 		$fd = fopen( $path, 'c+' );
 		if ( ! $fd ) {
@@ -102,6 +111,17 @@ class Gutenberg_HTTP_Signaling_Server {
 		return array( $fd, static::get_contents_from_file_descriptor( $fd ) );
 	}
 
+	/**
+	 * Makes the file descriptor content of $fd equal to the serialization of content.
+	 * Overwrites what was previously in $fd.
+	 * Unlocks the file descriptor and closes it.
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param resource $fd      A file descriptor.
+	 * @param array    $content An array with the contents to serialized and written to the file.
+	 */
 	private static function save_contents_and_unlock_file( $fd, $content ) {
 		static::save_contents_to_file_descriptor( $fd, $content );
 		flock( $fd, LOCK_UN );
@@ -141,13 +161,25 @@ class Gutenberg_HTTP_Signaling_Server {
 	private static function handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path ) {
 		header( 'Content-Type: text/event-stream' );
 		header( 'Cache-Control: no-cache' );
-		echo 'retry: 3000' . PHP_EOL;
-		$fd = fopen( $subscriber_to_messages_path, 'c+' );
+		list( $fd, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
 		if ( ! $fd ) {
-			die( 'Could not open required file.' );
+			$retries = isset( $_COOKIE['signaling_server_retries'] ) ? intval( $_COOKIE['signaling_server_retries'] ) : 0;
+			$secure  = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
+			setcookie( 'signaling_server_retries', $retries + 1, time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
+			echo 'id: ' . time() . PHP_EOL;
+			echo 'event: error' . PHP_EOL;
+			echo 'data: ' . 'Could not open required file.' . PHP_EOL . PHP_EOL;
+			echo 'retry: ' . 3000 * pow( 2, $retries ) . PHP_EOL;
+			exit;
 		}
-		flock( $fd, LOCK_EX );
-		$subscriber_to_messages = static::get_contents_from_file_descriptor( $fd );
+
+		if ( isset( $_COOKIE['signaling_server_retries'] ) ) {
+			$secure = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
+			// unset the cookie using a past expiration date.
+			setcookie( 'signaling_server_retries', 0, time() - DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
+		}
+
+		echo 'retry: 3000' . PHP_EOL;
 		if ( isset( $subscriber_to_messages[ $subscriber_id ] ) && count( $subscriber_to_messages[ $subscriber_id ] ) > 0 ) {
 			echo 'id: ' . time() . PHP_EOL;
 			echo 'event: message' . PHP_EOL;
@@ -181,7 +213,7 @@ class Gutenberg_HTTP_Signaling_Server {
 				$topics_to_subscribers[ $topic ] = array();
 			}
 			$topics_to_subscribers[ $topic ][] = $subscriber_id;
-			$topics_to_subscribers[ $topic ]   = array_unique( $topics_to_subscribers[ $topic ] ); 
+			$topics_to_subscribers[ $topic ]   = array_unique( $topics_to_subscribers[ $topic ] );
 		}
 		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
 	}
@@ -193,8 +225,9 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @access private
 	 * @internal
 	 *
-	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
-	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
+	 * @param string $topics_to_subscribers_path  Topics to subscribers path.
+	 * @param string $subscriber_id               The subscriber id.
+	 * @param array  $topics                      An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
 	private static function handle_unsubscribe_from_topics( $topics_to_subscribers_path, $subscriber_id, $topics ) {
 		list( $fd, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
@@ -274,16 +307,16 @@ class Gutenberg_HTTP_Signaling_Server {
 		// Example: array( 2323232121 => 34343433323(timestamp) ).
 
 		$fd_subscribers_last_connection = fopen( $subscribers_to_last_connection_path, 'c+' );
-		if( ! $fd_subscribers_last_connection ) {
+		if ( ! $fd_subscribers_last_connection ) {
 			die( 'Could not open required file.' );
 		}
 		flock( $fd_subscribers_last_connection, LOCK_EX );
-		$subscribers_to_last_connection_time                           = static::get_contents_from_file_descriptor( $fd_subscribers_last_connection );
+		$subscribers_to_last_connection_time                             = static::get_contents_from_file_descriptor( $fd_subscribers_last_connection );
 		$subscribers_to_last_connection_time[ $connected_subscriber_id ] = time();
 		$needs_cleanup = false;
 		foreach ( $subscribers_to_last_connection_time as $subscriber_id => $last_connection_time ) {
-			// cleanup connections older than 24 hours.
-			if ( $last_connection_time < time() - 24 * 60 * 60 ) {
+			// cleanup connections older than 1 hour.
+			if ( $last_connection_time < time() - 1 * 60 * 60 ) {
 				unset( $subscribers_to_last_connection_time[ $subscriber_id ] );
 				$needs_cleanup = true;
 			}
@@ -292,7 +325,7 @@ class Gutenberg_HTTP_Signaling_Server {
 
 		if ( $needs_cleanup ) {
 			$fd_subscriber_messages = fopen( $subscriber_to_messages_path, 'c+' );
-			if( ! $fd_subscriber_messages ) {
+			if ( ! $fd_subscriber_messages ) {
 				die( 'Could not open required file.' );
 			}
 			flock( $fd_subscriber_messages, LOCK_EX );
@@ -305,7 +338,7 @@ class Gutenberg_HTTP_Signaling_Server {
 			static::save_contents_to_file_descriptor( $fd_subscriber_messages, $subscriber_to_messages );
 
 			$fd_topics_subscriber = fopen( $topics_to_subscribers_path, 'c+' );
-			if( ! $fd_topics_subscriber ) {
+			if ( ! $fd_topics_subscriber ) {
 				die( 'Could not open required file.' );
 			}
 			flock( $fd_topics_subscriber, LOCK_EX );
@@ -325,12 +358,10 @@ class Gutenberg_HTTP_Signaling_Server {
 			flock( $fd_topics_subscriber, LOCK_UN );
 			fclose( $fd_topics_subscriber );
 		}
-		
+
 		flock( $fd_subscribers_last_connection, LOCK_UN );
 		fclose( $fd_subscribers_last_connection );
 	}
-
-
 }
 
 Gutenberg_HTTP_Signaling_Server::init();
