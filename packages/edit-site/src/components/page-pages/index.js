@@ -4,7 +4,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import {
-	VisuallyHidden,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -18,8 +17,8 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import PageActions from '../page-actions';
 import { DataViews } from '../dataviews';
+import useTrashPostAction from '../actions/trash-post';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
@@ -134,27 +133,22 @@ export default function PagePages() {
 					postStatuses[ props.row.original.status ] ??
 					props.row.original.status,
 			},
-			{
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-				id: 'actions',
-				cell: ( props ) => {
-					const page = props.row.original;
-					return <PageActions postId={ page.id } />;
-				},
-				enableHiding: false,
-			},
 		],
 		[ postStatuses ]
 	);
+
+	const trashPostAction = useTrashPostAction();
+	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<Page title={ __( 'Pages' ) }>
 			<DataViews
 				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
-				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
 				options={ {
