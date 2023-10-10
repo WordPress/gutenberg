@@ -19,12 +19,14 @@ function render_block_core_template_part( $attributes ) {
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 
-	if (
-		isset( $attributes['slug'] ) &&
-		isset( $attributes['theme'] ) &&
-		get_stylesheet() === $attributes['theme']
-	) {
-		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
+	if ( isset( $attribues['theme'] ) ) {
+		$theme = $attributes['theme'];
+	} else {
+		$theme = get_stylesheet();
+	}
+
+	if ( isset( $attributes['slug'] ) ) {
+		$template_part_id    = $theme . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'           => 'wp_template_part',
@@ -34,7 +36,7 @@ function render_block_core_template_part( $attributes ) {
 					array(
 						'taxonomy' => 'wp_theme',
 						'field'    => 'name',
-						'terms'    => $attributes['theme'],
+						'terms'    => $theme,
 					),
 				),
 				'posts_per_page'      => 1,
