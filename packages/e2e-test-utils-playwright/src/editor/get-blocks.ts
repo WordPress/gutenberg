@@ -19,6 +19,10 @@ type Block = {
  * @return  The blocks.
  */
 export async function getBlocks( this: Editor, { full = false } = {} ) {
+	await this.page.waitForFunction(
+		() => window?.wp?.blocks && window?.wp?.data
+	);
+
 	return await this.page.evaluate(
 		( [ _full ] ) => {
 			// Remove other unpredictable properties like clientId from blocks for testing purposes.

@@ -33,6 +33,7 @@
 		"html": false,
 		"multiple": false,
 		"reusable": false,
+		"inserter": false,
 		"spacing": {
 			"margin": true,
 			"padding": true,

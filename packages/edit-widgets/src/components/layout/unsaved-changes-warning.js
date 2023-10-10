@@ -16,7 +16,7 @@ import { store as editWidgetsStore } from '../../store';
  * This is a duplicate of the component implemented in the editor package.
  * Duplicated here as edit-widgets doesn't depend on editor.
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function UnsavedChangesWarning() {
 	const isDirty = useSelect( ( select ) => {

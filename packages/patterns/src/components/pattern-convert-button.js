@@ -29,7 +29,7 @@ import { PATTERN_SYNC_TYPES } from '../constants';
  * @param {Object}   props              Component props.
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
- * @return {import('@wordpress/element').WPComponent} The menu control or null.
+ * @return {import('react').ComponentType} The menu control or null.
  */
 export default function PatternConvertButton( { clientIds, rootClientId } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );

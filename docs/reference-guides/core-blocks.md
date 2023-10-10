@@ -274,7 +274,46 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/footnotes
 -	**Category:** text
--	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~multiple~~, ~~reusable~~
+-	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
+## Form
+
+A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form))
+
+-	**Name:** core/form
+-	**Category:** common
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Attributes:** action, email, method, submissionMethod
+
+## Input field
+
+The basic building block for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input))
+
+-	**Name:** core/form-input
+-	**Category:** common
+-	**Parent:** core/form
+-	**Supports:** anchor, spacing (margin), ~~reusable~~
+-	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
+
+## Form Submission Notification
+
+Provide a notification message after the form has been submitted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification))
+
+-	**Name:** core/form-submission-notification
+-	**Category:** common
+-	**Parent:** core/form
+-	**Supports:** 
+-	**Attributes:** type
+
+## Form submit button
+
+A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submit-button))
+
+-	**Name:** core/form-submit-button
+-	**Category:** common
+-	**Parent:** core/form
+-	**Supports:** 
 -	**Attributes:** 
 
 ## Classic

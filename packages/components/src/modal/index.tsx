@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
+import type {
+	ForwardedRef,
+	KeyboardEvent,
+	MutableRefObject,
+	UIEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -15,12 +20,13 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
+	createContext,
+	useContext,
 } from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
 	useFocusOnMount,
-	__experimentalUseFocusOutside as useFocusOutside,
 	useConstrainedTabbing,
 	useMergeRefs,
 } from '@wordpress/compose';
@@ -36,8 +42,13 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
-// Used to count the number of open modals.
-let openModalCount = 0;
+// Used to track and dismiss the prior modal when another opens unless nested.
+const level0Dismissers: MutableRefObject<
+	ModalProps[ 'onRequestClose' ] | undefined
+>[] = [];
+const ModalContext = createContext( level0Dismissers );
+
+let isBodyOpenClassActive = false;
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -91,7 +102,6 @@ function UnforwardedModal(
 	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( onRequestClose );
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
 
@@ -120,26 +130,52 @@ function UnforwardedModal(
 		}
 	}, [ contentRef ] );
 
+	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
 		ariaHelper.modalize( ref.current );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
+	// Keeps a fresh ref for the subsequent effect.
+	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
 	useEffect( () => {
-		openModalCount++;
+		refOnRequestClose.current = onRequestClose;
+	}, [ onRequestClose ] );
 
-		if ( openModalCount === 1 ) {
+	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
+	// one should remain open at a time and the list enables closing prior ones.
+	const dismissers = useContext( ModalContext );
+	// Used for the tracking and dismissing any nested modals.
+	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
+
+	// Updates the stack tracking open modals at this level and calls
+	// onRequestClose for any prior and/or nested modals as applicable.
+	useEffect( () => {
+		dismissers.push( refOnRequestClose );
+		const [ first, second ] = dismissers;
+		if ( second ) first?.current?.();
+
+		const nested = nestedDismissers.current;
+		return () => {
+			nested[ 0 ]?.current?.();
+			dismissers.shift();
+		};
+	}, [ dismissers ] );
+
+	const isLevel0 = dismissers === level0Dismissers;
+	// Adds/removes the value of bodyOpenClassName to body element.
+	useEffect( () => {
+		if ( ! isBodyOpenClassActive ) {
+			isBodyOpenClassActive = true;
 			document.body.classList.add( bodyOpenClassName );
 		}
-
 		return () => {
-			openModalCount--;
-
-			if ( openModalCount === 0 ) {
+			if ( isLevel0 && dismissers.length === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
+				isBodyOpenClassActive = false;
 			}
 		};
-	}, [ bodyOpenClassName ] );
+	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -200,12 +236,9 @@ function UnforwardedModal(
 		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
 	} = {
 		onPointerDown: ( event ) => {
-			if ( event.isPrimary && event.target === event.currentTarget ) {
+			if ( event.target === event.currentTarget ) {
 				pressTarget = event.target;
-				// Avoids loss of focus yet also leaves `useFocusOutside`
-				// practically useless with its only potential trigger being
-				// programmatic focus movement. TODO opt for either removing
-				// the hook or enhancing it such that this isn't needed.
+				// Avoids focus changing so that focus return works as expected.
 				event.preventDefault();
 			}
 		},
@@ -222,7 +255,7 @@ function UnforwardedModal(
 		},
 	};
 
-	return createPortal(
+	const modal = (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
@@ -253,9 +286,6 @@ function UnforwardedModal(
 					aria-labelledby={ contentLabel ? undefined : headingId }
 					aria-describedby={ aria.describedby }
 					tabIndex={ -1 }
-					{ ...( shouldCloseOnClickOutside
-						? focusOutsideProps
-						: {} ) }
 					onKeyDown={ onKeyDown }
 				>
 					<div
@@ -320,7 +350,13 @@ function UnforwardedModal(
 					</div>
 				</div>
 			</StyleProvider>
-		</div>,
+		</div>
+	);
+
+	return createPortal(
+		<ModalContext.Provider value={ nestedDismissers.current }>
+			{ modal }
+		</ModalContext.Provider>,
 		document.body
 	);
 }
