@@ -2,6 +2,7 @@
 /**
  * HTML API: WP_HTML_Tag_Processor class
  *
+ *
  * Scans through an HTML document to find specific tags, then
  * transforms those tags by adding, removing, or updating the
  * values of the HTML attributes within that tag (opener).

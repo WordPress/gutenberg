@@ -59,9 +59,6 @@
 	<exclude-pattern>./vendor/*</exclude-pattern>
 	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
 
-	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg -->
-	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
-
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>

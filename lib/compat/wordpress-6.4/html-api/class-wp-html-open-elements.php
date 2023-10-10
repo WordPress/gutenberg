@@ -2,6 +2,7 @@
 /**
  * HTML API: WP_HTML_Open_Elements class
  *
+ *
  * @package WordPress
  * @subpackage HTML-API
  * @since 6.4.0
