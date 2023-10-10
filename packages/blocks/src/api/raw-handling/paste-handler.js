@@ -32,6 +32,10 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import {
+	removeMetaTags,
+	removeWindowsFragments,
+} from './get-clipboard-event-data';
 
 /**
  * Browser dependencies
@@ -90,17 +94,8 @@ export function pasteHandler( {
 	tagName,
 	preserveWhiteSpace,
 } ) {
-	// First of all, strip any meta tags.
-	HTML = HTML.replace( /<meta[^>]+>/g, '' );
-	// Strip Windows markers.
-	HTML = HTML.replace(
-		/^\s*<html[^>]*>\s*<body[^>]*>(?:\s*<!--\s*StartFragment\s*-->)?/i,
-		''
-	);
-	HTML = HTML.replace(
-		/(?:<!--\s*EndFragment\s*-->\s*)?<\/body>\s*<\/html>\s*$/i,
-		''
-	);
+	HTML = removeMetaTags( HTML );
+	HTML = removeWindowsFragments( HTML );
 
 	// If we detect block delimiters in HTML, parse entirely as blocks.
 	if ( mode !== 'INLINE' ) {

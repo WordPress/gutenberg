@@ -4,6 +4,7 @@
 import {
 	serialize,
 	pasteHandler,
+	getClipboardEventData,
 	createBlock,
 	findTransform,
 	getBlockTransforms,
@@ -19,7 +20,6 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 
@@ -153,7 +153,8 @@ export default function useClipboardHandler() {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const { plainText, html, files } = getPasteEventData( event );
+				const { plainText, html, files } =
+					getClipboardEventData( event );
 				let blocks = [];
 
 				if ( files.length ) {
