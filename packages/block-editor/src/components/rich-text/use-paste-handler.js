@@ -56,26 +56,6 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			const transformed = formatTypes.reduce(
-				( accumlator, { __unstablePasteRule } ) => {
-					// Only allow one transform.
-					if ( __unstablePasteRule && accumlator === value ) {
-						accumlator = __unstablePasteRule( value, {
-							html,
-							plainText,
-						} );
-					}
-
-					return accumlator;
-				},
-				value
-			);
-
-			if ( transformed !== value ) {
-				onChange( transformed );
-				return;
-			}
-
 			const isInternal =
 				event.clipboardData.getData( 'rich-text' ) === 'true';
 
@@ -160,9 +140,28 @@ export function usePasteHandler( props ) {
 			} );
 
 			if ( typeof content === 'string' ) {
-				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
-				onChange( insert( value, valueToInsert ) );
+				const transformed = formatTypes.reduce(
+					( accumlator, { __unstablePasteRule } ) => {
+						// Only allow one transform.
+						if ( __unstablePasteRule && accumlator === value ) {
+							accumlator = __unstablePasteRule( value, {
+								html,
+								plainText,
+							} );
+						}
+
+						return accumlator;
+					},
+					value
+				);
+
+				if ( transformed !== value ) {
+					onChange( transformed );
+				} else {
+					const valueToInsert = create( { html: content } );
+					addActiveFormats( valueToInsert, value.activeFormats );
+					onChange( insert( value, valueToInsert ) );
+				}
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );

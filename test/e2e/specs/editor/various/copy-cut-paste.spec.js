@@ -521,12 +521,7 @@ test.describe( 'Copy/cut/paste', () => {
 	} );
 
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: {
-				content: '',
-			},
-		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		pageUtils.setClipboardData( {
 			plainText: 'https://wordpress.org/gutenberg',
 			html: 'https://wordpress.org/gutenberg',
@@ -540,6 +535,18 @@ test.describe( 'Copy/cut/paste', () => {
 						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
 				},
 			},
+		] );
+	} );
+
+	test( 'should embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
 		] );
 	} );
 

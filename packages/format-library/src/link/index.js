@@ -169,7 +169,7 @@ export const link = {
 			);
 		}
 
-		return applyFormat( value );
+		return applyFormat( value, format );
 	},
 	edit: Edit,
 };
