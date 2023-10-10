@@ -95,6 +95,15 @@ $swatch-gap: 12px;
 		border-bottom-right-radius: $radius-block-ui;
 	}
 
+	// Less accurate fallback to detect the last instance of this item
+	// for older browsers not yet supporting the `:has()` selector.
+	@supports not selector(:has(*)) {
+		&.last {
+			border-bottom-left-radius: $radius-block-ui;
+			border-bottom-right-radius: $radius-block-ui;
+		}
+	}
+
 	> div,
 	> div > button {
 		border-radius: inherit;
