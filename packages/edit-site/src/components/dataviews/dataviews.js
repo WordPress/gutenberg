@@ -64,7 +64,7 @@ export default function DataViews( {
 								currentView.sort
 									? [
 											{
-												id: currentView.sort.field,
+												id: currentView.sort.orderby,
 												desc:
 													currentView.sort
 														.direction === 'desc',
@@ -82,7 +82,7 @@ export default function DataViews( {
 				const [ { id, desc } ] = sort;
 				return {
 					...currentView,
-					sort: { field: id, direction: desc ? 'desc' : 'asc' },
+					sort: { orderby: id, direction: desc ? 'desc' : 'asc' },
 				};
 			} );
 		},
