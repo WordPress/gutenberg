@@ -93,7 +93,7 @@ store(
 		actions: {
 			core: {
 				image: {
-					showLightbox: ( { context }, image ) => {
+					showLightbox: ( { context, event }, image ) => {
 						// We can't initialize the lightbox until the reference
 						// image is loaded, otherwise the UX is broken.
 						if ( ! context.core.image.imageLoaded ) {
@@ -103,6 +103,7 @@ store(
 						context.core.image.lastFocusedElement =
 							window.document.activeElement;
 						context.core.image.scrollDelta = 0;
+						context.core.image.pointerType = event.pointerType;
 
 						context.core.image.lightboxEnabled = true;
 						setStyles( context, image );
@@ -303,7 +304,9 @@ store(
 									focusableElements.length - 1
 								];
 
-							ref.querySelector( '.close-button' ).focus();
+							if ( context.core.image.pointerType !== 'mouse' ) {
+								ref.querySelector( '.close-button' ).focus();
+							}
 						}
 					},
 					setStylesOnResize: ( { state, context, ref } ) => {
