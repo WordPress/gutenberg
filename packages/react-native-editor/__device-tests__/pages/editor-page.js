@@ -577,7 +577,7 @@ class EditorPage {
 		blockLocator += `[@${
 			this.accessibilityIdXPathAttrib
 		}="Move block up from row ${ position } to row ${ position - 1 }"]`;
-		const moveUpButton = await this.driver.elementByXPath( blockLocator );
+		const moveUpButton = await this.driver.$( `~${ blockLocator }` );
 		await moveUpButton.click();
 	}
 
@@ -793,8 +793,7 @@ class EditorPage {
 			this.accessibilityIdKey
 		);
 		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
-		const imageBlockInnerElement =
-			await this.driver.elementByXPath( blockLocator );
+		const imageBlockInnerElement = await this.driver.$( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 
