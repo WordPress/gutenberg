@@ -45,7 +45,7 @@ export default function DataViews( {
 			sorting: view.sort
 				? [
 						{
-							id: view.sort.field,
+							id: view.sort.orderby,
 							desc: view.sort.direction === 'desc',
 						},
 				  ]

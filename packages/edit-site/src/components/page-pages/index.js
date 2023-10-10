@@ -29,7 +29,7 @@ export default function PagePages() {
 		page: 0,
 		perPage: 5,
 		sort: {
-			field: 'date',
+			orderby: 'date',
 			direction: 'desc',
 		},
 	} );
@@ -49,7 +49,7 @@ export default function PagePages() {
 			page: view.page + 1, // tanstack starts from zero.
 			_embed: 'author',
 			order: view.sort.direction,
-			orderby: view.sort.field,
+			orderby: view.sort.orderby,
 			search: view.search,
 			status: [ 'publish', 'draft' ],
 		} ),
