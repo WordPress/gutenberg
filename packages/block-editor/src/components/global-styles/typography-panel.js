@@ -34,7 +34,6 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
-	const hasTextOrientation = useHasTextOrientationControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -47,7 +46,6 @@ export function useHasTypographyPanel( settings ) {
 		hasFontSize ||
 		hasTextDecoration ||
 		hasWritingMode ||
-		hasTextOrientation ||
 		hasTextColumns
 	);
 }
@@ -110,10 +108,6 @@ function useHasTextDecorationControl( settings ) {
 
 function useHasWritingModeControl( settings ) {
 	return settings?.typography?.writingMode;
-}
-
-function useHasTextOrientationControl( settings ) {
-	return settings?.typography?.textOrientation;
 }
 
 function useHasTextColumnsControl( settings ) {
