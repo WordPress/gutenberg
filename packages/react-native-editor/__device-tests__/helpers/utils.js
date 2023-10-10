@@ -6,6 +6,7 @@ const childProcess = require( 'child_process' );
 import { remote } from 'webdriverio';
 // TODO: Replace usage of wd in favor of WebdriverIO
 const wd = null;
+const crypto = require( 'crypto' );
 const path = require( 'path' );
 /**
  * Internal dependencies
@@ -188,8 +189,14 @@ const setupDriver = async () => {
 
 const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
-		const jobID = driver.sessionId;
-		const jobURL = `https://saucelabs.com/jobs/${ jobID }`;
+		const sessionId = driver.sessionId;
+
+		const secret = `${ serverConfigs.sauce.user }:${ serverConfigs.sauce.key }`;
+		const token = crypto
+			.createHmac( 'md5', secret )
+			.update( sessionId )
+			.digest( 'hex' );
+		const jobURL = `https://app.saucelabs.com/tests/${ sessionId }?auth=${ token }`;
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
