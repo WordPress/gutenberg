@@ -61,7 +61,7 @@ class Gutenberg_HTTP_Signaling_Server {
 					static::handle_unsubscribe_from_topics( $topics_to_subscribers_path, $subscriber_id, $message['topics'] );
 					break;
 				case 'publish':
-					static::handle_publish_message( static::$topics_to_subscribers_path, $subscriber_id, $message );
+					static::handle_publish_message( $topics_to_subscribers_path, $subscriber_to_messages_path, $subscriber_id, $message );
 					break;
 				case 'ping':
 					static::handle_ping( $subscriber_to_messages_path, $subscriber_id );
@@ -177,10 +177,10 @@ class Gutenberg_HTTP_Signaling_Server {
 			die( 'Could not open required file.' );
 		}
 		foreach ( $topics as $topic ) {
-			if ( ! $topics_to_subscribers[ $topic ] ) {
+			if ( ! isset( $topics_to_subscribers[ $topic ] ) ) {
 				$topics_to_subscribers[ $topic ] = array();
 			}
-			$topics_to_subscribers[ $topic ][] = static::$subscriber_id;
+			$topics_to_subscribers[ $topic ][] = $subscriber_id;
 			$topics_to_subscribers[ $topic ]   = array_unique( $topics_to_subscribers[ $topic ] ); 
 		}
 		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
@@ -203,7 +203,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		}
 		foreach ( $topics as $topic ) {
 			if ( $topics_to_subscribers[ $topic ] ) {
-				$topics_to_subscribers[ $topic ] = array_diff( $topics_to_subscribers[ $topic ], array( static::$subscriber_id ) );
+				$topics_to_subscribers[ $topic ] = array_diff( $topics_to_subscribers[ $topic ], array( $subscriber_id ) );
 			}
 		}
 		static::save_contents_and_unlock_file( $fd, $topics_to_subscribers );
@@ -220,7 +220,7 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
 	private static function handle_publish_message( $topics_to_subscribers_path, $subscriber_to_messages_path, $subscriber_id, $message ) {
-		list( $fd_topics_subscriber, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
+		list( $fd_topics_subscriber, $topics_to_subscribers )       = static::get_contents_and_lock_file( $topics_to_subscribers_path );
 		list( $fd_subscriber_to_messages, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
 		if ( ! $fd_topics_subscriber || ! $fd_subscriber_to_messages ) {
 			die( 'Could not open required file.' );
@@ -230,15 +230,15 @@ class Gutenberg_HTTP_Signaling_Server {
 		if ( $receivers && count( $receivers ) > 0 ) {
 			$message['clients'] = count( $receivers );
 			foreach ( $receivers as $receiver ) {
-				if ( ! $subscriber_to_messages[ $receiver ] ) {
+				if ( ! isset( $subscriber_to_messages[ $receiver ] ) ) {
 					$subscriber_to_messages[ $receiver ] = array();
 				}
 				$subscriber_to_messages[ $receiver ][] = $message;
 			}
 			static::save_contents_to_file_descriptor( $fd_subscriber_to_messages, $subscriber_to_messages );
 		}
-		flock( $fd_subscriber_messages, LOCK_UN );
-		fclose( $fd_subscriber_messages );
+		flock( $fd_subscriber_to_messages, LOCK_UN );
+		fclose( $fd_subscriber_to_messages );
 		flock( $fd_topics_subscriber, LOCK_UN );
 		fclose( $fd_topics_subscriber );
 	}
@@ -258,7 +258,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		if ( ! $fd_subscriber_to_messages ) {
 			die( 'Could not open required file.' );
 		}
-		if ( ! $subscriber_to_messages[ static::$subscriber_id ] ) {
+		if ( ! $subscriber_to_messages[ $subscriber_id ] ) {
 			$subscriber_to_messages[ $subscriber_id ] = array();
 		}
 		$subscriber_to_messages[ $subscriber_id ][] = array( 'type' => 'pong' );
