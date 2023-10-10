@@ -1359,11 +1359,8 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->` );
 	} );
 
-	test( 'should merge two list items with nested lists', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
+	test.describe( 'should merge two list items with nested lists', () => {
+		const start = {
 			name: 'core/list',
 			innerBlocks: [
 				{
@@ -1397,22 +1394,8 @@ test.describe( 'List (@firefox)', () => {
 					],
 				},
 			],
-		} );
-
-		// Navigate to the third item.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Test caret position.
-		await page.keyboard.type( '‸' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		};
+		const end = [
 			{
 				name: 'core/list',
 				innerBlocks: [
@@ -1437,6 +1420,43 @@ test.describe( 'List (@firefox)', () => {
 					},
 				],
 			},
-		] );
+		];
+
+		test( 'Backspace', async ( { editor, page } ) => {
+			await editor.insertBlock( start );
+
+			// Navigate to the start of the third item.
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+
+			await page.keyboard.press( 'Backspace' );
+
+			// Test caret position.
+			await page.keyboard.type( '‸' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( end );
+		} );
+
+		test( 'Delete (forward)', async ( { editor, page } ) => {
+			await editor.insertBlock( start );
+
+			// Navigate to the end of the second item.
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
+
+			await page.keyboard.press( 'Delete' );
+
+			// Test caret position.
+			await page.keyboard.type( '‸' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( end );
+		} );
 	} );
 } );
