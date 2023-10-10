@@ -114,9 +114,8 @@ export default function PagePages() {
 			{
 				header: 'Status',
 				id: 'status',
-				cell: ( props ) =>
-					postStatuses[ props.row.original.status ] ??
-					props.row.original.status,
+				accessorFn: ( page ) =>
+					postStatuses[ page.status ] ?? page.status,
 			},
 			{
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
