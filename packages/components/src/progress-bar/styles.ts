@@ -34,6 +34,10 @@ export const Track = styled.div`
 		transparent 90%
 	);
 	border-radius: ${ CONFIG.radiusBlockUi };
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 `;
 
 export const Indicator = styled.div< {
@@ -51,6 +55,10 @@ export const Indicator = styled.div< {
 		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
 		transparent 10%
 	);
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
 
 	${ ( { isIndeterminate, value } ) =>
 		isIndeterminate
