@@ -260,7 +260,8 @@ function ListViewComponent(
 		return null;
 	}
 
-	const describedById = description && 'block-editor-list-view-description';
+	const describedById =
+		description && `block-editor-list-view-description-${ instanceId }`;
 
 	return (
 		<AsyncModeProvider value={ true }>
