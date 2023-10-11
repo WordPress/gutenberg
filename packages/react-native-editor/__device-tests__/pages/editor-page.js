@@ -527,9 +527,8 @@ class EditorPage {
 	async moveBlockSelectionUp( options = { toRoot: false } ) {
 		let navigateUpElements = [];
 		do {
-			await this.driver.sleep( 2000 );
-			navigateUpElements =
-				await this.driver.elementsByAccessibilityId( 'Navigate Up' );
+			await this.driver.pause( 2000 );
+			navigateUpElements = await this.driver.$$( `~Navigate Up` );
 			if ( navigateUpElements.length > 0 ) {
 				await navigateUpElements[ 0 ].click();
 			}
@@ -578,7 +577,7 @@ class EditorPage {
 		blockLocator += `[@${
 			this.accessibilityIdXPathAttrib
 		}="Move block up from row ${ position } to row ${ position - 1 }"]`;
-		const moveUpButton = await this.driver.elementByXPath( blockLocator );
+		const moveUpButton = await this.driver.$( `~${ blockLocator }` );
 		await moveUpButton.click();
 	}
 
@@ -770,8 +769,7 @@ class EditorPage {
 			this.driver,
 			'//XCUIElementTypeOther[@name="Media Add image or video"]'
 		);
-		const addMediaButton =
-			await mediaSection.elementByAccessibilityId( 'Add image or video' );
+		const addMediaButton = await mediaSection.$( '~Add image or video' );
 		await addMediaButton.click();
 	}
 
@@ -795,8 +793,7 @@ class EditorPage {
 			this.accessibilityIdKey
 		);
 		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
-		const imageBlockInnerElement =
-			await this.driver.elementByXPath( blockLocator );
+		const imageBlockInnerElement = await this.driver.$( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 
@@ -809,10 +806,13 @@ class EditorPage {
 	}
 
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath(
+		const imageBlockCaptionButton = await this.driver.$(
 			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
 		);
-		await imageBlockCaptionField.click();
+		await imageBlockCaptionButton.click();
+		const imageBlockCaptionField = await imageBlockCaptionButton.$(
+			'//XCUIElementTypeTextView'
+		);
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
 

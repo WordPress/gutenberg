@@ -30,7 +30,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 		// tap on Media Library option
 		await editorPage.chooseMediaLibrary();
 		// wait until the media is added
-		await editorPage.driver.sleep( 500 );
+		await editorPage.driver.pause( 500 );
 
 		// get the html version of the content
 		const html = await editorPage.getHtmlContent();
@@ -65,7 +65,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 		// tap on Media Library option
 		await editorPage.chooseMediaLibrary();
 		// wait until the media is added
-		await editorPage.driver.sleep( 500 );
+		await editorPage.driver.pause( 500 );
 
 		// get the html version of the content
 		const html = await editorPage.getHtmlContent();
@@ -151,8 +151,7 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.replaceMediaImage();
 
 		// First modal should no longer be presented.
-		const replaceButtons =
-			await editorPage.driver.elementsByAccessibilityId( 'Replace' );
+		const replaceButtons = await editorPage.driver.$$( '~Replace' );
 		// eslint-disable-next-line jest/no-conditional-expect
 		expect( replaceButtons.length ).toBe( 0 );
 
