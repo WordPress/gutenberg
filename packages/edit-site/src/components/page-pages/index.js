@@ -171,7 +171,7 @@ export default function PagePages() {
 							}
 						>
 							{ [
-								{ id: undefined, name: __( 'None' ) },
+								{ id: undefined, name: __( 'All' ) },
 								...authors,
 							].map( ( author ) => {
 								return (
