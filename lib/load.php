@@ -102,6 +102,7 @@ require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
+require __DIR__ . '/compat/wordpress-6.4/site-editor.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
