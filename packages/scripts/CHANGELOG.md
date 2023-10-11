@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.14.0 (2023-10-05)
+
 ### Internal
 
 -   The bundled `@pmmmwh/react-refresh-webpack-plugin` dependency has been updated from requiring `^0.5.2` to requiring `^0.5.11` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).

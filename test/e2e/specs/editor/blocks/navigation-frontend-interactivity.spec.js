@@ -27,7 +27,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -88,7 +88,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -203,7 +203,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -268,7 +268,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Page list menu',
 				content: `

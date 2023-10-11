@@ -37,3 +37,21 @@ h3.edit-site-template-card__template-areas-title {
 	font-weight: 500;
 	margin: 0 0 $grid-unit-10;
 }
+
+
+.edit-site-template-panel__replace-template-modal {
+	z-index: z-index(".edit-site-template-panel__replace-template-modal");
+}
+
+.edit-site-template-panel__replace-template-modal__content {
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
+}

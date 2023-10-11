@@ -189,7 +189,12 @@ export default function useSetting( path ) {
 			// Return if the setting was found in either the block instance or the store.
 			if ( result !== undefined ) {
 				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
-					return result.custom ?? result.theme ?? result.default;
+					return [ 'default', 'theme', 'custom' ].reduce(
+						( acc, key ) => {
+							return acc.concat( result[ key ] ?? [] );
+						},
+						[]
+					);
 				}
 				return result;
 			}
