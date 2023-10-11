@@ -21,14 +21,6 @@ const openMenu = ( store, menuOpenedOn ) => {
 		// Add a `has-modal-open` class to the <html> root.
 		document.documentElement.classList.add( 'has-modal-open' );
 	}
-	// Focus the clicked button manually because Safari
-	// doesn't place focus on it.
-	if (
-		menuOpenedOn === 'click' &&
-		context.core.navigation.type === 'submenu'
-	) {
-		ref.focus();
-	}
 };
 
 const closeMenu = ( store, menuClosedOn ) => {
