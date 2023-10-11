@@ -30,7 +30,7 @@ import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { isURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -73,7 +73,7 @@ function AudioEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
-			if ( isURL( newSrc ) ) {
+			if ( isURL( newSrc ) && /^https?:/.test( getProtocol( newSrc ) ) ) {
 				setAttributes( { src: newSrc, id: undefined } );
 			} else {
 				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );

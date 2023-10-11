@@ -305,39 +305,6 @@ Attribute available in the block:
 { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
-
-_Example_: Extract the `content` attribute from a blockquote element found in the block's markup.
-
-Saved content:
-```html
-<div>
-	Block Content
-
-	<blockquote>
-		<p>First line</p>
-		<p>Second line</p>
-	</blockquote>
-</div>
-```
-
-Attribute definition:
-```js
-{
-	content: {
-		type: 'string',
-		source: 'html',
-		multiline: 'p',
-		selector: 'blockquote',
-	}
-}
-```
-
-Attribute available in the block:
-```js
-{ "content": "<p>First line</p><p>Second line</p>" }
-```
-
 ### `query` source
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the `selector` argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.

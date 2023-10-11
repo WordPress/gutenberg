@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -375,7 +376,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +395,22 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch.ensureDefaultBlock();
 	};
 
 /**
@@ -1007,17 +1014,12 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
-		if (
-			! blockAType.merge &&
-			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
-		) {
-			dispatch.selectBlock( blockA.clientId );
-			return;
-		}
-
 		const blockB = select.getBlock( clientIdB );
 
-		if ( ! blockAType.merge ) {
+		if (
+			! blockAType.merge &&
+			getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1034,6 +1036,7 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1044,7 +1047,63 @@ export const mergeBlocks =
 				dispatch.selectBlock(
 					blockWithSameType.innerBlocks[ 0 ].clientId
 				);
+
+				// Attempt to merge the next block if it's the same type and
+				// same attributes. This is useful when merging a paragraph into
+				// a list, and the next block is also a list. If we don't merge,
+				// it looks like one list, but it's actually two lists. The same
+				// applies to other blocks such as a group with the same
+				// attributes.
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientIdA );
+
+				if (
+					nextBlockClientId &&
+					select.getBlockName( clientIdA ) ===
+						select.getBlockName( nextBlockClientId )
+				) {
+					const rootAttributes =
+						select.getBlockAttributes( clientIdA );
+					const previousRootAttributes =
+						select.getBlockAttributes( nextBlockClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						dispatch.moveBlocksToPosition(
+							select.getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							clientIdA
+						);
+						dispatch.removeBlock( nextBlockClientId, false );
+					}
+				}
 			} );
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+			dispatch.removeBlock(
+				clientIdA,
+				select.isBlockSelected( clientIdA )
+			);
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockB ) ) {
+			dispatch.removeBlock(
+				clientIdB,
+				select.isBlockSelected( clientIdB )
+			);
+			return;
+		}
+
+		if ( ! blockAType.merge ) {
+			dispatch.selectBlock( blockA.clientId );
 			return;
 		}
 
@@ -1851,9 +1910,10 @@ export const registerInserterMediaCategory =
 			);
 			return;
 		}
-		const { inserterMediaCategories = [] } = select.getSettings();
+		const registeredInserterMediaCategories =
+			select.getRegisteredInserterMediaCategories();
 		if (
-			inserterMediaCategories.some(
+			registeredInserterMediaCategories.some(
 				( { name } ) => name === category.name
 			)
 		) {
@@ -1863,8 +1923,8 @@ export const registerInserterMediaCategory =
 			return;
 		}
 		if (
-			inserterMediaCategories.some(
-				( { labels: { name } } ) => name === category.labels?.name
+			registeredInserterMediaCategories.some(
+				( { labels: { name } = {} } ) => name === category.labels?.name
 			)
 		) {
 			console.error(
@@ -1877,13 +1937,8 @@ export const registerInserterMediaCategory =
 		// private, so extenders can only add new inserter media categories and don't have any
 		// control over the core media categories.
 		dispatch( {
-			type: 'UPDATE_SETTINGS',
-			settings: {
-				inserterMediaCategories: [
-					...inserterMediaCategories,
-					{ ...category, isExternalResource: true },
-				],
-			},
+			type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+			category: { ...category, isExternalResource: true },
 		} );
 	};
 

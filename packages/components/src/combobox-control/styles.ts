@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { Flex } from '../flex';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import type { ComboboxControlProps } from './types';
 
 const deprecatedDefaultSize = ( {

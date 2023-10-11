@@ -102,7 +102,7 @@ describe( 'Change detection', () => {
 
 		const postPendingReviewButton = (
 			await page.$x( "//label[contains(text(), 'Pending review')]" )
-		 )[ 0 ];
+		)[ 0 ];
 		await postPendingReviewButton.click( 'button' );
 
 		// Force autosave to occur immediately.
@@ -349,6 +349,7 @@ describe( 'Change detection', () => {
 		// Trash post.
 		await openDocumentSettingsSidebar();
 		await page.click( '.editor-post-trash.components-button' );
+		await page.click( '.components-confirm-dialog .is-primary' );
 
 		await Promise.all( [
 			// Wait for "Saved" to confirm save complete.

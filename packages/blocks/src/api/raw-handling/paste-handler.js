@@ -8,6 +8,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
  */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
+import { getBlockInnerHTML } from '../serializer';
 import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -16,6 +17,7 @@ import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
+import msListIgnore from './ms-list-ignore';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -48,6 +50,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
 	] );
@@ -66,40 +69,6 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 }
 
 /**
- * If we're allowed to return inline content, and there is only one inlineable
- * block, and the original plain text content does not have any line breaks,
- * then treat it as inline paste.
- *
- * @param {Object} options
- * @param {Array}  options.blocks
- * @param {string} options.plainText
- * @param {string} options.mode
- */
-function maybeConvertToInline( { blocks, plainText, mode } ) {
-	if (
-		mode === 'AUTO' &&
-		blocks.length === 1 &&
-		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
-	) {
-		const trimRegex = /^[\n]+|[\n]+$/g;
-		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( trimRegex, '' );
-
-		if (
-			trimmedPlainText !== '' &&
-			trimmedPlainText.indexOf( '\n' ) === -1
-		) {
-			const target = blocks[ 0 ].innerBlocks.length
-				? blocks[ 0 ].innerBlocks[ 0 ]
-				: blocks[ 0 ];
-			return target.attributes.content;
-		}
-	}
-
-	return blocks;
-}
-
-/**
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {Object}  options
@@ -112,7 +81,6 @@ function maybeConvertToInline( { blocks, plainText, mode } ) {
  * @param {Array}   [options.tagName]            The tag into which content will be inserted.
  * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
  *
- * @param {boolean} [options.disableFilters]     Whether or not to filter non semantic content.
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export function pasteHandler( {
@@ -121,7 +89,6 @@ export function pasteHandler( {
 	mode = 'AUTO',
 	tagName,
 	preserveWhiteSpace,
-	disableFilters,
 } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
@@ -156,25 +123,34 @@ export function pasteHandler( {
 		HTML = HTML.normalize();
 	}
 
-	if ( disableFilters ) {
-		return maybeConvertToInline( {
-			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
-			plainText,
-			mode,
-		} );
-	}
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
 
-	// Parse Markdown (and encoded HTML) if:
+	// Consider plain text if:
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
-	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
+	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	// Parse Markdown (and encoded HTML) if it's considered plain text.
+	if ( isPlainText ) {
 		HTML = plainText;
 
 		// The markdown converter (Showdown) trims whitespace.
 		if ( ! /^\s+$/.test( plainText ) ) {
 			HTML = markdownConverter( HTML );
 		}
+	}
 
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
+	const pieces = shortcodeConverter( HTML );
+
+	// The call to shortcodeConverter will always return more than one element
+	// if shortcodes are matched. The reason is when shortcodes are matched
+	// empty HTML strings are included.
+	const hasShortcodes = pieces.length > 1;
+
+	if ( isPlainText && ! hasShortcodes ) {
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
 		// * The original plain text had no line breaks.
@@ -193,18 +169,6 @@ export function pasteHandler( {
 	if ( mode === 'INLINE' ) {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
-
-	// Must be run before checking if it's inline content.
-	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
-
-	// An array of HTML strings and block objects. The blocks replace matched
-	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
-
-	// The call to shortcodeConverter will always return more than one element
-	// if shortcodes are matched. The reason is when shortcodes are matched
-	// empty HTML strings are included.
-	const hasShortcodes = pieces.length > 1;
 
 	if (
 		mode === 'AUTO' &&
@@ -262,5 +226,28 @@ export function pasteHandler( {
 		.flat()
 		.filter( Boolean );
 
-	return maybeConvertToInline( { blocks, plainText, mode } );
+	// If we're allowed to return inline content, and there is only one
+	// inlineable block, and the original plain text content does not have any
+	// line breaks, then treat it as inline paste.
+	if (
+		mode === 'AUTO' &&
+		blocks.length === 1 &&
+		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
+	) {
+		const trimRegex = /^[\n]+|[\n]+$/g;
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( trimRegex, '' );
+
+		if (
+			trimmedPlainText !== '' &&
+			trimmedPlainText.indexOf( '\n' ) === -1
+		) {
+			return removeInvalidHTML(
+				getBlockInnerHTML( blocks[ 0 ] ),
+				phrasingContentSchema
+			).replace( trimRegex, '' );
+		}
+	}
+
+	return blocks;
 }

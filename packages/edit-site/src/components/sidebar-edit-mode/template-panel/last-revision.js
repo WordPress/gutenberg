@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { sprintf, _n } from '@wordpress/i18n';
+import { Button, PanelRow } from '@wordpress/components';
+import { sprintf, _n, __ } from '@wordpress/i18n';
 import { backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { PostTypeSupportCheck } from '@wordpress/editor';
@@ -47,19 +47,24 @@ const PostLastRevision = () => {
 
 	return (
 		<PostLastRevisionCheck>
-			<Button
-				href={ addQueryArgs( 'revision.php', {
-					revision: lastRevisionId,
-				} ) }
-				className="edit-site-template-last-revision__title"
-				icon={ backup }
+			<PanelRow
+				header={ __( 'Editing history' ) }
+				className="edit-site-template-revisions"
 			>
-				{ sprintf(
-					/* translators: %d: number of revisions */
-					_n( '%d Revision', '%d Revisions', revisionsCount ),
-					revisionsCount
-				) }
-			</Button>
+				<Button
+					href={ addQueryArgs( 'revision.php', {
+						revision: lastRevisionId,
+					} ) }
+					className="edit-site-template-last-revision__title"
+					icon={ backup }
+				>
+					{ sprintf(
+						/* translators: %d: number of revisions */
+						_n( '%d Revision', '%d Revisions', revisionsCount ),
+						revisionsCount
+					) }
+				</Button>
+			</PanelRow>
 		</PostLastRevisionCheck>
 	);
 };

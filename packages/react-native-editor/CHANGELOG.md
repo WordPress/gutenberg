@@ -10,7 +10,23 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+
+## 1.105.0
+-   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
+-   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
+-   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
+
+## 1.104.0
 -   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
 
 ## 1.103.1
 -   [**] Fix long-press gestures not working in RichText component [Android] [#54213]

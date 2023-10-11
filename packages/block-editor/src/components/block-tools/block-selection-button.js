@@ -49,7 +49,7 @@ import BlockMover from '../block-mover';
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -165,7 +165,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				selectedBlockClientId;
 		} else if ( navigateIn ) {
 			focusedBlockUid =
-				getClientIdsOfDescendants( [ selectedBlockClientId ] )[ 0 ] ??
+				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
@@ -192,6 +192,14 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			);
 			selectBlock( startingBlockClientId );
 			setBlockMovingClientId( null );
+		}
+		// Prevent the block from being moved into itself.
+		if (
+			startingBlockClientId &&
+			selectedBlockClientId === startingBlockClientId &&
+			navigateIn
+		) {
+			return;
 		}
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 			if ( focusedBlockUid ) {

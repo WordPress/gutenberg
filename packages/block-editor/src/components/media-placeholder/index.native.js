@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableOpacity } from 'react-native';
-import { sentenceCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -104,13 +103,13 @@ function MediaPlaceholder( props ) {
 	let instructions = labels.instructions;
 	if ( instructions === undefined ) {
 		if ( isImage ) {
-			instructions = __( 'ADD IMAGE' );
+			instructions = __( 'Add image' );
 		} else if ( isVideo ) {
-			instructions = __( 'ADD VIDEO' );
+			instructions = __( 'Add video' );
 		} else if ( isAudio ) {
-			instructions = __( 'ADD AUDIO' );
+			instructions = __( 'Add audio' );
 		} else {
-			instructions = __( 'ADD IMAGE OR VIDEO' );
+			instructions = __( 'Add image or video' );
 		}
 	}
 
@@ -171,7 +170,7 @@ function MediaPlaceholder( props ) {
 						onPress={ onButtonPress( open ) }
 					>
 						<Text style={ emptyStateDescriptionStyles }>
-							{ sentenceCase( instructions ) }
+							{ instructions }
 						</Text>
 					</TouchableOpacity>
 				</>

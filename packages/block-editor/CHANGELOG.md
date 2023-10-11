@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 12.11.0 (2023-10-05)
+
+- Deprecated `CopyHandler`, absorbed into `WritingFlow`.
+
+## 12.10.0 (2023-09-20)
+
+- The Deprecated multiline prop on RichText will now fall back to using multiple
+  rich text instances instead of a single multiline instance. The prop remains
+  deprecated.
+
 ## 12.9.0 (2023-08-31)
 
 ### Enhancements

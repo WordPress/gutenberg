@@ -14,6 +14,10 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'First block' );
+
+		// Ensure the fixed toolbar option is off.
+		// See: https://github.com/WordPress/gutenberg/pull/54785.
+		await editor.setIsFixedToolbar( false );
 	} );
 
 	test( 'ensures base block toolbars use roving tabindex', async ( {
@@ -26,14 +30,14 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Paragraph' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup(
 			'Paragraph'
 		);
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 
@@ -75,7 +79,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
 		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Table' );
-		await editor.canvas.click( `role=button[name="Create Table"i]` );
+		await editor.canvas
+			.locator( `role=button[name="Create Table"i]` )
+			.click();
 		await pageUtils.pressKeys( 'Tab' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'Body cell text',

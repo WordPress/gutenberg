@@ -31,7 +31,7 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 		props.setRegistry( props.registry );
 	}
 	useBlockSync( props );
-	return <p>Test.</p>;
+	return null;
 } );
 
 describe( 'useBlockSync hook', () => {

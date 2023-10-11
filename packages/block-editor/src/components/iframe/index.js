@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useEffect,
 } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
@@ -37,7 +38,14 @@ function bubbleEvent( event, Constructor, frame ) {
 		init[ key ] = event[ key ];
 	}
 
-	if ( event instanceof frame.ownerDocument.defaultView.MouseEvent ) {
+	// Check if the event is a MouseEvent generated within the iframe.
+	// If so, adjust the coordinates to be relative to the position of
+	// the iframe. This ensures that components such as Draggable
+	// receive coordinates relative to the window, instead of relative
+	// to the iframe. Without this, the Draggable event handler would
+	// result in components "jumping" position as soon as the user
+	// drags over the iframe.
+	if ( event instanceof frame.contentDocument.defaultView.MouseEvent ) {
 		const rect = frame.getBoundingClientRect();
 		init.clientX += rect.left;
 		init.clientY += rect.top;
@@ -67,6 +75,9 @@ function bubbleEvent( event, Constructor, frame ) {
 function useBubbleEvents( iframeDocument ) {
 	return useRefEffect( ( body ) => {
 		const { defaultView } = iframeDocument;
+		if ( ! defaultView ) {
+			return;
+		}
 		const { frameElement } = defaultView;
 		const eventTypes = [ 'dragover', 'mousemove' ];
 		const handlers = {};
@@ -233,8 +244,7 @@ function Iframe( {
 	return (
 		<>
 			{ tabIndex >= 0 && before }
-			{ /* No title to reduce screen reader verbosity. */ }
-			{ /* eslint-disable-next-line jsx-a11y/iframe-has-title */ }
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
 				style={ {
@@ -261,7 +271,27 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
+				title={ __( 'Block canvas' ) }
 				role="application"
+				onKeyDown={ ( event ) => {
+					// If the event originates from inside the iframe, it means
+					// it bubbled through the portal, but only with React
+					// events. We need to to bubble native events as well,
+					// though by doing so we also trigger another React event,
+					// so we need to stop the propagation of this event to avoid
+					// duplication.
+					if (
+						event.currentTarget.ownerDocument !==
+						event.target.ownerDocument
+					) {
+						event.stopPropagation();
+						bubbleEvent(
+							event,
+							window.KeyboardEvent,
+							event.currentTarget
+						);
+					}
+				} }
 			>
 				{ iframeDocument &&
 					createPortal(
@@ -275,18 +305,6 @@ function Iframe( {
 								'editor-styles-wrapper',
 								...bodyClasses
 							) }
-							onKeyDown={ ( event ) => {
-								// This stopPropagation call ensures React doesn't create a syncthetic event to bubble this event
-								// which would result in two React events being bubbled throught the iframe.
-								event.stopPropagation();
-								const { defaultView } = iframeDocument;
-								const { frameElement } = defaultView;
-								bubbleEvent(
-									event,
-									window.KeyboardEvent,
-									frameElement
-								);
-							} }
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>

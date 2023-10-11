@@ -12,15 +12,21 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
 		"parent": "devenv"
 	},
 	{
@@ -70,18 +76,6 @@
 		"slug": "submitting-to-block-directory",
 		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "getting-started"
-	},
-	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "getting-started"
 	},
 	{
 		"title": "Glossary",
@@ -336,12 +330,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
 		"title": "Global Settings & Styles (theme.json)",
 		"slug": "theme-json",
 		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
@@ -498,7 +486,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Hooks",
+		"title": "Block Filters",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
@@ -1236,6 +1224,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Tabs",
+		"slug": "tabs",
+		"markdown_source": "../packages/components/src/tabs/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
@@ -1923,6 +1917,12 @@
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
 		"parent": "packages"
 	},
 	{

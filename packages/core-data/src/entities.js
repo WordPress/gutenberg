@@ -120,6 +120,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -223,6 +224,15 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
 	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
+	},
 ];
 
 export const additionalEntityConfigLoaders = [
@@ -317,6 +327,7 @@ async function loadPostTypeEntities() {
 			},
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
 		};
 	} );
 }
@@ -400,7 +411,12 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
-			registerSyncConfigs( configs );
+			if ( window.__experimentalEnableSync ) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					registerSyncConfigs( configs );
+				}
+			}
+
 			return configs;
 		}
 
@@ -412,7 +428,12 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
-		registerSyncConfigs( configs );
+		if ( window.__experimentalEnableSync ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				registerSyncConfigs( configs );
+			}
+		}
+
 		dispatch( addEntities( configs ) );
 
 		return configs;

@@ -155,7 +155,7 @@ function ParagraphBlock( {
 				onRemove={ onRemove }
 				aria-label={
 					content
-						? __( 'Paragraph block' )
+						? __( 'Block: Paragraph' )
 						: __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )

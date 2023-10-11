@@ -18,18 +18,18 @@ Go ahead and create these files using the following snippets:
 **src/index.js:**
 
 ```js
-import { render } from '@wordpress/element';
+import { createRoot } from 'react-dom';
 
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
+const root = createRoot( document.getElementById( 'my-first-gutenberg-app' ) );
 window.addEventListener(
 	'load',
 	function () {
-		render(
+		root.render(
 			<MyFirstApp />,
-			document.querySelector( '#my-first-gutenberg-app' )
 		);
 	},
 	false

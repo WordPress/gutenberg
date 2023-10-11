@@ -45,9 +45,8 @@ export function getLastInsertedBlocksClientIds( state ) {
 export const isBlockSubtreeDisabled = createSelector(
 	( state, clientId ) => {
 		const isChildSubtreeDisabled = ( childClientId ) => {
-			const mode = state.blockEditingModes.get( childClientId );
 			return (
-				( mode === undefined || mode === 'disabled' ) &&
+				getBlockEditingMode( state, childClientId ) === 'disabled' &&
 				getBlockOrder( state, childClientId ).every(
 					isChildSubtreeDisabled
 				)
@@ -58,7 +57,12 @@ export const isBlockSubtreeDisabled = createSelector(
 			getBlockOrder( state, clientId ).every( isChildSubtreeDisabled )
 		);
 	},
-	( state ) => [ state.blockEditingModes, state.blocks.parents ]
+	( state ) => [
+		state.blocks.parents,
+		state.blocks.order,
+		state.blockEditingModes,
+		state.blockListSettings,
+	]
 );
 
 /**
@@ -139,3 +143,96 @@ export function getRemovalPromptData( state ) {
 export function getBlockRemovalRules( state ) {
 	return state.blockRemovalRules;
 }
+
+/**
+ * Returns the client ID of the block settings menu that is currently open.
+ *
+ * @param {Object} state Global application state.
+ * @return {string|null} The client ID of the block menu that is currently open.
+ */
+export function getOpenedBlockSettingsMenu( state ) {
+	return state.openedBlockSettingsMenu;
+}
+
+/**
+ * Returns all style overrides, intended to be merged with global editor styles.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Map} A map of style IDs to style overrides.
+ */
+export function getStyleOverrides( state ) {
+	return state.styleOverrides;
+}
+
+/** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
+/**
+ * Returns the registered inserter media categories through the public API.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {InserterMediaCategory[]} Inserter media categories.
+ */
+export function getRegisteredInserterMediaCategories( state ) {
+	return state.registeredInserterMediaCategories;
+}
+
+/**
+ * Returns an array containing the allowed inserter media categories.
+ * It merges the registered media categories from extenders with the
+ * core ones. It also takes into account the allowed `mime_types`, which
+ * can be altered by `upload_mimes` filter and restrict some of them.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {InserterMediaCategory[]} Client IDs of descendants.
+ */
+export const getInserterMediaCategories = createSelector(
+	( state ) => {
+		const {
+			settings: {
+				inserterMediaCategories,
+				allowedMimeTypes,
+				enableOpenverseMediaCategory,
+			},
+			registeredInserterMediaCategories,
+		} = state;
+		// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
+		// some of them. In this case we shouldn't add the category to the available media
+		// categories list in the inserter.
+		if (
+			( ! inserterMediaCategories &&
+				! registeredInserterMediaCategories.length ) ||
+			! allowedMimeTypes
+		) {
+			return;
+		}
+		const coreInserterMediaCategoriesNames =
+			inserterMediaCategories?.map( ( { name } ) => name ) || [];
+		const mergedCategories = [
+			...( inserterMediaCategories || [] ),
+			...( registeredInserterMediaCategories || [] ).filter(
+				( { name } ) =>
+					! coreInserterMediaCategoriesNames.includes( name )
+			),
+		];
+		return mergedCategories.filter( ( category ) => {
+			// Check if Openverse category is enabled.
+			if (
+				! enableOpenverseMediaCategory &&
+				category.name === 'openverse'
+			) {
+				return false;
+			}
+			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
+				mimeType.startsWith( `${ category.mediaType }/` )
+			);
+		} );
+	},
+	( state ) => [
+		state.settings.inserterMediaCategories,
+		state.settings.allowedMimeTypes,
+		state.settings.enableOpenverseMediaCategory,
+		state.registeredInserterMediaCategories,
+	]
+);

@@ -19,6 +19,7 @@ test.describe( 'Site editor command palette', () => {
 
 	test( 'Open the command palette and navigate to the page create page', async ( {
 		page,
+		editor,
 	} ) => {
 		await page
 			.getByRole( 'button', { name: 'Open command palette' } )
@@ -26,13 +27,11 @@ test.describe( 'Site editor command palette', () => {
 		await page.keyboard.press( 'Meta+k' );
 		await page.keyboard.type( 'new page' );
 		await page.getByRole( 'option', { name: 'Add new page' } ).click();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		const frame = page.frame( 'editor-canvas' );
 		await expect( page ).toHaveURL(
 			'/wp-admin/post-new.php?post_type=page'
 		);
 		await expect(
-			frame.getByRole( 'textbox', { name: 'Add title' } )
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeVisible();
 	} );
 

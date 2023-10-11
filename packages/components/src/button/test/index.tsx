@@ -72,12 +72,6 @@ describe( 'Button', () => {
 			expect( button ).toHaveClass( 'is-link' );
 		} );
 
-		it( 'should render a button element with is-pressed without button class', () => {
-			render( <Button isPressed /> );
-
-			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
-		} );
-
 		it( 'should render a button element with has-text when children are passed', async () => {
 			const user = userEvent.setup();
 
@@ -194,7 +188,7 @@ describe( 'Button', () => {
 
 			render( <Button icon={ plusCircle } label="WordPress" /> );
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -231,7 +225,7 @@ describe( 'Button', () => {
 				/>
 			);
 
-			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -242,6 +236,8 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					label="Label"
@@ -258,6 +254,16 @@ describe( 'Button', () => {
 					description: 'Description text',
 				} )
 			).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'tooltip', {
+					name: 'Description text',
+				} )
+			).toBeVisible();
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should allow tooltip disable', async () => {
@@ -290,7 +296,7 @@ describe( 'Button', () => {
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -326,7 +332,7 @@ describe( 'Button', () => {
 				</Button>
 			);
 
-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
 			await user.tab();
@@ -334,6 +340,56 @@ describe( 'Button', () => {
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
 			await cleanupTooltip( user );
+		} );
+
+		describe( 'using `aria-pressed` prop', () => {
+			it( 'should render a button element with is-pressed when `true`', () => {
+				render( <Button aria-pressed /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed when `"true"`', () => {
+				render( <Button aria-pressed="true" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element with is-pressed/is-pressed-mixed when `"mixed"`', () => {
+				render( <Button aria-pressed="mixed" /> );
+
+				expect( screen.getByRole( 'button' ) ).toHaveClass(
+					'is-pressed is-pressed-mixed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `undefined`', () => {
+				render( <Button aria-pressed={ undefined } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `false`', () => {
+				render( <Button aria-pressed={ false } /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
+
+			it( 'should render a button element without is-pressed when `"false"`', () => {
+				render( <Button aria-pressed="false" /> );
+
+				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+					'is-pressed'
+				);
+			} );
 		} );
 	} );
 
@@ -421,6 +477,23 @@ describe( 'Button', () => {
 				'is-small'
 			);
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-compact' );
+		} );
+
+		it( 'should not break when the legacy isPressed prop is passed', () => {
+			render( <Button isPressed /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-pressed',
+				'true'
+			);
+		} );
+
+		it( 'should prioritize the `aria-pressed` prop over `isPressed`', () => {
+			render( <Button isPressed aria-pressed="mixed" /> );
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-pressed',
+				'mixed'
+			);
 		} );
 	} );
 

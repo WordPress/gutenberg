@@ -59,11 +59,12 @@ const getIOSPlatformVersions = () => {
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
-	return runtimes
-		.reverse()
-		.filter(
-			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
-		);
+	return runtimes.reverse().filter(
+		( { name, isAvailable, version } ) =>
+			name.startsWith( 'iOS' ) &&
+			/15(\.\d+)+/.test( version ) && // Appium 1 does not support newer iOS versions
+			isAvailable
+	);
 };
 
 // Initialises the driver and desired capabilities for appium.
@@ -122,7 +123,7 @@ const setupDriver = async () => {
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+					'No compatible iOS simulators available! Please verify that you have iOS 15 simulators installed.'
 				);
 			}
 			// eslint-disable-next-line no-console
@@ -209,6 +210,9 @@ const typeStringIos = async ( driver, element, str, clear ) => {
 		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+
+	// Wait for the list auto-scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const clearTextBox = async ( driver, element ) => {
@@ -426,6 +430,15 @@ const tapPasteAboveElement = async ( driver, element ) => {
 	}
 };
 
+const tapStatusBariOS = async ( driver ) => {
+	const action = new wd.TouchAction();
+	action.tap( { x: 20, y: 20 } );
+	await driver.performTouchAction( action );
+
+	// Wait for the scroll animation to finish
+	await driver.sleep( 3000 );
+};
+
 const selectTextFromElement = async ( driver, element ) => {
 	if ( isAndroid() ) {
 		await longPressMiddleOfElement( driver, element, 0 );
@@ -526,9 +539,8 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'More options'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'More options' );
 		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
@@ -536,9 +548,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 
 		await clickIfClickable(
@@ -548,9 +559,8 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
-		const moreOptionsButton = await driver.elementByAccessibilityId(
-			'editor-menu-button'
-		);
+		const moreOptionsButton =
+			await driver.elementByAccessibilityId( 'editor-menu-button' );
 		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
@@ -804,6 +814,7 @@ module.exports = {
 	tapCopyAboveElement,
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
+	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
 	toggleHtmlMode,

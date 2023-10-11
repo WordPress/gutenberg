@@ -89,8 +89,8 @@ export interface Options {
  *
  * @example
  * ```js
+ * import { useCallback } from 'react';
  * import { useDispatch } from '@wordpress/data';
- * import { useCallback } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  * import { TextControl } from '@wordpress/components';
  * import { store as noticeStore } from '@wordpress/notices';
@@ -155,8 +155,8 @@ export default function useEntityRecord< RecordType >(
 
 	const mutations = useMemo(
 		() => ( {
-			edit: ( record ) =>
-				editEntityRecord( kind, name, recordId, record ),
+			edit: ( record, editOptions: any = {} ) =>
+				editEntityRecord( kind, name, recordId, record, editOptions ),
 			save: ( saveOptions: any = {} ) =>
 				saveEditedEntityRecord( kind, name, recordId, {
 					throwOnError: true,
