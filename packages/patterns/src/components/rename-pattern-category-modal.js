@@ -27,12 +27,7 @@ export default function RenamePatternCategoryModal( {
 	onSuccess,
 	...props
 } ) {
-	// If the user created category has been retrieved via
-	// getUserPatternCategories the name value is assigned to the label property
-	// and `name` is overwritten with the slug value to match categories from
-	// core, template parts etc.
-	const originalName = decodeEntities( category.label || category.name );
-	const [ name, setName ] = useState( originalName );
+	const [ name, setName ] = useState( decodeEntities( category.name ) );
 	const [ isSaving, setIsSaving ] = useState( false );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );

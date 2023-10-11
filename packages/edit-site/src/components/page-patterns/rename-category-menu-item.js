@@ -20,6 +20,15 @@ export default function RenameCategoryMenuItem( { category, onClose } ) {
 		return null;
 	}
 
+	// User created pattern categories have their properties updated when
+	// retrieved via `getUserPatternCategories`. The rename modal expects an
+	// object that will match the pattern category entity.
+	const normalizedCategory = {
+		id: category.id,
+		slug: category.slug,
+		name: category.label,
+	};
+
 	return (
 		<>
 			<MenuItem onClick={ () => setIsModalOpen( true ) }>
@@ -27,7 +36,7 @@ export default function RenameCategoryMenuItem( { category, onClose } ) {
 			</MenuItem>
 			{ isModalOpen && (
 				<RenamePatternCategoryModal
-					category={ category }
+					category={ normalizedCategory }
 					onClose={ () => {
 						setIsModalOpen( false );
 						onClose();
