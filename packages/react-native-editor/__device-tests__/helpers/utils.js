@@ -285,19 +285,25 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x + size.width / 2, y: location.y } );
-	action.release();
-	await action.perform();
+	await driver.touchPerform( [
+		{
+			action: 'press',
+			options: { x: location.x + size.width / 2, y: location.y },
+		},
+		{ action: 'release' },
+	] );
 };
 
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x, y: location.y } );
-	action.release();
-	await action.perform();
+	await driver.touchPerform( [
+		{
+			action: 'press',
+			options: { x: location.x, y: location.y },
+		},
+		{ action: 'release' },
+	] );
 };
 
 // Clicks in the top left of a text-based element outside of the TextInput

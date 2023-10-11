@@ -208,7 +208,7 @@ class EditorPage {
 	// This makes this function return elements without scrolling on iOS.
 	// So we are keeping this Android only.
 	async androidScrollAndReturnElement( accessibilityLabel ) {
-		const elements = await this.driver.elementsByXPath(
+		const elements = await this.driver.$$(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
@@ -327,7 +327,7 @@ class EditorPage {
 		}
 
 		const dismissClipboardSmartSuggestionLocator = `//*[@${ this.accessibilityIdXPathAttrib }="Dismiss Smart Suggestion"]`;
-		const smartSuggestions = await this.driver.elementsByXPath(
+		const smartSuggestions = await this.driver.$$(
 			dismissClipboardSmartSuggestionLocator
 		);
 		if ( smartSuggestions.length !== 0 ) {
@@ -611,12 +611,12 @@ class EditorPage {
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.elementsByXPath(
+			let checkList = await this.driver.$$(
 				blockActionsMenuButtonLocator
 			);
 			while ( checkList.length === 0 ) {
 				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-				checkList = await this.driver.elementsByXPath(
+				checkList = await this.driver.$$(
 					blockActionsMenuButtonLocator
 				);
 			}
@@ -686,7 +686,7 @@ class EditorPage {
 			position
 		);
 
-		return await blockLocator.text();
+		return await blockLocator.getText();
 	}
 
 	async getNumberOfParagraphBlocks() {
@@ -694,9 +694,7 @@ class EditorPage {
 			? `//android.widget.Button[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 
-		const locator = await this.driver.elementsByXPath(
-			paragraphBlockLocator
-		);
+		const locator = await this.driver.$$( paragraphBlockLocator );
 		return locator.length;
 	}
 
