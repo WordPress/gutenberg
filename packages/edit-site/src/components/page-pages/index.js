@@ -35,7 +35,7 @@ export default function PagePages() {
 		},
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
-		hiddenFields: [ 'date' ],
+		hiddenFields: [ 'date', 'featured-image' ],
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
