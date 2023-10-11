@@ -18,8 +18,8 @@ import { WebrtcProvider } from 'y-webrtc';
  * @return {Promise<() => void>} Promise that resolves when the connection is established.
  */
 export function connectWebRTC( objectId, objectType, doc ) {
-	const docName = `${ objectType }-${ objectId }`;
-	new WebrtcProvider( docName, doc, {
+	const roomName = `${ objectType }-${ objectId }`;
+	new WebrtcProvider( roomName, doc, {
 		// @ts-ignore
 		password: window.__experimentalCollaborativeEditingSecret,
 	} );
