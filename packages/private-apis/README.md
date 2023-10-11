@@ -102,9 +102,9 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 The consent string for unlocking private APIs is intended to change on a regular basis. To update the consent string:
 
 1. Come up with a new consent string, the string should mention that themes or plugins opting in to unstable and private features will break in future versions of WordPress.
-1. Ensure the consent string has not being used previously.
-1. Append the new string to the history list below.
-1. Replace the consent string in the following locations:
+2. Ensure the consent string has not being used previously.
+3. Append the new string to the history list below.
+4. Replace the consent string in the following locations:
    * twice in the documentation above
    * in the `src/implementation.js` file of this package
    * in the `src/lock-unlock.js` file located in packages consuming private APIs
@@ -120,4 +120,4 @@ Updating the consent string is considered a task and can be done during the late
 The final string in this list is the current version.
 
 1. I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.
-1. I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.
+2. I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.
