@@ -28,11 +28,11 @@ function UnforwardedToolbar(
 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
-	const CONTEXT_SYSTEM_VALUE = useMemo( () => {
-		if ( variant !== undefined ) {
+	const isVariantDefined = variant !== undefined;
+	const contextSystemValue = useMemo( () => {
+		if ( isVariantDefined ) {
 			return {};
 		}
-
 		return {
 			DropdownMenu: {
 				variant: 'toolbar',
@@ -41,7 +41,7 @@ function UnforwardedToolbar(
 				variant: 'toolbar',
 			},
 		};
-	}, [ variant ] );
+	}, [ isVariantDefined ] );
 
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
@@ -63,11 +63,11 @@ function UnforwardedToolbar(
 	const finalClassName = classnames(
 		'components-accessible-toolbar',
 		className,
-		variant === undefined ? undefined : `is-${ variant }`
+		variant && `is-${ variant }`
 	);
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+		<ContextSystemProvider value={ contextSystemValue }>
 			<ToolbarContainer
 				className={ finalClassName }
 				label={ label }
