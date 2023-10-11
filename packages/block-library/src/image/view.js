@@ -333,6 +333,54 @@ store(
 							}
 						}
 					},
+					setButtonStyles: ( { context, ref } ) => {
+						const {
+							naturalWidth,
+							naturalHeight,
+							offsetWidth,
+							offsetHeight,
+						} = ref;
+
+						// If the image isn't loaded yet, we can't
+						// calculate where the button should be.
+						if ( naturalWidth === 0 || naturalHeight === 0 ) {
+							return;
+						}
+
+						// In the case of an image with object-fit: contain, the
+						// size of the <img> element can be larger than the image itself,
+						// so we need to calculate where to place the button.
+						if ( context.core.image.scaleAttr === 'contain' ) {
+							// Natural ratio of the image.
+							const naturalRatio = naturalWidth / naturalHeight;
+							// Offset ratio of the image.
+							const offsetRatio = offsetWidth / offsetHeight;
+
+							if ( naturalRatio > offsetRatio ) {
+								// If it reaches the width first, use a fixed
+								// position for the X axis and calculate Y position.
+								context.core.image.imageButtonRight = 25;
+								const imageHeight = offsetWidth / naturalRatio;
+								context.core.image.imageButtonTop =
+									( offsetHeight - imageHeight ) / 2 + 25;
+							} else {
+								// If it reaches the height first, use a fixed
+								// position for the Y axis and calculate X position.
+								context.core.image.imageButtonTop = 25;
+								const imageWidth = offsetHeight * naturalRatio;
+								context.core.image.imageButtonRight =
+									( offsetWidth - imageWidth ) / 2 + 25;
+							}
+						} else {
+							// TO DO : Add handling for custom widths and heights.
+
+							// In most other cases, we can just put the button in
+							// the top right corner of the containing element.
+
+							context.core.image.imageButtonTop = 25;
+							context.core.image.imageButtonRight = 25;
+						}
+					},
 					setStylesOnResize: ( { state, context, ref } ) => {
 						if (
 							context.core.image.lightboxEnabled &&

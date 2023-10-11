@@ -199,6 +199,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->next_tag( 'img' );
 	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
+	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
@@ -220,6 +221,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.core.image.callShowLightboxFromButton"
 			data-wp-class--show="context.core.image.isHovering"
+			data-wp-style--right="context.core.image.imageButtonRight"
+			data-wp-style--top="context.core.image.imageButtonTop"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>
