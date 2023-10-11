@@ -13,23 +13,23 @@ import { useMemo, useEffect, useRef } from '@wordpress/element';
  */
 import type { PickerProps } from './types';
 
-export const Picker = ( {
-	color,
-	enableAlpha,
-	onChange,
+/**
+ * Track the start and the end of drag pointer events related to controlling
+ * the picker's saturation / hue / alpha, and fire the corresponding callbacks.
+ * @param props
+ * @param props.containerEl
+ * @param props.onDragStart
+ * @param props.onDragEnd
+ */
+const useOnPickerDrag = ( {
+	containerEl,
 	onDragStart,
 	onDragEnd,
-	containerEl,
-}: PickerProps ) => {
-	const Component = enableAlpha
-		? RgbaStringColorPicker
-		: RgbStringColorPicker;
-	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
-
+}: Pick< PickerProps, 'containerEl' | 'onDragStart' | 'onDragEnd' > ) => {
 	const isDragging = useRef( false );
 	const leftWhileDragging = useRef( false );
 	useEffect( () => {
-		if ( ! containerEl ) {
+		if ( ! containerEl || ( ! onDragStart && ! onDragEnd ) ) {
 			return;
 		}
 		const interactiveElements = [
@@ -59,6 +59,9 @@ export const Picker = ( {
 			leftWhileDragging.current = isDragging.current;
 		};
 
+		// Try to detect if the user released the pointer while away from the
+		// current window. If the check is successfull, the dragEnd callback will
+		// called as soon as the pointer re-enters the window (better late than never)
 		const onPointerEnter: EventListener = ( event ) => {
 			const noPointerButtonsArePressed =
 				( event as PointerEvent ).buttons === 0;
@@ -68,6 +71,10 @@ export const Picker = ( {
 			}
 		};
 
+		// The pointerdown event is added on the interactive elements,
+		// while the remaining events are added on the document object since
+		// the pointer wouldn't necessarily be hovering the initial interactive
+		// element at that point.
 		interactiveElements.forEach( ( el ) =>
 			el.addEventListener( 'pointerdown', onPointerDown )
 		);
@@ -84,6 +91,22 @@ export const Picker = ( {
 			doc.removeEventListener( 'pointerleave', onPointerUp );
 		};
 	}, [ onDragStart, onDragEnd, containerEl ] );
+};
+
+export const Picker = ( {
+	color,
+	enableAlpha,
+	onChange,
+	onDragStart,
+	onDragEnd,
+	containerEl,
+}: PickerProps ) => {
+	const Component = enableAlpha
+		? RgbaStringColorPicker
+		: RgbStringColorPicker;
+	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
+
+	useOnPickerDrag( { containerEl, onDragStart, onDragEnd } );
 
 	return (
 		<Component
