@@ -42,7 +42,7 @@ class Gutenberg_HTTP_Signaling_Server {
 		$topics_to_subscribers_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'topics_to_subscribers.txt';
 
 		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
-			static::handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path );
+			static::handle_read_pending_messages( $subscriber_to_messages_path, $subscriber_id );
 		} else {
 			if ( empty( $_POST ) || empty( $_POST['message'] ) ) {
 				die( 'no message' );
@@ -161,10 +161,10 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @access private
 	 * @internal
 	 *
-	 * @param string $subscriber_id               The subscriber id.
 	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
+	 * @param string $subscriber_id               The subscriber id.
 	 */
-	private static function handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path ) {
+	private static function handle_read_pending_messages( $subscriber_to_messages_path, $subscriber_id ) {
 		header( 'Content-Type: text/event-stream' );
 		header( 'Cache-Control: no-cache' );
 		list( $fd, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
@@ -200,14 +200,14 @@ class Gutenberg_HTTP_Signaling_Server {
 	}
 
 	/**
-	 * Receives a $topics_to_subscribers data-structure and an array of topics,
-	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is subscribed to the topics.
+	 * Handles a wp_ajax signaling server request of client that wants to subscribe to a set of topics its messages.
 	 *
 	 * @access private
 	 * @internal
 	 *
-	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
-	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
+	 * @param string $topics_to_subscribers_path Topics to subscribers path.
+	 * @param string $subscriber_id              The subscriber id.
+	 * @param array  $topics                     An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
 	private static function handle_subscribe_to_topics( $topics_to_subscribers_path, $subscriber_id, $topics ) {
 		list( $fd, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
@@ -225,15 +225,14 @@ class Gutenberg_HTTP_Signaling_Server {
 	}
 
 	/**
-	 * Receives a $topics_to_subscribers data-structure and an array of topics,
-	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is not subscribed to the topics.
+	 * Handles a wp_ajax signaling server request of client that wants to unsubscribe from a set of topics its messages.
 	 *
 	 * @access private
 	 * @internal
 	 *
-	 * @param string $topics_to_subscribers_path  Topics to subscribers path.
-	 * @param string $subscriber_id               The subscriber id.
-	 * @param array  $topics                      An array of topics e.g: array( 'doc1', 'doc2' ).
+	 * @param string $topics_to_subscribers_path Topics to subscribers path.
+	 * @param string $subscriber_id              The subscriber id.
+	 * @param array  $topics                     An array of topics e.g: array( 'doc1', 'doc2' ).
 	 */
 	private static function handle_unsubscribe_from_topics( $topics_to_subscribers_path, $subscriber_id, $topics ) {
 		list( $fd, $topics_to_subscribers ) = static::get_contents_and_lock_file( $topics_to_subscribers_path );
@@ -249,14 +248,15 @@ class Gutenberg_HTTP_Signaling_Server {
 	}
 
 	/**
-	 * Receives a $topics_to_subscribers data-structure and an array of topics,
-	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is subscribed to the topics.
+	 * Handles a wp_ajax signaling server request of client that wants to publish a message.
 	 *
 	 * @access private
 	 * @internal
 	 *
-	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
-	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
+	 * @param string $topics_to_subscribers_path  Topics to subscribers path.
+	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
+	 * @param string $subscriber_id               The subscriber id.
+	 * @param array  $message                     The message associative array.
 	 */
 	private static function handle_publish_message( $topics_to_subscribers_path, $subscriber_to_messages_path, $subscriber_id, $message ) {
 		list( $fd_topics_subscriber, $topics_to_subscribers )       = static::get_contents_and_lock_file( $topics_to_subscribers_path );
@@ -283,14 +283,13 @@ class Gutenberg_HTTP_Signaling_Server {
 	}
 
 	/**
-	 * Receives a $topics_to_subscribers data-structure and an array of topics,
-	 * and returns a new $topics_to_subscribers data-structure where the current subscriber is subscribed to the topics.
+	 * Handles a wp_ajax signaling server request for the ping of a client.
 	 *
 	 * @access private
 	 * @internal
 	 *
-	 * @param array $topics_to_subscribers  Topics to subscribers data-structure.
-	 * @param array $topics                 An array of topics e.g: array( 'doc1', 'doc2' ).
+	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
+	 * @param string $subscriber_id               The subscriber id.
 	 */
 	private static function handle_ping( $subscriber_to_messages_path, $subscriber_id ) {
 		list( $fd_subscriber_to_messages, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
