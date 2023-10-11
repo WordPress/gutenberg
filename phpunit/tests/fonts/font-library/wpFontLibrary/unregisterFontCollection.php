@@ -21,7 +21,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 
 		// Registers two mock font collections.
 		$config = array(
-			'id'          => 'mock-col-to-unregister',
+			'id'          => 'mock-font-collection-1',
 			'name'        => 'Mock Collection to be unregistered',
 			'description' => 'A mock font collection to be unregistered.',
 			'src'         => 'my-collection-data.json',
@@ -29,7 +29,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 		WP_Font_Library::register_font_collection( $config );
 
 		$config = array(
-			'id'          => 'another-collecction',
+			'id'          => 'mock-font-collection-2',
 			'name'        => 'Mock Collection',
 			'description' => 'A mock font collection.',
 			'src'         => 'my-mock-data.json',
@@ -47,15 +47,14 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 
 	public function test_should_unregister_font_collection() {
 		// Unregister mock font collection.
-		WP_Font_Library::unregister_font_collection( 'mock-col-to-unregister' );
+		WP_Font_Library::unregister_font_collection( 'mock-font-collection-1' );
 		$collections = WP_Font_Library::get_font_collections();
-		$this->assertArrayNotHasKey( 'mock-col-to-unregister', $collections, 'Font collection was not unregistered.' );
-		$this->assertArrayHasKey( 'default-font-collection', $collections, 'Font collection was unregistered by mistake.' );
+		$this->assertArrayNotHasKey( 'mock-font-collection-1', $collections, 'Font collection was not unregistered.' );
 		
 		// Unregisters remaining mock font collection.
-		WP_Font_Library::unregister_font_collection( 'another-collecction' );
+		WP_Font_Library::unregister_font_collection( 'mock-font-collection-2' );
 		$collections = WP_Font_Library::get_font_collections();
-		$this->assertArrayNotHasKey( 'another-collecction', $collections, 'Mock font collection was not unregistered.' );
+		$this->assertArrayNotHasKey( 'mock-font-collection-2', $collections, 'Mock font collection was not unregistered.' );
 
 		// Checks that all font collections were unregistered.
 		$this->assertEmpty( $collections, 'Font collections were not unregistered.' );
