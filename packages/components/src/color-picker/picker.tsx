@@ -29,14 +29,20 @@ export const Picker = ( {
 	const isDragging = useRef( false );
 	const leftWhileDragging = useRef( false );
 	useEffect( () => {
-		const picker = containerEl?.querySelector(
-			'.react-colorful__saturation'
-		);
-		if ( ! picker ) {
+		if ( ! containerEl ) {
+			return;
+		}
+		const interactiveElements = [
+			containerEl.querySelector( '.react-colorful__saturation' ),
+			containerEl.querySelector( '.react-colorful__hue' ),
+			containerEl.querySelector( '.react-colorful__alpha' ),
+		].filter( ( el ) => !! el ) as Element[];
+
+		if ( interactiveElements.length === 0 ) {
 			return;
 		}
 
-		const doc = picker.ownerDocument;
+		const doc = containerEl.ownerDocument;
 
 		const onPointerUp: EventListener = ( event ) => {
 			isDragging.current = false;
@@ -62,13 +68,17 @@ export const Picker = ( {
 			}
 		};
 
-		picker.addEventListener( 'pointerdown', onPointerDown );
+		interactiveElements.forEach( ( el ) =>
+			el.addEventListener( 'pointerdown', onPointerDown )
+		);
 		doc.addEventListener( 'pointerup', onPointerUp );
 		doc.addEventListener( 'pointerenter', onPointerEnter );
 		doc.addEventListener( 'pointerleave', onPointerLeave );
 
 		return () => {
-			picker.removeEventListener( 'pointerdown', onPointerDown );
+			interactiveElements.forEach( ( el ) =>
+				el.removeEventListener( 'pointerdown', onPointerDown )
+			);
 			doc.removeEventListener( 'pointerup', onPointerUp );
 			doc.removeEventListener( 'pointerenter', onPointerEnter );
 			doc.removeEventListener( 'pointerleave', onPointerUp );
