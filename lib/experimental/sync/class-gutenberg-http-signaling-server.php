@@ -21,6 +21,10 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * Adds a wp_ajax action to handle the signaling server requests.
 	 */
 	public static function init() {
+		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+		if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
+			return;
+		}
 		add_action( 'wp_ajax_gutenberg_signaling_server', array( __CLASS__, 'do_wp_ajax_action' ) );
 	}
 
