@@ -388,6 +388,15 @@ const UnconnectedPopover = (
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
+	// In case a `ColorPicker` component is rendered as a child of `Popover`,
+	// the `Popover` component can be notified of when the user is dragging
+	// parts of the `ColorPicker` UI (this is possible because the `ColorPicker`
+	// component exposes the `onPickerDragStart` and `onPickerDragEnd` props
+	// via internal context).
+	// While the user is performing a pointer drag, the `Popover` will render
+	// a transparent backdrop element that will serve as a "pointer events trap",
+	// making sure that no pointer events reach any potential `iframe` element
+	// underneath (like, for example, the editor canvas in the WordPress editor).
 	const [ showBackdrop, setShowBackdrop ] = useState( false );
 	const contextValue = useMemo(
 		() => ( {

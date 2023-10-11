@@ -16,6 +16,11 @@ import type { PickerProps } from './types';
 /**
  * Track the start and the end of drag pointer events related to controlling
  * the picker's saturation / hue / alpha, and fire the corresponding callbacks.
+ * This is particularly useful to implement synergies like the one with the
+ * `Popover` component, where a pointer events "trap" is rendered while
+ * the user is dragging the pointer to avoid potential interference with iframe
+ * elements.
+ *
  * @param props
  * @param props.containerEl
  * @param props.onDragStart
