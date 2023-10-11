@@ -20,7 +20,7 @@ import NumberControl from '../number-control';
 import AngleCircle from './angle-circle';
 import { Root, UnitText } from './styles/angle-picker-control-styles';
 
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { AnglePickerControlProps } from './types';
 
 function UnforwardedAnglePickerControl(

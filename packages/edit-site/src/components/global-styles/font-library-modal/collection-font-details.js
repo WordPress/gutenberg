@@ -42,7 +42,7 @@ function CollectionFontDetails( {
 						handleToggleVariant={ handleToggleVariant }
 						selected={ isFontFontFaceInOutline(
 							font.slug,
-							face,
+							font.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is in the outline
 							fontToInstallOutline
 						) }
 					/>

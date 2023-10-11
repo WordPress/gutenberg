@@ -59,11 +59,12 @@ const getIOSPlatformVersions = () => {
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
-	return runtimes
-		.reverse()
-		.filter(
-			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
-		);
+	return runtimes.reverse().filter(
+		( { name, isAvailable, version } ) =>
+			name.startsWith( 'iOS' ) &&
+			/15(\.\d+)+/.test( version ) && // Appium 1 does not support newer iOS versions
+			isAvailable
+	);
 };
 
 // Initialises the driver and desired capabilities for appium.
@@ -122,7 +123,7 @@ const setupDriver = async () => {
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+					'No compatible iOS simulators available! Please verify that you have iOS 15 simulators installed.'
 				);
 			}
 			// eslint-disable-next-line no-console
@@ -209,6 +210,9 @@ const typeStringIos = async ( driver, element, str, clear ) => {
 		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+
+	// Wait for the list auto-scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const clearTextBox = async ( driver, element ) => {
@@ -424,6 +428,15 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
 	}
+};
+
+const tapStatusBariOS = async ( driver ) => {
+	const action = new wd.TouchAction();
+	action.tap( { x: 20, y: 20 } );
+	await driver.performTouchAction( action );
+
+	// Wait for the scroll animation to finish
+	await driver.sleep( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
@@ -801,6 +814,7 @@ module.exports = {
 	tapCopyAboveElement,
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
+	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
 	toggleHtmlMode,

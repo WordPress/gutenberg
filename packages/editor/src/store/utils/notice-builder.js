@@ -23,21 +23,21 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
-	// No notice is shown after trashing a post
-	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
-		return [];
-	}
-
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.includes( previousPost.status );
 	const willPublish = publishStatus.includes( post.status );
+	const willTrash =
+		post.status === 'trash' && previousPost.status !== 'trash';
 
 	let noticeMessage;
 	let shouldShowLink = postType?.viewable ?? false;
 	let isDraft;
 
 	// Always should a notice, which will be spoken for accessibility.
-	if ( ! isPublished && ! willPublish ) {
+	if ( willTrash ) {
+		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = __( 'Draft saved.' );
 		isDraft = true;

@@ -4,13 +4,14 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { plus, symbol, symbolFilled } from '@wordpress/icons';
+import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	privateApis as editPatternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -19,7 +20,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import CreateTemplatePartModal from '../create-template-part-modal';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
@@ -36,9 +36,8 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-		return !! settings.supportsTemplatePartsMode;
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme()?.is_block_theme;
 	}, [] );
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
@@ -52,7 +51,7 @@ export default function AddNewPattern() {
 		history.push( {
 			postId: pattern.id,
 			postType: PATTERN_TYPES.user,
-			categoryType: PATTERN_TYPES.user,
+			categoryType: PATTERN_TYPES.theme,
 			categoryId,
 			canvas: 'edit',
 		} );
@@ -82,9 +81,7 @@ export default function AddNewPattern() {
 		},
 	];
 
-	// Remove condition when command palette issues are resolved.
-	// See: https://github.com/WordPress/gutenberg/issues/52154.
-	if ( ! isTemplatePartsMode ) {
+	if ( isBlockBasedTheme ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -93,7 +90,7 @@ export default function AddNewPattern() {
 	}
 
 	controls.push( {
-		icon: symbol,
+		icon: upload,
 		onClick: () => {
 			patternUploadInputRef.current.click();
 		},

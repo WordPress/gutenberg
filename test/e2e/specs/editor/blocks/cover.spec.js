@@ -26,7 +26,6 @@ test.describe( 'Cover', () => {
 
 	test( 'can set overlay color using color picker on block placeholder', async ( {
 		editor,
-		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = editor.canvas.getByRole( 'document', {
@@ -39,18 +38,14 @@ test.describe( 'Cover', () => {
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
 
-		// Get the RGB value of Black.
-		const [ blackRGB ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
-
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
-		// Get the RGB value of the background dim.
-		const [ actualRGB ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
-
-		expect( blackRGB ).toEqual( actualRGB );
+		// Assert that after clicking black, the background color is black.
+		await expect( coverBlock ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 0)'
+		);
 	} );
 
 	test( 'can set background image using image upload on block placeholder', async ( {
@@ -76,7 +71,7 @@ test.describe( 'Cover', () => {
 		} ).toPass();
 	} );
 
-	test( 'dims background image down by 50% by default', async ( {
+	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -89,15 +84,14 @@ test.describe( 'Cover', () => {
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
+
+		await expect( overlay ).toHaveCSS(
+			'background-color',
+			'rgb(179, 179, 179)'
+		);
+		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
 
 	test( 'can have the title edited', async ( { editor } ) => {
@@ -200,7 +194,7 @@ test.describe( 'Cover', () => {
 		expect( newCoverBlockBox.height ).toBe( coverBlockBox.height + 100 );
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% black when transformed from the Image block', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -226,19 +220,11 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		await expect( overlay ).toHaveCSS( 'background-color', 'rgb(0, 0, 0)' );
+		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
 } );
 
@@ -268,12 +254,5 @@ class CoverBlockUtils {
 		await locator.setInputFiles( tmpFileName );
 
 		return filename;
-	}
-
-	async getBackgroundColorAndOpacity( locator ) {
-		return await locator.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		} );
 	}
 }
