@@ -121,6 +121,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 			() => ( {
 				shift: true,
 				offset: 20,
+				resize: false,
 				placement: 'left-start',
 				...receivedPopoverProps,
 				className: classnames(
