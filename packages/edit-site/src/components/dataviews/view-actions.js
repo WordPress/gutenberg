@@ -102,10 +102,10 @@ function PageSizeMenu( { dataView } ) {
 }
 
 function FieldsVisibilityMenu( { dataView } ) {
-	const hideableFields = dataView
+	const hidableFields = dataView
 		.getAllColumns()
 		.filter( ( columnn ) => columnn.getCanHide() );
-	if ( ! hideableFields?.length ) {
+	if ( ! hidableFields?.length ) {
 		return null;
 	}
 	return (
@@ -118,7 +118,7 @@ function FieldsVisibilityMenu( { dataView } ) {
 				</DropdownSubMenuTriggerV2>
 			}
 		>
-			{ hideableFields?.map( ( field ) => {
+			{ hidableFields?.map( ( field ) => {
 				return (
 					<DropdownMenuItemV2
 						key={ field.id }

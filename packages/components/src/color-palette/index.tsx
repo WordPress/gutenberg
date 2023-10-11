@@ -299,6 +299,7 @@ function UnforwardedColorPalette(
 								style={ {
 									background: value,
 								} }
+								type="button"
 							/>
 							<VStack
 								className="components-color-palette__custom-color-text-wrapper"
