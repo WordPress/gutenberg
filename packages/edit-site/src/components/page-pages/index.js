@@ -18,6 +18,7 @@ import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
 import useTrashPostAction from '../actions/trash-post';
+import Media from '../media';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
@@ -34,7 +35,7 @@ export default function PagePages() {
 		},
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
-		hiddenFields: [ 'date' ],
+		hiddenFields: [ 'date', 'featured-image' ],
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
@@ -76,6 +77,20 @@ export default function PagePages() {
 	const fields = useMemo(
 		() => [
 			{
+				id: 'featured-image',
+				header: __( 'Featured Image' ),
+				accessorFn: ( page ) => page.featured_media,
+				cell: ( props ) =>
+					!! props.row.original.featured_media ? (
+						<Media
+							className="edit-site-page-pages__featured-image"
+							id={ props.row.original.featured_media }
+							size="thumbnail"
+						/>
+					) : null,
+				enableSorting: false,
+			},
+			{
 				header: __( 'Title' ),
 				id: 'title',
 				accessorFn: ( page ) => page.title?.rendered || page.slug,
@@ -116,7 +131,7 @@ export default function PagePages() {
 				},
 			},
 			{
-				header: 'Status',
+				header: __( 'Status' ),
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
