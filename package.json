@@ -23,7 +23,6 @@
 	},
 	"dependencies": {
 		"@codemirror/lang-css": "6.2.1",
-		"@types/gradient-parser": "0.1.2",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
