@@ -83,6 +83,7 @@ export default function PagePages() {
 				cell: ( props ) =>
 					!! props.row.original.featured_media ? (
 						<Media
+							className="edit-site-page-pages__featured-image"
 							id={ props.row.original.featured_media }
 							size="thumbnail"
 						/>

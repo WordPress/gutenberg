@@ -3,7 +3,7 @@
  */
 import { useEntityRecord } from '@wordpress/core-data';
 
-function Media( { id, size } ) {
+function Media( { id, size, ...props } ) {
 	const { record: media } = useEntityRecord( 'root', 'media', id );
 	const sizesPerPriority = [ 'large', 'thumbnail' ];
 	const currentSize =
@@ -15,7 +15,13 @@ function Media( { id, size } ) {
 		return null;
 	}
 
-	return <img src={ mediaDetails.source_url } alt={ media.alt_text } />;
+	return (
+		<img
+			{ ...props }
+			src={ mediaDetails.source_url }
+			alt={ media.alt_text }
+		/>
+	);
 }
 
 export default Media;
