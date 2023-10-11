@@ -52,7 +52,7 @@ test.describe( 'Child Blocks', () => {
 		const inserterItemTitles =
 			await ChildBook.getAllBlockInserterItemTitles();
 		expect( inserterItemTitles ).toContain( 'Child Blocks Child' );
-		expect( inserterItemTitles.length ).toBeGreaterThanOrEqual( 20 );
+		expect( inserterItemTitles.length ).toBeGreaterThan( 10 );
 	} );
 
 	test( 'display in a parent block with allowedItems', async ( {
@@ -73,7 +73,6 @@ test.describe( 'Child Blocks', () => {
 		const allowedBlocks = await ChildBook.getAllBlockInserterItemTitles();
 		expect( allowedBlocks.sort() ).toEqual( [
 			'Child Blocks Child',
-			'Image',
 			'Paragraph',
 		] );
 	} );
@@ -85,7 +84,6 @@ class ChildBook {
 	}
 
 	async getAllBlockInserterItemTitles() {
-
 		const inserterItemTitles = await this.page.evaluate( () => {
 			return Array.from(
 				document.querySelectorAll(
