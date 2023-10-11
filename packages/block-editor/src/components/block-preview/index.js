@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-import { memo, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { memo, useEffect, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -18,6 +18,7 @@ import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
+import { unlock } from '../../lock-unlock';
 
 export function BlockPreview( {
 	blocks,
@@ -93,6 +94,33 @@ export function BlockPreview( {
 export default memo( BlockPreview );
 
 /**
+ * Syncs style overrides with the parent component. This allows a child of
+ * an `ExperimentalBlockEditorProvider` to sync its internal style overrides with
+ * the parent store.
+ *
+ * @param {Object}   props                        The component props.
+ * @param {Map}      props.parentStyleOverrides   The parent style overrides.
+ * @param {Function} props.setParentStyleOverride The parent's function to set a style override.
+ */
+function SyncStyleOverridesWithParent( {
+	parentStyleOverrides,
+	setParentStyleOverride,
+} ) {
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
+	);
+
+	useEffect( () => {
+		for ( const [ id, override ] of overrides ) {
+			if ( parentStyleOverrides.get( id ) !== override ) {
+				setParentStyleOverride( id, override );
+			}
+		}
+	}, [ overrides, parentStyleOverrides, setParentStyleOverride ] );
+}
+
+/**
  * This hook is used to lightly mark an element as a block preview wrapper
  * element. Call this hook and pass the returned props to the element to mark as
  * a block preview wrapper, automatically rendering inner blocks as children. If
@@ -108,6 +136,11 @@ export default memo( BlockPreview );
  * @param {Object}    options.layout Layout settings to be used in the preview.
  */
 export function useBlockPreview( { blocks, props = {}, layout } ) {
+	const { setStyleOverride } = unlock( useDispatch( blockEditorStore ) );
+	const parentStyleOverrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
+	);
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -128,6 +161,10 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
+			<SyncStyleOverridesWithParent
+				parentStyleOverrides={ parentStyleOverrides }
+				setParentStyleOverride={ setStyleOverride }
+			/>
 			<BlockListItems renderAppender={ false } layout={ layout } />
 		</ExperimentalBlockEditorProvider>
 	);
