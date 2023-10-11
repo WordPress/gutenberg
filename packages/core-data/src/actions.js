@@ -80,6 +80,7 @@ export function addEntities( entities ) {
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
+ * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -88,7 +89,8 @@ export function receiveEntityRecords(
 	records,
 	query,
 	invalidateCache = false,
-	edits
+	edits,
+	meta
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -102,9 +104,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query, edits );
+		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
-		action = receiveItems( records, edits );
+		action = receiveItems( records, edits, meta );
 	}
 
 	return {
@@ -385,12 +387,14 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			const objectId = entityConfig.getSyncObjectId( recordId );
-			getSyncProvider().update(
-				entityConfig.syncObjectType + '--edit',
-				objectId,
-				edit.edits
-			);
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				const objectId = entityConfig.getSyncObjectId( recordId );
+				getSyncProvider().update(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					edit.edits
+				);
+			}
 		} else {
 			if ( ! options.undoIgnore ) {
 				select.getUndoManager().addRecord(

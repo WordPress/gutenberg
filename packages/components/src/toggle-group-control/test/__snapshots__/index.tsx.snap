@@ -255,6 +255,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-8-20"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -292,6 +293,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-8-21"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -500,6 +502,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-7-18"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -521,6 +524,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-7-19"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -796,6 +800,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-2"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -833,6 +838,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-3"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -1035,6 +1041,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-0"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"
@@ -1056,6 +1063,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-1"
             role="radio"
+            type="button"
           >
             <div
               class="emotion-13 emotion-14"

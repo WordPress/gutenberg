@@ -383,6 +383,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',
+			'ms-word-list',
 			'ms-word-styled',
 			'ms-word-online',
 			'evernote',

@@ -21,9 +21,11 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
-	'WPComponent',
-	'WPElement',
 	'WPIcon',
+
+	// These two should be removed once we use the TS types from "react".
+	'Component',
+	'Element',
 ];
 
 /**

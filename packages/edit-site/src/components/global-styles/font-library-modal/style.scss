@@ -1,4 +1,14 @@
 .font-library-modal {
+	// @todo: If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
 	.components-modal__header {
 		border-bottom: none;
 	}
@@ -82,9 +92,22 @@
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	height: 100px;
+	height: 250px;
 	width: 100%;
 	background-color: #f0f0f0;
+}
+
+.font-library-modal__local-fonts {
+	margin: 0 auto;
+	width: 80%;
+
+	.font-library-modal__upload-area__text {
+		color: #6e6e6e;
+	}
+
+	.font-library-modal__upload-area__notice {
+		margin: 0;
+	}
 }
 
 .font-library-modal__font-name {
@@ -110,4 +133,24 @@
 		height: 100%;
 		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.components-card {
+		width: 50%;
+		min-width: 250px;
+		max-width: 350px;
+	}
+}
+
+.font-library-modal__font-collection__notice {
+	margin: 0;
 }

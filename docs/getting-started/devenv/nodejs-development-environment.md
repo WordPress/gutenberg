@@ -1,6 +1,6 @@
 # Node.js development environment
 
-When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment (see [Block Development Environment](README.md)). Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript code from the terminal (also known as a command-line interface, CLI, or shell)
+When developing for the Block Editor, you will need [Node.js](https://nodejs.org/en) development tools along with a code editor and a local WordPress environment (see [Block Development Environment](/docs/getting-started/devenv/README.md)). Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript code from the terminal (also known as a command-line interface, CLI, or shell)
 
 Installing `node` will automatically include the Node Package Manager (`npm`) and the Node Package eXecute (`npx`), two tools you will frequently use in block and plugin development.
 

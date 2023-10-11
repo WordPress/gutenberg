@@ -9,8 +9,8 @@ import { useCallback, useEffect, useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import type { WordPressComponentProps } from '../../ui/context';
-import { useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
@@ -176,18 +176,16 @@ export function useToolsPanelItem(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const placeholderStyle =
-			shouldRenderPlaceholder &&
-			! isShown &&
-			styles.ToolsPanelItemPlaceholder;
+		const shouldApplyPlaceholderStyles =
+			shouldRenderPlaceholder && ! isShown;
 		const firstItemStyle =
 			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
 		const lastItemStyle =
 			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
 		return cx(
 			styles.ToolsPanelItem,
-			placeholderStyle,
-			className,
+			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
+			! shouldApplyPlaceholderStyles && className,
 			firstItemStyle,
 			lastItemStyle
 		);

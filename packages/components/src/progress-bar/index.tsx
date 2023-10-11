@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import * as ProgressBarStyled from './styles';
 import type { ProgressBarProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedProgressBar(
 	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,

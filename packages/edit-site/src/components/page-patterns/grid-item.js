@@ -2,11 +2,16 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import downloadjs from 'downloadjs';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
  */
-import { BlockPreview } from '@wordpress/block-editor';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -45,12 +50,16 @@ import {
 } from '../../utils/constants';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 
 function GridItem( { categoryId, item, ...props } ) {
 	const descriptionId = useId();
 	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const { __experimentalDeleteReusableBlock } =
@@ -66,7 +75,7 @@ function GridItem( { categoryId, item, ...props } ) {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
-		categoryType: item.type,
+		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 	} );
 
 	const isEmpty = ! item.blocks?.length;
@@ -101,6 +110,20 @@ function GridItem( { categoryId, item, ...props } ) {
 	};
 	const deleteItem = () =>
 		isTemplatePart ? removeTemplate( item ) : deletePattern();
+	const exportAsJSON = () => {
+		const json = {
+			__file: item.type,
+			title: item.title || item.name,
+			content: item.patternBlock.content.raw,
+			syncStatus: item.patternBlock.wp_pattern_sync_status,
+		};
+
+		return downloadjs(
+			JSON.stringify( json, null, 2 ),
+			`${ kebabCase( item.title || item.name ) }.json`,
+			'application/json'
+		);
+	};
 
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isCustomPattern =
@@ -137,8 +160,12 @@ function GridItem( { categoryId, item, ...props } ) {
 		: sprintf(
 				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
 				__( 'Are you sure you want to delete "%s"?' ),
-				item.title
+				item.title || item.name
 		  );
+
+	const additionalStyles = ! backgroundColor
+		? [ { css: 'body { background: #fff; }' } ]
+		: undefined;
 
 	return (
 		<li className={ patternClassNames }>
@@ -147,6 +174,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				// Even though still incomplete, passing ids helps performance.
 				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
+				type="button"
 				{ ...props }
 				onClick={
 					item.type !== PATTERN_TYPES.theme ? onClick : undefined
@@ -168,7 +196,12 @@ function GridItem( { categoryId, item, ...props } ) {
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-				{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+				{ ! isEmpty && (
+					<BlockPreview
+						blocks={ item.blocks }
+						additionalStyles={ additionalStyles }
+					/>
+				) }
 			</button>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
 				<div
@@ -214,7 +247,7 @@ function GridItem( { categoryId, item, ...props } ) {
 									// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 									tabIndex="-1"
 								>
-									{ item.title }
+									{ item.title || item.name }
 								</Button>
 							</Heading>
 						) }
@@ -260,6 +293,12 @@ function GridItem( { categoryId, item, ...props } ) {
 								onClose={ onClose }
 								label={ __( 'Duplicate' ) }
 							/>
+							{ item.type === PATTERN_TYPES.user && (
+								<MenuItem onClick={ () => exportAsJSON() }>
+									{ __( 'Export as JSON' ) }
+								</MenuItem>
+							) }
+
 							{ isCustomPattern && (
 								<MenuItem
 									isDestructive={ ! hasThemeFile }

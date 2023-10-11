@@ -22,6 +22,8 @@ function gutenberg_reregister_core_block_types() {
 				'column',
 				'columns',
 				'details',
+				'form-input',
+				'form-submit-button',
 				'group',
 				'html',
 				'list',
@@ -66,6 +68,9 @@ function gutenberg_reregister_core_block_types() {
 				'comments.php'                     => 'core/comments',
 				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
+				'form.php'                         => 'core/form',
+				'form-input.php'                   => 'core/form-input',
+				'form-submission-notification.php' => 'core/form-submission-notification',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
@@ -461,3 +466,25 @@ function gutenberg_should_render_lightbox( $block ) {
 }
 
 add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
+
+/**
+ * Registers the metadata block attribute for all block types.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_metadata_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
+		$args['attributes']['metadata'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );

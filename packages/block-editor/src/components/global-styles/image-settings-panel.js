@@ -8,21 +8,21 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
-export function useHasImageSettingsPanel( name, settings, userSettings ) {
-	// Note: If lightbox userSettings exists, that means
-	// they were defined via the Global Styles UI and
-	// will NOT be a boolean value or contain the `allowEditing`
-	// property, so we should show the settings panel in those cases.
+export function useHasImageSettingsPanel( name, value, inheritedValue ) {
+	// Note: If lightbox `value` exists, that means it was
+	// defined via the the Global Styles UI and will NOT
+	// be a boolean value or contain the `allowEditing` property,
+	// so we should show the settings panel in those cases.
 	return (
-		( name === 'core/image' && settings?.lightbox?.allowEditing ) ||
-		!! userSettings?.lightbox
+		( name === 'core/image' && inheritedValue?.lightbox?.allowEditing ) ||
+		!! value?.lightbox
 	);
 }
 
 export default function ImageSettingsPanel( {
 	onChange,
-	userSettings,
-	settings,
+	value,
+	inheritedValue,
 	panelId,
 } ) {
 	const resetLightbox = () => {
@@ -37,8 +37,8 @@ export default function ImageSettingsPanel( {
 
 	let lightboxChecked = false;
 
-	if ( settings?.lightbox?.enabled ) {
-		lightboxChecked = settings.lightbox.enabled;
+	if ( inheritedValue?.lightbox?.enabled ) {
+		lightboxChecked = inheritedValue.lightbox.enabled;
 	}
 
 	return (
@@ -53,7 +53,7 @@ export default function ImageSettingsPanel( {
 					// contains the core/theme values for the lightbox and we want to show the
 					// "RESET" button ONLY when the user has explicitly set a value in the
 					// Global Styles.
-					hasValue={ () => !! userSettings?.lightbox }
+					hasValue={ () => !! value?.lightbox }
 					label={ __( 'Expand on Click' ) }
 					onDeselect={ resetLightbox }
 					isShownByDefault={ true }

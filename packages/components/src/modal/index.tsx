@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
+import type {
+	ForwardedRef,
+	KeyboardEvent,
+	MutableRefObject,
+	UIEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -15,12 +20,13 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
+	createContext,
+	useContext,
 } from '@wordpress/element';
 import {
 	useInstanceId,
 	useFocusReturn,
 	useFocusOnMount,
-	__experimentalUseFocusOutside as useFocusOutside,
 	useConstrainedTabbing,
 	useMergeRefs,
 } from '@wordpress/compose';
@@ -36,8 +42,13 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 
-// Used to count the number of open modals.
-let openModalCount = 0;
+// Used to track and dismiss the prior modal when another opens unless nested.
+const level0Dismissers: MutableRefObject<
+	ModalProps[ 'onRequestClose' ] | undefined
+>[] = [];
+const ModalContext = createContext( level0Dismissers );
+
+let isBodyOpenClassActive = false;
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -66,24 +77,43 @@ function UnforwardedModal(
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
+		size,
 		headerActions = null,
 		__experimentalHideHeader = false,
 	} = props;
 
 	const ref = useRef< HTMLDivElement >();
+
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+
+	// The focus hook does not support 'firstContentElement' but this is a valid
+	// value for the Modal's focusOnMount prop. The following code ensures the focus
+	// hook will focus the first focusable node within the element to which it is applied.
+	// When `firstContentElement` is passed as the value of the focusOnMount prop,
+	// the focus hook is applied to the Modal's content element.
+	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
+	// focus hook will focus the first element in the Modal's **content** when
+	// `firstContentElement` is passed.
+	const focusOnMountRef = useFocusOnMount(
+		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( onRequestClose );
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+
+	let sizeClass;
+	if ( isFullScreen || size === 'fill' ) {
+		sizeClass = 'is-full-screen';
+	} else if ( size ) {
+		sizeClass = `has-size-${ size }`;
+	}
 
 	// Determines whether the Modal content is scrollable and updates the state.
 	const isContentScrollable = useCallback( () => {
@@ -100,23 +130,52 @@ function UnforwardedModal(
 		}
 	}, [ contentRef ] );
 
+	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		openModalCount++;
+		ariaHelper.modalize( ref.current );
+		return () => ariaHelper.unmodalize();
+	}, [] );
 
-		if ( openModalCount === 1 ) {
-			ariaHelper.hideApp( ref.current );
+	// Keeps a fresh ref for the subsequent effect.
+	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+	useEffect( () => {
+		refOnRequestClose.current = onRequestClose;
+	}, [ onRequestClose ] );
+
+	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
+	// one should remain open at a time and the list enables closing prior ones.
+	const dismissers = useContext( ModalContext );
+	// Used for the tracking and dismissing any nested modals.
+	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
+
+	// Updates the stack tracking open modals at this level and calls
+	// onRequestClose for any prior and/or nested modals as applicable.
+	useEffect( () => {
+		dismissers.push( refOnRequestClose );
+		const [ first, second ] = dismissers;
+		if ( second ) first?.current?.();
+
+		const nested = nestedDismissers.current;
+		return () => {
+			nested[ 0 ]?.current?.();
+			dismissers.shift();
+		};
+	}, [ dismissers ] );
+
+	const isLevel0 = dismissers === level0Dismissers;
+	// Adds/removes the value of bodyOpenClassName to body element.
+	useEffect( () => {
+		if ( ! isBodyOpenClassActive ) {
+			isBodyOpenClassActive = true;
 			document.body.classList.add( bodyOpenClassName );
 		}
-
 		return () => {
-			openModalCount--;
-
-			if ( openModalCount === 0 ) {
+			if ( isLevel0 && dismissers.length === 0 ) {
 				document.body.classList.remove( bodyOpenClassName );
-				ariaHelper.showApp();
+				isBodyOpenClassActive = false;
 			}
 		};
-	}, [ bodyOpenClassName ] );
+	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -177,12 +236,9 @@ function UnforwardedModal(
 		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
 	} = {
 		onPointerDown: ( event ) => {
-			if ( event.isPrimary && event.target === event.currentTarget ) {
+			if ( event.target === event.currentTarget ) {
 				pressTarget = event.target;
-				// Avoids loss of focus yet also leaves `useFocusOutside`
-				// practically useless with its only potential trigger being
-				// programmatic focus movement. TODO opt for either removing
-				// the hook or enhancing it such that this isn't needed.
+				// Avoids focus changing so that focus return works as expected.
 				event.preventDefault();
 			}
 		},
@@ -199,7 +255,7 @@ function UnforwardedModal(
 		},
 	};
 
-	return createPortal(
+	const modal = (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
@@ -214,25 +270,22 @@ function UnforwardedModal(
 				<div
 					className={ classnames(
 						'components-modal__frame',
-						className,
-						{
-							'is-full-screen': isFullScreen,
-						}
+						sizeClass,
+						className
 					) }
 					style={ style }
 					ref={ useMergeRefs( [
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMountRef,
+						focusOnMount !== 'firstContentElement'
+							? focusOnMountRef
+							: null,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
 					aria-labelledby={ contentLabel ? undefined : headingId }
 					aria-describedby={ aria.describedby }
 					tabIndex={ -1 }
-					{ ...( shouldCloseOnClickOutside
-						? focusOutsideProps
-						: {} ) }
 					onKeyDown={ onKeyDown }
 				>
 					<div
@@ -283,11 +336,27 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						<div ref={ childrenContainerRef }>{ children }</div>
+
+						<div
+							ref={ useMergeRefs( [
+								childrenContainerRef,
+								focusOnMount === 'firstContentElement'
+									? focusOnMountRef
+									: null,
+							] ) }
+						>
+							{ children }
+						</div>
 					</div>
 				</div>
 			</StyleProvider>
-		</div>,
+		</div>
+	);
+
+	return createPortal(
+		<ModalContext.Provider value={ nestedDismissers.current }>
+			{ modal }
+		</ModalContext.Provider>,
 		document.body
 	);
 }

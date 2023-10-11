@@ -130,6 +130,7 @@ export const link = {
 		url: 'href',
 		type: 'data-type',
 		id: 'data-id',
+		_id: 'id',
 		target: 'target',
 		rel: 'rel',
 	},
@@ -143,7 +144,8 @@ export const link = {
 			.trim();
 
 		// A URL was pasted, turn the selection into a link.
-		if ( ! isURL( pastedText ) ) {
+		// For the link pasting feature, allow only http(s) protocols.
+		if ( ! isURL( pastedText ) || ! /^https?:/.test( pastedText ) ) {
 			return value;
 		}
 

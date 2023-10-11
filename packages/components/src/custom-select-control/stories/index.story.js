@@ -7,7 +7,7 @@ export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
 	argTypes: {
-		__next36pxDefaultSize: { control: { type: 'boolean' } },
+		__next40pxDefaultSize: { control: { type: 'boolean' } },
 		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
 		size: {
 			options: [ 'small', 'default', '__unstable-large' ],

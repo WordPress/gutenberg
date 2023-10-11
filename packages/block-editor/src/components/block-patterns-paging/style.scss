@@ -1,20 +1,23 @@
-.block-editor-patterns__grid-pagination {
-	border-top: 1px solid $gray-800;
-	padding: $grid-unit-05;
+.block-editor-patterns__grid-pagination-wrapper {
 
-	.components-button.is-tertiary {
-		width: auto;
-		height: $button-size-compact;
+	.block-editor-patterns__grid-pagination {
+		border-top: 1px solid $gray-800;
+		padding: $grid-unit-05;
 		justify-content: center;
+		.components-button.is-tertiary {
+			width: auto;
+			height: $button-size-compact;
+			justify-content: center;
 
-		&:disabled {
-			color: $gray-600;
-			background: none;
-		}
+			&:disabled {
+				color: $gray-600;
+				background: none;
+			}
 
-		&:hover:not(:disabled) {
-			color: $white;
-			background-color: $gray-700;
+			&:hover:not(:disabled) {
+				color: $white;
+				background-color: $gray-700;
+			}
 		}
 	}
 }
