@@ -203,8 +203,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							onChange={ ( newName ) => {
 								setAttributes( {
 									metadata: {
-										...( attributes?.metadata &&
-											attributes?.metadata ),
+										...attributes?.metadata,
 										name: newName,
 									},
 								} );
