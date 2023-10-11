@@ -561,7 +561,7 @@ export default function Image( {
 								help={
 									lightboxToggleDisabled
 										? __(
-												'Expand on Click is disabled for linked images.'
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
 										  )
 										: ''
 								}
