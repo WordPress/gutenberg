@@ -5,6 +5,7 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import {
 	pasteHandler,
+	privateApis,
 	findTransform,
 	getBlockTransforms,
 } from '@wordpress/blocks';
@@ -16,7 +17,9 @@ import { isURL } from '@wordpress/url';
  */
 import { addActiveFormats } from './utils';
 import { splitValue } from './split-value';
-import { getPasteEventData } from '../../utils/pasting';
+import { unlock } from '../../lock-unlock';
+
+const { getClipboardEventData } = unlock( privateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -43,7 +46,7 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			const { plainText, html, files } = getPasteEventData( event );
+			const { plainText, html, files } = getClipboardEventData( event );
 
 			event.preventDefault();
 

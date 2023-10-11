@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { shouldDismissPastedFiles } from '../pasting';
+import { shouldDismissPastedFiles } from '../get-clipboard-event-data';
 
 const mocks = {
 	pngImageFile: { type: 'image/png' },
