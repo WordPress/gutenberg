@@ -26,12 +26,18 @@ export default function CSSEditor( { value, onChange } ) {
 	useEffect( () => {
 		if ( editorRef.current ) {
 			new EditorView( {
-				extensions: [ basicSetup, css() ],
+				doc: value,
+				extensions: [
+					basicSetup,
+					css(),
+					EditorView.updateListener.of( ( editor ) => {
+						if ( editor.docChanged ) {
+							handleOnChange( editor.state.doc.toString() );
+						}
+					} ),
+				],
 				parent: editorRef.current,
 			} );
-			// editor.on( 'change', ( codemirror ) =>
-			// 	handleOnChange( codemirror.getValue() )
-			// );
 		}
 		// We only want to run this once, so we can ignore the dependency array.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,14 +77,17 @@ export default function CSSEditor( { value, onChange } ) {
 	}
 	const cssEditorId = useId();
 	return (
-		<VStack spacing={ 3 }>
+		<VStack
+			spacing={ 3 }
+			className=".block-editor-global-styles-advanced-panel__custom-css-editor"
+		>
 			<label htmlFor={ cssEditorId }>
 				{ __( 'Additional CSS' ) }
-				<textarea
+				<div
 					ref={ editorRef }
 					onBlur={ handleOnBlur }
 					id={ cssEditorId }
-				></textarea>
+				></div>
 			</label>
 			{ cssError && (
 				<Tooltip text={ cssError }>

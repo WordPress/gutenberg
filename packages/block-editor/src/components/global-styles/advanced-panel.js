@@ -7,7 +7,7 @@ import { Suspense, lazy } from '@wordpress/element';
  * Internal dependencies
  */
 const CSSEditor = lazy( () => import( './css-editor' ) );
-console.log( CSSEditor );
+
 export default function AdvancedPanel( {
 	value,
 	onChange,
