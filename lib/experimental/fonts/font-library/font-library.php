@@ -66,13 +66,9 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	 * @param string $collection_id The font collection ID.
 	 */
 	function wp_unregister_font_collection( $collection_id ) {
-		add_action(
-			'init',
-			function () use ( $collection_id ) {
-				WP_Font_Library::unregister_font_collection( $collection_id );
-			}
-		);
+		WP_Font_Library::unregister_font_collection( $collection_id );
 	}
+
 }
 
 $default_font_collection = array(

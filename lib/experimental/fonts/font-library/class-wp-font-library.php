@@ -53,6 +53,15 @@ class WP_Font_Library {
 	private static $collections = array();
 
 	/**
+	 * Unregistered font collections ids.
+	 *
+	 * @since 6.4.0
+	 *
+	 * @var array
+	 */
+	private static $unregistered_collection_ids = array();
+
+	/**
 	 * Register a new font collection.
 	 *
 	 * @since 6.4.0
@@ -81,11 +90,7 @@ class WP_Font_Library {
 	 * @return bool True if the font collection was unregistered successfully and false otherwise.
 	 */
 	public static function unregister_font_collection( $collection_id ) {
-		if ( ! isset( self::$collections[ $collection_id ] ) ) {
-			return false;
-		}
-		unset( self::$collections[ $collection_id ] );
-		return true;
+		self::$unregistered_collection_ids[] = $collection_id;
 	}
 
 	/**
@@ -96,7 +101,14 @@ class WP_Font_Library {
 	 * @return array List of font collections.
 	 */
 	public static function get_font_collections() {
-		return self::$collections;
+		// filters collections to remove unregistered collections.
+		$registered_collections = array();
+		foreach ( self::$collections as $key => $value ) {
+			if ( ! in_array( $key, self::$unregistered_collection_ids, true ) ) {
+				$registered_collections[ $key ] = $value;
+			}
+		}
+		return $registered_collections;
 	}
 
 	/**
