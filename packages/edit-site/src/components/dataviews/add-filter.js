@@ -16,7 +16,14 @@ import { unlock } from '../../lock-unlock';
 
 const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( {} ) {
+export default function AddFilter( { dataView } ) {
+	const filterableFields = dataView
+		.getAllColumns()
+		.filter( ( column ) => column.getCanFilter() );
+	if ( ! filterableFields.length ) {
+		return null;
+	}
+
 	return (
 		<DropdownMenuV2
 			trigger={
@@ -26,16 +33,18 @@ export default function AddFilter( {} ) {
 				</Button>
 			}
 		>
-			<DropdownMenuItemV2
-				key="one"
-				prefix={ <Icon icon={ check } /> }
-				role="menuitemcheckbox"
-			>
-				{ 'Filter one' }
-			</DropdownMenuItemV2>
-			<DropdownMenuItemV2 key="two" role="menuitemcheckbox">
-				{ 'Filter two' }
-			</DropdownMenuItemV2>
+			{ filterableFields.map( ( field ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ field.id }
+						prefix={ <Icon icon={ check } /> }
+						role="menuitemcheckbox"
+						onSelect={ () => {} }
+					>
+						{ field.columnDef.header }
+					</DropdownMenuItemV2>
+				);
+			} ) }
 		</DropdownMenuV2>
 	);
 }

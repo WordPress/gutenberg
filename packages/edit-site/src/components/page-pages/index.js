@@ -149,6 +149,7 @@ export default function PagePages() {
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
 				enableSorting: false,
+				enableColumnFilter: false,
 			},
 			{
 				header: 'Date',
