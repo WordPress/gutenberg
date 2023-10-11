@@ -42,6 +42,7 @@ import type {
 	InsertPointProps,
 } from '../types';
 import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
+import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 function ControlPointButton( {
 	isOpen,
@@ -93,6 +94,7 @@ function GradientColorPickerDropdown( {
 			( {
 				placement: 'bottom',
 				offset: 8,
+				resize: false,
 			} ) as const,
 		[]
 	);
@@ -271,7 +273,7 @@ function ControlPoints( {
 								/>
 							) }
 							renderContent={ ( { onClose } ) => (
-								<>
+								<DropdownContentWrapper paddingSize="none">
 									<ColorPicker
 										enableAlpha={ ! disableAlpha }
 										color={ point.color }
@@ -311,7 +313,7 @@ function ControlPoints( {
 												</Button>
 											</HStack>
 										) }
-								</>
+								</DropdownContentWrapper>
 							) }
 							style={ {
 								left: `${ point.position }%`,
@@ -360,29 +362,31 @@ function InsertPoint( {
 				/>
 			) }
 			renderContent={ () => (
-				<ColorPicker
-					enableAlpha={ ! disableAlpha }
-					onChange={ ( color ) => {
-						if ( ! alreadyInsertedPoint ) {
-							onChange(
-								addControlPoint(
-									controlPoints,
-									insertPosition,
-									colord( color ).toRgbString()
-								)
-							);
-							setAlreadyInsertedPoint( true );
-						} else {
-							onChange(
-								updateControlPointColorByPosition(
-									controlPoints,
-									insertPosition,
-									colord( color ).toRgbString()
-								)
-							);
-						}
-					} }
-				/>
+				<DropdownContentWrapper paddingSize="none">
+					<ColorPicker
+						enableAlpha={ ! disableAlpha }
+						onChange={ ( color ) => {
+							if ( ! alreadyInsertedPoint ) {
+								onChange(
+									addControlPoint(
+										controlPoints,
+										insertPosition,
+										colord( color ).toRgbString()
+									)
+								);
+								setAlreadyInsertedPoint( true );
+							} else {
+								onChange(
+									updateControlPointColorByPosition(
+										controlPoints,
+										insertPosition,
+										colord( color ).toRgbString()
+									)
+								);
+							}
+						} }
+					/>
+				</DropdownContentWrapper>
 			) }
 			style={
 				insertPosition !== null
