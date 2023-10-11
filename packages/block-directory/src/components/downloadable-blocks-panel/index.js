@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { withSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -72,10 +72,9 @@ function DownloadableBlocksPanel( {
 }
 
 export default compose( [
-	withSelect( ( select, { filterValue, rootClientId = null } ) => {
+	withSelect( ( select, { filterValue } ) => {
 		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
 			select( blockDirectoryStore );
-		const { canInsertBlockType } = select( blockEditorStore );
 
 		const hasPermission = select( coreStore ).canUser(
 			'read',
@@ -84,8 +83,9 @@ export default compose( [
 
 		function getInstallableBlocks( term ) {
 			const downloadableBlocks = getDownloadableBlocks( term );
-			const installableBlocks = downloadableBlocks.filter( ( block ) =>
-				canInsertBlockType( block, rootClientId, true )
+			// Filter out blocks that are already installed.
+			const installableBlocks = downloadableBlocks.filter(
+				( block ) => ! getBlockType( block.name )
 			);
 
 			if ( downloadableBlocks.length === installableBlocks.length ) {
