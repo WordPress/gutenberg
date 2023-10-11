@@ -139,10 +139,7 @@ class SwitchToDraftUtils {
 			id = page.id;
 		}
 
-		await this.#admin.visitPostEditor( {
-			postId: id,
-			action: 'edit',
-		} );
+		await this.#admin.visitPostEditor( { postId: id } );
 	};
 
 	getPostStatus = async () => {
