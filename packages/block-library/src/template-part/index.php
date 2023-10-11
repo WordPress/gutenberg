@@ -25,7 +25,7 @@ function render_block_core_template_part( $attributes ) {
 		$theme = get_stylesheet();
 	}
 
-	if ( isset( $attributes['slug'] ) ) {
+	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
 		$template_part_id    = $theme . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
