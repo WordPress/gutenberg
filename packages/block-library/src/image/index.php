@@ -310,8 +310,6 @@ HTML;
  * @since 6.4.0
  *
  * @global WP_Scripts $wp_scripts
- *
- * @return void
  */
 function block_core_image_ensure_interactivity_dependency() {
 	global $wp_scripts;
@@ -327,8 +325,6 @@ add_action( 'wp_print_scripts', 'block_core_image_ensure_interactivity_dependenc
 
 /**
  * Registers the `core/image` block on server.
- *
- * @return void
  */
 function register_block_core_image() {
 	register_block_type_from_metadata(
