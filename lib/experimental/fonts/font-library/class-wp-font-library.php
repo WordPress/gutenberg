@@ -85,7 +85,7 @@ class WP_Font_Library {
 			_doing_it_wrong(
 				__METHOD__,
 				/* translators: %s: Pattern name. */
-				sprintf( __( 'Font collection "%s" not found.' ), $collection_id ),
+				sprintf( __( 'Font collection "%s" not found.', 'default' ), $collection_id ),
 				'6.4.0'
 			);
 			return false;
