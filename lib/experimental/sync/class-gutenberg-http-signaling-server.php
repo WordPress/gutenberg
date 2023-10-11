@@ -69,7 +69,7 @@ class Gutenberg_HTTP_Signaling_Server {
 			echo wp_json_encode( array( 'result' => 'ok' ) ), PHP_EOL, PHP_EOL;
 		}
 
-		static::clean_up_old_connections( $subscriber_id, $subscriber_to_messages_path, $topics_to_subscribers_path );
+		static::clean_up_old_connections( $topics_to_subscribers_path, $subscriber_to_messages_path, $subscriber_id );
 		exit;
 	}
 
@@ -311,11 +311,11 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @access private
 	 * @internal
 	 *
-	 * @param string $connected_subscriber_id     The subscriber id.
-	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
 	 * @param string $topics_to_subscribers_path  The path to the file that contains the subscribers of the topics.
+	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
+	 * @param string $connected_subscriber_id     The subscriber id.
 	 */
-	private static function clean_up_old_connections( $connected_subscriber_id, $subscriber_to_messages_path, $topics_to_subscribers_path ) {
+	private static function clean_up_old_connections( $topics_to_subscribers_path, $subscriber_to_messages_path, $connected_subscriber_id, ) {
 		$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
 		// Example: array( 2323232121 => 34343433323(timestamp) ).
 
