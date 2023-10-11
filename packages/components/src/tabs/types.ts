@@ -139,4 +139,12 @@ export type TabPanelProps = {
 	 * Custom CSS styles for the rendered `TabPanel` component.
 	 */
 	style?: React.CSSProperties;
+	/**
+	 * Determines whether or not the tabpanel element should be focusable.
+	 * If `false`, pressing the tab key will skip over the tabpanel, and instead
+	 * focus on the first focusable element in the panel (if there is one).
+	 *
+	 * @default true
+	 */
+	focusable?: boolean;
 };

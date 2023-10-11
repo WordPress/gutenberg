@@ -240,3 +240,10 @@ The class name to apply to the tabpanel.
 Custom CSS styles for the tab.
 
 - Required: No
+
+###### `focusable`: `boolean`
+
+Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
+
+- Required: No
+- Default: `true`
