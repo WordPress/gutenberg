@@ -35,8 +35,7 @@ export default function PagePages() {
 		fields: {
 			// All fields are visible by default, so it's
 			// better to keep track of the hidden ones.
-			hidden: new Set( [ 'date' ] ),
-			hidable: [ 'author', 'status', 'date' ],
+			hidden: [ 'date' ],
 		},
 	} );
 	// Request post statuses to get the proper labels.
@@ -102,6 +101,7 @@ export default function PagePages() {
 				},
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
+				enableHiding: false,
 			},
 			{
 				header: __( 'Author' ),

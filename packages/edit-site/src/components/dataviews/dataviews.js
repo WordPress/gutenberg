@@ -45,7 +45,7 @@ export default function DataViews( {
 	options: { pageCount },
 } ) {
 	const columns = useMemo( () => {
-		let _columns = [ ...fields ];
+		const _columns = [ ...fields ];
 		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
@@ -81,23 +81,15 @@ export default function DataViews( {
 				enableHiding: false,
 			} );
 		}
-		if ( view.fields?.hidable?.length ) {
-			_columns = _columns.map( ( column ) => {
-				return {
-					...column,
-					enableHiding: view.fields.hidable.includes( column.id ),
-				};
-			} );
-		}
 
 		return _columns;
-	}, [ fields, actions, view.fields?.hidable ] );
+	}, [ fields, actions ] );
 
 	const columnVisibility = useMemo( () => {
-		if ( ! view.fields?.hidden?.size ) {
+		if ( ! view.fields?.hidden?.length ) {
 			return;
 		}
-		return Array.from( view.fields.hidden ).reduce(
+		return view.fields.hidden.reduce(
 			( accumulator, fieldId ) => ( {
 				...accumulator,
 				[ fieldId ]: false,
@@ -163,14 +155,17 @@ export default function DataViews( {
 			onChangeView( ( currentView ) => {
 				const hiddenFields = Object.entries(
 					columnVisibilityUpdater()
-				).reduce( ( accumulator, [ fieldId, value ] ) => {
-					if ( value ) {
-						accumulator.delete( fieldId );
-					} else {
-						accumulator.add( fieldId );
-					}
-					return accumulator;
-				}, new Set( currentView.fields.hidden ) );
+				).reduce(
+					( accumulator, [ fieldId, value ] ) => {
+						if ( value ) {
+							return accumulator.filter(
+								( id ) => id !== fieldId
+							);
+						}
+						return [ ...accumulator, fieldId ];
+					},
+					[ ...( currentView.fields.hidden || [] ) ]
+				);
 				return {
 					...currentView,
 					fields: {
