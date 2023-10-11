@@ -31,10 +31,21 @@ export default function DataViews( {
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
-					<TextFilter view={ view } onChangeView={ onChangeView } />
-					{
-						// Object.keys( view.filters ).map( ( key ) => key )
-					 }
+					<TextFilter view={view} onChange={ dataView.setGlobalFilter } />
+					{ Object.keys( view.filters ).map( ( key ) => {
+						const field = dataView
+							.getAllColumns()
+							.find(
+								( column ) =>
+									column.columnDef.renderFilter &&
+									column.id === key
+							);
+						if ( ! field ) {
+							return null;
+						}
+
+						return field.columnDef.renderFilter();
+					} ) }
 					<AddFilter
 						dataView={ dataView }
 						filters={ view.filters }

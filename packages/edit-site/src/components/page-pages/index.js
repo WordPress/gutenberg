@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import {
+	privateApis as componentsPrivateApis,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
+	Button,
+	Icon,
 } from '@wordpress/components';
+import { chevronDown, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -19,6 +23,9 @@ import Link from '../routes/link';
 import { DataViews } from '../dataviews';
 import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
@@ -141,6 +148,42 @@ export default function PagePages() {
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
 							{ author.name }
 						</a>
+					);
+				},
+				renderFilter: () => {
+					// TODO: request them from API.
+					const authors = [ 'admin-1', 'admin-2' ];
+					return (
+						<DropdownMenuV2
+							key={ 'filter-author' }
+							trigger={
+								<Button variant="tertiary">
+									{ __( 'Author' ) }
+									<Icon icon={ chevronDown } />
+								</Button>
+							}
+						>
+							{ authors.map( ( author ) => {
+								return (
+									<DropdownMenuItemV2
+										key={ author }
+										prefix={
+											view.filters?.author !==
+												undefined && (
+												<Icon icon={ check } />
+											)
+										}
+										role="menuitemcheckbox"
+										onSelect={ ( event ) => {
+											event.preventDefault();
+											// TODO: dispatch request to update the view.
+										} }
+									>
+										{ author }
+									</DropdownMenuItemV2>
+								);
+							} ) }
+						</DropdownMenuV2>
 					);
 				},
 			},

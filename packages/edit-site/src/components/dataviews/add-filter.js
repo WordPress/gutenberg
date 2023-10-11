@@ -19,7 +19,7 @@ const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 export default function AddFilter( { dataView, filters, onChangeFilters } ) {
 	const filterableFields = dataView
 		.getAllColumns()
-		.filter( ( column ) => column.getCanFilter() );
+		.filter( ( column ) => column.columnDef.renderFilter );
 	if ( ! filterableFields.length ) {
 		return null;
 	}
