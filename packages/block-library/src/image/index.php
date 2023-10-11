@@ -16,11 +16,13 @@
  * @return string The block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
+	if ( false === stripos( $content, '<img' ) ) {
+		return '';
+	}
 
 	$processor = new WP_HTML_Tag_Processor( $content );
-	$processor->next_tag( 'img' );
 
-	if ( $processor->get_attribute( 'src' ) === null ) {
+	if ( ! $processor->next_tag( 'img' ) || null === $processor->get_attribute( 'src' ) ) {
 		return '';
 	}
 
@@ -125,11 +127,28 @@ function block_core_image_get_lightbox_settings( $block ) {
  * @return string Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
+	/*
+	 * If it's not possible that an IMG element exists then return the given
+	 * block content as-is. It may be that there's no actual image in the block
+	 * or it could be that another plugin already modified this HTML.
+	 */
+	if ( false === stripos( $block_content, '<img' ) ) {
+		return $block_content;
+	}
+
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
 	$aria_label = __( 'Enlarge image' );
 
-	$processor->next_tag( 'img' );
+	/*
+	 * If there's definitely no IMG element in the block then return the given
+	 * block content as-is. There's nothing that this code can knowingly modify
+	 * to add the lightbox behavior.
+	 */
+	if ( ! $processor->next_tag( 'img' ) ) {
+		return $block_content;
+	}
+
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	// An empty alt attribute `alt=""` is valid for decorative images.
