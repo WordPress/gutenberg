@@ -73,6 +73,7 @@ test.describe( 'Child Blocks', () => {
 		const allowedBlocks = await ChildBook.getAllBlockInserterItemTitles();
 		expect( allowedBlocks.sort() ).toEqual( [
 			'Child Blocks Child',
+			'Image',
 			'Paragraph',
 		] );
 	} );
