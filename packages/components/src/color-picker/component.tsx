@@ -61,7 +61,12 @@ const UnconnectedColorPicker = (
 		}
 	>( props, 'ColorPicker' );
 
-	const containerRef = useRef< HTMLElement >( null );
+	const [ containerEl, setContainerEl ] = useState< HTMLElement | null >(
+		null
+	);
+	const containerRef = ( node: HTMLElement | null ) => {
+		setContainerEl( node );
+	};
 
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
@@ -93,7 +98,7 @@ const UnconnectedColorPicker = (
 			{ ...divProps }
 		>
 			<Picker
-				containerEl={ containerRef.current }
+				containerEl={ containerEl }
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }
