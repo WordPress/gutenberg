@@ -43,7 +43,7 @@ if ( class_exists( 'WP_HTML_Processor' ) ) {
  *
  * Example:
  *
- *     $processor = WP_HTML_Processor::createFragment( $html );
+ *     $processor = WP_HTML_Processor::create_fragment( $html );
  *     if ( $processor->next_tag( array( 'breadcrumbs' => array( 'DIV', 'FIGURE', 'IMG' ) ) ) ) {
  *         $processor->add_class( 'responsive-image' );
  *     }
@@ -62,7 +62,7 @@ if ( class_exists( 'WP_HTML_Processor' ) ) {
  * Since all elements find themselves inside a full HTML document
  * when parsed, the return value from `get_breadcrumbs()` will always
  * contain any implicit outermost elements. For example, when parsing
- * with `createFragment()` in the `BODY` context (the default), any
+ * with `create_fragment()` in the `BODY` context (the default), any
  * tag in the given HTML document will contain `array( 'HTML', 'BODY', … )`
  * in its breadcrumbs.
  *
@@ -243,7 +243,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 * @param string $encoding Text encoding of the document; must be default of 'UTF-8'.
 	 * @return WP_HTML_Processor|null The created processor if successful, otherwise null.
 	 */
-	public static function createFragment( $html, $context = '<body>', $encoding = 'UTF-8' ) {
+	public static function create_fragment( $html, $context = '<body>', $encoding = 'UTF-8' ) {
 		if ( '<body>' !== $context || 'UTF-8' !== $encoding ) {
 			return null;
 		}
@@ -284,7 +284,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @see WP_HTML_Processor::createFragment()
+	 * @see WP_HTML_Processor::create_fragment()
 	 *
 	 * @param string      $html                                  HTML to process.
 	 * @param string|null $use_the_static_create_methods_instead This constructor should not be called manually.
@@ -296,9 +296,9 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
-					/* translators: %s: WP_HTML_Processor::createFragment. */
+					/* translators: %s: WP_HTML_Processor::create_fragment(). */
 					__( 'Call %s to create an HTML Processor instead of calling the constructor directly.' ),
-					'<code>WP_HTML_Processor::createFragment</code>'
+					'<code>WP_HTML_Processor::create_fragment()</code>'
 				),
 				'6.4.0'
 			);
@@ -328,7 +328,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * Example
 	 *
-	 *     $processor = WP_HTML_Processor::createFragment( '<template><strong><button><em><p><em>' );
+	 *     $processor = WP_HTML_Processor::create_fragment( '<template><strong><button><em><p><em>' );
 	 *     false === $processor->next_tag();
 	 *     WP_HTML_Processor::ERROR_UNSUPPORTED === $processor->get_last_error();
 	 *
@@ -361,6 +361,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *                                     Defaults to first tag.
 	 *     @type string|null $class_name   Tag must contain this whole class name to match.
 	 *     @type string[]    $breadcrumbs  DOM sub-path at which element is found, e.g. `array( 'FIGURE', 'IMG' )`.
+	 *                                     May also contain the wildcard `*` which matches a single element, e.g. `array( 'SECTION', '*' )`.
 	 * }
 	 * @return bool Whether a tag was matched.
 	 */
@@ -410,26 +411,67 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		$breadcrumbs  = $query['breadcrumbs'];
 		$match_offset = isset( $query['match_offset'] ) ? (int) $query['match_offset'] : 1;
 
-		$crumb  = end( $breadcrumbs );
-		$target = strtoupper( $crumb );
 		while ( $match_offset > 0 && $this->step() ) {
-			if ( $target !== $this->get_tag() ) {
-				continue;
+			if ( $this->matches_breadcrumbs( $breadcrumbs ) && 0 === --$match_offset ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Indicates if the currently-matched tag matches the given breadcrumbs.
+	 *
+	 * A "*" represents a single tag wildcard, where any tag matches, but not no tags.
+	 *
+	 * At some point this function _may_ support a `**` syntax for matching any number
+	 * of unspecified tags in the breadcrumb stack. This has been intentionally left
+	 * out, however, to keep this function simple and to avoid introducing backtracking,
+	 * which could open up surprising performance breakdowns.
+	 *
+	 * Example:
+	 *
+	 *     $processor = WP_HTML_Processor::create_fragment( '<div><span><figure><img></figure></span></div>' );
+	 *     $processor->next_tag( 'img' );
+	 *     true  === $processor->matches_breadcrumbs( array( 'figure', 'img' ) );
+	 *     true  === $processor->matches_breadcrumbs( array( 'span', 'figure', 'img' ) );
+	 *     false === $processor->matches_breadcrumbs( array( 'span', 'img' ) );
+	 *     true  === $processor->matches_breadcrumbs( array( 'span', '*', 'img' ) );
+	 *
+	 * @since 6.4.0
+	 *
+	 * @param string[] $breadcrumbs DOM sub-path at which element is found, e.g. `array( 'FIGURE', 'IMG' )`.
+	 *                              May also contain the wildcard `*` which matches a single element, e.g. `array( 'SECTION', '*' )`.
+	 * @return bool Whether the currently-matched tag is found at the given nested structure.
+	 */
+	public function matches_breadcrumbs( $breadcrumbs ) {
+		if ( ! $this->get_tag() ) {
+			return false;
+		}
+
+		// Everything matches when there are zero constraints.
+		if ( 0 === count( $breadcrumbs ) ) {
+			return true;
+		}
+
+		// Start at the last crumb.
+		$crumb = end( $breadcrumbs );
+
+		if ( '*' !== $crumb && $this->get_tag() !== strtoupper( $crumb ) ) {
+			return false;
+		}
+
+		foreach ( $this->state->stack_of_open_elements->walk_up() as $node ) {
+			$crumb = strtoupper( current( $breadcrumbs ) );
+
+			if ( '*' !== $crumb && $node->node_name !== $crumb ) {
+				return false;
 			}
 
-			// Look up the stack to see if the breadcrumbs match.
-			foreach ( $this->state->stack_of_open_elements->walk_up() as $node ) {
-				if ( strtoupper( $crumb ) !== $node->node_name ) {
-					break;
-				}
-
-				$crumb = prev( $breadcrumbs );
-				if ( false === $crumb && 0 === --$match_offset && ! $this->is_tag_closer() ) {
-					return true;
-				}
+			if ( false === prev( $breadcrumbs ) ) {
+				return true;
 			}
-
-			$crumb = end( $breadcrumbs );
 		}
 
 		return false;
@@ -519,7 +561,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * Example
 	 *
-	 *     $processor = WP_HTML_Processor::createFragment( '<p><strong><em><img></em></strong></p>' );
+	 *     $processor = WP_HTML_Processor::create_fragment( '<p><strong><em><img></em></strong></p>' );
 	 *     $processor->next_tag( 'IMG' );
 	 *     $processor->get_breadcrumbs() === array( 'HTML', 'BODY', 'P', 'STRONG', 'EM', 'IMG' );
 	 *
@@ -1401,5 +1443,5 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * @access private
 	 */
-	const CONSTRUCTOR_UNLOCK_CODE = 'Use WP_HTML_Processor::createFragment instead of calling the class constructor directly.';
+	const CONSTRUCTOR_UNLOCK_CODE = 'Use WP_HTML_Processor::create_fragment() instead of calling the class constructor directly.';
 }

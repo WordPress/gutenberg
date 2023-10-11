@@ -377,6 +377,8 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
+	const lightboxToggleDisabled = linkDestination !== 'none';
+
 	const dimensionsControl = (
 		<DimensionsTool
 			value={ { width, height, scale, aspectRatio } }
@@ -555,6 +557,14 @@ export default function Image( {
 										lightbox: { enabled: newValue },
 									} );
 								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
 							/>
 						</ToolsPanelItem>
 					) }

@@ -191,5 +191,8 @@ A function to call when the `Reset all` menu option is selected. As an argument,
 Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
+Note that placeholder items won't apply the `className` that would be
+normally applied to a visible `ToolsPanelItem` via the `className` prop.
+
 - Required: No
 - Default: `false`
