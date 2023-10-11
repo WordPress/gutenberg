@@ -38,8 +38,9 @@ function register_block_core_back_to_top() {
 add_action( 'init', 'register_block_core_back_to_top' );
 
 /**
- * Block themes: If the block exists on the page, add the target id.
- * Classic themes: We can't check if the block is in use, so we always add the target id.
+ * Adds the target id 'wp-back-to-top' to the top of the page, so that focus can be moved.
+ * Block themes: Add the target id if the back to top block exists on the page.
+ * Classic themes with 'wp_body_open()': Always add the target id.
  */
 function block_core_back_to_top_target() {
 	echo '<div id="wp-back-to-top"></div>';
@@ -61,8 +62,8 @@ if ( wp_is_block_theme() ) {
 }
 
 /**
- * Enqueue the fallback view.js file if the classic theme does not
- * use `wp_body_open()`.
+ * For classic themes that do not use `wp_body_open()`,
+ * view.js is needed to move focus to the first focusable element on the top of the page.
  */
 function block_core_back_to_top_classic_fallback() {
 	if ( ! wp_is_block_theme() && 0 === did_action( 'wp_body_open' ) ) {

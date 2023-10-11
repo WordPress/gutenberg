@@ -1,6 +1,6 @@
 /**
- * This script is loaded on the front as a fallback
- * if the classic theme does not include wp_body_open().
+ * This script is needed to move the focus to the first focusable element on the page.
+ * It is only intended to be loaded on the front of classic themes that does not include wp_body_open().
  */
 window.addEventListener( 'load', () => {
 	const backToTopBlocks = document.querySelectorAll(
@@ -12,7 +12,26 @@ window.addEventListener( 'load', () => {
 			topAnchor.querySelector( 'a' ).focus();
 			return;
 		}
-		document.querySelector( 'body a' ).focus();
+		// This list is not exhaustive, but covers common elements that can recieve focus.
+		const focusable = [
+			'a[href]',
+			'audio',
+			'button:not([disabled])',
+			'[contenteditable]',
+			'details',
+			'embed',
+			'iframe',
+			'input:not([disabled]):not([type="hidden"])',
+			'object',
+			'[role="button"][tabindex="0"]',
+			'[role="link"][tabindex="0"]',
+			'select:not([disabled])',
+			'summary',
+			'textarea:not([disabled])',
+			'video',
+			'[tabindex]:not([tabindex="-1"])',
+		];
+		document.querySelector( focusable.join( ', ' ) ).focus();
 	}
 
 	backToTopBlocks.forEach( ( backToTop ) => {
