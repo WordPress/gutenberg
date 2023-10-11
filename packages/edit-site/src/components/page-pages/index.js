@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo } from '@wordpress/element';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -30,6 +31,12 @@ export default function PagePages() {
 		sort: {
 			field: 'date',
 			direction: 'desc',
+		},
+		fields: {
+			// All fields are visible by default, so it's
+			// better to keep track of the hidden ones.
+			hidden: new Set( [ 'date' ] ),
+			hideable: [ 'author', 'status', 'date' ],
 		},
 	} );
 	// Request post statuses to get the proper labels.
@@ -95,7 +102,6 @@ export default function PagePages() {
 				},
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
-				enableHiding: false,
 			},
 			{
 				header: __( 'Author' ),
@@ -115,6 +121,18 @@ export default function PagePages() {
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				enableSorting: false,
+			},
+			{
+				header: 'Date',
+				id: 'date',
+				cell: ( props ) => {
+					const formattedDate = dateI18n(
+						getSettings().formats.datetimeAbbreviated,
+						getDate( props.row.original.date )
+					);
+					return <time>{ formattedDate }</time>;
+				},
 				enableSorting: false,
 			},
 		],

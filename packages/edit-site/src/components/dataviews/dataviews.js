@@ -32,6 +32,8 @@ import ViewActions from './view-actions';
 import TextFilter from './text-filter';
 import { moreVertical } from '@wordpress/icons';
 
+const EMPTY_OBJECT = {};
+
 export default function DataViews( {
 	actions,
 	data,
@@ -43,8 +45,8 @@ export default function DataViews( {
 	options: { pageCount },
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [ ...fields ];
-		if ( actions && actions.length ) {
+		let _columns = [ ...fields ];
+		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
@@ -79,9 +81,30 @@ export default function DataViews( {
 				enableHiding: false,
 			} );
 		}
+		if ( view.fields?.hideable?.length ) {
+			_columns = _columns.map( ( column ) => {
+				return {
+					...column,
+					enableHiding: view.fields.hideable.includes( column.id ),
+				};
+			} );
+		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view.fields?.hideable ] );
+
+	const columnVisibility = useMemo( () => {
+		if ( ! view.fields?.hidden?.size ) {
+			return;
+		}
+		return Array.from( view.fields.hidden ).reduce(
+			( accumulator, fieldId ) => ( {
+				...accumulator,
+				[ fieldId ]: false,
+			} ),
+			{}
+		);
+	}, [ view.fields?.hidden ] );
 
 	const dataView = useReactTable( {
 		data,
@@ -104,6 +127,7 @@ export default function DataViews( {
 				pageIndex: view.page,
 				pageSize: view.perPage,
 			},
+			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
 		},
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
@@ -132,6 +156,27 @@ export default function DataViews( {
 				return {
 					...currentView,
 					sort: { field: id, direction: desc ? 'desc' : 'asc' },
+				};
+			} );
+		},
+		onColumnVisibilityChange: ( columnVisibilityUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const hiddenFields = Object.entries(
+					columnVisibilityUpdater()
+				).reduce( ( accumulator, [ fieldId, value ] ) => {
+					if ( value ) {
+						accumulator.delete( fieldId );
+					} else {
+						accumulator.add( fieldId );
+					}
+					return accumulator;
+				}, new Set( currentView.fields.hidden ) );
+				return {
+					...currentView,
+					fields: {
+						...currentView.fields,
+						hidden: hiddenFields,
+					},
 				};
 			} );
 		},
