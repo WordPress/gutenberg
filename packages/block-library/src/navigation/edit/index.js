@@ -884,7 +884,6 @@ function Navigation( {
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
-							label={ __( 'Menu' ) }
 							hasIcon={ hasIcon }
 							icon={ icon }
 							isOpen={ isResponsiveMenuOpen }

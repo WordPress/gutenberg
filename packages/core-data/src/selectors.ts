@@ -14,7 +14,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems } from './queried-data';
+import {
+	getQueriedItems,
+	getQueriedTotalItems,
+	getQueriedTotalPages,
+} from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
@@ -522,6 +526,60 @@ export const getEntityRecords = ( <
 	}
 	return getQueriedItems( queriedState, query );
 } ) as GetEntityRecords;
+
+/**
+ * Returns the Entity's total available records for a given query (ignoring pagination).
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
+export const getEntityRecordsTotalItems = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	return getQueriedTotalItems( queriedState, query );
+};
+
+/**
+ * Returns the number of available pages for the given query.
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
+export const getEntityRecordsTotalPages = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	return getQueriedTotalPages( queriedState, query );
+};
 
 type DirtyEntityRecord = {
 	title: string;

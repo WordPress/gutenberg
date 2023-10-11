@@ -4,7 +4,7 @@
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	MenuItem,
 	__experimentalHStack as HStack,
@@ -189,21 +189,13 @@ function BlockRenameControl( props ) {
 
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name, attributes, setAttributes } = props;
+		const { clientId, name, attributes, setAttributes, isSelected } = props;
 
-		const metaDataSupport = getBlockSupport(
-			name,
-			'__experimentalMetadata',
-			false
-		);
-
-		const supportsBlockNaming = !! (
-			true === metaDataSupport || metaDataSupport?.name
-		);
+		const supportsBlockNaming = hasBlockSupport( name, 'renaming', true );
 
 		return (
 			<>
-				{ supportsBlockNaming && (
+				{ isSelected && supportsBlockNaming && (
 					<>
 						<BlockRenameControl
 							clientId={ clientId }

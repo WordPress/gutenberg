@@ -7,8 +7,6 @@
 
 /**
  *  Registers the `core/pattern` block on the server.
- *
- * @return void
  */
 function register_block_core_pattern() {
 	register_block_type_from_metadata(

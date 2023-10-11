@@ -76,6 +76,19 @@
 }
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
+	@include break-medium() {
+		// Safari does not currently support `scrollbar-gutter: stable`, so at
+		// particular viewport sizes it's possible for previews to render prior to a
+		// scrollbar appearing. This then causes a scrollbar to appear, which reduces
+		// the width of the container and can cause the preview's width to change.
+		// As a result, the preview can go into an endless loop of resizing, causing
+		// the preview elements to appear to "dance". A workaround is to provide a
+		// max-width for the container, which prevents the introduction of the scrollbar
+		// from causing the preview's width to change.
+		// See: https://github.com/WordPress/gutenberg/issues/55112
+		max-width: 292px;
+	}
+
 	.edit-site-global-styles-variations_item-preview {
 		border: $gray-900 $border-width solid;
 	}
