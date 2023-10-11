@@ -15,7 +15,7 @@ function Media( { id, size } ) {
 		return null;
 	}
 
-	return <img src={ mediaDetails.source_url } alt="" />;
+	return <img src={ mediaDetails.source_url } alt={ media.alt_text } />;
 }
 
 export default Media;
