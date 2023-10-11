@@ -13,6 +13,13 @@
 class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase {
 
 	public function set_up() {
+		// Resets the private static property WP_Font_Library::$collections to empty array.
+		$reflection = new ReflectionClass( 'WP_Font_Library' );
+		$property   = $reflection->getProperty( 'collections' );
+		$property->setAccessible( true );
+		$property->setValue( array() );
+
+		// Registers two mock font collections.
 		$config = array(
 			'id'          => 'mock-col-to-unregister',
 			'name'        => 'Mock Collection to be unregistered',
@@ -30,11 +37,34 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 		WP_Font_Library::register_font_collection( $config );
 	}
 
+	public function tear_down() {
+		// Resets the private static property WP_Font_Library::$unregistered_collection_ids to empty array.
+		$reflection = new ReflectionClass( 'WP_Font_Library' );
+		$property   = $reflection->getProperty( 'unregistered_collection_ids' );
+		$property->setAccessible( true );
+		$property->setValue( array() );
+	}
+
 	public function test_should_unregister_font_collection() {
 		// Unregister mock font collection.
 		WP_Font_Library::unregister_font_collection( 'mock-col-to-unregister' );
 		$collections = WP_Font_Library::get_font_collections();
 		$this->assertArrayNotHasKey( 'mock-col-to-unregister', $collections, 'Font collection was not unregistered.' );
 		$this->assertArrayHasKey( 'default-font-collection', $collections, 'Font collection was unregistered by mistake.' );
+		
+		// Unregisters remaining mock font collection.
+		WP_Font_Library::unregister_font_collection( 'another-collecction' );
+		$collections = WP_Font_Library::get_font_collections();
+		$this->assertArrayNotHasKey( 'another-collecction', $collections, 'Mock font collection was not unregistered.' );
+
+		// Checks that all font collections were unregistered.
+		$this->assertEmpty( $collections, 'Font collections were not unregistered.' );
+	}
+
+	public function unregister_non_existing_collection() {
+		// Unregisters non existing font collection.
+		WP_Font_Library::unregister_font_collection( 'non-existing-collection' );
+		$collections = WP_Font_Library::get_font_collections();
+		$this->assertEmpty( $collections, 'Should not be registered collections.' );
 	}
 }
