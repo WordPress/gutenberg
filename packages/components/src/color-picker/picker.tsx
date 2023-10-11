@@ -19,6 +19,7 @@ export const Picker = ( {
 	onChange,
 	onDragStart,
 	onDragEnd,
+	containerEl,
 }: PickerProps ) => {
 	const Component = enableAlpha
 		? RgbaStringColorPicker
@@ -28,7 +29,9 @@ export const Picker = ( {
 	const isDragging = useRef( false );
 	const leftWhileDragging = useRef( false );
 	useEffect( () => {
-		const picker = document.querySelector( '.react-colorful__saturation' );
+		const picker = containerEl?.querySelector(
+			'.react-colorful__saturation'
+		);
 		if ( ! picker ) {
 			return;
 		}
@@ -70,7 +73,7 @@ export const Picker = ( {
 			doc.removeEventListener( 'pointerenter', onPointerEnter );
 			doc.removeEventListener( 'pointerleave', onPointerUp );
 		};
-	}, [ onDragStart, onDragEnd ] );
+	}, [ onDragStart, onDragEnd, containerEl ] );
 
 	return (
 		<Component

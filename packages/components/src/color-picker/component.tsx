@@ -9,8 +9,8 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { useCallback, useState, useMemo } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useCallback, useState, useMemo, useRef } from '@wordpress/element';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -61,6 +61,8 @@ const UnconnectedColorPicker = (
 		}
 	>( props, 'ColorPicker' );
 
+	const containerRef = useRef< HTMLElement >( null );
+
 	// Use a safe default value for the color and remove the possibility of `undefined`.
 	const [ color, setColor ] = useControlledValue( {
 		onChange,
@@ -86,8 +88,12 @@ const UnconnectedColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+		<ColorfulWrapper
+			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+			{ ...divProps }
+		>
 			<Picker
+				containerEl={ containerRef.current }
 				onChange={ handleChange }
 				color={ safeColordColor }
 				enableAlpha={ enableAlpha }

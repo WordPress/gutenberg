@@ -59,6 +59,7 @@ export interface PickerProps {
 	color: Colord;
 	enableAlpha: boolean;
 	onChange: ( nextColor: Colord ) => void;
+	containerEl: HTMLElement | null;
 	onDragStart?: ( event: MouseEvent ) => void;
 	onDragEnd?: ( event: MouseEvent ) => void;
 }
