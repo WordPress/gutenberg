@@ -504,12 +504,23 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	const action = new wd.TouchAction( driver )
-		.press( { x, y } )
-		.wait( 5000 )
-		.moveTo( { x, y: nextYPosition } )
-		.release();
-	await action.perform();
+	await driver.touchPerform( [
+		{
+			action: 'press',
+			options: { x, y },
+		},
+		{
+			action: 'wait',
+			options: {
+				ms: 5000,
+			},
+		},
+		{
+			action: 'moveTo',
+			options: { x, y: nextYPosition },
+		},
+		{ action: 'release' },
+	] );
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
