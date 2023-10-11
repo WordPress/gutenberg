@@ -36,10 +36,3 @@ export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps
 
 	${ padding };
 `;
-
-export const DropdownPointerEventsCapture = styled.div`
-	position: fixed;
-	inset: 0;
-	// Hardcoded fallback to (popover-z-index - 1)
-	z-index: 999999;
-`;
