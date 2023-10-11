@@ -48,7 +48,7 @@ function block_core_back_to_top_target() {
 if ( wp_is_block_theme() ) {
 	add_filter(
 		'render_block',
-		function( $html, $block ) {
+		function ( $html, $block ) {
 			if ( 'core/back-to-top' === $block['blockName'] ) {
 				add_action( 'wp_body_open', 'block_core_back_to_top_target' );
 			}
