@@ -9,7 +9,7 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { useCallback, useState, useMemo, useRef } from '@wordpress/element';
+import { useCallback, useState, useMemo } from '@wordpress/element';
 import { useDebounce, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
