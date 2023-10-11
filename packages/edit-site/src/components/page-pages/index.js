@@ -170,10 +170,13 @@ export default function PagePages() {
 								</Button>
 							}
 						>
-							{ authors.map( ( author ) => {
+							{ [
+								{ id: undefined, name: __( 'None' ) },
+								...authors,
+							].map( ( author ) => {
 								return (
 									<DropdownMenuItemV2
-										key={ author.id }
+										key={ author.name }
 										prefix={
 											view.filters?.author ===
 												author.id && (
