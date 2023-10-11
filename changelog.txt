@@ -1,5 +1,7 @@
 == Changelog ==
 
+= 16.8.0 =
+
 = 16.8.0-rc.2 =
 
 ## Changelog
@@ -305,6 +307,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @alexstine @andrewhayward @andrewserong @annezazu @anton-vlasenko @artemiomorales @aurooba @bangank36 @brookewp @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @dcalhoun @derekblank @draganescu @ellatrix @fluiddot @fullofcaffeine @geriux @getdave @glendaviesnz @gziolo @jameskoster @jeryj @jsnajdr @juhi123 @kevin940726 @leemyongpakvn @madhusudhand @MaggieCabrera @Mamaduka @matiasbenedetto @michalczaplinski @mirka @mtias @mujuonly @ndiego @noahtallen @noisysocks @ntsekouras @oandregal @ockham @pbking @priethor @ramonjd @richtabor @scruffian @SiobhyB @spacedmonkey @stokesman @swissspidy @t-hamano @tellthemachines @tellyworth @them-es @torounit @tyxla @westonruter @WunderBart @youknowriad
+
+
 
 
 = 16.7.0 =
