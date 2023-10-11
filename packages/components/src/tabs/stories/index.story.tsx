@@ -285,6 +285,43 @@ ControlledMode.args = {
 	selectedTabId: 'tab3',
 };
 
+const FocusableFalseTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	return (
+		<>
+			<div style={ { minHeight: '300px' } }>
+				<Tabs { ...props }>
+					<Tabs.TabList>
+						<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
+						<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
+						<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+					</Tabs.TabList>
+					<Tabs.TabPanel id={ 'tab1' } focusable={ false }>
+						<p>Selected tab: Tab 1</p>
+						<div>
+							<button>button</button>
+						</div>
+						<input />
+					</Tabs.TabPanel>
+					<Tabs.TabPanel id={ 'tab2' } focusable={ false }>
+						<p>Selected tab: Tab 2</p>
+						<button>button</button>
+					</Tabs.TabPanel>
+					<Tabs.TabPanel id={ 'tab3' } focusable={ false }>
+						<p>Selected tab: Tab 3</p>
+					</Tabs.TabPanel>
+				</Tabs>
+			</div>
+			<p>
+				Another focusable element, outside of the `Tabs` component
+				itself:
+			</p>
+			<button>button</button>
+		</>
+	);
+};
+export const TabPanelsWithFocusableFalse = FocusableFalseTemplate.bind( {} );
+TabPanelsWithFocusableFalse.storyName = 'TabPanels with focusable={ false }';
+
 const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	const [ disableTab2, setDisableTab2 ] = useState( false );
 
