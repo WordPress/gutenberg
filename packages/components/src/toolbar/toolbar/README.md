@@ -71,6 +71,15 @@ An accessible label for the toolbar.
 
 -   Required: Yes
 
+#### `variant`: `'unstyled' | undefined`
+
+Specifies the toolbar's style.
+
+Leave undefined for the default style. Or `'unstyled'` which removes the border from the toolbar, but keeps the default popover style.
+
+-   Required: No
+-   Default: `undefined`
+
 ## Related components
 
 -   Toolbar may contain [ToolbarGroup](/packages/components/src/toolbar-group/README.md), [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.

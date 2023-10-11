@@ -26,7 +26,7 @@ describe( 'Toolbar', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render a toolbar without styles if variant has been defined', () => {
+		it( 'should apply the unstyled variant correctly via the `variant` prop', () => {
 			render( <Toolbar label="blocks" variant="unstyled" /> );
 
 			expect( screen.getByRole( 'toolbar' ) ).toHaveClass(
