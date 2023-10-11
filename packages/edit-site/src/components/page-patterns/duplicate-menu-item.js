@@ -63,7 +63,7 @@ export default function DuplicateMenuItem( {
 			sprintf(
 				// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
 				__( '"%s" duplicated.' ),
-				pattern.title
+				pattern.title.raw
 			),
 			{
 				type: 'snackbar',
