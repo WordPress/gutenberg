@@ -188,7 +188,11 @@ store(
 
 							context.core.image.lightboxEnabled = false;
 
-							if ( event.pointerType !== 'mouse' ) {
+							// We want to avoid drawing attention to the button
+							// after the lightbox closes for mouse and touch users.
+							// Note that the `event.pointerType` property returns
+							// as an empty string if a keyboard fired the event.
+							if ( event.pointerType === '' ) {
 								context.core.image.lastFocusedElement.focus( {
 									preventScroll: true,
 								} );
@@ -319,13 +323,12 @@ store(
 									focusableElements.length - 1
 								];
 
-							// We want to avoid drawing unnecessary attention to the
-							// close button for mouse users. Note that even if opening
+							// We want to avoid drawing unnecessary attention to the close
+							// button for mouse and touch users. Note that even if opening
 							// the lightbox via keyboard, the event fired is of type
 							// `pointerEvent`, so we need to rely on the `event.pointerType`
-							// property, which returns `mouse` for mouse events and
-							// as an empty string for keyboard events.
-							if ( context.core.image.pointerType !== 'mouse' ) {
+							// property, which returns an empty string for keyboard events.
+							if ( context.core.image.pointerType === '' ) {
 								ref.querySelector( '.close-button' ).focus();
 							}
 						}
