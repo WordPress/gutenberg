@@ -104,7 +104,8 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 								>
-									{ decodeEntities( props.getValue() ) }
+									{ decodeEntities( props.getValue() ) ||
+										__( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
