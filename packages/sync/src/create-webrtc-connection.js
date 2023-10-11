@@ -27,8 +27,8 @@ export function createWebRTCConnection( { signaling, password } ) {
 		/** @type {string} */ objectType,
 		/** @type {import("yjs").Doc} */ doc
 	) {
-		const docName = `${ objectType }-${ objectId }`;
-		new WebrtcProviderWithHttpSignaling( docName, doc, {
+		const roomName = `${ objectType }-${ objectId }`;
+		new WebrtcProviderWithHttpSignaling( roomName, doc, {
 			signaling,
 			// @ts-ignore
 			password,
