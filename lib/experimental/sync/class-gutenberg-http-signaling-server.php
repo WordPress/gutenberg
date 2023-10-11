@@ -157,6 +157,12 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * event: <The type of event>
 	 * data: <The message to be sent>
 	 * ```
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param string $subscriber_id               The subscriber id.
+	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
 	 */
 	private static function handle_read_pending_messages( $subscriber_id, $subscriber_to_messages_path ) {
 		header( 'Content-Type: text/event-stream' );
@@ -301,6 +307,13 @@ class Gutenberg_HTTP_Signaling_Server {
 
 	/**
 	 * Deletes messages and subscriber information of clients that have not interacted with the signaling server in a long time.
+	 *
+	 * @access private
+	 * @internal
+	 *
+	 * @param string $connected_subscriber_id     The subscriber id.
+	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
+	 * @param string $topics_to_subscribers_path  The path to the file that contains the subscribers of the topics.
 	 */
 	private static function clean_up_old_connections( $connected_subscriber_id, $subscriber_to_messages_path, $topics_to_subscribers_path ) {
 		$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
