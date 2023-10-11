@@ -18,12 +18,7 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-
-	if ( isset( $attribues['theme'] ) ) {
-		$theme = $attributes['theme'];
-	} else {
-		$theme = get_stylesheet();
-	}
+	$theme            = isset( $attributes['theme'] ) ? $attributes['theme'] : get_stylesheet();
 
 	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
 		$template_part_id    = $theme . '//' . $attributes['slug'];
