@@ -23,13 +23,15 @@ export async function setPreferences(
 	await this.page.waitForFunction( () => window?.wp?.data );
 
 	await this.page.evaluate(
-		async ( [ _context, _preferences ] ) => {
-			for ( const [ key, value ] of Object.entries( _preferences ) ) {
+		async ( props ) => {
+			for ( const [ key, value ] of Object.entries(
+				props.preferences
+			) ) {
 				await window.wp.data
 					.dispatch( 'core/preferences' )
-					.set( _context, key, value );
+					.set( props.context, key, value );
 			}
 		},
-		[ context, preferences ]
+		{ context, preferences }
 	);
 }
