@@ -2065,7 +2065,7 @@ describe( 'Addition Settings UI', () => {
 
 		const link = screen.getByRole( 'link' );
 
-		expect( link ).toHaveTextContent( /a-document.pdf/i );
+		expect( link ).toHaveTextContent( 'a-document.pdf' );
 
 		await user.hover( link );
 
