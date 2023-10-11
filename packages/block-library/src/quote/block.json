@@ -54,6 +54,9 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
 		}
 	},
 	"styles": [
