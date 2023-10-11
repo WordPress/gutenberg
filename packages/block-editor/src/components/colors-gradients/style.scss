@@ -77,31 +77,18 @@ $swatch-gap: 12px;
 	border-right: 1px solid $gray-300;
 	border-bottom: 1px solid $gray-300;
 
-	// Identify the first instance as the item that is not a subsequent item to an
-	// item with the same class. The `~` selector is used instead of `+` to take
-	// into account any potential `ToolsPanelItem` placeholder item.
-	&:not(& ~ &) {
+	// Identify the first visible instance as placeholder items will not have this class.
+	&:nth-child(1 of &) {
 		margin-top: $grid-unit-30;
 		border-top-left-radius: $radius-block-ui;
 		border-top-right-radius: $radius-block-ui;
 		border-top: 1px solid $gray-300;
 	}
 
-	// Identify the last instance as an item without any subsequent siblings
-	// with the same class. The `~` selector is used instead of `+` to take
-	// into account any potential `ToolsPanelItem` placeholder item.
-	&:not(:has(~ &)) {
+	// Identify the last visible instance as placeholder items will not have this class.
+	&:nth-last-child(1 of &) {
 		border-bottom-left-radius: $radius-block-ui;
 		border-bottom-right-radius: $radius-block-ui;
-	}
-
-	// Less accurate fallback to detect the last instance of this item
-	// for older browsers not yet supporting the `:has()` selector.
-	@supports not selector(:has(*)) {
-		&.last {
-			border-bottom-left-radius: $radius-block-ui;
-			border-bottom-right-radius: $radius-block-ui;
-		}
 	}
 
 	> div,
