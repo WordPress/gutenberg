@@ -32,11 +32,9 @@ export default function PagePages() {
 			field: 'date',
 			direction: 'desc',
 		},
-		fields: {
-			// All fields are visible by default, so it's
-			// better to keep track of the hidden ones.
-			hidden: [ 'date' ],
-		},
+		// All fields are visible by default, so it's
+		// better to keep track of the hidden ones.
+		hiddenFields: [ 'date' ],
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );

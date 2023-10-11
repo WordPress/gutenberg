@@ -86,17 +86,17 @@ export default function DataViews( {
 	}, [ fields, actions ] );
 
 	const columnVisibility = useMemo( () => {
-		if ( ! view.fields?.hidden?.length ) {
+		if ( ! view.hiddenFields?.length ) {
 			return;
 		}
-		return view.fields.hidden.reduce(
+		return view.hiddenFields.reduce(
 			( accumulator, fieldId ) => ( {
 				...accumulator,
 				[ fieldId ]: false,
 			} ),
 			{}
 		);
-	}, [ view.fields?.hidden ] );
+	}, [ view.hiddenFields ] );
 
 	const dataView = useReactTable( {
 		data,
@@ -164,14 +164,11 @@ export default function DataViews( {
 						}
 						return [ ...accumulator, fieldId ];
 					},
-					[ ...( currentView.fields.hidden || [] ) ]
+					[ ...( currentView.hiddenFields || [] ) ]
 				);
 				return {
 					...currentView,
-					fields: {
-						...currentView.fields,
-						hidden: hiddenFields,
-					},
+					hiddenFields,
 				};
 			} );
 		},
