@@ -191,36 +191,8 @@ WithoutGroup.args = {
  * Otherwise, leave it as `undefined` for default styles.
  */
 
-export const WithoutStyles = Template.bind( {} );
-WithoutStyles.args = {
-	label: 'Options',
-	id: 'options-toolbar-without-styles',
+export const Unstyled = Template.bind( {} );
+Unstyled.args = {
+	...Default.args,
 	variant: 'unstyled',
-	children: (
-		<>
-			<ToolbarGroup>
-				<ToolbarButton icon={ paragraph } text="Paragraph" />
-			</ToolbarGroup>
-			<ToolbarGroup>
-				<ToolbarButton>Text</ToolbarButton>
-				<ToolbarButton icon={ formatBold } label="Bold" isPressed />
-				<ToolbarButton icon={ formatItalic } label="Italic" />
-				<ToolbarButton icon={ link } label="Link" />
-			</ToolbarGroup>
-			<ToolbarGroup
-				icon={ chevronDown }
-				title="Align"
-				isCollapsed
-				controls={ [
-					{
-						icon: alignLeft,
-						title: 'Align left',
-						isActive: true,
-					},
-					{ icon: alignCenter, title: 'Align center' },
-					{ icon: alignRight, title: 'Align right' },
-				] }
-			/>
-		</>
-	),
 };
