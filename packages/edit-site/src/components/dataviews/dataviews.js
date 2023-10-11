@@ -14,6 +14,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import TextFilter from './text-filter';
 import { ViewGrid } from './view-grid';
+import AddFilter from './add-filter';
+import { moreVertical } from '@wordpress/icons';
 
 export default function DataViews( {
 	view,
@@ -30,6 +32,7 @@ export default function DataViews( {
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
 					<TextFilter view={ view } onChangeView={ onChangeView } />
+					<AddFilter dataView={ dataView } />
 					<ViewActions
 						fields={ fields }
 						view={ view }
