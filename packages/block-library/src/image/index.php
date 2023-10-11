@@ -22,7 +22,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 
-	if ( ! $processor->next_tag( 'img' ) || null === $processor->get_attribute( 'src' ) ) {
+	if ( ! $processor->next_tag( 'IMG' ) || null === $processor->get_attribute( 'src' ) ) {
 		return '';
 	}
 
@@ -128,9 +128,10 @@ function block_core_image_get_lightbox_settings( $block ) {
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
 	/*
-	 * If it's not possible that an IMG element exists then return the given
-	 * block content as-is. It may be that there's no actual image in the block
-	 * or it could be that another plugin already modified this HTML.
+	 * If there's no possible IMG element in the block then there's nothing this code
+	 * can reliably do to add the lightbox because it doesn't understand the structure
+	 * of the block's HTML. The block may have never had an image assigned to it, or
+	 * some other plugin code may have already modified the contents.
 	 */
 	if ( false === stripos( $block_content, '<img' ) ) {
 		return $block_content;
@@ -138,28 +139,30 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-	$aria_label = __( 'Enlarge image' );
+	if ( ! $processor->next_tag() ) {
+		return $block_content;
+	}
 
 	/*
 	 * If there's definitely no IMG element in the block then return the given
 	 * block content as-is. There's nothing that this code can knowingly modify
 	 * to add the lightbox behavior.
 	 */
-	if ( ! $processor->next_tag( 'img' ) ) {
+	$processor->set_bookmark( 'first tag' );
+
+	// Find the first IMG if it isn't the first tag.
+	if ( 'IMG' !== $processor->get_tag() && ! $processor->next_tag( 'IMG' ) ) {
 		return $block_content;
 	}
 
 	$alt_attribute = $processor->get_attribute( 'alt' );
+	$alt_attribute = is_string( $alt_attribute ) ? trim( $alt_attribute ) : null;
 
-	// An empty alt attribute `alt=""` is valid for decorative images.
-	if ( is_string( $alt_attribute ) ) {
-		$alt_attribute = trim( $alt_attribute );
-	}
-
-	// It only makes sense to append the alt text to the button aria-label when the alt text is non-empty.
-	if ( $alt_attribute ) {
+	if ( ! empty( $alt_attribute ) ) {
 		/* translators: %s: Image alt text. */
 		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt_attribute );
+	} else {
+		$aria_label = __( 'Enlarge image' );
 	}
 
 	// Currently, we are only enabling the zoom animation.
@@ -184,12 +187,16 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		$scale_attr = false;
 	}
 
-	$w = new WP_HTML_Tag_Processor( $block_content );
-	$w->next_tag( 'figure' );
-	$w->add_class( 'wp-lightbox-container' );
-	$w->set_attribute( 'data-wp-interactive', true );
+	// Jump back to the first tag and find the first figure.
+	$processor->seek( 'first tag' );
+	if ( 'FIGURE' !== $processor->get_tag() && ! $processor->next_tag( 'FIGURE' ) ) {
+		return $block_content;
+	}
 
-	$w->set_attribute(
+	$processor->set_bookmark( 'figure' );
+	$processor->add_class( 'wp-lightbox-container' );
+	$processor->set_attribute( 'data-wp-interactive', true );
+	$processor->set_attribute(
 		'data-wp-context',
 		sprintf(
 			'{ "core":
@@ -217,20 +224,33 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			__( 'Enlarged image' )
 		)
 	);
-	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
-	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
-	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
-	$body_content = $w->get_updated_html();
 
-	// Wrap the image in the body content with a button.
-	$img = null;
-	preg_match( '/<img[^>]+>/', $body_content, $img );
+	// Only process if there's an IMG element after this FIGURE. It should be inside it.
+	if ( ! $processor->next_tag( 'IMG' ) ) {
+		return $block_content;
+	}
+
+	$processor->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
+	$processor->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
+	$processor->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
+	$processor->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
+	$body_content = $processor->get_updated_html();
+
+	/*
+	 * Insert a button in the body content before the image.
+	 *
+	 * Note that this match should never fail since it's already been
+	 * established that an IMG element exists within the body content.
+	 */
+	$img_match = null;
+	if ( false === preg_match( '/<img[^>]+>/i', $body_content, $img_match, PREG_OFFSET_CAPTURE ) ) {
+		return $block_content;
+	}
+
+	list( $image_tag, $image_at ) = $img_match[0];
 
 	$button =
-		$img[0]
-		. '<button
+		'<button
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
@@ -241,44 +261,65 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			data-wp-style--top="context.core.image.imageButtonTop"
 		></button>';
 
-	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
+	$end_of_img_tag = $image_at + strlen( $image_tag );
+	$body_content   = substr( $body_content, 0, $end_of_img_tag ) . $button . substr( $body_content, $end_of_img_tag );
 
-	// We need both a responsive image and an enlarged image to animate
-	// the zoom seamlessly on slow internet connections; the responsive
-	// image is a copy of the one in the body, which animates immediately
-	// as the lightbox is opened, while the enlarged one is a full-sized
-	// version that will likely still be loading as the animation begins.
-	$m = new WP_HTML_Tag_Processor( $block_content );
-	$m->next_tag( 'figure' );
-	$m->add_class( 'responsive-image' );
-	$m->next_tag( 'img' );
-	// We want to set the 'src' attribute to an empty string in the responsive image
-	// because otherwise, as of this writing, the wp_filter_content_tags() function in
-	// WordPress will automatically add a 'srcset' attribute to the image, which will at
-	// times cause the incorrectly sized image to be loaded in the lightbox on Firefox.
-	// Because of this, we bind the 'src' attribute explicitly the current src to reliably
-	// use the exact same image as in the content when the lightbox is first opened while
-	// we wait for the larger image to load.
-	$m->set_attribute( 'src', '' );
-	$m->set_attribute( 'data-wp-bind--src', 'context.core.image.imageCurrentSrc' );
-	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
-	$initial_image_content = $m->get_updated_html();
+	/*
+	 * This code needs to generate a responsive image and an enlarged image
+	 * to animate zoom seamlessly on slow internet connections; the responsive
+	 * image is a copy of the one in the body, which animates immediately
+	 * as the lightbox is opened, while the enlarged one is a full-sized
+	 * version that will likely still be loading as the animation begins.
+	 *
+	 * In order to reuse the existing Tag Processor, changes made before
+	 * need to be undone before setting the new changes here.
+	 */
+	$processor->seek( 'figure' );
+	$processor->remove_class( 'wp-lightbox-container' );
+	$processor->remove_attribute( 'data-wp-context' );
+	$processor->remove_attribute( 'data-wp-interactive' );
+	$processor->add_class( 'responsive-image' );
 
-	$q = new WP_HTML_Tag_Processor( $block_content );
-	$q->next_tag( 'figure' );
-	$q->add_class( 'enlarged-image' );
-	$q->next_tag( 'img' );
+	$processor->seek( 'figure' );
+	$processor->next_tag( 'img' );
+	$processor->remove_attribute( 'data-wp-init' );
+	$processor->remove_attribute( 'data-wp-on--load' );
+	$processor->remove_attribute( 'data-wp-effect' );
 
-	// We set the 'src' attribute to an empty string to prevent the browser from loading the image
-	// on initial page load, then bind the attribute to a selector that returns the full-sized image src when
-	// the lightbox is opened. We could use 'loading=lazy' in combination with the 'hidden' attribute to
-	// accomplish the same behavior, but that approach breaks progressive loading of the image in Safari
-	// and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
-	// is resolved, manually setting the 'src' seems to be the best solution to load the large image on demand.
-	$q->set_attribute( 'src', '' );
-	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
-	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
-	$enlarged_image_content = $q->get_updated_html();
+	/*
+	 * The 'src' attribute needs to be an empty string in the responsive image because
+	 * otherwise, as of this writing, the wp_filter_content_tags() function in WordPress
+	 * will automatically add a 'srcset' attribute to the image, which will at times
+	 * cause the incorrectly sized image to be loaded in the lightbox on Firefox.
+	 *
+	 * Because of this, the 'src' attribute needs to be explicitly bound to the current
+	 * src to reliably use the exact same image as in the content when the lightbox is
+	 * first opened while waiting for the larger image to load.
+	 */
+	$processor->set_attribute( 'src', '' );
+	$processor->set_attribute( 'data-wp-bind--src', 'context.core.image.imageCurrentSrc' );
+	$processor->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$initial_image_content = $processor->get_updated_html();
+
+	/*
+	 * Reusing the existing Tag Processor again requires resetting state.
+	 */
+	$processor->seek( 'figure' );
+	$processor->remove_class( 'responsive-image' );
+	$processor->add_class( 'enlarged-image' );
+
+	/*
+	 * It's necessary to set the 'src' attribute to an empty string to prevent the browser from loading the image
+	 * on initial page load, then to bind the attribute to a selector that returns the full-sized image src when
+	 * the lightbox is opened. The combination of 'loading=lazy' with the 'hidden' attribute could be used to
+	 * accomplish the same behavior, but that approach breaks progressive loading of the image in Safari
+	 * and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
+	 * is resolved, manually setting the 'src' loads the large image on demand without causing renderering issues.
+	 */
+	$processor->next_tag( 'img' );
+	$processor->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
+	$processor->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$enlarged_image_content = $processor->get_updated_html();
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not defined,
 	// we need to set the background color & close button color to some default values
