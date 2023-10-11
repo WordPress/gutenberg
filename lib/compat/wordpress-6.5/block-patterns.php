@@ -14,8 +14,6 @@
  * @return void
  */
 function gutenberg_register_media_pattern_categories() {
-	unregister_block_pattern_category( 'media' );
-
 	register_block_pattern_category(
 		'images',
 		array(
