@@ -79,58 +79,93 @@ export async function setClipboardData(
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
-	clipboardDataHolder = await page.evaluate(
+	return await page.evaluateHandle(
 		( [ _type, _clipboardData ] ) => {
-			const canvasDoc =
+			const activeElement =
 				document.activeElement instanceof HTMLIFrameElement
-					? document.activeElement.contentDocument!
-					: document;
-			const clipboardDataTransfer = new DataTransfer();
+					? document.activeElement.contentDocument!.activeElement
+					: document.activeElement;
 
-			if ( _type === 'paste' ) {
-				clipboardDataTransfer.setData(
-					'text/plain',
-					_clipboardData[ 'text/plain' ]
-				);
-				clipboardDataTransfer.setData(
-					'text/html',
-					_clipboardData[ 'text/html' ]
-				);
-				clipboardDataTransfer.setData(
-					'rich-text',
-					_clipboardData[ 'rich-text' ]
-				);
-			} else {
-				const selection = canvasDoc.defaultView!.getSelection()!;
-				const plainText = selection.toString();
-				let html = plainText;
-				if ( selection.rangeCount ) {
-					const range = selection.getRangeAt( 0 );
-					const fragment = range.cloneContents();
-					html = Array.from( fragment.childNodes )
-						.map(
-							( node ) =>
-								( node as Element ).outerHTML ??
-								( node as Element ).nodeValue
-						)
-						.join( '' );
-				}
-				clipboardDataTransfer.setData( 'text/plain', plainText );
-				clipboardDataTransfer.setData( 'text/html', html );
-			}
-
-			canvasDoc.activeElement?.dispatchEvent(
-				new ClipboardEvent( _type, {
-					bubbles: true,
-					cancelable: true,
-					clipboardData: clipboardDataTransfer,
-				} )
-			);
-
+			// Return an object with the promise handle to bypass the auto-resolving
+			// feature of `evaluateHandle()`.
 			return {
-				'text/plain': clipboardDataTransfer.getData( 'text/plain' ),
-				'text/html': clipboardDataTransfer.getData( 'text/html' ),
-				'rich-text': clipboardDataTransfer.getData( 'rich-text' ),
+				promise: new Promise< false | typeof clipboardDataHolder >(
+					( resolve ) => {
+						const timeout = setTimeout( () => {
+							resolve( false );
+						}, 50 );
+
+						activeElement?.ownerDocument.addEventListener(
+							_type,
+							( event ) => {
+								clearTimeout( timeout );
+								if (
+									_type === 'paste' &&
+									! event.defaultPrevented
+								) {
+									resolve( false );
+								} else {
+									const selection =
+										activeElement.ownerDocument.getSelection()!;
+									const plainText = selection.toString();
+									let html = plainText;
+									if ( selection.rangeCount ) {
+										const range = selection.getRangeAt( 0 );
+										const fragment = range.cloneContents();
+										html = Array.from( fragment.childNodes )
+											.map(
+												( node ) =>
+													( node as Element )
+														.outerHTML ??
+													( node as Element )
+														.nodeValue
+											)
+											.join( '' );
+									}
+									resolve( {
+										'text/plain':
+											event.clipboardData?.getData(
+												'text/plain'
+											) || plainText,
+										'text/html':
+											event.clipboardData?.getData(
+												'text/html'
+											) || html,
+										'rich-text':
+											event.clipboardData?.getData(
+												'rich-text'
+											) || '',
+									} );
+								}
+							},
+							{ once: true }
+						);
+
+						if ( _type === 'paste' ) {
+							const clipboardDataTransfer = new DataTransfer();
+							clipboardDataTransfer.setData(
+								'text/plain',
+								_clipboardData[ 'text/plain' ]
+							);
+							clipboardDataTransfer.setData(
+								'text/html',
+								_clipboardData[ 'text/html' ]
+							);
+							clipboardDataTransfer.setData(
+								'rich-text',
+								_clipboardData[ 'rich-text' ]
+							);
+
+							activeElement?.dispatchEvent(
+								new ClipboardEvent( _type, {
+									bubbles: true,
+									cancelable: true,
+									clipboardData: clipboardDataTransfer,
+								} )
+							);
+						}
+					}
+				),
 			};
 		},
 		[ type, clipboardDataHolder ] as const
@@ -199,9 +234,27 @@ export async function pressKeys(
 	let command = () => this.page.keyboard.press( normalizedKeys );
 
 	if ( key.toLowerCase() === 'primary+c' ) {
-		command = () => emulateClipboard( this.page, 'copy' );
+		command = async () => {
+			const promiseHandle = await emulateClipboard( this.page, 'copy' );
+			await this.page.keyboard.press( normalizedKeys );
+			const clipboardData = await promiseHandle.evaluate(
+				( { promise } ) => promise
+			);
+			if ( clipboardData ) {
+				clipboardDataHolder = clipboardData;
+			}
+		};
 	} else if ( key.toLowerCase() === 'primary+x' ) {
-		command = () => emulateClipboard( this.page, 'cut' );
+		command = async () => {
+			const promiseHandle = await emulateClipboard( this.page, 'cut' );
+			await this.page.keyboard.press( normalizedKeys );
+			const clipboardData = await promiseHandle.evaluate(
+				( { promise } ) => promise
+			);
+			if ( clipboardData ) {
+				clipboardDataHolder = clipboardData;
+			}
+		};
 	} else if ( key.toLowerCase() === 'primary+v' ) {
 		command = async () => {
 			/**
@@ -212,27 +265,10 @@ export async function pressKeys(
 			 * if the event handler calls `event.stopPropagation()`, but it's good
 			 * enough for our use cases for now.
 			 */
-			const handledPromise = this.page.evaluate( () => {
-				const activeElement =
-					document.activeElement instanceof HTMLIFrameElement
-						? document.activeElement.contentDocument!.activeElement
-						: document.activeElement;
-				return new Promise( ( resolve ) => {
-					const timeout = setTimeout( () => {
-						resolve( false );
-					}, 50 );
-					activeElement?.ownerDocument.addEventListener(
-						'paste',
-						( event ) => {
-							clearTimeout( timeout );
-							resolve( !! event.defaultPrevented );
-						},
-						{ once: true }
-					);
-				} );
-			} );
-			await emulateClipboard( this.page, 'paste' );
-			const handled = await handledPromise;
+			const promiseHandle = await emulateClipboard( this.page, 'paste' );
+			const handled = await promiseHandle.evaluate(
+				( { promise } ) => promise
+			);
 			if ( ! handled ) {
 				await this.page.keyboard.press( normalizedKeys );
 			}
