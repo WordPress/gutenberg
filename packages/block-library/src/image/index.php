@@ -139,6 +139,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
 	$aria_label = __( 'Enlarge image' );
+
 	/*
 	 * If there's definitely no IMG element in the block then return the given
 	 * block content as-is. There's nothing that this code can knowingly modify
