@@ -36,7 +36,7 @@ export default function PagePages() {
 			// All fields are visible by default, so it's
 			// better to keep track of the hidden ones.
 			hidden: new Set( [ 'date' ] ),
-			hideable: [ 'author', 'status', 'date' ],
+			hidable: [ 'author', 'status', 'date' ],
 		},
 	} );
 	// Request post statuses to get the proper labels.

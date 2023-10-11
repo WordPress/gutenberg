@@ -81,17 +81,17 @@ export default function DataViews( {
 				enableHiding: false,
 			} );
 		}
-		if ( view.fields?.hideable?.length ) {
+		if ( view.fields?.hidable?.length ) {
 			_columns = _columns.map( ( column ) => {
 				return {
 					...column,
-					enableHiding: view.fields.hideable.includes( column.id ),
+					enableHiding: view.fields.hidable.includes( column.id ),
 				};
 			} );
 		}
 
 		return _columns;
-	}, [ fields, actions, view.fields?.hideable ] );
+	}, [ fields, actions, view.fields?.hidable ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.fields?.hidden?.size ) {
