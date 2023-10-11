@@ -32,6 +32,8 @@ import ViewActions from './view-actions';
 import TextFilter from './text-filter';
 import { moreVertical } from '@wordpress/icons';
 
+const EMPTY_OBJECT = {};
+
 export default function DataViews( {
 	actions,
 	data,
@@ -44,7 +46,7 @@ export default function DataViews( {
 } ) {
 	const columns = useMemo( () => {
 		const _columns = [ ...fields ];
-		if ( actions && actions.length ) {
+		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
@@ -83,6 +85,19 @@ export default function DataViews( {
 		return _columns;
 	}, [ fields, actions ] );
 
+	const columnVisibility = useMemo( () => {
+		if ( ! view.hiddenFields?.length ) {
+			return;
+		}
+		return view.hiddenFields.reduce(
+			( accumulator, fieldId ) => ( {
+				...accumulator,
+				[ fieldId ]: false,
+			} ),
+			{}
+		);
+	}, [ view.hiddenFields ] );
+
 	const dataView = useReactTable( {
 		data,
 		columns,
@@ -104,6 +119,7 @@ export default function DataViews( {
 				pageIndex: view.page,
 				pageSize: view.perPage,
 			},
+			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
 		},
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
@@ -132,6 +148,27 @@ export default function DataViews( {
 				return {
 					...currentView,
 					sort: { field: id, direction: desc ? 'desc' : 'asc' },
+				};
+			} );
+		},
+		onColumnVisibilityChange: ( columnVisibilityUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const hiddenFields = Object.entries(
+					columnVisibilityUpdater()
+				).reduce(
+					( accumulator, [ fieldId, value ] ) => {
+						if ( value ) {
+							return accumulator.filter(
+								( id ) => id !== fieldId
+							);
+						}
+						return [ ...accumulator, fieldId ];
+					},
+					[ ...( currentView.hiddenFields || [] ) ]
+				);
+				return {
+					...currentView,
+					hiddenFields,
 				};
 			} );
 		},
