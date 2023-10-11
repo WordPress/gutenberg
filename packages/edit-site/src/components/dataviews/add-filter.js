@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { dataView } ) {
+export default function AddFilter( { dataView, filters, onChangeFilters } ) {
 	const filterableFields = dataView
 		.getAllColumns()
 		.filter( ( column ) => column.getCanFilter() );
@@ -37,9 +37,29 @@ export default function AddFilter( { dataView } ) {
 				return (
 					<DropdownMenuItemV2
 						key={ field.id }
-						prefix={ <Icon icon={ check } /> }
+						prefix={
+							filters.hasOwnProperty( field.id ) && (
+								<Icon icon={ check } />
+							)
+						}
 						role="menuitemcheckbox"
-						onSelect={ () => {} }
+						onSelect={ ( event ) => {
+							event.preventDefault();
+							onChangeFilters( ( currentView ) => {
+								if ( filters.hasOwnProperty( field.id ) ) {
+									delete currentView.filters[ field.id ];
+									return { ...currentView };
+								}
+
+								return {
+									...currentView,
+									filters: {
+										...currentView.filters,
+										[ field.id ]: undefined,
+									},
+								};
+							} );
+						} }
 					>
 						{ field.columnDef.header }
 					</DropdownMenuItemV2>

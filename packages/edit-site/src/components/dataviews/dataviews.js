@@ -32,7 +32,14 @@ export default function DataViews( {
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
 					<TextFilter view={ view } onChangeView={ onChangeView } />
-					<AddFilter dataView={ dataView } />
+					{
+						// Object.keys( view.filters ).map( ( key ) => key )
+					 }
+					<AddFilter
+						dataView={ dataView }
+						filters={ view.filters }
+						onChangeFilters={ onChangeView }
+					/>
 					<ViewActions
 						fields={ fields }
 						view={ view }
