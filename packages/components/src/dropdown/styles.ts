@@ -42,6 +42,4 @@ export const DropdownPointerEventsCapture = styled.div`
 	inset: 0;
 	// Hardcoded fallback to (popover-z-index - 1)
 	z-index: 999999;
-	// TODO: remove following background color
-	background-color: rgba( 0, 0, 0, 0.4 );
 `;
