@@ -107,7 +107,7 @@ const removeCustomPrefixes = ( path ) => {
  * ```
  */
 export default function useSetting( path ) {
-	const { name: blockName, clientId } = useBlockEditContext();
+	const { name: blockName, clientId = null } = useBlockEditContext();
 
 	return useSelect(
 		( select ) => {
@@ -136,26 +136,30 @@ export default function useSetting( path ) {
 
 			// 1. Take settings from the block instance or its ancestors.
 			// Start from the current block and work our way up the ancestors.
-			const candidates = [
-				clientId,
-				...select( blockEditorStore ).getBlockParents(
+			if ( clientId ) {
+				const candidates = [
 					clientId,
-					/* ascending */ true
-				),
-			];
+					...select( blockEditorStore ).getBlockParents(
+						clientId,
+						/* ascending */ true
+					),
+				];
 
-			for ( const candidateClientId of candidates ) {
-				const candidateBlockName =
-					select( blockEditorStore ).getBlockName(
-						candidateClientId
-					);
-				if (
-					hasBlockSupport(
-						candidateBlockName,
-						'__experimentalSettings',
-						false
-					)
-				) {
+				for ( const candidateClientId of candidates ) {
+					const candidateBlockName =
+						select( blockEditorStore ).getBlockName(
+							candidateClientId
+						);
+					if (
+						! hasBlockSupport(
+							candidateBlockName,
+							'__experimentalSettings',
+							false
+						)
+					) {
+						continue;
+					}
+
 					const candidateAtts =
 						select( blockEditorStore ).getBlockAttributes(
 							candidateClientId
@@ -178,16 +182,18 @@ export default function useSetting( path ) {
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 			const settings = select( blockEditorStore ).getSettings();
+			if ( result === undefined && blockName ) {
+				result = getValueFromObjectPath(
+					settings.__experimentalFeatures?.blocks?.[ blockName ],
+					normalizedPath
+				);
+			}
+
 			if ( result === undefined ) {
-				result =
-					getValueFromObjectPath(
-						settings.__experimentalFeatures?.blocks?.[ blockName ],
-						normalizedPath
-					) ??
-					getValueFromObjectPath(
-						settings.__experimentalFeatures,
-						normalizedPath
-					);
+				result = getValueFromObjectPath(
+					settings.__experimentalFeatures,
+					normalizedPath
+				);
 			}
 
 			// Return if the setting was found in either the block instance or the store.
@@ -204,9 +210,8 @@ export default function useSetting( path ) {
 			}
 
 			// 3. Otherwise, use deprecated settings.
-			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
-				? deprecatedFlags[ normalizedPath ]( settings )
-				: undefined;
+			const deprecatedSettingsValue =
+				deprecatedFlags[ normalizedPath ]?.( settings );
 			if ( deprecatedSettingsValue !== undefined ) {
 				return deprecatedSettingsValue;
 			}
