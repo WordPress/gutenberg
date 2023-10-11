@@ -79,7 +79,7 @@ export async function setClipboardData(
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
-	return await page.evaluateHandle(
+	const promiseHandle = await page.evaluateHandle(
 		( [ _type, _clipboardData ] ) => {
 			const activeElement =
 				document.activeElement instanceof HTMLIFrameElement
@@ -122,6 +122,8 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 											)
 											.join( '' );
 									}
+									// Get the clipboard data from the native bubbled event if it's set.
+									// Otherwise, compute the data from the current selection.
 									resolve( {
 										'text/plain':
 											event.clipboardData?.getData(
@@ -141,6 +143,8 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 							{ once: true }
 						);
 
+						// Only dispatch the virtual events for `paste` events.
+						// `copy` and `cut` events are handled by the native key presses.
 						if ( _type === 'paste' ) {
 							const clipboardDataTransfer = new DataTransfer();
 							clipboardDataTransfer.setData(
@@ -170,6 +174,30 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 		},
 		[ type, clipboardDataHolder ] as const
 	);
+
+	// For `copy` and `cut` events, we first do a real key press to set the
+	// native clipboard data for the "real" `paste` event. Then, we listen for
+	// the bubbled event on the document to set the clipboard data for the
+	// "virtual" `paste` event. This won't work if the event handler calls
+	// `event.stopPropagation()`, but it's good enough for our use cases for now.
+	if ( type === 'copy' ) {
+		await page.keyboard.press( isAppleOS() ? 'Meta+KeyC' : 'Control+KeyC' );
+	} else if ( type === 'cut' ) {
+		await page.keyboard.press( isAppleOS() ? 'Meta+KeyX' : 'Control+KeyX' );
+	}
+
+	const clipboardData = await promiseHandle.evaluate(
+		( { promise } ) => promise
+	);
+	if ( clipboardData ) {
+		clipboardDataHolder = clipboardData;
+	} else if ( type === 'paste' ) {
+		// For `paste` events, we do the opposite: We first listen for the bubbled
+		// virtual event on the document and dispatch it to the active element.
+		// This won't work for native elements that don't have a `paste` event
+		// handler, so we then fallback to a real key press.
+		await page.keyboard.press( isAppleOS() ? 'Meta+KeyV' : 'Control+KeyV' );
+	}
 }
 
 const isAppleOS = () => process.platform === 'darwin';
@@ -234,45 +262,11 @@ export async function pressKeys(
 	let command = () => this.page.keyboard.press( normalizedKeys );
 
 	if ( key.toLowerCase() === 'primary+c' ) {
-		command = async () => {
-			const promiseHandle = await emulateClipboard( this.page, 'copy' );
-			await this.page.keyboard.press( normalizedKeys );
-			const clipboardData = await promiseHandle.evaluate(
-				( { promise } ) => promise
-			);
-			if ( clipboardData ) {
-				clipboardDataHolder = clipboardData;
-			}
-		};
+		command = () => emulateClipboard( this.page, 'copy' );
 	} else if ( key.toLowerCase() === 'primary+x' ) {
-		command = async () => {
-			const promiseHandle = await emulateClipboard( this.page, 'cut' );
-			await this.page.keyboard.press( normalizedKeys );
-			const clipboardData = await promiseHandle.evaluate(
-				( { promise } ) => promise
-			);
-			if ( clipboardData ) {
-				clipboardDataHolder = clipboardData;
-			}
-		};
+		command = () => emulateClipboard( this.page, 'cut' );
 	} else if ( key.toLowerCase() === 'primary+v' ) {
-		command = async () => {
-			/**
-			 * `emulateClipboard()` will not work if the element doesn't have a
-			 * `paste` event handler. In that case, we need to do a real key press.
-			 * We listen for the bubbled `paste` event on the active document to
-			 * determine if the element has a `paste` event handler. This won't work
-			 * if the event handler calls `event.stopPropagation()`, but it's good
-			 * enough for our use cases for now.
-			 */
-			const promiseHandle = await emulateClipboard( this.page, 'paste' );
-			const handled = await promiseHandle.evaluate(
-				( { promise } ) => promise
-			);
-			if ( ! handled ) {
-				await this.page.keyboard.press( normalizedKeys );
-			}
-		};
+		command = () => emulateClipboard( this.page, 'paste' );
 	}
 
 	times = times ?? 1;
