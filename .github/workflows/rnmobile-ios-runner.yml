@@ -36,15 +36,15 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Restore Appium drivers cache
+            - name: Restore tests setup cache
               uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
               with:
                   path: |
                       ~/.appium
-                  key: ${{ runner.os }}-appium-${{ hashFiles('package-lock.json') }}
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
 
-            - name: Install Appium drivers
-              run: npm run native appium:setup
+            - name: Prepare tests setup
+              run: npm run native test:e2e:setup
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
