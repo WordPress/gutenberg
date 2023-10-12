@@ -677,14 +677,33 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	if ( isset( $attributes['icon'] ) ) {
-		if ( 'menu' === $attributes['icon'] ) {
-			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-		}
-	}
-	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
-	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+
+	/**
+	 * Filters menu toggle button icon, by default two horizontal dashes. If icon is changed in block settings then it is three dashes.
+	 *
+	 * @since 6.2.0
+	 */
+	$toggle_button_icon = apply_filters(
+		'block_core_navigation_menu_toggle_icon',
+		( isset( $attributes['icon'] ) && 'menu' === $attributes['icon'] ) ?
+			// Three horizontal dashes icon.
+			'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>' :
+			// Two horizontal dashes icon.
+			'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>'
+	);
+
+	$toggle_button_content = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
+
+	/**
+	 * Filters menu close button icon, by default cross.
+	 *
+	 * @since 6.2.0
+	 */
+	$toggle_close_button_icon = apply_filters(
+		'block_core_navigation_menu_close_icon',
+		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>'
+	);
+
 	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
 	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
