@@ -4,11 +4,20 @@
 
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
+export const PATTERN_TYPES = {
+	all: 'all',
+	synced: 'synced',
+	unsynced: 'unsynced',
+	user: 'user',
+	theme: 'theme',
+	directory: 'directory',
+};
 
-import { SYNC_TYPES, PATTERN_TYPES } from '../block-patterns-filter';
+export const SYNC_TYPES = {
+	all: 'all',
+	full: 'fully',
+	unsynced: 'unsynced',
+};
 
 export const allPatternsCategory = {
 	name: 'allPatterns',

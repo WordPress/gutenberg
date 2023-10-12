@@ -24,7 +24,7 @@ import {
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { BlockPatternsSyncFilter } from '../block-patterns-filter';
+import { BlockPatternsSyncFilter } from './patterns-filter';
 import { usePatternsCategories } from './use-patterns-categories';
 import {
 	isPatternFiltered,
