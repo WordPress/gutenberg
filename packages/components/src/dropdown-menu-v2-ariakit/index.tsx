@@ -252,9 +252,6 @@ const UnconnectedDropdownMenu = (
 		[ dropdownMenuStore, variant ]
 	);
 
-	// TODO: could be done via the `unmountOnHide` prop when updating to a newer version
-	const shouldShowDropdownMenu = dropdownMenuStore.useState( 'open' );
-
 	// Extract the side from the applied placement — useful for animations.
 	const appliedPlacementSide = dropdownMenuStore
 		.useState( 'placement' )
@@ -293,23 +290,22 @@ const UnconnectedDropdownMenu = (
 			/>
 
 			{ /* Menu popover */ }
-			{ shouldShowDropdownMenu && (
-				<Styled.DropdownMenu
-					{ ...otherProps }
-					modal={ modal }
-					store={ dropdownMenuStore }
-					gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 0 ) }
-					shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
-					hideOnHoverOutside={ false }
-					data-side={ appliedPlacementSide }
-					variant={ variant }
-					dir={ computedDirection }
-				>
-					<DropdownMenuContext.Provider value={ contextValue }>
-						{ children }
-					</DropdownMenuContext.Provider>
-				</Styled.DropdownMenu>
-			) }
+			<Styled.DropdownMenu
+				{ ...otherProps }
+				modal={ modal }
+				store={ dropdownMenuStore }
+				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 0 ) }
+				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
+				hideOnHoverOutside={ false }
+				data-side={ appliedPlacementSide }
+				variant={ variant }
+				dir={ computedDirection }
+				unmountOnHide
+			>
+				<DropdownMenuContext.Provider value={ contextValue }>
+					{ children }
+				</DropdownMenuContext.Provider>
+			</Styled.DropdownMenu>
 		</>
 	);
 };
