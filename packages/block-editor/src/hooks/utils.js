@@ -279,6 +279,8 @@ export function useBlockSettings( name, parentLayout ) {
 		isBackgroundEnabled,
 		isLinkEnabled,
 		isTextEnabled,
+		isHeadingEnabled,
+		isButtonEnabled,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );
