@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 16.8.1 =
+
+
+
+## Changelog
+
+### Enhancements
+
+- Update: Improve footnotes sanitisation by removing unrequired keys. ([55305](https://github.com/WordPress/gutenberg/pull/55305))
+
+
+### Code Quality
+
+- Update: Navigation link force arrow attribute to be part of the hardcoded set. ([55306](https://github.com/WordPress/gutenberg/pull/55306))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jorgefilipecosta
+
+
 = 16.8.0 =
 
 = 16.8.0-rc.2 =
