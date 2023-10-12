@@ -16,7 +16,7 @@
  * @return string The block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
-	if ( false === stripos( $content, '<img' ) ) {
+	if ( ! str_contains( $content, '<img' ) ) {
 		return '';
 	}
 
@@ -132,7 +132,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	 * block content as-is. It may be that there's no actual image in the block
 	 * or it could be that another plugin already modified this HTML.
 	 */
-	if ( false === stripos( $block_content, '<img' ) ) {
+	if ( ! str_contains( $block_content, '<img' ) ) {
 		return $block_content;
 	}
 
