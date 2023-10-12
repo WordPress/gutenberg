@@ -18,7 +18,7 @@ defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE',
 
 // Minimum supported version. Has to match "Requires at least" header above.
 if ( ! defined( 'GUTENBERG_MIN_WP_VERSION' ) ) {
-	define( 'GUTENBERG_MIN_WP_VERSION', '5.7' );
+	define( 'GUTENBERG_MIN_WP_VERSION', '6.2' );
 }
 
 // Next unsupporetd version.
@@ -32,7 +32,7 @@ if ( ! defined( 'GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION' ) ) {
 	// Also note that `version_compare()` considers 1 < 1.0 < 1.0.0 (before suffixes)
 	// so 6.0 < 6.0.0-alpha and 6.0-beta < 6.0.0-alpha are both true. For that reason
 	// the constant should be set to major (two digits) WordPress version.
-	define( 'GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION', '6.0' );
+	define( 'GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION', '6.5' );
 }
 
 if ( defined( 'ABSPATH' ) ) {
