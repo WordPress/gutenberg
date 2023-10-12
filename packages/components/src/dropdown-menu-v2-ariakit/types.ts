@@ -25,6 +25,7 @@ export interface DropdownMenuProps {
 	gutter?: number;
 	shift?: number;
 	defaultValues?: Ariakit.MenuStoreProps[ 'defaultValues' ];
+	hideOnEscape?: Ariakit.MenuProps[ 'hideOnEscape' ];
 }
 
 export interface DropdownMenuGroupProps

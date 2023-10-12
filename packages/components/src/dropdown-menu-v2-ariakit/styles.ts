@@ -63,12 +63,13 @@ const slideLeftAndFade = keyframes( {
 	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
-// TODO: z-index from global vars
 export const DropdownMenu = styled( Ariakit.Menu )<
 	Pick< DropdownMenuContext, 'variant' >
 >`
 	position: relative;
-	z-index: 50;
+	/* Same as popover component */
+	/* TODO: is there a way to read the sass variable? */
+	z-index: 1000000;
 
 	min-width: 220px;
 	max-height: var( --popover-available-height );

@@ -428,3 +428,40 @@ export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
 ToolbarVariant.args = {
 	...Default.args,
 };
+
+export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ isModalOpen, setModalOpen ] = useState( false );
+	return (
+		<>
+			<Button onClick={ () => setModalOpen( true ) }>Open modal</Button>
+			{ isModalOpen && (
+				<Modal onRequestClose={ () => setModalOpen( false ) }>
+					<DropdownMenu { ...props }>
+						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenu
+							trigger={
+								<DropdownMenuItem>
+									Submenu trigger
+								</DropdownMenuItem>
+							}
+						>
+							<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+						</DropdownMenu>
+					</DropdownMenu>
+					<Button onClick={ () => setModalOpen( false ) }>
+						Close modal
+					</Button>
+				</Modal>
+			) }
+		</>
+	);
+};
+InsideModal.args = {
+	...Default.args,
+	hideOnEscape: ( e ) => {
+		e.stopPropagation();
+		return true;
+	},
+};

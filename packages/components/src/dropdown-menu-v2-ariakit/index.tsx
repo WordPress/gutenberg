@@ -199,6 +199,7 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift = 0,
 		modal = true,
+		hideOnEscape = true,
 
 		// From internal components context
 		variant,
@@ -300,6 +301,7 @@ const UnconnectedDropdownMenu = (
 				data-side={ appliedPlacementSide }
 				variant={ variant }
 				dir={ computedDirection }
+				hideOnEscape={ hideOnEscape }
 				unmountOnHide
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
