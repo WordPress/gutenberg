@@ -12,36 +12,47 @@ import { store as noticesStore } from '@wordpress/notices';
 import CreatePatternModal from './create-pattern-modal';
 import { PATTERN_SYNC_TYPES } from '../constants';
 
+function getTermLabels( pattern, categories ) {
+	// Theme patterns don't have an id and rely on core pattern categories.
+	if ( ! pattern.id ) {
+		return categories.core
+			?.filter( ( category ) =>
+				pattern.categories.includes( category.name )
+			)
+			.map( ( category ) => category.label );
+	}
+
+	return categories.user
+		?.filter( ( category ) =>
+			pattern.wp_pattern_category.includes( category.id )
+		)
+		.map( ( category ) => category.label );
+}
+
 export default function DuplicatePatternModal( {
 	pattern,
 	onClose,
 	onSuccess,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const categories = useSelect( ( select ) =>
-		select( coreStore ).getUserPatternCategories()
-	);
+	const categories = useSelect( ( select ) => {
+		const { getUserPatternCategories, getBlockPatternCategories } =
+			select( coreStore );
+
+		return {
+			core: getBlockPatternCategories(),
+			user: getUserPatternCategories(),
+		};
+	} );
 
 	if ( ! pattern ) {
 		return null;
 	}
 
-	// Until all the different types of patterns are unified, the pattern being
-	// duplicated here could be a theme or user-created pattern. The latter
-	// is the only type with an ID field.
-	const isThemePattern = ! pattern.id;
-	const defaultCategories = isThemePattern
-		? pattern.categories
-		: categories
-				?.filter( ( category ) =>
-					pattern.wp_pattern_category.includes( category.id )
-				)
-				.map( ( category ) => category.label );
-
 	const duplicatedProps = {
-		defaultCategories,
 		content: pattern.content,
-		defaultSyncType: isThemePattern
+		defaultCategories: getTermLabels( pattern, categories ),
+		defaultSyncType: ! pattern.id // Theme patterns don't have an ID.
 			? PATTERN_SYNC_TYPES.unsynced
 			: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 		defaultTitle: sprintf(
