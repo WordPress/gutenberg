@@ -233,9 +233,6 @@ export const getEntityRecords =
 				const response = await apiFetch( { path, parse: false } );
 				records = Object.values( await response.json() );
 				meta = {
-					totalPages: parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					),
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
 					),
