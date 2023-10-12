@@ -213,12 +213,17 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				break;
 
 			case 'wp-edit-post':
-				array_push( $dependencies, 'media-models', 'media-views', 'postbox' );
+				array_push( $dependencies, 'media-models', 'media-views', 'postbox', 'wp-core-commands' );
 				break;
 
 			case 'wp-edit-site':
-				array_push( $dependencies, 'wp-dom-ready' );
+				array_push( $dependencies, 'wp-dom-ready', 'wp-core-commands' );
 				break;
+
+			case 'wp-edit-widgets':
+				array_push( $dependencies, 'wp-core-commands' );
+				break;
+
 			case 'wp-preferences':
 				array_push( $dependencies, 'wp-preferences-persistence' );
 				break;
@@ -418,7 +423,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-reusable-blocks', 'wp-widgets' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-reusable-blocks', 'wp-widgets', 'wp-commands' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );

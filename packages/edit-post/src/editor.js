@@ -13,8 +13,6 @@ import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
@@ -26,10 +24,8 @@ import { unlock } from './lock-unlock';
 import useCommonCommands from './hooks/commands/use-common-commands';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
-const { useCommands } = unlock( coreCommandsPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
-	useCommands();
 	useCommonCommands();
 	const {
 		hasFixedToolbar,
@@ -165,7 +161,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				{ ...props }
 			>
 				<ErrorBoundary>
-					<CommandMenu />
 					<EditorInitialization postId={ postId } />
 					<Layout />
 				</ErrorBoundary>

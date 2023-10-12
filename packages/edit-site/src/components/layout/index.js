@@ -21,16 +21,14 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import {
-	CommandMenu,
-	privateApis as commandsPrivateApis,
-} from '@wordpress/commands';
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
 	useBlockCommands,
 } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+// eslint-disable-next-line no-unused-vars
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
@@ -55,7 +53,6 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import PageMain from '../page-main';
 import { useIsSiteEditorLoading } from './hooks';
 
-const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -66,7 +63,6 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
-	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
 	useBlockCommands();
@@ -170,7 +166,6 @@ export default function Layout() {
 
 	return (
 		<>
-			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }
