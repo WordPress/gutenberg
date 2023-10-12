@@ -154,6 +154,8 @@
 
 .wp-lightbox-container {
 	position: relative;
+	display: flex;
+	flex-direction: column;
 
 	button {
 		border: none;
@@ -193,11 +195,16 @@
 
 	.close-button {
 		position: absolute;
-		top: calc(env(safe-area-inset-top) + 20px);
-		right: calc(env(safe-area-inset-right) + 20px);
+		top: calc(env(safe-area-inset-top) + 16px); // equivalent to $grid-unit-20
+		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
 		padding: 0;
 		cursor: pointer;
 		z-index: 5000000;
+		min-width: 40px; // equivalent to $button-size-next-default-40px
+		min-height: 40px; // equivalent to $button-size-next-default-40px
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		&:hover,
 		&:focus,

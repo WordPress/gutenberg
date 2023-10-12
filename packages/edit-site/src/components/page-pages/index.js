@@ -1,36 +1,41 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import {
-	VisuallyHidden,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import PageActions from '../page-actions';
-import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
+import { DataViews } from '../dataviews';
+import useTrashPostAction from '../actions/trash-post';
+import Media from '../media';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
 export default function PagePages() {
-	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
-	const [ globalFilter, setGlobalFilter ] = useState( '' );
-	const [ paginationInfo, setPaginationInfo ] = useState();
-	const [ { pageIndex, pageSize }, setPagination ] = useState( {
-		pageIndex: 0,
-		pageSize: PAGE_SIZE_VALUES[ 0 ],
+	const [ view, setView ] = useState( {
+		type: 'list',
+		search: '',
+		page: 0,
+		perPage: 5,
+		sort: {
+			field: 'date',
+			direction: 'desc',
+		},
+		// All fields are visible by default, so it's
+		// better to keep track of the hidden ones.
+		hiddenFields: [ 'date', 'featured-image' ],
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
@@ -42,60 +47,49 @@ export default function PagePages() {
 					return acc;
 			  }, EMPTY_OBJECT );
 
-	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
-	const pagination = useMemo(
-		() => ( { pageIndex, pageSize } ),
-		[ pageIndex, pageSize ]
-	);
-	const [ sorting, setSorting ] = useState( [
-		{ order: 'desc', orderby: 'date' },
-	] );
 	const queryArgs = useMemo(
 		() => ( {
-			per_page: pageSize,
-			page: pageIndex + 1, // tanstack starts from zero.
+			per_page: view.perPage,
+			page: view.page + 1, // tanstack starts from zero.
 			_embed: 'author',
-			order: sorting[ 0 ]?.desc ? 'desc' : 'asc',
-			orderby: sorting[ 0 ]?.id,
-			search: globalFilter,
+			order: view.sort?.direction,
+			orderby: view.sort?.field,
+			search: view.search,
 			status: [ 'publish', 'draft' ],
 		} ),
-		[
-			globalFilter,
-			sorting[ 0 ]?.id,
-			sorting[ 0 ]?.desc,
-			pageSize,
-			pageIndex,
-			reset,
-		]
+		[ view ]
 	);
-	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
-		'postType',
-		'page',
-		queryArgs
+	const {
+		records: pages,
+		isResolving: isLoadingPages,
+		totalItems,
+		totalPages,
+	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems,
+			totalPages,
+		} ),
+		[ totalItems, totalPages ]
 	);
-	useEffect( () => {
-		// Make extra request to handle controlled pagination.
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pages', {
-				...queryArgs,
-				_fields: 'id',
-			} ),
-			method: 'HEAD',
-			parse: false,
-		} ).then( ( res ) => {
-			const totalPages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
-			const totalItems = parseInt( res.headers.get( 'X-WP-Total' ) );
-			setPaginationInfo( {
-				totalPages,
-				totalItems,
-			} );
-		} );
-		// Status should not make extra request if already did..
-	}, [ globalFilter, pageSize, reset ] );
 
 	const fields = useMemo(
 		() => [
+			{
+				id: 'featured-image',
+				header: __( 'Featured Image' ),
+				accessorFn: ( page ) => page.featured_media,
+				cell: ( props ) =>
+					!! props.row.original.featured_media ? (
+						<Media
+							className="edit-site-page-pages__featured-image"
+							id={ props.row.original.featured_media }
+							size="thumbnail"
+						/>
+					) : null,
+				enableSorting: false,
+			},
 			{
 				header: __( 'Title' ),
 				id: 'title',
@@ -112,7 +106,8 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 								>
-									{ decodeEntities( props.getValue() ) }
+									{ decodeEntities( props.getValue() ) ||
+										__( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
@@ -136,57 +131,44 @@ export default function PagePages() {
 				},
 			},
 			{
-				header: 'Status',
+				header: __( 'Status' ),
 				id: 'status',
-				cell: ( props ) =>
-					postStatuses[ props.row.original.status ] ??
-					props.row.original.status,
+				accessorFn: ( page ) =>
+					postStatuses[ page.status ] ?? page.status,
+				enableSorting: false,
 			},
 			{
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-				id: 'actions',
+				header: 'Date',
+				id: 'date',
 				cell: ( props ) => {
-					const page = props.row.original;
-					return (
-						<PageActions
-							postId={ page.id }
-							onRemove={ () => setResetQuery() }
-						/>
+					const formattedDate = dateI18n(
+						getSettings().formats.datetimeAbbreviated,
+						getDate( props.row.original.date )
 					);
+					return <time>{ formattedDate }</time>;
 				},
-				enableHiding: false,
+				enableSorting: false,
 			},
 		],
 		[ postStatuses ]
 	);
+
+	const trashPostAction = useTrashPostAction();
+	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<Page title={ __( 'Pages' ) }>
 			<DataViews
 				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
-				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
 				options={ {
-					manualSorting: true,
-					manualFiltering: true,
-					manualPagination: true,
-					enableRowSelection: true,
-					state: {
-						sorting,
-						globalFilter,
-						pagination,
-					},
-					pageCount: paginationInfo?.totalPages,
-					onSortingChange: setSorting,
-					onGlobalFilterChange: ( value ) => {
-						setGlobalFilter( value );
-						setPagination( { pageIndex: 0, pageSize } );
-					},
-					// TODO: check these callbacks and maybe reset the query when needed...
-					onPaginationChange: setPagination,
-					meta: { resetQuery: setResetQuery },
+					pageCount: totalPages,
 				} }
 			/>
 		</Page>

@@ -180,7 +180,7 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
-			const hadSelecton = hasSelectedBlock();
+			const hadSelection = hasSelectedBlock();
 			const selectionAnchor = getSelectionStart();
 			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
@@ -195,7 +195,7 @@ export default function useBlockSync( {
 				const selectionStillExists = getBlock(
 					selectionAnchor.clientId
 				);
-				if ( hadSelecton && ! selectionStillExists ) {
+				if ( hadSelection && ! selectionStillExists ) {
 					selectBlock( clientId );
 				} else {
 					resetSelection( selectionAnchor, selectionFocus );

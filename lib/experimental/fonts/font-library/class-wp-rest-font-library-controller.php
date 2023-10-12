@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
@@ -16,14 +16,14 @@ if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
 /**
  * Font Library Controller class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 */
 	public function __construct() {
 		$this->rest_base = 'fonts';
@@ -33,7 +33,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Registers the routes for the objects of the controller.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -96,7 +96,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets a font collection.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -121,7 +121,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the font collections available.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
@@ -137,7 +137,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Returns validation errors in font families data for installation.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array[] $font_families Font families to install.
 	 * @param array   $files         Files to install.
@@ -233,7 +233,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Validate input for the install endpoint.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string          $param The font families to install.
 	 * @param WP_REST_Request $request The request object.
@@ -254,7 +254,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the schema for the uninstall endpoint.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array Schema array.
 	 */
@@ -283,7 +283,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Removes font families from the Font Library and all their assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -327,7 +327,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether the user has permissions to update the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
@@ -347,7 +347,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether the user has write permissions to the temp and fonts directories.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
 	 */
@@ -364,7 +364,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether the request needs write permissions.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array[] $font_families Font families to install.
 	 * @return bool Whether the request needs write permissions.
@@ -389,7 +389,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * Takes a request containing new fonts to install, downloads their assets, and adds them
 	 * to the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request The request object containing the new fonts to install
 	 *                                 in the request parameters.

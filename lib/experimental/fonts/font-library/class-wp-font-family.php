@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Family' ) ) {
@@ -16,14 +16,14 @@ if ( class_exists( 'WP_Font_Family' ) ) {
 /**
  * Font Library class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Family {
 
 	/**
 	 * Font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @var array
 	 */
@@ -32,7 +32,7 @@ class WP_Font_Family {
 	/**
 	 * WP_Font_Family constructor.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_data Font family data.
 	 * @throws Exception If the font family data is missing the slug.
@@ -47,7 +47,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array An array in fontFamily theme.json format.
 	 */
@@ -58,7 +58,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return string fontFamily in theme.json format as stringified JSON.
 	 */
@@ -69,7 +69,7 @@ class WP_Font_Family {
 	/**
 	 * Checks whether the font family has font faces defined.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool True if the font family has font faces defined, false otherwise.
 	 */
@@ -80,7 +80,7 @@ class WP_Font_Family {
 	/**
 	 * Removes font family assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool True if assets were removed, false otherwise.
 	 */
@@ -99,7 +99,7 @@ class WP_Font_Family {
 	/**
 	 * Removes a font family from the database and deletes its assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
 	 */
@@ -128,7 +128,7 @@ class WP_Font_Family {
 	/**
 	 * Deletes a specified font asset file from the fonts directory.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $src The path of the font asset file to delete.
 	 * @return bool Whether the file was deleted.
@@ -145,7 +145,7 @@ class WP_Font_Family {
 	/**
 	 * Deletes all font face asset files associated with a given font face.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face The font face array containing the 'src' attribute
 	 *                         with the file path(s) to be deleted.
@@ -167,7 +167,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the overrides for the 'wp_handle_upload' function.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $filename The filename to be used for the uploaded file.
 	 * @return array The overrides for the 'wp_handle_upload' function.
@@ -194,7 +194,7 @@ class WP_Font_Family {
 	 * Downloads a font asset from a specified source URL and saves it to
 	 * the font directory.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $url      The source URL of the font asset to be downloaded.
 	 * @param string $filename The filename to save the downloaded font asset as.
@@ -244,7 +244,7 @@ class WP_Font_Family {
 	 *
 	 * This is used when uploading local fonts.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face Font face to download.
 	 * @param array $file      Uploaded file.
@@ -290,7 +290,7 @@ class WP_Font_Family {
 	/**
 	 * Sanitizes the font family data using WP_Theme_JSON.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array A sanitized font family definition.
 	 */
@@ -321,7 +321,7 @@ class WP_Font_Family {
 	 * Downloads the font face asset(s) associated with a font face. It works with
 	 * both single source URLs and arrays of multiple source URLs.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face The font face array containing the 'src' attribute
 	 *                         with the source URL(s) of the assets.
@@ -364,7 +364,7 @@ class WP_Font_Family {
 	 * Downloads font face assets if the font family is a Google font,
 	 * or moves them if it is a local font.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $files An array of files to be installed.
 	 * @return bool True if the font faces were downloaded or moved successfully, false otherwise.
@@ -429,7 +429,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_Post|null The post for this font family object or
 	 *                      null if the post does not exist.
@@ -455,7 +455,7 @@ class WP_Font_Family {
 	 * Gets the data for this object from the database and
 	 * sets it to the data property.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_Post|null The post for this font family object or
 	 *                      null if the post does not exist.
@@ -473,7 +473,7 @@ class WP_Font_Family {
 	/**
 	 * Creates a post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return int|WP_Error Post ID if the post was created, WP_Error otherwise.
 	 */
@@ -500,7 +500,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font faces that are in both the existing and incoming font families.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $existing The existing font faces.
 	 * @param array $incoming The incoming font faces.
@@ -523,7 +523,7 @@ class WP_Font_Family {
 	/**
 	 * Updates a post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_Post $post The post to update.
 	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
@@ -570,7 +570,7 @@ class WP_Font_Family {
 	 * Creates a post for a font in the Font Library if it doesn't exist,
 	 * or updates it if it does.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return int|WP_Error Post id if the post was created or updated successfully,
 	 *                      WP_Error otherwise.
@@ -589,7 +589,7 @@ class WP_Font_Family {
 	/**
 	 * Installs the font family into the library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $files Optional. An array of files to be installed. Default null.
 	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
