@@ -94,6 +94,9 @@ function GradientColorPickerDropdown( {
 			( {
 				placement: 'bottom',
 				offset: 8,
+				// Disabling resize as it would otherwise cause the popover to show
+				// scrollbars while dragging the color picker's handle close to the
+				// popover edge.
 				resize: false,
 			} ) as const,
 		[]
