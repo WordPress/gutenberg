@@ -94,9 +94,9 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	return (
 		<CompositeItem
-			__experimentalIsFocusable
 			render={
 				<Button
+					__experimentalIsFocusable
 					type="button"
 					role="option"
 					className="block-directory-downloadable-block-list-item"
@@ -110,7 +110,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 						isInstalled,
 						isInstalling,
 					} ) }
-					showTooltip={ true }
+					showTooltip
 					tooltipPosition="top center"
 				/>
 			}
