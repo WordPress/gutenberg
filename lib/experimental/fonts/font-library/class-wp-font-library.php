@@ -72,7 +72,7 @@ class WP_Font_Library {
 			_doing_it_wrong(
 				__METHOD__,
 				$error_message,
-				'6.4.0'
+				'6.5.0'
 			);
 			return new WP_Error( 'font_collection_registration_error', $error_message );
 		}
@@ -83,7 +83,7 @@ class WP_Font_Library {
 	/**
 	 * Unregisters a previously registered font collection.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $collection_id Font collection ID.
 	 * @return bool True if the font collection was unregistered successfully and false otherwise.
@@ -105,7 +105,7 @@ class WP_Font_Library {
 	/**
 	 * Checks if a font collection is registered.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $collection_id Font collection ID.
 	 * @return bool True if the font collection is registered and false otherwise.

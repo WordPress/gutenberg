@@ -61,7 +61,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	/**
 	 * Unregisters a font collection from the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $collection_id The font collection ID.
 	 */
