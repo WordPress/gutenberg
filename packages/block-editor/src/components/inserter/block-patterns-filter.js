@@ -16,7 +16,7 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { myPatternsCategory } from './block-patterns-tab';
+import { myPatternsCategory } from './block-patterns-tab/utils';
 
 export const PATTERN_TYPES = {
 	all: 'all',

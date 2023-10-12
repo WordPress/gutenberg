@@ -24,9 +24,8 @@ import { useSelect } from '@wordpress/data';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
-import BlockPatternsTabs, {
-	BlockPatternsCategoryDialog,
-} from './block-patterns-tab';
+import BlockPatternsTab from './block-patterns-tab';
+import { PatternsCategoryPreviewPanel } from './block-patterns-tab/category-preview-panel';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useDebouncedInput from './hooks/use-debounced-input';
@@ -160,7 +159,7 @@ function InserterMenu(
 
 	const patternsTab = useMemo(
 		() => (
-			<BlockPatternsTabs
+			<BlockPatternsTab
 				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
@@ -297,7 +296,7 @@ function InserterMenu(
 				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 			{ showPatternPanel && (
-				<BlockPatternsCategoryDialog
+				<PatternsCategoryPreviewPanel
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					onHover={ onHoverPattern }

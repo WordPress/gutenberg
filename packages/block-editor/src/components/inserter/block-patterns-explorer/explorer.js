@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
-import { usePatternsCategories } from '../block-patterns-tab';
+import { usePatternsCategories } from '../block-patterns-tab/use-patterns-categories';
 
 function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );

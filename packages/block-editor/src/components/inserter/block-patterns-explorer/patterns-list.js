@@ -17,7 +17,10 @@ import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { allPatternsCategory, myPatternsCategory } from '../block-patterns-tab';
+import {
+	allPatternsCategory,
+	myPatternsCategory,
+} from '../block-patterns-tab/utils';
 
 function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	if ( ! filterValue ) {
