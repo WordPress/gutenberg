@@ -37,14 +37,6 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 		WP_Font_Library::register_font_collection( $config );
 	}
 
-	public function tear_down() {
-		// Resets the private static property WP_Font_Library::$unregistered_collection_ids to empty array.
-		$reflection = new ReflectionClass( 'WP_Font_Library' );
-		$property   = $reflection->getProperty( 'unregistered_collection_ids' );
-		$property->setAccessible( true );
-		$property->setValue( array() );
-	}
-
 	public function test_should_unregister_font_collection() {
 		// Unregister mock font collection.
 		WP_Font_Library::unregister_font_collection( 'mock-font-collection-1' );
