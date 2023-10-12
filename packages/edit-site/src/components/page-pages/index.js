@@ -52,8 +52,8 @@ export default function PagePages() {
 			per_page: view.perPage,
 			page: view.page + 1, // tanstack starts from zero.
 			_embed: 'author',
-			order: view.sort.direction,
-			orderby: view.sort.field,
+			order: view.sort?.direction,
+			orderby: view.sort?.field,
 			search: view.search,
 			status: [ 'publish', 'draft' ],
 		} ),

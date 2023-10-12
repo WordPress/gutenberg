@@ -8,7 +8,14 @@ import { flexRender } from '@tanstack/react-table';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp, unseen } from '@wordpress/icons';
+import {
+	chevronDown,
+	chevronUp,
+	unseen,
+	check,
+	arrowUp,
+	arrowDown,
+} from '@wordpress/icons';
 import {
 	Button,
 	Icon,
@@ -20,7 +27,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { FieldSortingItems } from './view-actions';
 
 const {
 	DropdownMenuV2,
@@ -29,6 +35,10 @@ const {
 	DropdownMenuSeparatorV2,
 } = unlock( componentsPrivateApis );
 
+const sortingItemsInfo = {
+	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
+	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
+};
 const sortIcons = { asc: chevronUp, desc: chevronDown };
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
@@ -43,6 +53,7 @@ function HeaderMenu( { dataView, header } ) {
 	if ( ! isSortable && ! isHidable ) {
 		return text;
 	}
+	const sortedDirection = header.column.getIsSorted();
 	return (
 		<DropdownMenuV2
 			align="start"
@@ -57,10 +68,34 @@ function HeaderMenu( { dataView, header } ) {
 		>
 			{ isSortable && (
 				<DropdownMenuGroupV2>
-					<FieldSortingItems
-						field={ header.column }
-						dataView={ dataView }
-					/>
+					{ Object.entries( sortingItemsInfo ).map(
+						( [ direction, info ] ) => (
+							<DropdownMenuItemV2
+								key={ direction }
+								prefix={ <Icon icon={ info.icon } /> }
+								suffix={
+									sortedDirection === direction && (
+										<Icon icon={ check } />
+									)
+								}
+								onSelect={ ( event ) => {
+									event.preventDefault();
+									if ( sortedDirection === direction ) {
+										dataView.resetSorting();
+									} else {
+										dataView.setSorting( [
+											{
+												id: header.column.id,
+												desc: direction === 'desc',
+											},
+										] );
+									}
+								} }
+							>
+								{ info.label }
+							</DropdownMenuItemV2>
+						)
+					) }
 				</DropdownMenuGroupV2>
 			) }
 			{ isSortable && isHidable && <DropdownMenuSeparatorV2 /> }
