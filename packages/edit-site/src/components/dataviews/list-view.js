@@ -8,12 +8,29 @@ import { flexRender } from '@tanstack/react-table';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { chevronDown, chevronUp, unseen } from '@wordpress/icons';
+import {
+	Button,
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+import { FieldSortingItems } from './view-actions';
+
+const {
+	DropdownMenuV2,
+	DropdownMenuGroupV2,
+	DropdownMenuItemV2,
+	DropdownMenuSeparatorV2,
+} = unlock( componentsPrivateApis );
+
 const sortIcons = { asc: chevronUp, desc: chevronDown };
-function Header( { header } ) {
+function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
 		return null;
 	}
@@ -21,21 +38,46 @@ function Header( { header } ) {
 		header.column.columnDef.header,
 		header.getContext()
 	);
-	if ( ! header.column.getCanSort() ) {
+	const isSortable = !! header.column.getCanSort();
+	const isHidable = !! header.column.getCanHide();
+	if ( ! isSortable && ! isHidable ) {
 		return text;
 	}
-	const sortDirection = header.column.getIsSorted();
 	return (
-		<Button
-			onClick={ header.column.getToggleSortingHandler() }
-			icon={ sortIcons[ sortDirection ] }
-			iconPosition="right"
-			text={ text }
-			style={ { padding: 0 } }
-		/>
+		<DropdownMenuV2
+			align="start"
+			trigger={
+				<Button
+					icon={ sortIcons[ header.column.getIsSorted() ] }
+					iconPosition="right"
+					text={ text }
+					style={ { padding: 0 } }
+				/>
+			}
+		>
+			{ isSortable && (
+				<DropdownMenuGroupV2>
+					<FieldSortingItems
+						field={ header.column }
+						dataView={ dataView }
+					/>
+				</DropdownMenuGroupV2>
+			) }
+			{ isSortable && isHidable && <DropdownMenuSeparatorV2 /> }
+			{ isHidable && (
+				<DropdownMenuItemV2
+					prefix={ <Icon icon={ unseen } /> }
+					onSelect={ ( event ) => {
+						event.preventDefault();
+						header.column.getToggleVisibilityHandler()( event );
+					} }
+				>
+					{ __( 'Hide' ) }
+				</DropdownMenuItemV2>
+			) }
+		</DropdownMenuV2>
 	);
 }
-
 function ListView( { dataView, className, isLoading = false }, ref ) {
 	const { rows } = dataView.getRowModel();
 	const hasRows = !! rows?.length;
@@ -66,7 +108,10 @@ function ListView( { dataView, className, isLoading = false }, ref ) {
 													.maxWidth || undefined,
 										} }
 									>
-										<Header header={ header } />
+										<HeaderMenu
+											dataView={ dataView }
+											header={ header }
+										/>
 									</th>
 								) ) }
 							</tr>

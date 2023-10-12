@@ -144,6 +144,31 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
+export function FieldSortingItems( { field, dataView } ) {
+	const sortedDirection = field.getIsSorted();
+	return Object.entries( sortingItemsInfo ).map( ( [ direction, info ] ) => (
+		<DropdownMenuItemV2
+			key={ direction }
+			prefix={ <Icon icon={ info.icon } /> }
+			suffix={ sortedDirection === direction && <Icon icon={ check } /> }
+			onSelect={ ( event ) => {
+				event.preventDefault();
+				if ( sortedDirection === direction ) {
+					dataView.resetSorting();
+				} else {
+					dataView.setSorting( [
+						{
+							id: field.id,
+							desc: direction === 'desc',
+						},
+					] );
+				}
+			} }
+		>
+			{ info.label }
+		</DropdownMenuItemV2>
+	) );
+}
 function SortMenu( { dataView } ) {
 	const sortableFields = dataView
 		.getAllColumns()
@@ -170,7 +195,6 @@ function SortMenu( { dataView } ) {
 			}
 		>
 			{ sortableFields?.map( ( field ) => {
-				const sortedDirection = field.getIsSorted();
 				return (
 					<DropdownSubMenuV2
 						key={ field.id }
@@ -183,40 +207,10 @@ function SortMenu( { dataView } ) {
 						}
 						side="left"
 					>
-						{ Object.entries( sortingItemsInfo ).map(
-							( [ direction, info ] ) => {
-								return (
-									<DropdownMenuItemV2
-										key={ direction }
-										prefix={ <Icon icon={ info.icon } /> }
-										suffix={
-											sortedDirection === direction && (
-												<Icon icon={ check } />
-											)
-										}
-										onSelect={ ( event ) => {
-											event.preventDefault();
-											if (
-												sortedDirection === direction
-											) {
-												dataView.resetSorting();
-											} else {
-												dataView.setSorting( [
-													{
-														id: field.id,
-														desc:
-															direction ===
-															'desc',
-													},
-												] );
-											}
-										} }
-									>
-										{ info.label }
-									</DropdownMenuItemV2>
-								);
-							}
-						) }
+						<FieldSortingItems
+							field={ field }
+							dataView={ dataView }
+						/>
 					</DropdownSubMenuV2>
 				);
 			} ) }
