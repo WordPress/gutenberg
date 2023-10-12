@@ -1,5 +1,5 @@
 /**
- * Defines as extensibility slot for the Summary panel.
+ * Defines as extensibility slot for the Excerpt panel.
  */
 
 /**
