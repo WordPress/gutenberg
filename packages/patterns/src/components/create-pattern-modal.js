@@ -110,9 +110,9 @@ export default function CreatePatternModal( {
 		} catch ( error ) {
 			createErrorNotice( error.message, {
 				type: 'snackbar',
-				id: 'convert-to-pattern-error',
+				id: 'pattern-create',
 			} );
-			onError();
+			onError?.();
 		} finally {
 			setIsSaving( false );
 			setCategoryTerms( [] );

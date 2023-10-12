@@ -381,6 +381,15 @@ function usePatternCommands() {
 				close();
 			},
 		} );
+		commands.push( {
+			name: 'core/duplicate-pattern',
+			label: __( 'Duplicate pattern' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				openModal( PATTERN_MODALS.duplicate );
+				close();
+			},
+		} );
 	}
 
 	return { isLoading: false, commands };
