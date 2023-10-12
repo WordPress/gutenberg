@@ -8,7 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-setting';
 import { store as blockEditorStore } from '../../store';
 
 export function __experimentalGetGradientClass( gradientSlug ) {
@@ -60,9 +60,15 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const userGradientPalette = useSetting( 'color.gradients.custom' );
-	const themeGradientPalette = useSetting( 'color.gradients.theme' );
-	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const [
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+	] = useSettings( [
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default',
+	] );
 	const allGradients = useMemo(
 		() => [
 			...( userGradientPalette || [] ),

@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useSetting } from '../components';
+import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 
@@ -126,48 +126,93 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
  * @return {Object} Settings object.
  */
 export function useBlockSettings( name, parentLayout ) {
-	const fontFamilies = useSetting( 'typography.fontFamilies' );
-	const fontSizes = useSetting( 'typography.fontSizes' );
-	const customFontSize = useSetting( 'typography.customFontSize' );
-	const fontStyle = useSetting( 'typography.fontStyle' );
-	const fontWeight = useSetting( 'typography.fontWeight' );
-	const lineHeight = useSetting( 'typography.lineHeight' );
-	const textColumns = useSetting( 'typography.textColumns' );
-	const textDecoration = useSetting( 'typography.textDecoration' );
-	const writingMode = useSetting( 'typography.writingMode' );
-	const textTransform = useSetting( 'typography.textTransform' );
-	const letterSpacing = useSetting( 'typography.letterSpacing' );
-	const padding = useSetting( 'spacing.padding' );
-	const margin = useSetting( 'spacing.margin' );
-	const blockGap = useSetting( 'spacing.blockGap' );
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
-	const units = useSetting( 'spacing.units' );
-	const minHeight = useSetting( 'dimensions.minHeight' );
-	const layout = useSetting( 'layout' );
-	const borderColor = useSetting( 'border.color' );
-	const borderRadius = useSetting( 'border.radius' );
-	const borderStyle = useSetting( 'border.style' );
-	const borderWidth = useSetting( 'border.width' );
-	const customColorsEnabled = useSetting( 'color.custom' );
-	const customColors = useSetting( 'color.palette.custom' );
-	const customDuotone = useSetting( 'color.customDuotone' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const defaultColors = useSetting( 'color.palette.default' );
-	const defaultPalette = useSetting( 'color.defaultPalette' );
-	const defaultDuotone = useSetting( 'color.defaultDuotone' );
-	const userDuotonePalette = useSetting( 'color.duotone.custom' );
-	const themeDuotonePalette = useSetting( 'color.duotone.theme' );
-	const defaultDuotonePalette = useSetting( 'color.duotone.default' );
-	const userGradientPalette = useSetting( 'color.gradients.custom' );
-	const themeGradientPalette = useSetting( 'color.gradients.theme' );
-	const defaultGradientPalette = useSetting( 'color.gradients.default' );
-	const defaultGradients = useSetting( 'color.defaultGradients' );
-	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
-	const isBackgroundEnabled = useSetting( 'color.background' );
-	const isLinkEnabled = useSetting( 'color.link' );
-	const isTextEnabled = useSetting( 'color.text' );
-	const isHeadingEnabled = useSetting( 'color.heading' );
-	const isButtonEnabled = useSetting( 'color.button' );
+	const [
+		fontFamilies,
+		fontSizes,
+		customFontSize,
+		fontStyle,
+		fontWeight,
+		lineHeight,
+		textColumns,
+		textDecoration,
+		writingMode,
+		textTransform,
+		letterSpacing,
+		padding,
+		margin,
+		blockGap,
+		spacingSizes,
+		units,
+		minHeight,
+		layout,
+		borderColor,
+		borderRadius,
+		borderStyle,
+		borderWidth,
+		customColorsEnabled,
+		customColors,
+		customDuotone,
+		themeColors,
+		defaultColors,
+		defaultPalette,
+		defaultDuotone,
+		userDuotonePalette,
+		themeDuotonePalette,
+		defaultDuotonePalette,
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+		defaultGradients,
+		areCustomGradientsEnabled,
+		isBackgroundEnabled,
+		isLinkEnabled,
+		isTextEnabled,
+		isHeadingEnabled,
+		isButtonEnabled,
+	] = useSettings( [
+		'typography.fontFamilies',
+		'typography.fontSizes',
+		'typography.customFontSize',
+		'typography.fontStyle',
+		'typography.fontWeight',
+		'typography.lineHeight',
+		'typography.textColumns',
+		'typography.textDecoration',
+		'typography.writingMode',
+		'typography.textTransform',
+		'typography.letterSpacing',
+		'spacing.padding',
+		'spacing.margin',
+		'spacing.blockGap',
+		'spacing.spacingSizes',
+		'spacing.units',
+		'dimensions.minHeight',
+		'layout',
+		'border.color',
+		'border.radius',
+		'border.style',
+		'border.width',
+		'color.custom',
+		'color.palette.custom',
+		'color.customDuotone',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.defaultPalette',
+		'color.defaultDuotone',
+		'color.duotone.custom',
+		'color.duotone.theme',
+		'color.duotone.default',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default',
+		'color.defaultGradients',
+		'color.customGradient',
+		'color.background',
+		'color.link',
+		'color.text',
+		'color.heading',
+		'color.button',
+	] );
 
 	const rawSettings = useMemo( () => {
 		return {

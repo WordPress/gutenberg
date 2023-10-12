@@ -18,7 +18,7 @@ import {
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
+import { useSettings } from '../use-setting';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -160,17 +160,20 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const colorGradientSettings = {};
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
-	colorGradientSettings.disableCustomGradients = ! useSetting(
-		'color.customGradient'
-	);
+	const [ colors, gradients, customColors, customGradients ] = useSettings( [
+		'color.palette',
+		'color.gradients',
+		'color.custom',
+		'color.customGradient',
+	] );
 
 	return (
 		<ColorGradientControlInner
-			{ ...{ ...colorGradientSettings, ...props } }
+			colors={ colors }
+			gradients={ gradients }
+			disableCustomColors={ ! customColors }
+			disableCustomGradients={ ! customGradients }
+			{ ...props }
 		/>
 	);
 }

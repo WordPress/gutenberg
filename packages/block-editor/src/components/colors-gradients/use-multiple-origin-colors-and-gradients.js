@@ -7,7 +7,7 @@ import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
+import { useSettings } from '../use-setting';
 
 /**
  * Retrieves color and gradient related settings.
@@ -18,14 +18,34 @@ import useSetting from '../use-setting';
  * @return {Object} Color and gradient related settings.
  */
 export default function useMultipleOriginColorsAndGradients() {
+	const [
+		enableCustomColors,
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+		enableCustomGradients,
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
+	] = useSettings( [
+		'color.custom',
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.defaultPalette',
+		'color.customGradient',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default',
+		'color.defaultGradients',
+	] );
+
 	const colorGradientSettings = {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
+		disableCustomColors: ! enableCustomColors,
+		disableCustomGradients: ! enableCustomGradients,
 	};
-	const customColors = useSetting( 'color.palette.custom' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const defaultColors = useSetting( 'color.palette.default' );
-	const shouldDisplayDefaultColors = useSetting( 'color.defaultPalette' );
 
 	colorGradientSettings.colors = useMemo( () => {
 		const result = [];
@@ -62,18 +82,12 @@ export default function useMultipleOriginColorsAndGradients() {
 		}
 		return result;
 	}, [
-		defaultColors,
-		themeColors,
 		customColors,
+		themeColors,
+		defaultColors,
 		shouldDisplayDefaultColors,
 	] );
 
-	const customGradients = useSetting( 'color.gradients.custom' );
-	const themeGradients = useSetting( 'color.gradients.theme' );
-	const defaultGradients = useSetting( 'color.gradients.default' );
-	const shouldDisplayDefaultGradients = useSetting(
-		'color.defaultGradients'
-	);
 	colorGradientSettings.gradients = useMemo( () => {
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {

@@ -25,7 +25,7 @@ import {
 	shouldSkipSerialization,
 	useBlockSettings,
 } from './utils';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
 import {
 	useHasColorPanel,
@@ -368,9 +368,12 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const userPalette = useSetting( 'color.palette.custom' );
-		const themePalette = useSetting( 'color.palette.theme' );
-		const defaultPalette = useSetting( 'color.palette.default' );
+		const [ userPalette, themePalette, defaultPalette ] = useSettings( [
+			'color.palette.custom',
+			'color.palette.theme',
+			'color.palette.default',
+		] );
+
 		const colors = useMemo(
 			() => [
 				...( userPalette || [] ),
