@@ -10,7 +10,6 @@ export interface DropdownMenuContext {
 	variant?: 'toolbar';
 }
 
-// TODO: add support for standard HTML props
 export interface DropdownMenuProps {
 	trigger: React.ReactElement;
 	children?: React.ReactNode;
@@ -18,7 +17,6 @@ export interface DropdownMenuProps {
 	 * @default true
 	 */
 	modal?: boolean;
-	className?: string;
 	open?: boolean;
 	defaultOpen?: boolean;
 	onOpenChange?: ( open: boolean ) => void;

@@ -23,6 +23,7 @@ import { SVG, Circle } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../context';
+import type { WordPressComponentProps } from '../context';
 import Icon from '../icon';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
@@ -41,7 +42,7 @@ export const DropdownMenuContext = createContext<
 
 export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
-	DropdownMenuItemProps
+	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
 >( function DropdownMenuItem( { prefix, suffix, children, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
@@ -63,7 +64,7 @@ export const DropdownMenuItem = forwardRef<
 
 export const DropdownMenuCheckboxItem = forwardRef<
 	HTMLDivElement,
-	DropdownMenuCheckboxItemProps
+	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
 >( function DropdownMenuCheckboxItem( { suffix, children, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
@@ -113,7 +114,7 @@ export const DropdownMenuCheckboxItem = forwardRef<
 
 export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
-	DropdownMenuCheckboxItemProps
+	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
 >( function DropdownMenuRadioItem( { suffix, children, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
@@ -151,7 +152,7 @@ export const DropdownMenuRadioItem = forwardRef<
 
 export const DropdownMenuGroup = forwardRef<
 	HTMLDivElement,
-	DropdownMenuGroupProps
+	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
 >( function DropdownMenuGroup( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
@@ -165,7 +166,7 @@ export const DropdownMenuGroup = forwardRef<
 
 export const DropdownMenuGroupLabel = forwardRef<
 	HTMLDivElement,
-	DropdownMenuGroupLabelProps
+	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
 >( function DropdownMenuGroupLabel( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
@@ -178,7 +179,7 @@ export const DropdownMenuGroupLabel = forwardRef<
 } );
 
 const UnconnectedDropdownMenu = (
-	props: DropdownMenuProps,
+	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const {
@@ -205,7 +206,7 @@ const UnconnectedDropdownMenu = (
 		// Rest
 		...otherProps
 	} = useContextSystem<
-		DropdownMenuProps & Pick< DropdownMenuContextType, 'variant' >
+		typeof props & Pick< DropdownMenuContextType, 'variant' >
 	>( props, 'DropdownMenu' );
 
 	const parentContext = useContext( DropdownMenuContext );
@@ -319,7 +320,7 @@ export const DropdownMenu = contextConnect(
 
 export const DropdownMenuSeparator = forwardRef<
 	HTMLHRElement,
-	DropdownMenuSeparatorProps
+	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
 >( function DropdownMenuSeparator( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
