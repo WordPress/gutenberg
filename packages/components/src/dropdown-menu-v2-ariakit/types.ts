@@ -12,7 +12,6 @@ export interface DropdownMenuContext {
 
 // TODO: add support for standard HTML props
 export interface DropdownMenuProps {
-	// TODO: do we need to support render props too?
 	trigger: React.ReactElement;
 	children?: React.ReactNode;
 	/**

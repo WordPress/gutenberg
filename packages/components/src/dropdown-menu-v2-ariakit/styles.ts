@@ -230,10 +230,6 @@ const baseItem = css`
 		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
 	}
 `;
-// TODO: add styles to item for adding extra space when there's no prefix
-// &:not( :has( ${ ItemPrefixWrapper } ) ) {
-// 	padding-inline-start: ${ ITEM_PREFIX_WIDTH };
-// }
 
 export const DropdownMenuItem = styled( Ariakit.MenuItem )`
 	${ baseItem }
