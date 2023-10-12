@@ -6,5 +6,5 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
-		'@wordpress/edit-site'
+		'@wordpress/block-directory'
 	);
