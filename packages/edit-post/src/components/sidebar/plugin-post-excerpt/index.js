@@ -40,9 +40,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
  * import { PluginPostExcerpt } from '@wordpress/edit-post';
  *
  * const MyPluginPostExcerpt = () => (
- * 	<PluginPostExcerpt
- * 		className="my-plugin-post-excerpt"
- * 	>
+ * 	<PluginPostExcerpt className="my-plugin-post-excerpt">
  * 		{ __( 'Post excerpt custom content' ) }
  * 	</PluginPostExcerpt>
  * );
