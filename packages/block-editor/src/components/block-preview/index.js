@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
+import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
@@ -92,6 +93,17 @@ export function BlockPreview( {
  */
 export default memo( BlockPreview );
 
+function InnerStyles() {
+	const { styles } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			styles: settings.styles,
+		};
+	}, [] );
+
+	return <EditorStyles styles={ styles } />;
+}
+
 /**
  * This hook is used to lightly mark an element as a block preview wrapper
  * element. Call this hook and pass the returned props to the element to mark as
@@ -128,6 +140,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
+			<InnerStyles />
 			<BlockListItems renderAppender={ false } layout={ layout } />
 		</ExperimentalBlockEditorProvider>
 	);
