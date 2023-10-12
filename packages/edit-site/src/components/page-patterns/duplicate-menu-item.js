@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -13,32 +14,14 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import {
 	TEMPLATE_PART_POST_TYPE,
-	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
+	PATTERN_TYPES,
 } from '../../utils/constants';
-import {
-	useExistingTemplateParts,
-	getUniqueTemplatePartTitle,
-	getCleanTemplatePartSlug,
-} from '../../utils/template-part-create';
 import { unlock } from '../../lock-unlock';
-import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
+import CreateTemplatePartModal from '../create-template-part-modal';
 
+const { CreatePatternModal } = unlock( patternsPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
-
-function getPatternMeta( item ) {
-	if ( item.type === PATTERN_TYPES.theme ) {
-		return { wp_pattern_sync_status: PATTERN_SYNC_TYPES.unsynced };
-	}
-
-	const syncStatus = item.patternBlock.wp_pattern_sync_status;
-	const isUnsynced = syncStatus === PATTERN_SYNC_TYPES.unsynced;
-
-	return {
-		...item.patternBlock.meta,
-		wp_pattern_sync_status: isUnsynced ? syncStatus : undefined,
-	};
-}
 
 export default function DuplicateMenuItem( {
 	categoryId,
@@ -46,173 +29,116 @@ export default function DuplicateMenuItem( {
 	label = __( 'Duplicate' ),
 	onClose,
 } ) {
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
-
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const history = useHistory();
-	const existingTemplateParts = useExistingTemplateParts();
-	const { patternCategories } = usePatternCategories();
 
-	async function createTemplatePart() {
-		try {
-			const copiedTitle = sprintf(
-				/* translators: %s: Existing template part title */
-				__( '%s (Copy)' ),
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+
+	async function onTemplatePartSuccess( templatePart ) {
+		createSuccessNotice(
+			sprintf(
+				// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+				__( '"%s" duplicated.' ),
 				item.title
-			);
-			const title = getUniqueTemplatePartTitle(
-				copiedTitle,
-				existingTemplateParts
-			);
-			const slug = getCleanTemplatePartSlug( title );
-			const { area, content } = item.templatePart;
-
-			const result = await saveEntityRecord(
-				'postType',
-				TEMPLATE_PART_POST_TYPE,
-				{ slug, title, content, area },
-				{ throwOnError: true }
-			);
-
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
-					__( '"%s" duplicated.' ),
-					item.title
-				),
-				{
-					type: 'snackbar',
-					id: 'edit-site-patterns-success',
-				}
-			);
-
-			history.push( {
-				postType: TEMPLATE_PART_POST_TYPE,
-				postId: result?.id,
-				categoryType: TEMPLATE_PART_POST_TYPE,
-				categoryId,
-			} );
-
-			onClose();
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __(
-							'An error occurred while creating the template part.'
-					  );
-
-			createErrorNotice( errorMessage, {
+			),
+			{
 				type: 'snackbar',
-				id: 'edit-site-patterns-error',
-			} );
-			onClose();
-		}
-	}
-
-	async function findOrCreateTerm( term ) {
-		try {
-			const newTerm = await saveEntityRecord(
-				'taxonomy',
-				'wp_pattern_category',
-				{
-					name: term.label,
-					slug: term.name,
-					description: term.description,
-				},
-				{
-					throwOnError: true,
-				}
-			);
-			invalidateResolution( 'getUserPatternCategories' );
-			return newTerm.id;
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
+				id: 'edit-site-patterns-success',
 			}
+		);
 
-			return error.data.term_id;
-		}
-	}
-
-	async function getCategories( categories ) {
-		const terms = categories.map( ( category ) => {
-			const fullCategory = patternCategories.find(
-				( cat ) => cat.name === category
-			);
-			if ( fullCategory.id ) {
-				return fullCategory.id;
-			}
-			return findOrCreateTerm( fullCategory );
+		history.push( {
+			postType: TEMPLATE_PART_POST_TYPE,
+			postId: templatePart?.id,
+			categoryType: TEMPLATE_PART_POST_TYPE,
+			categoryId,
 		} );
 
-		return Promise.all( terms );
+		onClose();
 	}
 
-	async function createPattern() {
-		try {
-			const isThemePattern = item.type === PATTERN_TYPES.theme;
-			const title = sprintf(
-				/* translators: %s: Existing pattern title */
-				__( '%s (Copy)' ),
-				item.title || item.name
-			);
-			const categories = await getCategories( item.categories || [] );
+	function onPatternSuccess( { pattern } ) {
+		createSuccessNotice(
+			sprintf(
+				// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
+				__( '"%s" duplicated.' ),
+				pattern.title.raw
+			),
+			{
+				type: 'snackbar',
+				id: 'edit-site-patterns-success',
+			}
+		);
 
-			const result = await saveEntityRecord(
-				'postType',
-				PATTERN_TYPES.user,
-				{
-					content: isThemePattern
-						? item.content
-						: item.patternBlock.content,
-					meta: getPatternMeta( item ),
-					status: 'publish',
-					title,
-					wp_pattern_category: categories,
-				},
-				{ throwOnError: true }
-			);
+		history.push( {
+			categoryType: PATTERN_TYPES.theme,
+			categoryId,
+			postType: PATTERN_TYPES.user,
+			postId: pattern.id,
+		} );
 
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-					__( '"%s" duplicated.' ),
+		onClose();
+	}
+
+	const isThemePattern = item.type === PATTERN_TYPES.theme;
+	const closeModal = () => setIsModalOpen( false );
+	const duplicatedProps = isTemplatePart
+		? {
+				blocks: item.blocks,
+				defaultArea: item.templatePart.area,
+				defaultTitle: sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					item.title
+				),
+		  }
+		: {
+				defaultCategories: isThemePattern
+					? item.categories
+					: item.termLabels,
+				content: isThemePattern
+					? item.content
+					: item.patternBlock.content,
+				defaultSyncType: isThemePattern
+					? PATTERN_SYNC_TYPES.unsynced
+					: item.syncStatus,
+				defaultTitle: sprintf(
+					/* translators: %s: Existing pattern title */
+					__( '%s (Copy)' ),
 					item.title || item.name
 				),
-				{
-					type: 'snackbar',
-					id: 'edit-site-patterns-success',
-				}
-			);
+		  };
 
-			history.push( {
-				categoryType: PATTERN_TYPES.theme,
-				categoryId,
-				postType: PATTERN_TYPES.user,
-				postId: result?.id,
-			} );
-
-			onClose();
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the pattern.' );
-
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-				id: 'edit-site-patterns-error',
-			} );
-			onClose();
-		}
-	}
-
-	const createItem =
-		item.type === TEMPLATE_PART_POST_TYPE
-			? createTemplatePart
-			: createPattern;
-
-	return <MenuItem onClick={ createItem }>{ label }</MenuItem>;
+	return (
+		<>
+			<MenuItem
+				onClick={ () => setIsModalOpen( true ) }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			>
+				{ label }
+			</MenuItem>
+			{ isModalOpen && ! isTemplatePart && (
+				<CreatePatternModal
+					confirmLabel={ __( 'Duplicate' ) }
+					modalTitle={ __( 'Duplicate pattern' ) }
+					onClose={ closeModal }
+					onError={ closeModal }
+					onSuccess={ onPatternSuccess }
+					{ ...duplicatedProps }
+				/>
+			) }
+			{ isModalOpen && isTemplatePart && (
+				<CreateTemplatePartModal
+					confirmLabel={ __( 'Duplicate' ) }
+					closeModal={ closeModal }
+					modalTitle={ __( 'Duplicate template part' ) }
+					onCreate={ onTemplatePartSuccess }
+					onError={ closeModal }
+					{ ...duplicatedProps }
+				/>
+			) }
+		</>
+	);
 }
