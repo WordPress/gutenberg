@@ -13,7 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
-import PluginPostExcerp from '../plugin-post-excerpt';
+import PluginPostExcerpt from '../plugin-post-excerpt';
 
 /**
  * Module Constants
