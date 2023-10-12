@@ -39,14 +39,14 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	area: defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
 	confirmLabel = __( 'Create' ),
 	closeModal,
 	modalTitle = __( 'Create template part' ),
 	onCreate,
 	onError,
-	title: defaultTitle = '',
+	defaultTitle = '',
 } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );

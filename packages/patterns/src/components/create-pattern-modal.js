@@ -29,15 +29,15 @@ import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
 	confirmLabel = __( 'Create' ),
-	categories: defaultCategories = [],
+	defaultCategories = [],
 	className = 'patterns-menu-items__convert-modal',
 	content,
 	modalTitle = __( 'Create pattern' ),
 	onClose,
 	onError,
 	onSuccess,
-	syncType: defaultSyncType = PATTERN_SYNC_TYPES.full,
-	title: defaultTitle = '',
+	defaultSyncType = PATTERN_SYNC_TYPES.full,
+	defaultTitle = '',
 } ) {
 	const [ syncType, setSyncType ] = useState( defaultSyncType );
 	const [ categoryTerms, setCategoryTerms ] = useState( defaultCategories );

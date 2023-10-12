@@ -86,22 +86,24 @@ export default function DuplicateMenuItem( {
 	const duplicatedProps = isTemplatePart
 		? {
 				blocks: item.blocks,
-				area: item.templatePart.area,
-				title: sprintf(
+				defaultArea: item.templatePart.area,
+				defaultTitle: sprintf(
 					/* translators: %s: Existing template part title */
 					__( '%s (Copy)' ),
 					item.title
 				),
 		  }
 		: {
-				categories: isThemePattern ? item.categories : item.termLabels,
+				defaultCategories: isThemePattern
+					? item.categories
+					: item.termLabels,
 				content: isThemePattern
 					? item.content
 					: item.patternBlock.content,
-				syncType: isThemePattern
+				defaultSyncType: isThemePattern
 					? PATTERN_SYNC_TYPES.unsynced
 					: item.syncStatus,
-				title: sprintf(
+				defaultTitle: sprintf(
 					/* translators: %s: Existing pattern title */
 					__( '%s (Copy)' ),
 					item.title || item.name
