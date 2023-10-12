@@ -60,15 +60,14 @@ export function PageSizeControl( { dataView } ) {
 	);
 }
 
-function PageSizeMenu( { dataView } ) {
-	const currenPageSize = dataView.getState().pagination.pageSize;
+function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2
 			trigger={
 				<DropdownSubMenuTriggerV2
 					suffix={
 						<>
-							{ currenPageSize }
+							{ view.perPage }
 							<Icon icon={ chevronRightSmall } />
 						</>
 					}
@@ -83,12 +82,12 @@ function PageSizeMenu( { dataView } ) {
 					<DropdownMenuItemV2
 						key={ size }
 						prefix={
-							currenPageSize === size && <Icon icon={ check } />
+							view.perPage === size && <Icon icon={ check } />
 						}
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							dataView.setPageSize( size );
+							onChangeView( { ...view, perPage: size, page: 0 } );
 						} }
 						// TODO: check about role and a11y.
 						role="menuitemcheckbox"
@@ -101,10 +100,10 @@ function PageSizeMenu( { dataView } ) {
 	);
 }
 
-function FieldsVisibilityMenu( { dataView } ) {
-	const hidableFields = dataView
-		.getAllColumns()
-		.filter( ( columnn ) => columnn.getCanHide() );
+function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
+	const hidableFields = fields.filter(
+		( field ) => field.enableHiding !== false
+	);
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
@@ -123,15 +122,26 @@ function FieldsVisibilityMenu( { dataView } ) {
 					<DropdownMenuItemV2
 						key={ field.id }
 						prefix={
-							field.getIsVisible() && <Icon icon={ check } />
+							! view.hiddenFields?.includes( field.id ) && (
+								<Icon icon={ check } />
+							)
 						}
 						onSelect={ ( event ) => {
 							event.preventDefault();
-							field.getToggleVisibilityHandler()( event );
+							onChangeView( {
+								...view,
+								hiddenFields: view.hiddenFields?.includes(
+									field.id
+								)
+									? view.hiddenFields.filter(
+											( id ) => id !== field.id
+									  )
+									: [ ...view.hiddenFields, field.id ],
+							} );
 						} }
 						role="menuitemcheckbox"
 					>
-						{ field.columnDef.header }
+						{ field.header }
 					</DropdownMenuItemV2>
 				);
 			} ) }
@@ -144,40 +154,15 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
-export function FieldSortingItems( { field, dataView } ) {
-	const sortedDirection = field.getIsSorted();
-	return Object.entries( sortingItemsInfo ).map( ( [ direction, info ] ) => (
-		<DropdownMenuItemV2
-			key={ direction }
-			prefix={ <Icon icon={ info.icon } /> }
-			suffix={ sortedDirection === direction && <Icon icon={ check } /> }
-			onSelect={ ( event ) => {
-				event.preventDefault();
-				if ( sortedDirection === direction ) {
-					dataView.resetSorting();
-				} else {
-					dataView.setSorting( [
-						{
-							id: field.id,
-							desc: direction === 'desc',
-						},
-					] );
-				}
-			} }
-		>
-			{ info.label }
-		</DropdownMenuItemV2>
-	) );
-}
-function SortMenu( { dataView } ) {
-	const sortableFields = dataView
-		.getAllColumns()
-		.filter( ( columnn ) => columnn.getCanSort() );
+function SortMenu( { fields, view, onChangeView } ) {
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
 	if ( ! sortableFields?.length ) {
 		return null;
 	}
-	const currentSortedField = sortableFields.find( ( field ) =>
-		field.getIsSorted()
+	const currentSortedField = fields.find(
+		( field ) => field.id === view.sort?.field
 	);
 	return (
 		<DropdownSubMenuV2
@@ -185,7 +170,7 @@ function SortMenu( { dataView } ) {
 				<DropdownSubMenuTriggerV2
 					suffix={
 						<>
-							{ currentSortedField?.columnDef.header }
+							{ currentSortedField?.header }
 							<Icon icon={ chevronRightSmall } />
 						</>
 					}
@@ -195,6 +180,7 @@ function SortMenu( { dataView } ) {
 			}
 		>
 			{ sortableFields?.map( ( field ) => {
+				const sortedDirection = view.sort?.direction;
 				return (
 					<DropdownSubMenuV2
 						key={ field.id }
@@ -202,15 +188,49 @@ function SortMenu( { dataView } ) {
 							<DropdownSubMenuTriggerV2
 								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
-								{ field.columnDef.header }
+								{ field.header }
 							</DropdownSubMenuTriggerV2>
 						}
 						side="left"
 					>
-						<FieldSortingItems
-							field={ field }
-							dataView={ dataView }
-						/>
+						{ Object.entries( sortingItemsInfo ).map(
+							( [ direction, info ] ) => {
+								const isActive =
+									currentSortedField &&
+									sortedDirection === direction &&
+									field.id === currentSortedField.id;
+								return (
+									<DropdownMenuItemV2
+										key={ direction }
+										prefix={ <Icon icon={ info.icon } /> }
+										suffix={
+											isActive && <Icon icon={ check } />
+										}
+										onSelect={ ( event ) => {
+											event.preventDefault();
+											if (
+												sortedDirection === direction
+											) {
+												onChangeView( {
+													...view,
+													sort: undefined,
+												} );
+											} else {
+												onChangeView( {
+													...view,
+													sort: {
+														field: field.id,
+														direction,
+													},
+												} );
+											}
+										} }
+									>
+										{ info.label }
+									</DropdownMenuItemV2>
+								);
+							}
+						) }
 					</DropdownSubMenuV2>
 				);
 			} ) }
@@ -218,11 +238,10 @@ function SortMenu( { dataView } ) {
 	);
 }
 
-export default function ViewActions( { dataView, className } ) {
+export default function ViewActions( { fields, view, onChangeView } ) {
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
-			className={ className }
 			trigger={
 				<Button variant="tertiary" icon={ blockTable }>
 					{ __( 'View' ) }
@@ -231,9 +250,17 @@ export default function ViewActions( { dataView, className } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
-				<SortMenu dataView={ dataView } />
-				<FieldsVisibilityMenu dataView={ dataView } />
-				<PageSizeMenu dataView={ dataView } />
+				<SortMenu
+					fields={ fields }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+				<FieldsVisibilityMenu
+					fields={ fields }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+				<PageSizeMenu view={ view } onChangeView={ onChangeView } />
 			</DropdownMenuGroupV2>
 		</DropdownMenuV2>
 	);
