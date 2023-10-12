@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,15 +15,22 @@ import PluginPostExcerptPanel from '../';
 
 describe( 'PluginPostExcerptPanel', () => {
 	test( 'renders fill properly', () => {
-		const { container } = render(
+		render(
 			<SlotFillProvider>
 				<PluginPostExcerptPanel className="my-plugin-post-excerpt-custom-content">
 					Post Excerpt - Custom content
 				</PluginPostExcerptPanel>
-				<PluginPostExcerptPanel.Slot />
+				<div role="tabpanel">
+					<PluginPostExcerptPanel.Slot />
+				</div>
 			</SlotFillProvider>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'Post Excerpt - Custom content'
+		);
+		expect(
+			screen.getByText( 'Post Excerpt - Custom content' )
+		).toHaveClass( 'my-plugin-post-excerpt-custom-content' );
 	} );
 } );
