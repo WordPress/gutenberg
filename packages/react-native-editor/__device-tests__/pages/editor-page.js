@@ -67,8 +67,7 @@ class EditorPage {
 	}
 
 	async getAddBlockButton() {
-		const elements =
-			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+		const elements = await this.driver.$$( `~${ ADD_BLOCK_ID }` );
 		return elements[ 0 ];
 	}
 
