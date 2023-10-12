@@ -72,7 +72,6 @@ test.describe( 'Cover', () => {
 	} );
 
 	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {
-		page,
 		editor,
 		coverBlockUtils,
 	} ) => {
