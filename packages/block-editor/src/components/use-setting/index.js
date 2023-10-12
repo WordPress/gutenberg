@@ -6,6 +6,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -111,67 +112,63 @@ function mergeOrigins( value ) {
  * It looks up the settings first in the block instance hierarchy.
  * If none is found, it'll look it up in the block editor store.
  *
- * @param {string} path The path to the setting.
- * @return {any} Returns the value defined for the setting.
- * @example
- * ```js
- * const isEnabled = useSetting( 'typography.dropCap' );
- * ```
+ * @param {string[]} paths The path to the setting.
+ * @return {any[]} Returns the values defined for the settings.
  */
-export default function useSetting( path ) {
+export function useSettings( paths ) {
 	const { name: blockName, clientId = null } = useBlockEditContext();
+
+	paths = useMemo( () => paths, paths );
 
 	return useSelect(
 		( select ) => {
-			if ( blockedPaths.includes( path ) ) {
-				// eslint-disable-next-line no-console
-				console.warn(
-					'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'
-				);
-				return undefined;
-			}
-
-			// 0. Allow third parties to filter the block's settings at runtime.
-			let result = applyFilters(
-				'blockEditor.useSetting.before',
-				undefined,
-				path,
-				clientId,
-				blockName
-			);
-
-			if ( undefined !== result ) {
-				return result;
-			}
-
-			const normalizedPath = removeCustomPrefixes( path );
-
-			// 1. Take settings from the block instance or its ancestors.
-			// Start from the current block and work our way up the ancestors.
-			if ( clientId ) {
-				const candidates = [
-					clientId,
-					...select( blockEditorStore ).getBlockParents(
+			const candidates = clientId
+				? [
 						clientId,
-						/* ascending */ true
-					),
-				];
-
-				for ( const candidateClientId of candidates ) {
-					const candidateBlockName =
-						select( blockEditorStore ).getBlockName(
-							candidateClientId
-						);
-					if (
-						! hasBlockSupport(
+						...select( blockEditorStore ).getBlockParents(
+							clientId,
+							/* ascending */ true
+						),
+				  ].filter( ( candidateClientId ) => {
+						const candidateBlockName =
+							select( blockEditorStore ).getBlockName(
+								candidateClientId
+							);
+						return hasBlockSupport(
 							candidateBlockName,
 							'__experimentalSettings',
 							false
-						)
-					) {
-						continue;
-					}
+						);
+				  } )
+				: [];
 
+			return paths.map( ( path ) => {
+				if ( blockedPaths.includes( path ) ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'
+					);
+					return undefined;
+				}
+
+				// 0. Allow third parties to filter the block's settings at runtime.
+				let result = applyFilters(
+					'blockEditor.useSetting.before',
+					undefined,
+					path,
+					clientId,
+					blockName
+				);
+
+				if ( undefined !== result ) {
+					return result;
+				}
+
+				const normalizedPath = removeCustomPrefixes( path );
+
+				// 1. Take settings from the block instance or its ancestors.
+				// Start from the current block and work our way up the ancestors.
+				for ( const candidateClientId of candidates ) {
 					const candidateAtts =
 						select( blockEditorStore ).getBlockAttributes(
 							candidateClientId
@@ -190,45 +187,65 @@ export default function useSetting( path ) {
 						break;
 					}
 				}
-			}
 
-			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
-			const settings = select( blockEditorStore ).getSettings();
-			if ( result === undefined && blockName ) {
-				result = getValueFromObjectPath(
-					settings.__experimentalFeatures?.blocks?.[ blockName ],
-					normalizedPath
-				);
-			}
-
-			if ( result === undefined ) {
-				result = getValueFromObjectPath(
-					settings.__experimentalFeatures,
-					normalizedPath
-				);
-			}
-
-			// Return if the setting was found in either the block instance or the store.
-			if ( result !== undefined ) {
-				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
-					return mergeOrigins( result );
+				// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
+				const settings = select( blockEditorStore ).getSettings();
+				if ( result === undefined && blockName ) {
+					result = getValueFromObjectPath(
+						settings.__experimentalFeatures?.blocks?.[ blockName ],
+						normalizedPath
+					);
 				}
-				return result;
-			}
 
-			// 3. Otherwise, use deprecated settings.
-			const deprecatedSettingsValue =
-				deprecatedFlags[ normalizedPath ]?.( settings );
-			if ( deprecatedSettingsValue !== undefined ) {
-				return deprecatedSettingsValue;
-			}
+				if ( result === undefined ) {
+					result = getValueFromObjectPath(
+						settings.__experimentalFeatures,
+						normalizedPath
+					);
+				}
 
-			// 4. Fallback for typography.dropCap:
-			// This is only necessary to support typography.dropCap.
-			// when __experimentalFeatures are not present (core without plugin).
-			// To remove when __experimentalFeatures are ported to core.
-			return normalizedPath === 'typography.dropCap' ? true : undefined;
+				// Return if the setting was found in either the block instance or the store.
+				if ( result !== undefined ) {
+					if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
+						return mergeOrigins( result );
+					}
+					return result;
+				}
+
+				// 3. Otherwise, use deprecated settings.
+				const deprecatedSettingsValue =
+					deprecatedFlags[ normalizedPath ]?.( settings );
+				if ( deprecatedSettingsValue !== undefined ) {
+					return deprecatedSettingsValue;
+				}
+
+				// 4. Fallback for typography.dropCap:
+				// This is only necessary to support typography.dropCap.
+				// when __experimentalFeatures are not present (core without plugin).
+				// To remove when __experimentalFeatures are ported to core.
+				return normalizedPath === 'typography.dropCap'
+					? true
+					: undefined;
+			} );
 		},
-		[ blockName, clientId, path ]
+		[ blockName, clientId, paths ]
 	);
+}
+
+/**
+ * Hook that retrieves the given setting for the block instance in use.
+ *
+ * It looks up the settings first in the block instance hierarchy.
+ * If none is found, it'll look it up in the block editor store.
+ *
+ * @param {string} path The path to the setting.
+ * @return {any} Returns the value defined for the setting.
+ * @example
+ * ```js
+ * const isEnabled = useSetting( 'typography.dropCap' );
+ * ```
+ */
+export default function useSetting( path ) {
+	const [ value ] = useSettings( [ path ] );
+	return value;
 }

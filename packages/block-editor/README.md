@@ -962,6 +962,20 @@ _Returns_
 
 -   `any`: Returns the value defined for the setting.
 
+### useSettings
+
+Hook that retrieves the given setting for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+
+_Parameters_
+
+-   _paths_ `string[]`: The path to the setting.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
+
 ### Warning
 
 _Related_
