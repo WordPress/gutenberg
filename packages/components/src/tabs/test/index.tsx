@@ -26,6 +26,9 @@ type Tab = {
 		icon?: IconType;
 		disabled?: boolean;
 	};
+	tabpanel?: {
+		focusable?: boolean;
+	};
 };
 
 const TABS: Tab[] = [
@@ -83,7 +86,11 @@ const UncontrolledTabs = ( {
 				) ) }
 			</Tabs.TabList>
 			{ tabs.map( ( tabObj ) => (
-				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
+				<Tabs.TabPanel
+					key={ tabObj.id }
+					id={ tabObj.id }
+					focusable={ tabObj.tabpanel?.focusable }
+				>
 					{ tabObj.content }
 				</Tabs.TabPanel>
 			) ) }
@@ -182,6 +189,63 @@ describe( 'Tabs', () => {
 				'aria-labelledby',
 				allTabs[ 0 ].getAttribute( 'id' )
 			);
+		} );
+	} );
+	describe( 'Focus Behavior', () => {
+		it( 'should focus on the related TabPanel when pressing the Tab key', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledTabs tabs={ TABS } /> );
+
+			const selectedTabPanel = await screen.findByRole( 'tabpanel' );
+
+			// Tab should initially focus the first tab in the tablist, which
+			// is Alpha.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+
+			// By default the tabpanel should receive focus
+			await user.keyboard( '[Tab]' );
+			expect( selectedTabPanel ).toHaveFocus();
+		} );
+		it( 'should not focus on the related TabPanel when pressing the Tab key if `focusable: false` is set', async () => {
+			const user = userEvent.setup();
+
+			const TABS_WITH_ALPHA_FOCUSABLE_FALSE = TABS.map( ( tabObj ) =>
+				tabObj.id === 'alpha'
+					? {
+							...tabObj,
+							content: (
+								<>
+									Selected Tab: Alpha
+									<button>Alpha Button</button>
+								</>
+							),
+							tabpanel: { focusable: false },
+					  }
+					: tabObj
+			);
+
+			render(
+				<UncontrolledTabs tabs={ TABS_WITH_ALPHA_FOCUSABLE_FALSE } />
+			);
+
+			const alphaButton = await screen.findByRole( 'button', {
+				name: /alpha button/i,
+			} );
+
+			// Tab should initially focus the first tab in the tablist, which
+			// is Alpha.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+			// Because the alpha tabpanel is set to `focusable: false`, pressing
+			// the Tab key should focus the button, not the tabpanel
+			await user.keyboard( '[Tab]' );
+			expect( alphaButton ).toHaveFocus();
 		} );
 	} );
 
