@@ -13,6 +13,7 @@ import {
 	useContext,
 	useMemo,
 	cloneElement,
+	isValidElement,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -258,6 +259,16 @@ const UnconnectedDropdownMenu = (
 		.useState( 'placement' )
 		.split( '-' )[ 0 ];
 
+	if (
+		dropdownMenuStore.parent &&
+		! ( isValidElement( trigger ) && DropdownMenuItem === trigger.type )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
+		);
+	}
+
 	return (
 		<>
 			{ /* Menu trigger */ }
@@ -265,11 +276,9 @@ const UnconnectedDropdownMenu = (
 				ref={ ref }
 				store={ dropdownMenuStore }
 				render={
-					// Add arrow for submenus
 					dropdownMenuStore.parent
-						? // TODO: check that `trigger` renders a `DropdownMenuItem`?
-						  cloneElement( trigger, {
-								// TODO: add prefix
+						? cloneElement( trigger, {
+								// Add submenu arrow, unless a `suffix` is explicitly specified
 								suffix: trigger.props.suffix ?? (
 									<Styled.SubmenuChevronIcon
 										aria-hidden="true"
