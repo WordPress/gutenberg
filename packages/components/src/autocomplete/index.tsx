@@ -218,8 +218,27 @@ export function useAutocomplete( {
 			return;
 		}
 
-		const completer = completers?.find(
+		const lastTriggerPrefix = completers.reduce< string | null >(
+			( lastTrigger, { triggerPrefix } ) => {
+				const triggerIndex = textContent.lastIndexOf( triggerPrefix );
+				const lastTriggerIndex =
+					lastTrigger !== null
+						? textContent.lastIndexOf( lastTrigger )
+						: -1;
+
+				return triggerIndex > lastTriggerIndex
+					? triggerPrefix
+					: lastTrigger;
+			},
+			null
+		);
+
+		const completer = completers.find(
 			( { triggerPrefix, allowContext } ) => {
+				if ( triggerPrefix !== lastTriggerPrefix ) {
+					return false;
+				}
+
 				const index = textContent.lastIndexOf( triggerPrefix );
 
 				if ( index === -1 ) {
@@ -258,8 +277,7 @@ export function useAutocomplete( {
 				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
 				// if the user presses backspace here, it will show the completion popup again.
 				const matchingWhileBackspacing =
-					backspacing.current &&
-					textWithoutTrigger.split( /\s/ ).length <= 3;
+					backspacing.current && wordsFromTrigger.length <= 3;
 
 				if (
 					mismatch &&
