@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-  Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
+
 ## 9.13.0 (2023-10-05)
 
 ### Enhancements
