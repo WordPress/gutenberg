@@ -52,7 +52,7 @@ export default function PostExcerpt() {
 							{ fills }
 						</>
 					) }
-				</PluginPostExcerp.Slot>
+				</PluginPostExcerpt.Slot>
 			</PanelBody>
 		</PostExcerptCheck>
 	);
