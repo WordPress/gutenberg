@@ -569,7 +569,7 @@ const toggleOrientation = async ( driver ) => {
  */
 const toggleDarkMode = ( driver, darkMode = true ) => {
 	if ( isAndroid() ) {
-		return driver.execute( 'mobile: shell', [
+		return driver.executeScript( 'mobile: shell', [
 			{
 				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
 			},
