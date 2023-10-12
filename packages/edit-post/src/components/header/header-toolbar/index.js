@@ -136,6 +136,7 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
