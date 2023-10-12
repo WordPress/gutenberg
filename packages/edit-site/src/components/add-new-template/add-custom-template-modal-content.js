@@ -43,7 +43,6 @@ function SuggestionListItem( {
 		<CompositeItem
 			render={
 				<Button
-					type="button"
 					role="option"
 					className={ baseCssClass }
 					onClick={ () =>
