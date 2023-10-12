@@ -31,10 +31,11 @@ test.describe( 'Post publish button', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Test post'
-		);
+		await editor.canvas
+			.getByRole( 'textbox', {
+				name: 'Add title',
+			} )
+			.fill( 'Test post' );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		await expect(
@@ -51,10 +52,11 @@ test.describe( 'Post publish button', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Test post'
-		);
+		await editor.canvas
+			.getByRole( 'textbox', {
+				name: 'Add title',
+			} )
+			.fill( 'Test post' );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		await expect(
