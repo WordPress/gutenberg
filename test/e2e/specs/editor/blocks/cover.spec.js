@@ -81,16 +81,6 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		const deferred = defer();
-
-		await page.route(
-			new RegExp( encodeURIComponent( '/wp/v2/media' ) ),
-			async ( route ) => {
-				await deferred;
-				await route.continue();
-			}
-		);
-
 		await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
@@ -103,8 +93,6 @@ test.describe( 'Cover', () => {
 			'rgb(179, 179, 179)'
 		);
 		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
-
-		deferred.resolve();
 	} );
 
 	test( 'can have the title edited', async ( { editor } ) => {
@@ -268,13 +256,4 @@ class CoverBlockUtils {
 
 		return filename;
 	}
-}
-
-function defer() {
-	let resolve;
-	const deferred = new Promise( ( res ) => {
-		resolve = res;
-	} );
-	deferred.resolve = resolve;
-	return deferred;
 }
