@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { flexRender } from '@tanstack/react-table';
+import {
+	getCoreRowModel,
+	getFilteredRowModel,
+	getSortedRowModel,
+	getPaginationRowModel,
+	useReactTable,
+	flexRender,
+} from '@tanstack/react-table';
 
 /**
  * WordPress dependencies
@@ -15,13 +21,18 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
+	moreVertical,
 } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
+	VisuallyHidden,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +46,7 @@ const {
 	DropdownMenuSeparatorV2,
 } = unlock( componentsPrivateApis );
 
+const EMPTY_OBJECT = {};
 const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
@@ -113,7 +125,162 @@ function HeaderMenu( { dataView, header } ) {
 		</DropdownMenuV2>
 	);
 }
-function ListView( { dataView, className, isLoading = false }, ref ) {
+function ViewList( {
+	view,
+	onChangeView,
+	fields,
+	actions,
+	data,
+	isLoading = false,
+	paginationInfo,
+} ) {
+	const columns = useMemo( () => {
+		const _columns = [ ...fields ];
+		if ( actions?.length ) {
+			_columns.push( {
+				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+				id: 'actions',
+				cell: ( props ) => {
+					return (
+						<DropdownMenu
+							icon={ moreVertical }
+							label={ __( 'Actions' ) }
+						>
+							{ () => (
+								<MenuGroup>
+									{ actions.map( ( action ) => (
+										<MenuItem
+											key={ action.id }
+											onClick={ () =>
+												action.perform(
+													props.row.original
+												)
+											}
+											isDestructive={
+												action.isDesctructive
+											}
+										>
+											{ action.label }
+										</MenuItem>
+									) ) }
+								</MenuGroup>
+							) }
+						</DropdownMenu>
+					);
+				},
+				enableHiding: false,
+			} );
+		}
+
+		return _columns;
+	}, [ fields, actions ] );
+
+	const columnVisibility = useMemo( () => {
+		if ( ! view.hiddenFields?.length ) {
+			return;
+		}
+		return view.hiddenFields.reduce(
+			( accumulator, fieldId ) => ( {
+				...accumulator,
+				[ fieldId ]: false,
+			} ),
+			{}
+		);
+	}, [ view.hiddenFields ] );
+
+	const dataView = useReactTable( {
+		data,
+		columns,
+		manualSorting: true,
+		manualFiltering: true,
+		manualPagination: true,
+		enableRowSelection: true,
+		state: {
+			sorting: view.sort
+				? [
+						{
+							id: view.sort.field,
+							desc: view.sort.direction === 'desc',
+						},
+				  ]
+				: [],
+			globalFilter: view.search,
+			pagination: {
+				pageIndex: view.page,
+				pageSize: view.perPage,
+			},
+			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
+		},
+		onSortingChange: ( sortingUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const sort =
+					typeof sortingUpdater === 'function'
+						? sortingUpdater(
+								currentView.sort
+									? [
+											{
+												id: currentView.sort.field,
+												desc:
+													currentView.sort
+														.direction === 'desc',
+											},
+									  ]
+									: []
+						  )
+						: sortingUpdater;
+				if ( ! sort.length ) {
+					return {
+						...currentView,
+						sort: {},
+					};
+				}
+				const [ { id, desc } ] = sort;
+				return {
+					...currentView,
+					sort: { field: id, direction: desc ? 'desc' : 'asc' },
+				};
+			} );
+		},
+		onColumnVisibilityChange: ( columnVisibilityUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const hiddenFields = Object.entries(
+					columnVisibilityUpdater()
+				).reduce(
+					( accumulator, [ fieldId, value ] ) => {
+						if ( value ) {
+							return accumulator.filter(
+								( id ) => id !== fieldId
+							);
+						}
+						return [ ...accumulator, fieldId ];
+					},
+					[ ...( currentView.hiddenFields || [] ) ]
+				);
+				return {
+					...currentView,
+					hiddenFields,
+				};
+			} );
+		},
+		onGlobalFilterChange: ( value ) => {
+			onChangeView( { ...view, search: value, page: 0 } );
+		},
+		onPaginationChange: ( paginationUpdater ) => {
+			onChangeView( ( currentView ) => {
+				const { pageIndex, pageSize } = paginationUpdater( {
+					pageIndex: currentView.page,
+					pageSize: currentView.perPage,
+				} );
+				return { ...view, page: pageIndex, perPage: pageSize };
+			} );
+		},
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		pageCount: paginationInfo.totalPages,
+	} );
+
 	const { rows } = dataView.getRowModel();
 	const hasRows = !! rows?.length;
 	if ( isLoading ) {
@@ -123,10 +290,7 @@ function ListView( { dataView, className, isLoading = false }, ref ) {
 	return (
 		<div className="dataviews-list-view-wrapper">
 			{ hasRows && (
-				<table
-					ref={ ref }
-					className={ classnames( 'dataviews-list-view', className ) }
-				>
+				<table className="dataviews-list-view">
 					<thead>
 						{ dataView.getHeaderGroups().map( ( headerGroup ) => (
 							<tr key={ headerGroup.id }>
@@ -183,4 +347,4 @@ function ListView( { dataView, className, isLoading = false }, ref ) {
 	);
 }
 
-export default forwardRef( ListView );
+export default ViewList;

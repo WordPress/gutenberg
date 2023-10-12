@@ -167,9 +167,6 @@ export default function PagePages() {
 				isLoading={ isLoadingPages }
 				view={ view }
 				onChangeView={ setView }
-				options={ {
-					pageCount: totalPages,
-				} }
 			/>
 		</Page>
 	);

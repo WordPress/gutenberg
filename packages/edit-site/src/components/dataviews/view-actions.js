@@ -4,9 +4,7 @@
 import {
 	Button,
 	Icon,
-	SelectControl,
 	privateApis as componentsPrivateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import {
 	chevronRightSmall,
@@ -31,35 +29,60 @@ const {
 	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
-export const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+const availableViews = [
+	{
+		id: 'list',
+		label: __( 'List' ),
+	},
+	{
+		id: 'grid',
+		label: __( 'Grid' ),
+	},
+];
 
-export function PageSizeControl( { dataView } ) {
-	const label = __( 'Rows per page:' );
+function ViewTypeMenu( { view, onChangeView } ) {
+	const activeView = availableViews.find( ( v ) => view.type === v.id );
 	return (
-		<SelectControl
-			__nextHasNoMarginBottom
-			label={ label }
-			hideLabelFromVision
-			// TODO: This should probably use a label based on the wanted design
-			// and we could remove InputControlPrefixWrapper usage.
-			prefix={
-				<InputControlPrefixWrapper
-					as="span"
-					className="dataviews__per-page-control-prefix"
+		<DropdownSubMenuV2
+			trigger={
+				<DropdownSubMenuTriggerV2
+					suffix={
+						<>
+							{ activeView.label }
+							<Icon icon={ chevronRightSmall } />
+						</>
+					}
 				>
-					{ label }
-				</InputControlPrefixWrapper>
+					{ __( 'Layout' ) }
+				</DropdownSubMenuTriggerV2>
 			}
-			value={ dataView.getState().pagination.pageSize }
-			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
-				value: pageSize,
-				label: pageSize,
-			} ) ) }
-			onChange={ ( value ) => dataView.setPageSize( +value ) }
-		/>
+		>
+			{ availableViews.map( ( availableView ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ availableView.id }
+						prefix={
+							availableView.id === view.type && (
+								<Icon icon={ check } />
+							)
+						}
+						onSelect={ ( event ) => {
+							// We need to handle this on DropDown component probably..
+							event.preventDefault();
+							onChangeView( { ...view, type: availableView.id } );
+						} }
+						// TODO: check about role and a11y.
+						role="menuitemcheckbox"
+					>
+						{ availableView.label }
+					</DropdownMenuItemV2>
+				);
+			} ) }
+		</DropdownSubMenuV2>
 	);
 }
 
+const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2
@@ -250,6 +273,7 @@ export default function ViewActions( { fields, view, onChangeView } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
+				<ViewTypeMenu view={ view } onChangeView={ onChangeView } />
 				<SortMenu
 					fields={ fields }
 					view={ view }
