@@ -45,7 +45,7 @@ export default function PostExcerpt() {
 				opened={ isOpened }
 				onToggle={ toggleExcerptPanel }
 			>
-				<PluginPostExcerp.Slot>
+				<PluginPostExcerpt.Slot>
 					{ ( fills ) => (
 						<>
 							<PostExcerptForm />
