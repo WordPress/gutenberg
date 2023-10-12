@@ -576,9 +576,11 @@ const toggleDarkMode = ( driver, darkMode = true ) => {
 		] );
 	}
 
-	return driver.execute( 'mobile: setAppearance', {
-		style: darkMode ? 'dark' : 'light',
-	} );
+	return driver.executeScript( 'mobile: setAppearance', [
+		{
+			style: darkMode ? 'dark' : 'light',
+		},
+	] );
 };
 
 const isEditorVisible = async ( driver ) => {
