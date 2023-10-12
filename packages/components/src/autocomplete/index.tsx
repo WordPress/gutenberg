@@ -279,6 +279,7 @@ export function useAutocomplete( {
 			backspacing.current && wordsFromTrigger.length <= 3;
 
 		if ( mismatch && ! ( matchingWhileBackspacing || hasOneTriggerWord ) ) {
+			if ( autocompleter ) reset();
 			return;
 		}
 
@@ -293,6 +294,7 @@ export function useAutocomplete( {
 				textAfterSelection
 			)
 		) {
+			if ( autocompleter ) reset();
 			return;
 		}
 
@@ -300,10 +302,12 @@ export function useAutocomplete( {
 			/^\s/.test( textWithoutTrigger ) ||
 			/\s\s+$/.test( textWithoutTrigger )
 		) {
+			if ( autocompleter ) reset();
 			return;
 		}
 
 		if ( ! /[\u0000-\uFFFF]*$/.test( textWithoutTrigger ) ) {
+			if ( autocompleter ) reset();
 			return;
 		}
 
