@@ -14,7 +14,6 @@ import {
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -159,96 +158,18 @@ export function receiveBlocks( blocks ) {
  * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export const updateBlockAttributes =
-	( clientIds, attributes, uniqueByBlock = false ) =>
-	( { select, dispatch, registry } ) => {
-		if ( ! window.__experimentalPatterns ) {
-			dispatch( {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientIds: castArray( clientIds ),
-				attributes,
-				uniqueByBlock,
-			} );
-			return;
-		}
-
-		const updates = {};
-		for ( const clientId of castArray( clientIds ) ) {
-			const attrs = uniqueByBlock ? attributes[ clientId ] : attributes;
-			const parentBlocks = select.getBlocksByClientId(
-				select.getBlockParents( clientId )
-			);
-			const parentPattern = parentBlocks.findLast(
-				( parentBlock ) => parentBlock.name === 'core/block'
-			);
-			const block = select.getBlock( clientId );
-			if (
-				! parentPattern ||
-				! registry
-					.select( blocksStore )
-					.hasBlockSupport( block.name, '__experimentalPattern' )
-			) {
-				updates[ clientId ] = attrs;
-				continue;
-			}
-
-			const contentAttributes = registry
-				.select( blocksStore )
-				.getBlockSupport( block.name, '__experimentalPattern' );
-			const dynamicContent = {};
-			const updatedAttributes = {};
-			for ( const attributeKey of Object.keys( attrs ) ) {
-				if ( Object.hasOwn( contentAttributes, attributeKey ) ) {
-					dynamicContent[ attributeKey ] = attrs[ attributeKey ];
-				} else {
-					updatedAttributes[ attributeKey ] = attrs[ attributeKey ];
-				}
-			}
-			if ( Object.keys( dynamicContent ).length > 0 ) {
-				let id = block.attributes.metadata?.id;
-				if ( ! id ) {
-					// The id just has to be unique within the pattern context, so we
-					// use the block's clientId as a convenient unique identifier.
-					id = block.clientId;
-					updatedAttributes.metadata = {
-						...block.attributes.metadata,
-						id,
-					};
-				}
-
-				updates[ parentPattern.clientId ] = {
-					dynamicContent: {
-						...parentPattern.attributes.dynamicContent,
-						[ id ]: dynamicContent,
-					},
-				};
-			}
-			if ( Object.keys( updatedAttributes ).length > 0 ) {
-				updates[ clientId ] = updatedAttributes;
-			}
-		}
-
-		if (
-			Object.values( updates ).every(
-				( updatedAttributes, _index, arr ) =>
-					updatedAttributes === arr[ 0 ]
-			)
-		) {
-			dispatch( {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientIds: Object.keys( updates ),
-				attributes: Object.values( updates )[ 0 ],
-				uniqueByBlock: false,
-			} );
-		} else {
-			dispatch( {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientIds: Object.keys( updates ),
-				attributes: updates,
-				uniqueByBlock: true,
-			} );
-		}
+export function updateBlockAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
+	return {
+		type: 'UPDATE_BLOCK_ATTRIBUTES',
+		clientIds: castArray( clientIds ),
+		attributes,
+		uniqueByBlock,
 	};
+}
 
 /**
  * Action that updates the block with the specified client ID.
