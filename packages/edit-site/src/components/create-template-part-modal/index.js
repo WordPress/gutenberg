@@ -39,21 +39,21 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	area: areaProp = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	area: defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
-	buttonLabel = __( 'Create' ),
+	confirmLabel = __( 'Create' ),
 	closeModal,
 	modalTitle = __( 'Create template part' ),
 	onCreate,
 	onError,
-	title: titleProp = '',
+	title: defaultTitle = '',
 } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const existingTemplateParts = useExistingTemplateParts();
 
-	const [ title, setTitle ] = useState( titleProp );
-	const [ area, setArea ] = useState( areaProp );
+	const [ title, setTitle ] = useState( defaultTitle );
+	const [ area, setArea ] = useState( defaultArea );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 
@@ -185,7 +185,7 @@ export default function CreateTemplatePartModal( {
 							aria-disabled={ ! title || isSubmitting }
 							isBusy={ isSubmitting }
 						>
-							{ buttonLabel }
+							{ confirmLabel }
 						</Button>
 					</HStack>
 				</VStack>

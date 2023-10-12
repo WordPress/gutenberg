@@ -119,7 +119,7 @@ export default function DuplicateMenuItem( {
 			</MenuItem>
 			{ isModalOpen && ! isTemplatePart && (
 				<CreatePatternModal
-					buttonLabel={ __( 'Duplicate' ) }
+					confirmLabel={ __( 'Duplicate' ) }
 					modalTitle={ __( 'Duplicate pattern' ) }
 					onClose={ closeModal }
 					onError={ closeModal }
@@ -129,7 +129,7 @@ export default function DuplicateMenuItem( {
 			) }
 			{ isModalOpen && isTemplatePart && (
 				<CreateTemplatePartModal
-					buttonLabel={ __( 'Duplicate' ) }
+					confirmLabel={ __( 'Duplicate' ) }
 					closeModal={ closeModal }
 					modalTitle={ __( 'Duplicate template part' ) }
 					onCreate={ onTemplatePartSuccess }

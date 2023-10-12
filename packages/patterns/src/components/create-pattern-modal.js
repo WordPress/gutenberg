@@ -28,20 +28,20 @@ import CategorySelector, { CATEGORY_SLUG } from './category-selector';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
-	buttonLabel = __( 'Create' ),
-	categories: categoriesProp = [],
+	confirmLabel = __( 'Create' ),
+	categories: defaultCategories = [],
 	className = 'patterns-menu-items__convert-modal',
 	content,
 	modalTitle = __( 'Create pattern' ),
 	onClose,
 	onError,
 	onSuccess,
-	syncType: syncTypeProp = PATTERN_SYNC_TYPES.full,
-	title: titleProp = '',
+	syncType: defaultSyncType = PATTERN_SYNC_TYPES.full,
+	title: defaultTitle = '',
 } ) {
-	const [ syncType, setSyncType ] = useState( syncTypeProp );
-	const [ categoryTerms, setCategoryTerms ] = useState( categoriesProp );
-	const [ title, setTitle ] = useState( titleProp );
+	const [ syncType, setSyncType ] = useState( defaultSyncType );
+	const [ categoryTerms, setCategoryTerms ] = useState( defaultCategories );
+	const [ title, setTitle ] = useState( defaultTitle );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
@@ -209,7 +209,7 @@ export default function CreatePatternModal( {
 							aria-disabled={ ! title || isSaving }
 							isBusy={ isSaving }
 						>
-							{ buttonLabel }
+							{ confirmLabel }
 						</Button>
 					</HStack>
 				</VStack>
