@@ -37,9 +37,17 @@ function renderFilter( { field, view, onChangeView } ) {
 			}
 		>
 			{ [
-				{ id: undefined, name: __( 'All' ) }, // Should providing the nullable state be the field responsibility?
+				// Should providing the nullable state be the field responsibility?
+				{ id: undefined, name: __( 'All' ) },
 				...field.setList,
 			].map( ( element ) => {
+				if (
+					! element.hasOwnProperty( 'id' ) ||
+					! element.hasOwnProperty( 'name' )
+				) {
+					return null;
+				}
+
 				return (
 					<DropdownMenuItemV2
 						key={ element.name } // TODO: formalize elements – they should have name.
