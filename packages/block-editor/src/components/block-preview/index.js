@@ -125,7 +125,11 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			styles: undefined,
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const disabledRef = useDisabled();
