@@ -14,8 +14,6 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import TextFilter from './text-filter';
 import { ViewGrid } from './view-grid';
-import AddFilter from './add-filter';
-import FieldFilters from './field-filters';
 
 export default function DataViews( {
 	view,
@@ -32,16 +30,6 @@ export default function DataViews( {
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
 					<TextFilter view={ view } onChangeView={ onChangeView } />
-					<AddFilter
-						fields={ fields }
-						filters={ view.filters }
-						onChangeView={ onChangeView }
-					/>
-					<FieldFilters
-						view={ view }
-						fields={ fields }
-						onChangeView={ onChangeView }
-					/>
 					<ViewActions
 						fields={ fields }
 						view={ view }
