@@ -150,6 +150,11 @@ export default function FiltersPanel( {
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
 
+	const disableCustomColors = ! settings?.color?.custom;
+	const disableCustomDuotone =
+		! settings?.color?.customDuotone ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -207,9 +212,12 @@ export default function FiltersPanel( {
 									<DuotonePicker
 										colorPalette={ colorPalette }
 										duotonePalette={ duotonePalette }
-										// TODO: Re-enable both when custom colors are supported for block-level styles.
-										disableCustomColors
-										disableCustomDuotone
+										disableCustomColors={
+											disableCustomColors
+										}
+										disableCustomDuotone={
+											disableCustomDuotone
+										}
 										value={ duotone }
 										onChange={ setDuotone }
 									/>
