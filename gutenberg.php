@@ -48,7 +48,7 @@ if ( defined( 'ABSPATH' ) ) {
  * Retiurns the text for the "WordPress version is too old" notices.
  *
  * @since 16.9.0
-*
+ *
  * @return string Text for the notices, escaped.
  */
 function gutenberg_wordpress_version_too_old_text() {
