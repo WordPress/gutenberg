@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { insert, isCollapsed } from '@wordpress/rich-text';
+import { insert, isCollapsed, remove } from '@wordpress/rich-text';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -22,6 +22,42 @@ export default ( props ) => ( element ) => {
 	function onInput( event ) {
 		const { inputType, data } = event;
 		const { value, onChange, registry } = props.current;
+
+		const replaceNamedCharacterReference = () => {
+			const text = value.text;
+			if ( ';' === data ) {
+				const ampAt = text.lastIndexOf( '&', value.start );
+				if ( -1 === ampAt || ampAt >= value.start ) {
+					return false;
+				}
+
+				const reference = text.slice( ampAt, value.start ) + ';';
+				if ( ! /^&[a-zA-Z0-9]+;$/.test( reference ) ) {
+					return false;
+				}
+
+				const d = document.createElement( 'div' );
+				d.innerHTML = reference;
+				const replacement = d.innerText;
+
+				if ( replacement === reference ) {
+					return false;
+				}
+
+				let newValue = remove( value, ampAt, value.start );
+				newValue = insert( newValue, replacement, ampAt, ampAt );
+
+				__unstableMarkLastChangeAsPersistent();
+				onChange( newValue );
+				__unstableMarkAutomaticChange();
+
+				return true;
+			}
+		};
+
+		if ( true === replaceNamedCharacterReference() ) {
+			return;
+		}
 
 		// Only run the rules when inserting text.
 		if ( inputType !== 'insertText' ) {
