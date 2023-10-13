@@ -61,6 +61,6 @@ lock( privateApis, {
 	DropdownSubMenuV2,
 	DropdownSubMenuTriggerV2,
 	ProgressBar,
-	Theme,
 	Tabs,
+	Theme,
 } );
