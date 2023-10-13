@@ -61,10 +61,10 @@ class WP_Block_Parser {
 	 * @return array[]
 	 */
 	public function parse( $document ) {
-		$this->document    = $document;
-		$this->offset      = 0;
-		$this->output      = array();
-		$this->stack       = array();
+		$this->document = $document;
+		$this->offset   = 0;
+		$this->output   = array();
+		$this->stack    = array();
 
 		while ( $this->proceed() ) {
 			continue;
