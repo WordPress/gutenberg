@@ -21,6 +21,8 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
+	moreVertical,
+	search,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -41,6 +43,8 @@ const {
 	DropdownMenuGroupV2,
 	DropdownMenuItemV2,
 	DropdownMenuSeparatorV2,
+	DropdownSubMenuV2,
+	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -59,7 +63,11 @@ function HeaderMenu( { dataView, header } ) {
 	);
 	const isSortable = !! header.column.getCanSort();
 	const isHidable = !! header.column.getCanHide();
-	if ( ! isSortable && ! isHidable ) {
+	const isFilterable = !! header.column.getCanFilter();
+	const isFilterableBySetList =
+		header.column.columnDef.type === 'set' &&
+		header.column.columnDef.setList;
+	if ( ! isSortable && ! isHidable && ! isFilterable ) {
 		return text;
 	}
 	const sortedDirection = header.column.getIsSorted();

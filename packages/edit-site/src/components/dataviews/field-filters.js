@@ -85,7 +85,7 @@ export default function FieldFilters( { view, fields, onChangeView } ) {
 	return Object.keys( view.filters ).map( ( key ) => {
 		const fieldWithFilter = fields.find(
 			( field ) =>
-				field.enableFiltering &&
+				field.enableColumnFilter &&
 				field.type && // We could consider lift off this restriction and having a fallback filter (search text, for example).
 				field.id === key
 		);

@@ -18,7 +18,7 @@ const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 export default function AddFilter( { fields, filters, onChangeView } ) {
 	const filterableFields = fields.filter(
-		( field ) => field.enableFiltering
+		( field ) => field.enableColumnFilter
 	);
 	if ( ! filterableFields.length ) {
 		return null;
