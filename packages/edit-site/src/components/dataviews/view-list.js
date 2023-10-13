@@ -66,7 +66,8 @@ function HeaderMenu( { dataView, header } ) {
 	const isFilterable = !! header.column.getCanFilter();
 	const isFilterableBySetList =
 		header.column.columnDef.type === 'set' &&
-		header.column.columnDef.setList;
+		header.column.columnDef.setList &&
+		header.column.columnDef.setList.length > 0;
 	if ( ! isSortable && ! isHidable && ! isFilterable ) {
 		return text;
 	}
