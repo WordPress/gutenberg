@@ -35,9 +35,13 @@ export default function DataViews( {
 					<AddFilter
 						fields={ fields }
 						filters={ view.filters }
-						onChangeFilters={ onChangeView }
+						onChangeView={ onChangeView }
 					/>
-					<FieldFilters view={ view } fields={ fields } />
+					<FieldFilters
+						view={ view }
+						fields={ fields }
+						onChangeView={ onChangeView }
+					/>
 					<ViewActions
 						fields={ fields }
 						view={ view }

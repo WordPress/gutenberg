@@ -16,8 +16,10 @@ import { unlock } from '../../lock-unlock';
 
 const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, filters, onChangeFilters } ) {
-	const filterableFields = fields.filter( ( field ) => field.renderFilter );
+export default function AddFilter( { fields, filters, onChangeView } ) {
+	const filterableFields = fields.filter(
+		( field ) => field.enableFiltering
+	);
 	if ( ! filterableFields.length ) {
 		return null;
 	}
@@ -43,7 +45,7 @@ export default function AddFilter( { fields, filters, onChangeFilters } ) {
 						role="menuitemcheckbox"
 						onSelect={ ( event ) => {
 							event.preventDefault();
-							onChangeFilters( ( currentView ) => {
+							onChangeView( ( currentView ) => {
 								if ( filters.hasOwnProperty( field.id ) ) {
 									delete currentView.filters[ field.id ];
 									return { ...currentView };

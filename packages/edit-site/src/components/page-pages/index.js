@@ -2,13 +2,9 @@
  * WordPress dependencies
  */
 import {
-	privateApis as componentsPrivateApis,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
-	Button,
-	Icon,
 } from '@wordpress/components';
-import { chevronDown, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -23,9 +19,6 @@ import Link from '../routes/link';
 import { DataViews } from '../dataviews';
 import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
-import { unlock } from '../../lock-unlock';
-
-const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
@@ -155,54 +148,9 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				renderFilter: () => {
-					if ( ! authors ) {
-						return null;
-					}
-
-					return (
-						<DropdownMenuV2
-							key={ 'filter-author' }
-							trigger={
-								<Button variant="tertiary">
-									{ __( 'Author' ) }
-									<Icon icon={ chevronDown } />
-								</Button>
-							}
-						>
-							{ [
-								{ id: undefined, name: __( 'All' ) },
-								...authors,
-							].map( ( author ) => {
-								return (
-									<DropdownMenuItemV2
-										key={ author.name }
-										prefix={
-											view.filters?.author ===
-												author.id && (
-												<Icon icon={ check } />
-											)
-										}
-										role="menuitemcheckbox"
-										onSelect={ () => {
-											setView( ( currentView ) => {
-												return {
-													...currentView,
-													filters: {
-														...currentView.filters,
-														author: author.id,
-													},
-												};
-											} );
-										} }
-									>
-										{ author.name }
-									</DropdownMenuItemV2>
-								);
-							} ) }
-						</DropdownMenuV2>
-					);
-				},
+				type: 'set',
+				setList: authors,
+				enableFiltering: true,
 			},
 			{
 				header: __( 'Status' ),
@@ -225,7 +173,7 @@ export default function PagePages() {
 				enableSorting: false,
 			},
 		],
-		[ postStatuses, authors, view ]
+		[ postStatuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
