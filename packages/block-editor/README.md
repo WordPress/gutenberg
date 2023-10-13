@@ -946,7 +946,7 @@ _Parameters_
 
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -964,13 +964,13 @@ _Returns_
 
 ### useSettings
 
-Hook that retrieves the given setting for the block instance in use.
+Hook that retrieves the given settings for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
 
 _Parameters_
 
--   _paths_ `string[]`: The path to the setting.
+-   _paths_ `string[]`: The paths to the settings.
 
 _Returns_
 

@@ -107,12 +107,12 @@ function mergeOrigins( value ) {
 }
 
 /**
- * Hook that retrieves the given setting for the block instance in use.
+ * Hook that retrieves the given settings for the block instance in use.
  *
  * It looks up the settings first in the block instance hierarchy.
- * If none is found, it'll look it up in the block editor store.
+ * If none are found, it'll look them up in the block editor settings.
  *
- * @param {string[]} paths The path to the setting.
+ * @param {string[]} paths The paths to the settings.
  * @return {any[]} Returns the values defined for the settings.
  */
 export function useSettings( paths ) {
@@ -235,8 +235,8 @@ export function useSettings( paths ) {
 /**
  * Hook that retrieves the given setting for the block instance in use.
  *
- * It looks up the settings first in the block instance hierarchy.
- * If none is found, it'll look it up in the block editor store.
+ * It looks up the setting first in the block instance hierarchy.
+ * If none is found, it'll look it up in the block editor settings.
  *
  * @param {string} path The path to the setting.
  * @return {any} Returns the value defined for the setting.
