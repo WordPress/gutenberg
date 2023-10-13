@@ -14,24 +14,7 @@
  * @return void
  */
 function gutenberg_register_media_pattern_categories() {
-	// Update the default gallery category to better differentiate it with Images.
-	unregister_block_pattern_category( 'gallery' );
-	register_block_pattern_category(
-		'gallery',
-		array(
-			'label'       => _x( 'Gallery', 'Block pattern category' ),
-			'description' => __( 'Different layouts containing a collection of images.' ),
-		)
-	);
-
 	// Register new categories.
-	register_block_pattern_category(
-		'images',
-		array(
-			'label'       => _x( 'Images', 'Block pattern category' ),
-			'description' => __( 'Different layouts containing images.' ),
-		)
-	);
 	register_block_pattern_category(
 		'videos',
 		array(
