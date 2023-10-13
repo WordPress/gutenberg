@@ -3,6 +3,7 @@
  */
 import { closeSmall } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 function ActiveFilter( { filterName, filterValue, filterId, onChangeView } ) {
 	// TODO
@@ -35,7 +36,16 @@ export default function FieldsFilters( { fields, view, onChangeView } ) {
 	}
 
 	return Object.keys( view.filters ).map( ( id ) => {
-		const field = fields.find( ( element ) => element.id === id );
+		// TODO: can two fields declare a filter for the same REST API param?
+		// This is only looking for the first match.
+		const field = fields.find(
+			( element ) =>
+				element?.filters?.in === id || element?.filters?.notIn === id
+		);
+		if ( ! field ) {
+			return null;
+		}
+
 		const value = field.setList.find(
 			( element ) => element.id === view.filters[ id ]
 		);
@@ -43,10 +53,14 @@ export default function FieldsFilters( { fields, view, onChangeView } ) {
 			return null;
 		}
 
+		const isFilterNotIn = field.filters?.notIn === id;
 		return (
 			<ActiveFilter
 				key={ id }
-				filterName={ field?.header ?? field?.id }
+				filterName={
+					( field?.header ?? field?.id ) +
+					( isFilterNotIn ? ' ' + __( 'not' ) : '' )
+				}
 				filterValue={ value?.name ?? value.id }
 				filterId={ id }
 				onChangeView={ onChangeView }
