@@ -50,7 +50,7 @@ import {
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import { unlock } from '../../lock-unlock';
-import RenameMenuItem from '../template-actions/rename-menu-item';
+import RenameMenuItem from '../pattern-actions/rename-menu-item';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 

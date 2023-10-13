@@ -18,7 +18,7 @@ import Page from '../page';
 import Table from '../table';
 import Link from '../routes/link';
 import AddedBy from '../list/added-by';
-import TemplateActions from '../template-actions';
+import PatternActions from '../pattern-actions';
 import AddNewTemplatePart from './add-new-template-part';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -78,7 +78,7 @@ export default function PageTemplateParts() {
 		{
 			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 			cell: ( templatePart ) => (
-				<TemplateActions
+				<PatternActions
 					postType={ templatePart.type }
 					postId={ templatePart.id }
 				/>

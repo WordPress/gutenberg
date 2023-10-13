@@ -30,7 +30,7 @@ import {
 	PATTERN_TYPES,
 } from '../../utils/constants';
 
-export default function TemplateActions( {
+export default function PatternActions( {
 	postType,
 	postId,
 	className,

@@ -16,7 +16,7 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import TemplateActions from '../template-actions';
+import PatternActions from '../pattern-actions';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function SidebarNavigationScreenPattern() {
@@ -43,7 +43,7 @@ export default function SidebarNavigationScreenPattern() {
 		<SidebarNavigationScreen
 			actions={
 				<>
-					<TemplateActions
+					<PatternActions
 						postType={ postType }
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }

@@ -19,7 +19,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
-import TemplateActions from '../template-actions';
+import PatternActions from '../pattern-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
@@ -117,7 +117,7 @@ export default function SidebarNavigationScreenTemplate() {
 			title={ title }
 			actions={
 				<>
-					<TemplateActions
+					<PatternActions
 						postType={ postType }
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
