@@ -1296,6 +1296,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
+		// Ensure PHPUnit 10 compatibility.
 		set_error_handler(
 			static function ( $errno, $errstr ) {
 				restore_error_handler();
