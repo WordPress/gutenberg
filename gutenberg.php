@@ -21,18 +21,21 @@ if ( ! defined( 'GUTENBERG_MIN_WP_VERSION' ) ) {
 	define( 'GUTENBERG_MIN_WP_VERSION', '6.2' );
 }
 
-// Next unsupporetd version.
-if ( ! defined( 'GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION' ) ) {
-	// The next major WordPress version that is not supported yet.
-	// Generally that would be the current WP trunk + 1. This will allow running of
-	// the currently released Gutenberg while the next WP version is under development,
-	// but not after it has been released.
-	// For example if the next unsupported version is 6.0, Gutenberg will still run
-	// in 6.0-alpha-12345, 6.0-beta1, etc. but not in 6.0, 6.0.1, 6.0.1-alpha, etc.
-	// Also note that `version_compare()` considers 1 < 1.0 < 1.0.0 (before suffixes)
-	// so 6.0 < 6.0.0-alpha and 6.0-beta < 6.0.0-alpha are both true. For that reason
-	// the constant should be set to major (two digits) WordPress version.
-	define( 'GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION', '6.5' );
+// Max supported version.
+if ( ! defined( 'GUTENBERG_MAX_WP_VERSION' ) ) {
+	/*
+	 * The maximum WordPress version that is supported.
+	 * Generally that would be the current WordPress development version from core trunk,
+	 * see: https://core.trac.wordpress.org/browser/trunk/src/wp-includes/version.php.
+	 * This constant should be set to a major (two digits) version. For example,
+	 * whether the current WP development version is 6.4-alpha-12345-src or 6.4-beta4-67890-src,
+	 * the constant would be 6.4.
+	 * The expectation is that bug fixes and new features from this Gutenberg release will be
+	 * added to the curent WordPress release. If that is not the case, or if the WP version
+	 * from trunk is already RC, the constant should be set to the next major WP version.
+	 * Following the above example that would be 6.5.
+	 */
+	define( 'GUTENBERG_MAX_WP_VERSION', '6.4' );
 }
 
 if ( defined( 'ABSPATH' ) ) {
@@ -42,117 +45,124 @@ if ( defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Retiurns the text for the "WordPress version is too old" notices.
+ *
+ * @since 16.9.0
+*
+ * @return string Text for the notices, escaped.
+ */
+function gutenberg_wordpress_version_too_old_text() {
+	if ( current_user_can( 'update_plugins' ) ) {
+		$text = sprintf(
+			/* translators: %s: Minimum required version */
+			__( 'Gutenberg requires WordPress %s or later to function properly and was not loaded. Please upgrade WordPress.', 'gutenberg' ),
+			GUTENBERG_MIN_WP_VERSION
+		);
+	} else {
+		$text = sprintf(
+			/* translators: %s: Minimum required version */
+			__( 'Gutenberg requires WordPress %s or later to function properly and was not loaded. Please ask an administrator to upgrade WordPress.', 'gutenberg' ),
+			GUTENBERG_MIN_WP_VERSION
+		);
+	}
+
+	return esc_html( $text );
+}
+
+/**
+ * Retiurns the text for the "Gutenberg version is too old" notices.
+ *
+ * @since 16.9.0
+ *
+ * @return string Text for the notices, escaped.
+ */
+function gutenberg_version_too_old_text() {
+	if ( current_user_can( 'update_plugins' ) ) {
+		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please turn the auto-update on or update it manually.', 'gutenberg' );
+	} else {
+		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please ask an administrator to update it.', 'gutenberg' );
+	}
+
+	return esc_html( $text );
+}
+
+/**
  * Display a "WordPress version is too old" notice.
  *
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_too_old_notice() {
 	echo '<div class="error"><p>';
-
-	if ( current_user_can( 'update_plugins' ) ) {
-		printf(
-			/* translators: %s: Minimum required version */
-			__( 'The Gutenberg plugin cannot be used. It requires WordPress %s or later to function properly. Please upgrade WordPress.', 'gutenberg' ),
-			esc_html( GUTENBERG_MIN_WP_VERSION )
-		);
-	} else {
-		printf(
-			/* translators: %s: Minimum required version */
-			__( 'The Gutenberg plugin cannot be used. It requires WordPress %s or later to function properly. Please ask an administrator to upgrade WordPress.', 'gutenberg' ),
-			esc_html( GUTENBERG_MIN_WP_VERSION )
-		);
-	}
-
+	echo gutenberg_wordpress_version_too_old_text();
 	echo '</p></div>';
 }
 
 /**
  * Display a "Gutenberg version is too old" notice.
  *
- * @since 11.7.0
+ * @since 16.9.0
  */
 function gutenberg_version_too_old_notice() {
 	echo '<div class="error"><p>';
-
-	if ( current_user_can( 'update_plugins' ) ) {
-		printf(
-			/* translators: %s: URL to the Plugins screen */
-			__( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please <a href="%s">turn auto-updates on</a> or update it manually.', 'gutenberg' ),
-			admin_url( 'plugins.php' )
-		);
-	} else {
-		_e( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please ask an administrator to update it.', 'gutenberg' );
-	}
-
+	echo gutenberg_version_too_old_text();
 	echo '</p></div>';
 }
 
 /**
  * Add a "WordPress version is too old" plugins list table notice.
  *
- * @since 11.7.0
+ * @since 16.9.0
  *
- * @param string[] $links Array of plugin action links.
- * @param string   $file  Path to the plugin file relative to the plugins directory.
- * @return string[] Updated array of plugin action links.
+ * @param string[] $plugin_meta Array of plugin row meta data.
+ * @param string   $file        Path to the plugin file relative to the plugins directory.
+ * @return string[] Updated array of plugin row meta data.
  */
-function gutenberg_wordpress_version_too_old_action_links_notice( $links, $file ) {
+function gutenberg_wordpress_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 	$plugin_basename = basename( __DIR__ ) . '/gutenberg.php';
 
-	if ( $file === $plugin_basename && current_user_can( 'manage_options' ) ) {
+	if ( $file === $plugin_basename ) {
 		// Prevent PHP warnings when a plugin uses this filter incorrectly.
-		$links = (array) $links;
+		$plugin_meta = (array) $plugin_meta;
+		$text        = gutenberg_wordpress_version_too_old_text();
 
-		// Can only be a very short notice.
-		$text = __( 'WordPress is too old. Gutenberg cannot be used.', 'gutenberg' );
-
-		// The 'button-link-delete' class name makes the text red.
-		$links['wp-gutenberg-plugin-notice button-link-delete'] = esc_html( $text );
+		$plugin_meta['gutenberg-plugin-notice'] = '<p style="color:red;margin:0.7em 0;">' . $text . '</p>';
 	}
 
-	return $links;
+	return $plugin_meta;
 }
 
 /**
  * Add a "Gutenberg version is too old" plugins list table notice.
  *
- * @since 11.7.0
+ * @since 16.9.0
  *
- * @param string[] $links Array of plugin action links.
- * @param string   $file  Path to the plugin file relative to the plugins directory.
- * @return string[] Updated array of plugin action links.
+ * @param string[] $plugin_meta Array of plugin row meta data.
+ * @param string   $file        Path to the plugin file relative to the plugins directory.
+ * @return string[] Updated array of plugin row meta data.
  */
-function gutenberg_version_too_old_action_links_notice( $links, $file ) {
+function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 	$plugin_basename = basename( __DIR__ ) . '/gutenberg.php';
 
-	if ( $file === $plugin_basename && current_user_can( 'manage_options' ) ) {
+	if ( $file === $plugin_basename ) {
 		// Prevent PHP warnings when a plugin uses this filter incorrectly.
-		$links = (array) $links;
+		$plugin_meta = (array) $plugin_meta;
+		$text        = gutenberg_version_too_old_text();
 
-		// Can only be a very short notice.
-		$text = __( 'Gutenberg is too old and cannot be used.', 'gutenberg' );
-
-		// The 'button-link-delete' class name makes the text red.
-		$links['wp-gutenberg-plugin-notice button-link-delete'] = esc_html( $text );
+		$plugin_meta['gutenberg-plugin-notice'] = '<p style="color:red;margin:0.7em 0;">' . $text . '</p>';
 	}
 
-	return $links;
+	return $plugin_meta;
 }
 
 /**
  * Add a "Gutenberg version is getting old. Please update!" notice on the Dashboard.
+ * This will be shown only when running WordPress fevelopment versions.
  *
- * @since 11.7.0
+ * @since 16.9.0
  */
 function gutenberg_needs_update_notice() {
 	echo '<div class="notice notice-warning is-dismissible"><p>';
-
-	printf(
-		/* translators: %s: Too new, unsupported WordPress version */
-		__( 'Your version of Gutenberg is getting too old. It will stop working after you upgrade WordPress to %s. Please turn auto-updates on for the Gutenberg plugin or update it manually.', 'gutenberg' ),
-		esc_html( GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION )
-	);
-
+	_e( 'Your version of Gutenberg is getting old. It will stop working after you upgrade WordPress to the next major version. Please update the Gutenberg plugin.', 'gutenberg' );
 	echo '</p></div>';
 }
 
@@ -176,34 +186,43 @@ function gutenberg_pre_init() {
 	// Get unmodified $wp_version.
 	include ABSPATH . WPINC . '/version.php';
 
-	// Strip '-src' from the version string. Messes up version_compare().
+	// Strip '-src' from the WP version string. May interfere with `version_compare()`.
 	$wp_version = str_replace( '-src', '', $wp_version );
 
+	/*
+	 * Note that `version_compare()` considers 1 < 1.0 < 1.0.0 (before suffixes)
+	 * so 6.0 < 6.0.0-alpha and 6.0-beta < 6.0.0-alpha are both true.
+	 * To work around any possible problems when comparing with WP development version strings
+	 * the GUTENBERG_MAX_WP_VERSION is incremented by one and the comparisons are with `>=`.
+	 */
+	$max_supported_version = (float) GUTENBERG_MAX_WP_VERSION + 0.1;
+
+	// `version_compare()` expects strings.
+	$max_supported_version = (string) $max_supported_version;
+
 	// Check if this version of Gutenberg supports the version of WordPress.
-	// Compare against major release versions (X.Y) rather than minor (X.Y.Z)
-	// unless a minor release is the actual minimum requirement. WordPress reports
-	// X.Y for its major releases.
 	if ( version_compare( $wp_version, GUTENBERG_MIN_WP_VERSION, '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_too_old_notice' );
 
-		// Also add a notice to the plugin's row in the plugins list table.
-		add_filter( 'plugin_action_links', 'gutenberg_wordpress_version_too_old_action_links_notice', 10, 2 );
-		add_filter( 'network_admin_plugin_action_links', 'gutenberg_wordpress_version_too_old_action_links_notice', 10, 2 );
+		// Also add a notice to the plugin's row in the plugins list tables.
+		add_filter( 'plugin_row_meta', 'gutenberg_wordpress_version_too_old_plugin_row_meta', 10, 2 );
 
+		// Return early, do not load Gutenberg.
 		return;
-	} elseif ( version_compare( $wp_version, GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION, '>=' ) ) {
-		// Do not load in newer, unsupported versions of WordPress. This will prevent incompatibilities,
-		// PHP fatal errors, etc. in the future. Ask the users to update Gutenberg or turn plugin auto-updates on.
+	} elseif ( version_compare( $wp_version, $max_supported_version, '>=' ) ) {
+		/*
+		 * Do not load Gutenebrg in newer, unsupported versions of WordPress. This will prevent incompatibilities,
+		 * PHP fatal errors, etc. Ask the users to update Gutenberg or turn plugin auto-updates on.
+		*/
 		add_action( 'admin_notices', 'gutenberg_version_too_old_notice' );
 
 		// Also add a notice to the plugin's row in the plugins list table.
-		add_filter( 'plugin_action_links', 'gutenberg_version_too_old_action_links_notice', 10, 2 );
-		add_filter( 'network_admin_plugin_action_links', 'gutenberg_version_too_old_action_links_notice', 10, 2 );
+		add_filter( 'plugin_row_meta', 'gutenberg_version_too_old_plugin_row_meta', 10, 2 );
 
 		return;
 	} elseif (
-		version_compare( $wp_version, GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION, '<' ) &&
-		version_compare( $wp_version, GUTENBERG_NEXT_UNSUPPORTED_WP_VERSION . '-alpha', '>=' )
+		version_compare( $wp_version, $max_supported_version, '<' ) &&
+		version_compare( $wp_version, $max_supported_version . '-alpha', '>=' )
 	) {
 		// Running in a newer WordPress aplha/beta/RC.
 		// Gutenberg will stop loading after this version of WordPress is released and the site is upgraded.
@@ -211,7 +230,11 @@ function gutenberg_pre_init() {
 	}
 
 	// Check if Gutenberg has been built for the first time.
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
+	if (
+		defined( 'GUTENBERG_DEVELOPMENT_MODE' ) &&
+		GUTENBERG_DEVELOPMENT_MODE &&
+		! file_exists( __DIR__ . '/build/blocks' )
+	) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
