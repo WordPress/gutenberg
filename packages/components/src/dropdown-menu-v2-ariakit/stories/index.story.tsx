@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,7 @@ import { useState, useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -61,14 +63,37 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
+const ItemHelpText = styled.span`
+	font-size: 12px;
+	color: ${ COLORS.gray[ '700' ] };
+
+	/* when the immediate parent item is hovered / focused */
+	[data-active-item] > * > &,
+	/* when the parent item is a submenu trigger and the submenu is open */
+	[aria-expanded='true'] > &,
+	/* when the parent item is disabled */
+	[aria-disabled='true'] > & {
+		color: inherit;
+	}
+`;
+
 export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
 		<DropdownMenuItem>Default item</DropdownMenuItem>
 		<DropdownMenuItem hideOnClick={ false }>
-			{ /* TODO: move this to description text */ }
-			Keep menu open on click
+			<div
+				style={ {
+					display: 'inline-flex',
+					flexDirection: 'column',
+				} }
+			>
+				Other item
+				<ItemHelpText>
+					Won&apos;t close the menu when clicked
+				</ItemHelpText>
+			</div>
 		</DropdownMenuItem>
-		<DropdownMenuItem disabled>Disabled</DropdownMenuItem>
+		<DropdownMenuItem disabled>Disabled item</DropdownMenuItem>
 		<DropdownMenuSeparator />
 		<DropdownMenuGroup>
 			<DropdownMenuGroupLabel>Prefix and suffix</DropdownMenuGroupLabel>
@@ -77,15 +102,15 @@ export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 			>
 				With prefix
 			</DropdownMenuItem>
-			<DropdownMenuItem suffix={ <span>Suf</span> }>
+			<DropdownMenuItem suffix={ <span>⌘S</span> }>
 				With suffix
 			</DropdownMenuItem>
 			<DropdownMenuItem
 				disabled
-				prefix={ <span>Pre</span> }
-				suffix={ <span>Suf</span> }
+				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
+				suffix={ <span>⌥⌘T</span> }
 			>
-				Disabled with both
+				Disabled with prefix and suffix
 			</DropdownMenuItem>
 		</DropdownMenuGroup>
 	</DropdownMenu>
