@@ -31,13 +31,13 @@ export default function DataViews( {
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
-					<TextFilter view={view} onChange={ dataView.setGlobalFilter } />
+					<TextFilter view={ view } onChangeView={ onChangeView } />
 					<AddFilter
 						dataView={ dataView }
 						filters={ view.filters }
 						onChangeFilters={ onChangeView }
 					/>
-					<FieldFilters view={view} dataView={dataView}/>
+					<FieldFilters view={ view } fields={ fields }/>
 					<ViewActions
 						fields={ fields }
 						view={ view }

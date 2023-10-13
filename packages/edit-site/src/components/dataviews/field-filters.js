@@ -1,18 +1,17 @@
-export default function FieldFilters({ view, dataView }) {
+export default function FieldFilters({ view, fields }) {
     return (
         Object.keys(view.filters).map((key) => {
-            const field = dataView
-                .getAllColumns()
+            const fieldWithFilter = fields
                 .find(
-                    (column) =>
-                        column.columnDef.renderFilter &&
-                        column.id === key
+                    ( field ) =>
+                        field.renderFilter &&
+                        field.id === key
                 );
-            if (!field) {
+            if (!fieldWithFilter) {
                 return null;
             }
 
-            return field.columnDef.renderFilter();
+            return fieldWithFilter.renderFilter();
         })
     );
 }
