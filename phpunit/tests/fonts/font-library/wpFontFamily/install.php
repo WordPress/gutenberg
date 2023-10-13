@@ -167,6 +167,8 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 				copy( __DIR__ . '/../../../data/fonts/cooper-hewitt.woff', $file['tmp_name'] );
 			} elseif ( 'font/woff2' === $file['type'] ) {
 				copy( __DIR__ . '/../../../data/fonts/DMSans.woff2', $file['tmp_name'] );
+			} elseif ( 'application/vnd.ms-opentype' === $file['type'] ) {
+				copy( __DIR__ . '/../../../data/fonts/gilbert-color.otf', $file['tmp_name'] );
 			}
 		}
 
@@ -301,6 +303,32 @@ class Tests_Fonts_WpFontFamily_Install extends WP_Font_Family_UnitTestCase {
 					),
 				),
 				'expected'   => array( 'dm-sans_regular_500.woff2' ),
+			),
+			// otf font type.
+			'otf local font'   => array(
+				'font_data'  => array(
+					'name'       => 'Gilbert Color',
+					'slug'       => 'gilbert-color',
+					'fontFamily' => 'Gilbert Color',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Gilbert Color',
+							'fontStyle'    => 'regular',
+							'fontWeight'   => '500',
+							'uploadedFile' => 'files0',
+						),
+					),
+				),
+				'files_data' => array(
+					'files0' => array(
+						'name'     => 'gilbert-color.otf',
+						'type'     => 'application/vnd.ms-opentype',
+						'tmp_name' => wp_tempnam( 'Gilbert-' ),
+						'error'    => 0,
+						'size'     => 123,
+					),
+				),
+				'expected'   => array( 'gilbert-color_regular_500.otf' ),
 			),
 		);
 	}

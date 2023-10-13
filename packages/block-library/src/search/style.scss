@@ -55,11 +55,12 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		margin-left: 0;
 		// Prevent unintended text wrapping.
 		flex-shrink: 0;
-		// Ensure minimum input field width in small viewports.
+		max-width: 100%;
+	}
+
+	// Ensure minimum input field width in small viewports.
+	.wp-block-search__button[aria-expanded="true"] {
 		max-width: calc(100% - 100px);
-		&.has-icon {
-			max-width: 100%;
-		}
 	}
 }
 

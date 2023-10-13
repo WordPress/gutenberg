@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "16.7.0-rc.2",
+	"version": "16.8.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -22,7 +22,6 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
-		"@types/gradient-parser": "0.1.2",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -126,7 +125,6 @@
 		"@testing-library/user-event": "14.4.3",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
-		"@types/highlight-words-core": "1.2.1",
 		"@types/istanbul-lib-report": "3.0.0",
 		"@types/mime": "2.0.3",
 		"@types/npm-package-arg": "6.1.1",
@@ -198,7 +196,7 @@
 		"eslint-plugin-prettier": "5.0.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
 		"eslint-plugin-storybook": "0.6.13",
-		"eslint-plugin-testing-library": "5.7.2",
+		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "3.2.7",
 		"filenamify": "4.2.0",

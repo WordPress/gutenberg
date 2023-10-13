@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -26,6 +26,7 @@ import {
 import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -55,7 +56,11 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = unitControlProps;
+	} = useDeprecated36pxDefaultSizeProp(
+		unitControlProps,
+		'wp.components.UnitControl',
+		'6.4'
+	);
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -182,7 +187,12 @@ function UnforwardedUnitControl(
 			disabled={ disabled }
 			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
-			size={ size }
+			size={
+				size === 'small' ||
+				( size === 'default' && ! props.__next40pxDefaultSize )
+					? 'small'
+					: 'default'
+			}
 			unit={ unit }
 			units={ units }
 			onFocus={ onFocusProp }

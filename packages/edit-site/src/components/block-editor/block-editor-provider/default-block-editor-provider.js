@@ -27,8 +27,8 @@ const noop = () => {};
  * mimic the look and feel of the post editor and
  * allow editing of the page content only.
  *
- * @param {Object}    props
- * @param {WPElement} props.children
+ * @param {Object}  props
+ * @param {Element} props.children
  */
 export default function DefaultBlockEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();

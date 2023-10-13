@@ -44,7 +44,7 @@ const MAX_BORDER_RADIUS_VALUES = {
  * @param {Function} props.onChange Callback to handle onChange.
  * @param {Object}   props.values   Border radius values.
  *
- * @return {WPElement}              Custom border radius control.
+ * @return {Element}              Custom border radius control.
  */
 export default function BorderRadiusControl( { onChange, values } ) {
 	const [ isLinked, setIsLinked ] = useState(

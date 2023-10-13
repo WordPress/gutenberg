@@ -16,8 +16,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect, useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import type {
 	ToggleGroupControlOptionBaseProps,
 	WithToolTipProps,
@@ -143,6 +143,7 @@ function ToggleGroupControlOptionBase(
 					<Ariakit.Radio
 						render={
 							<button
+								type="button"
 								{ ...commonProps }
 								onFocus={ ( event ) => {
 									onFocusProp?.( event );

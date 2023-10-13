@@ -15,7 +15,8 @@ export function getFontsOutline( fonts ) {
 }
 
 export function isFontFontFaceInOutline( slug, face, outline ) {
-	return (
-		outline[ slug ]?.[ `${ face.fontStyle }-${ face.fontWeight }` ] || false
-	);
+	if ( ! face ) {
+		return !! outline[ slug ];
+	}
+	return !! outline[ slug ]?.[ `${ face.fontStyle }-${ face.fontWeight }` ];
 }

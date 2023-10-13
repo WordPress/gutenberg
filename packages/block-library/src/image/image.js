@@ -372,10 +372,12 @@ export default function Image( {
 	const lightboxSetting = useSetting( 'lightbox' );
 
 	const showLightboxToggle =
-		lightboxSetting === true || lightboxSetting?.allowEditing === true;
+		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
-		lightbox?.enabled || ( ! lightbox && lightboxSetting?.enabled );
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const lightboxToggleDisabled = linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -555,6 +557,14 @@ export default function Image( {
 										lightbox: { enabled: newValue },
 									} );
 								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
 							/>
 						</ToolsPanelItem>
 					) }

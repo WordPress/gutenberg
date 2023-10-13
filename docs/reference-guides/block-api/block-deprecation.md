@@ -104,7 +104,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% Plain %}
 
 ```js
-var el = wp.element.createElement,
+var el = React.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	attributes = {
 		text: {
@@ -195,7 +195,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% Plain %}
 
 ```js
-var el = wp.element.createElement,
+var el = React.createElement,
 	registerBlockType = wp.blocks.registerBlockType;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
@@ -295,7 +295,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 {% Plain %}
 
 ```js
-var el = wp.element.createElement,
+var el = React.createElement,
 	registerBlockType = wp.blocks.registerBlockType;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {

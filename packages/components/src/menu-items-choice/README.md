@@ -54,8 +54,8 @@ Designs with a `MenuItemsChoice` option selected by default make a strong sugges
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyMenuItemsChoice = () => {
 	const [ mode, setMode ] = useState( 'visual' );

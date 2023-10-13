@@ -28,7 +28,7 @@ end
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+  use_frameworks! linkage: :static
 
   config = use_native_modules!
 
@@ -37,7 +37,7 @@ target 'GutenbergDemo' do
     # Hermes is now enabled by default. Disable by setting this flag to false.
     # Upcoming versions of React Native may rely on get_default_flags(), but
     # we make it explicit here to aid in the React Native upgrade process.
-    :hermes_enabled => false,
+    :hermes_enabled => true,
     :fabric_enabled => false,
     # Enables Flipper.
     #
@@ -93,16 +93,16 @@ target 'GutenbergDemo' do
         end
       end
     end
-		### End workaround for https://github.com/facebook/react-native/issues/31034
+    ### End workaround for https://github.com/facebook/react-native/issues/31034
 
-		### Begin workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
-		installer.pods_project.targets.each do |target|
-			if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
-				target.build_configurations.each do |config|
-						config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-				end
-			end
-		end
-		### End workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
+    ### Begin workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
+    installer.pods_project.targets.each do |target|
+    	if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+        target.build_configurations.each do |config|
+            config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
+    	end
+    end
+    ### End workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
   end
 end

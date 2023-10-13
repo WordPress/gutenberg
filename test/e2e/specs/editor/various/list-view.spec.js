@@ -261,13 +261,6 @@ test.describe( 'List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',

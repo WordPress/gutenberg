@@ -138,7 +138,12 @@ const mockEmbedResponses = ( mockedResponses ) => {
 
 async function mockOtherResponses( { path } ) {
 	if ( path.startsWith( '/wp/v2/themes' ) ) {
-		return [ { theme_supports: { 'responsive-embeds': true } } ];
+		return [
+			{
+				stylesheet: 'test-theme',
+				theme_supports: { 'responsive-embeds': true },
+			},
+		];
 	}
 
 	if ( path.startsWith( '/wp/v2/block-patterns/patterns' ) ) {

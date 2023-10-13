@@ -12,8 +12,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import { useContextSystem } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem } from '../context';
 import * as styles from './styles';
 import { CONFIG, reduceMotion } from '../utils';
 import { useCx } from '../utils/hooks/use-cx';

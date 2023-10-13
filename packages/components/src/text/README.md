@@ -22,7 +22,7 @@ function Example() {
 
 ### adjustLineHeightForInnerControls
 
-**Type**: `boolean`,`"large"`,`"medium"`,`"small"`,`"xSmall"`
+**Type**: `"large"`,`"medium"`,`"small"`,`"xSmall"`
 
 Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
 
@@ -31,7 +31,7 @@ import { __experimentalText as Text, TextInput } from '@wordpress/components';
 
 function Example() {
 	return (
-		<Text adjustLineHeightForInnerControls>
+		<Text adjustLineHeightForInnerControls={"small"}>
 			Lorem ipsum dolor sit amet, consectetur
 			<TextInput value="adipiscing elit..." />
 		</Text>

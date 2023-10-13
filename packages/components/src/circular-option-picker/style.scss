@@ -83,7 +83,8 @@ $color-palette-circle-spacing: 12px;
 		box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5) !important;
 	}
 
-	&.is-pressed {
+	&[aria-pressed="true"],
+	&[aria-selected="true"] {
 		box-shadow: inset 0 0 0 4px;
 		position: relative;
 		z-index: z-index(".components-circular-option-picker__option.is-pressed");

@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 
 /**
@@ -24,10 +24,11 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -41,11 +42,6 @@ const Template: StoryFn< typeof AlignmentMatrixControl > = ( {
 } ) => {
 	const [ value, setValue ] =
 		useState< AlignmentMatrixControlProps[ 'value' ] >();
-
-	// Convenience handler for Canvas view so changes are reflected
-	useEffect( () => {
-		setValue( defaultValue );
-	}, [ defaultValue ] );
 
 	return (
 		<AlignmentMatrixControl

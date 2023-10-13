@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { Browser, Page, BrowserContext, Frame } from '@playwright/test';
+import type {
+	Browser,
+	Page,
+	BrowserContext,
+	FrameLocator,
+} from '@playwright/test';
 
 /**
  * Internal dependencies
@@ -19,6 +24,7 @@ import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
+import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
@@ -36,8 +42,8 @@ export class Editor {
 		this.browser = this.context.browser()!;
 	}
 
-	get canvas(): Frame | Page {
-		return this.page.frame( 'editor-canvas' ) || this.page;
+	get canvas(): FrameLocator {
+		return this.page.frameLocator( '[name="editor-canvas"]' );
 	}
 
 	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
@@ -72,6 +78,9 @@ export class Editor {
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
+	/** @borrows switchToLegacyCanvas as this.switchToLegacyCanvas */
+	switchToLegacyCanvas: typeof switchToLegacyCanvas =
+		switchToLegacyCanvas.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
 }

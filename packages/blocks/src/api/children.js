@@ -20,7 +20,7 @@ import * as node from './node';
  *
  * @param {WPBlockChildren} children Block children object to convert.
  *
- * @return {WPElement} A serialize-capable element.
+ * @return {Element} A serialize-capable element.
  */
 export function getSerializeCapableElement( children ) {
 	// The fact that block children are compatible with the element serializer is

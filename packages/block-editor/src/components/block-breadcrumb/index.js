@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
  *
  * @param {Object} props               Component props.
  * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @return {WPElement}                 Block Breadcrumb.
+ * @return {Element}                   Block Breadcrumb.
  */
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );

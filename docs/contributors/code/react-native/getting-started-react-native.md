@@ -71,6 +71,40 @@ npm run native ios -- -- --simulator="iPhone Xs Max"
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
 
+### Customizing the Demo Editor
+
+By default, the Demo editor renders most of the supported core blocks. This is helpful to showcase the editor's capabilities, but can be distracting when focusing on a specific block or feature. One can customize the editor's intial state by leveraging the `native.block_editor_props` hook in a `packages/react-native-editor/src/setup-local.js` file.
+
+<details><summary>Example setup-local.js</summary>
+
+```js
+/**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
+
+export default () => {
+	addFilter(
+		'native.block_editor_props',
+		'core/react-native-editor',
+		( props ) => {
+			return {
+				...props,
+				initialHtml,
+			};
+		}
+	);
+};
+
+const initialHtml = `
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Just a Heading</h2>
+<!-- /wp:heading -->
+`;
+```
+
+</details>
+
 ### Troubleshooting
 
 If the Android emulator doesn't start correctly, or compiling fails with `Could not initialize class org.codehaus.groovy.runtime.InvokerHelper` or similar, it may help to double check the set up of your development environment against the latest requirements in [React Native's documentation](https://reactnative.dev/docs/environment-setup). With Android Studio, for example, you will need to configure the `ANDROID_HOME` environment variable and ensure that your version of JDK matches the latest requirements.

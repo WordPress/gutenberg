@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import { useContextSystem, contextConnect } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useContextSystem, contextConnect } from '../context';
 import { visuallyHidden } from './styles';
 import { View } from '../view';
 import type { VisuallyHiddenProps } from './types';

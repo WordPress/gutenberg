@@ -27,6 +27,7 @@ module.exports = {
 				inlineRequires: false,
 			},
 		} ),
+		unstable_allowRequireContext: true, // Used for optional setup configuration.
 	},
 	server: {
 		enhanceMiddleware: ( middleware ) => ( req, res, next ) => {

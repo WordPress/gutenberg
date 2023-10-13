@@ -11,10 +11,10 @@ const isValidLink = ( ref ) =>
 	ref.origin === window.location.origin;
 
 const isValidEvent = ( event ) =>
-	event.button === 0 && // left clicks only
-	! event.metaKey && // open in new tab (mac)
-	! event.ctrlKey && // open in new tab (windows)
-	! event.altKey && // download
+	event.button === 0 && // Left clicks only.
+	! event.metaKey && // Open in new tab (Mac).
+	! event.ctrlKey && // Open in new tab (Windows).
+	! event.altKey && // Download.
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
@@ -39,7 +39,7 @@ store( {
 						const id = ref.closest( '[data-wp-navigation-id]' )
 							.dataset.wpNavigationId;
 
-						// Don't announce the navigation immediately, wait 300 ms.
+						// Don't announce the navigation immediately, wait 400 ms.
 						const timeout = setTimeout( () => {
 							context.core.query.message =
 								context.core.query.loadingText;

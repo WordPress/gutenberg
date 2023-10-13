@@ -87,6 +87,13 @@ wpStore( {
 						? 'true'
 						: null;
 				},
+				ariaLabel: ( store ) => {
+					const { context, selectors } = store;
+					return context.core.navigation.type === 'overlay' &&
+						selectors.core.navigation.isMenuOpen( store )
+						? context.core.navigation.ariaLabel
+						: null;
+				},
 				isMenuOpen: ( { context } ) =>
 					// The menu is opened if either `click`, `hover` or `focus` is true.
 					Object.values(
