@@ -72,7 +72,9 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while deleting the pattern.' );
+					: __(
+							'An error occurred while deleting the pattern category.'
+					  );
 
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',
