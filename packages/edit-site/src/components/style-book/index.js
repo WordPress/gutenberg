@@ -7,13 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
 	Disabled,
 	TabPanel,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	getCategories,
@@ -42,6 +39,12 @@ import EditorCanvasContainer from '../editor-canvas-container';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -339,12 +342,13 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
-		const composite = useCompositeState( { orientation: 'vertical' } );
+		const composite = useCompositeStore( { orientation: 'vertical' } );
 		return (
 			<Composite
-				{ ...composite }
+				store={ composite }
 				className={ className }
 				aria-label={ label }
+				role="grid"
 			>
 				{ examples
 					.filter( ( example ) =>
@@ -354,7 +358,6 @@ const Examples = memo(
 						<Example
 							key={ example.name }
 							id={ `example-${ example.name }` }
-							composite={ composite }
 							title={ example.title }
 							blocks={ example.blocks }
 							isSelected={ isSelected( example.name ) }
@@ -368,7 +371,7 @@ const Examples = memo(
 	}
 );
 
-const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
+const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -385,35 +388,41 @@ const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
 	);
 
 	return (
-		<CompositeItem
-			{ ...composite }
-			className={ classnames( 'edit-site-style-book__example', {
-				'is-selected': isSelected,
-			} ) }
-			id={ id }
-			aria-label={ sprintf(
-				// translators: %s: Title of a block, e.g. Heading.
-				__( 'Open %s styles in Styles panel' ),
-				title
-			) }
-			onClick={ onClick }
-			role="button"
-			as="div"
-		>
-			<span className="edit-site-style-book__example-title">
-				{ title }
-			</span>
-			<div className="edit-site-style-book__example-preview" aria-hidden>
-				<Disabled className="edit-site-style-book__example-preview__content">
-					<ExperimentalBlockEditorProvider
-						value={ renderedBlocks }
-						settings={ settings }
+		<div role="row">
+			<div role="gridcell">
+				<CompositeItem
+					className={ classnames( 'edit-site-style-book__example', {
+						'is-selected': isSelected,
+					} ) }
+					id={ id }
+					aria-label={ sprintf(
+						// translators: %s: Title of a block, e.g. Heading.
+						__( 'Open %s styles in Styles panel' ),
+						title
+					) }
+					render={ <div /> }
+					role="button"
+					onClick={ onClick }
+				>
+					<span className="edit-site-style-book__example-title">
+						{ title }
+					</span>
+					<div
+						className="edit-site-style-book__example-preview"
+						aria-hidden
 					>
-						<BlockList renderAppender={ false } />
-					</ExperimentalBlockEditorProvider>
-				</Disabled>
+						<Disabled className="edit-site-style-book__example-preview__content">
+							<ExperimentalBlockEditorProvider
+								value={ renderedBlocks }
+								settings={ settings }
+							>
+								<BlockList renderAppender={ false } />
+							</ExperimentalBlockEditorProvider>
+						</Disabled>
+					</div>
+				</CompositeItem>
 			</div>
-		</CompositeItem>
+		</div>
 	);
 };
 
