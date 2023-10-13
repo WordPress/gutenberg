@@ -63,15 +63,16 @@ function HeaderMenu( { dataView, header } ) {
 	);
 	const isSortable = !! header.column.getCanSort();
 	const isHidable = !! header.column.getCanHide();
-	const isFilterable = !! header.column.getCanFilter();
-	const isFilterableByInFilter =
+	const hasInFilter =
 		header.column.columnDef.setList &&
 		header.column.columnDef.setList.length > 0 &&
-		header.column.columnDef.filters.in;
-	const isFilterableByNotInFilter =
+		header.column.columnDef?.filters?.in;
+	const hasNotInFilter =
 		header.column.columnDef.setList &&
 		header.column.columnDef.setList.length > 0 &&
-		header.column.columnDef.filters.notIn;
+		header.column.columnDef?.filters?.notIn;
+	const hasSearchFilter = header.column.columnDef.filters?.search;
+	const isFilterable = hasInFilter || hasNotInFilter || hasSearchFilter;
 
 	if ( ! isSortable && ! isHidable && ! isFilterable ) {
 		return text;
