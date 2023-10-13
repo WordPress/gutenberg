@@ -37,6 +37,7 @@ export default function RenameCategoryMenuItem( { category, onClose } ) {
 						setIsModalOpen( false );
 						onClose();
 					} }
+					overlayClassName="edit-site-list__rename-modal"
 				/>
 			) }
 		</>
