@@ -54,8 +54,7 @@ function useMultiOriginColorPresets(
 }
 
 export function useHasFiltersPanel( settings ) {
-	// TODO: Add customDuotone when we have a control for custom duotone filters.
-	return settings.color.defaultDuotone;
+	return useHasDuotoneControl( settings );
 }
 
 function useHasDuotoneControl( settings ) {
