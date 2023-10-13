@@ -44,8 +44,6 @@ export default function RenamePatternCategoryModal( {
 
 		try {
 			setIsSaving( true );
-			setName( '' );
-			onClose?.();
 
 			// User pattern category properties may differ as they can be
 			// normalized for use alongside template part areas, core pattern
@@ -63,6 +61,7 @@ export default function RenamePatternCategoryModal( {
 
 			invalidateResolution( 'getUserPatternCategories' );
 			onSuccess?.( savedRecord );
+			onClose();
 
 			createSuccessNotice( __( 'Pattern category renamed.' ), {
 				type: 'snackbar',
@@ -81,7 +80,7 @@ export default function RenamePatternCategoryModal( {
 	};
 
 	const onRequestClose = () => {
-		onClose?.();
+		onClose();
 		setName( '' );
 	};
 
