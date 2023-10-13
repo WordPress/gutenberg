@@ -4,7 +4,7 @@
 import { closeSmall } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 
-function ActiveFilter( { label, onChangeView } ) {
+function ActiveFilter( { id, label, onChangeView } ) {
 	// TODO. Do not reuse the components-form-token-field classes:
 	// either make that component public or create a new one.
 	return (
@@ -17,7 +17,7 @@ function ActiveFilter( { label, onChangeView } ) {
 				icon={ closeSmall }
 				onClick={ () => {
 					onChangeView( ( currentView ) => {
-						delete currentView.filters[ label ];
+						delete currentView.filters[ id ];
 						return {
 							...currentView,
 						};
@@ -28,12 +28,17 @@ function ActiveFilter( { label, onChangeView } ) {
 	);
 }
 
-export default function FieldsFilters( { view, onChangeView } ) {
+export default function FieldsFilters( { fields, view, onChangeView } ) {
 	if ( Object.keys( view.filters ).length === 0 ) {
 		return null;
 	}
 
 	return Object.keys( view.filters ).map( ( id ) => (
-		<ActiveFilter key={ id } label={ id } onChangeView={ onChangeView } />
+		<ActiveFilter
+			key={ id }
+			id={ id }
+			label={ fields.find( ( field ) => field.id === id )?.header ?? id }
+			onChangeView={ onChangeView }
+		/>
 	) );
 }

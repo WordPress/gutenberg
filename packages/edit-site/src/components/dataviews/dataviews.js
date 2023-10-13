@@ -36,6 +36,7 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 						<FieldsFilters
+							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
