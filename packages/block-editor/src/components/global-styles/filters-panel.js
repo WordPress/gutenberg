@@ -58,11 +58,7 @@ export function useHasFiltersPanel( settings ) {
 }
 
 function useHasDuotoneControl( settings ) {
-	return (
-		settings.color.customDuotone ||
-		settings.color.defaultDuotone ||
-		settings.color.duotone.length > 0
-	);
+	return settings.color.defaultDuotone || settings.color.duotone.length > 0;
 }
 
 function FiltersToolsPanel( {
