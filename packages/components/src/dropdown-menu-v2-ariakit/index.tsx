@@ -300,7 +300,12 @@ const UnconnectedDropdownMenu = (
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
-				dir={ computedDirection }
+				wrapperProps={ {
+					dir: computedDirection,
+					style: {
+						direction: computedDirection,
+					},
+				} }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
 			>
