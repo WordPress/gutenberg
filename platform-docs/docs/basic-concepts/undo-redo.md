@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 6
 ---
 
 # Undo Redo
@@ -14,7 +14,8 @@ First, make sure you add the `@wordpress/compose` package to your dependencies, 
 
 ```jsx
 import { useStateWithHistory } from '@wordpress/compose';
-import { createRoot, createElement, useState } from "@wordpress/element";
+import { createElement, useState } from "react";
+import { createRoot } from 'react-dom/client';
 import {
   BlockEditorProvider,
   BlockCanvas,

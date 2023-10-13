@@ -84,7 +84,7 @@ export default function SearchEdit( {
 		style,
 	} = attributes;
 
-	const insertedInNavigationBlock = useSelect(
+	const wasJustInsertedIntoNavigationBlock = useSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName, wasBlockJustInserted } =
 				select( blockEditorStore );
@@ -98,15 +98,21 @@ export default function SearchEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	if ( insertedInNavigationBlock ) {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			showLabel: false,
-			buttonUseIcon: true,
-			buttonPosition: 'button-inside',
-		} );
-	}
+	useEffect( () => {
+		if ( wasJustInsertedIntoNavigationBlock ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				showLabel: false,
+				buttonUseIcon: true,
+				buttonPosition: 'button-inside',
+			} );
+		}
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		wasJustInsertedIntoNavigationBlock,
+		setAttributes,
+	] );
 
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );

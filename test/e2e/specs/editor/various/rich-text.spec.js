@@ -35,7 +35,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -53,7 +55,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Some ' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'bold' );
@@ -73,7 +77,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.type( '1' );
@@ -102,11 +108,14 @@ test.describe( 'RichText', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		const count = await editor.canvas.evaluate(
-			() =>
-				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
-					.length
-		);
+		const count = await editor.canvas
+			.locator( ':root' )
+			.evaluate(
+				() =>
+					document.querySelectorAll(
+						'*[data-rich-text-format-boundary]'
+					).length
+			);
 		expect( count ).toBe( 1 );
 	} );
 
@@ -114,7 +123,9 @@ test.describe( 'RichText', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Some ' );
 		await editor.clickBlockToolbarButton( 'Bold' );
 		await page.keyboard.type( 'bold' );
@@ -134,7 +145,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A `backtick`' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -155,7 +168,9 @@ test.describe( 'RichText', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -171,7 +186,9 @@ test.describe( 'RichText', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Backspace' );
@@ -184,7 +201,9 @@ test.describe( 'RichText', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '`a`' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Move inside format boundary.
@@ -200,7 +219,9 @@ test.describe( 'RichText', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A `backtick` and more.' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -216,7 +237,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A selection test.' );
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -246,14 +269,16 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '3' );
 
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			let called;
 			const { body } = document;
 			const config = {
@@ -313,7 +338,7 @@ test.describe( 'RichText', () => {
 
 		await page.keyboard.type( '4' );
 
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			// The selection change event should be called once. If there's only
 			// one item in `window.unsubscribes`, it means that only one
 			// function is present to disconnect the `mutationObserver`.
@@ -339,7 +364,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -369,7 +396,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '12' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -391,7 +420,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
@@ -412,11 +443,13 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		// Simulate moving focus to a different app, then moving focus back,
 		// without selection being changed.
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			const activeElement = document.activeElement;
 			activeElement.blur();
 			activeElement.focus();
@@ -443,7 +476,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -479,7 +514,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+x' );
@@ -500,7 +537,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '2' );
@@ -525,7 +564,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
@@ -545,7 +586,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.type( '2' );
@@ -571,7 +614,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		// Add text and select to color.
 		await page.keyboard.type( '1' );
@@ -626,7 +671,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		// Create two lines of text in a paragraph.
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'shift+Enter' );
@@ -668,7 +715,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		// Create an indented list of two lines.
 		await page.keyboard.type( '* 1' );
@@ -717,7 +766,9 @@ test.describe( 'RichText', () => {
 	} );
 
 	test( 'should navigate arround emoji', async ( { page, editor } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '🍓' );
 		// Only one press on arrow left should be required to move in front of
 		// the emoji.
@@ -735,12 +786,14 @@ test.describe( 'RichText', () => {
 	test( 'should run input rules after composition end', async ( {
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		// Playwright doesn't support composition, so emulate it by inserting
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await editor.canvas.evaluate( async () => {
+		await editor.canvas.locator( ':root' ).evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
 			// The `selectionchange` and `compositionend` events should run in separate event
@@ -767,7 +820,9 @@ test.describe( 'RichText', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );

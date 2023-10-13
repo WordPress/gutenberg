@@ -109,6 +109,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 }
 
 export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+	if ( ! input ) {
+		return;
+	}
+
 	let src;
 	if ( Array.isArray( input ) ) {
 		src = input[ 0 ];
@@ -148,6 +152,6 @@ export function makeFormDataFromFontFamilies( fontFamilies ) {
 		}
 		return family;
 	} );
-	formData.append( 'fontFamilies', JSON.stringify( newFontFamilies ) );
+	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
 	return formData;
 }

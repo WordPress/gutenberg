@@ -59,6 +59,9 @@
 	<exclude-pattern>./vendor/*</exclude-pattern>
 	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
 
+	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg -->
+	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
+
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>
@@ -92,8 +95,6 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
-		<!-- Ignore until squizlabs/PHP_CodeSniffer#3685 is fixed: it thinks that a caught exception escapes the function. -->
-		<exclude-pattern>lib/compat/wordpress-6.4/html-api/class-wp-html-processor.php</exclude-pattern>
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 

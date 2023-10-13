@@ -7,6 +7,8 @@
 -   Corrected `PATH` to include the host user's Composer bin directory.
 -   Replaced `yoast/phpunit-polyfills` with `phpunit/phpunit` to install the required PHPUnit version, avoiding the need for project-specific polyfills.
 
+## 8.9.0 (2023-10-05)
+
 ## 8.8.0 (2023-09-20)
 
 ## 8.7.0 (2023-08-31)

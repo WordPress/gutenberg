@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -14,6 +13,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { combineReducers } from './combine-reducers';
 import { builtinControls } from '../controls';
 import { lock } from '../lock-unlock';
 import promise from '../promise-middleware';
@@ -22,6 +22,8 @@ import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+
+export { combineReducers };
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /** @typedef {import('../types').ListenerFunction} ListenerFunction */
@@ -32,7 +34,7 @@ import * as metadataActions from './metadata/actions';
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
  * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template {Record<string,import('../types').ActionCreator>} Actions
  * @template Selectors
  */
 
@@ -134,7 +136,7 @@ function createBindingCache( bind ) {
  * ```
  *
  * @template State
- * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template {Record<string,import('../types').ActionCreator>} Actions
  * @template Selectors
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties

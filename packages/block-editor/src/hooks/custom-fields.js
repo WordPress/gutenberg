@@ -40,9 +40,9 @@ function addAttribute( settings ) {
  * Currently, only the `core/paragraph` block is supported and there is only a relation
  * between paragraph content and a custom field.
  *
- * @param {WPComponent} BlockEdit Original component.
+ * @param {Component} BlockEdit Original component.
  *
- * @return {WPComponent} Wrapped component.
+ * @return {Component} Wrapped component.
  */
 const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {

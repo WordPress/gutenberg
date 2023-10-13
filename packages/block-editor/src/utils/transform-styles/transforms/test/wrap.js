@@ -83,4 +83,13 @@ describe( 'CSS selector wrap', () => {
 
 		expect( output ).toMatchSnapshot();
 	} );
+
+	it( 'should not double wrap selectors', () => {
+		const callback = wrap( '.my-namespace' );
+		const input = ` .my-namespace h1, .red { color: red; }`;
+
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
 } );

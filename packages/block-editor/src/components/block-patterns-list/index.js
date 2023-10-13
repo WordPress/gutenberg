@@ -149,7 +149,7 @@ function BlockPatternList(
 		onHover,
 		onClickPattern,
 		orientation,
-		label = __( 'Block Patterns' ),
+		label = __( 'Block patterns' ),
 		showTitlesAsTooltip,
 		pagingProps,
 	},
@@ -180,9 +180,7 @@ function BlockPatternList(
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
-			{ pagingProps && pagingProps.numPages > 1 && (
-				<BlockPatternsPaging { ...pagingProps } />
-			) }
+			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
 }

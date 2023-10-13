@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
@@ -16,14 +16,14 @@ if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
 /**
  * Font Library Controller class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 */
 	public function __construct() {
 		$this->rest_base = 'fonts';
@@ -33,7 +33,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Registers the routes for the objects of the controller.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -45,7 +45,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'install_fonts' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => array(
-						'fontFamilies' => array(
+						'font_families' => array(
 							'required'          => true,
 							'type'              => 'string',
 							'validate_callback' => array( $this, 'validate_install_font_families' ),
@@ -96,7 +96,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets a font collection.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -121,7 +121,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the font collections available.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
@@ -137,7 +137,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Returns validation errors in font families data for installation.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array[] $font_families Font families to install.
 	 * @param array   $files         Files to install.
@@ -147,13 +147,13 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		$error_messages = array();
 
 		if ( ! is_array( $font_families ) ) {
-			$error_messages[] = __( 'fontFamilies should be an array of font families.', 'gutenberg' );
+			$error_messages[] = __( 'font_families should be an array of font families.', 'gutenberg' );
 			return $error_messages;
 		}
 
 		// Checks if there is at least one font family.
 		if ( count( $font_families ) < 1 ) {
-			$error_messages[] = __( 'fontFamilies should have at least one font family definition.', 'gutenberg' );
+			$error_messages[] = __( 'font_families should have at least one font family definition.', 'gutenberg' );
 			return $error_messages;
 		}
 
@@ -233,7 +233,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Validate input for the install endpoint.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string          $param The font families to install.
 	 * @param WP_REST_Request $request The request object.
@@ -254,13 +254,13 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the schema for the uninstall endpoint.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array Schema array.
 	 */
 	public function uninstall_schema() {
 		return array(
-			'fontFamilies' => array(
+			'font_families' => array(
 				'type'        => 'array',
 				'description' => __( 'The font families to install.', 'gutenberg' ),
 				'required'    => true,
@@ -283,31 +283,51 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	/**
 	 * Removes font families from the Font Library and all their assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function uninstall_fonts( $request ) {
-		$fonts_param = $request->get_param( 'fontFamilies' );
+		$fonts_to_uninstall = $request->get_param( 'font_families' );
 
-		foreach ( $fonts_param as $font_data ) {
-			$font   = new WP_Font_Family( $font_data );
-			$result = $font->uninstall();
+		$errors    = array();
+		$successes = array();
 
-			// If there was an error uninstalling the font, return the error.
-			if ( is_wp_error( $result ) ) {
-				return $result;
-			}
+		if ( empty( $fonts_to_uninstall ) ) {
+			$errors[] = new WP_Error(
+				'no_fonts_to_install',
+				__( 'No fonts to uninstall', 'gutenberg' )
+			);
+			$data     = array(
+				'successes' => $successes,
+				'errors'    => $errors,
+			);
+			$response = rest_ensure_response( $data );
+			$response->set_status( 400 );
+			return $response;
 		}
 
-		return new WP_REST_Response( __( 'Font family uninstalled successfully.', 'gutenberg' ), 200 );
+		foreach ( $fonts_to_uninstall as $font_data ) {
+			$font   = new WP_Font_Family( $font_data );
+			$result = $font->uninstall();
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result;
+			} else {
+				$successes[] = $result;
+			}
+		}
+		$data = array(
+			'successes' => $successes,
+			'errors'    => $errors,
+		);
+		return rest_ensure_response( $data );
 	}
 
 	/**
 	 * Checks whether the user has permissions to update the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
@@ -321,21 +341,46 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 				)
 			);
 		}
+		return true;
+	}
 
+	/**
+	 * Checks whether the user has write permissions to the temp and fonts directories.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
+	 */
+	private function has_write_permission() {
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir   = get_temp_dir();
-		$upload_dir = wp_upload_dir()['basedir'];
+		$upload_dir = WP_Font_Library::get_fonts_dir();
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
-			return new WP_Error(
-				'rest_cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' ),
-				array(
-					'status' => 500,
-				)
-			);
+			return false;
 		}
-
 		return true;
+	}
+
+	/**
+	 * Checks whether the request needs write permissions.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array[] $font_families Font families to install.
+	 * @return bool Whether the request needs write permissions.
+	 */
+	private function needs_write_permission( $font_families ) {
+		foreach ( $font_families as $font ) {
+			if ( isset( $font['fontFace'] ) ) {
+				foreach ( $font['fontFace'] as $face ) {
+					// If the font is being downloaded from a URL or uploaded, it needs write permissions.
+					if ( isset( $face['downloadFromUrl'] ) || isset( $face['uploadedFile'] ) ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -344,7 +389,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * Takes a request containing new fonts to install, downloads their assets, and adds them
 	 * to the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request The request object containing the new fonts to install
 	 *                                 in the request parameters.
@@ -352,7 +397,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 */
 	public function install_fonts( $request ) {
 		// Get new fonts to install.
-		$fonts_param = $request->get_param( 'fontFamilies' );
+		$fonts_param = $request->get_param( 'font_families' );
 
 		/*
 		 * As this is receiving form data, the font families are encoded as a string.
@@ -361,38 +406,52 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		 */
 		$fonts_to_install = json_decode( $fonts_param, true );
 
+		$successes       = array();
+		$errors          = array();
+		$response_status = 200;
+
 		if ( empty( $fonts_to_install ) ) {
-			return new WP_Error(
+			$errors[]        = new WP_Error(
 				'no_fonts_to_install',
-				__( 'No fonts to install', 'gutenberg' ),
-				array( 'status' => 400 )
+				__( 'No fonts to install', 'gutenberg' )
 			);
+			$response_status = 400;
+		}
+
+		if ( $this->needs_write_permission( $fonts_to_install ) && ! $this->has_write_permission() ) {
+			$errors[]        = new WP_Error(
+				'cannot_write_fonts_folder',
+				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
+			);
+			$response_status = 500;
+		}
+
+		if ( ! empty( $errors ) ) {
+			$data     = array(
+				'successes' => $successes,
+				'errors'    => $errors,
+			);
+			$response = rest_ensure_response( $data );
+			$response->set_status( $response_status );
+			return $response;
 		}
 
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
-
-		// Iterates the fonts data received and creates a new WP_Font_Family object for each one.
-		$fonts_installed = array();
 		foreach ( $fonts_to_install as $font_data ) {
-			$font = new WP_Font_Family( $font_data );
-			$font->install( $files );
-			$fonts_installed[] = $font;
+			$font   = new WP_Font_Family( $font_data );
+			$result = $font->install( $files );
+			if ( is_wp_error( $result ) ) {
+				$errors[] = $result;
+			} else {
+				$successes[] = $result;
+			}
 		}
 
-		if ( empty( $fonts_installed ) ) {
-			return new WP_Error(
-				'error_installing_fonts',
-				__( 'Error installing fonts. No font was installed.', 'gutenberg' ),
-				array( 'status' => 500 )
-			);
-		}
-
-		$response = array();
-		foreach ( $fonts_installed as $font ) {
-			$response[] = $font->get_data();
-		}
-
-		return new WP_REST_Response( $response );
+		$data = array(
+			'successes' => $successes,
+			'errors'    => $errors,
+		);
+		return rest_ensure_response( $data );
 	}
 }

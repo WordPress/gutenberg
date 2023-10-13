@@ -39,17 +39,21 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	closeModal,
+	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
+	confirmLabel = __( 'Create' ),
+	closeModal,
+	modalTitle = __( 'Create template part' ),
 	onCreate,
 	onError,
+	defaultTitle = '',
 } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const existingTemplateParts = useExistingTemplateParts();
 
-	const [ title, setTitle ] = useState( '' );
-	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_DEFAULT_CATEGORY );
+	const [ title, setTitle ] = useState( defaultTitle );
+	const [ area, setArea ] = useState( defaultArea );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 
@@ -104,7 +108,7 @@ export default function CreateTemplatePartModal( {
 
 	return (
 		<Modal
-			title={ __( 'Create template part' ) }
+			title={ modalTitle }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
@@ -181,7 +185,7 @@ export default function CreateTemplatePartModal( {
 							aria-disabled={ ! title || isSubmitting }
 							isBusy={ isSubmitting }
 						>
-							{ __( 'Create' ) }
+							{ confirmLabel }
 						</Button>
 					</HStack>
 				</VStack>

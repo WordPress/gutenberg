@@ -83,7 +83,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	edit: function( props ) {
 		var blockProps = wp.blockEditor.useBlockProps();
 
-		return wp.element.createElement( wp.blockEditor.RichText, Object.assign( blockProps, {
+		return React.createElement( wp.blockEditor.RichText, Object.assign( blockProps, {
 			tagName: 'h2',  // The tag here is the element output and editable in the admin
 			value: props.attributes.content, // Any existing content, either from the database or an attribute default
 			allowedFormats: [ 'core/bold', 'core/italic' ], // Allow the content to be made bold or italic, but do not allow other formatting options
@@ -97,7 +97,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	save: function( props ) {
 		var blockProps = wp.blockEditor.useBlockProps.save();
 
-		return wp.element.createElement( wp.blockEditor.RichText.Content, Object.assign( blockProps, {
+		return React.createElement( wp.blockEditor.RichText.Content, Object.assign( blockProps, {
 			tagName: 'h2', value: props.attributes.content // Saves <h2>Content added in the editor...</h2> to the database for frontend display
 		} ) );
 	}

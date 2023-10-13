@@ -186,6 +186,8 @@ Renders a red text-based button style to indicate destructive behavior.
 
 Renders a pressed button style.
 
+If the native `aria-pressed` attribute is also set, it will take precedence.
+
 -   Required: No
 
 #### `isSmall`: `boolean`

@@ -7,7 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	CheckboxControl,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalTruncate as Truncate,
@@ -62,10 +61,6 @@ function TemplateAreaButton( { postId, icon, title } ) {
 }
 
 export default function HomeTemplateDetails() {
-	const navigator = useNavigator();
-	const {
-		params: { postType, postId },
-	} = navigator;
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const {
@@ -75,34 +70,30 @@ export default function HomeTemplateDetails() {
 		postsPageTitle,
 		postsPageId,
 		currentTemplateParts,
-	} = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const _currentTemplateParts =
-				select( editSiteStore ).getCurrentTemplateTemplateParts();
-			const siteEditorSettings = getSettings();
-			const _postsPageRecord = siteSettings?.page_for_posts
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'page',
-						siteSettings?.page_for_posts
-				  )
-				: EMPTY_OBJECT;
+	} = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const { getSettings, getCurrentTemplateTemplateParts } = unlock(
+			select( editSiteStore )
+		);
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		const _postsPageRecord = siteSettings?.page_for_posts
+			? getEntityRecord(
+					'postType',
+					'page',
+					siteSettings?.page_for_posts
+			  )
+			: EMPTY_OBJECT;
 
-			return {
-				allowCommentsOnNewPosts:
-					siteSettings?.default_comment_status === 'open',
-				postsPageTitle: _postsPageRecord?.title?.rendered,
-				postsPageId: _postsPageRecord?.id,
-				postsPerPage: siteSettings?.posts_per_page,
-				templatePartAreas: siteEditorSettings?.defaultTemplatePartAreas,
-				currentTemplateParts: _currentTemplateParts,
-			};
-		},
-		[ postType, postId ]
-	);
+		return {
+			allowCommentsOnNewPosts:
+				siteSettings?.default_comment_status === 'open',
+			postsPageTitle: _postsPageRecord?.title?.rendered,
+			postsPageId: _postsPageRecord?.id,
+			postsPerPage: siteSettings?.posts_per_page,
+			templatePartAreas: getSettings()?.defaultTemplatePartAreas,
+			currentTemplateParts: getCurrentTemplateTemplateParts(),
+		};
+	}, [] );
 
 	const [ commentsOnNewPostsValue, setCommentsOnNewPostsValue ] =
 		useState( '' );
@@ -126,11 +117,12 @@ export default function HomeTemplateDetails() {
 	 */
 	const templateAreas = useMemo( () => {
 		return currentTemplateParts.length && templatePartAreas
-			? currentTemplateParts.map( ( { templatePart } ) => ( {
+			? currentTemplateParts.map( ( { templatePart, block } ) => ( {
 					...templatePartAreas?.find(
 						( { area } ) => area === templatePart?.area
 					),
 					...templatePart,
+					clientId: block.clientId,
 			  } ) )
 			: [];
 	}, [ currentTemplateParts, templatePartAreas ] );
@@ -214,9 +206,9 @@ export default function HomeTemplateDetails() {
 			>
 				<ItemGroup>
 					{ templateAreas.map(
-						( { label, icon, theme, slug, title } ) => (
+						( { clientId, label, icon, theme, slug, title } ) => (
 							<SidebarNavigationScreenDetailsPanelRow
-								key={ slug }
+								key={ clientId }
 							>
 								<TemplateAreaButton
 									postId={ `${ theme }//${ slug }` }

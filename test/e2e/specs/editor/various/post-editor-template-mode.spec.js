@@ -156,7 +156,6 @@ class PostEditorTemplateMode {
 
 	async createPostAndSaveDraft() {
 		await this.admin.createNewPost();
-		await this.editor.canvas.waitForLoadState();
 		// Create a random post.
 		await this.page.keyboard.type( 'Just an FSE Post' );
 		await this.page.keyboard.press( 'Enter' );
@@ -170,10 +169,7 @@ class PostEditorTemplateMode {
 		// Save the post
 		// Saving shouldn't be necessary but unfortunately,
 		// there's a template resolution bug forcing us to do so.
-		await this.page.click( 'role=button[name="Save draft"i]' );
-		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await this.editor.saveDraft();
 	}
 
 	async createNewTemplate( templateName ) {

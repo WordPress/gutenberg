@@ -209,7 +209,7 @@ describe( 'Pattern blocks', () => {
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"Pattern created:")]'
+			'//*[contains(@class, "components-snackbar")]/*[contains(text(),"pattern created:")]'
 		);
 
 		await clearAllBlocks();

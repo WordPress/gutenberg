@@ -226,7 +226,7 @@ describe( 'hasEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -361,7 +361,7 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'': [ 'post', 'page' ],
+										'': { itemIds: [ 'post', 'page' ] },
 									},
 								},
 							},
@@ -399,7 +399,9 @@ describe( 'getEntityRecords', () => {
 								},
 								queries: {
 									default: {
-										'_fields=id%2Ccontent': [ 1 ],
+										'_fields=id%2Ccontent': {
+											itemIds: [ 1 ],
+										},
 									},
 								},
 							},

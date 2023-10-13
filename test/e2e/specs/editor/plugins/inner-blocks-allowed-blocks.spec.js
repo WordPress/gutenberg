@@ -107,7 +107,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await page.keyboard.press( 'Enter' );
 

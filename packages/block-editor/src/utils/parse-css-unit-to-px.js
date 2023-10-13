@@ -211,6 +211,26 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 		ex: 7.15625, // X-height of the element's font. Approximate.
 		lh: setOptions.lineHeight,
 	};
+	relativeUnits.svw = relativeUnits.vmin;
+	relativeUnits.lvw = relativeUnits.vmax;
+	relativeUnits.dvw = relativeUnits.vw;
+	relativeUnits.svh = relativeUnits.vmin;
+	relativeUnits.lvh = relativeUnits.vmax;
+	relativeUnits.dvh = relativeUnits.vh;
+	relativeUnits.vi = relativeUnits.vh;
+	relativeUnits.svi = relativeUnits.vmin;
+	relativeUnits.lvi = relativeUnits.vmax;
+	relativeUnits.dvi = relativeUnits.vw;
+	relativeUnits.vb = relativeUnits.vh;
+	relativeUnits.svb = relativeUnits.vmin;
+	relativeUnits.lvb = relativeUnits.vmax;
+	relativeUnits.dvb = relativeUnits.vh;
+	relativeUnits.svmin = relativeUnits.vmin;
+	relativeUnits.lvmin = relativeUnits.vmin;
+	relativeUnits.dvmin = relativeUnits.vmin;
+	relativeUnits.svmax = relativeUnits.vmax;
+	relativeUnits.lvmax = relativeUnits.vmax;
+	relativeUnits.dvmax = relativeUnits.vmax;
 
 	const absoluteUnits = {
 		in: PIXELS_PER_INCH,

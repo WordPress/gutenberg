@@ -7,10 +7,11 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
+	ExternalLink,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -73,13 +74,11 @@ export function BlockPatternsSyncFilter( {
 			{
 				value: SYNC_TYPES.full,
 				label: __( 'Synced' ),
-				info: __( 'Updated everywhere' ),
 				disabled: shouldDisableSyncFilter,
 			},
 			{
 				value: SYNC_TYPES.unsynced,
-				label: __( 'Standard' ),
-				info: __( 'Edit freely' ),
+				label: __( 'Not synced' ),
 				disabled: shouldDisableSyncFilter,
 			},
 		],
@@ -95,20 +94,17 @@ export function BlockPatternsSyncFilter( {
 			},
 			{
 				value: PATTERN_TYPES.directory,
-				label: __( 'Directory' ),
-				info: __( 'Pattern directory & core' ),
+				label: __( 'Pattern Directory' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
 				value: PATTERN_TYPES.theme,
-				label: __( 'Theme' ),
-				info: __( 'Bundled with the theme' ),
+				label: __( 'Theme & Plugins' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
 				value: PATTERN_TYPES.user,
 				label: __( 'User' ),
-				info: __( 'Custom created' ),
 			},
 		],
 		[ shouldDisableNonUserSources ]
@@ -149,7 +145,7 @@ export function BlockPatternsSyncFilter( {
 			>
 				{ () => (
 					<>
-						<MenuGroup label={ __( 'Author' ) }>
+						<MenuGroup label={ __( 'Source' ) }>
 							<MenuItemsChoice
 								choices={ patternSourceMenuOptions }
 								onSelect={ ( value ) => {
@@ -175,6 +171,22 @@ export function BlockPatternsSyncFilter( {
 								value={ patternSyncFilter }
 							/>
 						</MenuGroup>
+						<div className="block-editor-tool-selector__help">
+							{ createInterpolateElement(
+								__(
+									'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
+								),
+								{
+									Link: (
+										<ExternalLink
+											href={ __(
+												'https://wordpress.org/patterns/'
+											) }
+										/>
+									),
+								}
+							) }
+						</div>
 					</>
 				) }
 			</DropdownMenu>

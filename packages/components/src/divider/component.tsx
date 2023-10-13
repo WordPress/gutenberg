@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import { contextConnect, useContextSystem } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { contextConnect, useContextSystem } from '../context';
 import { DividerView } from './styles';
 import type { DividerProps } from './types';
 

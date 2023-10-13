@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../ui/context';
+import { contextConnect, useContextSystem } from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';

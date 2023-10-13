@@ -26,8 +26,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect, useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';

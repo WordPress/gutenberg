@@ -98,6 +98,7 @@
 
 .block-editor-block-switcher__preview__popover {
 	display: none;
+	overflow: hidden;
 
 	// Position correctly. Needs specificity.
 	&.components-popover {
@@ -115,6 +116,7 @@
 		border-radius: $radius-block-ui;
 		outline: none;
 		box-shadow: none;
+		overflow: auto;
 	}
 
 	.block-editor-block-switcher__preview {
@@ -124,6 +126,10 @@
 		// Use padding to prevent the pattern previews focus style from being cut-off.
 		padding: 0 $grid-unit-20;
 		overflow: hidden;
+
+		&.is-pattern-list-preview {
+			overflow: unset;
+		}
 	}
 }
 
