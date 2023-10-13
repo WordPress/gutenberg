@@ -53,6 +53,7 @@ jobs:
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
+                  fetch-depth: 100
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
