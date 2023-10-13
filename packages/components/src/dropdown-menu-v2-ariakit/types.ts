@@ -11,60 +11,175 @@ export interface DropdownMenuContext {
 }
 
 export interface DropdownMenuProps {
+	/**
+	 * The trigger button.
+	 */
 	trigger: React.ReactElement;
+	/**
+	 * The contents of the dropdown
+	 */
 	children?: React.ReactNode;
 	/**
+	 * The modality of the dropdown menu. When set to true, interaction with
+	 * outside elements will be disabled and only menu content will be visible to
+	 * screen readers.
+	 *
 	 * @default true
 	 */
 	modal?: boolean;
+	/**
+	 * The controlled open state of the dropdown menu. Must be used in conjunction
+	 * with `onOpenChange`.
+	 */
 	open?: boolean;
+	/**
+	 * The open state of the dropdown menu when it is initially rendered. Use when
+	 * not wanting to control its open state.
+	 */
 	defaultOpen?: boolean;
+	/**
+	 * Event handler called when the open state of the dropdown menu changes.
+	 */
 	onOpenChange?: ( open: boolean ) => void;
-	// default depends on root level or nested menu
+	/**
+	 * The placement of the dropdown menu popover.
+	 *
+	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
+	 */
 	placement?: Placement;
+	/**
+	 * The distance between the popover and the anchor element.
+	 *
+	 * @default 8 for root-level menus, 16 for nested menus
+	 */
 	gutter?: number;
+	/**
+	 * The skidding of the popover along the anchor element. Can be set to
+	 * negative values to make the popover shift to the opposite side.
+	 *
+	 * @default 0 for root-level menus, -8 for nested menus
+	 */
 	shift?: number;
-	defaultValues?: Ariakit.MenuStoreProps[ 'defaultValues' ];
-	hideOnEscape?: Ariakit.MenuProps[ 'hideOnEscape' ];
+	/**
+	 * The default values for the values state.
+	 */
+	defaultValues?: Record<
+		string,
+		string | boolean | number | Array< string | number >
+	>;
+	/**
+	 * Determines whether the menu popover will be hidden when the user presses
+	 * the Escape key.
+	 *
+	 * @default true
+	 */
+	hideOnEscape?:
+		| boolean
+		| ( (
+				event: KeyboardEvent | React.KeyboardEvent< Element >
+		  ) => boolean );
 }
 
-export interface DropdownMenuGroupProps
-	extends Omit< Ariakit.MenuGroupProps, 'store' > {}
+export interface DropdownMenuGroupProps {
+	/**
+	 * The contents of the group
+	 */
+	children: React.ReactNode;
+}
 
-export interface DropdownMenuGroupLabelProps
-	extends Omit< Ariakit.MenuGroupLabelProps, 'store' > {}
+export interface DropdownMenuGroupLabelProps {
+	/**
+	 * The contents of the label
+	 */
+	children: React.ReactNode;
+}
 
 export interface DropdownMenuItemProps {
+	/**
+	 * The contents of the label
+	 */
 	children: React.ReactNode;
+	/**
+	 * The contents of the item's prefix
+	 */
 	prefix?: React.ReactNode;
+	/**
+	 * The contents of the item's suffix
+	 */
 	suffix?: React.ReactNode;
-	onClick?: React.MouseEventHandler;
-	// Default true
+	/**
+	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 *
+	 * @default true
+	 */
 	hideOnClick?: boolean;
+	/**
+	 * Determines if the element is disabled.
+	 */
 	disabled?: boolean;
 }
 
 export interface DropdownMenuCheckboxItemProps
 	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
-	// Default false
+	/**
+	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 *
+	 * @default false
+	 */
 	hideOnClick?: boolean;
+	/**
+	 * The checkbox item's name.
+	 */
 	name: string;
-	value: string;
+	/**
+	 * The checkbox item's value, useful when using multiple checkbox items
+	 * associated to the same `name`.
+	 */
+	value?: string;
+	/**
+	 * The controlled checked state of the checkbox menu item.
+	 */
 	checked?: boolean;
+	/**
+	 * The checked state of the checkbox menu item when it is initially rendered.
+	 * Use when not wanting to control its checked state.
+	 */
 	defaultChecked?: boolean;
+	/**
+	 * Event handler called when the checked state of the checkbox menu item changes.
+	 */
 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }
 
 export interface DropdownMenuRadioItemProps
 	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
-	// Default false
+	/**
+	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 *
+	 * @default false
+	 */
 	hideOnClick?: boolean;
+	/**
+	 * The radio item's name.
+	 */
 	name: string;
-	value: string;
+	/**
+	 * The radio item's value.
+	 */
+	value: string | number;
+	/**
+	 * The controlled checked state of the radio menu item.
+	 */
 	checked?: boolean;
+	/**
+	 * The checked state of the radio menu item when it is initially rendered.
+	 * Use when not wanting to control its checked state.
+	 */
 	defaultChecked?: boolean;
+	/**
+	 * Event handler called when the checked radio menu item changes.
+	 */
 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }
 
-export interface DropdownMenuSeparatorProps
-	extends Omit< Ariakit.MenuSeparatorProps, 'store' > {}
+export interface DropdownMenuSeparatorProps {}

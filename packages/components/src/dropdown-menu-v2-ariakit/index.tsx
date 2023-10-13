@@ -32,6 +32,7 @@ import type {
 	DropdownMenuGroupLabelProps,
 	DropdownMenuItemProps,
 	DropdownMenuCheckboxItemProps,
+	DropdownMenuRadioItemProps,
 	DropdownMenuSeparatorProps,
 } from './types';
 import * as Styled from './styles';
@@ -43,12 +44,16 @@ export const DropdownMenuContext = createContext<
 export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
->( function DropdownMenuItem( { prefix, suffix, children, ...props }, ref ) {
+>( function DropdownMenuItem(
+	{ prefix, suffix, children, hideOnClick = true, ...props },
+	ref
+) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
 		<Styled.DropdownMenuItem
 			ref={ ref }
 			{ ...props }
+			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
 		>
 			{ prefix && (
@@ -65,7 +70,10 @@ export const DropdownMenuItem = forwardRef<
 export const DropdownMenuCheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
->( function DropdownMenuCheckboxItem( { suffix, children, ...props }, ref ) {
+>( function DropdownMenuCheckboxItem(
+	{ suffix, children, hideOnClick = false, ...props },
+	ref
+) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
 	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
@@ -93,6 +101,7 @@ export const DropdownMenuCheckboxItem = forwardRef<
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }
 			{ ...props }
+			hideOnClick={ hideOnClick }
 			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
@@ -117,8 +126,11 @@ export const DropdownMenuCheckboxItem = forwardRef<
 
 export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
->( function DropdownMenuRadioItem( { suffix, children, ...props }, ref ) {
+	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
+>( function DropdownMenuRadioItem(
+	{ suffix, children, hideOnClick = false, ...props },
+	ref
+) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
 		props.onChange?.( {
@@ -134,6 +146,7 @@ export const DropdownMenuRadioItem = forwardRef<
 		<Styled.DropdownMenuRadioItem
 			ref={ ref }
 			{ ...props }
+			hideOnClick={ hideOnClick }
 			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
