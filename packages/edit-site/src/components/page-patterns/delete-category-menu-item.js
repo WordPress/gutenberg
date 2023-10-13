@@ -91,7 +91,9 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 			>
 				{ sprintf(
 					// translators: %s: The pattern category's name.
-					__( 'Are you sure you want to delete "%s"?' ),
+					__(
+						'Are you sure you want to delete the category "%s"? The patterns will not be deleted.'
+					),
 					decodeEntities( category.label )
 				) }
 			</ConfirmDialog>
