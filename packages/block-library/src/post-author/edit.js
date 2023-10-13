@@ -12,8 +12,11 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	ComboboxControl,
 	PanelBody,
 	SelectControl,
@@ -22,6 +25,14 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { migrateToRecommendedBlocks } from './utils';
+import { unlock } from '../lock-unlock';
+
+const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 const minimumUsersForCombobox = 25;
 
@@ -35,6 +46,7 @@ function PostAuthorEdit( {
 	context: { postType, postId, queryId },
 	attributes,
 	setAttributes,
+	clientId,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
@@ -57,6 +69,7 @@ function PostAuthorEdit( {
 	);
 
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
 		attributes;
@@ -96,8 +109,19 @@ function PostAuthorEdit( {
 	const showAuthorControl =
 		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
 
+	function transformBlock() {
+		replaceBlock( clientId, migrateToRecommendedBlocks( attributes ) );
+	}
+
 	return (
 		<>
+			<BlockInfo>
+				<div className="wp-block-post-author__transform-button">
+					<Button variant="primary" onClick={ transformBlock }>
+						{ __( 'Migrate block' ) }
+					</Button>
+				</div>
+			</BlockInfo>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showAuthorControl &&
