@@ -71,7 +71,10 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
 		props.onChange?.( {
 			...e,
-			target: Object.assign( e.target, { value: props.value } ),
+			target: Object.assign( e.target, {
+				value: props.value,
+				name: props.name,
+			} ),
 		} );
 	};
 
@@ -120,7 +123,10 @@ export const DropdownMenuRadioItem = forwardRef<
 	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
 		props.onChange?.( {
 			...e,
-			target: Object.assign( e.target, { value: props.value } ),
+			target: Object.assign( e.target, {
+				value: props.value,
+				name: props.name,
+			} ),
 		} );
 	};
 
