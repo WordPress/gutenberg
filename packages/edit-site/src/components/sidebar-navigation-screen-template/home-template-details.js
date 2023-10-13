@@ -117,19 +117,17 @@ export default function HomeTemplateDetails() {
 	 */
 	const templateAreas = useMemo( () => {
 		// Keep track of template part IDs that have already been added to the array.
-		const templatePartIds = [];
+		const templatePartIds = new Set();
 		const filterOutDuplicateTemplateParts = ( currentTemplatePart ) => {
 			// If the template part has already been added to the array, skip it.
-			if (
-				templatePartIds.indexOf( currentTemplatePart.templatePart.id ) >
-				-1
-			) {
+			if ( templatePartIds.has( currentTemplatePart.templatePart.id ) ) {
 				return;
 			}
 			// Add to the array of template part IDs.
-			templatePartIds.push( currentTemplatePart.templatePart.id );
+			templatePartIds.add( currentTemplatePart.templatePart.id );
 			return currentTemplatePart;
 		};
+
 		return currentTemplateParts.length && templatePartAreas
 			? currentTemplateParts
 					.filter( filterOutDuplicateTemplateParts )
