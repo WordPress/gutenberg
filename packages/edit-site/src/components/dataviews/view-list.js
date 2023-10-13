@@ -21,16 +21,12 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
-	moreVertical,
 } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
 	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
@@ -38,6 +34,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import FieldActions from './field-actions';
 
 const {
 	DropdownMenuV2,
@@ -135,38 +132,24 @@ function ViewList( {
 	paginationInfo,
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [ ...fields ];
+		const _columns = [
+			...fields.map( ( field ) => {
+				const column = { ...field };
+				delete column.render;
+				column.cell = ( props ) => {
+					return field.render
+						? field.render( { item: props.row.original } )
+						: field.accessorFn( props.row.original );
+				};
+				return column;
+			} ),
+		];
 		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
-					return (
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						>
-							{ () => (
-								<MenuGroup>
-									{ actions.map( ( action ) => (
-										<MenuItem
-											key={ action.id }
-											onClick={ () =>
-												action.perform(
-													props.row.original
-												)
-											}
-											isDestructive={
-												action.isDesctructive
-											}
-										>
-											{ action.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-						</DropdownMenu>
-					);
+					return <FieldActions item={ props.row.original } />;
 				},
 				enableHiding: false,
 			} );
