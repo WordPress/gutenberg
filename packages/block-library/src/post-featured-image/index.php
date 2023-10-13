@@ -17,7 +17,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	$post_ID.        = $block->context['postId'];
+	$post_ID         = $block->context['postId'];
 	$is_link         = isset( $attributes['isLink'] ) && $attributes['isLink'];
 	$size_slug       = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$attr            = get_block_core_post_featured_image_border_attributes( $attributes );
