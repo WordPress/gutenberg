@@ -94,6 +94,7 @@ $GLOBALS['wp_tests_options'] = array(
 	'gutenberg-experiments' => array(
 		'gutenberg-widget-experiments' => '1',
 		'gutenberg-full-site-editing'  => 1,
+		'gutenberg-form-blocks'        => 1,
 	),
 );
 

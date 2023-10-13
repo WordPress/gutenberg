@@ -17,6 +17,7 @@ import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
+import msListIgnore from './ms-list-ignore';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -49,6 +50,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
 	] );
@@ -121,17 +123,34 @@ export function pasteHandler( {
 		HTML = HTML.normalize();
 	}
 
-	// Parse Markdown (and encoded HTML) if:
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
+
+	// Consider plain text if:
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
-	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
+	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	// Parse Markdown (and encoded HTML) if it's considered plain text.
+	if ( isPlainText ) {
 		HTML = plainText;
 
 		// The markdown converter (Showdown) trims whitespace.
 		if ( ! /^\s+$/.test( plainText ) ) {
 			HTML = markdownConverter( HTML );
 		}
+	}
 
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
+	const pieces = shortcodeConverter( HTML );
+
+	// The call to shortcodeConverter will always return more than one element
+	// if shortcodes are matched. The reason is when shortcodes are matched
+	// empty HTML strings are included.
+	const hasShortcodes = pieces.length > 1;
+
+	if ( isPlainText && ! hasShortcodes ) {
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
 		// * The original plain text had no line breaks.
@@ -150,18 +169,6 @@ export function pasteHandler( {
 	if ( mode === 'INLINE' ) {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
-
-	// Must be run before checking if it's inline content.
-	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
-
-	// An array of HTML strings and block objects. The blocks replace matched
-	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
-
-	// The call to shortcodeConverter will always return more than one element
-	// if shortcodes are matched. The reason is when shortcodes are matched
-	// empty HTML strings are included.
-	const hasShortcodes = pieces.length > 1;
 
 	if (
 		mode === 'AUTO' &&

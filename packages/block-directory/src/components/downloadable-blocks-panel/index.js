@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { withSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -72,10 +72,12 @@ function DownloadableBlocksPanel( {
 }
 
 export default compose( [
-	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
-			select( blockDirectoryStore );
-		const { canInsertBlockType } = select( blockEditorStore );
+	withSelect( ( select, { filterValue } ) => {
+		const {
+			getDownloadableBlocks,
+			isRequestingDownloadableBlocks,
+			getInstalledBlockTypes,
+		} = select( blockDirectoryStore );
 
 		const hasPermission = select( coreStore ).canUser(
 			'read',
@@ -84,9 +86,19 @@ export default compose( [
 
 		function getInstallableBlocks( term ) {
 			const downloadableBlocks = getDownloadableBlocks( term );
-			const installableBlocks = downloadableBlocks.filter( ( block ) =>
-				canInsertBlockType( block, rootClientId, true )
-			);
+			const installedBlockTypes = getInstalledBlockTypes();
+			// Filter out blocks that are already installed.
+			const installableBlocks = downloadableBlocks.filter( ( block ) => {
+				// Check if the block has just been installed, in which case it
+				// should still show in the list to avoid suddenly disappearing.
+				// `installedBlockTypes` only returns blocks stored in state
+				// immediately after installation, not all installed blocks.
+				const isJustInstalled = !! installedBlockTypes.find(
+					( blockType ) => blockType.name === block.name
+				);
+				const isPreviouslyInstalled = getBlockType( block.name );
+				return isJustInstalled || ! isPreviouslyInstalled;
+			} );
 
 			if ( downloadableBlocks.length === installableBlocks.length ) {
 				return downloadableBlocks;

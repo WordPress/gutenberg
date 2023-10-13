@@ -166,9 +166,12 @@ function CoverEdit( {
 
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
+		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
+			IMAGE_BACKGROUND_TYPE
+		);
 
 		const averageBackgroundColor = await getMediaColor(
-			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
+			isImage ? newMedia?.url : undefined
 		);
 
 		let newOverlayColor = overlayColor.color;

@@ -215,9 +215,11 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 ```js
 // File: src/index.js
 
+// External dependencies.
+import { createRoot } from 'react-dom';
+
 // WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
-import { render } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 // Internal dependencies.
@@ -233,11 +235,11 @@ Next, once the DOM is ready you will need to run a function which:
 
 ```jsx
 domReady( function () {
+	const root = createRoot( document.getElementById( 'getdave-sbe-block-editor' ) );
 	const settings = window.getdaveSbeSettings || {};
 	registerCoreBlocks();
-	render(
-		<Editor settings={ settings } />,
-		document.getElementById( 'getdave-sbe-block-editor' )
+	root.render(
+		<Editor settings={ settings } />
 	);
 } );
 ```

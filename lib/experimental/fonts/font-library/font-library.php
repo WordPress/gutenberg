@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 /**
@@ -17,7 +17,7 @@
  * provides instructions on where the could needs to go
  * in Core.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
@@ -41,7 +41,7 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	/**
 	 * Registers a new Font Collection in the Font Library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string[] $config {
 	 *     Font collection associative array of configuration options.

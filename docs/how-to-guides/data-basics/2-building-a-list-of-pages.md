@@ -150,8 +150,8 @@ The list of pages is short for now; however, the longer it grows, the harder it 
 Let’s start by adding a search field:
 
 ```js
+import { useState } from 'react';
 import { SearchControl } from '@wordpress/components';
-import { useState, render } from '@wordpress/element';
 
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = useState( '' );
@@ -211,8 +211,9 @@ The `searchTerm` is now used as a `search` query parameter when provided. Note t
 Finally, here’s how `MyFirstApp` looks once we wire it all together:
 
 ```js
+import { useState } from 'react';
+import { createRoot } from 'react-dom';
 import { SearchControl } from '@wordpress/components';
-import { useState, render } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
@@ -359,8 +360,9 @@ And voilà! That's it.
 All the pieces are in place, great! Here’s the complete JavaScript code of our app:
 
 ```js
+import { useState } from 'react';
+import { createRoot } from 'react-dom';
 import { SearchControl, Spinner } from '@wordpress/components';
-import { useState, render } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -421,12 +423,14 @@ function PagesList( { hasResolved, pages } ) {
 	);
 }
 
+const root = createRoot(
+	document.querySelector( '#my-first-gutenberg-app' )
+);
 window.addEventListener(
 	'load',
 	function () {
-		render(
-			<MyFirstApp />,
-			document.querySelector( '#my-first-gutenberg-app' )
+		root.render(
+			<MyFirstApp />
 		);
 	},
 	false

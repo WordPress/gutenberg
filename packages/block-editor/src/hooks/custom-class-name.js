@@ -44,9 +44,9 @@ export function addAttribute( settings ) {
  * assigning the custom class name, if block supports custom class name.
  * The control is displayed within the Advanced panel in the block inspector.
  *
- * @param {WPComponent} BlockEdit Original component.
+ * @param {Component} BlockEdit Original component.
  *
- * @return {WPComponent} Wrapped component.
+ * @return {Component} Wrapped component.
  */
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {

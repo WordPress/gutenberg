@@ -14,7 +14,6 @@ import {
 	Popover,
 } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -65,9 +64,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
 				{ stylesToRender.map( ( style ) => {
-					const buttonText = style.isDefault
-						? __( 'Default' )
-						: style.label || style.name;
+					const buttonText = style.label || style.name;
 
 					return (
 						<Button

@@ -18,7 +18,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/)
  *                                                                      icon slug string, or an SVG WP element, to be rendered when
  *                                                                      the sidebar is pinned to toolbar.
- * @param {WPElement}             props.children                        Children to be rendered
+ * @param {Element}               props.children                        Children to be rendered
  *
  * @example
  * ```js
@@ -27,7 +27,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
  *
  * function MyPluginPrePublishPanel() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginPrePublishPanel,
  * 		{
  * 			className: 'my-plugin-pre-publish-panel',
@@ -56,7 +56,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginPrePublishPanel = ( {
 	children,

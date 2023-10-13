@@ -17,7 +17,7 @@ export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {Element} Line height edit element.
  */
 export function LineHeightEdit( props ) {
 	const {

@@ -10,6 +10,16 @@ import TemplatePartNavigationMenus from './template-part-navigation-menus';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
+function getBlocksFromRecord( record ) {
+	if ( record?.blocks ) {
+		return record?.blocks;
+	}
+
+	return record?.content && typeof record.content !== 'function'
+		? parse( record.content )
+		: [];
+}
+
 /**
  * Retrieves a list of specific blocks from a given tree of blocks.
  *
@@ -60,11 +70,7 @@ export default function useNavigationMenuContent( postType, postId ) {
 		return;
 	}
 
-	const blocks =
-		record?.content && typeof record.content !== 'function'
-			? parse( record.content )
-			: [];
-
+	const blocks = getBlocksFromRecord( record );
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
 		blocks

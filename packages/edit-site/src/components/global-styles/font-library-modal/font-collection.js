@@ -12,6 +12,7 @@ import {
 	FlexItem,
 	Flex,
 	Button,
+	Notice,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -29,6 +30,7 @@ import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
+import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -45,13 +47,15 @@ function FontCollection( { id } ) {
 		);
 	};
 
+	const [ notice, setNotice ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection } = useContext( FontLibraryContext );
+	const { collections, getFontCollection, installFonts } =
+		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
 	);
@@ -68,13 +72,35 @@ function FontCollection( { id } ) {
 	}, [ id, requiresPermission ] );
 
 	useEffect( () => {
-		getFontCollection( id );
-		resetFilters();
+		const fetchFontCollection = async () => {
+			try {
+				await getFontCollection( id );
+				resetFilters();
+			} catch ( e ) {
+				setNotice( {
+					type: 'error',
+					message: e?.message,
+					duration: 0, // Don't auto-hide.
+				} );
+			}
+		};
+		fetchFontCollection();
 	}, [ id, getFontCollection ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
+		setNotice( null );
 	}, [ id ] );
+
+	// Reset notice after 5 seconds
+	useEffect( () => {
+		if ( notice && notice?.duration !== 0 ) {
+			const timeout = setTimeout( () => {
+				setNotice( null );
+			}, notice.duration ?? 5000 );
+			return () => clearTimeout( timeout );
+		}
+	}, [ notice ] );
 
 	const collectionFonts = useMemo(
 		() => selectedCollection?.data?.fontFamilies ?? [],
@@ -122,6 +148,13 @@ function FontCollection( { id } ) {
 		setFontsToInstall( [] );
 	};
 
+	const handleInstall = async () => {
+		const response = await installFonts( fontsToInstall );
+		const installNotice = getNoticeFromInstallResponse( response );
+		setNotice( installNotice );
+		resetFontsToInstall();
+	};
+
 	return (
 		<TabLayout
 			title={
@@ -135,10 +168,7 @@ function FontCollection( { id } ) {
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
 				fontsToInstall.length > 0 && (
-					<Footer
-						fontsToInstall={ fontsToInstall }
-						resetFontsToInstall={ resetFontsToInstall }
-					/>
+					<Footer handleInstall={ handleInstall } />
 				)
 			}
 		>
@@ -149,8 +179,20 @@ function FontCollection( { id } ) {
 				</>
 			) }
 
-			{ ! renderConfirmDialog && ! selectedCollection.data && (
-				<Spinner />
+			{ notice && (
+				<>
+					<FlexItem>
+						<Spacer margin={ 2 } />
+						<Notice
+							isDismissible={ false }
+							status={ notice.type }
+							className="font-library-modal__font-collection__notice"
+						>
+							{ notice.message }
+						</Notice>
+					</FlexItem>
+					<Spacer margin={ 2 } />
+				</>
 			) }
 
 			{ ! renderConfirmDialog && ! selectedFont && (
@@ -193,9 +235,9 @@ function FontCollection( { id } ) {
 			) }
 
 			<Spacer margin={ 4 } />
-
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies && <Spinner /> }
+				! selectedCollection?.data?.fontFamilies &&
+				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
 				!! selectedCollection?.data?.fontFamilies?.length &&
@@ -232,13 +274,8 @@ function FontCollection( { id } ) {
 	);
 }
 
-function Footer( { fontsToInstall, resetFontsToInstall } ) {
-	const { installFonts, isInstalling } = useContext( FontLibraryContext );
-
-	const handleInstall = async () => {
-		await installFonts( fontsToInstall );
-		resetFontsToInstall();
-	};
+function Footer( { handleInstall } ) {
+	const { isInstalling } = useContext( FontLibraryContext );
 
 	return (
 		<Flex justify="flex-end">

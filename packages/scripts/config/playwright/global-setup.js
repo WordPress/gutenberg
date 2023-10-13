@@ -32,4 +32,4 @@ async function globalSetup( config ) {
 	await requestContext.dispose();
 }
 
-export default globalSetup;
+module.exports = globalSetup;

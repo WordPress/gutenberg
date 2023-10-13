@@ -1279,9 +1279,9 @@ describe( 'actions', () => {
 					fetch: () => {},
 				} )( {
 					select: {
-						getSettings: () => ( {
-							inserterMediaCategories: [ { name: 'a' } ],
-						} ),
+						getRegisteredInserterMediaCategories: () => [
+							{ name: 'a' },
+						],
 					},
 				} );
 				expect( console ).toHaveErroredWith(
@@ -1296,11 +1296,9 @@ describe( 'actions', () => {
 					fetch: () => {},
 				} )( {
 					select: {
-						getSettings: () => ( {
-							inserterMediaCategories: [
-								{ labels: { name: 'a' } },
-							],
-						} ),
+						getRegisteredInserterMediaCategories: () => [
+							{ labels: { name: 'a' } },
+						],
 					},
 				} );
 				expect( console ).toHaveErroredWith(
@@ -1321,18 +1319,14 @@ describe( 'actions', () => {
 			const dispatch = jest.fn();
 			registerInserterMediaCategory( category )( {
 				select: {
-					getSettings: () => ( { inserterMediaCategories } ),
+					getRegisteredInserterMediaCategories: () =>
+						inserterMediaCategories,
 				},
 				dispatch,
 			} );
 			expect( dispatch ).toHaveBeenLastCalledWith( {
-				type: 'UPDATE_SETTINGS',
-				settings: {
-					inserterMediaCategories: [
-						...inserterMediaCategories,
-						{ ...category, isExternalResource: true },
-					],
-				},
+				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+				category: { ...category, isExternalResource: true },
 			} );
 		} );
 	} );
