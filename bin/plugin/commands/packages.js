@@ -86,7 +86,7 @@ async function checkoutNpmReleaseBranch( {
 	 * Note that we are grabbing an arbitrary depth of commits (999) during the fetch.
 	 * When Lerna attempts to determine if a package needs an update, it looks at
 	 * `git` history to find the commit created during the previous npm publishing.
-	 * Lerna assumes that all packages will be published if it can't access
+	 * Lerna assumes that all packages need publishing if it can't access
 	 * the necessary information.
 	 */
 	await SimpleGit( gitWorkingDirectoryPath )
