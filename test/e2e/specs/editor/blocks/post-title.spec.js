@@ -19,12 +19,7 @@ test.describe( 'Post Title block', () => {
 			.fill( 'Just tweaking the post title' );
 
 		// Save the post draft and reload.
-		await page.getByRole( 'button', { name: 'Save draft' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Draft saved' } )
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 
 		const titleBlock = editor.canvas.getByRole( 'document', {
