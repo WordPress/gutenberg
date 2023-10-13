@@ -10,14 +10,16 @@ function buildNavigationLabel( title, id, status ) {
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
+	const decodedTitle = decodeEntities( title );
+
 	if ( status === 'publish' ) {
-		return decodeEntities( title );
+		return decodedTitle;
 	}
 
 	return sprintf(
 		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
 		__( '%1$s (%2$s)' ),
-		decodeEntities( title ),
+		decodedTitle,
 		status
 	);
 }
