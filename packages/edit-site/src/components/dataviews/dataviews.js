@@ -13,6 +13,7 @@ import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import TextFilter from './text-filter';
+import FieldsFilters from './fields-filters';
 import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
@@ -28,13 +29,24 @@ export default function DataViews( {
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
-				<HStack justify="space-between">
-					<TextFilter view={ view } onChangeView={ onChangeView } />
-					<ViewActions
-						fields={ fields }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
+				<HStack>
+					<HStack justify="start">
+						<TextFilter
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<FieldsFilters
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</HStack>
+					<HStack justify="end">
+						<ViewActions
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</HStack>
 				</HStack>
 				<ViewComponent
 					fields={ fields }
