@@ -5,20 +5,26 @@ import { closeSmall } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 
 function ActiveFilter( { label, onChangeView } ) {
+	// TODO. Do not reuse the components-form-token-field classes:
+	// either make that component public or create a new one.
 	return (
-		<Button
-			icon={ closeSmall }
-			onClick={ () => {
-				onChangeView( ( currentView ) => {
-					delete currentView.filters[ label ];
-					return {
-						...currentView,
-					};
-				} );
-			} }
-		>
-			{ label }
-		</Button>
+		<span className="components-form-token-field__token">
+			<span className="components-form-token-field__token-text">
+				{ label }
+			</span>
+			<Button
+				className="components-form-token-field__remove-token"
+				icon={ closeSmall }
+				onClick={ () => {
+					onChangeView( ( currentView ) => {
+						delete currentView.filters[ label ];
+						return {
+							...currentView,
+						};
+					} );
+				} }
+			/>
+		</span>
 	);
 }
 
