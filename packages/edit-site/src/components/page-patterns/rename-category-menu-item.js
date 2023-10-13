@@ -16,10 +16,6 @@ const { RenamePatternCategoryModal } = unlock( patternsPrivateApis );
 export default function RenameCategoryMenuItem( { category, onClose } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	if ( ! category?.id ) {
-		return null;
-	}
-
 	// User created pattern categories have their properties updated when
 	// retrieved via `getUserPatternCategories`. The rename modal expects an
 	// object that will match the pattern category entity.

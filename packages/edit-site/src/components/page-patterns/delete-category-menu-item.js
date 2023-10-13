@@ -30,10 +30,6 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 	const { deleteEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
 
-	if ( ! category?.id ) {
-		return null;
-	}
-
 	const onDelete = async () => {
 		try {
 			await deleteEntityRecord(
