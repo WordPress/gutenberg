@@ -156,10 +156,12 @@ const itemSuffix = css`
 	*/
 	opacity: 0.6;
 
-	/* TODO: find equivalent of data-state="open" and data-disabled */
-	&[data-active-item] > &,
-	[data-state='open'] > &,
-	[data-disabled] > & {
+	/* when the parent item is hovered / focused */
+	[data-active-item] > &,
+	/* when the parent item is a submenu trigger and the submenu is open */
+	[aria-expanded='true'] > &,
+	/* when the parent item is disabled */
+	[aria-disabled='true'] > & {
 		opacity: 1;
 	}
 `;
