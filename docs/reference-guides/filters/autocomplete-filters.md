@@ -66,7 +66,7 @@ var acronymCompleter = {
 		return acronym.letters;
 	},
 	getOptionCompletion: function ( abbr ) {
-		return wp.element.createElement(
+		return React.createElement(
 			'abbr',
 			{ title: abbr.expansion },
 			abbr.letters

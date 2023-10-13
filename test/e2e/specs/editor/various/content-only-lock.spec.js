@@ -24,8 +24,9 @@ test.describe( 'Content-only lock', () => {
 <!-- /wp:group -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await editor.canvas.click( 'role=document[name="Block: Paragraph"i]' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.click();
 		await page.keyboard.type( ' World' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -49,8 +50,9 @@ test.describe( 'Content-only lock', () => {
 <!-- /wp:group -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await editor.canvas.click( 'role=document[name="Block: Paragraph"i]' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.click();
 		await page.keyboard.type( ' WP' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

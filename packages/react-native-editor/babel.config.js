@@ -41,14 +41,14 @@ module.exports = function ( api ) {
 					/node_modules\/(react-native|@react-native-community|@react-navigation|react-native-reanimated)/,
 			},
 			{
-				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found.
+				// Auto-add `import { createElement } from 'react';` when JSX is found.
 				plugins: [
 					[
 						'@wordpress/babel-plugin-import-jsx-pragma',
 						{
 							scopeVariable: 'createElement',
 							scopeVariableFrag: 'Fragment',
-							source: '@wordpress/element',
+							source: 'react',
 							isDefault: false,
 						},
 					],

@@ -85,7 +85,7 @@ The following filters are available to change the behavior of blocks while editi
 
 ### `blocks.getSaveElement`
 
-A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
+A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
 The filter's callback receives an element, a block type definition object and the block attributes as arguments. It should return an element.
 
@@ -210,14 +210,14 @@ wp.hooks.addFilter(
 {% Plain %}
 
 ```js
-var el = wp.element.createElement;
+var el = React.createElement;
 
 var withInspectorControls = wp.compose.createHigherOrderComponent( function (
 	BlockEdit
 ) {
 	return function ( props ) {
 		return el(
-			wp.element.Fragment,
+			React.Fragment,
 			{},
 			el( BlockEdit, props ),
 			el(
@@ -275,7 +275,7 @@ wp.hooks.addFilter(
 {% Plain %}
 
 ```js
-var el = wp.element.createElement;
+var el = React.createElement;
 
 var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
 	BlockListBlock
@@ -328,7 +328,7 @@ wp.hooks.addFilter(
 {% Plain %}
 
 ```js
-var el = wp.element.createElement;
+var el = React.createElement;
 var hoc = wp.compose.createHigherOrderComponent;
 
 var withMyWrapperProp = hoc( function ( BlockListBlock ) {
@@ -482,7 +482,7 @@ To set an SVG icon for the category shown in the previous example, add the follo
 
 ```js
 ( function () {
-	var el = wp.element.createElement;
+	var el = React.createElement;
 	var SVG = wp.primitives.SVG;
 	var circle = el( 'circle', {
 		cx: 10,

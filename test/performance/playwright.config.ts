@@ -13,7 +13,7 @@ const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
 process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
-	...baseConfig.default,
+	...baseConfig,
 	reporter: process.env.CI
 		? './config/performance-reporter.ts'
 		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
@@ -26,7 +26,7 @@ const config = defineConfig( {
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
 	use: {
-		...baseConfig.default.use,
+		...baseConfig.use,
 		video: 'off',
 	},
 } );

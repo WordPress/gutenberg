@@ -27,6 +27,11 @@ const wrap =
 				return selector;
 			}
 
+			// Skip the update when a selector already has a namespace + space (" ").
+			if ( selector.trim().startsWith( `${ namespace } ` ) ) {
+				return selector;
+			}
+
 			// Anything other than a root tag is always prefixed.
 			{
 				if ( ! selector.match( IS_ROOT_TAG ) ) {

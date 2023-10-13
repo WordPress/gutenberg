@@ -2056,6 +2056,25 @@ describe( 'Addition Settings UI', () => {
 			} )
 		);
 	} );
+
+	it( 'should show tooltip with full URL alongside filtered display', async () => {
+		const user = userEvent.setup();
+		const url =
+			'http://www.wordpress.org/wp-content/uploads/a-document.pdf';
+		render( <LinkControl value={ { url } } /> );
+
+		const link = screen.getByRole( 'link' );
+
+		expect( link ).toHaveTextContent( 'a-document.pdf' );
+
+		await user.hover( link );
+
+		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent( url );
+
+		await user.unhover( link );
+
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+	} );
 } );
 
 describe( 'Post types', () => {

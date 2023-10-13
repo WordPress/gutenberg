@@ -67,6 +67,7 @@ export {
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
+export { default as UnsupportedBlockDetails } from './unsupported-block-details';
 
 export {
 	BottomSheetSettings,

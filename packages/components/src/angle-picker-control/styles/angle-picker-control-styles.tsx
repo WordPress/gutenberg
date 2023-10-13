@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import { COLORS } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 import { Text } from '../../text';
 import CONFIG from '../../utils/config-values';
 

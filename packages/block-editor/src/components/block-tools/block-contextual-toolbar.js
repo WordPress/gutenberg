@@ -188,6 +188,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
+			variant={ isFixed ? 'unstyled' : undefined }
 			{ ...props }
 		>
 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }

@@ -41,7 +41,7 @@ The value of the `ToggleGroupControlOption`.
 
 -   Required: Yes
 
-### `icon`: `WPComponent`
+### `icon`: `Component`
 
 Icon displayed as the content of the option. Usually one of the icons from the `@wordpress/icons` package, or a custom React `<svg>` icon.
 

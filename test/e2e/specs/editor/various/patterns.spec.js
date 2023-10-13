@@ -6,6 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -14,6 +15,7 @@ test.describe( 'Unsynced pattern', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
 	} );
 
 	test( 'create a new unsynced pattern via the block options menu', async ( {
@@ -40,6 +42,10 @@ test.describe( 'Unsynced pattern', () => {
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My unsynced pattern' );
+		const newCategory = 'Contact details';
+		await createPatternDialog
+			.getByRole( 'combobox', { name: 'Categories' } )
+			.fill( newCategory );
 		await createPatternDialog
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( false );
@@ -59,18 +65,19 @@ test.describe( 'Unsynced pattern', () => {
 		// a plain paragraph block.
 		await page.getByLabel( 'Toggle block inserter' ).click();
 		await page
-			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+			.getByRole( 'tab', {
+				name: 'Patterns',
 			} )
-			.fill( 'My unsynced pattern' );
+			.click();
+		await page
+			.getByRole( 'button', {
+				name: newCategory,
+			} )
+			.click();
 		await page.getByLabel( 'My unsynced pattern' ).click();
 
-		// Just compare the block name and content as the clientIDs will be different.
-		before.forEach( ( block ) => {
-			delete block.clientId;
-		} );
 		await expect
 			.poll( editor.getBlocks )
-			.toMatchObject( [ ...before, ...before ] );
+			.toEqual( [ ...before, ...before ] );
 	} );
 } );

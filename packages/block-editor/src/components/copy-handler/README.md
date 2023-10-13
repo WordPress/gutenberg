@@ -1,5 +1,7 @@
 # Copy Handler
 
+**Deprecated**
+
 The `CopyHandler` component handles the copy/cut and paste events of its children blocks. It handles multiple selection of blocks as well.
 
 Concretely, it handles the display of success messages and takes care of copying the block to the clipboard. It uses for that the [serialize function](https://github.com/WordPress/gutenberg/blob/HEAD/packages/blocks/src/api/serializer.js), which outputs HTML augmented with the HTML-comment demarcations to denote blocks.

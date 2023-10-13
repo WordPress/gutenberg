@@ -10,7 +10,7 @@ import Button from '../../button';
 import { COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;

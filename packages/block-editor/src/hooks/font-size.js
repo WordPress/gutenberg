@@ -115,7 +115,7 @@ function addEditProps( settings ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Font size edit element.
+ * @return {Element} Font size edit element.
  */
 export function FontSizeEdit( props ) {
 	const {

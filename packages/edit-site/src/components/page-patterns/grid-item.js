@@ -174,6 +174,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				// Even though still incomplete, passing ids helps performance.
 				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
+				type="button"
 				{ ...props }
 				onClick={
 					item.type !== PATTERN_TYPES.theme ? onClick : undefined

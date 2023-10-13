@@ -16,8 +16,8 @@ _Note:_ It is worth noting that the minimum height option is an opt-in feature. 
 Renders the markup for height control component, to be used in the block inspector.
 
 ```jsx
+import { useState } from 'react';
 import { HeightControl } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 
 const MyLineHeightControl = () => (
 	const [ value, setValue ] = useState();
