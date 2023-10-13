@@ -25,7 +25,6 @@ import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
-import { VisuallyHidden } from '../../visually-hidden';
 import type { ColorObject } from '../../color-palette/types';
 import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
@@ -258,9 +257,9 @@ const BorderControlDropdown = (
 
 	return (
 		<>
-			<VisuallyHidden id={ toggleDescriptionId }>
+			<div id={ toggleDescriptionId } style={ { display: 'none' } }>
 				{ toggleDescription }
-			</VisuallyHidden>
+			</div>
 			<Dropdown
 				renderToggle={ renderToggle }
 				renderContent={ renderContent }
