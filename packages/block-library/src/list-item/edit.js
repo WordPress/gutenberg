@@ -25,11 +25,9 @@ import {
 	useSpace,
 	useIndentListItem,
 	useOutdentListItem,
-	useSplit,
 	useMerge,
 	useCopy,
 } from './hooks';
-import { convertToListItems } from './utils';
 
 export function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
@@ -58,7 +56,6 @@ export function IndentUI( { clientId } ) {
 export default function ListItemEdit( {
 	attributes,
 	setAttributes,
-	onReplace,
 	clientId,
 	mergeBlocks,
 } ) {
@@ -71,7 +68,6 @@ export default function ListItemEdit( {
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );
-	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
@@ -86,18 +82,7 @@ export default function ListItemEdit( {
 					value={ content }
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
-					onSplit={ onSplit }
 					onMerge={ onMerge }
-					onReplace={
-						onReplace
-							? ( blocks, ...args ) => {
-									onReplace(
-										convertToListItems( blocks ),
-										...args
-									);
-							  }
-							: undefined
-					}
 				/>
 				{ innerBlocksProps.children }
 			</li>

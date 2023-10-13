@@ -36,7 +36,6 @@ import {
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 
 const LINK_SETTINGS = [
@@ -199,12 +198,6 @@ function ButtonEdit( props ) {
 						...colorProps.style,
 						...spacingProps.style,
 					} }
-					onSplit={ ( value ) =>
-						createBlock( 'core/button', {
-							...attributes,
-							text: value,
-						} )
-					}
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"

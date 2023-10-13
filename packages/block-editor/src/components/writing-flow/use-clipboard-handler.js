@@ -7,6 +7,7 @@ import {
 	createBlock,
 	findTransform,
 	getBlockTransforms,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -29,11 +30,13 @@ export default function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		getBlockName,
 		__unstableIsFullySelected,
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
+		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -41,7 +44,7 @@ export default function useClipboardHandler() {
 		replaceBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
-		insertBlocks,
+		__unstableSplitSelection,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
@@ -58,28 +61,11 @@ export default function useClipboardHandler() {
 				return;
 			}
 
-			// Always handle multiple selected blocks.
-			if ( ! hasMultiSelection() ) {
-				const { target } = event;
-				const { ownerDocument } = target;
-				// If copying, only consider actual text selection as selection.
-				// Otherwise, any focus on an input field is considered.
-				const hasSelection =
-					event.type === 'copy' || event.type === 'cut'
-						? documentHasUncollapsedSelection( ownerDocument )
-						: documentHasSelection( ownerDocument );
+			const { activeElement } = event.target.ownerDocument;
 
-				// Let native copy behaviour take over in input fields.
-				if ( hasSelection ) {
-					return;
-				}
-			}
-
-			if ( ! node.contains( event.target.ownerDocument.activeElement ) ) {
+			if ( ! node.contains( activeElement ) ) {
 				return;
 			}
-
-			event.preventDefault();
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
 			const shouldHandleWholeBlocks =
@@ -87,6 +73,24 @@ export default function useClipboardHandler() {
 			const expandSelectionIsNeeded =
 				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
+				if ( ! hasMultiSelection() ) {
+					const { target } = event;
+					const { ownerDocument } = target;
+					// If copying, only consider actual text selection as selection.
+					// Otherwise, any focus on an input field is considered.
+					const hasSelection =
+						event.type === 'copy' || event.type === 'cut'
+							? documentHasUncollapsedSelection( ownerDocument )
+							: documentHasSelection( ownerDocument );
+
+					// Let native copy behaviour take over in input fields.
+					if ( hasSelection ) {
+						return;
+					}
+				}
+
+				event.preventDefault();
+
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
@@ -153,7 +157,13 @@ export default function useClipboardHandler() {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
+				const isInternal =
+					event.clipboardData.getData( 'rich-text' ) === 'true';
+				if ( isInternal ) {
+					return;
+				}
 				const { plainText, html, files } = getPasteEventData( event );
+				const isFullySelected = __unstableIsFullySelected();
 				let blocks = [];
 
 				if ( files.length ) {
@@ -178,37 +188,69 @@ export default function useClipboardHandler() {
 					blocks = pasteHandler( {
 						HTML: html,
 						plainText,
-						mode: 'BLOCKS',
+						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
 						canUserUseUnfilteredHTML,
 					} );
 				}
 
-				if ( selectedBlockClientIds.length === 1 ) {
-					const [ selectedBlockClientId ] = selectedBlockClientIds;
-
-					if (
-						blocks.every( ( block ) =>
-							canInsertBlockType(
-								block.name,
-								selectedBlockClientId
-							)
-						)
-					) {
-						insertBlocks(
-							blocks,
-							undefined,
-							selectedBlockClientId
-						);
-						return;
-					}
+				// Inline paste: let rich text handle it.
+				if ( typeof blocks === 'string' ) {
+					return;
 				}
 
-				replaceBlocks(
-					selectedBlockClientIds,
-					blocks,
-					blocks.length - 1,
-					-1
+				if ( isFullySelected ) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					event.preventDefault();
+					return;
+				}
+
+				// If a block doesn't support splitting, let rich text paste
+				// inline.
+				if (
+					! hasMultiSelection() &&
+					! hasBlockSupport(
+						getBlockName( selectedBlockClientIds[ 0 ] ),
+						'splitting',
+						false
+					) &&
+					! event.__deprecatedOnSplit
+				) {
+					return;
+				}
+
+				const [ firstSelectedClientId ] = selectedBlockClientIds;
+				const firstSelectedBlockName = getBlockName(
+					firstSelectedClientId
 				);
+
+				const [ transform ] = getBlockTransforms(
+					'from',
+					firstSelectedBlockName
+				).filter( ( { type } ) => type === 'paste' );
+
+				if ( transform ) {
+					blocks = transform.transform( blocks );
+				}
+
+				const rootClientId = getBlockRootClientId(
+					firstSelectedClientId
+				);
+
+				if (
+					! blocks.every( ( block ) =>
+						canInsertBlockType( block.name, rootClientId )
+					)
+				) {
+					return;
+				}
+
+				__unstableSplitSelection( blocks );
+				event.preventDefault();
 			}
 		}
 

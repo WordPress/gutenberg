@@ -115,6 +115,13 @@ export function RichTextWrapper(
 ) {
 	props = removeNativeProps( props );
 
+	if ( onSplit ) {
+		deprecated( 'wp.blockEditor.RichText onSplit prop', {
+			since: '6.4',
+			alternative: 'block.json support key: "splitting"',
+		} );
+	}
+
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
@@ -346,7 +353,6 @@ export function RichTextWrapper(
 						formatTypes,
 						tagName,
 						onReplace,
-						onSplit,
 						__unstableEmbedURLOnPaste,
 						preserveWhiteSpace,
 						pastePlainText,
@@ -357,7 +363,7 @@ export function RichTextWrapper(
 						onRemove,
 					} ),
 					useEnter( {
-						removeEditorOnlyFormats,
+						isSelected,
 						value,
 						onReplace,
 						onSplit,
