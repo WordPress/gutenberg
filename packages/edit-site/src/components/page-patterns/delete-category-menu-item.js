@@ -89,6 +89,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 				onConfirm={ onDelete }
 				onCancel={ () => setIsModalOpen( false ) }
 				confirmButtonText={ __( 'Delete' ) }
+				className="edit-site-patterns__delete-modal"
 			>
 				{ sprintf(
 					// translators: %s: The pattern category's name.
