@@ -16,10 +16,8 @@ import { unlock } from '../../lock-unlock';
 
 const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { dataView, filters, onChangeFilters } ) {
-	const filterableFields = dataView
-		.getAllColumns()
-		.filter( ( column ) => column.columnDef.renderFilter );
+export default function AddFilter( { fields, filters, onChangeFilters } ) {
+	const filterableFields = fields.filter( ( field ) => field.renderFilter );
 	if ( ! filterableFields.length ) {
 		return null;
 	}
@@ -61,7 +59,7 @@ export default function AddFilter( { dataView, filters, onChangeFilters } ) {
 							} );
 						} }
 					>
-						{ field.columnDef.header }
+						{ field.header }
 					</DropdownMenuItemV2>
 				);
 			} ) }

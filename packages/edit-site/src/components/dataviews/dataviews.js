@@ -33,11 +33,11 @@ export default function DataViews( {
 				<HStack justify="space-between">
 					<TextFilter view={ view } onChangeView={ onChangeView } />
 					<AddFilter
-						dataView={ dataView }
+						fields={ fields }
 						filters={ view.filters }
 						onChangeFilters={ onChangeView }
 					/>
-					<FieldFilters view={ view } fields={ fields }/>
+					<FieldFilters view={ view } fields={ fields } />
 					<ViewActions
 						fields={ fields }
 						view={ view }
