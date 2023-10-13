@@ -201,9 +201,9 @@ const UnconnectedDropdownMenu = (
 		trigger,
 
 		// Menu props
-		gutter = 8,
+		gutter,
 		children,
-		shift = 0,
+		shift,
 		modal = true,
 		hideOnEscape = true,
 
@@ -301,7 +301,7 @@ const UnconnectedDropdownMenu = (
 				{ ...otherProps }
 				modal={ modal }
 				store={ dropdownMenuStore }
-				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 0 ) }
+				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 8 ) }
 				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
