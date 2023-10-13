@@ -88,6 +88,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 				isOpen={ isModalOpen }
 				onConfirm={ onDelete }
 				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Delete' ) }
 			>
 				{ sprintf(
 					// translators: %s: The pattern category's name.
