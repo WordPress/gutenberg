@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import { render } from '@testing-library/react';
+
+/**
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,6 +44,18 @@ const mockCurrentBlockContext = (
 	);
 };
 
+function runHook( hookCb ) {
+	let storedResult;
+	function TestHook() {
+		const result = hookCb();
+		useEffect( () => {
+			storedResult = result;
+		}, [ result ] );
+	}
+	render( <TestHook /> );
+	return storedResult;
+}
+
 describe( 'useSetting', () => {
 	beforeEach( () => {
 		setupSelectMock();
@@ -59,7 +77,8 @@ describe( 'useSetting', () => {
 			name: 'core/test-block',
 		} );
 
-		expect( useSetting( 'layout.contentSize' ) ).toBe( '840px' );
+		const result = runHook( () => useSetting( 'layout.contentSize' ) );
+		expect( result ).toBe( '840px' );
 	} );
 
 	it( 'uses blockEditor.useSetting.before hook override', () => {
@@ -89,7 +108,8 @@ describe( 'useSetting', () => {
 			}
 		);
 
-		expect( useSetting( 'layout.contentSize' ) ).toBe( '960px' );
+		const result = runHook( () => useSetting( 'layout.contentSize' ) );
+		expect( result ).toBe( '960px' );
 
 		removeFilter(
 			'blockEditor.useSetting.before',
