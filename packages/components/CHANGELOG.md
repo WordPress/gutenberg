@@ -19,6 +19,7 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to version `0.3.5` ([#55365](https://github.com/WordPress/gutenberg/pull/55365))
 -   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
 
 ### New Features
