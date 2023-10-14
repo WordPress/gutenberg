@@ -208,7 +208,7 @@ const baseItem = css`
 
 	/* Keyboard focus (focus-visible) */
 	&[data-focus-visible] {
-		/* TODO: should there be a visual indication of keyboard focus vs hover? */
+		box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
 
 		/* Only visible in Windows High Contrast mode */
 		outline: 2px solid transparent;
