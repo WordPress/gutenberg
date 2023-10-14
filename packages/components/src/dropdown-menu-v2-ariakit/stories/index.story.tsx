@@ -3,6 +3,7 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,7 @@ import { useState, useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../../utils';
+import { COLORS, useCx } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -310,10 +311,20 @@ WithRadios.args = {
 	...Default.args,
 };
 
+const modalOnTopOfDropdown = css`
+	&& {
+		z-index: 1000000;
+	}
+`;
+
 // For more examples with `Modal`, check https://ariakit.org/examples/menu-wordpress-modal
 export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
 	const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
 	const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
+
+	const cx = useCx();
+	const modalOverlayClassName = cx( modalOnTopOfDropdown );
+
 	return (
 		<>
 			<DropdownMenu { ...props }>
@@ -330,7 +341,10 @@ export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
 					Open inner modal
 				</DropdownMenuItem>
 				{ isInnerModalOpen && (
-					<Modal onRequestClose={ () => setInnerModalOpen( false ) }>
+					<Modal
+						onRequestClose={ () => setInnerModalOpen( false ) }
+						overlayClassName={ modalOverlayClassName }
+					>
 						Modal&apos;s contents
 						<button onClick={ () => setInnerModalOpen( false ) }>
 							Close
@@ -339,7 +353,10 @@ export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
 				) }
 			</DropdownMenu>
 			{ isOuterModalOpen && (
-				<Modal onRequestClose={ () => setOuterModalOpen( false ) }>
+				<Modal
+					onRequestClose={ () => setOuterModalOpen( false ) }
+					overlayClassName={ modalOverlayClassName }
+				>
 					Modal&apos;s contents
 					<button onClick={ () => setOuterModalOpen( false ) }>
 						Close
