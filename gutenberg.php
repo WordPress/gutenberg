@@ -92,6 +92,12 @@ function gutenberg_version_too_old_text() {
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_too_old_notice() {
+	$current_screen = get_current_screen();
+
+	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
+		return;
+	}
+
 	echo '<div class="error"><p>';
 	echo gutenberg_wordpress_version_too_old_text();
 	echo '</p></div>';
@@ -103,6 +109,12 @@ function gutenberg_wordpress_version_too_old_notice() {
  * @since 16.9.0
  */
 function gutenberg_version_too_old_notice() {
+	$current_screen = get_current_screen();
+
+	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
+		return;
+	}
+
 	echo '<div class="error"><p>';
 	echo gutenberg_version_too_old_text();
 	echo '</p></div>';
@@ -161,6 +173,12 @@ function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
  * @since 16.9.0
  */
 function gutenberg_needs_update_notice() {
+	$current_screen = get_current_screen();
+
+	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
+		return;
+	}
+
 	echo '<div class="notice notice-warning is-dismissible"><p>';
 	_e( 'Your version of Gutenberg is getting old. It will stop working after you upgrade WordPress to the next major version. Please update the Gutenberg plugin.', 'gutenberg' );
 	echo '</p></div>';
