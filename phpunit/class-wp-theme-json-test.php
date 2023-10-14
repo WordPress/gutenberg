@@ -1282,8 +1282,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @dataProvider data_set_spacing_sizes_when_invalid
 	 */
 	public function test_set_spacing_sizes_when_invalid( $spacing_scale, $expected_output ) {
-		$this->expectNotice();
-		$this->expectNoticeMessage( 'Some of the theme.json settings.spacing.spacingScale values are invalid' );
+		$this->setExpectedIncorrectUsage( 'WP_Theme_JSON_Gutenberg::set_spacing_sizes' );
 
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
