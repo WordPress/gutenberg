@@ -82,10 +82,12 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 			? TOOLBAR_VARIANT_BOX_SHADOW
 			: DEFAULT_BOX_SHADOW };
 	` }
-	outline: none !important;
 
 	overscroll-behavior: contain;
 	overflow: visible;
+
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
 
 	/* Animation */
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
@@ -278,6 +280,9 @@ export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 			: DEFAULT_BORDER_COLOR };
 	/* Negative horizontal margin to make separator go from side to side */
 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
+
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent;
 `;
 
 export const SubmenuChevronIcon = styled( Icon )`
