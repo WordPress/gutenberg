@@ -112,12 +112,6 @@ The skidding of the popover along the anchor element. Can be set to negative val
 - Required: no
 - Default: `0` for root-level menus, `-8` for nested menus
 
-##### `defaultValues`: `Record<string, string | boolean | number | Array< string | number > >`
-
-The default values for the values state.
-
-- Required: no
-
 ##### `hideOnEscape`: `boolean | ( ( event: KeyboardEvent | React.KeyboardEvent< Element > ) => boolean )`
 
 Determines whether the menu popover will be hidden when the user presses the Escape key.
