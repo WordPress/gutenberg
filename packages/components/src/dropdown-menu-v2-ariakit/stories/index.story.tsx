@@ -180,10 +180,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					value="b"
 					defaultChecked
 				>
-					{ /*
-					 * TODO: default checked doesn't work yet
-					 * https://github.com/ariakit/ariakit/issues/2913
-					 */ }
 					Checkbox item B (initially checked)
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
@@ -212,8 +208,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
 				<DropdownMenuGroupLabel>
-					{ /* TODO: can this be done using `defaultChecked` on the single item,
-					 * instead of using `defaultValues` on the menu component? */ }
 					Multiple, uncontrolled checkboxes
 				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
@@ -225,6 +219,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="b"
+					defaultChecked
 				>
 					Checkbox item B (initially checked)
 				</DropdownMenuCheckboxItem>
@@ -256,7 +251,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 };
 WithCheckboxes.args = {
 	...Default.args,
-	defaultValues: { 'checkbox-multiple-uncontrolled': [ 'b' ] },
 };
 
 export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {

@@ -76,33 +76,11 @@ export const DropdownMenuCheckboxItem = forwardRef<
 ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
-	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
-		props.onChange?.( {
-			...e,
-			target: Object.assign( e.target, {
-				value: props.value,
-				name: props.name,
-			} ),
-		} );
-	};
-
-	// This can't be currently done because of
-	// https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/menu/menu-item-check.ts
-	// But using `Ariakit.MenuItemCheck` works as expected.
-	// const isChecked = dropdownMenuContext?.store.useState( ( state ) => {
-	// 	// state.values doesn't have a property with key [props.name] when empty
-	// 	const checkedOrValues = state.values[ props.name ];
-	// 	return Array.isArray( checkedOrValues )
-	// 		? checkedOrValues.includes( props.value )
-	// 		: checkedOrValues;
-	// } );
-
 	return (
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }
 			{ ...props }
 			hideOnClick={ hideOnClick }
-			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
 			<Ariakit.MenuItemCheck
@@ -111,10 +89,6 @@ export const DropdownMenuCheckboxItem = forwardRef<
 			>
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
-
-			{ /* <Styled.ItemPrefixWrapper>
-				{ isChecked ? <Icon icon={ check } size={ 24 } /> : null }
-			</Styled.ItemPrefixWrapper> */ }
 
 			{ children }
 			{ suffix && (
@@ -132,22 +106,12 @@ export const DropdownMenuRadioItem = forwardRef<
 	ref
 ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
-	const onChangeWithTargetValue: typeof props.onChange = ( e ) => {
-		props.onChange?.( {
-			...e,
-			target: Object.assign( e.target, {
-				value: props.value,
-				name: props.name,
-			} ),
-		} );
-	};
 
 	return (
 		<Styled.DropdownMenuRadioItem
 			ref={ ref }
 			{ ...props }
 			hideOnClick={ hideOnClick }
-			onChange={ onChangeWithTargetValue }
 			store={ dropdownMenuContext?.store }
 		>
 			<Ariakit.MenuItemCheck
@@ -207,8 +171,6 @@ const UnconnectedDropdownMenu = (
 		defaultOpen,
 		onOpenChange,
 		placement,
-		// TODO: can we remove this prop?
-		defaultValues,
 
 		// Menu trigger props
 		trigger,
@@ -259,7 +221,6 @@ const UnconnectedDropdownMenu = (
 		open,
 		defaultOpen,
 		placement: computedPlacement,
-		defaultValues,
 		focusLoop: true,
 		setOpen( willBeOpen ) {
 			onOpenChange?.( willBeOpen );

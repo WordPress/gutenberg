@@ -61,13 +61,6 @@ export interface DropdownMenuProps {
 	 */
 	shift?: number;
 	/**
-	 * The default values for the values state.
-	 */
-	defaultValues?: Record<
-		string,
-		string | boolean | number | Array< string | number >
-	>;
-	/**
 	 * Determines whether the menu popover will be hidden when the user presses
 	 * the Escape key.
 	 *
