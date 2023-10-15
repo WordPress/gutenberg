@@ -114,7 +114,6 @@ The consent string for unlocking private APIs is intended to change on a regular
 
 Updating the consent string is considered a task and can be done during the late stages of a WordPress release.
 
-
 #### Consent string history
 
 The final string in this list is the current version.
