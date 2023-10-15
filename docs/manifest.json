@@ -30,6 +30,12 @@
 		"parent": "devenv"
 	},
 	{
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
+		"parent": "devenv"
+	},
+	{
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
 		"markdown_source": "../docs/getting-started/create-block/README.md",
