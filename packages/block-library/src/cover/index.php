@@ -54,6 +54,7 @@ function render_block_core_cover( $attributes, $content ) {
 		$processor->next_tag();
 
 		$styles         = $processor->get_attribute( 'style' );
+		$styles         = is_string( $styles ) ? $styles : '';
 		$merged_styles  = ! empty( $styles ) ? $styles . ';' : '';
 		$merged_styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 

@@ -18,7 +18,7 @@ function gutenberg_interactivity_process_wp_context( $tags, $context ) {
 	}
 
 	$value = $tags->get_attribute( 'data-wp-context' );
-	if ( null === $value ) {
+	if ( ! is_string( $value ) || empty( $value ) ) {
 		// No data-wp-context directive.
 		return;
 	}

@@ -26,6 +26,7 @@ function gutenberg_interactivity_process_wp_class( $tags, $context ) {
 		}
 
 		$expr      = $tags->get_attribute( $attr );
+		$expr      = is_string( $expr ) ? $expr : '';
 		$add_class = gutenberg_interactivity_evaluate_reference( $expr, $context->get_context() );
 		if ( $add_class ) {
 			$tags->add_class( $class_name );

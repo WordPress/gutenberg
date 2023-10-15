@@ -18,7 +18,7 @@ function gutenberg_interactivity_process_wp_text( $tags, $context ) {
 	}
 
 	$value = $tags->get_attribute( 'data-wp-text' );
-	if ( null === $value ) {
+	if ( ! is_string( $value ) || empty( $value ) ) {
 		return;
 	}
 
