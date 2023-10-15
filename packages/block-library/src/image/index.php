@@ -167,15 +167,17 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	// Note: We want to store the `src` in the context so we
 	// can set it dynamically when the lightbox is opened.
+	$img_width  = 'none';
+	$img_height = 'none';
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
-		$img_width        = $img_metadata['width'];
-		$img_height       = $img_metadata['height'];
+		if ( ! empty( $img_metadata ) && is_array( $img_metadata ) ) {
+			$img_width  = $img_metadata['width'];
+			$img_height = $img_metadata['height'];
+		}
 	} else {
 		$img_uploaded_src = $processor->get_attribute( 'src' );
-		$img_width        = 'none';
-		$img_height       = 'none';
 	}
 
 	if ( isset( $block['attrs']['scale'] ) ) {
