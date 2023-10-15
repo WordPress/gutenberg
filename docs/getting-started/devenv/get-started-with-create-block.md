@@ -1,6 +1,6 @@
 # Get started with create-block
 
-The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool for scaffolding a WordPress plugin that registers a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts.md)) with no prior configuration necessary. 
+The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool for scaffolding a WordPress plugin that registers a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts.md)) with no configuration required. 
 
 The package is designed to help developers quickly set up a block development environment following WordPress best practices.
 
