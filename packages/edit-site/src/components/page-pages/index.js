@@ -193,7 +193,6 @@ export default function PagePages() {
 					);
 					return <time>{ formattedDate }</time>;
 				},
-				enableSorting: false,
 			},
 		],
 		[ postStatuses, authors ]
