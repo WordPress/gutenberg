@@ -35,7 +35,7 @@
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],
 	"supports": {
-		"inserter": true,
+		"inserter": false,
 		"html": false,
 		"spacing": {
 			"margin": true,
