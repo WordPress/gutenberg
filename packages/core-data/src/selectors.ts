@@ -1397,8 +1397,7 @@ export const getEntityRevisions = (
 	query?: GetRecordsHttpQuery
 ) => {
 	const queriedStateRevisions =
-		state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ];
-
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
 	if ( ! queriedStateRevisions ) {
 		return null;
 	}
@@ -1429,7 +1428,7 @@ export const getEntityRevision = createSelector(
 		query?: GetRecordsHttpQuery
 	) => {
 		const queriedRevisionsState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ];
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
 
 		if ( ! queriedRevisionsState ) {
 			return undefined;

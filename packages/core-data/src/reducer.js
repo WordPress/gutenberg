@@ -13,7 +13,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import { ifMatchingAction, replaceAction, parseEntityName } from './utils';
 import {
 	reducer as queriedDataReducer,
 	revisionsQueriedDataReducer,
@@ -230,14 +230,14 @@ function entity( entityConfig ) {
 
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
-		ifMatchingAction(
-			( action ) =>
+		ifMatchingAction( ( action ) => {
+			return (
 				action.name &&
 				action.kind &&
-				// @TODO Create predictable parsing rules for names like post:[key]:revisions.
-				action.name.split( ':' )[ 0 ] === entityConfig.name &&
+				parseEntityName( action.name )?.name === entityConfig.name &&
 				action.kind === entityConfig.kind
-		),
+			);
+		} ),
 
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
@@ -249,11 +249,6 @@ function entity( entityConfig ) {
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-			// @TODO can this be filtered by supports above or elsewhere?
-			// @TODO  We only want to add to state tree if revisions are supported by post type.
-			...( entityConfig?.supports?.revisions
-				? { revisions: revisionsQueriedDataReducer }
-				: {} ),
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -363,6 +358,11 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			// Add revisions to the state tree if the post type supports it.
+			...( entityConfig?.supports?.revisions
+				? { revisions: revisionsQueriedDataReducer }
+				: {} ),
 		} )
 	);
 }
