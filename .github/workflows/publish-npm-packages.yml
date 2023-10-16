@@ -53,6 +53,9 @@ jobs:
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
+                  # We need to ensure that Lerna can read the commit created during the previous npm publishing.
+                  # Lerna assumes that all packages need publishing if it can't access the necessary information.
+                  fetch-depth: 999
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
