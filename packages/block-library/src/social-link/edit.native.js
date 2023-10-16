@@ -10,11 +10,18 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useContext,
+} from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
+	GlobalStylesContext,
 } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -62,15 +69,21 @@ const SocialLinkEdit = ( {
 	const { url, service = name } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ hasUrl, setHasUrl ] = useState( !! url );
+	const globalStyles = useContext( GlobalStylesContext );
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] ||
 		styles[ `wp-social-link` ] ||
 		DEFAULT_ACTIVE_ICON_STYLES;
+
+	const inactivePreferredStyles = usePreferredColorSchemeStyle(
+		styles.inactiveIcon,
+		styles.inactiveIconDark
+	);
+
 	const inactiveIcon =
-		usePreferredColorSchemeStyle(
-			styles.inactiveIcon,
-			styles.inactiveIconDark
-		) || DEFAULT_INACTIVE_ICON_STYLES;
+		! globalStyles && inactivePreferredStyles
+			? inactivePreferredStyles
+			: DEFAULT_INACTIVE_ICON_STYLES;
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
