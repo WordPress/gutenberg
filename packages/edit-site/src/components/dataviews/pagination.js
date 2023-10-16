@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf, __, _x, _n } from '@wordpress/i18n';
+import { chevronRight, chevronLeft, previous, next } from '@wordpress/icons';
 
 const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
 function PageSizeControl( { view, onChangeView } ) {
@@ -77,9 +78,8 @@ function Pagination( {
 						onClick={ () => onChangeView( { ...view, page: 1 } ) }
 						disabled={ view.page === 1 }
 						aria-label={ __( 'First page' ) }
-					>
-						«
-					</Button>
+						icon={ previous }
+					/>
 					<Button
 						variant="tertiary"
 						onClick={ () =>
@@ -87,9 +87,8 @@ function Pagination( {
 						}
 						disabled={ view.page === 1 }
 						aria-label={ __( 'Previous page' ) }
-					>
-						‹
-					</Button>
+						icon={ chevronLeft }
+					/>
 					<HStack
 						justify="flex-start"
 						expanded={ false }
@@ -137,9 +136,8 @@ function Pagination( {
 						}
 						disabled={ view.page >= totalPages }
 						aria-label={ __( 'Next page' ) }
-					>
-						›
-					</Button>
+						icon={ chevronRight }
+					/>
 					<Button
 						variant="tertiary"
 						onClick={ () =>
@@ -147,9 +145,8 @@ function Pagination( {
 						}
 						disabled={ view.page >= totalPages }
 						aria-label={ __( 'Last page' ) }
-					>
-						»
-					</Button>
+						icon={ next }
+					/>
 				</HStack>
 			) }
 			<PageSizeControl view={ view } onChangeView={ onChangeView } />

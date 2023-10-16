@@ -3,6 +3,12 @@
 	padding: $grid-unit-40;
 }
 
+.dataviews-pagination {
+	position: sticky;
+	bottom: $grid-unit-20;
+	background: $white;
+}
+
 .dataviews-list-view {
 	width: 100%;
 	text-indent: 0;
