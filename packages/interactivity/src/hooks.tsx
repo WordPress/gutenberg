@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
+import { h, options, createContext, cloneElement, type VNode } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import { deepSignal } from 'deepsignal';
 /**
@@ -186,7 +186,7 @@ const resolve = ( path, namespace ) => {
 
 // Generate the evaluate function.
 const getEvaluate =
-	( { scope } = {} ) =>
+	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
 		// If path starts with !, remove it and save a flag.
@@ -211,7 +211,7 @@ const getPriorityLevels = ( directives ) => {
 	}, {} );
 
 	return Object.entries( byPriority )
-		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
+		.sort( ( [ p1 ], [ p2 ] ) => parseInt( p1 ) - parseInt( p2 ) )
 		.map( ( [ , arr ] ) => arr );
 };
 
@@ -243,7 +243,7 @@ const Directives = ( {
 		nextPriorityLevels.length > 0 ? (
 			<Directives
 				directives={ directives }
-				priorityLevels={ nextPriorityLevels }
+				priorityLevels={ nextPriorityLevels as [ any, ...any[] ] }
 				element={ element }
 				originalProps={ originalProps }
 				previousScope={ scope }
@@ -275,7 +275,7 @@ const Directives = ( {
 
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
-options.vnode = ( vnode ) => {
+options.vnode = ( vnode: VNode< { __directives?: any } > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
@@ -288,10 +288,10 @@ options.vnode = ( vnode ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type, props ),
+				element: h( vnode.type as string, props ),
 				top: true,
-			};
-			vnode.type = Directives;
+			} as any;
+			vnode.type = Directives as any;
 		}
 	}
 
