@@ -203,7 +203,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
-	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.callShowLightboxFromImage' );
+	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.showLightbox' );
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
@@ -217,7 +217,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
-			data-wp-on--click="actions.core.image.callShowLightboxFromButton"
+			data-wp-on--click="actions.core.image.showLightbox"
 			data-wp-style--right="context.core.image.imageButtonRight"
 			data-wp-style--top="context.core.image.imageButtonTop"
 		>

@@ -93,7 +93,7 @@ store(
 		actions: {
 			core: {
 				image: {
-					showLightbox: ( { context, event }, image ) => {
+					showLightbox: ( { context, event } ) => {
 						// We can't initialize the lightbox until the reference
 						// image is loaded, otherwise the UX is broken.
 						if ( ! context.core.image.imageLoaded ) {
@@ -106,7 +106,7 @@ store(
 						context.core.image.pointerType = event.pointerType;
 
 						context.core.image.lightboxEnabled = true;
-						setStyles( context, image );
+						setStyles( context, context.core.image.imageRef );
 
 						context.core.image.scrollTopReset =
 							window.pageYOffset ||
@@ -133,41 +133,6 @@ store(
 							'scroll',
 							scrollCallback,
 							false
-						);
-					},
-					// When opening the lightbox via clicking an image,
-					// we can use the event target directly and pass it to the
-					// showLightbox action, which uses it to create the styles.
-					callShowLightboxFromImage: ( {
-						context,
-						event,
-						actions,
-					} ) => {
-						actions.core.image.showLightbox(
-							{
-								context,
-								event,
-							},
-							event.target
-						);
-					},
-					// When opening the lightbox via clicking the button,
-					// we need to reach into event target's parent element to
-					// get the image element needed to create the styles.
-					callShowLightboxFromButton: ( {
-						context,
-						event,
-						actions,
-					} ) => {
-						actions.core.image.showLightbox(
-							{
-								context,
-								event,
-							},
-							// The event target we receive when clicking the button
-							// is the SVG element inside of it, so we need to go to
-							// the parent element's sibling to get the image.
-							event.target.parentElement.previousElementSibling
 						);
 					},
 					hideLightbox: async ( { context, event } ) => {
@@ -233,6 +198,7 @@ store(
 					},
 					handleLoad: ( { context, effects, ref } ) => {
 						context.core.image.imageLoaded = true;
+						context.core.image.imageRef = ref;
 						context.core.image.imageCurrentSrc = ref.currentSrc;
 						effects.core.image.setButtonStyles( {
 							context,
