@@ -18,6 +18,7 @@ export default function TextFilter( { view, onChangeView } ) {
 		onChangeView( ( currentView ) => ( {
 			...currentView,
 			search: debouncedSearch,
+			page: 1,
 		} ) );
 	}, [ debouncedSearch, onChangeView ] );
 	const searchLabel = __( 'Filter list' );

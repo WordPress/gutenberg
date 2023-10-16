@@ -27,7 +27,7 @@ export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
 		search: '',
-		page: 0,
+		page: 1,
 		perPage: 5,
 		sort: {
 			field: 'date',
@@ -52,7 +52,7 @@ export default function PagePages() {
 	const queryArgs = useMemo(
 		() => ( {
 			per_page: view.perPage,
-			page: view.page + 1, // tanstack starts from zero.
+			page: view.page,
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
