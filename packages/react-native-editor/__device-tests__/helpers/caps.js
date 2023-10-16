@@ -11,7 +11,7 @@ const ios = {
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice ? 'iPhone 13' : 'iPad Pro (9.7-inch)',
-	devicePixelRatio: ! iPadDevice ? 3 : 2,
+	pixelRatio: ! iPadDevice ? 3 : 2,
 	usePrebuiltWDA: true,
 } );
 
@@ -20,7 +20,7 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 	deviceName: ! iPadDevice
 		? 'iPhone 13 Simulator'
 		: 'iPad Pro (9.7 inch) Simulator',
-	devicePixelRatio: ! iPadDevice ? 3 : 2,
+	pixelRatio: ! iPadDevice ? 3 : 2,
 } );
 
 exports.android = {
