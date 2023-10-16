@@ -309,14 +309,14 @@ store(
 						}
 
 						const figure = ref.parentElement;
-						const figureWidth = ref.parentElement.offsetWidth;
+						const figureWidth = ref.parentElement.clientWidth;
 
 						// We need special handling for the height because
 						// a caption will cause the figure to be taller than
 						// the image, which means we need to account for that
 						// when calculating the placement of the button in the
 						// top right corner of the image.
-						let figureHeight = ref.parentElement.offsetHeight;
+						let figureHeight = ref.parentElement.clientHeight;
 						const caption = figure.querySelector( 'figcaption' );
 						if ( caption ) {
 							const captionComputedStyle =
