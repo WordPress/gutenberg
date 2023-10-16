@@ -225,7 +225,12 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 
-	// Only process if there's an IMG element after this FIGURE. It should be inside it.
+	/*
+	 * Starting at a matched FIGURE element, assume that the next IMG element is inside it.
+	 * It could be that there's no IMG inside this FIGURE, but for now, it's a strong enough
+	 * assumption to work most of the time. Either way, if no IMG exists, then there is
+	 * nothing to possibly do, so return the unmodified content.
+	 */
 	if ( ! $processor->next_tag( 'IMG' ) ) {
 		return $block_content;
 	}
