@@ -448,7 +448,7 @@ const swipeFromTo = async (
 	driver,
 	from = defaultCoordinates,
 	to = defaultCoordinates,
-	delay
+	delay = 0
 ) =>
 	await driver
 		.action( 'pointer', {
