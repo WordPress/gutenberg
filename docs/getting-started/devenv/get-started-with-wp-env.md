@@ -4,6 +4,8 @@ The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-
 
 Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so.
 
+[![wp-env basics diagram](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/wp-env-diagram.png)](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA)
+
 ## Quick start
  
 1. Download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your operating system.
