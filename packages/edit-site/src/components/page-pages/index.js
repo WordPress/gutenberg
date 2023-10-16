@@ -39,13 +39,15 @@ export default function PagePages() {
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const postStatuses =
-		statuses === null
-			? EMPTY_OBJECT
-			: statuses.reduce( ( acc, status ) => {
-					acc[ status.slug ] = status.name;
-					return acc;
-			  }, EMPTY_OBJECT );
+	const postStatuses = useMemo(
+		() =>
+			statuses === null
+				? EMPTY_OBJECT
+				: Object.fromEntries(
+						statuses.map( ( { slug, name } ) => [ slug, name ] )
+				  ),
+		[ statuses ]
+	);
 
 	const queryArgs = useMemo(
 		() => ( {
@@ -167,9 +169,6 @@ export default function PagePages() {
 				isLoading={ isLoadingPages }
 				view={ view }
 				onChangeView={ setView }
-				options={ {
-					pageCount: totalPages,
-				} }
 			/>
 		</Page>
 	);

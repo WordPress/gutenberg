@@ -2,13 +2,18 @@
  * Internal dependencies
  */
 import PatternRenameModal from './rename';
+import PatternDuplicateModal from './duplicate';
 
 export const PATTERN_MODALS = {
 	rename: 'edit-site/pattern-rename',
+	duplicate: 'edit-site/pattern-duplicate',
 };
 
 export default function PatternModal() {
-	// Further modals are likely
-	// e.g. duplicating and switching up sync status etc.
-	return <PatternRenameModal />;
+	return (
+		<>
+			<PatternDuplicateModal />
+			<PatternRenameModal />
+		</>
+	);
 }

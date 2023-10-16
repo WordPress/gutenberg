@@ -37,10 +37,21 @@ import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockSettings } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_ARRAY = [];
+
+// Safari does not always update the duotone filter when the duotone colors
+// are changed. This browser check is later used to force a re-render of the block
+// element to ensure the duotone filter is updated. The check is included at the
+// root of this file as it only needs to be run once per page load.
+const isSafari =
+	window?.navigator.userAgent &&
+	window.navigator.userAgent.includes( 'Safari' ) &&
+	! window.navigator.userAgent.includes( 'Chrome' ) &&
+	! window.navigator.userAgent.includes( 'Chromium' );
 
 extend( [ namesPlugin ] );
 
@@ -223,6 +234,7 @@ const withDuotoneControls = createHigherOrderComponent(
 );
 
 function DuotoneStyles( {
+	clientId,
 	id: filterId,
 	selector: duotoneSelector,
 	attribute: duotoneAttr,
@@ -278,6 +290,8 @@ function DuotoneStyles( {
 		useDispatch( blockEditorStore )
 	);
 
+	const blockElement = useBlockElement( clientId );
+
 	useEffect( () => {
 		if ( ! isValidFilter ) return;
 
@@ -294,12 +308,30 @@ function DuotoneStyles( {
 			__unstableType: 'svgs',
 		} );
 
+		// Safari does not always update the duotone filter when the duotone colors
+		// are changed. When using Safari, force the block element to be repainted by
+		// the browser to ensure any changes are reflected visually. This logic matches
+		// that used on the site frontend in `block-supports/duotone.php`.
+		if ( blockElement && isSafari ) {
+			const display = blockElement.style.display;
+			// Switch to `inline-block` to force a repaint. In the editor, `inline-block`
+			// is used instead of `none` to ensure that scroll position is not affected,
+			// as `none` results in the editor scrolling to the top of the block.
+			blockElement.style.display = 'inline-block';
+			// Simply accessing el.offsetHeight flushes layout and style
+			// changes in WebKit without having to wait for setTimeout.
+			// eslint-disable-next-line no-unused-expressions
+			blockElement.offsetHeight;
+			blockElement.style.display = display;
+		}
+
 		return () => {
 			deleteStyleOverride( filterId );
 			deleteStyleOverride( `duotone-${ filterId }` );
 		};
 	}, [
 		isValidFilter,
+		blockElement,
 		colors,
 		selector,
 		filterId,
@@ -378,6 +410,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			<>
 				{ shouldRender && (
 					<DuotoneStyles
+						clientId={ props.clientId }
 						id={ filterClass }
 						selector={ selector }
 						attribute={ attribute }

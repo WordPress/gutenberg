@@ -96,3 +96,27 @@ This is an individual package that's part of the Gutenberg project. The project 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+### Updating the consent string
+
+The consent string for unlocking private APIs is intended to change on a regular basis. To update the consent string:
+
+1. Come up with a new consent string, the string should mention that themes or plugins opting in to unstable and private features will break in future versions of WordPress.
+2. Ensure the consent string has not being used previously.
+3. Append the new string to the history list below.
+4. Replace the consent string in the following locations:
+   * twice in the documentation above
+   * in the `src/implementation.js` file of this package
+   * in the `src/lock-unlock.js` file located in packages consuming private APIs
+   * search the full code base for any other occurrences
+
+**Note**: The consent string is not used for user facing content and as such should _not_ be made translatable via the internationalization features of WordPress.
+
+Updating the consent string is considered a task and can be done during the late stages of a WordPress release.
+
+#### Consent string history
+
+The final string in this list is the current version.
+
+1. I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.
+2. I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.

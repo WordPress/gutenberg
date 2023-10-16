@@ -7,6 +7,7 @@ import { camelCase } from 'change-case';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -656,7 +657,7 @@ export const getUserPatternCategories =
 		const mappedPatternCategories =
 			patternCategories?.map( ( userCategory ) => ( {
 				...userCategory,
-				label: userCategory.name,
+				label: decodeEntities( userCategory.name ),
 				name: userCategory.slug,
 			} ) ) || [];
 

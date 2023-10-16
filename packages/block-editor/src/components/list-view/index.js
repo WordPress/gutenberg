@@ -6,7 +6,10 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -257,12 +260,20 @@ function ListViewComponent(
 		return null;
 	}
 
+	const describedById =
+		description && `block-editor-list-view-description-${ instanceId }`;
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
+			{ description && (
+				<VisuallyHidden id={ describedById }>
+					{ description }
+				</VisuallyHidden>
+			) }
 			<TreeGrid
 				id={ id }
 				className="block-editor-list-view-tree"
@@ -272,8 +283,7 @@ function ListViewComponent(
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
-				// eslint-disable-next-line jsx-a11y/aria-props
-				aria-description={ description }
+				aria-describedby={ describedById }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

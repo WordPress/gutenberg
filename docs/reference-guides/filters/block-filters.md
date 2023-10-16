@@ -227,8 +227,7 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function (
 			)
 		);
 	};
-},
-'withInspectorControls' );
+}, 'withInspectorControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
@@ -238,6 +237,29 @@ wp.hooks.addFilter(
 ```
 
 {% end %}
+
+Note that as this hook is run for _all blocks_, consuming it has potential for performance regressions particularly around block selection metrics.
+
+To mitigate this, consider whether any work you perform can be altered to run only under certain conditions.
+
+For example, if you are adding components that only need to render when the block is _selected_, then you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
+
+```js
+const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ props.isSelected && {
+					<InspectorControls>
+						<PanelBody>My custom control</PanelBody>
+					</InspectorControls>
+				}}
+			</>
+		);
+	};
+}, 'withInspectorControl' );
+```
 
 #### `editor.BlockListBlock`
 
@@ -288,8 +310,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
 
 		return el( BlockListBlock, newProps );
 	};
-},
-'withClientIdClassName' );
+}, 'withClientIdClassName' );
 
 wp.hooks.addFilter(
 	'editor.BlockListBlock',

@@ -31,6 +31,7 @@ import {
 } from './dropdown-menu-v2';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
+import Tabs from './tabs';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -60,5 +61,6 @@ lock( privateApis, {
 	DropdownSubMenuV2,
 	DropdownSubMenuTriggerV2,
 	ProgressBar,
+	Tabs,
 	Theme,
 } );
