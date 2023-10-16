@@ -161,6 +161,10 @@
 		cursor: zoom-in;
 	}
 
+	img:hover + button {
+		opacity: 1;
+	}
+
 	button {
 		opacity: 0;
 		border: none;
@@ -175,10 +179,6 @@
 		text-align: center;
 		padding: 0;
 		border-radius: 10%;
-
-		&.show {
-			opacity: 1;
-		}
 
 		&:focus-visible {
 			outline: 5px auto #212121;

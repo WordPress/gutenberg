@@ -199,15 +199,6 @@ store(
 							}
 						}
 					},
-					// We need to use a handler to know whether the mouse is hovering
-					// so we know when to show the lightbox trigger button. We are unable
-					// to use just CSS for this because the button is not a child of the image.
-					handleMouseOver( { context } ) {
-						context.core.image.isHovering = true;
-					},
-					handleMouseOut( { context } ) {
-						context.core.image.isHovering = false;
-					},
 					handleKeydown: ( { context, actions, event } ) => {
 						if ( context.core.image.lightboxEnabled ) {
 							if ( event.key === 'Tab' || event.keyCode === 9 ) {
