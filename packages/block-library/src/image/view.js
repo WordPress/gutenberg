@@ -240,9 +240,13 @@ store(
 							}
 						}
 					},
-					handleLoad: ( { context, ref } ) => {
+					handleLoad: ( { context, effects, ref } ) => {
 						context.core.image.imageLoaded = true;
 						context.core.image.imageCurrentSrc = ref.currentSrc;
+						effects.core.image.setButtonStyles( {
+							context,
+							ref,
+						} );
 					},
 					handleTouchStart: () => {
 						isTouching = true;
@@ -348,13 +352,7 @@ store(
 						}
 
 						const figure = ref.parentElement;
-						const figureComputedStyle =
-							window.getComputedStyle( figure );
-
-						const figureWidth =
-							ref.parentElement.offsetWidth -
-							parseFloat( figureComputedStyle.marginLeft ) -
-							parseFloat( figureComputedStyle.marginRight );
+						const figureWidth = ref.parentElement.offsetWidth;
 
 						// We need special handling for the height because
 						// a caption will cause the figure to be taller than
@@ -364,11 +362,13 @@ store(
 						let figureHeight = ref.parentElement.offsetHeight;
 						const caption = figure.querySelector( 'figcaption' );
 						if ( caption ) {
+							const captionComputedStyle =
+								window.getComputedStyle( caption );
 							figureHeight =
 								figureHeight -
-								parseFloat( figureComputedStyle.marginTop ) -
-								parseFloat( figureComputedStyle.marginBottom ) -
-								caption.offsetHeight;
+								caption.offsetHeight -
+								parseFloat( captionComputedStyle.marginTop ) -
+								parseFloat( captionComputedStyle.marginBottom );
 						}
 
 						const buttonOffsetTop = figureHeight - offsetHeight;
@@ -384,33 +384,31 @@ store(
 							const offsetRatio = offsetWidth / offsetHeight;
 
 							if ( naturalRatio >= offsetRatio ) {
-								// If it reaches the width first, use a fixed
-								// position for the X axis and calculate Y position.
-								context.core.image.imageButtonRight =
-									buttonOffsetRight + 25;
-								const imageHeight = offsetWidth / naturalRatio;
+								// If it reaches the width first, keep
+								// the width and compute the height.
+								const referenceHeight =
+									offsetWidth / naturalRatio;
 								context.core.image.imageButtonTop =
-									( offsetHeight - imageHeight ) / 2 +
+									( offsetHeight - referenceHeight ) / 2 +
 									buttonOffsetTop +
 									25;
+								context.core.image.imageButtonRight =
+									buttonOffsetRight + 25;
 							} else {
-								// If it reaches the height first, use a fixed
-								// position for the Y axis and calculate X position.
+								// If it reaches the height first, keep
+								// the height and compute the width.
+								const referenceWidth =
+									offsetHeight * naturalRatio;
 								context.core.image.imageButtonTop =
 									buttonOffsetTop + 25;
-								const imageWidth = offsetHeight * naturalRatio;
 								context.core.image.imageButtonRight =
-									( offsetWidth - imageWidth ) / 2 +
+									( offsetWidth - referenceWidth ) / 2 +
 									buttonOffsetRight +
 									25;
 							}
 						} else {
-							// In other cases, we can just put the button in
-							// the top right corner of the containing element,
-							// accounting for the fact that users may have resized
-							// the image, which will require us to reposition
-							// the button on the X axis but not the Y axis.
-							context.core.image.imageButtonTop = 25;
+							context.core.image.imageButtonTop =
+								buttonOffsetTop + 25;
 							context.core.image.imageButtonRight =
 								buttonOffsetRight + 25;
 						}
