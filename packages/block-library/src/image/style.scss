@@ -168,10 +168,10 @@
 	button {
 		opacity: 0;
 		border: none;
-		background: #1e1e1e;
+		background: #000;
 		cursor: zoom-in;
-		width: 25px;
-		height: 25px;
+		width: 24px;
+		height: 24px;
 		position: absolute;
 		z-index: 100;
 		top: 5px;
@@ -198,7 +198,7 @@
 		&:hover,
 		&:focus,
 		&:not(:hover):not(:active):not(.has-background) {
-			background: #1e1e1e;
+			background: #000;
 			border: none;
 		}
 	}
