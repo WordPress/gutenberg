@@ -4,7 +4,9 @@ The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-
 
 Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so.
 
-[![wp-env basics diagram](https://developer.wordpress.org/files/2023/10/wp-env-diagram.png)](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA)
+![wp-env basics diagram](https://developer.wordpress.org/files/2023/10/wp-env-diagram.png)
+
+_See [diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA)_
 
 ## Quick start
  
