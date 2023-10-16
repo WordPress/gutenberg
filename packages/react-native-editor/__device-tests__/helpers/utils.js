@@ -174,7 +174,7 @@ const setupDriver = async () => {
 
 	const driver = await remote( {
 		...serverConfig,
-		logLevel: 'debug',
+		logLevel: 'error',
 		capabilities: {
 			platformName: PLATFORM_NAME,
 			...prefixKeysWithAppium( desiredCaps ),
