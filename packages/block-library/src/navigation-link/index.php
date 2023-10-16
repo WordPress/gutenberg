@@ -415,9 +415,9 @@ function register_block_core_navigation_link_post_type_variation( $post_type, $p
  * Register a custom taxonomy variation for navigation link on taxonomy registration
  * Handles all taxonomies registered after the block is registered in register_navigation_link_post_type_variations
  *
- * @param string       $taxonomy Taxonomy name.
- * @param array|string $object_type Name of the object type for the taxonomy object.
- * @param array|string $args Optional args used in taxonomy registration.
+ * @param string       $taxonomy Taxonomy slug.
+ * @param array|string $object_type Object type or array of object types.
+ * @param array        $args Array of taxonomy registration arguments.
  * @return void
  */
 function register_block_core_navigation_link_taxonomy_variation( $taxonomy, $object_type, $args ) {
