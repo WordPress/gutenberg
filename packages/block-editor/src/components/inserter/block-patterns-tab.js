@@ -28,7 +28,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import usePatternsState from './hooks/use-patterns-state';
-import BlockPatternList from '../block-patterns-list';
+import BlockPatternsList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 import usePatternsPaging from './hooks/use-patterns-paging';
@@ -332,7 +332,7 @@ export function BlockPatternsCategoryPanel( {
 			</VStack>
 
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternList
+				<BlockPatternsList
 					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }

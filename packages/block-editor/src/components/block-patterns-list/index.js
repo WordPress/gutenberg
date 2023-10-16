@@ -153,7 +153,7 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList(
+function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
@@ -224,4 +224,4 @@ function BlockPatternList(
 	);
 }
 
-export default forwardRef( BlockPatternList );
+export default forwardRef( BlockPatternsList );
