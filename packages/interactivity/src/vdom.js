@@ -10,6 +10,7 @@ import { directivePrefix as p } from './constants';
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
+let namespace = null;
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -24,6 +25,12 @@ const directiveParser = new RegExp(
 		'(?:--([a-z0-9_-]+))?$',
 	'i' // Case insensitive.
 );
+
+const nsPathRegExp = /^([\w-]+)::(.+)$/;
+
+const nsValueParser = ( value ) => {
+	return nsPathRegExp.exec( value )?.slice( 1 ) ?? [ namespace, value ];
+};
 
 export const hydratedIslands = new WeakSet();
 
@@ -66,15 +73,24 @@ export function toVdom( root ) {
 					ignore = true;
 				} else if ( n === islandAttr ) {
 					island = true;
+					try {
+						const val = JSON.parse( attributes[ i ].value );
+						namespace = val?.namespace ?? null;
+					} catch ( e ) {}
 				} else {
 					hasDirectives = true;
-					let val = attributes[ i ].value;
+					let [ ns, val ] = nsValueParser( attributes[ i ].value );
 					try {
 						val = JSON.parse( val );
 					} catch ( e ) {}
-					const [ , prefix, suffix ] = directiveParser.exec( n );
-					directives[ prefix ] = directives[ prefix ] || {};
-					directives[ prefix ][ suffix || 'default' ] = val;
+					const [ , prefix, suffix = 'default' ] =
+						directiveParser.exec( n );
+					directives[ prefix ] = directives[ prefix ] || [];
+					directives[ prefix ].push( {
+						namespace: ns,
+						value: val,
+						suffix,
+					} );
 				}
 			} else if ( n === 'ref' ) {
 				continue;
@@ -92,7 +108,10 @@ export function toVdom( root ) {
 			];
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) props.__directives = directives;
+		if ( hasDirectives ) {
+			props.__directives = directives;
+			directives.namespace = namespace;
+		}
 
 		let child = treeWalker.firstChild();
 		if ( child ) {
