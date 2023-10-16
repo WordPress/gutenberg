@@ -38,6 +38,9 @@ export function migrateToRecommendedBlocks( attributes ) {
 			...restAttributes,
 			style: cleanEmptyObject( {
 				...style,
+				spacing: {
+					blockGap: '1em',
+				},
 				color: {
 					...style?.color,
 					// Duotone must be applied to the avatar block.
