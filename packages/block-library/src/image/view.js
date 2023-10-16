@@ -348,26 +348,26 @@ store(
 								context.core.image.imageButtonTop =
 									( offsetHeight - referenceHeight ) / 2 +
 									buttonOffsetTop +
-									15;
+									10;
 								context.core.image.imageButtonRight =
-									buttonOffsetRight + 15;
+									buttonOffsetRight + 10;
 							} else {
 								// If it reaches the height first, keep
 								// the height and compute the width.
 								const referenceWidth =
 									offsetHeight * naturalRatio;
 								context.core.image.imageButtonTop =
-									buttonOffsetTop + 15;
+									buttonOffsetTop + 10;
 								context.core.image.imageButtonRight =
 									( offsetWidth - referenceWidth ) / 2 +
 									buttonOffsetRight +
-									15;
+									10;
 							}
 						} else {
 							context.core.image.imageButtonTop =
-								buttonOffsetTop + 15;
+								buttonOffsetTop + 10;
 							context.core.image.imageButtonRight =
-								buttonOffsetRight + 15;
+								buttonOffsetRight + 10;
 						}
 					},
 					setStylesOnResize: ( { state, context, ref } ) => {
