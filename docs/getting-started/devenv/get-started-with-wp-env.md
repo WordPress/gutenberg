@@ -6,8 +6,6 @@ Before following this guide, install [Node.js development tools](/docs/getting-s
 
 ![wp-env basics diagram](https://developer.wordpress.org/files/2023/10/wp-env-diagram.png)
 
-_See [diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA)_
-
 ## Quick start
  
 1. Download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your operating system.
@@ -139,6 +137,7 @@ Your environment should now be set up at `http://localhost:8888/`.
 
 ## Additional resources
 
--   [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
--   [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
--   [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
+- [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
+- [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
+- [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
+- [`wp-env` Basics diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA) (Excalidraw)
