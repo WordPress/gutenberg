@@ -197,10 +197,10 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const [ allowFixed, allowSticky ] = useSettings( [
+	const [ allowFixed, allowSticky ] = useSettings(
 		'position.fixed',
-		'position.sticky',
-	] );
+		'position.sticky'
+	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
 	return ! hasPositionSupport( blockName ) || isDisabled;

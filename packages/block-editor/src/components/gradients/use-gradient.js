@@ -64,11 +64,11 @@ export function __experimentalUseGradient( {
 		userGradientPalette,
 		themeGradientPalette,
 		defaultGradientPalette,
-	] = useSettings( [
+	] = useSettings(
 		'color.gradients.custom',
 		'color.gradients.theme',
-		'color.gradients.default',
-	] );
+		'color.gradients.default'
+	);
 	const allGradients = useMemo(
 		() => [
 			...( userGradientPalette || [] ),

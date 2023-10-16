@@ -10,10 +10,10 @@ import { useSettings } from '../use-setting';
 
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
-		const [ colorsFeature, enableCustomColors ] = useSettings( [
+		const [ colorsFeature, enableCustomColors ] = useSettings(
 			'color.palette',
-			'color.custom',
-		] );
+			'color.custom'
+		);
 		const {
 			colors = colorsFeature,
 			disableCustomColors = ! enableCustomColors,

@@ -51,11 +51,11 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const [ userPalette, themePalette, defaultPalette ] = useSettings( [
+			const [ userPalette, themePalette, defaultPalette ] = useSettings(
 				'color.palette.custom',
 				'color.palette.theme',
-				'color.palette.default',
-			] );
+				'color.palette.default'
+			);
 			const allColors = useMemo(
 				() => [
 					...( userPalette || [] ),

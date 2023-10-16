@@ -29,7 +29,7 @@ export default function useMultipleOriginColorsAndGradients() {
 		themeGradients,
 		defaultGradients,
 		shouldDisplayDefaultGradients,
-	] = useSettings( [
+	] = useSettings(
 		'color.custom',
 		'color.palette.custom',
 		'color.palette.theme',
@@ -39,8 +39,8 @@ export default function useMultipleOriginColorsAndGradients() {
 		'color.gradients.custom',
 		'color.gradients.theme',
 		'color.gradients.default',
-		'color.defaultGradients',
-	] );
+		'color.defaultGradients'
+	);
 
 	const colorGradientSettings = {
 		disableCustomColors: ! enableCustomColors,

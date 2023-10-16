@@ -169,7 +169,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
-	] = useSettings( [
+	] = useSettings(
 		'typography.fontFamilies',
 		'typography.fontSizes',
 		'typography.customFontSize',
@@ -211,8 +211,8 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.link',
 		'color.text',
 		'color.heading',
-		'color.button',
-	] );
+		'color.button'
+	);
 
 	const rawSettings = useMemo( () => {
 		return {

@@ -115,9 +115,10 @@ function mergeOrigins( value ) {
  * @param {string[]} paths The paths to the settings.
  * @return {any[]} Returns the values defined for the settings.
  */
-export function useSettings( paths ) {
+export function useSettings( ...paths ) {
 	const { name: blockName, clientId = null } = useBlockEditContext();
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	paths = useMemo( () => paths, paths );
 
 	return useSelect(
@@ -246,6 +247,6 @@ export function useSettings( paths ) {
  * ```
  */
 export default function useSetting( path ) {
-	const [ value ] = useSettings( [ path ] );
+	const [ value ] = useSettings( path );
 	return value;
 }

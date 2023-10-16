@@ -160,12 +160,12 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const [ colors, gradients, customColors, customGradients ] = useSettings( [
+	const [ colors, gradients, customColors, customGradients ] = useSettings(
 		'color.palette',
 		'color.gradients',
 		'color.custom',
-		'color.customGradient',
-	] );
+		'color.customGradient'
+	);
 
 	return (
 		<ColorGradientControlInner

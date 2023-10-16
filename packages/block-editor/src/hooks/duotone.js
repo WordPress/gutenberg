@@ -57,12 +57,12 @@ extend( [ namesPlugin ] );
 
 function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	const [ enableDefault, userPresets, themePresets, defaultPresets ] =
-		useSettings( [
+		useSettings(
 			defaultSetting,
 			`${ presetSetting }.custom`,
 			`${ presetSetting }.theme`,
-			`${ presetSetting }.default`,
-		] );
+			`${ presetSetting }.default`
+		);
 	return useMemo(
 		() => [
 			...( userPresets || EMPTY_ARRAY ),
@@ -111,10 +111,10 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
 	} );
-	const [ enableCustomColors, enableCustomDuotone ] = useSettings( [
+	const [ enableCustomColors, enableCustomDuotone ] = useSettings(
 		'color.custom',
-		'color.customDuotone',
-	] );
+		'color.customDuotone'
+	);
 	const disableCustomColors = ! enableCustomColors;
 	const disableCustomDuotone =
 		! enableCustomDuotone ||

@@ -94,14 +94,14 @@ export function useColorProps( attributes ) {
 		userGradients,
 		themeGradients,
 		defaultGradients,
-	] = useSettings( [
+	] = useSettings(
 		'color.palette.custom',
 		'color.palette.theme',
 		'color.palette.default',
 		'color.gradients.custom',
 		'color.gradients.theme',
-		'color.gradients.default',
-	] );
+		'color.gradients.default'
+	);
 
 	const colors = useMemo(
 		() => [

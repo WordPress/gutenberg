@@ -368,11 +368,11 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const [ userPalette, themePalette, defaultPalette ] = useSettings( [
+		const [ userPalette, themePalette, defaultPalette ] = useSettings(
 			'color.palette.custom',
 			'color.palette.theme',
-			'color.palette.default',
-		] );
+			'color.palette.default'
+		);
 
 		const colors = useMemo(
 			() => [
