@@ -448,28 +448,18 @@ const swipeFromTo = async (
 	driver,
 	from = defaultCoordinates,
 	to = defaultCoordinates,
-	delay
+	delay = 0
 ) =>
-	driver.touchPerform( [
-		{
-			action: 'press',
-			options: from,
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: delay,
-			},
-		},
-		{
-			action: 'moveTo',
-			options: to,
-		},
-		{
-			action: 'release',
-			options: {},
-		},
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { ...from, duration: 0 } )
+		.down( { button: 0 } )
+		.move( { ...to, duration: 300 } )
+		.up( { button: 0 } )
+		.pause( delay )
+		.perform();
 
 // Starts from the middle of the screen and swipes downwards
 const swipeDown = async ( driver, delay = 3000 ) => {
@@ -569,16 +559,18 @@ const toggleOrientation = async ( driver ) => {
  */
 const toggleDarkMode = ( driver, darkMode = true ) => {
 	if ( isAndroid() ) {
-		return driver.execute( 'mobile: shell', [
+		return driver.executeScript( 'mobile: shell', [
 			{
 				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
 			},
 		] );
 	}
 
-	return driver.execute( 'mobile: setAppearance', {
-		style: darkMode ? 'dark' : 'light',
-	} );
+	return driver.executeScript( 'mobile: setAppearance', [
+		{
+			style: darkMode ? 'dark' : 'light',
+		},
+	] );
 };
 
 const isEditorVisible = async ( driver ) => {

@@ -67,8 +67,7 @@ class EditorPage {
 	}
 
 	async getAddBlockButton() {
-		const elements =
-			await this.driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+		const elements = await this.driver.$$( `~${ ADD_BLOCK_ID }` );
 		return elements[ 0 ];
 	}
 
@@ -302,7 +301,10 @@ class EditorPage {
 	async waitForKeyboardToBeHidden() {
 		const { addButtonLocation } = this.initialValues;
 		const addButton = await this.getAddBlockButton();
-		const location = await addButton.getLocation();
+		let location;
+		if ( addButton ) {
+			location = await addButton.getLocation();
+		}
 		let YLocation = addButtonLocation?.y;
 		const currentOrientation = await this.driver.getOrientation();
 		const isLandscape = currentOrientation === 'LANDSCAPE';
@@ -316,7 +318,7 @@ class EditorPage {
 			);
 		}
 
-		if ( location.y < YLocation ) {
+		if ( ! addButton || location?.y < YLocation ) {
 			await this.waitForKeyboardToBeHidden();
 		}
 	}
