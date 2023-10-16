@@ -1127,6 +1127,86 @@ _Returns_
 
 -   `boolean`: Whether resolution is in progress.
 
+### Normalizing Selector Arguments
+
+In specific circumstances it may be necessary to normalize the arguments passed to a given _call_ of a selector/resolver pairing.
+
+Each resolver has [its resolution status cached in an internal state](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/reducer.ts#L39) where the [key is the arguments supplied to the selector](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/utils.ts#L48) at _call_ time.
+
+For example for a selector with a single argument, the related resolver would generate a cache key of: `[ 123 ]`.
+
+[This cache is used to determine the resolution status of a given resolver](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/selectors.js#L22-L29) which is used to [avoid unwanted additional invocations of resolvers](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/index.js#L469-L474) (which often undertake "expensive" operations such as network requests).
+
+As a result it's important that arguments remain _consistent_ when calling the selector. For example, by _default_ these two calls will not be cached using the same key, even though they are likely identical:
+
+```js
+// Arg as number
+getSomeDataById( 123 );
+
+// Arg as string
+getSomeDataById( '123' );
+```
+
+This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+
+#### Example
+
+The _3rd_ argument of the following selector is intended to be a `Number`:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	return state.items[ name ][ type ][ id ] || null;
+};
+```
+
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+
+```js
+// Define normalization method.
+getItemsSelector.__unstableNormalizeArgs = ( args ) {
+	// "id" argument at the 2nd index
+	if (args[2] && typeof args[2] === 'string' ) {
+		args[2] === Number(args[2]);
+	}
+
+	return args;
+}
+```
+
+With this in place the following code will behave consistently:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[ name ][ type ][ id ] || null;
+};
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+};
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		getItems: getItemsSelector,
+	},
+	resolvers: {
+		getItems: getItemsResolver,
+	},
+} );
+
+// Call with correct number type.
+registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
+
+// Call with the wrong string type, **but** here we have avoided an
+// wanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `__unstableNormalizeArgs` method.
+registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
+```
+
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
+
 ## Going further
 
 -   [What is WordPress Data?](https://unfoldingneurons.com/2020/what-is-wordpress-data/)
