@@ -220,6 +220,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			data-wp-on--click="actions.core.image.showLightbox"
 			data-wp-style--right="context.core.image.imageButtonRight"
 			data-wp-style--top="context.core.image.imageButtonTop"
+			style="background: #000"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>
