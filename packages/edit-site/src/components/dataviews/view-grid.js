@@ -5,9 +5,6 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Card,
-	CardBody,
-	CardMedia,
 	FlexBlock,
 	Placeholder,
 } from '@wordpress/components';
@@ -30,8 +27,8 @@ export function ViewGrid( { data, fields, view, actions } ) {
 		<Grid gap={ 6 } columns={ 2 }>
 			{ data.map( ( item, index ) => {
 				return (
-					<Card key={ index }>
-						<CardMedia>
+					<VStack key={ index }>
+						<div className="dataviews-view-grid__media">
 							{ ( mediaField &&
 								mediaField.render( { item } ) ) || (
 								<Placeholder
@@ -42,28 +39,23 @@ export function ViewGrid( { data, fields, view, actions } ) {
 									} }
 								/>
 							) }
-						</CardMedia>
+						</div>
 
-						<CardBody>
-							<HStack justify="space-between" alignment="top">
-								<FlexBlock>
-									<VStack>
-										{ visibleFields.map( ( field ) => (
-											<div key={ field.id }>
-												{ field.render
-													? field.render( { item } )
-													: field.accessorFn( item ) }
-											</div>
-										) ) }
-									</VStack>
-								</FlexBlock>
-								<FieldActions
-									item={ item }
-									actions={ actions }
-								/>
-							</HStack>
-						</CardBody>
-					</Card>
+						<HStack justify="space-between" alignment="top">
+							<FlexBlock>
+								<VStack>
+									{ visibleFields.map( ( field ) => (
+										<div key={ field.id }>
+											{ field.render
+												? field.render( { item } )
+												: field.accessorFn( item ) }
+										</div>
+									) ) }
+								</VStack>
+							</FlexBlock>
+							<FieldActions item={ item } actions={ actions } />
+						</HStack>
+					</VStack>
 				);
 			} ) }
 		</Grid>
