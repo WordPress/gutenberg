@@ -32,7 +32,6 @@ function gutenberg_register_taxonomy_patterns() {
 		'show_admin_column'  => true,
 		'capabilities'       => array(
 			'edit_terms'   => 'publish_posts',
-			'assign_terms' => 'publish_posts',
 		),
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
