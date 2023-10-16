@@ -3,6 +3,14 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
  * Generate Author-related blocks based on block attributes.
@@ -27,14 +35,14 @@ export function migrateToRecommendedBlocks( attributes ) {
 		'core/group',
 		{
 			...restAttributes,
-			style: {
+			style: cleanEmptyObject( {
 				...style,
 				color: {
 					...style?.color,
 					// Duotone must be applied to the avatar block.
 					duotone: undefined,
 				},
-			},
+			} ),
 			layout: {
 				type: 'flex',
 				flexWrap: 'nowrap',
@@ -45,14 +53,14 @@ export function migrateToRecommendedBlocks( attributes ) {
 			showBio &&
 				createBlock( 'core/avatar', {
 					size: avatarSize,
-					style: {
+					style: cleanEmptyObject( {
 						border: {
 							radius: '0px',
 						},
 						color: {
 							duotone: style?.color?.duotone,
 						},
-					},
+					} ),
 				} ),
 			createBlock(
 				'core/group',
