@@ -301,13 +301,7 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: 'test' },
 		} );
 
-		await page.getByRole( 'button', { name: 'Save draft' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Draft saved' } )
-		).toBeVisible();
-
+		await editor.saveDraft();
 		await page.reload();
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
@@ -1188,10 +1182,17 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: ']2' },
 		} );
 		// Focus and move the caret to the end.
-		await page
+		const secondParagraphBlock = page
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: ']2' } )
-			.click();
+			.filter( { hasText: ']2' } );
+		const secondParagraphBlockBox =
+			await secondParagraphBlock.boundingBox();
+		await secondParagraphBlock.click( {
+			position: {
+				x: secondParagraphBlockBox.width - 1,
+				y: secondParagraphBlockBox.height / 2,
+			},
+		} );
 
 		await page.keyboard.press( 'ArrowLeft' );
 		const strongText = page
@@ -1199,14 +1200,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		// Focus and move the caret to the end.
-		await page
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: '1[' } )
-			.click( {
-				// Ensure clicking on the right half of the element.
-				position: { x: strongBox.width - 1, y: strongBox.height / 2 },
-				modifiers: [ 'Shift' ],
-			} );
+		await strongText.click( {
+			// Ensure clicking on the right half of the element.
+			position: { x: strongBox.width - 1, y: strongBox.height / 2 },
+			modifiers: [ 'Shift' ],
+		} );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.

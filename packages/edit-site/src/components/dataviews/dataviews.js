@@ -1,15 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	getCoreRowModel,
-	getFilteredRowModel,
-	getSortedRowModel,
-	getPaginationRowModel,
-	useReactTable,
-} from '@tanstack/react-table';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -20,39 +9,46 @@ import {
 /**
  * Internal dependencies
  */
-import ListView from './list-view';
-import { Pagination } from './pagination';
+import ViewList from './view-list';
+import Pagination from './pagination';
 import ViewActions from './view-actions';
 import TextFilter from './text-filter';
+import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
-	data,
+	view,
+	onChangeView,
 	fields,
-	isLoading,
+	actions,
+	data,
+	isLoading = false,
 	paginationInfo,
-	options,
 } ) {
-	const dataView = useReactTable( {
-		data,
-		columns: fields,
-		...options,
-		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-	} );
+	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between">
-					<TextFilter onChange={ dataView.setGlobalFilter } />
-					<ViewActions dataView={ dataView } />
+					<TextFilter view={ view } onChangeView={ onChangeView } />
+					<ViewActions
+						fields={ fields }
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
 				</HStack>
-				{ /* This component will be selected based on viewConfigs. Now we only have the list view. */ }
-				<ListView dataView={ dataView } isLoading={ isLoading } />
+				<ViewComponent
+					fields={ fields }
+					view={ view }
+					onChangeView={ onChangeView }
+					paginationInfo={ paginationInfo }
+					actions={ actions }
+					data={ data }
+					isLoading={ isLoading }
+				/>
 				<Pagination
-					dataView={ dataView }
-					totalItems={ paginationInfo?.totalItems }
+					view={ view }
+					onChangeView={ onChangeView }
+					paginationInfo={ paginationInfo }
 				/>
 			</VStack>
 		</div>
