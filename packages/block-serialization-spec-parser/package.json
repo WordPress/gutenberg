@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-serialization-spec-parser",
-	"version": "4.42.6",
+	"version": "4.42.7",
 	"description": "Block serialization specification parser for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
