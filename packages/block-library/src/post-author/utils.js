@@ -23,6 +23,7 @@ export function migrateToRecommendedBlocks( attributes ) {
 	const {
 		avatarSize,
 		byline,
+		showAvatar,
 		showBio,
 		isLink,
 		linkTarget,
@@ -50,7 +51,7 @@ export function migrateToRecommendedBlocks( attributes ) {
 			},
 		},
 		[
-			showBio &&
+			showAvatar &&
 				createBlock( 'core/avatar', {
 					size: avatarSize,
 					style: cleanEmptyObject( {
@@ -96,14 +97,15 @@ export function migrateToRecommendedBlocks( attributes ) {
 							},
 						},
 					} ),
-					createBlock( 'core/post-author-biography', {
-						style: {
-							typography: {
-								fontSize: '0.7em',
+					showBio &&
+						createBlock( 'core/post-author-biography', {
+							style: {
+								typography: {
+									fontSize: '0.7em',
+								},
 							},
-						},
-					} ),
-				]
+						} ),
+				].filter( Boolean )
 			),
 		].filter( Boolean )
 	);
