@@ -149,7 +149,7 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				setList: authors,
+				elements: authors,
 				enableColumnFiltering: true,
 			},
 			{

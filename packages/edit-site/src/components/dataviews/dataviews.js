@@ -31,7 +31,7 @@ export default function DataViews( {
 		{ label: __( 'All authors' ), value: '' },
 		...( fields
 			.find( ( f ) => f.id === 'author' )
-			.setList?.map( ( author ) => ( {
+			.elements?.map( ( author ) => ( {
 				label: author.name,
 				value: author.id,
 			} ) ) || [] ),
