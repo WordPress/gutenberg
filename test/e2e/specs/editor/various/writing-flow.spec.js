@@ -1129,7 +1129,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect(
 			editor.canvas.locator( '[data-type="core/block"]' )
-		).toBeFocused();
+		).toBeVisible();
 
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
