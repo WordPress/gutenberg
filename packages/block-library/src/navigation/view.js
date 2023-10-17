@@ -22,11 +22,6 @@ const openMenu = ( store, menuOpenedOn ) => {
 	}
 };
 
-// This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
-// when the user taps in the body. It can be removed once we add an overlay to
-// capture the clicks, instead of relying on the focusout event.
-document.addEventListener( 'click', () => {} );
-
 const closeMenu = ( store, menuClosedOn ) => {
 	const { context, selectors } = store;
 	selectors.core.navigation.menuOpenedBy( store )[ menuClosedOn ] = false;
@@ -147,6 +142,8 @@ wpStore( {
 				},
 				toggleMenuOnClick: ( store ) => {
 					const { selectors, context, ref } = store;
+					// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
+					if ( window.document.activeElement !== ref ) ref.focus();
 					const menuOpenedBy =
 						selectors.core.navigation.menuOpenedBy( store );
 					if ( menuOpenedBy.click || menuOpenedBy.focus ) {
@@ -201,11 +198,14 @@ wpStore( {
 					// event.relatedTarget === The element receiving focus (if any)
 					// When focusout is outsite the document,
 					// `window.document.activeElement` doesn't change.
+
+					// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.
 					if (
-						! context.core.navigation.modal?.contains(
+						event.relatedTarget === null ||
+						( ! context.core.navigation.modal?.contains(
 							event.relatedTarget
 						) &&
-						event.target !== window.document.activeElement
+							event.target !== window.document.activeElement )
 					) {
 						closeMenu( store, 'click' );
 						closeMenu( store, 'focus' );
