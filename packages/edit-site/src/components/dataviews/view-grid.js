@@ -16,12 +16,12 @@ import FieldActions from './field-actions';
 
 export function ViewGrid( { data, fields, view, actions } ) {
 	const mediaField = fields.find(
-		( field ) => field.id === view.layoutConfig.mediaField
+		( field ) => field.id === view.layout.mediaField
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
-			field.id !== view.layoutConfig.mediaField
+			field.id !== view.layout.mediaField
 	);
 	return (
 		<Grid gap={ 6 } columns={ 2 }>

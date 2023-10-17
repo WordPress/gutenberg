@@ -42,6 +42,7 @@ export default function PagePages() {
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
@@ -172,7 +173,7 @@ export default function PagePages() {
 			if ( updatedView.type !== view.type ) {
 				updatedView = {
 					...updatedView,
-					layoutConfig: {
+					layout: {
 						...defaultConfigPerViewType[ updatedView.type ],
 					},
 				};
