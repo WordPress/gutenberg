@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
-	"name": "test/directive-effect",
-	"title": "E2E Interactivity tests - directive effect",
+	"name": "test/directive-watch",
+	"title": "E2E Interactivity tests - directive watch",
 	"category": "text",
 	"icon": "heart",
 	"description": "",
@@ -9,6 +9,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "directive-effect-view",
+	"viewScript": "directive-watch-view",
 	"render": "file:./render.php"
 }

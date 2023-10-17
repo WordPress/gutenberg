@@ -7,50 +7,52 @@
 		'show-mock',
 		( {
 			directives: {
-				"show-mock": { default: showMock },
+				"show-mock": showMock,
 			},
 			element,
 			evaluate,
 		} ) => {
-			if ( ! evaluate( showMock ) ) return null;
+			const entry = showMock.find(
+				( { suffix } ) => suffix === 'default'
+			);
+			if ( ! evaluate( entry ) ) return null;
 			return element;
 		}
 	);
 
-	store( {
+	const { state } = store( 'directive-watch', {
 		state: {
 			isOpen: true,
 			isElementInTheDOM: false,
 			counter: 0,
-		},
-		selectors: {
-			elementInTheDOM: ( { state } ) =>
-				state.isElementInTheDOM
+			get elementInTheDOM() {
+				return state.isElementInTheDOM
 					? 'element is in the DOM'
-					: 'element is not in the DOM',
+					: 'element is not in the DOM';
+			}
 		},
 		actions: {
-			toggle( { state } ) {
+			toggle() {
 				state.isOpen = ! state.isOpen;
 			},
-			increment( { state } ) {
+			increment() {
 				state.counter = state.counter + 1;
 			},
 		},
 		effects: {
-			elementAddedToTheDOM: ( { state } ) => {
+			elementAddedToTheDOM: () => {
 				state.isElementInTheDOM = true;
 
 				return () => {
 					state.isElementInTheDOM = false;
 				};
 			},
-			changeFocus: ( { state } ) => {
+			changeFocus: () => {
 				if ( state.isOpen ) {
 					document.querySelector( "[data-testid='input']" ).focus();
 				}
 			},
-			infiniteLoop: ({ state }) => {
+			infiniteLoop: () => {
 				state.counter = state.counter + 1;
 			}
 		},
