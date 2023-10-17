@@ -148,13 +148,30 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				elements: authors,
+				elements:
+					( authors &&
+						authors.map( ( { id, name } ) => ( {
+							value: id,
+							label: name,
+						} ) ) ) ||
+					[],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				elements:
+					( postStatuses &&
+						Object.entries( postStatuses )
+							.filter( ( [ slug ] ) =>
+								[ 'publish', 'draft' ].includes( slug )
+							)
+							.map( ( [ slug, name ] ) => ( {
+								value: slug,
+								label: name,
+							} ) ) ) ||
+					[],
 				enableSorting: false,
 			},
 			{

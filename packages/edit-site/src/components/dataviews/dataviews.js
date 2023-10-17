@@ -29,12 +29,11 @@ export default function DataViews( {
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
 	const authors = [
 		{ label: __( 'All authors' ), value: '' },
-		...( fields
-			.find( ( f ) => f.id === 'author' )
-			.elements?.map( ( author ) => ( {
-				label: author.name,
-				value: author.id,
-			} ) ) || [] ),
+		...( fields.find( ( f ) => f.id === 'author' ).elements || [] ),
+	];
+	const statuses = [
+		{ label: __( 'All statuses' ), value: [ 'publish', 'draft' ] },
+		...( fields.find( ( f ) => f.id === 'status' ).elements || [] ),
 	];
 	return (
 		<div className="dataviews-wrapper">
@@ -49,6 +48,12 @@ export default function DataViews( {
 						<InFilter
 							id={ 'author' }
 							options={ authors }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<InFilter
+							id={ 'status' }
+							options={ statuses }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
