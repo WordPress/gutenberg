@@ -26,11 +26,11 @@ const directiveParser = new RegExp(
 	'i' // Case insensitive.
 );
 
-const nsPathRegExp = /^([\w-]+)::(.+)$/;
-
-const nsValueParser = ( value ) => {
-	return nsPathRegExp.exec( value )?.slice( 1 ) ?? [ namespace, value ];
-};
+// Regular expression for reference parsing. It can contain a namespace before
+// the reference, separated by `::`, like `some-namespace::state.somePath`.
+// Namespaces can contain any alphanumeric characters, hyphens or underscores.
+// References don't have any restrictions.
+const nsPathRegExp = /^([\w-_]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -71,26 +71,27 @@ export function toVdom( root ) {
 			) {
 				if ( n === ignoreAttr ) {
 					ignore = true;
-				} else if ( n === islandAttr ) {
-					island = true;
-					try {
-						const val = JSON.parse( attributes[ i ].value );
-						namespace = val?.namespace ?? null;
-					} catch ( e ) {}
 				} else {
-					hasDirectives = true;
-					let [ ns, val ] = nsValueParser( attributes[ i ].value );
+					let [ ns, value ] = nsPathRegExp
+						.exec( attributes[ i ].value )
+						?.slice( 1 ) ?? [ namespace, attributes[ i ].value ];
 					try {
-						val = JSON.parse( val );
+						value = JSON.parse( value );
 					} catch ( e ) {}
-					const [ , prefix, suffix = 'default' ] =
-						directiveParser.exec( n );
-					directives[ prefix ] = directives[ prefix ] || [];
-					directives[ prefix ].push( {
-						namespace: ns,
-						value: val,
-						suffix,
-					} );
+					if ( n === islandAttr ) {
+						island = true;
+						namespace = value?.namespace ?? null;
+					} else {
+						hasDirectives = true;
+						const [ , prefix, suffix = 'default' ] =
+							directiveParser.exec( n );
+						directives[ prefix ] = directives[ prefix ] || [];
+						directives[ prefix ].push( {
+							namespace: ns,
+							value,
+							suffix,
+						} );
+					}
 				}
 			} else if ( n === 'ref' ) {
 				continue;
@@ -108,10 +109,7 @@ export function toVdom( root ) {
 			];
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) {
-			props.__directives = directives;
-			directives.namespace = namespace;
-		}
+		if ( hasDirectives ) props.__directives = directives;
 
 		let child = treeWalker.firstChild();
 		if ( child ) {

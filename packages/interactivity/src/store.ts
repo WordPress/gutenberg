@@ -55,6 +55,7 @@ const storeLocks = new Map();
 
 const objToProxy = new WeakMap();
 const proxyToNs = new WeakMap();
+const scopeToGetters = new WeakMap();
 
 const proxify = ( obj: any, ns: string ) => {
 	if ( ! objToProxy.has( obj ) ) {
@@ -62,7 +63,6 @@ const proxify = ( obj: any, ns: string ) => {
 		objToProxy.set( obj, proxy );
 		proxyToNs.set( proxy, ns );
 	}
-
 	return objToProxy.get( obj );
 };
 
@@ -70,22 +70,18 @@ const handlers = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
 		const ns = proxyToNs.get( receiver );
 
-		// Check if the proxy is the store root and no prop with that name
-		// exist. In that case, return an empty object for the prop requested.
-		if ( receiver === stores.get( ns ) && ! ( key in target ) ) {
-			const obj = {};
-			target[ key ] = obj;
-			return proxify( obj, ns );
-		}
-
-		// Check if the property is a getter.
+		// Check if the property is a getter and we are inside an scope. If that is
+		// the case, we clone the getter to avoid overwriting the scoped
+		// dependencies of the computed each time that getter runs.
 		const getter = Object.getOwnPropertyDescriptor( target, key )?.get;
 		if ( getter ) {
 			const scope = getScope();
 			if ( scope ) {
-				scope.getters = scope.getters || new Map();
-				if ( ! scope.getters.has( getter ) ) {
-					scope.getters.set(
+				const getters =
+					scopeToGetters.get( scope ) ||
+					scopeToGetters.set( scope, new Map() ).get( scope );
+				if ( ! getters.has( getter ) ) {
+					getters.set(
 						getter,
 						computed( () => {
 							setNamespace( ns );
@@ -99,13 +95,23 @@ const handlers = {
 						} )
 					);
 				}
-				return scope.getters.get( getter ).value;
+				return getters.get( getter ).value;
 			}
 		}
 
 		const result = Reflect.get( target, key, receiver );
 
-		// Check if the property is a generator.
+		// Check if the proxy is the store root and no key with that name exist. In
+		// that case, return an empty object for the requested key.
+		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
+			const obj = {};
+			Reflect.set( target, key, obj, receiver );
+			return proxify( obj, ns );
+		}
+
+		// Check if the property is a generator. If it is, we turn it into an
+		// asynchronous function where we restore the default namespace and scope
+		// each time it awaits/yields.
 		if ( result?.constructor?.name === 'GeneratorFunction' ) {
 			return async ( ...args: unknown[] ) => {
 				const scope = getScope();
@@ -137,8 +143,9 @@ const handlers = {
 			};
 		}
 
-		// Check if the property is a function.
-		// Actions always run in the current scope.
+		// Check if the property is a synchronous function. If it is, set the
+		// default namespace. Synchronous functions always run in the proper scope,
+		// which is set by the Directives component.
 		if ( typeof result === 'function' ) {
 			return ( ...args: unknown[] ) => {
 				setNamespace( ns );
@@ -150,7 +157,7 @@ const handlers = {
 			};
 		}
 
-		// Check if the property is an object.
+		// Check if the property is an object. If it is, proxyify it.
 		if ( isObject( result ) ) return proxify( result, ns );
 
 		return result;
@@ -209,20 +216,16 @@ const handlers = {
  * @param {StoreOptions} [options]  Options passed to the `store` call.
  */
 
-type DeepPartial< T > = T extends object
-	? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
-	: T;
-
 interface StoreOptions {
 	lock?: boolean | string;
 }
 
 const universalUnlock =
-	'I know using a private store means my plugin will inevitably break on the next store release.';
+	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
 export function store< S extends object = {} >(
 	namespace: string,
-	storePart?: DeepPartial< S >,
+	storePart?: S,
 	options?: StoreOptions
 ): S;
 export function store< T extends object >(
@@ -252,7 +255,7 @@ export function store(
 		// Lock the store if it wasn't locked yet and the passed lock is
 		// different from the universal unlock. If no lock is given, the store
 		// will be public and won't accept any lock from now on.
-		if ( ! storeLocks.has( namespace ) && lock !== universalUnlock ) {
+		if ( lock !== universalUnlock && ! storeLocks.has( namespace ) ) {
 			storeLocks.set( namespace, lock );
 		} else {
 			const storeLock = storeLocks.get( namespace );

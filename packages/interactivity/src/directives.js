@@ -75,10 +75,7 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useSignalEffect( async () => {
-				const result = evaluate( entry );
-				return await result;
-			} );
+			useSignalEffect( () => evaluate( entry ) );
 		} );
 	} );
 
@@ -87,10 +84,7 @@ export default () => {
 		'layout-init',
 		( { directives: { 'layout-init': layoutInit }, evaluate } ) => {
 			layoutInit.forEach( ( entry ) => {
-				useLayoutEffect( () => {
-					const result = evaluate( entry );
-					return result;
-				}, [] );
+				useLayoutEffect( () => evaluate( entry ), [] );
 			} );
 		}
 	);
@@ -98,10 +92,7 @@ export default () => {
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
-			useEffect( () => {
-				const result = evaluate( entry );
-				return result;
-			}, [] );
+			useEffect( () => evaluate( entry ), [] );
 		} );
 	} );
 

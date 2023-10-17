@@ -1,7 +1,9 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement, type VNode } from 'preact';
+import { h, options, createContext, cloneElement } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import { deepSignal } from 'deepsignal';
 /**
@@ -38,37 +40,36 @@ import { stores } from './store';
 // Main context.
 const context = createContext( {} );
 
+// Wrap the element props to prevent modifications.
 const immutableMap = new WeakMap();
+const immutableError = () => {
+	throw new Error(
+		'Please use `data-wp-bind` to modify the attributes of an element.'
+	);
+};
+const immutableHandlers = {
+	get( target, key, receiver ) {
+		const value = Reflect.get( target, key, receiver );
+		return !! value && typeof value === 'object'
+			? deepImmutable( value )
+			: value;
+	},
+	set: immutableError,
+	deleteProperty: immutableError,
+};
 const deepImmutable = < T extends Object = {} >( target: T ): T => {
-	if ( immutableMap.has( target ) ) {
-		return immutableMap.get( target );
-	}
-	const proxy = new Proxy( target, {
-		get( obj, prop ) {
-			const value = Reflect.get< any, string | symbol >( obj, prop );
-			if ( !! value && typeof value === 'object' ) {
-				return deepImmutable( value );
-			}
-			return value;
-		},
-		set() {
-			throw Error( 'Cannot modify a deep immutable object.' );
-		},
-		deleteProperty() {
-			throw Error( 'Cannot modify a deep immutable object.' );
-		},
-	} );
-	immutableMap.set( target, proxy );
-	return proxy;
+	if ( ! immutableMap.has( target ) )
+		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
+	return immutableMap.get( target );
 };
 
+// Store stacks for the current scope and the default namespaces and export APIs
+// to interact with them.
 const scopeStack: any[] = [];
 const namespaceStack: string[] = [];
 
-export const getContext = < T extends object >( namespace?: string ): T => {
-	const [ currentNamespace ] = namespaceStack.slice( -1 );
-	return getScope()?.context[ namespace || currentNamespace ];
-};
+export const getContext = < T extends object >( namespace?: string ): T =>
+	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
 
 export const getElement = () => {
 	if ( ! getScope() ) {
@@ -79,7 +80,7 @@ export const getElement = () => {
 	const { ref, state, props } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		state: state.current,
+		state,
 		props: deepImmutable( props ),
 	} );
 };
@@ -186,7 +187,7 @@ const resolve = ( path, namespace ) => {
 
 // Generate the evaluate function.
 const getEvaluate =
-	( { scope } ) =>
+	( { scope } = {} ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
 		// If path starts with !, remove it and save a flag.
@@ -211,39 +212,39 @@ const getPriorityLevels = ( directives ) => {
 	}, {} );
 
 	return Object.entries( byPriority )
-		.sort( ( [ p1 ], [ p2 ] ) => parseInt( p1 ) - parseInt( p2 ) )
+		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
 		.map( ( [ , arr ] ) => arr );
 };
 
-// Priority level wrapper.
+// Component that wraps each priority level of directives of an element.
 const Directives = ( {
 	directives,
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
 	originalProps,
-	previousScope = {} as any,
+	previousScope = {},
 } ) => {
 	// Initialize the scope of this element. These scopes are different per each
 	// level because each level has a different context, but they share the same
 	// element ref, state and props.
-	const scope: any = useRef( {} ).current;
-	scope.context = useContext( context );
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	scope.ref = previousScope.ref || useRef( null );
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	scope.state = previousScope.state || useRef( deepSignal( {} ) );
-	scope.props = element?.props || originalProps;
+	const scope = useRef( {} ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
+	scope.context = useContext( context );
+	/* eslint-disable react-hooks/rules-of-hooks */
+	scope.ref = previousScope.ref || useRef( null );
+	scope.state = previousScope.state || useRef( deepSignal( {} ) ).current;
+	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element.
+	// Create a fresh copy of the vnode element and add the props to the scope.
 	element = cloneElement( element, { ref: scope.ref } );
+	scope.props = element.props;
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
 		nextPriorityLevels.length > 0 ? (
 			<Directives
 				directives={ directives }
-				priorityLevels={ nextPriorityLevels as [ any, ...any[] ] }
+				priorityLevels={ nextPriorityLevels }
 				element={ element }
 				originalProps={ originalProps }
 				previousScope={ scope }
@@ -275,7 +276,7 @@ const Directives = ( {
 
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
-options.vnode = ( vnode: VNode< { __directives?: any } > ) => {
+options.vnode = ( vnode ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
@@ -288,10 +289,10 @@ options.vnode = ( vnode: VNode< { __directives?: any } > ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type as string, props ),
+				element: h( vnode.type, props ),
 				top: true,
-			} as any;
-			vnode.type = Directives as any;
+			};
+			vnode.type = Directives;
 		}
 	}
 
