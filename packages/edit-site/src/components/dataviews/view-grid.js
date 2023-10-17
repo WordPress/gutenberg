@@ -24,7 +24,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 			field.id !== view.layout.mediaField
 	);
 	return (
-		<Grid gap={ 6 } columns={ 2 }>
+		<Grid gap={ 8 } columns={ 2 } alignment="top">
 			{ data.map( ( item, index ) => {
 				return (
 					<VStack key={ index }>

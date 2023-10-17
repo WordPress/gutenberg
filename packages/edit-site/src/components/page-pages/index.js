@@ -97,7 +97,7 @@ export default function PagePages() {
 							size={
 								currentView.type === 'list'
 									? [ 'thumbnail', 'medium', 'large', 'full' ]
-									: [ 'large', 'medium', 'full', 'thumbnail' ]
+									: [ 'large', 'full', 'medium', 'thumbnail' ]
 							}
 						/>
 					) : null,
