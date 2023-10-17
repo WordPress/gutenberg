@@ -133,6 +133,7 @@ export default function PagePages() {
 						</VStack>
 					);
 				},
+				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
