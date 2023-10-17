@@ -13,10 +13,10 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useSetting from '..';
+import { useSettings } from '..';
 import * as BlockEditContext from '../../block-edit/context';
 
-// Mock useSelect() functions used by useSetting()
+// Mock useSelect() functions used by useSettings()
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 let selectMock = {};
@@ -56,7 +56,7 @@ function runHook( hookCb ) {
 	return storedResult;
 }
 
-describe( 'useSetting', () => {
+describe( 'useSettings', () => {
 	beforeEach( () => {
 		setupSelectMock();
 		mockCurrentBlockContext();
@@ -77,8 +77,8 @@ describe( 'useSetting', () => {
 			name: 'core/test-block',
 		} );
 
-		const result = runHook( () => useSetting( 'layout.contentSize' ) );
-		expect( result ).toBe( '840px' );
+		const result = runHook( () => useSettings( 'layout.contentSize' ) );
+		expect( result ).toEqual( [ '840px' ] );
 	} );
 
 	it( 'uses blockEditor.useSetting.before hook override', () => {
@@ -108,8 +108,8 @@ describe( 'useSetting', () => {
 			}
 		);
 
-		const result = runHook( () => useSetting( 'layout.contentSize' ) );
-		expect( result ).toBe( '960px' );
+		const result = runHook( () => useSettings( 'layout.contentSize' ) );
+		expect( result ).toEqual( [ '960px' ] );
 
 		removeFilter(
 			'blockEditor.useSetting.before',
