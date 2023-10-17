@@ -5,6 +5,14 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	SelectControl,
 } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export default ( { id, fields, view, onChangeView } ) => {
 	const field = fields.find( ( f ) => f.id === id );
@@ -28,10 +36,10 @@ export default ( { id, fields, view, onChangeView } ) => {
 
 				onChangeView( ( currentView ) => ( {
 					...currentView,
-					filters: {
+					filters: cleanEmptyObject( {
 						...currentView.filters,
 						[ id ]: value,
-					},
+					} ),
 				} ) );
 			} }
 		/>
