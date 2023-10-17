@@ -6,7 +6,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {

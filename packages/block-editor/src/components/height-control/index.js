@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const RANGE_CONTROL_CUSTOM_SETTINGS = {
 	px: { max: 1000, step: 1 },

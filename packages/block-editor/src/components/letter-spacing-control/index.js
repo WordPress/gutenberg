@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../../components/use-setting';
+import { useSettings } from '../../components/use-settings';
 
 /**
  * Control for letter-spacing.

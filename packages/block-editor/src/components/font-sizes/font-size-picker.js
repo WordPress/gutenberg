@@ -6,7 +6,7 @@ import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 function FontSizePicker( props ) {
 	const [ fontSizes, customFontSizes ] = useSettings(

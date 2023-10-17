@@ -8,7 +8,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 

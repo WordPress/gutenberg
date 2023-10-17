@@ -25,7 +25,7 @@ import {
 	shouldSkipSerialization,
 	useBlockSettings,
 } from './utils';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import {
 	useHasColorPanel,

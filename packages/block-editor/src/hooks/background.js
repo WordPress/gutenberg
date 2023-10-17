@@ -29,7 +29,7 @@ import { getFilename } from '@wordpress/url';
  */
 import InspectorControls from '../components/inspector-controls';
 import MediaReplaceFlow from '../components/media-replace-flow';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 

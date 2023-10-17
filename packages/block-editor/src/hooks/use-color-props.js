@@ -20,7 +20,7 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 
 // The code in this file has largely been lifted from the color block support
 // hook.

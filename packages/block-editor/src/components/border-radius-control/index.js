@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import LinkedButton from './linked-button';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 import {
 	getAllValue,
 	getAllUnit,

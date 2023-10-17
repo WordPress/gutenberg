@@ -9,7 +9,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
 	const [ availableUnits ] = useSettings( 'spacing.units' );

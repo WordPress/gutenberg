@@ -18,7 +18,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const colorsAndGradientKeys = [
 	'colors',

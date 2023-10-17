@@ -38,7 +38,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const EMPTY_ARRAY = [];
 

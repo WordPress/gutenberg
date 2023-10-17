@@ -29,7 +29,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const EMPTY_OBJECT = {};
 

@@ -13,7 +13,7 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 import { kebabCase } from '../../utils/object';
 
 /**

@@ -26,7 +26,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';

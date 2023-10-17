@@ -8,7 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 
 export function __experimentalGetGradientClass( gradientSlug ) {

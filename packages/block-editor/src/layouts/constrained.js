@@ -21,7 +21,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';

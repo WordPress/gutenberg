@@ -8,7 +8,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const DEFAULT_FONT_SIZES = [];
 

@@ -24,7 +24,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';

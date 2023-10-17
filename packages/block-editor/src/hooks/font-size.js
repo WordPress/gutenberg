@@ -22,7 +22,7 @@ import {
 	transformStyles,
 	shouldSkipSerialization,
 } from './utils';
-import { useSettings } from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import {
 	getTypographyFontSizeValue,

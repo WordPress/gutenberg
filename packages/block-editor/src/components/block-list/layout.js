@@ -7,7 +7,7 @@ import { createContext, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { getLayoutType } from '../../layouts';
-import { useSettings } from '../use-setting';
+import { useSettings } from '../use-settings';
 
 export const defaultLayout = { type: 'default' };
 

@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSettings } from '../../use-setting';
+import { useSettings } from '../../use-settings';
 
 export default function useSpacingSizes() {
 	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
