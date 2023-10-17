@@ -89,7 +89,7 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				accessorFn: ( page ) => page.featured_media,
-				render: ( { item, view: currentView } ) =>
+				render: ( item, currentView ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
@@ -107,7 +107,7 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				render: ( { item: page } ) => {
+				render: ( page ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
@@ -134,7 +134,7 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
+				render: ( item ) => {
 					const author = item._embedded?.author[ 0 ];
 					return (
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
@@ -153,7 +153,7 @@ export default function PagePages() {
 			{
 				header: 'Date',
 				id: 'date',
-				render: ( { item } ) => {
+				render: ( item ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
 						getDate( item.date )
