@@ -246,7 +246,7 @@ export function useSettings( ...paths ) {
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useSetting( path ) {
+export function useSetting( path ) {
 	const [ value ] = useSettings( path );
 	return value;
 }
