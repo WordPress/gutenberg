@@ -118,5 +118,22 @@ function gutenberg_wp_block_register_post_meta() {
 			),
 		)
 	);
+
+	register_post_meta(
+		$post_type,
+		'block_ids',
+		array(
+			'single'            => true,
+			'type'              => 'array',
+			'show_in_rest'      => array(
+				'schema' => array(
+					'type' => 'array',
+					'items' => array(
+						'type' => 'number',
+					),
+				),
+			),
+		)
+	);
 }
 add_action( 'init', 'gutenberg_wp_block_register_post_meta' );

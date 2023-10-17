@@ -49,26 +49,26 @@ function render_block_core_block( $attributes ) {
 		return $context;
 	};
 
-	$id = 0;
-	$filter_recursive_auto_id = static function ( $parsed_block, $source_block, $parent_block ) use ( &$id ) {
-		$set_auto_id = static function ( &$block ) use ( &$set_auto_id, &$id ) {
+	$block_ids = get_post_meta( $attributes['ref'], 'block_ids', true );
+
+	$index = 0;
+	$filter_set_internal_id = static function ( $parsed_block, $source_block, $parent_block ) use ( &$index, $block_ids ) {
+		$set_internal_id = static function ( &$block ) use ( &$set_internal_id, &$index, $block_ids ) {
 			if ( null === $block['blockName'] ) return;
-			$id++;
-			if ( ! _wp_array_get( $block, array( 'attrs', 'metadata', 'id'), false ) ) {
-				$block['attrs']['metadata'] = array( 'id' => $id );
-			}
+			$block['_id'] = empty( $block_ids ) ? $index + 1 : $block_ids[ $index ];
+			$index++;
 			foreach ( $block['innerBlocks'] as &$inner_block ) {
-				$set_auto_id( $inner_block );
+				$set_internal_id( $inner_block );
 			}
 		};
 
 		if ( null === $parent_block ) {
-			$set_auto_id( $parsed_block );
+			$set_internal_id( $parsed_block );
 		}
 
 		return $parsed_block;
 	};
-	add_filter( 'render_block_data', $filter_recursive_auto_id, 10, 3 );
+	add_filter( 'render_block_data', $filter_set_internal_id, 10, 3 );
 
 	/**
 	 * We set the `dynamicContent` context through the `render_block_context`
@@ -85,7 +85,7 @@ function render_block_core_block( $attributes ) {
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
 
-	remove_filter( 'render_block_data', $filter_recursive_auto_id, 10, 3 );
+	remove_filter( 'render_block_data', $filter_set_internal_id, 10, 3 );
 	remove_filter( 'render_block_context', $filter_block_context, 1 );
 
 	return $content;
