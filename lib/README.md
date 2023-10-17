@@ -1,5 +1,7 @@
 # Gutenberg PHP
 
+This documentation is intended for developers who are contributing to the PHP code in the Gutenberg plugin, and pertains to files in the `lib` directory.
+
 The Gutenberg plugin is continuously enhancing existing features and creating new ones. Some features, once considered stable and useful, are merged into Core (the WordPress source code) during a WordPress release. Others remain in the plugin forever or are eventually removed as the minimum supported WordPress version changes.
 
 During a WordPress release, new features, bugfixes and other changes are "synced" between the Gutenberg plugin and WordPress Core. Consistent naming and directory structures make this process easier by preventing naming conflicts and compartmentalizing release-specific code.
@@ -99,6 +101,16 @@ class WP_A_Stable_Class { ... }
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
 
 When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
+
+#### When not to use plugin-specific prefixes/suffixes
+
+The above recommendations in relation to plugin-specific prefixes/suffixes are relevant only to files in the `lib` directory and only in the Gutenberg plugin.
+
+`Gutenberg` prefixes/suffixes _should not_ be used in Core PHP code. When synching `/lib` files to Core, plugin-specific prefixes/suffixes are generally replaced with their `WP_` or `wp_` equivalents manually.
+
+Accordingly, unless required to run plugin-only code, you should avoid using plugin-specific prefixes/suffixes in any block PHP code. Core blocks in the plugin are [published as NPM packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates), which Core consumes as NPM dependencies.
+
+See [block naming conventions](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library#naming-convention-for-php-functions) for more information on block naming conventions.
 
 As always, get in touch with your fellow contributors if you're unsure.
 
