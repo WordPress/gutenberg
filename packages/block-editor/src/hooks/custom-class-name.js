@@ -83,13 +83,13 @@ export const withInspectorControl = createHigherOrderComponent(
 
 			return (
 				<>
+					<BlockEdit { ...props } />
 					{ hasCustomClassName && props.isSelected && (
 						<CustomClassNameControls
 							attributes={ props.attributes }
 							setAttributes={ props.setAttributes }
 						/>
 					) }
-					<BlockEdit { ...props } />
 				</>
 			);
 		};
