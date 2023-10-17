@@ -1,6 +1,6 @@
 # Get started with create-block
 
-The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool for scaffolding a WordPress plugin that registers a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts.md)) with no configuration required. 
+Custom blocks for the Block Editor in WordPress are typically registered using plugins and are defined through a specific set of files. The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool to scaffold the structure of files needed to create and register a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts.md)) with no configuration required. 
 
 The package is designed to help developers quickly set up a block development environment following WordPress best practices.
 
@@ -10,7 +10,11 @@ The package is designed to help developers quickly set up a block development en
 
 Start by ensuring you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not.
 
-Using the terminal, navigate to the `plugins/` folder of your [local WordPress development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#local-wordpress-environment). Run the following command to scaffold an example block plugin:
+You can use `create-block` to scaffold a block just about anywhere and then [use `wp-env`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/) from the inside of the generated plugin folder. This will create a local WordPress development environment with your new block plugin installed and activated.
+
+If you have your own [local WordPress development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#local-wordpress-environment) already set up, navigate to the `plugins/` folder using the terminal.
+
+Run the following command to scaffold an example block plugin:
 
 ```bash
 npx @wordpress/create-block@latest todo-list
