@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { addQueryArgs } from '@wordpress/url';
-
-/**
  * Internal dependencies
  */
 import type { Admin } from './';
@@ -26,14 +21,15 @@ export async function visitSiteEditor(
 	this: Admin,
 	options: SiteEditorOptions = {}
 ) {
-	const query = addQueryArgs( '', {
-		postId: options.postId,
-		postType: options.postType,
-		path: options.path,
-		canvas: options.canvas,
-	} ).slice( 1 );
+	const { postId, postType, path, canvas } = options;
+	const query = new URLSearchParams();
 
-	await this.visitAdminPage( 'site-editor.php', query );
+	if ( postId ) query.set( 'postId', String( postId ) );
+	if ( postType ) query.set( 'postType', postType );
+	if ( path ) query.set( 'path', path );
+	if ( canvas ) query.set( 'canvas', canvas );
+
+	await this.visitAdminPage( 'site-editor.php', query.toString() );
 
 	if ( ! options.showWelcomeGuide ) {
 		await this.editor.setPreferences( 'core/edit-site', {
