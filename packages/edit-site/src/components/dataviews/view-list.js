@@ -28,7 +28,7 @@ import {
 	privateApis as componentsPrivateApis,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -75,53 +75,66 @@ function HeaderMenu( { dataView, header } ) {
 				/>
 			}
 		>
-			{ isSortable && (
-				<DropdownMenuGroupV2>
-					{ Object.entries( sortingItemsInfo ).map(
-						( [ direction, info ] ) => (
-							<DropdownMenuItemV2
-								key={ direction }
-								prefix={ <Icon icon={ info.icon } /> }
-								suffix={
-									sortedDirection === direction && (
-										<Icon icon={ check } />
-									)
-								}
-								onSelect={ ( event ) => {
-									event.preventDefault();
-									if ( sortedDirection === direction ) {
-										dataView.resetSorting();
-									} else {
-										dataView.setSorting( [
-											{
-												id: header.column.id,
-												desc: direction === 'desc',
-											},
-										] );
+			<WithSeparators>
+				{ isSortable && (
+					<DropdownMenuGroupV2>
+						{ Object.entries( sortingItemsInfo ).map(
+							( [ direction, info ] ) => (
+								<DropdownMenuItemV2
+									key={ direction }
+									prefix={ <Icon icon={ info.icon } /> }
+									suffix={
+										sortedDirection === direction && (
+											<Icon icon={ check } />
+										)
 									}
-								} }
-							>
-								{ info.label }
-							</DropdownMenuItemV2>
-						)
-					) }
-				</DropdownMenuGroupV2>
-			) }
-			{ isSortable && isHidable && <DropdownMenuSeparatorV2 /> }
-			{ isHidable && (
-				<DropdownMenuItemV2
-					prefix={ <Icon icon={ unseen } /> }
-					onSelect={ ( event ) => {
-						event.preventDefault();
-						header.column.getToggleVisibilityHandler()( event );
-					} }
-				>
-					{ __( 'Hide' ) }
-				</DropdownMenuItemV2>
-			) }
+									onSelect={ ( event ) => {
+										event.preventDefault();
+										if ( sortedDirection === direction ) {
+											dataView.resetSorting();
+										} else {
+											dataView.setSorting( [
+												{
+													id: header.column.id,
+													desc: direction === 'desc',
+												},
+											] );
+										}
+									} }
+								>
+									{ info.label }
+								</DropdownMenuItemV2>
+							)
+						) }
+					</DropdownMenuGroupV2>
+				) }
+				{ isHidable && (
+					<DropdownMenuItemV2
+						prefix={ <Icon icon={ unseen } /> }
+						onSelect={ ( event ) => {
+							event.preventDefault();
+							header.column.getToggleVisibilityHandler()( event );
+						} }
+					>
+						{ __( 'Hide' ) }
+					</DropdownMenuItemV2>
+				) }
+			</WithSeparators>
 		</DropdownMenuV2>
 	);
 }
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparatorV2 /> }
+				{ child }
+			</Fragment>
+		) );
+}
+
 function ViewList( {
 	view,
 	onChangeView,
