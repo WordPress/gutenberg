@@ -21,9 +21,10 @@ class Gutenberg_REST_Pattern_Categories_Controller extends WP_REST_Terms_Control
 	 *
 	 * @since 6.4.0
 	 *
+	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function create_item_permissions_check() {
+	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! $this->check_is_taxonomy_allowed( $this->taxonomy ) ) {
 			return false;
 		}
