@@ -33,7 +33,9 @@ export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
 		search: '',
-		filters: {},
+		filters: {
+			status: [ 'publish', 'draft' ],
+		},
 		page: 1,
 		perPage: 5,
 		sort: {
@@ -65,9 +67,7 @@ export default function PagePages() {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
-			author: view.filters?.author,
-			author_exclude: view.filters?.author_exclude,
-			status: [ 'publish', 'draft' ],
+			...view.filters,
 		} ),
 		[ view ]
 	);
