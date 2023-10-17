@@ -5,7 +5,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,14 +26,6 @@ export default function DataViews( {
 	paginationInfo,
 } ) {
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
-	const authors = [
-		{ label: __( 'All authors' ), value: '' },
-		...( fields.find( ( f ) => f.id === 'author' ).elements || [] ),
-	];
-	const statuses = [
-		{ label: __( 'All statuses' ), value: [ 'publish', 'draft' ] },
-		...( fields.find( ( f ) => f.id === 'status' ).elements || [] ),
-	];
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
@@ -47,13 +38,13 @@ export default function DataViews( {
 						/>
 						<InFilter
 							id={ 'author' }
-							options={ authors }
+							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 						<InFilter
 							id={ 'status' }
-							options={ statuses }
+							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>

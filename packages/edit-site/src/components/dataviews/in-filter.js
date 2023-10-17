@@ -3,7 +3,9 @@
  */
 import { SelectControl } from '@wordpress/components';
 
-export default ( { id, options, view, onChangeView } ) => {
+export default ( { id, fields, view, onChangeView } ) => {
+	const options = fields.find( ( f ) => f.id === id )?.elements || [];
+
 	return (
 		<SelectControl
 			value={ view.filters[ id ] }

@@ -148,21 +148,25 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				elements:
-					( authors &&
-						authors.map( ( { id, name } ) => ( {
-							value: id,
-							label: name,
-						} ) ) ) ||
-					[],
+				elements: [
+					{
+						value: '',
+						label: __( 'All authors' ),
+					},
+					...( authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [] ),
+				],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
-				elements:
-					( postStatuses &&
+				elements: [
+					{ label: __( 'All statuses' ), value: 'publish,draft' },
+					...( ( postStatuses &&
 						Object.entries( postStatuses )
 							.filter( ( [ slug ] ) =>
 								[ 'publish', 'draft' ].includes( slug )
@@ -171,7 +175,8 @@ export default function PagePages() {
 								value: slug,
 								label: name,
 							} ) ) ) ||
-					[],
+						[] ),
+				],
 				enableSorting: false,
 			},
 			{
