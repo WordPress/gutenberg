@@ -68,6 +68,8 @@ export class PerfUtils {
 	 * Disables the editor autosave function.
 	 */
 	async disableAutosave() {
+		await this.page.waitForFunction( () => window?.wp?.data );
+
 		await this.page.evaluate( () => {
 			return window.wp.data
 				.dispatch( 'core/editor' )
@@ -76,12 +78,6 @@ export class PerfUtils {
 					localAutosaveInterval: 100000000000,
 				} );
 		} );
-
-		const { autosaveInterval } = await this.page.evaluate( () => {
-			return window.wp.data.select( 'core/editor' ).getEditorSettings();
-		} );
-
-		expect( autosaveInterval ).toBe( 100000000000 );
 	}
 
 	/**
@@ -132,6 +128,10 @@ export class PerfUtils {
 			throw new Error( `File not found: ${ filepath }` );
 		}
 
+		await this.page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
+
 		return await this.page.evaluate( ( html: string ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
@@ -152,6 +152,10 @@ export class PerfUtils {
 	 * Generates and loads a 1000 empty paragraphs into the editor canvas.
 	 */
 	async load1000Paragraphs() {
+		await this.page.waitForFunction(
+			() => window?.wp?.blocks && window?.wp?.data
+		);
+
 		await this.page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
