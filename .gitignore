@@ -51,3 +51,5 @@ test/gutenberg-test-themes/twentytwentythree
 test/gutenberg-test-themes/twentytwentyfour
 packages/react-native-editor/src/setup-local.js
 .idea
+development/core 
+development/themes
