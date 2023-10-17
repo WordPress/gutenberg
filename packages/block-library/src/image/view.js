@@ -196,9 +196,10 @@ store(
 							}
 						}
 					},
+					// This is fired just by lazily loaded
+					// images on the page, not all images.
 					handleLoad: ( { context, effects, ref } ) => {
 						context.core.image.imageLoaded = true;
-						context.core.image.imageRef = ref;
 						context.core.image.imageCurrentSrc = ref.currentSrc;
 						effects.core.image.setButtonStyles( {
 							context,
@@ -263,17 +264,14 @@ store(
 		effects: {
 			core: {
 				image: {
-					setCurrentSrc: ( { context, ref } ) => {
+					initOriginImage: ( { context, ref } ) => {
+						context.core.image.imageRef = ref;
 						if ( ref.complete ) {
 							context.core.image.imageLoaded = true;
 							context.core.image.imageCurrentSrc = ref.currentSrc;
 						}
 					},
 					initLightbox: async ( { context, ref } ) => {
-						context.core.image.figureRef =
-							ref.querySelector( 'figure' );
-						context.core.image.imageRef =
-							ref.querySelector( 'img' );
 						if ( context.core.image.lightboxEnabled ) {
 							const focusableElements =
 								ref.querySelectorAll( focusableSelectors );
