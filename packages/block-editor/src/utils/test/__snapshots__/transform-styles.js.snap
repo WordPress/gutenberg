@@ -92,3 +92,12 @@ exports[`transformStyles selector wrap should wrap selectors inside container qu
 			}",
 ]
 `;
+
+exports[`transformStyles should not break with data urls 1`] = `
+[
+  ".wp-block-group {
+			background-image: url("data:image/svg+xml,%3Csvg%3E.b%7Bclip-path:url(test);%7D%3C/svg%3E");
+			color: red !important;
+		  }",
+]
+`;

@@ -149,6 +149,22 @@ describe( 'transformStyles', () => {
 		} );
 	} );
 
+	it( 'should not break with data urls', () => {
+		const input = `.wp-block-group {
+			background-image: url("data:image/svg+xml,%3Csvg%3E.b%7Bclip-path:url(test);%7D%3C/svg%3E");
+			color: red !important;
+		  }`;
+
+		const output = transformStyles( [
+			{
+				css: input,
+				baseURL: 'http://wp-site.local/themes/gut/css/',
+			},
+		] );
+
+		expect( output ).toMatchSnapshot();
+	} );
+
 	describe( 'URL rewrite', () => {
 		it( 'should rewrite relative paths', () => {
 			const input = `h1 { background: url(images/test.png); }`;
