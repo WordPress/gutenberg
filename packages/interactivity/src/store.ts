@@ -36,7 +36,7 @@ const deepMerge = ( target: any, source: any ) => {
 
 const parseInitialState = () => {
 	const storeTag = document.querySelector(
-		`script[type="application/json"]#wc-interactivity-initial-state`
+		`script[type="application/json"]#wp-interactivity-initial-state`
 	);
 	if ( ! storeTag?.textContent ) return {};
 	try {
