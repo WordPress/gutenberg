@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
+import { FormTokenField, SelectControl } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -17,7 +17,9 @@ export default function CategorySelector( {
 	categoryTerms,
 	onChange,
 	categoryMap,
+	canAddCategories,
 } ) {
+	const categoryOptions = Array.from( categoryMap.values() );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
@@ -51,16 +53,28 @@ export default function CategorySelector( {
 	}
 
 	return (
-		<FormTokenField
-			className="patterns-menu-items__convert-modal-categories"
-			value={ categoryTerms }
-			suggestions={ suggestions }
-			onChange={ handleChange }
-			onInputChange={ debouncedSearch }
-			label={ __( 'Categories' ) }
-			tokenizeOnBlur
-			__experimentalExpandOnFocus
-			__next40pxDefaultSize
-		/>
+		<>
+			{ canAddCategories && (
+				<FormTokenField
+					className="patterns-menu-items__convert-modal-categories"
+					value={ categoryTerms }
+					suggestions={ suggestions }
+					onChange={ handleChange }
+					onInputChange={ debouncedSearch }
+					label={ __( 'Categories' ) }
+					tokenizeOnBlur
+					__experimentalExpandOnFocus
+					__next40pxDefaultSize
+				/>
+			) }
+			{ ! canAddCategories && categoryOptions.length > 0 && (
+				<SelectControl
+					options={ categoryOptions }
+					multiple
+					onChange={ ( terms ) => onChange( terms ) }
+					label={ __( 'Categories' ) }
+				/>
+			) }
+		</>
 	);
 }
