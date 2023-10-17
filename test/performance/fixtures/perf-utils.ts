@@ -54,9 +54,7 @@ export class PerfUtils {
 	 * @return URL of the saved draft.
 	 */
 	async saveDraft() {
-		await this.page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
+		await this.page.getByRole( 'button', { name: 'Save draft' } ).click();
 		await expect(
 			this.page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
