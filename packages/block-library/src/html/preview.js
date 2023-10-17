@@ -23,7 +23,7 @@ const DEFAULT_STYLES = `
 
 export default function HTMLEditPreview( { content, isSelected } ) {
 	const settingStyles = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()?.styles;
+		return select( blockEditorStore ).getSettings()?.styles ?? [];
 	}, [] );
 
 	const styles = useMemo(
