@@ -30,6 +30,7 @@ function gutenberg_register_taxonomy_patterns() {
 		'show_in_nav_menus'  => false,
 		'show_in_rest'       => true,
 		'show_admin_column'  => true,
+		'rest_controller_class' => 'Gutenberg_REST_Pattern_Categories_Controller',
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }
