@@ -207,7 +207,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
-	// Wrap the image in the body content with a button.
+	// Add a button alongside image in the body content.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
