@@ -5,9 +5,7 @@ import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 import { useState } from '@wordpress/element';
@@ -22,43 +20,106 @@ import BlockPreview from '../block-preview';
 import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
 import { VIEWMODES } from './constants';
+import { unlock } from '../../lock-unlock';
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 const SetupContent = ( {
 	viewMode,
 	activeSlide,
 	patterns,
+	onChangeSlide,
 	onBlockPatternSelect,
 	showTitles,
 } ) => {
-	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
-	if ( viewMode === VIEWMODES.carousel ) {
-		const slideClass = new Map( [
-			[ activeSlide, 'active-slide' ],
-			[ activeSlide - 1, 'previous-slide' ],
-			[ activeSlide + 1, 'next-slide' ],
-		] );
-		return (
-			<div className="block-editor-block-pattern-setup__carousel">
-				<div className={ containerClass }>
-					<ul className="carousel-container">
-						{ patterns.map( ( pattern, index ) => (
-							<BlockPatternSlide
-								className={ slideClass.get( index ) || '' }
-								key={ pattern.name }
-								pattern={ pattern }
-							/>
-						) ) }
-					</ul>
+	const commonProps = { containerClass, patterns };
+
+	return viewMode === VIEWMODES.carousel ? (
+		<SetupContentAsCarousel
+			{ ...commonProps }
+			activeSlide={ activeSlide }
+			onChangeSlide={ onChangeSlide }
+		/>
+	) : (
+		<SetupContentAsGrid
+			{ ...commonProps }
+			onBlockPatternSelect={ onBlockPatternSelect }
+			showTitles={ showTitles }
+		/>
+	);
+};
+
+function SetupContentAsCarousel( {
+	containerClass,
+	patterns,
+	activeSlide,
+	onChangeSlide,
+} ) {
+	const activeId = `block-editor-block-pattern-setup__carousel__${ patterns[ activeSlide ].name }__tab`;
+	const composite = useCompositeStore( {
+		defaultActiveId: activeId,
+		orientation: 'horizontal',
+	} );
+	composite.setActiveId( activeId );
+	const slideClass = new Map( [
+		[ activeSlide, 'active-slide' ],
+		[ activeSlide - 1, 'previous-slide' ],
+		[ activeSlide + 1, 'next-slide' ],
+	] );
+
+	return (
+		<div className="block-editor-block-pattern-setup__carousel">
+			<div className={ containerClass }>
+				<div className="carousel-container">
+					<Composite store={ composite } role="tablist">
+						<VisuallyHidden>
+							{ patterns.map( ( pattern, index ) => (
+								<CompositeItem
+									key={ pattern.name }
+									role="tab"
+									id={ `block-editor-block-pattern-setup__carousel__${ pattern.name }__tab` }
+									aria-controls={ `block-editor-block-pattern-setup__carousel__${ pattern.name }` }
+									onClick={ () => onChangeSlide( index ) }
+									onFocus={ () => onChangeSlide( index ) }
+								>
+									{ pattern.title }
+								</CompositeItem>
+							) ) }
+						</VisuallyHidden>
+					</Composite>
+					{ patterns.map( ( pattern, index ) => (
+						<BlockPatternSlide
+							className={ slideClass.get( index ) || '' }
+							key={ pattern.name }
+							pattern={ pattern }
+							id={ `block-editor-block-pattern-setup__carousel__${ pattern.name }` }
+							aria-hidden={ activeSlide !== index }
+						/>
+					) ) }
 				</div>
 			</div>
-		);
-	}
+		</div>
+	);
+}
+
+function SetupContentAsGrid( {
+	containerClass,
+	patterns,
+	onBlockPatternSelect,
+	showTitles,
+} ) {
+	const composite = useCompositeStore( { orientation: 'vertical' } );
+
 	return (
 		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
-				{ ...composite }
-				role="listbox"
+				store={ composite }
+				role="list"
 				className={ containerClass }
 				aria-label={ __( 'Patterns list' ) }
 			>
@@ -67,16 +128,15 @@ const SetupContent = ( {
 						key={ pattern.name }
 						pattern={ pattern }
 						onSelect={ onBlockPatternSelect }
-						composite={ composite }
 						showTitles={ showTitles }
 					/>
 				) ) }
 			</Composite>
 		</div>
 	);
-};
+}
 
-function BlockPattern( { pattern, onSelect, composite, showTitles } ) {
+function BlockPattern( { pattern, onSelect, showTitles } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
 	const { blocks, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
@@ -84,56 +144,70 @@ function BlockPattern( { pattern, onSelect, composite, showTitles } ) {
 		`${ baseClassName }__item-description`
 	);
 	return (
-		<div
-			className={ `${ baseClassName }__list-item` }
-			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
-		>
+		<div className={ `${ baseClassName }__list-item` } role="listitem">
 			<CompositeItem
-				role="option"
-				as="div"
-				{ ...composite }
+				role="button"
+				render={ <div /> }
 				className={ `${ baseClassName }__item` }
 				onClick={ () => onSelect( blocks ) }
 			>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ viewportWidth }
-				/>
-				{ showTitles && (
-					<div className={ `${ baseClassName }__item-title` }>
-						{ pattern.title }
-					</div>
-				) }
-				{ !! description && (
-					<VisuallyHidden id={ descriptionId }>
-						{ description }
-					</VisuallyHidden>
-				) }
+				<div
+					role="img"
+					aria-label={ pattern.title }
+					aria-describedby={
+						pattern.description ? descriptionId : undefined
+					}
+				>
+					<BlockPreview
+						blocks={ blocks }
+						viewportWidth={ viewportWidth }
+					/>
+					{ showTitles && (
+						<div className={ `${ baseClassName }__item-title` }>
+							{ pattern.title }
+						</div>
+					) }
+					{ !! description && (
+						<VisuallyHidden id={ descriptionId }>
+							{ description }
+						</VisuallyHidden>
+					) }
+				</div>
 			</CompositeItem>
 		</div>
 	);
 }
 
-function BlockPatternSlide( { className, pattern, minHeight } ) {
+function BlockPatternSlide( {
+	className,
+	pattern,
+	minHeight,
+	...additionalProps
+} ) {
 	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
 		'block-editor-block-pattern-setup-list__item-description'
 	);
 	return (
-		<li
+		<div
+			{ ...additionalProps }
 			className={ `pattern-slide ${ className }` }
-			aria-label={ title }
-			aria-describedby={ description ? descriptionId : undefined }
+			role="tabpanel"
 		>
-			<BlockPreview blocks={ blocks } minHeight={ minHeight } />
-			{ !! description && (
-				<VisuallyHidden id={ descriptionId }>
-					{ description }
-				</VisuallyHidden>
-			) }
-		</li>
+			<div
+				role="img"
+				aria-label={ title }
+				aria-describedby={ description ? descriptionId : undefined }
+			>
+				<BlockPreview blocks={ blocks } minHeight={ minHeight } />
+				{ !! description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ description }
+					</VisuallyHidden>
+				) }
+			</div>
+		</div>
 	);
 }
 
@@ -170,6 +244,14 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
+					onChangeSlide={ ( newSlide ) => {
+						setActiveSlide(
+							Math.min(
+								Math.max( newSlide, 0 ),
+								patterns.length - 1
+							)
+						);
+					} }
 					showTitles={ showTitles }
 				/>
 				<SetupToolbar
@@ -178,10 +260,14 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					totalSlides={ patterns.length }
 					handleNext={ () => {
-						setActiveSlide( ( active ) => active + 1 );
+						setActiveSlide( ( active ) =>
+							Math.min( active + 1, patterns.length - 1 )
+						);
 					} }
 					handlePrevious={ () => {
-						setActiveSlide( ( active ) => active - 1 );
+						setActiveSlide( ( active ) =>
+							Math.max( active - 1, 0 )
+						);
 					} }
 					onBlockPatternSelect={ () => {
 						onPatternSelectCallback(
