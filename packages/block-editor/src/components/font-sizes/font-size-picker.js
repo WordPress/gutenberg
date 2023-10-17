@@ -9,7 +9,7 @@ import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
 import { useSettings } from '../use-settings';
 
 function FontSizePicker( props ) {
-	const [ fontSizes, customFontSizes ] = useSettings(
+	const [ fontSizes, customFontSize ] = useSettings(
 		'typography.fontSizes',
 		'typography.customFontSize'
 	);
@@ -18,7 +18,7 @@ function FontSizePicker( props ) {
 		<BaseFontSizePicker
 			{ ...props }
 			fontSizes={ fontSizes }
-			disableCustomFontSizes={ ! customFontSizes }
+			disableCustomFontSizes={ ! customFontSize }
 		/>
 	);
 }
