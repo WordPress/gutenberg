@@ -20,11 +20,10 @@ const openMenu = ( store, menuOpenedOn ) => {
 	if ( context.core.navigation.type === 'overlay' ) {
 		// Add a `has-modal-open` class to the <html> root.
 		document.documentElement.classList.add( 'has-modal-open' );
-	} else {
-		// Ensure that Safari on iOS/iPadOS trigger the mouseleave events.
-		document.body.setAttribute( 'tabindex', '-1' );
 	}
 };
+
+document.addEventListener( 'click', () => {} );
 
 const closeMenu = ( store, menuClosedOn ) => {
 	const { context, selectors } = store;
@@ -42,8 +41,6 @@ const closeMenu = ( store, menuClosedOn ) => {
 		context.core.navigation.previousFocus = null;
 		if ( context.core.navigation.type === 'overlay' ) {
 			document.documentElement.classList.remove( 'has-modal-open' );
-		} else {
-			document.body.removeAttribute( 'tabindex' );
 		}
 	}
 };
