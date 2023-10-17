@@ -12,7 +12,7 @@ import useDebouncedInput from '../../utils/use-debounced-input';
 
 export default function TextFilter( { id, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
-		view[ id ]
+		view.filters[ id ]
 	);
 	const onChangeViewRef = useRef( onChangeView );
 	useEffect( () => {
@@ -21,8 +21,11 @@ export default function TextFilter( { id, view, onChangeView } ) {
 	useEffect( () => {
 		onChangeViewRef.current( ( currentView ) => ( {
 			...currentView,
-			[ id ]: debouncedSearch,
 			page: 1,
+			filters: {
+				...currentView.filters,
+				[ id ]: debouncedSearch,
+			},
 		} ) );
 	}, [ debouncedSearch ] );
 	const searchLabel = __( 'Filter list' );

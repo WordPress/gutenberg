@@ -32,8 +32,8 @@ const defaultConfigPerViewType = {
 export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
-		search: '',
 		filters: {
+			search: '',
 			status: [ 'publish', 'draft' ],
 		},
 		page: 1,
@@ -66,7 +66,6 @@ export default function PagePages() {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
-			search: view.search,
 			...view.filters,
 		} ),
 		[ view ]
