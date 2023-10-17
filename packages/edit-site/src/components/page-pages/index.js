@@ -151,7 +151,7 @@ export default function PagePages() {
 				elements: [
 					{
 						value: '',
-						label: __( 'All authors' ),
+						label: __( 'All' ),
 					},
 					...( authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -165,7 +165,7 @@ export default function PagePages() {
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
 				elements: [
-					{ label: __( 'All statuses' ), value: 'publish,draft' },
+					{ label: __( 'All' ), value: 'publish,draft' },
 					...( ( postStatuses &&
 						Object.entries( postStatuses )
 							.filter( ( [ slug ] ) =>

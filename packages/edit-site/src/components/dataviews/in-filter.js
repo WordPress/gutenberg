@@ -1,15 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
+import {
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	SelectControl,
+} from '@wordpress/components';
 
 export default ( { id, fields, view, onChangeView } ) => {
-	const options = fields.find( ( f ) => f.id === id )?.elements || [];
+	const field = fields.find( ( f ) => f.id === id );
 
 	return (
 		<SelectControl
 			value={ view.filters[ id ] }
-			options={ options }
+			prefix={
+				<InputControlPrefixWrapper
+					as="span"
+					className="dataviews__per-page-control-prefix"
+				>
+					{ field.header + ':' }
+				</InputControlPrefixWrapper>
+			}
+			options={ field?.elements || [] }
 			onChange={ ( value ) => {
 				if ( value === '' ) {
 					value = undefined;
