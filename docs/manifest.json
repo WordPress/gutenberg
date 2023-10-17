@@ -34,6 +34,12 @@
 		"slug": "get-started-with-wp-scripts",
 		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
 		"parent": "devenv"
+  },
+	{
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
+		"parent": "devenv"
 	},
 	{
 		"title": "Create a Block Tutorial",

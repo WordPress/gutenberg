@@ -116,14 +116,28 @@ export default function HomeTemplateDetails() {
 	 * which contains the template icon and fallback labels
 	 */
 	const templateAreas = useMemo( () => {
+		// Keep track of template part IDs that have already been added to the array.
+		const templatePartIds = new Set();
+		const filterOutDuplicateTemplateParts = ( currentTemplatePart ) => {
+			// If the template part has already been added to the array, skip it.
+			if ( templatePartIds.has( currentTemplatePart.templatePart.id ) ) {
+				return;
+			}
+			// Add to the array of template part IDs.
+			templatePartIds.add( currentTemplatePart.templatePart.id );
+			return currentTemplatePart;
+		};
+
 		return currentTemplateParts.length && templatePartAreas
-			? currentTemplateParts.map( ( { templatePart, block } ) => ( {
-					...templatePartAreas?.find(
-						( { area } ) => area === templatePart?.area
-					),
-					...templatePart,
-					clientId: block.clientId,
-			  } ) )
+			? currentTemplateParts
+					.filter( filterOutDuplicateTemplateParts )
+					.map( ( { templatePart, block } ) => ( {
+						...templatePartAreas?.find(
+							( { area } ) => area === templatePart?.area
+						),
+						...templatePart,
+						clientId: block.clientId,
+					} ) )
 			: [];
 	}, [ currentTemplateParts, templatePartAreas ] );
 

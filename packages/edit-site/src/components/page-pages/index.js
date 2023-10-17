@@ -8,7 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
@@ -22,20 +22,31 @@ import Media from '../media';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'featured-image',
+	},
+};
 
 export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
-		search: '',
-		page: 0,
+		filters: {
+			search: '',
+			status: 'publish, draft',
+		},
+		page: 1,
 		perPage: 5,
 		sort: {
 			field: 'date',
 			direction: 'desc',
 		},
+		visibleFilters: [ 'search', 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
@@ -52,12 +63,11 @@ export default function PagePages() {
 	const queryArgs = useMemo(
 		() => ( {
 			per_page: view.perPage,
-			page: view.page + 1, // tanstack starts from zero.
+			page: view.page,
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
-			search: view.search,
-			status: [ 'publish', 'draft' ],
+			...view.filters,
 		} ),
 		[ view ]
 	);
@@ -67,6 +77,10 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const { records: authors } = useEntityRecords( 'root', 'user', {
+		who: 'authors',
+	} );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -82,12 +96,16 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				accessorFn: ( page ) => page.featured_media,
-				cell: ( props ) =>
-					!! props.row.original.featured_media ? (
+				render: ( item, currentView ) =>
+					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
-							id={ props.row.original.featured_media }
-							size="thumbnail"
+							id={ item.featured_media }
+							size={
+								currentView.type === 'list'
+									? [ 'thumbnail', 'medium', 'large', 'full' ]
+									: [ 'large', 'full', 'medium', 'thumbnail' ]
+							}
 						/>
 					) : null,
 				enableSorting: false,
@@ -96,8 +114,7 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				cell: ( props ) => {
-					const page = props.row.original;
+				render: ( page ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
@@ -108,13 +125,15 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 								>
-									{ decodeEntities( props.getValue() ) ||
-										__( '(no title)' ) }
+									{ decodeEntities(
+										page.title?.rendered || page.slug
+									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
 					);
 				},
+				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -123,40 +142,84 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				cell: ( props ) => {
-					const author = props.row.original._embedded?.author[ 0 ];
+				render: ( item ) => {
+					const author = item._embedded?.author[ 0 ];
 					return (
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
 							{ author.name }
 						</a>
 					);
 				},
+				filters: [ { id: 'author', type: 'enumeration' } ],
+				elements: [
+					{
+						value: '',
+						label: __( 'All' ),
+					},
+					...( authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [] ),
+				],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				filters: [ { type: 'enumeration', id: 'status' } ],
+				elements: [
+					{ label: __( 'All' ), value: 'publish,draft' },
+					...( ( postStatuses &&
+						Object.entries( postStatuses )
+							.filter( ( [ slug ] ) =>
+								[ 'publish', 'draft' ].includes( slug )
+							)
+							.map( ( [ slug, name ] ) => ( {
+								value: slug,
+								label: name,
+							} ) ) ) ||
+						[] ),
+				],
 				enableSorting: false,
 			},
 			{
 				header: 'Date',
 				id: 'date',
-				cell: ( props ) => {
+				render: ( item ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
-						getDate( props.row.original.date )
+						getDate( item.date )
 					);
 					return <time>{ formattedDate }</time>;
 				},
 				enableSorting: false,
 			},
 		],
-		[ postStatuses ]
+		[ postStatuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
+	const onChangeView = useCallback(
+		( viewUpdater ) => {
+			let updatedView =
+				typeof viewUpdater === 'function'
+					? viewUpdater( view )
+					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
+			setView( updatedView );
+		},
+		[ view ]
+	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
@@ -168,7 +231,7 @@ export default function PagePages() {
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ onChangeView }
 			/>
 		</Page>
 	);
