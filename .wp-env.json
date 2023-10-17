@@ -1,9 +1,16 @@
 {
 	"$schema": "./schemas/json/wp-env.json",
-	"core": "WordPress/WordPress",
+	"core": "./development/core",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
+		"development": {
+			"mappings": {
+				"wp-content/plugins/hooked-block": "./development/plugins/hooked-block",
+				"wp-content/plugins/suspended-block": "./development/plugins/suspended-block",
+				"wp-content/themes/twentytwentyfour": "./development/themes/twentytwentyfour"
+			}
+		},
 		"tests": {
 			"mappings": {
 				"wp-content/plugins/gutenberg": ".",
