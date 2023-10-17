@@ -114,6 +114,10 @@ function mergeOrigins( value ) {
  *
  * @param {string[]} paths The paths to the settings.
  * @return {any[]} Returns the values defined for the settings.
+ * @example
+ * ```js
+ * const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+ * ```
  */
 export function useSettings( ...paths ) {
 	const { name: blockName, clientId = null } = useBlockEditContext();

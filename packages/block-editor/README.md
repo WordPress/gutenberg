@@ -968,6 +968,12 @@ Hook that retrieves the given settings for the block instance in use.
 
 It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
 
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
 _Parameters_
 
 -   _paths_ `string[]`: The paths to the settings.
