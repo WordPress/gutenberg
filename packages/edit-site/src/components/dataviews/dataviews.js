@@ -5,6 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import TextFilter from './text-filter';
-import FieldsFilters from './fields-filters';
+import InFilter from './in-filter';
 import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
@@ -26,17 +27,28 @@ export default function DataViews( {
 	paginationInfo,
 } ) {
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
+	const authors = [
+		{ label: __( 'All authors' ), value: '' },
+		...( fields
+			.find( ( f ) => f.id === 'author' )
+			.setList?.map( ( author ) => ( {
+				label: author.name,
+				value: author.id,
+			} ) ) || [] ),
+	];
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
 				<HStack>
 					<HStack justify="start">
 						<TextFilter
+							id={ 'search' }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
-						<FieldsFilters
-							fields={ fields }
+						<InFilter
+							id={ 'author' }
+							options={ authors }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
