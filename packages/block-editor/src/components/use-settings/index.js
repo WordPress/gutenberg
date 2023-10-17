@@ -94,7 +94,14 @@ const removeCustomPrefixes = ( path ) => {
 	return prefixedFlags[ path ] || path;
 };
 
-const mergeCache = new WeakMap();
+/**
+ * For settings like `color.palette`, which have a value that is an object
+ * with `default`, `theme`, `custom`, with field values that are arrays of
+ * items, merge these three arrays into one and return it. The calculation
+ * is memoized so that identical input values produce identical output.
+ * @param {Object} value Object to merge
+ * @return {Array} Array of merged items
+ */
 function mergeOrigins( value ) {
 	let result = mergeCache.get( value );
 	if ( ! result ) {
@@ -105,6 +112,7 @@ function mergeOrigins( value ) {
 	}
 	return result;
 }
+const mergeCache = new WeakMap();
 
 /**
  * Hook that retrieves the given settings for the block instance in use.
