@@ -86,7 +86,7 @@ add_action( 'init', 'register_block_core_post_excerpt' );
 add_filter(
 	/**
 	 * Don't add the filter now, as at this point, REST_REQUEST is not set yet.
-	 * Add it later when REST_REQUEST is initialized.
+	 * Add it later when REST_REQUEST is defined.
 	 */
 	'rest_api_init',
 	static function () {
