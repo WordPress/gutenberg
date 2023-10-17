@@ -21,7 +21,6 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
-	moreVertical,
 } from '@wordpress/icons';
 import {
 	Button,
