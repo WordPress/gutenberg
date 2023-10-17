@@ -86,6 +86,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 	 */
 	function gutenberg_render_block_pattern_data( $block_content, $block, $block_instance ) {
 		$block_type = $block_instance->block_type;
+		// var_dump($block);
 
 		// If for some reason, the block type is not found, skip it.
 		if ( null === $block_type ) {
@@ -98,10 +99,11 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 		}
 
 		// If the block doesn't have an ID to retrieve pattern instance data from, skip it.
-		$pattern_block_id = _wp_array_get( $block, array( 'attrs', 'metadata', 'id' ), false );
+		$pattern_block_id = _wp_array_get( $block, array( '_id' ), false );
 		if ( ! $pattern_block_id ) {
 			return $block_content;
 		}
+		unset( $block['_id'] );
 
 		// If there is no dynamic content matching this block's ID, skip it.
 		$dynamic_content = _wp_array_get( $block_instance->context, array( 'dynamicContent', $pattern_block_id ), false );

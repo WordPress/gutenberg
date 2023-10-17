@@ -1,19 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
+import { useRef, useCallback } from '@wordpress/element';
 import {
-	RegistryProvider,
-	useRegistry,
-	useSelect,
-	useDispatch,
-} from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+	useEntityBlockEditor,
+	useEntityRecord,
+	useEntityProp,
+} from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,143 +22,91 @@ import useSiteEditorSettings from '../use-site-editor-settings';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
-function hasAttributeSynced( registry, block ) {
-	return registry
-		.select( blocksStore )
-		.hasBlockSupport( block.name, '__experimentalPattern' );
-}
-
-function recursivelyAddId( registry, blocks ) {
-	return blocks.map( ( block ) => ( {
-		...block,
-		attributes: hasAttributeSynced( registry, block )
-			? {
-					...block.attributes,
-					metadata: {
-						...( block.attributes.metadata ?? {} ),
-						id: window.crypto.randomUUID(),
-					},
-			  }
-			: block.attributes,
-		innerBlocks: recursivelyAddId( block.innerBlocks ),
-	} ) );
-}
-
-const insertBlocks =
-	( blocks, ...args ) =>
-	( { registry, dispatch } ) => {
-		return dispatch.insertBlocks(
-			recursivelyAddId( registry, blocks ),
-			...args
-		);
-	};
-const replaceBlocks =
-	( clientIds, blocks, ...args ) =>
-	( { registry, dispatch } ) => {
-		return dispatch.replaceBlocks(
-			clientIds,
-			recursivelyAddId( registry, blocks ),
-			...args
-		);
-	};
-
 export default function PatternEditorProvider( { children } ) {
-	const registry = useRegistry();
-
 	const settings = useSiteEditorSettings();
 
-	const { templateType } = useSelect( ( select ) => {
-		const { getEditedPostType } = unlock( select( editSiteStore ) );
+	const { templateType, templateId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
 
 		return {
 			templateType: getEditedPostType(),
+			templateId: getEditedPostId(),
 		};
 	}, [] );
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
-	const { getClientIdsWithDescendants, getBlock } =
-		useSelect( blockEditorStore );
+	const { hasResolved } = useEntityRecord(
+		'postType',
+		templateType,
+		templateId
+	);
+	const { getClientIdsWithDescendants } = useSelect( blockEditorStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
-	const hasBlocks = blocks.length > 0;
+	const [ , setMeta, meta ] = useEntityProp(
+		'postType',
+		templateType,
+		'meta'
+	);
 
-	useEffect( () => {
-		if ( hasBlocks ) {
-			const initialBlockClientIds = getClientIdsWithDescendants();
-			const updates = {};
-			initialBlockClientIds.forEach( ( clientId, index ) => {
-				const block = getBlock( clientId );
-				if (
-					hasAttributeSynced( registry, block ) &&
-					! block.attributes.metadata?.id
-				) {
-					updates[ clientId ] = {
-						metadata: {
-							...( block.attributes.metadata ?? {} ),
-							id: index + 1,
-						},
-					};
-				}
-			} );
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( Object.keys( updates ), updates, true );
-		}
-	}, [
-		hasBlocks,
-		getClientIdsWithDescendants,
-		getBlock,
-		updateBlockAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-		registry,
-	] );
+	const blockIdsMapRef = useRef( null );
+	if ( hasResolved && blockIdsMapRef.current === null ) {
+		blockIdsMapRef.current = {};
+		const blockClientIds = getClientIdsWithDescendants();
+		const blockIds =
+			meta?.blockIds ??
+			blockClientIds.map( ( clientId, index ) => index + 1 );
+		blockClientIds.forEach( ( clientId, index ) => {
+			blockIdsMapRef.current[ clientId ] = blockIds[ index ];
+		} );
+	}
 
-	const subRegistry = useMemo( () => {
-		return {
-			...registry,
-			dispatch( store ) {
-				if (
-					store !== blockEditorStore &&
-					store !== blockEditorStore.name
-				) {
-					return registry.dispatch( store );
+	const updateBlockIds = useCallback(
+		( callback ) =>
+			( newBlocks, ...args ) => {
+				if ( ! blockIdsMapRef.current ) {
+					return callback( newBlocks, ...args );
 				}
-				const select = registry.select( store );
-				const dispatch = registry.dispatch( store );
-				return {
-					...dispatch,
-					insertBlocks( ...args ) {
-						return insertBlocks( ...args )( {
-							registry,
-							select,
-							dispatch,
-						} );
-					},
-					replaceBlocks( ...args ) {
-						return replaceBlocks( ...args )( {
-							registry,
-							select,
-							dispatch,
-						} );
-					},
-				};
+
+				let id = Math.max(
+					0,
+					...Object.values( blockIdsMapRef.current )
+				);
+				const blockClientIds = getClientIdsWithDescendants(
+					newBlocks.map( ( block ) => block.clientId )
+				);
+				const blockIds = blockClientIds.map( ( clientId ) => {
+					if ( blockIdsMapRef.current[ clientId ] ) {
+						return blockIdsMapRef.current[ clientId ];
+					}
+					id++;
+					blockIdsMapRef.current[ clientId ] = id;
+					return id;
+				} );
+				setMeta( { ...meta, block_ids: blockIds } );
+				return callback( newBlocks, ...args );
 			},
-		};
-	}, [ registry ] );
+		[ getClientIdsWithDescendants, meta, setMeta ]
+	);
 
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
+			onInput={ useCallback(
+				( ...args ) => updateBlockIds( onInput )( ...args ),
+				[ updateBlockIds, onInput ]
+			) }
+			onChange={ useCallback(
+				( ...args ) => updateBlockIds( onChange )( ...args ),
+				[ updateBlockIds, onChange ]
+			) }
 			useSubRegistry={ false }
 		>
-			<RegistryProvider value={ subRegistry }>
-				{ children }
-			</RegistryProvider>
+			{ children }
 		</ExperimentalBlockEditorProvider>
 	);
 }

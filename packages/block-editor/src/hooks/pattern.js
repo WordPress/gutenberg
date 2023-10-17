@@ -1,67 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../components/block-edit';
-import { store as blockEditorStore } from '../store';
 
 export const PATTERN_SUPPORT_KEY = '__experimentalPattern';
-
-// TODO: Extract this to a custom source file?
-function useSourceAttributes( attributes ) {
-	const { name, clientId } = useBlockEditContext();
-	const { dynamicContent, index } = useSelect(
-		( select ) => {
-			const hasPatternSupport = select( blocksStore ).hasBlockSupport(
-				name,
-				PATTERN_SUPPORT_KEY
-			);
-			if ( ! hasPatternSupport )
-				return { dynamicContent: undefined, index: -1 };
-			const { getBlockParentsByBlockName, getClientIdsWithDescendants } =
-				select( blockEditorStore );
-			const parentPatternClientId = getBlockParentsByBlockName(
-				clientId,
-				'core/block',
-				true
-			)[ 0 ];
-			if ( ! parentPatternClientId )
-				return { dynamicContent: undefined, index: -1 };
-			return {
-				dynamicContent: select( blockEditorStore ).getBlockAttributes(
-					parentPatternClientId
-				).dynamicContent,
-				index: getClientIdsWithDescendants(
-					parentPatternClientId
-				).indexOf( clientId ),
-			};
-		},
-		[ name, clientId ]
-	);
-
-	const attributesWithSourcedAttributes = useMemo( () => {
-		const id = attributes.metadata?.id ?? index;
-
-		if ( ! dynamicContent || ! dynamicContent[ id ] ) {
-			return attributes;
-		}
-
-		return {
-			...attributes,
-			...dynamicContent[ id ],
-		};
-	}, [ attributes, dynamicContent, index ] );
-
-	return attributesWithSourcedAttributes;
-}
 
 /**
  * Creates a higher order component that overrides the `attributes` and
@@ -76,10 +24,17 @@ const createEditFunctionWithPatternSource = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) =>
 			( { attributes, ...props } ) => {
-				const sourceAttributes = useSourceAttributes( attributes );
+				const registry = useRegistry();
+				const sourceAttributes = registry._selectAttributes?.(
+					props.clientId,
+					attributes
+				);
 
 				return (
-					<BlockEdit { ...props } attributes={ sourceAttributes } />
+					<BlockEdit
+						{ ...props }
+						attributes={ sourceAttributes ?? attributes }
+					/>
 				);
 			}
 	);

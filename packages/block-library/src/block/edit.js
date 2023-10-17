@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RegistryProvider, useRegistry } from '@wordpress/data';
+import { RegistryProvider, useRegistry, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	useEntityBlockEditor,
@@ -39,7 +39,7 @@ function getAttributeSynced( registry, block ) {
 }
 
 const updateBlockAttributes =
-	( patternClientId ) =>
+	( patternClientId, blockIdsMap ) =>
 	( clientIds, attributes, uniqueByBlock = false ) =>
 	( { select, dispatch, registry } ) => {
 		const updates = {};
@@ -63,14 +63,7 @@ const updateBlockAttributes =
 				}
 			}
 			if ( Object.keys( dynamicContent ).length > 0 ) {
-				let id = block.attributes.metadata?.id;
-				if ( ! id ) {
-					// The id just has to be unique within the pattern context, so we
-					// use the block's flattened index as a convenient unique identifier.
-					const flattenedClientIds =
-						select.getClientIdsWithDescendants( patternClientId );
-					id = flattenedClientIds.indexOf( clientId );
-				}
+				const id = blockIdsMap[ block.clientId ];
 
 				updates[ parentPattern.clientId ] = {
 					dynamicContent: {
@@ -130,6 +123,26 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 
+	const blockIdsMap = useSelect(
+		( select ) => {
+			const blockClientIds = select(
+				blockEditorStore
+			).getClientIdsOfDescendants( [ patternClientId ] );
+			const blockIds =
+				record?.meta?.blockIds ??
+				Array.from(
+					{ length: blockClientIds.length },
+					( _, i ) => i + 1
+				);
+			const map = {};
+			blockClientIds.forEach( ( clientId, index ) => {
+				map[ clientId ] = blockIds[ index ];
+			} );
+			return map;
+		},
+		[ patternClientId, record?.meta ]
+	);
+
 	const blockProps = useBlockProps( {
 		className: 'block-library-block__reusable-block-container',
 	} );
@@ -146,6 +159,17 @@ export default function ReusableBlockEdit( {
 	const subRegistry = useMemo( () => {
 		return {
 			...registry,
+			_selectAttributes( clientId, attributes ) {
+				const id = blockIdsMap[ clientId ];
+				const { dynamicContent } = registry
+					.select( blockEditorStore )
+					.getBlockAttributes( patternClientId );
+				if ( ! dynamicContent?.[ id ] ) return attributes;
+				return {
+					...attributes,
+					...dynamicContent[ id ],
+				};
+			},
 			dispatch( store ) {
 				if (
 					store !== blockEditorStore &&
@@ -162,7 +186,10 @@ export default function ReusableBlockEdit( {
 						attributes,
 						uniqueByBlock
 					) {
-						return updateBlockAttributes( patternClientId )(
+						return updateBlockAttributes(
+							patternClientId,
+							blockIdsMap
+						)(
 							clientId,
 							attributes,
 							uniqueByBlock
@@ -175,7 +202,7 @@ export default function ReusableBlockEdit( {
 				};
 			},
 		};
-	}, [ registry, patternClientId ] );
+	}, [ registry, patternClientId, blockIdsMap ] );
 
 	if ( hasAlreadyRendered ) {
 		return (
