@@ -150,10 +150,6 @@ export default function PagePages() {
 					);
 				},
 				setList: authors,
-				filters: {
-					in: 'author',
-					notIn: 'author_exclude',
-				},
 				enableColumnFiltering: true,
 			},
 			{
