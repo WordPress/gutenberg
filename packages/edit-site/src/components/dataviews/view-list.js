@@ -133,9 +133,8 @@ function ViewList( {
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
-			const column = { ...field };
-			delete column.render;
-			column.cell = ( props ) => field.render( props.row.original, view );
+			const { render, ...column } = field;
+			column.cell = ( props ) => render( props.row.original, view );
 			return column;
 		} );
 		if ( actions?.length ) {
