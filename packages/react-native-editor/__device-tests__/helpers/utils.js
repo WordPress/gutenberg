@@ -419,15 +419,15 @@ const tapStatusBariOS = async ( driver ) => {
 };
 
 const selectTextFromElement = async ( driver, element ) => {
-	if ( isAndroid() ) {
-		await longPressMiddleOfElement( driver, element, 0 );
-	} else {
-		await doubleTap( driver, element );
-		await driver.waitForElementByXPath(
-			'//XCUIElementTypeMenuItem[@name="Copy"]',
-			wd.asserters.isDisplayed,
-			4000
+	await longPressMiddleOfElement( driver, element );
+
+	// On iOS long-pressing doesn't select the text automatically
+	if ( ! isAndroid() ) {
+		const selectAllElement = await driver.$(
+			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
+		await selectAllElement.waitForDisplayed( { timeout: 1000 } );
+		await selectAllElement.click();
 	}
 };
 
