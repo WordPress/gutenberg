@@ -22,6 +22,9 @@ const openMenu = ( store, menuOpenedOn ) => {
 	}
 };
 
+// This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
+// when the user taps in the body. It can be removed once we add an overlay to
+// capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
 const closeMenu = ( store, menuClosedOn ) => {
