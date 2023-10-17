@@ -13,7 +13,7 @@
 		</span>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 		<div data-wp-show-mock="state.falseValue">
 			<span data-testid="inside an island">
 				This should not be shown because it is inside an island.
@@ -21,7 +21,7 @@
 		</div>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 		<div data-wp-ignore>
 			<div data-wp-show-mock="state.falseValue">
 				<span
@@ -34,8 +34,8 @@
 		</div>
 	</div>
 
-	<div data-wp-interactive>
-		<div data-wp-interactive>
+	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+		<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 			<div
 				data-wp-show-mock="state.falseValue"
 				data-testid="island inside another island"
@@ -48,9 +48,12 @@
 		</div>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
 		<div>
-			<div data-wp-interactive data-wp-ignore>
+			<div
+				data-wp-interactive='{ "namespace": "tovdom-islands" }'
+				data-wp-ignore
+			>
 				<div data-wp-show-mock="state.falseValue">
 					<span
 						data-testid="island inside inner block of isolated island"
