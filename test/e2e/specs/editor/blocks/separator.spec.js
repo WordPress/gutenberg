@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Separator', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'can be created by three dashes and enter', async ( {

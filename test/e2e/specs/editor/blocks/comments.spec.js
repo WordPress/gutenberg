@@ -48,7 +48,7 @@ test.describe( 'Comments', () => {
 		requestUtils,
 	} ) => {
 		await requestUtils.deleteAllComments();
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/comments' } );
 		await expect(
 			editor.canvas.locator(
@@ -63,7 +63,7 @@ test.describe( 'Comments', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
@@ -117,7 +117,7 @@ test.describe( 'Comments', () => {
 		commentsBlockUtils,
 	} ) => {
 		await commentsBlockUtils.setOption( 'page_comments', '0' );
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
@@ -147,7 +147,7 @@ test.describe( 'Comments', () => {
 		admin,
 		editor,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( {
 			name: 'core/comments',
 			attributes: { legacy: true, textColor: 'vivid-purple' },
@@ -184,7 +184,7 @@ test.describe( 'Comments', () => {
 		editor,
 		requestUtils,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
@@ -212,7 +212,7 @@ test.describe( 'Comments', () => {
 		editor,
 		requestUtils,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( {
 			name: 'core/comments',
 			attributes: { legacy: true },

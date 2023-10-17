@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Links', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -30,7 +30,7 @@ test.describe( 'Links', () => {
 			status: 'publish',
 		} );
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await editor.insertBlock( {
@@ -373,7 +373,7 @@ test.describe( 'Links', () => {
 			status: 'publish',
 		} );
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await editor.insertBlock( {

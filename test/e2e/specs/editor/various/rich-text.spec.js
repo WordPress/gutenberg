@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'RichText', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'should handle change in tag name gracefully', async ( {

@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeFocused();

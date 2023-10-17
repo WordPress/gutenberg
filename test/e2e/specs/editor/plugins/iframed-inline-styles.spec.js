@@ -28,7 +28,7 @@ test.describe( 'iframed inline styles', () => {
 			}
 		} );
 
-		await admin.createNewPost( { postType: 'page' } );
+		await admin.visitPostEditor( { postType: 'page' } );
 		await editor.insertBlock( { name: 'test/iframed-inline-styles' } );
 
 		const block = editor.canvas.getByRole( 'document', {

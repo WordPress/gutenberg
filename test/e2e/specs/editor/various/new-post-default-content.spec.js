@@ -11,7 +11,7 @@ test.describe( 'new editor filtered state', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

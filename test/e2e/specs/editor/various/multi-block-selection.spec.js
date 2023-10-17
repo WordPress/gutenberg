@@ -18,7 +18,7 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'should select with double ctrl+a and speak', async ( {

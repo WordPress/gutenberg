@@ -21,7 +21,7 @@ test.use( {
 
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'can set overlay color using color picker on block placeholder', async ( {

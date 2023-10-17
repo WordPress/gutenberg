@@ -8,7 +8,7 @@ test.describe( 'Register block type hooks', () => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-register-block-type-hooks'
 		);
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

@@ -14,7 +14,7 @@ test.use( {
 
 test.describe( 'a11y (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'navigating through the Editor regions four times should land on the Editor top bar region', async ( {

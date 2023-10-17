@@ -24,7 +24,7 @@ test.describe( 'Navigation block', () => {
 			admin,
 			editor,
 		} ) => {
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			const pageListBlock = editor.canvas.getByRole( 'document', {
@@ -52,7 +52,7 @@ test.describe( 'Navigation block', () => {
 			page,
 			requestUtils,
 		} ) => {
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
@@ -96,7 +96,7 @@ test.describe( 'Navigation block', () => {
 		} ) => {
 			// Create a classic menu.
 			await requestUtils.createClassicMenu( 'Test Classic 1' );
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 			// We need to check the canvas after inserting the navigation block to be able to target the block.
@@ -130,7 +130,7 @@ test.describe( 'Navigation block', () => {
 			editor,
 			requestUtils,
 		} ) => {
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
@@ -183,7 +183,7 @@ test.describe( 'Navigation block', () => {
 			editor,
 			requestUtils,
 		} ) => {
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content: '',
@@ -220,7 +220,7 @@ test.describe( 'Navigation block', () => {
 			editor,
 			requestUtils,
 		} ) => {
-			await admin.createNewPost();
+			await admin.visitPostEditor();
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu',
 				content:
@@ -264,7 +264,7 @@ test.describe( 'Navigation block', () => {
 		admin,
 		editor,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		await editor.insertBlock( {
 			name: 'core/navigation',
@@ -308,7 +308,7 @@ test.describe( 'Navigation block', () => {
 			} )
 		).toHaveLength( 0 );
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		await editor.insertBlock( {
 			name: 'core/navigation',

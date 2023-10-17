@@ -9,7 +9,7 @@ test.describe( 'adding blocks', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		// Inserting a quote block
 		await editor.insertBlock( {

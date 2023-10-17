@@ -25,7 +25,7 @@ test.describe( 'Image', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -738,7 +738,7 @@ test.describe.skip( 'Image - interactivity', () => {
 	} );
 
 	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/image' } );
 	} );
 

@@ -31,7 +31,7 @@ test.describe( 'changing image size', () => {
 		const filename = '1024x768_e2e_test_image_size.jpeg';
 		const filepath = path.join( './test/e2e/assets', filename );
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		const media = await requestUtils.uploadMedia( filepath );
 
 		await editor.insertBlock( {

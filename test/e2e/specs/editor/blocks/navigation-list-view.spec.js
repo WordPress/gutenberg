@@ -29,7 +29,7 @@ test.describe( 'Navigation block - List view editing', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

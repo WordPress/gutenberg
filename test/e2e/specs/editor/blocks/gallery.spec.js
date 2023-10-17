@@ -45,7 +45,7 @@ test.describe( 'Gallery', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 
 		pageUtils.setClipboardData( {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
@@ -91,7 +91,7 @@ test.describe( 'Gallery', () => {
 		editor,
 		galleryBlockUtils,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/gallery' } );
 		const galleryBlock = editor.canvas.locator(
 			'role=document[name="Block: Gallery"i]'
@@ -119,7 +119,7 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		const galleryCaption = 'Tested gallery caption';
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( {
 			name: 'core/gallery',
 			innerBlocks: [
@@ -162,7 +162,7 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		const caption = 'Tested caption';
 
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( {
 			name: 'core/gallery',
 			innerBlocks: [
@@ -204,7 +204,7 @@ test.describe( 'Gallery', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 		await editor.insertBlock( { name: 'core/gallery' } );
 		await editor.canvas
 			.locator( 'role=button[name="Media Library"i]' )

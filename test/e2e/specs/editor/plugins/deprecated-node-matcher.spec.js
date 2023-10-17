@@ -14,7 +14,7 @@ test.describe( 'Deprecated Node Matcher', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

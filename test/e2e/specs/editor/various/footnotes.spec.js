@@ -23,7 +23,7 @@ async function getFootnotes( page, withoutSave = false ) {
 
 test.describe( 'Footnotes', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
+		await admin.visitPostEditor();
 	} );
 
 	test( 'can be inserted', async ( { editor, page } ) => {

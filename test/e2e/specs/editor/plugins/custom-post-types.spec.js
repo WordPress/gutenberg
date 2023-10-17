@@ -19,7 +19,7 @@ test.describe( 'Test Custom Post Types', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'hierar-no-title' } );
+		await admin.visitPostEditor( { postType: 'hierar-no-title' } );
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
@@ -27,7 +27,7 @@ test.describe( 'Test Custom Post Types', () => {
 		await editor.publishPost();
 
 		// Create a post that is a child of the previously created post.
-		await admin.createNewPost( { postType: 'hierar-no-title' } );
+		await admin.visitPostEditor( { postType: 'hierar-no-title' } );
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -71,7 +71,7 @@ test.describe( 'Test Custom Post Types', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'leg_block_in_tpl' } );
+		await admin.visitPostEditor( { postType: 'leg_block_in_tpl' } );
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
