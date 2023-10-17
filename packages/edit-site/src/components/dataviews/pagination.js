@@ -25,7 +25,7 @@ function PageSizeControl( { view, onChangeView } ) {
 			prefix={
 				<InputControlPrefixWrapper
 					as="span"
-					className="dataviews__per-page-control-prefix"
+					className="dataviews__select-control-prefix"
 				>
 					{ label }
 				</InputControlPrefixWrapper>

@@ -32,13 +32,17 @@ const defaultConfigPerViewType = {
 export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
-		search: '',
+		filters: {
+			search: '',
+			status: 'publish, draft',
+		},
 		page: 1,
 		perPage: 5,
 		sort: {
 			field: 'date',
 			direction: 'desc',
 		},
+		visibleFilters: [ 'search', 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
@@ -63,8 +67,7 @@ export default function PagePages() {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
-			search: view.search,
-			status: [ 'publish', 'draft' ],
+			...view.filters,
 		} ),
 		[ view ]
 	);
@@ -74,6 +77,10 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const { records: authors } = useEntityRecords( 'root', 'user', {
+		who: 'authors',
+	} );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -126,6 +133,7 @@ export default function PagePages() {
 						</VStack>
 					);
 				},
+				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -142,12 +150,37 @@ export default function PagePages() {
 						</a>
 					);
 				},
+				filters: [ { id: 'author', type: 'enumeration' } ],
+				elements: [
+					{
+						value: '',
+						label: __( 'All' ),
+					},
+					...( authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [] ),
+				],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				filters: [ { type: 'enumeration', id: 'status' } ],
+				elements: [
+					{ label: __( 'All' ), value: 'publish,draft' },
+					...( ( postStatuses &&
+						Object.entries( postStatuses )
+							.filter( ( [ slug ] ) =>
+								[ 'publish', 'draft' ].includes( slug )
+							)
+							.map( ( [ slug, name ] ) => ( {
+								value: slug,
+								label: name,
+							} ) ) ) ||
+						[] ),
+				],
 				enableSorting: false,
 			},
 			{
@@ -163,7 +196,7 @@ export default function PagePages() {
 				enableSorting: false,
 			},
 		],
-		[ postStatuses ]
+		[ postStatuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
