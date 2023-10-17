@@ -235,6 +235,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$button =
 		$img[0]
 		. '<button
+			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
@@ -322,6 +323,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--touchend="actions.core.image.handleTouchEnd"
             data-wp-on--click="actions.core.image.hideLightbox"
+			tabindex="0"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
