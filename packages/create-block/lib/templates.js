@@ -244,6 +244,7 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		...pluginTemplate.defaultValues,
 		...pluginTemplate.variants?.[ variant ],
 		variantVars: getVariantVars( pluginTemplate.variants, variant ),
+		transformer: ( view ) => view,
 	};
 };
 

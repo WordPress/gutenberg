@@ -49,10 +49,49 @@ module.exports = async (
 		customPackageJSON,
 		customBlockJSON,
 		example,
+		transformer,
 	}
 ) => {
-	slug = slug.toLowerCase();
-	namespace = namespace.toLowerCase();
+	const transformedData = transformer( {
+		$schema,
+		apiVersion,
+		plugin,
+		namespace,
+		slug,
+		title,
+		description,
+		dashicon,
+		category,
+		attributes,
+		supports,
+		author,
+		pluginURI,
+		license,
+		licenseURI,
+		domainPath,
+		updateURI,
+		version,
+		wpScripts,
+		wpEnv,
+		npmDependencies,
+		npmDevDependencies,
+		customScripts,
+		folderName,
+		editorScript,
+		editorStyle,
+		style,
+		render,
+		viewScript,
+		variantVars,
+		customPackageJSON,
+		customBlockJSON,
+		example,
+	} );
+
+	const { slug: transformedSlug, namespace: transformedNamespace } =
+		transformedData;
+	slug = transformedSlug.toLowerCase();
+	namespace = transformedNamespace.toLowerCase();
 	/**
 	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
 	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
@@ -73,42 +112,11 @@ module.exports = async (
 	);
 
 	const view = {
-		$schema,
-		apiVersion,
-		plugin,
-		namespace,
+		...transformedData,
 		namespaceSnakeCase: snakeCase( namespace ),
-		slug,
 		slugSnakeCase: snakeCase( slug ),
 		slugPascalCase: pascalCase( slug ),
-		title,
-		description,
-		dashicon,
-		category,
-		attributes,
-		supports,
-		version,
-		author,
-		pluginURI,
-		license,
-		licenseURI,
 		textdomain: slug,
-		domainPath,
-		updateURI,
-		wpScripts,
-		wpEnv,
-		npmDependencies,
-		npmDevDependencies,
-		customScripts,
-		folderName,
-		editorScript,
-		editorStyle,
-		style,
-		render,
-		viewScript,
-		customPackageJSON,
-		customBlockJSON,
-		example,
 		...variantVars,
 	};
 
