@@ -138,7 +138,7 @@ function ViewList( {
 				delete column.render;
 				column.cell = ( props ) => {
 					return field.render
-						? field.render( { item: props.row.original } )
+						? field.render( { item: props.row.original, view } )
 						: field.accessorFn( props.row.original );
 				};
 				return column;

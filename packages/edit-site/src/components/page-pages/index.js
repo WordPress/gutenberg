@@ -89,12 +89,16 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				accessorFn: ( page ) => page.featured_media,
-				render: ( { item } ) =>
+				render: ( { item, view: currentView } ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
 							id={ item.featured_media }
-							size="thumbnail"
+							size={
+								currentView.type === 'list'
+									? [ 'thumbnail', 'medium', 'large', 'full' ]
+									: [ 'large', 'medium', 'full', 'thumbnail' ]
+							}
 						/>
 					) : null,
 				enableSorting: false,
