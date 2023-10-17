@@ -83,13 +83,23 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * the excerpt length block setting has no effect.
  * Returns 100 because 100 is the max length in the setting.
  */
-if ( is_admin() ||
-	defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-	add_filter(
-		'excerpt_length',
-		static function () {
-			return 100;
-		},
-		PHP_INT_MAX
-	);
-}
+add_filter(
+	/**
+	 * Don't add the filter now, as at this point, REST_REQUEST is not set yet.
+	 * Add it later when REST_REQUEST is initialized.
+	 */
+	'rest_api_init',
+	static function () {
+		if ( ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return;
+		}
+		add_filter(
+			'excerpt_length',
+			static function () {
+				return 100;
+			},
+			PHP_INT_MAX
+		);
+	},
+	PHP_INT_MAX
+);
