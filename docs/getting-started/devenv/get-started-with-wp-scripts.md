@@ -21,6 +21,10 @@ The package abstracts away much of the initial setup, configuration, and boilerp
 
 ### Installation
 
+<div class="callout callout-tip">
+    If you want to build a custom block, the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/"><code>@wordpress/create-block</code></a> package allows you to scaffold the structure of files needed to create and register a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using <code>wp-scripts</code>) with no configuration required. Refer to <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with <code>create-block</code></a> for more details.
+</div>
+
 Ensure you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not. 
 
 Then, create a project folder and ensure it contains a `package.json` file, a `build` folder, and an `src` folder. The `src` folder should also include an `index.js` file. 
