@@ -18,28 +18,39 @@ export const PATTERN_SUPPORT_KEY = '__experimentalPattern';
 // TODO: Extract this to a custom source file?
 function useSourceAttributes( attributes ) {
 	const { name, clientId } = useBlockEditContext();
-	const dynamicContent = useSelect(
+	const { dynamicContent, index } = useSelect(
 		( select ) => {
 			const hasPatternSupport = select( blocksStore ).hasBlockSupport(
 				name,
 				PATTERN_SUPPORT_KEY
 			);
-			if ( ! hasPatternSupport ) return undefined;
-			const parentPatternClientId = select(
-				blockEditorStore
-			).getBlockParentsByBlockName( clientId, 'core/block', true )[ 0 ];
-			if ( ! parentPatternClientId ) return undefined;
-			return select( blockEditorStore ).getBlockAttributes(
-				parentPatternClientId
-			).dynamicContent;
+			if ( ! hasPatternSupport )
+				return { dynamicContent: undefined, index: -1 };
+			const { getBlockParentsByBlockName, getClientIdsWithDescendants } =
+				select( blockEditorStore );
+			const parentPatternClientId = getBlockParentsByBlockName(
+				clientId,
+				'core/block',
+				true
+			)[ 0 ];
+			if ( ! parentPatternClientId )
+				return { dynamicContent: undefined, index: -1 };
+			return {
+				dynamicContent: select( blockEditorStore ).getBlockAttributes(
+					parentPatternClientId
+				).dynamicContent,
+				index: getClientIdsWithDescendants(
+					parentPatternClientId
+				).indexOf( clientId ),
+			};
 		},
 		[ name, clientId ]
 	);
 
 	const attributesWithSourcedAttributes = useMemo( () => {
-		const id = attributes.metadata?.id;
+		const id = attributes.metadata?.id ?? index;
 
-		if ( ! id || ! dynamicContent ) {
+		if ( ! dynamicContent || ! dynamicContent[ id ] ) {
 			return attributes;
 		}
 
@@ -47,7 +58,7 @@ function useSourceAttributes( attributes ) {
 			...attributes,
 			...dynamicContent[ id ],
 		};
-	}, [ attributes, dynamicContent ] );
+	}, [ attributes, dynamicContent, index ] );
 
 	return attributesWithSourcedAttributes;
 }

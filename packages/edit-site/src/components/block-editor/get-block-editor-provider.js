@@ -3,6 +3,7 @@
  */
 import DefaultBlockEditor from './providers/default-block-editor-provider';
 import NavigationBlockEditor from './providers/navigation-block-editor-provider';
+import PatternEditorProvider from './providers/pattern-editor-provider';
 
 /**
  * Factory to isolate choosing the appropriate block editor
@@ -17,6 +18,9 @@ export default function getBlockEditorProvider( entityType ) {
 	switch ( entityType ) {
 		case 'wp_navigation':
 			Provider = NavigationBlockEditor;
+			break;
+		case 'wp_block':
+			Provider = PatternEditorProvider;
 			break;
 		case 'wp_template':
 		case 'wp_template_part':
