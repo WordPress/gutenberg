@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "2.25.7",
+	"version": "2.25.8",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
