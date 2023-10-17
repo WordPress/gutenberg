@@ -5,6 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,6 +26,12 @@ export default function DataViews( {
 	paginationInfo,
 } ) {
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
+	const _fields = useMemo( () => {
+		return fields.map( ( field ) => ( {
+			...field,
+			render: field.render || field.accessorFn,
+		} ) );
+	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
@@ -37,7 +44,7 @@ export default function DataViews( {
 					/>
 				</HStack>
 				<ViewComponent
-					fields={ fields }
+					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
 					paginationInfo={ paginationInfo }

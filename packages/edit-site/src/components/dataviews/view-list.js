@@ -145,18 +145,11 @@ function ViewList( {
 	paginationInfo,
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [
-			...fields.map( ( field ) => {
-				const column = { ...field };
-				delete column.render;
-				column.cell = ( props ) => {
-					return field.render
-						? field.render( { item: props.row.original, view } )
-						: field.accessorFn( props.row.original );
-				};
-				return column;
-			} ),
-		];
+		const _columns = fields.map( ( field ) => {
+			const { render, ...column } = field;
+			column.cell = ( props ) => render( props.row.original, view );
+			return column;
+		} );
 		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
