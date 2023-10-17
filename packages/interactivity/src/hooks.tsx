@@ -280,7 +280,10 @@ options.vnode = ( vnode ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key ) vnode.key = directives.key.default;
+		if ( directives.key )
+			vnode.key = directives.key.find(
+				( { suffix } ) => suffix === 'default'
+			).value;
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {
