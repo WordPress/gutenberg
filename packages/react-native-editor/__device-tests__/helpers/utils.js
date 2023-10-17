@@ -320,7 +320,7 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 const longPressMiddleOfElement = async (
 	driver,
 	element,
-	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	waitTime = 1000,
 	customElementSize
 ) => {
 	const location = await element.getLocation();
@@ -329,11 +329,28 @@ const longPressMiddleOfElement = async (
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
 
-	const action = new wd.TouchAction( driver )
-		.longPress( { x, y } )
-		.wait( waitTime )
-		.release();
-	await action.perform();
+	// Focus on the element first, otherwise on iOS it fails to open the context menu.
+	// We can't do it all in one action because it detects it as a force press and it
+	// is not supported by the simulator.
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { origin: element } )
+		.down()
+		.up()
+		.perform();
+
+	// Long-press
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( waitTime )
+		.up()
+		.perform();
 };
 
 // Press "Select All" in floating context menu.
