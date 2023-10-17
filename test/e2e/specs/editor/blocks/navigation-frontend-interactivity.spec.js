@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Navigation block - Frontend interactivity', () => {
+test.describe( 'Navigation block - Frontend interactivity (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -133,10 +133,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			const secondLevelElement = page.getByRole( 'link', {
 				name: 'Nested Submenu Link 1',
 			} );
+			const lastFirstLevelElement = page.getByRole( 'link', {
+				name: 'Complex Submenu Link 2',
+			} );
 
 			// Test: submenu opens on click
 			await expect( innerElement ).toBeHidden();
 			await simpleSubmenuButton.click();
+			await expect( simpleSubmenuButton ).toBeFocused();
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on click outside submenu
@@ -145,10 +149,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			// Test: nested submenu opens on click
 			await complexSubmenuButton.click();
+			await expect( complexSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
 			await nestedSubmenuButton.click();
+			await expect( nestedSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeVisible();
 
@@ -160,6 +166,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Test: submenu opens on Enter keypress
 			await simpleSubmenuButton.focus();
 			await pageUtils.pressKeys( 'Enter' );
+			await expect( simpleSubmenuButton ).toBeFocused();
 			await expect( innerElement ).toBeVisible();
 
 			// Test: submenu closes on ESC key and focuses parent link
@@ -168,27 +175,29 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( simpleSubmenuButton ).toBeFocused();
 
 			// Test: submenu closes on tab outside submenu
-			await simpleSubmenuButton.focus();
 			await pageUtils.pressKeys( 'Enter' );
+			await expect( simpleSubmenuButton ).toBeFocused();
 			await expect( innerElement ).toBeVisible();
 			// Tab to first element, then tab outside the submenu.
 			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
-			await expect( innerElement ).toBeHidden();
 			await expect( complexSubmenuButton ).toBeFocused();
+			await expect( innerElement ).toBeHidden();
 
 			// Test: only nested submenu closes on tab outside
-			await complexSubmenuButton.focus();
 			await pageUtils.pressKeys( 'Enter' );
+			await expect( complexSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
 			await nestedSubmenuButton.click();
+			await expect( nestedSubmenuButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeVisible();
 
 			// Tab to nested submenu first element, then tab outside the nested
 			// submenu.
 			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( lastFirstLevelElement ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 			// Tab outside the complex submenu.
@@ -222,7 +231,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await editor.saveSiteEditorEntities();
 		} );
 
-		test( 'submenu opens on click in the arrow', async ( { page } ) => {
+		test( 'submenu click on the arrow interactions', async ( { page } ) => {
 			await page.goto( '/' );
 			const arrowButton = page.getByRole( 'button', {
 				name: 'Submenu submenu',
@@ -239,12 +248,41 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
+			// Open first submenu level
 			await arrowButton.click();
+			await expect( arrowButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
+
+			// Close first submenu level, check that it closes and focus is on the arrow button
+			await arrowButton.click();
+			await expect( arrowButton ).toBeFocused();
+			// Move the mouse so the hover on the button doesn't keep the menu open
+			await page.mouse.move( 400, 400 );
+			await expect( firstLevelElement ).toBeHidden();
+			await expect( secondLevelElement ).toBeHidden();
+
+			// Open first submenu level one more time so we can test the nested submenu
+			await arrowButton.click();
+			await expect( arrowButton ).toBeFocused();
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			// Nested submenu open
 			await nestedSubmenuArrowButton.click();
+			await expect( nestedSubmenuArrowButton ).toBeFocused();
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeVisible();
+
+			// Nested submenu close
+			await nestedSubmenuArrowButton.click();
+			await expect( nestedSubmenuArrowButton ).toBeFocused();
+			// Move the mouse so the hover on the button doesn't keep the menu open
+			await page.mouse.move( 400, 400 );
+			await expect( firstLevelElement ).toBeVisible();
+			await expect( secondLevelElement ).toBeHidden();
+
+			// Close menu via click on the body
 			await page.click( 'body' );
 			await expect( firstLevelElement ).toBeHidden();
 			await expect( secondLevelElement ).toBeHidden();
