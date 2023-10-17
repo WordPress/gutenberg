@@ -9,7 +9,8 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../../store';
 import DefaultBlockEditorProvider from './default-block-editor-provider';
 import NavigationBlockEditorProvider from './navigation-block-editor-provider';
-import { NAVIGATION_POST_TYPE } from '../../../utils/constants';
+import PatternEditorProvider from './pattern-editor-provider';
+import { NAVIGATION_POST_TYPE, PATTERN_TYPES } from '../../../utils/constants';
 
 export default function BlockEditorProvider( { children } ) {
 	const entityType = useSelect(
@@ -22,6 +23,8 @@ export default function BlockEditorProvider( { children } ) {
 				{ children }
 			</NavigationBlockEditorProvider>
 		);
+	} else if ( entityType === PATTERN_TYPES.user ) {
+		return <PatternEditorProvider>{ children }</PatternEditorProvider>;
 	}
 	return (
 		<DefaultBlockEditorProvider>{ children }</DefaultBlockEditorProvider>
