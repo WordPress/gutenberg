@@ -42,13 +42,7 @@ export default function PagePages() {
 			field: 'date',
 			direction: 'desc',
 		},
-		layout: {
-			filters: [
-				{ type: 'search', id: 'search' },
-				{ type: 'in', id: 'author' },
-				{ type: 'in', id: 'status' },
-			],
-		},
+		visibleFilters: [ 'search', 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
@@ -155,6 +149,7 @@ export default function PagePages() {
 						</a>
 					);
 				},
+				filters: [ { id: 'author', type: 'enumeration' } ],
 				elements: [
 					{
 						value: '',
@@ -171,6 +166,7 @@ export default function PagePages() {
 				id: 'status',
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
+				filters: [ { type: 'enumeration', id: 'status' } ],
 				elements: [
 					{ label: __( 'All' ), value: 'publish,draft' },
 					...( ( postStatuses &&
