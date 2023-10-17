@@ -42,6 +42,13 @@ export default function PagePages() {
 			field: 'date',
 			direction: 'desc',
 		},
+		layout: {
+			filters: [
+				{ type: 'search', id: 'search' },
+				{ type: 'in', id: 'author' },
+				{ type: 'in', id: 'status' },
+			],
+		},
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],

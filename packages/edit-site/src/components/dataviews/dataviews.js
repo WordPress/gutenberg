@@ -5,6 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,23 +32,31 @@ export default function DataViews( {
 			<VStack spacing={ 4 }>
 				<HStack>
 					<HStack justify="start">
-						<TextFilter
-							id={ 'search' }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-						<InFilter
-							id={ 'author' }
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-						<InFilter
-							id={ 'status' }
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
+						{ view.layout?.filters?.map( ( filter ) => {
+							if ( filter.type === 'search' ) {
+								return (
+									<TextFilter
+										key={ filter.id }
+										id={ filter.id }
+										view={ view }
+										onChangeView={ onChangeView }
+									/>
+								);
+							}
+							if ( filter.type === 'in' ) {
+								return (
+									<InFilter
+										key={ filter.id }
+										id={ filter.id }
+										fields={ fields }
+										view={ view }
+										onChangeView={ onChangeView }
+									/>
+								);
+							}
+
+							return null;
+						} ) || __( 'No filters available' ) }
 					</HStack>
 					<HStack justify="end">
 						<ViewActions
