@@ -8,7 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
@@ -22,6 +22,12 @@ import Media from '../media';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'featured-image',
+	},
+};
 
 export default function PagePages() {
 	const [ view, setView ] = useState( {
@@ -36,6 +42,7 @@ export default function PagePages() {
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
@@ -82,12 +89,16 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				accessorFn: ( page ) => page.featured_media,
-				cell: ( props ) =>
-					!! props.row.original.featured_media ? (
+				render: ( { item, view: currentView } ) =>
+					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
-							id={ props.row.original.featured_media }
-							size="thumbnail"
+							id={ item.featured_media }
+							size={
+								currentView.type === 'list'
+									? [ 'thumbnail', 'medium', 'large', 'full' ]
+									: [ 'large', 'full', 'medium', 'thumbnail' ]
+							}
 						/>
 					) : null,
 				enableSorting: false,
@@ -96,8 +107,7 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				cell: ( props ) => {
-					const page = props.row.original;
+				render: ( { item: page } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
@@ -108,8 +118,9 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 								>
-									{ decodeEntities( props.getValue() ) ||
-										__( '(no title)' ) }
+									{ decodeEntities(
+										page.title?.rendered || page.slug
+									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
@@ -123,8 +134,8 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				cell: ( props ) => {
-					const author = props.row.original._embedded?.author[ 0 ];
+				render: ( { item } ) => {
+					const author = item._embedded?.author[ 0 ];
 					return (
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
 							{ author.name }
@@ -142,10 +153,10 @@ export default function PagePages() {
 			{
 				header: 'Date',
 				id: 'date',
-				cell: ( props ) => {
+				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
-						getDate( props.row.original.date )
+						getDate( item.date )
 					);
 					return <time>{ formattedDate }</time>;
 				},
@@ -157,6 +168,25 @@ export default function PagePages() {
 
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
+	const onChangeView = useCallback(
+		( viewUpdater ) => {
+			let updatedView =
+				typeof viewUpdater === 'function'
+					? viewUpdater( view )
+					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
+			setView( updatedView );
+		},
+		[ view ]
+	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
@@ -168,7 +198,7 @@ export default function PagePages() {
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ onChangeView }
 			/>
 		</Page>
 	);

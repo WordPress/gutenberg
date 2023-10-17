@@ -34,3 +34,13 @@
 	color: $gray-700;
 	text-wrap: nowrap;
 }
+
+.dataviews-view-grid__media {
+	width: 100%;
+	min-height: 200px;
+
+	> * {
+		max-width: 100%;
+		object-fit: cover;
+	}
+}
