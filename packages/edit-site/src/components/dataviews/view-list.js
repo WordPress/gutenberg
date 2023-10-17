@@ -202,16 +202,6 @@ function ViewList( {
 				  ]
 				: [],
 			globalFilter: view.search,
-			columnFilters: view.filters
-				? [
-						...Object.entries( view.filters ).map(
-							( [ id, value ] ) => ( {
-								id,
-								value,
-							} )
-						),
-				  ]
-				: [],
 			pagination: {
 				pageIndex: view.page,
 				pageSize: view.perPage,
@@ -271,38 +261,6 @@ function ViewList( {
 		},
 		onGlobalFilterChange: ( value ) => {
 			onChangeView( { ...view, search: value, page: 0 } );
-		},
-		onColumnFiltersChange: ( filteringUpdater ) => {
-			onChangeView( ( currentView ) => {
-				const filters =
-					typeof filteringUpdater === 'function'
-						? filteringUpdater(
-								currentView.filters
-									? [
-											...Object.entries(
-												currentView.filters
-											).map( ( [ id, value ] ) => ( {
-												id,
-												value,
-											} ) ),
-									  ]
-									: []
-						  )
-						: filteringUpdater;
-
-				return {
-					...currentView,
-					filters: {
-						...filters.reduce(
-							( accumulator, { id, value } ) => ( {
-								...accumulator,
-								[ id ]: value,
-							} ),
-							{}
-						),
-					},
-				};
-			} );
 		},
 		onPaginationChange: ( paginationUpdater ) => {
 			onChangeView( ( currentView ) => {

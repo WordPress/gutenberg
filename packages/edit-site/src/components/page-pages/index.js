@@ -149,7 +149,6 @@ export default function PagePages() {
 					);
 				},
 				elements: authors,
-				enableColumnFiltering: true,
 			},
 			{
 				header: __( 'Status' ),
@@ -157,7 +156,6 @@ export default function PagePages() {
 				accessorFn: ( page ) =>
 					postStatuses[ page.status ] ?? page.status,
 				enableSorting: false,
-				enableColumnFilter: false,
 			},
 			{
 				header: 'Date',
