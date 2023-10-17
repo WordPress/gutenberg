@@ -155,14 +155,19 @@ function ViewList( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
-					return <FieldActions item={ props.row.original } />;
+					return (
+						<FieldActions
+							item={ props.row.original }
+							actions={ actions }
+						/>
+					);
 				},
 				enableHiding: false,
 			} );
 		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {
