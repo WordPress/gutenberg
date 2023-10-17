@@ -149,12 +149,15 @@ store(
 									'scroll',
 									scrollCallback
 								);
+								// If we don't delay before changing the focus,
+								// the focus ring will appear on Firefox before
+								// the image has finished animating, which looks broken.
+								context.core.image.lightboxTriggerRef.focus( {
+									preventScroll: true,
+								} );
 							}, 450 );
 
 							context.core.image.lightboxEnabled = false;
-							context.core.image.lightboxTriggerRef.focus( {
-								preventScroll: true,
-							} );
 						}
 					},
 					handleKeydown: ( { context, actions, event } ) => {
