@@ -14,9 +14,8 @@ const focusableSelectors = [
 ];
 
 const openMenu = ( store, menuOpenedOn ) => {
-	const { context, ref, selectors } = store;
+	const { context, selectors } = store;
 	selectors.core.navigation.menuOpenedBy( store )[ menuOpenedOn ] = true;
-	context.core.navigation.previousFocus = ref;
 	if ( context.core.navigation.type === 'overlay' ) {
 		// Add a `has-modal-open` class to the <html> root.
 		document.documentElement.classList.add( 'has-modal-open' );
@@ -35,7 +34,7 @@ const closeMenu = ( store, menuClosedOn ) => {
 				window.document.activeElement
 			)
 		) {
-			context.core.navigation.previousFocus.focus();
+			context.core.navigation.previousFocus?.focus();
 		}
 		context.core.navigation.modal = null;
 		context.core.navigation.previousFocus = null;
@@ -132,6 +131,8 @@ wpStore( {
 					closeMenu( store, 'hover' );
 				},
 				openMenuOnClick( store ) {
+					const { context, ref } = store;
+					context.core.navigation.previousFocus = ref;
 					openMenu( store, 'click' );
 				},
 				closeMenuOnClick( store ) {
@@ -142,13 +143,14 @@ wpStore( {
 					openMenu( store, 'focus' );
 				},
 				toggleMenuOnClick: ( store ) => {
-					const { selectors } = store;
+					const { selectors, context, ref } = store;
 					const menuOpenedBy =
 						selectors.core.navigation.menuOpenedBy( store );
 					if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 						closeMenu( store, 'click' );
 						closeMenu( store, 'focus' );
 					} else {
+						context.core.navigation.previousFocus = ref;
 						openMenu( store, 'click' );
 					}
 				},
