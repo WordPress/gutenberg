@@ -34,7 +34,7 @@ export default function PagePages() {
 		type: 'list',
 		filters: {
 			search: '',
-			status: [ 'publish', 'draft' ],
+			status: 'publish, draft',
 		},
 		page: 1,
 		perPage: 5,
