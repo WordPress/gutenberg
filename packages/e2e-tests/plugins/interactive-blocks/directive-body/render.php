@@ -7,7 +7,7 @@
 
 ?>
 <div
-	data-wp-interactive
+	data-wp-interactive='{ "namespace":"directive-body" }'
 	data-wp-context='{"text":"text-1"}'
 >
 	<div data-testid="container">
