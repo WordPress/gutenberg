@@ -50,14 +50,13 @@ const fetchPage = async ( url, { html } ) => {
 // `navigation-id` directive.
 const regionsToVdom = ( dom ) => {
 	const regions = {};
-	const titles = {};
 	const attrName = `data-${ directivePrefix }-navigation-id`;
 	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
 		const id = region.getAttribute( attrName );
 		regions[ id ] = toVdom( region );
-		titles[ id ] = dom.querySelectorAll( 'title' )[ 0 ].innerHTML || null;
 	} );
-	return { regions, titles };
+	const title = dom.querySelector( 'title' ).innerHTML || null;
+	return { regions, title };
 };
 
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
@@ -76,8 +75,8 @@ const renderRegions = ( page ) => {
 		const id = region.getAttribute( attrName );
 		const fragment = getRegionRootFragment( region );
 		render( page.regions[ id ], fragment );
-		if ( page.titles[ id ] ) {
-			document.title = page.titles[ id ];
+		if ( page.title ) {
+			document.title = page.title;
 		}
 	} );
 };
