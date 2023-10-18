@@ -419,14 +419,42 @@ const tapStatusBariOS = async ( driver ) => {
 };
 
 const selectTextFromElement = async ( driver, element ) => {
-	await longPressMiddleOfElement( driver, element );
+	const timeout = 1000;
 
-	// On iOS long-pressing doesn't select the text automatically
-	if ( ! isAndroid() ) {
+	// On Android we can't "locate" the context menu options,
+	// To avoid having fixed coordinates to be able to
+	// select all text, it just selects all text by
+	// long-pressing and dragging.
+	if ( isAndroid() ) {
+		await element.click();
+
+		const location = await element.getLocation();
+		const size = await element.getSize();
+		const paddingPercentage = 0.2;
+		const leftPaddingOffset = size.width * paddingPercentage;
+		const startX = location.x + leftPaddingOffset;
+		const endX = location.x + size.width;
+		const centerY = location.y + size.height / 2;
+
+		await driver
+			.action( 'pointer', {
+				parameters: { pointerType: 'touch' },
+			} )
+			.move( { x: startX, y: centerY } )
+			.down()
+			.pause( timeout )
+			.move( { x: endX, y: centerY, duration: timeout } )
+			.up()
+			.pause( timeout )
+			.perform();
+	} else {
+		// On iOS we can use the context menu to "Select all" text.
+		await longPressMiddleOfElement( driver, element );
+
 		const selectAllElement = await driver.$(
 			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
-		await selectAllElement.waitForDisplayed( { timeout: 1000 } );
+		await selectAllElement.waitForDisplayed( { timeout } );
 		await selectAllElement.click();
 	}
 };
