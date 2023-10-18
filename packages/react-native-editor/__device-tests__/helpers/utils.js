@@ -442,10 +442,10 @@ const selectTextFromElement = async ( driver, element ) => {
 			} )
 			.move( { x: startX, y: centerY } )
 			.down()
-			.pause( timeout )
-			.move( { x: endX, y: centerY, duration: timeout } )
+			.pause( timeout ) // Long-press at the start of the element
+			.move( { x: endX, y: centerY, duration: 1000 } ) // Slowly drag to the end of the element to highlight all text
 			.up()
-			.pause( timeout )
+			.pause( timeout ) // Pause to wait for the context menu to show up
 			.perform();
 	} else {
 		// On iOS we can use the context menu to "Select all" text.
