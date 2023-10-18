@@ -42,13 +42,13 @@ function deleteRecordingFile( filePath ) {
 	}
 }
 
-async function getAndroidDeviceID() {
+async function getDeviceID() {
 	try {
 		const session = await global.editorPage.driver.getSession();
 		return session.deviceUDID;
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
-		console.error( 'Failed to fetch Android device ID:', error.message );
+		console.error( 'Failed to fetch the device ID:', error.message );
 		return null;
 	}
 }
@@ -90,7 +90,7 @@ jasmine.getEnv().addReporter( {
 			return;
 		}
 
-		deviceID = await getAndroidDeviceID();
+		deviceID = await getDeviceID();
 
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
