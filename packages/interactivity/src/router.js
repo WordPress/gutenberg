@@ -55,7 +55,7 @@ const regionsToVdom = ( dom ) => {
 		const id = region.getAttribute( attrName );
 		regions[ id ] = toVdom( region );
 	} );
-	const title = dom.querySelector( 'title' ).innerHTML || null;
+	const title = dom.querySelector( 'title' ).innerText || null;
 	return { regions, title };
 };
 
