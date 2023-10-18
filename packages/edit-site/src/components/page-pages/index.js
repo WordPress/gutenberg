@@ -30,12 +30,12 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
-	const allStatuses = 'publish, draft';
+	const DEFAULT_STATUSES = 'publish, draft, future, pending, private'; // All but 'trash'.
 	const [ view, setView ] = useState( {
 		type: 'list',
 		filters: {
 			search: '',
-			status: allStatuses,
+			status: DEFAULT_STATUSES,
 		},
 		page: 1,
 		perPage: 5,
@@ -49,17 +49,22 @@ export default function PagePages() {
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
 	} );
-	// Request post statuses to get the proper labels.
+
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const postStatuses = useMemo(
-		() =>
-			statuses === null
-				? EMPTY_OBJECT
-				: Object.fromEntries(
-						statuses.map( ( { slug, name } ) => [ slug, name ] )
-				  ),
-		[ statuses ]
-	);
+	const { postStatuses, allStatuses } = useMemo( () => {
+		return {
+			postStatuses:
+				statuses === null
+					? EMPTY_OBJECT
+					: Object.fromEntries(
+							statuses.map( ( { slug, name } ) => [ slug, name ] )
+					  ),
+			allStatuses:
+				statuses
+					.filter( ( { slug } ) => slug !== 'trash' )
+					.map( ( { slug } ) => slug ) || DEFAULT_STATUSES,
+		};
+	}, [ statuses ] );
 
 	const queryArgs = useMemo(
 		() => ( {
