@@ -13,7 +13,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useSettings } from '..';
+import { useSettings, useSetting } from '..';
 import * as BlockEditContext from '../../block-edit/context';
 
 // Mock useSelect() functions used by useSettings()
@@ -114,6 +114,28 @@ describe( 'useSettings', () => {
 		removeFilter(
 			'blockEditor.useSetting.before',
 			'test/useSetting.before'
+		);
+	} );
+
+	it( 'supports also the deprecated useSetting function', () => {
+		mockSettings( {
+			blocks: {
+				'core/test-block': {
+					layout: {
+						contentSize: '840px',
+					},
+				},
+			},
+		} );
+
+		mockCurrentBlockContext( {
+			name: 'core/test-block',
+		} );
+
+		const result = runHook( () => useSetting( 'layout.contentSize' ) );
+		expect( result ).toBe( '840px' );
+		expect( console ).toHaveWarnedWith(
+			'wp.blockEditor.useSetting is deprecated since version 6.4. Please use wp.blockEditor.useSettings instead.'
 		);
 	} );
 } );
