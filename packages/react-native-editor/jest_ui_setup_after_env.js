@@ -14,7 +14,7 @@ jest.setTimeout( 1000000 ); // In milliseconds.
 
 let iOSScreenRecordingProcess;
 let androidScreenRecordingProcess;
-let deviceID;
+let androidDeviceID;
 
 const isMacOSEnvironment = () => {
 	return process.platform === 'darwin';
@@ -42,58 +42,42 @@ function deleteRecordingFile( filePath ) {
 	}
 }
 
-async function getDeviceID() {
+function getFirstAvailableAndroidEmulatorID() {
 	try {
-		const session = await global.editorPage.driver.getSession();
-		// eslint-disable-next-line no-console
-		console.log( 'session', session );
-		return session.deviceUDID;
+		const adbOutput = childProcess.execSync( 'adb devices -l' ).toString();
+
+		// Split by line and extract the device ID from the first line (excluding the header)
+		const lines = adbOutput
+			.split( '\n' )
+			.filter( ( line ) => line && ! line.startsWith( 'List' ) );
+		if ( lines.length === 0 ) {
+			// eslint-disable-next-line no-console
+			console.error( 'No available devices found.' );
+			return null;
+		}
+		const firstDeviceLine = lines[ 0 ];
+		// Extract device ID from the beginning of the line
+		return firstDeviceLine.split( /\s+/ )[ 0 ];
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
-		console.error( 'Failed to fetch the device ID:', error.message );
+		console.error(
+			'Failed to fetch the first available device ID:',
+			error.message
+		);
 		return null;
 	}
 }
 
 let allPassed = true;
 
-function logAndroidError( data ) {
-	// eslint-disable-next-line no-console
-	console.log( `Android screen recording error => ${ data }` );
-}
-
-// Setup the listener before each test.
-beforeEach( () => {
-	if (
-		androidScreenRecordingProcess &&
-		androidScreenRecordingProcess.stderr
-	) {
-		androidScreenRecordingProcess.stderr.on( 'data', logAndroidError );
-	}
-} );
-
-// Cleanup the listener after each test.
-afterEach( () => {
-	if (
-		androidScreenRecordingProcess &&
-		androidScreenRecordingProcess.stderr
-	) {
-		androidScreenRecordingProcess.stderr.removeListener(
-			'data',
-			logAndroidError
-		);
-	}
-} );
-
 // eslint-disable-next-line jest/no-jasmine-globals, no-undef
 jasmine.getEnv().addReporter( {
-	specStarted: async ( { testPath, id } ) => {
+	specStarted: ( { testPath, id } ) => {
 		if ( ! isMacOSEnvironment() ) {
 			return;
 		}
 
-		deviceID = await getDeviceID();
-
+		androidDeviceID = getFirstAvailableAndroidEmulatorID();
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
 
@@ -106,7 +90,7 @@ jasmine.getEnv().addReporter( {
 			// ANDROID_EMULATOR_DIR directory if it doesn't exist.
 			try {
 				childProcess.execSync(
-					`adb -s ${ deviceID } shell "mkdir -p ${ ANDROID_EMULATOR_DIR }" 2>/dev/null`
+					`adb -s ${ androidDeviceID } shell "mkdir -p ${ ANDROID_EMULATOR_DIR }" 2>/dev/null`
 				);
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
@@ -115,7 +99,7 @@ jasmine.getEnv().addReporter( {
 
 			androidScreenRecordingProcess = childProcess.spawn( 'adb', [
 				'-s',
-				deviceID,
+				androidDeviceID,
 				'shell',
 				'screenrecord',
 				'--verbose',
@@ -125,6 +109,11 @@ jasmine.getEnv().addReporter( {
 				'720x1280',
 				`${ ANDROID_EMULATOR_DIR }${ fileName }`,
 			] );
+
+			androidScreenRecordingProcess.stderr.on( 'data', ( data ) => {
+				// eslint-disable-next-line no-console
+				console.log( `Android screen recording error => ${ data }` );
+			} );
 			return;
 		}
 
@@ -172,7 +161,7 @@ jasmine.getEnv().addReporter( {
 
 			try {
 				childProcess.execSync(
-					`adb -s ${ deviceID } pull ${ ANDROID_EMULATOR_DIR }${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
+					`adb -s ${ androidDeviceID } pull ${ ANDROID_EMULATOR_DIR }${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
 				);
 			} catch ( error ) {
 				// Some (old) Android devices don't support screen recording or
