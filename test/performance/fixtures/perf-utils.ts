@@ -33,26 +33,19 @@ export class PerfUtils {
 	 * @return Locator for the editor canvas element.
 	 */
 	async getCanvas() {
-		return await Promise.any( [
-			( async () => {
-				const legacyCanvasLocator = this.page.locator(
-					'.wp-block-post-content'
-				);
-				await legacyCanvasLocator.waitFor( {
-					timeout: 120_000,
-				} );
-				return legacyCanvasLocator;
-			} )(),
-			( async () => {
-				const iframedCanvasLocator = this.page.frameLocator(
-					'[name=editor-canvas]'
-				);
-				await iframedCanvasLocator
-					.locator( 'body' )
-					.waitFor( { timeout: 120_000 } );
-				return iframedCanvasLocator;
-			} )(),
-		] );
+		const canvasLocator = this.page.locator(
+			'.wp-block-post-content, iframe[name=editor-canvas]'
+		);
+
+		const isFramed = await canvasLocator.evaluate(
+			( node ) => node.tagName === 'IFRAME'
+		);
+
+		if ( isFramed ) {
+			return canvasLocator.frameLocator( ':scope' );
+		}
+
+		return canvasLocator;
 	}
 
 	/**
