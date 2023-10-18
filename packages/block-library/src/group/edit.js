@@ -10,7 +10,13 @@ import {
 	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
 
@@ -95,6 +101,7 @@ function GroupEdit( {
 		templateLock,
 		allowedBlocks,
 		layout = {},
+		showInView,
 	} = attributes;
 
 	// Layout settings.
@@ -150,6 +157,8 @@ function GroupEdit( {
 		setShowPlaceholder( false );
 	};
 
+	const [ hasShowInView, setShowInView ] = useState( showInView );
+
 	return (
 		<>
 			<GroupEditControls
@@ -158,6 +167,26 @@ function GroupEdit( {
 					setAttributes( { tagName: value } )
 				}
 			/>
+			<InspectorControls>
+				<ToolsPanel label={ __( 'Settings' ) }>
+					<ToolsPanelItem
+						hasValue={ () => !! showInView }
+						label={ __( 'Animate in View' ) }
+						isShownByDefault={ true }
+					>
+						<ToggleControl
+							label={ __( 'Animate in View' ) }
+							checked={ hasShowInView }
+							onChange={ ( newValue ) => {
+								setShowInView( ( state ) => ! state );
+								setAttributes( {
+									showInView: newValue,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			{ showPlaceholder && (
 				<View>
 					{ innerBlocksProps.children }
