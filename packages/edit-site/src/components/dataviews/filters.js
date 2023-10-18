@@ -17,13 +17,36 @@ export default function Filters( { fields, view, onChangeView } ) {
 		}
 
 		field.filters.forEach( ( filter ) => {
+			let id = field.id;
 			if ( 'string' === typeof filter ) {
-				filters[ field.id ] = { type: filter };
+				filters[ id ] = {
+					id,
+					name: field.header,
+					type: filter,
+				};
 			}
 
 			if ( 'object' === typeof filter ) {
-				filters[ filter.id ] = { ...filter };
-				delete filters[ filter.id ].id;
+				id = filter.id || field.id;
+				filters[ id ] = {
+					id,
+					name: filter.name || field.header,
+					type: filter.type,
+				};
+			}
+
+			if ( 'enumeration' === filters[ id ]?.type ) {
+				const elements = [
+					{
+						value: filter.resetValue || '',
+						label: filter.resetLabel || __( 'All' ),
+					},
+					...( field.elements || [] ),
+				];
+				filters[ id ] = {
+					...filters[ id ],
+					elements,
+				};
 			}
 		} );
 	} );
@@ -40,7 +63,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				return (
 					<TextFilter
 						key={ filterName }
-						id={ filterName }
+						filter={ filter }
 						view={ view }
 						onChangeView={ onChangeView }
 					/>
@@ -50,8 +73,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				return (
 					<InFilter
 						key={ filterName }
-						id={ filterName }
-						fields={ fields }
+						filter={ filter }
 						view={ view }
 						onChangeView={ onChangeView }
 					/>
