@@ -30,11 +30,12 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
+	const allStatuses = 'publish, draft';
 	const [ view, setView ] = useState( {
 		type: 'list',
 		filters: {
 			search: '',
-			status: 'publish, draft',
+			status: allStatuses,
 		},
 		page: 1,
 		perPage: 5,
