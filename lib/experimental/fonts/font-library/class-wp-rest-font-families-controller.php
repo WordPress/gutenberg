@@ -239,7 +239,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 		$result      = $font_family->uninstall();
 
 		if ( is_wp_error( $result ) ) {
-			if ( 'font_family_not_found' === $result->get_error_code() ) {
+			if ( 'font_family_slug_not_found' === $result->get_error_code() ) {
 				$result->add_data( array( 'status' => 404 ) );
 			} else {
 				$result->add_data( array( 'status' => 500 ) );
