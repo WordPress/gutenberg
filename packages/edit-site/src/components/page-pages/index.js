@@ -79,7 +79,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', 'page', queryArgs );
 
 	const { records: authors } = useEntityRecords( 'root', 'user', {
-		who: 'authors',
+		has_published_posts: true,
 	} );
 
 	const paginationInfo = useMemo(
