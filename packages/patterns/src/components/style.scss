@@ -50,7 +50,6 @@
 	border: 1px solid $gray-600;
 	// Extra left padding prevents checkbox focus borders from being cut off.
 	padding-left: $border-width * 4 + $border-width-focus-fallback;
-	margin-top: -$border-width * 4 - $border-width-focus-fallback;
 	padding-top: $border-width * 4 + $border-width-focus-fallback;
 
 	.patterns-menu-items__convert-modal__terms-choice {

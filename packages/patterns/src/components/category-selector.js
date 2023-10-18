@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { FormTokenField, CheckboxControl } from '@wordpress/components';
+import {
+	FormTokenField,
+	CheckboxControl,
+	BaseControl,
+} from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -101,17 +105,20 @@ export default function CategorySelector( {
 			) }
 			{ ! canAddCategories && categoryOptions.length > 0 && (
 				<>
-					<div className="patterns-menu-items__convert-modal__terms-label">
-						{ __( 'Categories' ) }
-					</div>
-					<div
-						className="patterns-menu-items__convert-modal__terms-list"
-						tabIndex="0"
-						role="group"
-						aria-label={ __( 'Categories' ) }
-					>
-						{ renderTerms( categoryOptions ) }
-					</div>
+					<BaseControl>
+						<BaseControl.VisualLabel>
+							{ __( 'Categories' ) }
+						</BaseControl.VisualLabel>
+
+						<div
+							className="patterns-menu-items__convert-modal__terms-list"
+							tabIndex="0"
+							role="group"
+							aria-label={ __( 'Categories' ) }
+						>
+							{ renderTerms( categoryOptions ) }
+						</div>
+					</BaseControl>
 				</>
 			) }
 		</>
