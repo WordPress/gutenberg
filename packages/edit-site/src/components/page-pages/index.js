@@ -8,7 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
@@ -30,7 +30,10 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
-	const DEFAULT_STATUSES = 'publish, draft, future, pending, private'; // All but 'trash'.
+	// The pages endpoint depends on the request to the status endpoint (see status filter).
+	// This is a convenience to avoid a double request to the pages endpoint
+	// unless it is strictly necessary (the statuses are different from the default ones).
+	const DEFAULT_STATUSES = 'publish,future,draft,pending,private'; // All statuses but 'trash'.
 	const [ view, setView ] = useState( {
 		type: 'list',
 		filters: {
@@ -64,9 +67,22 @@ export default function PagePages() {
 					? DEFAULT_STATUSES
 					: statuses
 							.filter( ( { slug } ) => slug !== 'trash' )
-							.map( ( { slug } ) => slug ),
+							.map( ( { slug } ) => slug )
+							.join(),
 		};
 	}, [ statuses ] );
+
+	useEffect( () => {
+		if ( DEFAULT_STATUSES !== defaultStatuses ) {
+			setView( {
+				...view,
+				filters: {
+					...view.filters,
+					status: defaultStatuses,
+				},
+			} );
+		}
+	}, [ defaultStatuses ] );
 
 	const queryArgs = useMemo(
 		() => ( {
