@@ -282,7 +282,7 @@ store(
 									focusableElements.length - 1
 								];
 
-							ref.focus();
+							ref.querySelector( '.close-button' ).focus();
 						}
 					},
 					setButtonStyles: ( { context, ref } ) => {
