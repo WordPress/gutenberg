@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { RegistryProvider, useRegistry, useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
@@ -32,7 +32,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as blocksStore } from '@wordpress/blocks';
-import { useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
