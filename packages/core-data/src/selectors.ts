@@ -21,7 +21,6 @@ import {
 	isRawAttribute,
 	setNestedValue,
 	isNumericID,
-	parseEntityName,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -63,6 +62,14 @@ interface QueriedData {
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
 
+interface RevisionsQueriedData {
+	items:
+		| Record< ET.Context, Record< number, ET.PostRevision > >
+		| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
+	queries: Record< ET.Context, Record< string, Array< number > > >;
+}
+
 interface EntityState< EntityRecord extends ET.EntityRecord > {
 	edits: Record< string, Partial< EntityRecord > >;
 	saving: Record<
@@ -71,7 +78,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
-	revisions: QueriedData;
+	revisions: RevisionsQueriedData;
 }
 
 interface EntityConfig {
