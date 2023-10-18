@@ -184,7 +184,7 @@ export default function PagePages() {
 				enableSorting: false,
 			},
 			{
-				header: 'Date',
+				header: __( 'Date' ),
 				id: 'date',
 				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
