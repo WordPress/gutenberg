@@ -944,6 +944,8 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.4.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
 It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.

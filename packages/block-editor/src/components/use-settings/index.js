@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -253,12 +254,19 @@ export function useSettings( ...paths ) {
  *
  * @param {string} path The path to the setting.
  * @return {any} Returns the value defined for the setting.
+ * @deprecated 6.4.0 Use useSettings instead.
  * @example
  * ```js
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
 export function useSetting( path ) {
+	deprecated( 'wp.blockEditor.useSetting', {
+		since: '6.4',
+		alternative: 'wp.blockEditor.useSettings',
+		note: 'The new useSettings function can retrieve multiple settings at once, with better performance.',
+	} );
+
 	const [ value ] = useSettings( path );
 	return value;
 }
