@@ -145,31 +145,33 @@ function ViewList( {
 	paginationInfo,
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [
-			...fields.map( ( field ) => {
-				const column = { ...field };
-				delete column.render;
-				column.cell = ( props ) => {
-					return field.render
-						? field.render( { item: props.row.original, view } )
-						: field.accessorFn( props.row.original );
-				};
-				return column;
-			} ),
-		];
+		const _columns = fields.map( ( field ) => {
+			const { render, getValue, ...column } = field;
+			column.cell = ( props ) =>
+				render( { item: props.row.original, view } );
+			if ( getValue ) {
+				column.accessorFn = ( item ) => getValue( { item } );
+			}
+			return column;
+		} );
 		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
-					return <FieldActions item={ props.row.original } />;
+					return (
+						<FieldActions
+							item={ props.row.original }
+							actions={ actions }
+						/>
+					);
 				},
 				enableHiding: false,
 			} );
 		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {

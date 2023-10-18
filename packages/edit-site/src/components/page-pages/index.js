@@ -32,13 +32,17 @@ const defaultConfigPerViewType = {
 export default function PagePages() {
 	const [ view, setView ] = useState( {
 		type: 'list',
-		search: '',
+		filters: {
+			search: '',
+			status: 'publish, draft',
+		},
 		page: 1,
 		perPage: 5,
 		sort: {
 			field: 'date',
 			direction: 'desc',
 		},
+		visibleFilters: [ 'search', 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
@@ -63,8 +67,7 @@ export default function PagePages() {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
-			search: view.search,
-			status: [ 'publish', 'draft' ],
+			...view.filters,
 		} ),
 		[ view ]
 	);
@@ -74,6 +77,10 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const { records: authors } = useEntityRecords( 'root', 'user', {
+		who: 'authors',
+	} );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -88,7 +95,7 @@ export default function PagePages() {
 			{
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
-				accessorFn: ( page ) => page.featured_media,
+				getValue: ( { item } ) => item.featured_media,
 				render: ( { item, view: currentView } ) =>
 					!! item.featured_media ? (
 						<Media
@@ -106,26 +113,27 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				render: ( { item: page } ) => {
+				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
 								<Link
 									params={ {
-										postId: page.id,
-										postType: page.type,
+										postId: item.id,
+										postType: item.type,
 										canvas: 'edit',
 									} }
 								>
 									{ decodeEntities(
-										page.title?.rendered || page.slug
+										item.title?.rendered || item.slug
 									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
 					);
 				},
+				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -133,7 +141,7 @@ export default function PagePages() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
+				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
 				render: ( { item } ) => {
 					const author = item._embedded?.author[ 0 ];
 					return (
@@ -142,17 +150,43 @@ export default function PagePages() {
 						</a>
 					);
 				},
+				filters: [ { id: 'author', type: 'enumeration' } ],
+				elements: [
+					{
+						value: '',
+						label: __( 'All' ),
+					},
+					...( authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [] ),
+				],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
-				accessorFn: ( page ) =>
-					postStatuses[ page.status ] ?? page.status,
+				getValue: ( { item } ) =>
+					postStatuses[ item.status ] ?? item.status,
+				filters: [ { type: 'enumeration', id: 'status' } ],
+				elements: [
+					{ label: __( 'All' ), value: 'publish,draft' },
+					...( ( postStatuses &&
+						Object.entries( postStatuses )
+							.filter( ( [ slug ] ) =>
+								[ 'publish', 'draft' ].includes( slug )
+							)
+							.map( ( [ slug, name ] ) => ( {
+								value: slug,
+								label: name,
+							} ) ) ) ||
+						[] ),
+				],
 				enableSorting: false,
 			},
 			{
-				header: 'Date',
+				header: __( 'Date' ),
 				id: 'date',
+				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
@@ -160,10 +194,9 @@ export default function PagePages() {
 					);
 					return <time>{ formattedDate }</time>;
 				},
-				enableSorting: false,
 			},
 		],
-		[ postStatuses ]
+		[ postStatuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
