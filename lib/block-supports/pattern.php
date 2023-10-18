@@ -86,7 +86,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-patterns', $gutenber
 	 */
 	function gutenberg_render_block_pattern_data( $block_content, $block, $block_instance ) {
 		$block_type = $block_instance->block_type;
-		// var_dump($block);
 
 		// If for some reason, the block type is not found, skip it.
 		if ( null === $block_type ) {

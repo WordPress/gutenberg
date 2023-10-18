@@ -176,12 +176,14 @@ export default function ReusableBlockEdit( {
 			const blockClientIds = select(
 				blockEditorStore
 			).getClientIdsOfDescendants( [ patternClientId ] );
-			const blockIds =
-				record?.meta?.blockIds ??
-				Array.from(
+			let blockIds = record?.meta?.block_ids;
+			if ( blockIds?.length !== blockClientIds.length ) {
+				// Fallback to preorder-based ids.
+				blockIds = Array.from(
 					{ length: blockClientIds.length },
-					( _, i ) => i + 1
+					( _, index ) => index + 1
 				);
+			}
 			const map = {};
 			blockClientIds.forEach( ( clientId, index ) => {
 				map[ clientId ] = blockIds[ index ];

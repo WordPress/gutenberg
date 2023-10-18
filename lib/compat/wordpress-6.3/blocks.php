@@ -129,7 +129,7 @@ function gutenberg_wp_block_register_post_meta() {
 				'schema' => array(
 					'type' => 'array',
 					'items' => array(
-						'type' => 'number',
+						'type' => 'integer',
 					),
 				),
 			),

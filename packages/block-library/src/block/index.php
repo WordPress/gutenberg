@@ -55,6 +55,7 @@ function render_block_core_block( $attributes ) {
 	$filter_set_internal_id = static function ( $parsed_block, $source_block, $parent_block ) use ( &$index, $block_ids ) {
 		$set_internal_id = static function ( &$block ) use ( &$set_internal_id, &$index, $block_ids ) {
 			if ( null === $block['blockName'] ) return;
+			// Fallback to preorder-based ids.
 			$block['_id'] = empty( $block_ids ) ? $index + 1 : $block_ids[ $index ];
 			$index++;
 			foreach ( $block['innerBlocks'] as &$inner_block ) {

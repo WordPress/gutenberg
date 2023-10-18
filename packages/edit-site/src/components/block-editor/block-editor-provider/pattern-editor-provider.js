@@ -3,11 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useRef, useCallback } from '@wordpress/element';
-import {
-	useEntityBlockEditor,
-	useEntityRecord,
-	useEntityProp,
-} from '@wordpress/core-data';
+import { useEntityBlockEditor, useEntityProp } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -22,24 +18,23 @@ import useSiteEditorSettings from '../use-site-editor-settings';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
+function flattenBlockClientIds( blocks ) {
+	return blocks.flatMap( ( block ) => [
+		block.clientId,
+		...flattenBlockClientIds( block.innerBlocks ),
+	] );
+}
+
 export default function PatternEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();
 
-	const { templateType, templateId } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = unlock(
-			select( editSiteStore )
-		);
+	const { templateType } = useSelect( ( select ) => {
+		const { getEditedPostType } = unlock( select( editSiteStore ) );
 
 		return {
 			templateType: getEditedPostType(),
-			templateId: getEditedPostId(),
 		};
 	}, [] );
-	const { hasResolved } = useEntityRecord(
-		'postType',
-		templateType,
-		templateId
-	);
 	const { getClientIdsWithDescendants } = useSelect( blockEditorStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -53,12 +48,14 @@ export default function PatternEditorProvider( { children } ) {
 	);
 
 	const blockIdsMapRef = useRef( null );
-	if ( hasResolved && blockIdsMapRef.current === null ) {
+	if ( blocks.length > 0 && blockIdsMapRef.current === null ) {
 		blockIdsMapRef.current = {};
-		const blockClientIds = getClientIdsWithDescendants();
-		const blockIds =
-			meta?.blockIds ??
-			blockClientIds.map( ( clientId, index ) => index + 1 );
+		let blockIds = meta?.block_ids ?? [];
+		const blockClientIds = flattenBlockClientIds( blocks );
+		// Fallback to preorder-based ids.
+		if ( blockIds.length !== blockClientIds.length ) {
+			blockIds = blockClientIds.map( ( _, index ) => index + 1 );
+		}
 		blockClientIds.forEach( ( clientId, index ) => {
 			blockIdsMapRef.current[ clientId ] = blockIds[ index ];
 		} );
@@ -79,7 +76,7 @@ export default function PatternEditorProvider( { children } ) {
 					newBlocks.map( ( block ) => block.clientId )
 				);
 				const blockIds = blockClientIds.map( ( clientId ) => {
-					if ( blockIdsMapRef.current[ clientId ] ) {
+					if ( Object.hasOwn( blockIdsMapRef.current, clientId ) ) {
 						return blockIdsMapRef.current[ clientId ];
 					}
 					id++;

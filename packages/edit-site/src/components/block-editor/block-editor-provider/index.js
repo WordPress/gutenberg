@@ -13,8 +13,11 @@ import PatternEditorProvider from './pattern-editor-provider';
 import { NAVIGATION_POST_TYPE, PATTERN_TYPES } from '../../../utils/constants';
 
 export default function BlockEditorProvider( { children } ) {
-	const entityType = useSelect(
-		( select ) => select( editSiteStore ).getEditedPostType(),
+	const { entityType, entityId } = useSelect(
+		( select ) => ( {
+			entityType: select( editSiteStore ).getEditedPostType(),
+			entityId: select( editSiteStore ).getEditedPostId(),
+		} ),
 		[]
 	);
 	if ( entityType === NAVIGATION_POST_TYPE ) {
@@ -24,7 +27,11 @@ export default function BlockEditorProvider( { children } ) {
 			</NavigationBlockEditorProvider>
 		);
 	} else if ( entityType === PATTERN_TYPES.user ) {
-		return <PatternEditorProvider>{ children }</PatternEditorProvider>;
+		return (
+			<PatternEditorProvider key={ entityId }>
+				{ children }
+			</PatternEditorProvider>
+		);
 	}
 	return (
 		<DefaultBlockEditorProvider>{ children }</DefaultBlockEditorProvider>
