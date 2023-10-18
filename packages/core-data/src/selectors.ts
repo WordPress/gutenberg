@@ -20,6 +20,7 @@ import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
 	setNestedValue,
+	isNumericID,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -94,6 +95,13 @@ type Optional< T > = T | undefined;
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 type GetRecordsHttpQuery = Record< string, any >;
+
+/**
+ * Arguments for EntityRecord selectors.
+ */
+type EntityRecordArgs =
+	| [ string, string, EntityRecordKey ]
+	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -292,6 +300,7 @@ export interface GetEntityRecord {
 		key: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
+	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -364,6 +373,24 @@ export const getEntityRecord = createSelector(
 		];
 	}
 ) as GetEntityRecord;
+
+/**
+ * Normalizes `recordKey`s that look like numeric IDs to numbers.
+ *
+ * @param args EntityRecordArgs the selector arguments.
+ * @return EntityRecordArgs the normalized arguments.
+ */
+getEntityRecord.__unstableNormalizeArgs = (
+	args: EntityRecordArgs
+): EntityRecordArgs => {
+	const newArgs = [ ...args ] as EntityRecordArgs;
+	const recordKey = newArgs?.[ 2 ];
+
+	// If recordKey looks to be a numeric ID then coerce to number.
+	newArgs[ 2 ] = isNumericID( recordKey ) ? Number( recordKey ) : recordKey;
+
+	return newArgs;
+};
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.

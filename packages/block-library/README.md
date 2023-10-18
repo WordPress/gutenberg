@@ -138,4 +138,16 @@ For the PHP functions declared in the `packages/block-library/src/my-block/index
 -   `render_block_core_my_block`
 -   `register_block_core_my_block`
 
+#### Using plugin-specific prefixes/suffixes
+
+Unlike in [PHP code in the /lib directory](https://github.com/WordPress/gutenberg/blob/trunk/lib/README.md), you should generally avoid applying plugin-specific prefixes/suffixes such as `gutenberg_` to functions and other code in block PHP files.
+
+There are times, however, when blocks may need to use Gutenberg functions even when a Core-equivalent exists, for example, where a Gutenberg function relies on code that is only available in the plugin.
+
+In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to [a list of prefixed functions in the Webpack configuration file](https://github.com/WordPress/gutenberg/blob/trunk/tools/webpack/blocks.js#L30).
+
+At build time, Webpack will search for `wp_` functions in that list and replace them with their `gutenberg_` equivalents. This process ensures that the plugin calls the `gutenberg_` functions, but the block will still call the Core `wp_` function when updates are back ported.
+
+Webpack assumes that, prefixes aside, the functions' names are identical: `wp_get_something_useful()` will be replaced with `gutenberg_get_something_useful()`.
+
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

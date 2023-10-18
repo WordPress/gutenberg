@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.10.0 (2023-10-18)
+
 ### Enhancements
 
 -   `ProgressBar`: use text color to ensure enough contrast against background ([#55285](https://github.com/WordPress/gutenberg/pull/55285)).

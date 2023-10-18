@@ -110,7 +110,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							onChangeView( { ...view, perPage: size, page: 0 } );
+							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 						// TODO: check about role and a11y.
 						role="menuitemcheckbox"
