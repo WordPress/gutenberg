@@ -96,7 +96,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		$font_family = new WP_Font_Family( array( 'slug' => $request['slug'] ) );
+		$font_family      = new WP_Font_Family( array( 'slug' => $request['slug'] ) );
 		$font_family_data = $font_family->get_data_from_post();
 
 		if ( is_wp_error( $font_family_data ) ) {
@@ -412,23 +412,23 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 		if ( $this->schema ) {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
-		$family_schema = array (
+		$family_schema         = array(
 			'title'      => 'Font family',
 			'type'       => 'object',
 			'properties' => $this->font_family_schema(),
 		);
 		$delete_success_schema = array(
-			'title' => 'Font family delete success',
-			'type' => 'boolean',
+			'title'       => 'Font family delete success',
+			'type'        => 'boolean',
 			'description' => 'Indicates a successful response.',
-			'enum' => array( true),
+			'enum'        => array( true ),
 		);
-		$schema = array(
+		$schema                = array(
 			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => 'Font family item endpoint reponse',
-			'oneOf' => array( $family_schema, $delete_success_schema, $this->error_schema() ),
+			'title'   => 'Font family item endpoint reponse',
+			'oneOf'   => array( $family_schema, $delete_success_schema, $this->error_schema() ),
 		);
-		$this->schema = $schema;
+		$this->schema          = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
 
@@ -444,21 +444,21 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 		$families_schema = array(
-			'title'      => 'Font families',
-			'type'       => 'array',
-			'items'      => (
+			'title' => 'Font families',
+			'type'  => 'array',
+			'items' => (
 				array(
 					'type'       => 'object',
 					'properties' => $this->font_family_schema(),
 				)
-			)
+			),
 		);
-		$schema = array(
+		$schema          = array(
 			'$schema' => 'http://json-schema.org/draft-04/schema#',
-			'title' => 'Font families items endpoint reponse',
-			'oneOf' => array( $families_schema, $this->error_schema() ),
+			'title'   => 'Font families items endpoint reponse',
+			'oneOf'   => array( $families_schema, $this->error_schema() ),
 		);
-		$this->schema = $schema;
+		$this->schema    = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
 
@@ -469,28 +469,28 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 	 *
 	 * @return array Error schema data.
 	 */
-	private function error_schema () {
+	private function error_schema() {
 		return array(
-			'title' => 'Error response',
-			'type' => 'object',
+			'title'      => 'Error response',
+			'type'       => 'object',
 			'properties' => array(
-				'errors' => array(
-					'type' => 'object',
-					'description' => 'An associative array of error codes to error messages.',
-					'propertyNames' => array(
+				'errors'     => array(
+					'type'                 => 'object',
+					'description'          => 'An associative array of error codes to error messages.',
+					'propertyNames'        => array(
 						'type' => 'string',
 					),
 					'additionalProperties' => array(
-						'type' => 'array',
+						'type'  => 'array',
 						'items' => array(
 							'type' => 'string',
 						),
 					),
 				),
 				'error_data' => array(
-					'type' => 'object',
-					'description' => 'An associative array of error codes to mixed error data.',
-					'propertyNames' => array(
+					'type'                 => 'object',
+					'description'          => 'An associative array of error codes to mixed error data.',
+					'propertyNames'        => array(
 						'type' => 'string',
 					),
 					'additionalProperties' => array(

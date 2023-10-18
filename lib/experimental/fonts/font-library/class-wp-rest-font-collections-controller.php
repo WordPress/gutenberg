@@ -97,9 +97,8 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @since 6.4.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response Response object.
-	 *
 	 */
 	public function get_items( $request ) {
 		$collections = array();
@@ -143,10 +142,10 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		}
 
 		$schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'font-collections',
-			'type'       => 'array',
-			'items'      => array(
+			'$schema' => 'http://json-schema.org/draft-04/schema#',
+			'title'   => 'font-collections',
+			'type'    => 'array',
+			'items'   => array(
 				'type'       => 'object',
 				'properties' => array(
 					'id'          => array(
@@ -222,7 +221,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 							'items'       => array(
 								'type'       => 'object',
 								'properties' => array(
-									'name'       => array(
+									'name'        => array(
 										'description' => __( 'Name of the font family.' ),
 										'type'        => 'string',
 									),
@@ -230,11 +229,11 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 										'description' => __( 'Font family string.' ),
 										'type'        => 'string',
 									),
-									'slug'       => array(
+									'slug'        => array(
 										'description' => __( 'Slug of the font family.' ),
 										'type'        => 'string',
 									),
-									'category'   => array(
+									'category'    => array(
 										'description' => __( 'Category of the font family.' ),
 										'type'        => 'string',
 									),
@@ -267,7 +266,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 											),
 										),
 									),
-									'preview'    => array(
+									'preview'     => array(
 										'description' => __( 'URL for font family preview.' ),
 										'type'        => 'string',
 									),
@@ -282,5 +281,4 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		$this->schema = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
-
 }

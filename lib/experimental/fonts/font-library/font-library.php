@@ -34,7 +34,6 @@ function gutenberg_init_font_library_routes() {
 	$font_families_controller->register_routes();
 	$font_collections_controller = new WP_REST_Font_Collections_Controller();
 	$font_collections_controller->register_routes();
-
 }
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );

@@ -456,7 +456,6 @@ class WP_Font_Family {
 	 * @since 6.5.0
 	 *
 	 * @return WP_Post|WP_Error The post for this font family object if it exists and has valid JSON content.
-	 *
 	 */
 	public function get_data_from_post() {
 		$post = $this->get_font_post();
@@ -464,7 +463,7 @@ class WP_Font_Family {
 		if ( ! $post ) {
 			return new WP_Error(
 				'font_family_slug_not_found',
-				__('Font Family with that slug was not found.'),
+				__( 'Font Family with that slug was not found.' ),
 				array(
 					'status' => 404,
 				)
