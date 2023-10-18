@@ -184,7 +184,7 @@ export default function PagePages() {
 				enableSorting: false,
 			},
 			{
-				header: 'Date',
+				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
