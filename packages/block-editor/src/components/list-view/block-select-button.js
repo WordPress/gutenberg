@@ -192,9 +192,26 @@ function ListViewBlockSelectButton(
 			}
 			event.preventDefault();
 
-			const blockClientIds = getBlockOrder( rootClientId );
+			const { firstBlockRootClientId, selectedBlockClientIds } =
+				getBlocksToUpdate();
+			const blockClientIds = getBlockOrder( firstBlockRootClientId );
 			if ( ! blockClientIds.length ) {
 				return;
+			}
+
+			// If we have selected all sibling nested blocks, try selecting up a level.
+			// This is a similar implementation to that used by `useSelectAll`.
+			if ( selectedBlockClientIds.length === blockClientIds.length ) {
+				// Only select up a level if the first block is not the root block.
+				// This ensures that the block selection can't break out of the root block
+				// used by the list view, if the list view is only showing a partial hierarchy.
+				if (
+					firstBlockRootClientId &&
+					firstBlockRootClientId !== rootClientId
+				) {
+					updateFocusAndSelection( firstBlockRootClientId, true );
+					return;
+				}
 			}
 
 			// Select all while passing `null` to skip focusing to the editor canvas,
