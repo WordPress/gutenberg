@@ -2,17 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
 import { CheckboxControl, BaseControl } from '@wordpress/components';
-
 import { decodeEntities } from '@wordpress/html-entities';
-
-export const CATEGORY_SLUG = 'wp_pattern_category';
 
 export default function CategorySelector( {
 	onChange,
 	isCategorySelected,
 	categoryOptions,
+	showLabel = true,
 } ) {
 	const renderTerms = ( renderedTerms ) => {
 		return renderedTerms.map( ( category ) => {
@@ -34,10 +31,11 @@ export default function CategorySelector( {
 
 	return (
 		<BaseControl>
-			<BaseControl.VisualLabel>
-				{ __( 'Categories' ) }
-			</BaseControl.VisualLabel>
-
+			{ showLabel && (
+				<BaseControl.VisualLabel>
+					{ __( 'Categories' ) }
+				</BaseControl.VisualLabel>
+			) }
 			<div
 				className="patterns-menu-items__convert-modal__terms-list"
 				tabIndex="0"
