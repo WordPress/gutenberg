@@ -186,6 +186,7 @@ export default function PagePages() {
 			{
 				header: 'Date',
 				id: 'date',
+				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
@@ -193,7 +194,6 @@ export default function PagePages() {
 					);
 					return <time>{ formattedDate }</time>;
 				},
-				enableSorting: false,
 			},
 		],
 		[ postStatuses, authors ]
