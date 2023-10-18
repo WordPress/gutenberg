@@ -96,12 +96,64 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
+				...coreFieldTypes.image,
+				render:
+					( getValue ) =>
+					( { item, view: currentView } ) => {
+						const value = getValue( { item } );
+						if ( ! value ) {
+							return null;
+						}
+						return (
+							<Media
+								className="edit-site-page-pages__featured-image"
+								id={ value }
+								size={
+									currentView.type === 'list'
+										? [
+												'thumbnail',
+												'medium',
+												'large',
+												'full',
+										  ]
+										: [
+												'large',
+												'full',
+												'medium',
+												'thumbnail',
+										  ]
+								}
+							/>
+						);
+					},
 				enableSorting: false,
 			},
 			{
 				header: __( 'Title' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				...coreFieldTypes.string,
+				render:
+					( getValue ) =>
+					( { item } ) => {
+						return (
+							<VStack spacing={ 1 }>
+								<Heading as="h3" level={ 5 }>
+									<Link
+										params={ {
+											postId: item.id,
+											postType: item.type,
+											canvas: 'edit',
+										} }
+									>
+										{ decodeEntities(
+											getValue( { item } )
+										) || __( '(no title)' ) }
+									</Link>
+								</Heading>
+							</VStack>
+						);
+					},
 				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
@@ -111,6 +163,17 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				...coreFieldTypes.string,
+				render:
+					( getValue ) =>
+					( { item } ) => {
+						const author = item._embedded?.author[ 0 ];
+						return (
+							<a href={ `user-edit.php?user_id=${ author.id }` }>
+								{ getValue( { item } ) }
+							</a>
+						);
+					},
 				filters: [ { id: 'author', type: 'enumeration' } ],
 				elements: [
 					{
@@ -128,6 +191,7 @@ export default function PagePages() {
 				id: 'status',
 				getValue: ( { item } ) =>
 					postStatuses[ item.status ] ?? item.status,
+				...coreFieldTypes.string,
 				filters: [ { type: 'enumeration', id: 'status' } ],
 				elements: [
 					{ label: __( 'All' ), value: 'publish,draft' },
@@ -148,89 +212,21 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				getValue: ( { item } ) => item.date,
+				...coreFieldTypes.date,
+				render:
+					( getValue ) =>
+					( { item } ) => {
+						const formattedDate = dateI18n(
+							getSettings().formats.datetimeAbbreviated,
+							getDate( getValue( { item } ) )
+						);
+						return <time>{ formattedDate }</time>;
+					},
 				enableSorting: false,
 			},
 		],
 		[ postStatuses, authors ]
 	);
-
-	const dataConfig = {
-		'featured-image': {
-			...coreFieldTypes.image,
-			view:
-				( getValue ) =>
-				( { item, view: currentView } ) => {
-					const value = getValue( { item } );
-					if ( ! value ) {
-						return null;
-					}
-					return (
-						<Media
-							className="edit-site-page-pages__featured-image"
-							id={ value }
-							size={
-								currentView.type === 'list'
-									? [ 'thumbnail', 'medium', 'large', 'full' ]
-									: [ 'large', 'full', 'medium', 'thumbnail' ]
-							}
-						/>
-					);
-				},
-		},
-		title: {
-			...coreFieldTypes.string,
-			view:
-				( getValue ) =>
-				( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities( getValue( { item } ) ) ||
-										__( '(no title)' ) }
-								</Link>
-							</Heading>
-						</VStack>
-					);
-				},
-		},
-		// For now we treat author as a string, but we should have a way
-		// to create a relation field type.
-		author: {
-			...coreFieldTypes.string,
-			view:
-				( getValue ) =>
-				( { item } ) => {
-					const author = item._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ getValue( { item } ) }
-						</a>
-					);
-				},
-		},
-		status: {
-			...coreFieldTypes.string,
-		},
-		date: {
-			...coreFieldTypes.date,
-			view:
-				( getValue ) =>
-				( { item } ) => {
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( getValue( { item } ) )
-					);
-					return <time>{ formattedDate }</time>;
-				},
-		},
-	};
 
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
@@ -262,7 +258,6 @@ export default function PagePages() {
 				fields={ fields }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
-				dataConfig={ dataConfig }
 				isLoading={ isLoadingPages }
 				view={ view }
 				onChangeView={ onChangeView }

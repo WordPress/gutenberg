@@ -5,16 +5,18 @@ import Media from '../../components/media';
 
 export const coreFieldTypes = {
 	string: {
-		view:
+		render:
 			( getValue ) =>
 			( { item } ) =>
 				getValue( { item } ),
 	},
 	date: {
-		view: ( { item, getValue } ) => <time>{ getValue( { item } ) }</time>,
+		render:
+			( getValue ) =>
+			( { item } ) => <time>{ getValue( { item } ) }</time>,
 	},
 	image: {
-		view:
+		render:
 			( getValue ) =>
 			( { item } ) => (
 				<Media id={ getValue( { item } ) } size={ [ 'thumbnail' ] } />
