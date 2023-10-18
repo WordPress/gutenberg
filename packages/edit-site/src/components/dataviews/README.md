@@ -69,12 +69,12 @@ The fields describe the dataset. For example:
 			);
 		},
 		elements: [
-			{ value: 1, label: 'admin' }
-			{ value: 2, label: 'user' }
+			{ value: 1, label: 'Admin' }
+			{ value: 2, label: 'User' }
 		]
 		filters: [
-			{ id: 'author', type: 'enumeration' },
-			{ id: 'author_search', type: 'search' }
+			'enumeration',
+			{ id: 'author_search', type: 'search', name: __( 'Search by author' ) }
 		],
 	},
 ]
@@ -85,10 +85,12 @@ The fields describe the dataset. For example:
 - `getValue`: function that returns the value of the field.
 - `render`: function that renders the field.
 - `elements`: a set of valid values for the field.
-- `filters`: what filters are available. A filter is an object with `id` and `type` as properties:
-	- `id`: unique identifier for the filter. Matches the entity query param.
+- `filters`: what filters are available for the user to use. A filter contains the following properties:
+	- `id`: unique identifier for the filter. Matches the entity query param. If not provided, the field's `id` is used.
+	- `name`: nice looking name for the filter. If not provided, the field's `header` is used.
 	- `type`: the type of filter. One of `search` or `enumeration`.
-
+	- `resetLabel`: the label for the reset option of the filter. If none provided, `All` is used.
+	- `resetValue`: the value for the reset option of the filter. If none provedid, `''` is used.
 
 ## DataViews
 
