@@ -332,8 +332,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( firstLevelElement ).toBeVisible();
 			await expect( secondLevelElement ).toBeHidden();
 
-			// Close all the menus with click on a non-body element outside the menu
-			await page.getByText( 'Just another Gutenberg site' ).click();
+			// Close the menu via click on the body
+			await page.click( 'body' );
 			await expect( firstLevelElement ).toBeHidden();
 
 			// Tests not covered: Tabbing to close menus
