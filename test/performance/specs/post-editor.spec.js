@@ -211,12 +211,7 @@ test.describe( 'Post Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( {
-			admin,
-			editor,
-			perfUtils,
-			metrics,
-		} ) => {
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
 			await admin.visitPostEditor( { postId: draftId } );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
@@ -231,7 +226,7 @@ test.describe( 'Post Editor Performance', () => {
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax
-				await editor.waitForTimeout( BROWSER_IDLE_WAIT );
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
 				await metrics.startTracing();
