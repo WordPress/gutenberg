@@ -95,8 +95,8 @@ export default function PagePages() {
 			{
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
-				accessorFn: ( page ) => page.featured_media,
-				render: ( item, currentView ) =>
+				getValue: ( { item } ) => item.featured_media,
+				render: ( { item, view: currentView } ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
@@ -113,20 +113,20 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				render: ( page ) => {
+				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
 								<Link
 									params={ {
-										postId: page.id,
-										postType: page.type,
+										postId: item.id,
+										postType: item.type,
 										canvas: 'edit',
 									} }
 								>
 									{ decodeEntities(
-										page.title?.rendered || page.slug
+										item.title?.rendered || item.slug
 									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
@@ -141,8 +141,8 @@ export default function PagePages() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				render: ( item ) => {
+				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				render: ( { item } ) => {
 					const author = item._embedded?.author[ 0 ];
 					return (
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
@@ -165,8 +165,8 @@ export default function PagePages() {
 			{
 				header: __( 'Status' ),
 				id: 'status',
-				accessorFn: ( page ) =>
-					postStatuses[ page.status ] ?? page.status,
+				getValue: ( { item } ) =>
+					postStatuses[ item.status ] ?? item.status,
 				filters: [ { type: 'enumeration', id: 'status' } ],
 				elements: [
 					{ label: __( 'All' ), value: 'publish,draft' },
@@ -186,7 +186,7 @@ export default function PagePages() {
 			{
 				header: 'Date',
 				id: 'date',
-				render: ( item ) => {
+				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
 						getDate( item.date )
