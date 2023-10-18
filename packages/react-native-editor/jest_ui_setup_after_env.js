@@ -101,7 +101,7 @@ jasmine.getEnv().addReporter( {
 			}
 
 			// Use the "mkdir -p" command to create the
-			// ANDROID_EMULATOR_DIR directory if it doesn't exists.
+			// ANDROID_EMULATOR_DIR directory if it doesn't exist.
 			try {
 				childProcess.execSync(
 					`adb -s ${ deviceID } shell "mkdir -p ${ ANDROID_EMULATOR_DIR }" 2>/dev/null`
