@@ -30,9 +30,6 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
-	// The pages endpoint depends on the request to the status endpoint (see status filter).
-	// This is a convenience to avoid a double request to the pages endpoint
-	// unless it is strictly necessary (the statuses are different from the default ones).
 	const DEFAULT_STATUSES = 'publish,future,draft,pending,private'; // All statuses but 'trash'.
 	const [ view, setView ] = useState( {
 		type: 'list',
@@ -73,7 +70,20 @@ export default function PagePages() {
 	}, [ statuses ] );
 
 	useEffect( () => {
-		if ( DEFAULT_STATUSES !== defaultStatuses ) {
+		// Only update the view if the statuses received from the endpoint
+		// are different from the DEFAULT_STATUSES provided initially.
+		//
+		// The pages endpoint depends on the status endpoint via the status filter.
+		// Initially, this code filters the pages request by DEFAULT_STATUTES,
+		// instead of using the default (publish).
+		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
+		//
+		// By doing so, it avoids a second request to the pages endpoint
+		// upon receiving the statuses when they are the same (most common scenario).
+		if (
+			DEFAULT_STATUSES.split( ',' ).sort().join() !==
+			defaultStatuses.split( ',' ).sort().join()
+		) {
 			setView( {
 				...view,
 				filters: {
