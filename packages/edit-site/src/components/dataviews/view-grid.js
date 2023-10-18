@@ -20,7 +20,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
+			! view.hiddenFields?.includes( field.id ) &&
 			field.id !== view.layout.mediaField
 	);
 	return (

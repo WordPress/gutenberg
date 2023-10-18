@@ -16,7 +16,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews } from '../dataviews';
+import { DataViews, coreFieldTypes } from '../dataviews';
 import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
 
@@ -96,43 +96,12 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item, view: currentView } ) =>
-					!! item.featured_media ? (
-						<Media
-							className="edit-site-page-pages__featured-image"
-							id={ item.featured_media }
-							size={
-								currentView.type === 'list'
-									? [ 'thumbnail', 'medium', 'large', 'full' ]
-									: [ 'large', 'full', 'medium', 'thumbnail' ]
-							}
-						/>
-					) : null,
 				enableSorting: false,
 			},
 			{
 				header: __( 'Title' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' ) }
-								</Link>
-							</Heading>
-						</VStack>
-					);
-				},
 				filters: [ { id: 'search', type: 'search' } ],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
@@ -142,14 +111,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
-					const author = item._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
-					);
-				},
 				filters: [ { id: 'author', type: 'enumeration' } ],
 				elements: [
 					{
@@ -187,17 +148,89 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				getValue: ( { item } ) => item.date,
-				render: ( { item } ) => {
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( item.date )
-					);
-					return <time>{ formattedDate }</time>;
-				},
+				enableSorting: false,
 			},
 		],
 		[ postStatuses, authors ]
 	);
+
+	const dataConfig = {
+		'featured-image': {
+			...coreFieldTypes.image,
+			view:
+				( getValue ) =>
+				( { item, view: currentView } ) => {
+					const value = getValue( { item } );
+					if ( ! value ) {
+						return null;
+					}
+					return (
+						<Media
+							className="edit-site-page-pages__featured-image"
+							id={ value }
+							size={
+								currentView.type === 'list'
+									? [ 'thumbnail', 'medium', 'large', 'full' ]
+									: [ 'large', 'full', 'medium', 'thumbnail' ]
+							}
+						/>
+					);
+				},
+		},
+		title: {
+			...coreFieldTypes.string,
+			view:
+				( getValue ) =>
+				( { item } ) => {
+					return (
+						<VStack spacing={ 1 }>
+							<Heading as="h3" level={ 5 }>
+								<Link
+									params={ {
+										postId: item.id,
+										postType: item.type,
+										canvas: 'edit',
+									} }
+								>
+									{ decodeEntities( getValue( { item } ) ) ||
+										__( '(no title)' ) }
+								</Link>
+							</Heading>
+						</VStack>
+					);
+				},
+		},
+		// For now we treat author as a string, but we should have a way
+		// to create a relation field type.
+		author: {
+			...coreFieldTypes.string,
+			view:
+				( getValue ) =>
+				( { item } ) => {
+					const author = item._embedded?.author[ 0 ];
+					return (
+						<a href={ `user-edit.php?user_id=${ author.id }` }>
+							{ getValue( { item } ) }
+						</a>
+					);
+				},
+		},
+		status: {
+			...coreFieldTypes.string,
+		},
+		date: {
+			...coreFieldTypes.date,
+			view:
+				( getValue ) =>
+				( { item } ) => {
+					const formattedDate = dateI18n(
+						getSettings().formats.datetimeAbbreviated,
+						getDate( getValue( { item } ) )
+					);
+					return <time>{ formattedDate }</time>;
+				},
+		},
+	};
 
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
@@ -229,6 +262,7 @@ export default function PagePages() {
 				fields={ fields }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
+				dataConfig={ dataConfig }
 				isLoading={ isLoadingPages }
 				view={ view }
 				onChangeView={ onChangeView }

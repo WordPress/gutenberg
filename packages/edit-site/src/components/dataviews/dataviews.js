@@ -22,6 +22,7 @@ export default function DataViews( {
 	fields,
 	actions,
 	data,
+	dataConfig,
 	isLoading = false,
 	paginationInfo,
 } ) {
@@ -29,9 +30,11 @@ export default function DataViews( {
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
-			render: field.render || field.getValue,
+			render:
+				dataConfig[ field.id ]?.view?.( field.getValue ) ||
+				field.getValue,
 		} ) );
-	}, [ fields ] );
+	}, [ fields, dataConfig ] );
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
