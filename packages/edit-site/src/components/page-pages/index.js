@@ -174,9 +174,6 @@ export default function PagePages() {
 				elements:
 					( postStatuses &&
 						Object.entries( postStatuses )
-							.filter( ( [ slug ] ) =>
-								[ 'publish', 'draft' ].includes( slug )
-							)
 							.map( ( [ slug, name ] ) => ( {
 								value: slug,
 								label: name,
