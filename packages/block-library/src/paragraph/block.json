@@ -29,6 +29,10 @@
 		"direction": {
 			"type": "string",
 			"enum": [ "ltr", "rtl" ]
+		},
+		"typewritter": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
