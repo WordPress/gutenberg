@@ -14,7 +14,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_register_font_collection() {
 		$config     = array(
-			'id'          => 'my-collection',
+			'id'          => 'my-collection-0',
 			'name'        => 'My Collection',
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
@@ -54,13 +54,13 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 
 	public function test_should_return_error_if_id_is_repeated() {
 		$config1 = array(
-			'id'          => 'my-collection-1',
+			'id'          => 'my-collection-repeated',
 			'name'        => 'My Collection 1',
 			'description' => 'My Collection 1 Description',
 			'src'         => 'my-collection-1-data.json',
 		);
 		$config2 = array(
-			'id'          => 'my-collection-1',
+			'id'          => 'my-collection-repeated',
 			'name'        => 'My Collection 2',
 			'description' => 'My Collection 2 Description',
 			'src'         => 'my-collection-2-data.json',
