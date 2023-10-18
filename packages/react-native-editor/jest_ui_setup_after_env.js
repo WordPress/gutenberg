@@ -45,6 +45,8 @@ function deleteRecordingFile( filePath ) {
 async function getDeviceID() {
 	try {
 		const session = await global.editorPage.driver.getSession();
+		// eslint-disable-next-line no-console
+		console.log( 'session', session );
 		return session.deviceUDID;
 	} catch ( error ) {
 		// eslint-disable-next-line no-console
