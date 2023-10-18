@@ -48,21 +48,23 @@ As of right now, the default entities defined by this package map to the [REST A
 
 What follows is a description of some of the properties of `rootEntitiesConfig`.
 
-## baseURL
+### Connecting the entity with the data source
+
+#### baseURL
 
 -   Type: string.
 -   Example: `'/wp/v2/users'`.
 
 This property maps the entity to a given endpoint, taking its relative URL as value.
 
-## baseURLParams
+#### baseURLParams
 
 -   Type: `object`.
 -   Example: `{ context: 'edit' }`.
 
 Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
 
-## key
+#### key
 
 -   Type: `string`.
 -   Example: `'slug'`.
@@ -97,6 +99,61 @@ There are also cases in which a response represents a collection shaped as an ob
 	"draft": { "slug": "draft", "name": "Draft", "...": "..." },
 	"future": { "slug": "future", "name": "Future", "...": "..." }
 }
+```
+
+### Interacting with entity records
+
+Entity records are unique. For entities that are collections, it's assumed that each record has an `id` property which serves as an identifier to manage it. If the entity defines a `key`, that property would be used as its identifier instead of the assumed `id`.
+
+#### name
+
+-   Type: `string`.
+-   Example: `user`.
+
+The name of the entity. To be used in the utilities that interact with it (selectors, actions, hooks).
+
+#### kind
+
+-   Type: `string`.
+-   Example: `root`.
+
+Entities can be grouped by `kind`. To be used in the utilities that interact with them (selectors, actions, hooks).
+
+The package provides general methods to interact with the entities (`getEntityRecords`, `getEntityRecord`, etc.) by leveraging the `kind` and `name` properties:
+
+```js
+// Get the record collection for the user entity.
+wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+
+// Get a single record for the user entity.
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+```
+
+#### plural
+
+-   Type: `string`.
+-   Example: `statuses`.
+
+In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as follows:
+
+```js
+// Collection
+wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getUsers();
+
+// Single record
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+wp.data.select( 'core' ).getUser( recordId );
+```
+
+Sometimes, the pluralized form of an entity is not regular (it is not formed by adding a `-s` suffix). The `plural` property of the entity config allows to declare an alternative pluralized form for the dynamic methods created for the entity. For example, given the `status` entity that declares the `statuses` plural, there are the following methods created for it:
+
+```js
+// Collection
+wp.data.select( 'core' ).getStatuses();
+
+// Single record
+wp.data.select( 'core' ).getStatus( recordId );
 ```
 
 ## Actions
@@ -160,6 +217,7 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
@@ -534,6 +592,36 @@ _Parameters_
 _Returns_
 
 -   `EntityRecord[] | null`: Records.
+
+### getEntityRecordsTotalItems
+
+Returns the Entity's total available records for a given query (ignoring pagination).
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
+### getEntityRecordsTotalPages
+
+Returns the number of available pages for the given query.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
 
 ### getLastEntityDeleteError
 

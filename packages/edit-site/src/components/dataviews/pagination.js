@@ -6,26 +6,54 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalNumberControl as NumberControl,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	SelectControl,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf, __, _x, _n } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { PageSizeControl } from './view-actions';
+const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+function PageSizeControl( { view, onChangeView } ) {
+	const label = __( 'Rows per page:' );
+	return (
+		<SelectControl
+			__nextHasNoMarginBottom
+			label={ label }
+			hideLabelFromVision
+			// TODO: This should probably use a label based on the wanted design
+			// and we could remove InputControlPrefixWrapper usage.
+			prefix={
+				<InputControlPrefixWrapper
+					as="span"
+					className="dataviews__per-page-control-prefix"
+				>
+					{ label }
+				</InputControlPrefixWrapper>
+			}
+			value={ view.perPage }
+			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
+				value: pageSize,
+				label: pageSize,
+			} ) ) }
+			onChange={ ( value ) =>
+				onChangeView( { ...view, perPage: value } )
+			}
+		/>
+	);
+}
 
 // For now this is copied from the patterns list Pagination component, because
 // the datatable pagination starts from index zero(`0`). Eventually all lists will be
 // using this one.
-export function Pagination( {
-	dataView,
-	// If passed, use it, as it's for controlled pagination.
-	totalItems = 0,
+function Pagination( {
+	view,
+	onChangeView,
+	paginationInfo: { totalItems = 0, totalPages },
 } ) {
-	const currentPage = dataView.getState().pagination.pageIndex + 1;
-	const numPages = dataView.getPageCount();
-	const _totalItems = totalItems || dataView.getCoreRowModel().rows.length;
+	const currentPage = view.page + 1;
+	if ( ! totalItems || ! totalPages ) {
+		return null;
+	}
 	return (
 		<HStack
 			expanded={ false }
@@ -38,25 +66,27 @@ export function Pagination( {
 					// translators: %s: Total number of entries.
 					sprintf(
 						// translators: %s: Total number of entries.
-						_n( '%s item', '%s items', _totalItems ),
-						_totalItems
+						_n( '%s item', '%s items', totalItems ),
+						totalItems
 					)
 				}
 			</Text>
-			{ !! _totalItems && (
+			{ !! totalItems && (
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
 						variant="tertiary"
-						onClick={ () => dataView.setPageIndex( 0 ) }
-						disabled={ ! dataView.getCanPreviousPage() }
+						onClick={ () => onChangeView( { ...view, page: 0 } ) }
+						disabled={ view.page === 0 }
 						aria-label={ __( 'First page' ) }
 					>
 						«
 					</Button>
 					<Button
 						variant="tertiary"
-						onClick={ () => dataView.previousPage() }
-						disabled={ ! dataView.getCanPreviousPage() }
+						onClick={ () =>
+							onChangeView( { ...view, page: view.page - 1 } )
+						}
+						disabled={ view.page === 0 }
 						aria-label={ __( 'Previous page' ) }
 					>
 						‹
@@ -71,17 +101,20 @@ export function Pagination( {
 								// translators: %1$s: Current page number, %2$s: Total number of pages.
 								_x( '<CurrenPageControl /> of %2$s', 'paging' ),
 								currentPage,
-								numPages
+								totalPages
 							),
 							{
 								CurrenPageControl: (
 									<NumberControl
 										aria-label={ __( 'Current page' ) }
 										min={ 1 }
-										max={ numPages }
+										max={ totalPages }
 										onChange={ ( value ) => {
-											if ( value > numPages ) return;
-											dataView.setPageIndex( value - 1 );
+											if ( value > totalPages ) return;
+											onChangeView( {
+												...view,
+												page: view.page - 1,
+											} );
 										} }
 										step="1"
 										value={ currentPage }
@@ -94,8 +127,10 @@ export function Pagination( {
 					</HStack>
 					<Button
 						variant="tertiary"
-						onClick={ () => dataView.nextPage() }
-						disabled={ ! dataView.getCanNextPage() }
+						onClick={ () =>
+							onChangeView( { ...view, page: view.page + 1 } )
+						}
+						disabled={ view.page >= totalPages - 1 }
 						aria-label={ __( 'Next page' ) }
 					>
 						›
@@ -103,16 +138,18 @@ export function Pagination( {
 					<Button
 						variant="tertiary"
 						onClick={ () =>
-							dataView.setPageIndex( dataView.getPageCount() - 1 )
+							onChangeView( { ...view, page: totalPages - 1 } )
 						}
-						disabled={ ! dataView.getCanNextPage() }
+						disabled={ view.page >= totalPages - 1 }
 						aria-label={ __( 'Last page' ) }
 					>
 						»
 					</Button>
 				</HStack>
 			) }
-			<PageSizeControl dataView={ dataView } />
+			<PageSizeControl view={ view } onChangeView={ onChangeView } />
 		</HStack>
 	);
 }
+
+export default Pagination;

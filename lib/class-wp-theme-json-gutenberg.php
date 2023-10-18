@@ -1066,6 +1066,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $style_nodes as &$node ) {
 				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
 			}
+			unset( $node );
 		}
 
 		if ( ! empty( $options['root_selector'] ) ) {
@@ -3389,7 +3390,7 @@ class WP_Theme_JSON_Gutenberg {
 			|| ! is_numeric( $spacing_scale['mediumStep'] )
 			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
 			if ( ! empty( $spacing_scale ) ) {
-				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), E_USER_NOTICE );
+				_doing_it_wrong( __METHOD__, __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), '6.1.0' );
 			}
 			return null;
 		}

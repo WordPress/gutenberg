@@ -83,8 +83,6 @@ add_filter( 'render_block_core_form_extra_fields', 'block_core_form_extra_fields
 
 /**
  * Sends an email if the form is a contact form.
- *
- * @return void
  */
 function block_core_form_send_email() {
 	check_ajax_referer( 'wp-block-form' );
@@ -126,8 +124,6 @@ add_action( 'wp_ajax_nopriv_wp_block_form_email_submit', 'block_core_form_send_e
 
 /**
  * Send the data export/remove request if the form is a privacy-request form.
- *
- * @return void
  */
 function block_core_form_privacy_form() {
 	// Get the POST data.

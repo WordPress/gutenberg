@@ -120,6 +120,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -326,6 +327,7 @@ async function loadPostTypeEntities() {
 			},
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
 		};
 	} );
 }

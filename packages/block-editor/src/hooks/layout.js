@@ -408,11 +408,11 @@ export const withLayoutStyles = createHigherOrderComponent(
 
 		useEffect( () => {
 			if ( ! css ) return;
-			setStyleOverride( id, { css } );
+			setStyleOverride( selector, { css } );
 			return () => {
-				deleteStyleOverride( id );
+				deleteStyleOverride( selector );
 			};
-		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+		}, [ selector, css, setStyleOverride, deleteStyleOverride ] );
 
 		return (
 			<BlockListBlock
@@ -472,11 +472,11 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 
 		useEffect( () => {
 			if ( ! css ) return;
-			setStyleOverride( id, { css } );
+			setStyleOverride( selector, { css } );
 			return () => {
-				deleteStyleOverride( id );
+				deleteStyleOverride( selector );
 			};
-		}, [ id, css, setStyleOverride, deleteStyleOverride ] );
+		}, [ selector, css, setStyleOverride, deleteStyleOverride ] );
 
 		return <BlockListBlock { ...props } className={ className } />;
 	},

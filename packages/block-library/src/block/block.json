@@ -15,6 +15,7 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"renaming": false
 	}
 }
