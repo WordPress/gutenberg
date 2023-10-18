@@ -105,8 +105,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
 			$collections[] = $collection->get_config();
 		}
-
-		return new WP_REST_Response( $collections, 200 );
+		return rest_ensure_response( $collections );
 	}
 
 	/**
