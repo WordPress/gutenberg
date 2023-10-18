@@ -57,7 +57,7 @@ class WP_Interactivity_Initial_State {
 			return;
 		}
 		echo sprintf(
-			'<script id="wc-interactivity-initial-state" type="application/json">%s</script>',
+			'<script id="wp-interactivity-initial-state" type="application/json">%s</script>',
 			wp_json_encode( self::$initial_state, JSON_HEX_TAG | JSON_HEX_AMP )
 		);
 	}
