@@ -823,7 +823,15 @@ class EditorPage {
 				'//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
 			await waitForVisible( this.driver, locator );
 
-			await swipeDown( this.driver );
+			const { width, height } = await this.driver.getWindowSize();
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( { x: width * 0.5, y: height * 0.1 } )
+				.down( { button: 0 } )
+				.up( { button: 0 } )
+				.perform();
 		} else {
 			await clickIfClickable(
 				this.driver,
