@@ -744,7 +744,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" %10$s>%8$s</button>
+		'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s" %11$s>
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" %12$s>
