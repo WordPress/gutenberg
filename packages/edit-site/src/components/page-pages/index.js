@@ -51,7 +51,7 @@ export default function PagePages() {
 	} );
 
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const { postStatuses, allStatuses } = useMemo( () => {
+	const { postStatuses, defaultStatuses } = useMemo( () => {
 		return {
 			postStatuses:
 				statuses === null
@@ -59,10 +59,12 @@ export default function PagePages() {
 					: Object.fromEntries(
 							statuses.map( ( { slug, name } ) => [ slug, name ] )
 					  ),
-			allStatuses:
-				statuses
-					.filter( ( { slug } ) => slug !== 'trash' )
-					.map( ( { slug } ) => slug ) || DEFAULT_STATUSES,
+			defaultStatuses:
+				statuses === null
+					? DEFAULT_STATUSES
+					: statuses
+							.filter( ( { slug } ) => slug !== 'trash' )
+							.map( ( { slug } ) => slug ),
 		};
 	}, [ statuses ] );
 
