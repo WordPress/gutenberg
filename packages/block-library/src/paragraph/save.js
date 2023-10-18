@@ -19,9 +19,12 @@ export default function save( { attributes } ) {
 		[ `has-text-align-${ align }` ]: align,
 	} );
 
+	// I needed to add an extra `span` because there is a bug we have to fix.
 	return (
 		<p { ...useBlockProps.save( { className, dir: direction } ) }>
-			<RichText.Content value={ content } />
+			<span>
+				<RichText.Content value={ content } />
+			</span>
 		</p>
 	);
 }
