@@ -19,6 +19,7 @@ import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { __, sprintf } from '@wordpress/i18n';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -201,7 +202,11 @@ function ListViewBlockSelectButton(
 
 			// If we have selected all sibling nested blocks, try selecting up a level.
 			// This is a similar implementation to that used by `useSelectAll`.
-			if ( selectedBlockClientIds.length === blockClientIds.length ) {
+			// `isShallowEqual` is used for the list view instead of a length check,
+			// as the array of siblings of the currently focused block may be a different
+			// set of blocks from the current block selection if the user is focused
+			// on a different part of the list view from the block selection.
+			if ( isShallowEqual( selectedBlockClientIds, blockClientIds ) ) {
 				// Only select up a level if the first block is not the root block.
 				// This ensures that the block selection can't break out of the root block
 				// used by the list view, if the list view is only showing a partial hierarchy.
