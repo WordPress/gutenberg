@@ -534,7 +534,8 @@ function CoverEdit( {
 					) : (
 						<div
 							ref={ mediaElement }
-							role="img"
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
 							className={ classnames(
 								classes,
 								'wp-block-cover__image-background'
