@@ -24,7 +24,7 @@ import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
  * Internal dependencies
  */
 import { store as patternsStore } from '../store';
-import CategorySelector, { CATEGORY_SLUG } from './category-selector';
+import CategoryEditor, { CATEGORY_SLUG } from './category-editor';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
@@ -185,7 +185,7 @@ export default function CreatePatternModal( {
 						placeholder={ __( 'My pattern' ) }
 						className="patterns-create-modal__name-input"
 					/>
-					<CategorySelector
+					<CategoryEditor
 						categoryTerms={ categoryTerms }
 						onChange={ setCategoryTerms }
 						categoryMap={ categoryMap }
