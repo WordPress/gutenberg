@@ -16,8 +16,15 @@ export default function Filters( { fields, view, onChangeView } ) {
 			return;
 		}
 
-		field.filters.forEach( ( f ) => {
-			filters[ f.id ] = { type: f.type };
+		field.filters.forEach( ( filter ) => {
+			if ( 'string' === typeof filter ) {
+				filters[ field.id ] = { type: filter };
+			}
+
+			if ( 'object' === typeof filter ) {
+				filters[ filter.id ] = { ...filter };
+				delete filters[ filter.id ].id;
+			}
 		} );
 	} );
 

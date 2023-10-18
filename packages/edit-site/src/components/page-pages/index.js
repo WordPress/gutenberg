@@ -150,7 +150,7 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				filters: [ { id: 'author', type: 'enumeration' } ],
+				filters: [ 'enumeration' ],
 				elements: [
 					{
 						value: '',
