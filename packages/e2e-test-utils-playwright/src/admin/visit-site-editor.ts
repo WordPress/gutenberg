@@ -13,8 +13,6 @@ export interface SiteEditorQueryParams {
 	postType: string;
 }
 
-const CANVAS_SELECTOR = 'iframe[title="Editor canvas"i] >> visible=true';
-
 /**
  * Visits the Site Editor main page
  *
@@ -54,23 +52,4 @@ export async function visitSiteEditor(
 				.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 		} );
 	}
-
-	// Check if the current page has an editor canvas first.
-	if ( ( await this.page.locator( CANVAS_SELECTOR ).count() ) > 0 ) {
-		// The site editor initially loads with an empty body,
-		// we need to wait for the editor canvas to be rendered.
-		await this.page
-			.frameLocator( CANVAS_SELECTOR )
-			.locator( 'body > *' )
-			.first()
-			.waitFor();
-	}
-
-	// TODO: Ideally the content underneath the canvas loader should be marked inert until it's ready.
-	await this.page
-		.locator( '.edit-site-canvas-loader' )
-		// Bigger timeout is needed for larger entities, for example the large
-		// post html fixture that we load for performance tests, which often
-		// doesn't make it under the default 10 seconds.
-		.waitFor( { state: 'hidden', timeout: 60_000 } );
 }
