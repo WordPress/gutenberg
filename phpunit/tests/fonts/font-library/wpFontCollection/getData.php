@@ -3,7 +3,7 @@
  * Test WP_Font_Collection::get_data().
  *
  * @package WordPress
- * @subpackage Font Library
+ * @subpackage Fonts
  *
  * @group fonts
  * @group font-library
@@ -28,7 +28,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 
 	public function mock_request( $preempt, $args, $url ) {
 		// if the URL is not the URL you want to mock, return false.
-		if ( 'https://localhost/fonts/mock-font-collection.json' !== $url ) {
+		if ( 'https://wordpress.org/fonts/mock-font-collection.json' !== $url ) {
 			return false;
 		}
 
@@ -86,7 +86,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 					'id'          => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
-					'src'         => 'https://localhost/fonts/mock-font-collection.json',
+					'src'         => 'https://wordpress.org/fonts/mock-font-collection.json',
 				),
 				'expected_data' => array(
 					'id'          => 'my-collection-with-url',
