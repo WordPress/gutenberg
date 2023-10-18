@@ -1,0 +1,180 @@
+diff --git a/packages/block-editor/src/autocompleters/block.js b/packages/block-editor/src/autocompleters/block.js
+index bc06c9de5aa..92c62db3b87 100644
+--- a/packages/block-editor/src/autocompleters/block.js
++++ b/packages/block-editor/src/autocompleters/block.js
+@@ -95,6 +95,7 @@ function createBlockCompleter() {
+ 						return {
+ 							key: `block-${ blockItem.id }`,
+ 							value: blockItem,
++							textLabel: title,
+ 							label: (
+ 								<>
+ 									<BlockIcon
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3b467cf083e..f12e76f01d3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -   Render a "mouse event trap" when using a `ColorPicker` inside a `Popover` to prevent issues when rendering on top of `iframes` ([#55149](https://github.com/WordPress/gutenberg/pull/55149)).
+ -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
++-   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/autocomplete/get-default-use-items.tsx b/packages/components/src/autocomplete/get-default-use-items.tsx
+index e0be57c8c19..0649fd804da 100644
+--- a/packages/components/src/autocomplete/get-default-use-items.tsx
++++ b/packages/components/src/autocomplete/get-default-use-items.tsx
+@@ -81,6 +81,10 @@ export default function getDefaultUseItems( autocompleter: WPCompleter ) {
+ 								label: autocompleter.getOptionLabel(
+ 									optionData
+ 								),
++								textLabel:
++									autocompleter.getOptionTextLabel(
++										optionData
++									),
+ 								keywords: autocompleter.getOptionKeywords
+ 									? autocompleter.getOptionKeywords(
+ 											optionData
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 7825526fe34..bc5c6d7f69f 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -22,6 +22,8 @@ import {
+ 	isCollapsed,
+ 	getTextContent,
+ } from '@wordpress/rich-text';
++import { speak } from '@wordpress/a11y';
++import { isAppleOS } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -39,6 +41,35 @@ import type {
+ 	WPCompleter,
+ } from './types';
+ 
++const getNodeText = ( node: React.ReactNode ): string => {
++	if ( node === null ) {
++		return '';
++	}
++
++	switch ( typeof node ) {
++		case 'string':
++		case 'number':
++			return node.toString();
++			break;
++		case 'boolean':
++			return '';
++			break;
++		case 'object': {
++			if ( node instanceof Array ) {
++				return node.map( getNodeText ).join( '' );
++			}
++			if ( 'props' in node ) {
++				return getNodeText( node.props.children );
++			}
++			break;
++		}
++		default:
++			return '';
++	}
++
++	return '';
++};
++
+ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
+ 
+ export function useAutocomplete( {
+@@ -163,20 +194,36 @@ export function useAutocomplete( {
+ 		) {
+ 			return;
+ 		}
++
+ 		switch ( event.key ) {
+-			case 'ArrowUp':
+-				setSelectedIndex(
++			case 'ArrowUp': {
++				const newIndex =
+ 					( selectedIndex === 0
+ 						? filteredOptions.length
+-						: selectedIndex ) - 1
+-				);
++						: selectedIndex ) - 1;
++				setSelectedIndex( newIndex );
++				if ( isAppleOS() ) {
++					speak(
++						filteredOptions[ newIndex ].textLabel ||
++							getNodeText( filteredOptions[ newIndex ].label ),
++						'assertive'
++					);
++				}
+ 				break;
++			}
+ 
+-			case 'ArrowDown':
+-				setSelectedIndex(
+-					( selectedIndex + 1 ) % filteredOptions.length
+-				);
++			case 'ArrowDown': {
++				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
++				setSelectedIndex( newIndex );
++				if ( isAppleOS() ) {
++					speak(
++						filteredOptions[ newIndex ].textLabel ||
++							getNodeText( filteredOptions[ newIndex ].label ),
++						'assertive'
++					);
++				}
+ 				break;
++			}
+ 
+ 			case 'Escape':
+ 				setAutocompleter( null );
+diff --git a/packages/components/src/autocomplete/test/index.tsx b/packages/components/src/autocomplete/test/index.tsx
+index 7a31680b3dd..ee853f0f70b 100644
+--- a/packages/components/src/autocomplete/test/index.tsx
++++ b/packages/components/src/autocomplete/test/index.tsx
+@@ -38,6 +38,9 @@ describe( 'AutocompleterUI', () => {
+ 						{ option.name }
+ 					</span>
+ 				),
++				getOptionTextLabel: ( option: FruitOption ) => {
++					return option.name;
++				},
+ 				// Mock useItems function to return a autocomplete item.
+ 				useItems: ( filterValue: string ) => {
+ 					const options = autocompleter.options;
+@@ -46,6 +49,8 @@ describe( 'AutocompleterUI', () => {
+ 							key: `${ autocompleter.name }-${ optionIndex }`,
+ 							value: optionData,
+ 							label: autocompleter.getOptionLabel( optionData ),
++							textLabel:
++								autocompleter.getOptionTextLabel( optionData ),
+ 							keywords: [],
+ 							isDisabled: false,
+ 						} )
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index ebe69648fc7..e221351f644 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -29,6 +29,7 @@ export type KeyedOption = {
+ 	key: string;
+ 	value: any;
+ 	label: OptionLabel;
++	textLabel?: string;
+ 	keywords: Array< string >;
+ 	isDisabled: boolean;
+ };
+@@ -72,6 +73,11 @@ export type WPCompleter< TCompleterOption = any > = {
+ 	 * string or a mixed array of strings, elements, and components.
+ 	 */
+ 	getOptionLabel: ( option: TCompleterOption ) => OptionLabel;
++	/**
++	 * A function that returns the text label for a given option. A text label may be a
++	 * string only.
++	 */
++	getOptionTextLabel: ( option: TCompleterOption ) => string;
+ 	/**
+ 	 * A function that takes a Range before and a Range after the autocomplete
+ 	 * trigger and query text and returns a boolean indicating whether the
