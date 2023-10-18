@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.28.0 (2023-10-18)
+
 ### New Feature
 
 -   Add new `transformer` property to external templates to allow customization of any values being passed from cli or the template.[#55423](https://github.com/WordPress/gutenberg/pull/55423)

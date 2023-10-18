@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.12.0 (2023-10-18)
+
 ## 12.11.0 (2023-10-05)
 
 - Deprecated `CopyHandler`, absorbed into `WritingFlow`.
