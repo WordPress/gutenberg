@@ -24,7 +24,7 @@ class Tests_Fonts_WpFontFamily_Uninstall extends WP_Font_Family_UnitTestCase {
 		$actual = $font->uninstall();
 		$this->assertWPError( $actual, 'WP_Error should have been returned' );
 		$this->assertSame(
-			array( 'font_family_not_found' => array( 'The font family could not be found.' ) ),
+			array( 'font_family_slug_not_found' => array( 'Font Family with that slug was not found.' ) ),
 			$actual->errors,
 			'WP_Error should have "fonts_must_have_same_slug" error'
 		);
