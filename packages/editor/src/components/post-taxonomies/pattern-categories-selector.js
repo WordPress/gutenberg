@@ -65,7 +65,7 @@ export function PatternCategoriesSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 
-	if ( ! hasAssignAction || loading ) {
+	if ( ! hasAssignAction || loading || availableTerms.length === 0 ) {
 		return null;
 	}
 
