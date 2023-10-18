@@ -28,11 +28,9 @@ test.describe( 'Inner blocks templates', () => {
 			name: 'test/test-inner-blocks-async-template',
 		} );
 
-		const blockWithTemplateContent = page
-			.frameLocator( '[name=editor-canvas]' )
-			.locator(
-				'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
-			);
+		const blockWithTemplateContent = editor.canvas.locator(
+			'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
+		);
 
 		// The block template content appears asynchronously, so wait for it.
 		await expect( blockWithTemplateContent ).toBeVisible();

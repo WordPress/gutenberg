@@ -64,6 +64,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 			{ hasChildren && context.openSubmenusOnClick ? (
 				<>
 					<button
+						type="button"
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
 					>
@@ -90,6 +91,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 							<button
 								className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
 								aria-expanded="false"
+								type="button"
 							>
 								<ItemSubmenuIcon />
 							</button>

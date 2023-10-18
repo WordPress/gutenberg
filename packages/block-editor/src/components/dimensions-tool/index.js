@@ -131,31 +131,6 @@ function DimensionsTool( {
 					onChange( nextValue );
 				} }
 			/>
-			{ showScaleControl && (
-				<ScaleTool
-					panelId={ panelId }
-					options={ scaleOptions }
-					defaultValue={ defaultScale }
-					value={ lastScale }
-					onChange={ ( nextScale ) => {
-						const nextValue = { ...value };
-
-						// 'fill' is CSS default, so it gets treated as null.
-						nextScale = nextScale === 'fill' ? null : nextScale;
-
-						setLastScale( nextScale );
-
-						// Update scale.
-						if ( ! nextScale ) {
-							delete nextValue.scale;
-						} else {
-							nextValue.scale = nextScale;
-						}
-
-						onChange( nextValue );
-					} }
-				/>
-			) }
 			<WidthHeightTool
 				panelId={ panelId }
 				units={ unitsOptions }
@@ -205,6 +180,31 @@ function DimensionsTool( {
 					onChange( nextValue );
 				} }
 			/>
+			{ showScaleControl && (
+				<ScaleTool
+					panelId={ panelId }
+					options={ scaleOptions }
+					defaultValue={ defaultScale }
+					value={ lastScale }
+					onChange={ ( nextScale ) => {
+						const nextValue = { ...value };
+
+						// 'fill' is CSS default, so it gets treated as null.
+						nextScale = nextScale === 'fill' ? null : nextScale;
+
+						setLastScale( nextScale );
+
+						// Update scale.
+						if ( ! nextScale ) {
+							delete nextValue.scale;
+						} else {
+							nextValue.scale = nextScale;
+						}
+
+						onChange( nextValue );
+					} }
+				/>
+			) }
 		</>
 	);
 }

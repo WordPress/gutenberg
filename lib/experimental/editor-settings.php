@@ -36,3 +36,15 @@ function gutenberg_enable_experiments() {
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
+
+/**
+ * Sets a global JS variable used to trigger the availability of form & input blocks.
+ */
+function gutenberg_enable_form_input_blocks() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-form-blocks', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableFormBlocks = true', 'before' );
+	}
+}
+
+add_action( 'admin_init', 'gutenberg_enable_form_input_blocks' );

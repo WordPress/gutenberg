@@ -29,12 +29,7 @@ export interface Props extends TruncateProps {
 	/**
 	 * Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
 	 */
-	adjustLineHeightForInnerControls?:
-		| boolean
-		| 'large'
-		| 'medium'
-		| 'small'
-		| 'xSmall';
+	adjustLineHeightForInnerControls?: 'large' | 'medium' | 'small' | 'xSmall';
 	/**
 	 * Adjusts the text color.
 	 */

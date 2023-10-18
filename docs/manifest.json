@@ -30,9 +30,15 @@
 		"parent": "devenv"
 	},
 	{
-		"title": "Get started with wp-now",
-		"slug": "get-started-with-wp-now",
-		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-now.md",
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
 		"parent": "devenv"
 	},
 	{
@@ -1227,6 +1233,12 @@
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "../packages/components/src/tab-panel/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Tabs",
+		"slug": "tabs",
+		"markdown_source": "../packages/components/src/tabs/README.md",
 		"parent": "components"
 	},
 	{

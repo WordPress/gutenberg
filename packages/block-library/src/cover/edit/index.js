@@ -166,9 +166,12 @@ function CoverEdit( {
 
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
+		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
+			IMAGE_BACKGROUND_TYPE
+		);
 
 		const averageBackgroundColor = await getMediaColor(
-			newMedia?.type === IMAGE_BACKGROUND_TYPE ? newMedia?.url : undefined
+			isImage ? newMedia?.url : undefined
 		);
 
 		let newOverlayColor = overlayColor.color;
@@ -180,7 +183,12 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
-		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		// See issue #52835 for context.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
 		const newIsDark = compositeIsDark(
 			newDimRatio,
 			newOverlayColor,
@@ -531,7 +539,8 @@ function CoverEdit( {
 					) : (
 						<div
 							ref={ mediaElement }
-							role="img"
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
 							className={ classnames(
 								classes,
 								'wp-block-cover__image-background'

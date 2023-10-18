@@ -18,7 +18,7 @@ test.describe( 'Site Editor List View', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {
@@ -105,7 +105,7 @@ test.describe( 'Site Editor List View', () => {
 		// Since focus is now inside the list view, the shortcut should close
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Focus should now be on the list view toggle button.
 		await expect(
@@ -129,7 +129,7 @@ test.describe( 'Site Editor List View', () => {
 				} )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 		await expect(
 			page.getByRole( 'button', { name: 'List View' } )
 		).toBeFocused();

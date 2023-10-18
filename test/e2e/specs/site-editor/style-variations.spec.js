@@ -39,7 +39,7 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 
 		await siteEditorStyleVariations.browseStyles();
 
@@ -76,7 +76,7 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -117,7 +117,7 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click(
@@ -164,7 +164,7 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -196,15 +196,16 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 
-		const frame = page.frame( 'editor-canvas' );
-		const paragraph = frame.locator( 'text="My awesome paragraph"' );
+		const paragraph = editor.canvas.locator(
+			'text="My awesome paragraph"'
+		);
 		await expect( paragraph ).toHaveCSS( 'color', 'rgb(25, 25, 17)' );
 
-		const body = frame.locator( 'css=body' );
+		const body = editor.canvas.locator( 'css=body' );
 		await expect( body ).toHaveCSS(
 			'background-color',
 			'rgb(255, 239, 11)'
