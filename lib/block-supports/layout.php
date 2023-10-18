@@ -636,8 +636,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	* for features like the enhanced pagination of the Query block.
 	*/
 	$container_class = gutenberg_incremental_id_per_prefix(
-		'wp-container-' .
-		str_replace( '/', '--', $block['blockName'] ) . '-'
+		'wp-container-' . sanitize_title( $block['blockName'] ) . '-layout-'
 	);
 
 	// Set the correct layout type for blocks using legacy content width.
