@@ -146,8 +146,12 @@ function ViewList( {
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
-			const { render, ...column } = field;
-			column.cell = ( props ) => render( props.row.original, view );
+			const { render, getValue, ...column } = field;
+			column.cell = ( props ) =>
+				render( { item: props.row.original, view } );
+			if ( getValue ) {
+				column.accessorFn = ( item ) => getValue( { item } );
+			}
 			return column;
 		} );
 		if ( actions?.length ) {

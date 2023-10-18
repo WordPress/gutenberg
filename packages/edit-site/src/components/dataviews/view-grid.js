@@ -29,7 +29,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 				return (
 					<VStack key={ index }>
 						<div className="dataviews-view-grid__media">
-							{ mediaField?.render( item, view ) || (
+							{ mediaField?.render( { item, view } ) || (
 								<Placeholder
 									withIllustration
 									style={ {
@@ -45,7 +45,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 								<VStack>
 									{ visibleFields.map( ( field ) => (
 										<div key={ field.id }>
-											{ field.render( item, view ) }
+											{ field.render( { item, view } ) }
 										</div>
 									) ) }
 								</VStack>

@@ -29,7 +29,7 @@ export default function DataViews( {
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
-			render: field.render || field.accessorFn,
+			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
 	return (
