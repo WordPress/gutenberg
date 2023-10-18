@@ -89,7 +89,7 @@ class WP_Font_Library {
 	 * @since 6.5.0
 	 *
 	 * @param string $id Font collection id.
-	 * @return array List of font collections.
+	 * @return WP_Font_Collection|WP_Error Font collection if it exists and a WP_Error otherwise.
 	 */
 	public static function get_font_collection( $id ) {
 		if ( array_key_exists( $id, self::$collections ) ) {
