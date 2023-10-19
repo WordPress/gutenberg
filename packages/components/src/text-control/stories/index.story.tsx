@@ -21,6 +21,7 @@ const meta: Meta< typeof TextControl > = {
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },
+		__next40pxDefaultSize: { control: { type: 'boolean' } },
 	},
 	parameters: {
 		controls: {
