@@ -121,6 +121,9 @@ const SpacerEdit = ( {
 	}
 
 	let { orientation, columns } = context;
+
+	// if we get the coloumns context, we assume that the block is inside a gallery
+	const isInsideGallery = !! columns;
 	const { orientation: parentOrientation, type } = parentLayout || {};
 
 	if ( pos && columns === 1 ) {
@@ -382,7 +385,10 @@ const SpacerEdit = ( {
 				{ ...useBlockProps( {
 					style,
 					className: classnames( className, {
+						'is-inside-gallery': isInsideGallery,
 						'custom-sizes-disabled': disableCustomSpacingSizes,
+						'is-horizontal': orientation === 'horizontal',
+						'is-vertical': orientation === 'vertical',
 					} ),
 				} ) }
 			>

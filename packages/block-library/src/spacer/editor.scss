@@ -44,3 +44,13 @@
 		margin-bottom: 0;
 	}
 }
+
+.is-inside-gallery {
+	&.is-vertical {
+		width: 100% !important;
+	}
+	
+	&.is-horizontal {
+		height: auto !important;
+	}
+}
