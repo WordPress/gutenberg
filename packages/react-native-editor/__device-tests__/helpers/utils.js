@@ -320,7 +320,7 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 const longPressMiddleOfElement = async (
 	driver,
 	element,
-	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	waitTime = 1000,
 	customElementSize
 ) => {
 	const location = await element.getLocation();
@@ -329,11 +329,28 @@ const longPressMiddleOfElement = async (
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
 
-	const action = new wd.TouchAction( driver )
-		.longPress( { x, y } )
-		.wait( waitTime )
-		.release();
-	await action.perform();
+	// Focus on the element first, otherwise on iOS it fails to open the context menu.
+	// We can't do it all in one action because it detects it as a force press and it
+	// is not supported by the simulator.
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { origin: element } )
+		.down()
+		.up()
+		.perform();
+
+	// Long-press
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( waitTime )
+		.up()
+		.perform();
 };
 
 // Press "Select All" in floating context menu.
@@ -402,15 +419,43 @@ const tapStatusBariOS = async ( driver ) => {
 };
 
 const selectTextFromElement = async ( driver, element ) => {
+	const timeout = 1000;
+
+	// On Android we can't "locate" the context menu options,
+	// To avoid having fixed coordinates to be able to
+	// select all text, it just selects all text by
+	// long-pressing and dragging.
 	if ( isAndroid() ) {
-		await longPressMiddleOfElement( driver, element, 0 );
+		await element.click();
+
+		const location = await element.getLocation();
+		const size = await element.getSize();
+		const paddingPercentage = 0.2;
+		const leftPaddingOffset = size.width * paddingPercentage;
+		const startX = location.x + leftPaddingOffset;
+		const endX = location.x + size.width;
+		const centerY = location.y + size.height / 2;
+
+		await driver
+			.action( 'pointer', {
+				parameters: { pointerType: 'touch' },
+			} )
+			.move( { x: startX, y: centerY } )
+			.down()
+			.pause( timeout ) // Long-press at the start of the element
+			.move( { x: endX, y: centerY, duration: 1000 } ) // Slowly drag to the end of the element to highlight all text
+			.up()
+			.pause( timeout ) // Pause to wait for the context menu to show up
+			.perform();
 	} else {
-		await doubleTap( driver, element );
-		await driver.waitForElementByXPath(
-			'//XCUIElementTypeMenuItem[@name="Copy"]',
-			wd.asserters.isDisplayed,
-			4000
+		// On iOS we can use the context menu to "Select all" text.
+		await longPressMiddleOfElement( driver, element );
+
+		const selectAllElement = await driver.$(
+			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
+		await selectAllElement.waitForDisplayed( { timeout } );
+		await selectAllElement.click();
 	}
 };
 
