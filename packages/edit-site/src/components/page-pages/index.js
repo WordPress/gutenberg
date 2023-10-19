@@ -133,9 +133,6 @@ export default function PagePages() {
 						</VStack>
 					);
 				},
-				filters: [
-					{ id: 'search', type: 'search', name: __( 'Search' ) },
-				],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -200,6 +197,8 @@ export default function PagePages() {
 		[ postStatuses, authors ]
 	);
 
+	const filters = useMemo( () => [ { id: 'search', type: 'search' } ] );
+
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
 	const onChangeView = useCallback(
@@ -228,6 +227,7 @@ export default function PagePages() {
 			<DataViews
 				paginationInfo={ paginationInfo }
 				fields={ fields }
+				filters={ filters }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
