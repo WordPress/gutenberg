@@ -15,7 +15,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 
 		// dismiss the media picker automatically opened when adding an audio block
 		await waitForMediaLibrary( editorPage.driver );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		// verify there's an audio block
 		const block = await editorPage.getFirstBlockVisible();
@@ -50,7 +50,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 
 		// dismiss the media picker automatically opened when adding a file block
 		await waitForMediaLibrary( editorPage.driver );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		// verify there's a file block
 		const block = await editorPage.getFirstBlockVisible();
@@ -82,7 +82,7 @@ onlyOniOS( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.image );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image
