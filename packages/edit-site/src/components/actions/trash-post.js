@@ -7,8 +7,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
+import { trash } from '@wordpress/icons';
 
-export default function useMoveToTrashAction() {
+/**
+ * Internal dependencies
+ */
+import { ACTION_TYPES } from './constants';
+
+export default function useTrashPostAction() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
@@ -17,6 +23,11 @@ export default function useMoveToTrashAction() {
 		() => ( {
 			id: 'move-to-trash',
 			label: __( 'Move to Trash' ),
+			type: ACTION_TYPES.primary,
+			icon: trash,
+			isEligible( { status } ) {
+				return status !== 'trash';
+			},
 			async perform( post ) {
 				try {
 					await deleteEntityRecord(
