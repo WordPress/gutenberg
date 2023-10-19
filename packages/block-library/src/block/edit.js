@@ -151,10 +151,11 @@ export default function ReusableBlockEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div
-				children={ children }
-				{ ...( children === null ? innerBlocksProps : blockProps ) }
-			/>
+			{ children === null ? (
+				<div { ...innerBlocksProps } />
+			) : (
+				<div { ...blockProps }>{ children }</div>
+			) }
 		</RecursionProvider>
 	);
 }
