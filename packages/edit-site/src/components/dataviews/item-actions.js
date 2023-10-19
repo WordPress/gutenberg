@@ -12,11 +12,6 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { ACTION_TYPES } from '../actions/constants';
-
 export default function ItemActions( { item, actions } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
@@ -26,9 +21,9 @@ export default function ItemActions( { item, actions } ) {
 				if ( action.isEligible && ! action.isEligible( item ) ) {
 					return accumulator;
 				}
-				if ( action.type === ACTION_TYPES.primary ) {
+				if ( action.isPrimary && !! action.icon ) {
 					accumulator.primaryActions.push( action );
-				} else if ( action.type === ACTION_TYPES.secondary ) {
+				} else {
 					accumulator.secondaryActions.push( action );
 				}
 				return accumulator;
@@ -48,7 +43,7 @@ export default function ItemActions( { item, actions } ) {
 						key={ action.id }
 						icon={ action.icon }
 						onClick={ () => action.perform( item ) }
-						isDestructive={ action.isDesctructive }
+						isDestructive={ action.isDestructive }
 						size="small"
 					/>
 				) ) }
@@ -60,7 +55,7 @@ export default function ItemActions( { item, actions } ) {
 								<MenuItem
 									key={ action.id }
 									onClick={ () => action.perform( item ) }
-									isDestructive={ action.isDesctructive }
+									isDestructive={ action.isDestructive }
 								>
 									{ action.label }
 								</MenuItem>

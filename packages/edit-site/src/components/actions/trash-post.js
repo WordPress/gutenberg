@@ -9,11 +9,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { trash } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { ACTION_TYPES } from './constants';
-
 export default function useTrashPostAction() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -23,7 +18,7 @@ export default function useTrashPostAction() {
 		() => ( {
 			id: 'move-to-trash',
 			label: __( 'Move to Trash' ),
-			type: ACTION_TYPES.primary,
+			isPrimary: true,
 			icon: trash,
 			isEligible( { status } ) {
 				return status !== 'trash';
@@ -59,7 +54,7 @@ export default function useTrashPostAction() {
 					createErrorNotice( errorMessage, { type: 'snackbar' } );
 				}
 			},
-			isDesctructive: true,
+			isDestructive: true,
 		} ),
 		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
 	);

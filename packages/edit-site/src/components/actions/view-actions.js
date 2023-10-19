@@ -5,15 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-import { ACTION_TYPES } from './constants';
-
 export const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
-	type: ACTION_TYPES.primary,
+	isPrimary: true,
 	icon: external,
 	isEligible( post ) {
 		return post.status !== 'trash';
@@ -26,7 +21,7 @@ export const viewPostAction = {
 export const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
-	type: ACTION_TYPES.secondary,
+	isPrimary: false,
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;
