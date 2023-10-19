@@ -6,13 +6,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../../use-setting';
+import { useSettings } from '../../use-settings';
 
 export default function useSpacingSizes() {
-	const spacingSizes = [
-		{ name: 0, slug: '0', size: 0 },
-		...( useSetting( 'spacing.spacingSizes' ) || [] ),
-	];
+	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
+
+	const [ settingsSizes ] = useSettings( 'spacing.spacingSizes' );
+	if ( settingsSizes ) {
+		spacingSizes.push( ...settingsSizes );
+	}
 
 	if ( spacingSizes.length > 8 ) {
 		spacingSizes.unshift( {

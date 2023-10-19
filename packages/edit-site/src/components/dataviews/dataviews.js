@@ -20,6 +20,7 @@ export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
+	filters,
 	actions,
 	data,
 	isLoading = false,
@@ -29,7 +30,7 @@ export default function DataViews( {
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
-			render: field.render || field.accessorFn,
+			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
 	return (
@@ -38,6 +39,7 @@ export default function DataViews( {
 				<HStack>
 					<HStack justify="start">
 						<Filters
+							filters={ filters }
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }

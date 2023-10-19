@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.10.0 (2023-10-18)
+
 ### Bug Fix
 
 -   Corrected `PATH` to include the host user's Composer bin directory.

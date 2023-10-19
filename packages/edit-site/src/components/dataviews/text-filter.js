@@ -10,9 +10,9 @@ import { SearchControl } from '@wordpress/components';
  */
 import useDebouncedInput from '../../utils/use-debounced-input';
 
-export default function TextFilter( { id, view, onChangeView } ) {
+export default function TextFilter( { filter, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
-		view.filters[ id ]
+		view.filters[ filter.id ]
 	);
 	const onChangeViewRef = useRef( onChangeView );
 	useEffect( () => {
@@ -24,11 +24,11 @@ export default function TextFilter( { id, view, onChangeView } ) {
 			page: 1,
 			filters: {
 				...currentView.filters,
-				[ id ]: debouncedSearch,
+				[ filter.id ]: debouncedSearch,
 			},
 		} ) );
 	}, [ debouncedSearch ] );
-	const searchLabel = __( 'Filter list' );
+	const searchLabel = filter?.name || __( 'Filter list' );
 	return (
 		<SearchControl
 			onChange={ setSearch }

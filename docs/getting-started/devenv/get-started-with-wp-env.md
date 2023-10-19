@@ -12,7 +12,7 @@ Before following this guide, install [Node.js development tools](/docs/getting-s
 2. Run `npm -g install @wordpress/env` in the terminal to install `wp-env` globally.
 3. In the terminal, navigate to an existing plugin directory, theme directory, or a new working directory.
 4. Run `wp-env start` in the terminal to start the local WordPress environment.
-5. After the script runs, navigate to `http://localhost:8888/wp-admin/` and log into the WordPress dashboard using username `admin` and password `password`.
+5. After the script runs, navigate to <code>http://localhost:8888/wp-admin</code> and log into the WordPress dashboard using username `admin` and password `password`.
 
 ## Set up Docker Desktop
 
@@ -44,7 +44,7 @@ Next, navigate to an existing plugin directory, theme directory, or a new workin
 wp-env start
 ```
 
-Once the script completes, you can access the local environment at: `http://localhost:8888`. Log into the WordPress dashboard using username `admin` and password `password`.
+Once the script completes, you can access the local environment at: <code>http://localhost:8888</code>. Log into the WordPress dashboard using username `admin` and password `password`.
 
 <div class="callout callout-tip">
     Some projects, like Gutenberg, include their own specific <code>wp-env</code> configurations, and the documentation might prompt you to run <code>npm run start wp-env</code> instead.
@@ -133,7 +133,7 @@ export DOCKER_HOST=tcp://127.0.0.1:2376
 wp-env start
 ```
 
-Your environment should now be set up at `http://localhost:8888/`.
+Your environment should now be set up at <code>http://localhost:8888</code>.
 
 ## Additional resources
 

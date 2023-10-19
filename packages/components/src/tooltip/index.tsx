@@ -69,8 +69,6 @@ function Tooltip( props: TooltipProps ) {
 		timeout: delay,
 	} );
 
-	const isTooltipOpen = tooltipStore.useState( 'open' );
-
 	return (
 		<>
 			<Ariakit.TooltipAnchor
@@ -80,8 +78,9 @@ function Tooltip( props: TooltipProps ) {
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
-			{ isOnlyChild && ( text || shortcut ) && isTooltipOpen && (
+			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
+					unmountOnHide
 					className="components-tooltip"
 					gutter={ 4 }
 					id={ describedById }

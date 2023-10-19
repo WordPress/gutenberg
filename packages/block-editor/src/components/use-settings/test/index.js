@@ -1,16 +1,22 @@
 /**
+ * External dependencies
+ */
+import { render } from '@testing-library/react';
+
+/**
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import useSetting from '..';
+import { useSettings, useSetting } from '..';
 import * as BlockEditContext from '../../block-edit/context';
 
-// Mock useSelect() functions used by useSetting()
+// Mock useSelect() functions used by useSettings()
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 let selectMock = {};
@@ -38,7 +44,19 @@ const mockCurrentBlockContext = (
 	);
 };
 
-describe( 'useSetting', () => {
+function runHook( hookCb ) {
+	let storedResult;
+	function TestHook() {
+		const result = hookCb();
+		useEffect( () => {
+			storedResult = result;
+		}, [ result ] );
+	}
+	render( <TestHook /> );
+	return storedResult;
+}
+
+describe( 'useSettings', () => {
 	beforeEach( () => {
 		setupSelectMock();
 		mockCurrentBlockContext();
@@ -59,7 +77,8 @@ describe( 'useSetting', () => {
 			name: 'core/test-block',
 		} );
 
-		expect( useSetting( 'layout.contentSize' ) ).toBe( '840px' );
+		const result = runHook( () => useSettings( 'layout.contentSize' ) );
+		expect( result ).toEqual( [ '840px' ] );
 	} );
 
 	it( 'uses blockEditor.useSetting.before hook override', () => {
@@ -89,11 +108,34 @@ describe( 'useSetting', () => {
 			}
 		);
 
-		expect( useSetting( 'layout.contentSize' ) ).toBe( '960px' );
+		const result = runHook( () => useSettings( 'layout.contentSize' ) );
+		expect( result ).toEqual( [ '960px' ] );
 
 		removeFilter(
 			'blockEditor.useSetting.before',
 			'test/useSetting.before'
+		);
+	} );
+
+	it( 'supports also the deprecated useSetting function', () => {
+		mockSettings( {
+			blocks: {
+				'core/test-block': {
+					layout: {
+						contentSize: '840px',
+					},
+				},
+			},
+		} );
+
+		mockCurrentBlockContext( {
+			name: 'core/test-block',
+		} );
+
+		const result = runHook( () => useSetting( 'layout.contentSize' ) );
+		expect( result ).toBe( '840px' );
+		expect( console ).toHaveWarnedWith(
+			'wp.blockEditor.useSetting is deprecated since version 6.4. Please use wp.blockEditor.useSettings instead.'
 		);
 	} );
 } );

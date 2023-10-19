@@ -146,8 +146,12 @@ function ViewList( {
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
-			const { render, ...column } = field;
-			column.cell = ( props ) => render( props.row.original, view );
+			const { render, getValue, ...column } = field;
+			column.cell = ( props ) =>
+				render( { item: props.row.original, view } );
+			if ( getValue ) {
+				column.accessorFn = ( item ) => getValue( { item } );
+			}
 			return column;
 		} );
 		if ( actions?.length ) {
@@ -155,14 +159,19 @@ function ViewList( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
-					return <FieldActions item={ props.row.original } />;
+					return (
+						<FieldActions
+							item={ props.row.original }
+							actions={ actions }
+						/>
+					);
 				},
 				enableHiding: false,
 			} );
 		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {

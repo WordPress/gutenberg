@@ -471,10 +471,13 @@ describe( 'Tabs', () => {
 
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
+			// Instead, focus should go to the currently selected tabpanel (alpha).
 			await user.keyboard( '[Tab]' );
 			expect(
-				await screen.findByRole( 'tab', { name: 'Beta' } )
-			).not.toHaveFocus();
+				await screen.findByRole( 'tabpanel', {
+					name: 'Alpha',
+				} )
+			).toHaveFocus();
 		} );
 
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
@@ -497,6 +500,9 @@ describe( 'Tabs', () => {
 			// Click on Alpha and make sure it is selected.
 			// onSelect shouldn't fire since the selected tab didn't change.
 			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
@@ -505,10 +511,10 @@ describe( 'Tabs', () => {
 			// or enter key. onSelect shouldn't fire since the selected tab
 			// didn't change.
 			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )
 			).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 			await user.keyboard( '[Enter]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
@@ -519,6 +525,9 @@ describe( 'Tabs', () => {
 			// spacebar or enter key. onSelect shouldn't fire since the selected
 			// tab didn't change.
 			await user.keyboard( '[ArrowRight]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Gamma' } )
+			).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect(
 				screen.getByRole( 'tab', { name: 'Gamma' } )
