@@ -124,6 +124,16 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		return null;
 	}
 
+	// Ensures media details exist in specific blocks; if they're missing, it hides the control.
+	const blockNamesToCheck = [ 'core/cover', 'core/image' ];
+	const requiredAttributes = [ 'id', 'useFeaturedImage' ];
+	if (
+		blockNamesToCheck.includes( name ) &&
+		! requiredAttributes.some( ( key ) => attributes?.[ key ] )
+	) {
+		return null;
+	}
+
 	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
 		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
 		: duotoneStyle;
