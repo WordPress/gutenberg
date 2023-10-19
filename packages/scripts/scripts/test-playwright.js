@@ -41,7 +41,7 @@ const config =
 	! hasArgInCLI( '--config' ) &&
 	! hasProjectFile( 'playwright.config.ts' ) &&
 	! hasProjectFile( 'playwright.config.js' )
-		? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
+		? [ '--config', fromConfigRoot( 'playwright.config.js' ) ]
 		: [];
 
 // Set the default artifacts path.

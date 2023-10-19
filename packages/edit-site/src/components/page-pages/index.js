@@ -1,123 +1,165 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import {
-	VisuallyHidden,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import PageActions from '../page-actions';
-import { DataViews, PAGE_SIZE_VALUES } from '../dataviews';
+import { DataViews } from '../dataviews';
+import useTrashPostAction from '../actions/trash-post';
+import Media from '../media';
 
 const EMPTY_ARRAY = [];
-const EMPTY_OBJECT = {};
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'featured-image',
+	},
+};
 
 export default function PagePages() {
-	const [ reset, setResetQuery ] = useState( ( v ) => ! v );
-	const [ globalFilter, setGlobalFilter ] = useState( '' );
-	const [ paginationInfo, setPaginationInfo ] = useState();
-	const [ { pageIndex, pageSize }, setPagination ] = useState( {
-		pageIndex: 0,
-		pageSize: PAGE_SIZE_VALUES[ 0 ],
+	// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+	// The reason for that is to match defaultStatuses because we compare both strings below (see useEffect).
+	const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
+	const [ view, setView ] = useState( {
+		type: 'list',
+		filters: {
+			search: '',
+			status: DEFAULT_STATUSES,
+		},
+		page: 1,
+		perPage: 5,
+		sort: {
+			field: 'date',
+			direction: 'desc',
+		},
+		visibleFilters: [ 'search', 'author', 'status' ],
+		// All fields are visible by default, so it's
+		// better to keep track of the hidden ones.
+		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
-	// Request post statuses to get the proper labels.
-	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const postStatuses =
-		statuses === null
-			? EMPTY_OBJECT
-			: statuses.reduce( ( acc, status ) => {
-					acc[ status.slug ] = status.name;
-					return acc;
-			  }, EMPTY_OBJECT );
 
-	// TODO: probably memo other objects passed as state(ex:https://tanstack.com/table/v8/docs/examples/react/pagination-controlled).
-	const pagination = useMemo(
-		() => ( { pageIndex, pageSize } ),
-		[ pageIndex, pageSize ]
-	);
-	const [ sorting, setSorting ] = useState( [
-		{ order: 'desc', orderby: 'date' },
-	] );
+	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const defaultStatuses = useMemo( () => {
+		return statuses === null
+			? DEFAULT_STATUSES
+			: statuses
+					.filter( ( { slug } ) => slug !== 'trash' )
+					.map( ( { slug } ) => slug )
+					.sort()
+					.join();
+	}, [ statuses ] );
+
+	useEffect( () => {
+		// Only update the view if the statuses received from the endpoint
+		// are different from the DEFAULT_STATUSES provided initially.
+		//
+		// The pages endpoint depends on the status endpoint via the status filter.
+		// Initially, this code filters the pages request by DEFAULT_STATUTES,
+		// instead of using the default (publish).
+		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
+		//
+		// By doing so, it avoids a second request to the pages endpoint
+		// upon receiving the statuses when they are the same (most common scenario).
+		if ( DEFAULT_STATUSES !== defaultStatuses ) {
+			setView( {
+				...view,
+				filters: {
+					...view.filters,
+					status: defaultStatuses,
+				},
+			} );
+		}
+	}, [ defaultStatuses ] );
+
 	const queryArgs = useMemo(
 		() => ( {
-			per_page: pageSize,
-			page: pageIndex + 1, // tanstack starts from zero.
+			per_page: view.perPage,
+			page: view.page,
 			_embed: 'author',
-			order: sorting[ 0 ]?.desc ? 'desc' : 'asc',
-			orderby: sorting[ 0 ]?.id,
-			search: globalFilter,
-			status: [ 'publish', 'draft' ],
+			order: view.sort?.direction,
+			orderby: view.sort?.field,
+			...view.filters,
 		} ),
-		[
-			globalFilter,
-			sorting[ 0 ]?.id,
-			sorting[ 0 ]?.desc,
-			pageSize,
-			pageIndex,
-			reset,
-		]
+		[ view ]
 	);
-	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
-		'postType',
-		'page',
-		queryArgs
+	const {
+		records: pages,
+		isResolving: isLoadingPages,
+		totalItems,
+		totalPages,
+	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	const { records: authors } = useEntityRecords( 'root', 'user', {
+		has_published_posts: [ 'page' ],
+	} );
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems,
+			totalPages,
+		} ),
+		[ totalItems, totalPages ]
 	);
-	useEffect( () => {
-		// Make extra request to handle controlled pagination.
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pages', {
-				...queryArgs,
-				_fields: 'id',
-			} ),
-			method: 'HEAD',
-			parse: false,
-		} ).then( ( res ) => {
-			const totalPages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
-			const totalItems = parseInt( res.headers.get( 'X-WP-Total' ) );
-			setPaginationInfo( {
-				totalPages,
-				totalItems,
-			} );
-		} );
-		// Status should not make extra request if already did..
-	}, [ globalFilter, pageSize, reset ] );
 
 	const fields = useMemo(
 		() => [
 			{
+				id: 'featured-image',
+				header: __( 'Featured Image' ),
+				getValue: ( { item } ) => item.featured_media,
+				render: ( { item, view: currentView } ) =>
+					!! item.featured_media ? (
+						<Media
+							className="edit-site-page-pages__featured-image"
+							id={ item.featured_media }
+							size={
+								currentView.type === 'list'
+									? [ 'thumbnail', 'medium', 'large', 'full' ]
+									: [ 'large', 'full', 'medium', 'thumbnail' ]
+							}
+						/>
+					) : null,
+				enableSorting: false,
+			},
+			{
 				header: __( 'Title' ),
 				id: 'title',
-				accessorFn: ( page ) => page.title?.rendered || page.slug,
-				cell: ( props ) => {
-					const page = props.row.original;
+				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
 								<Link
 									params={ {
-										postId: page.id,
-										postType: page.type,
+										postId: item.id,
+										postType: item.type,
 										canvas: 'edit',
 									} }
 								>
-									{ decodeEntities( props.getValue() ) }
+									{ decodeEntities(
+										item.title?.rendered || item.slug
+									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
 						</VStack>
 					);
 				},
+				filters: [
+					{ id: 'search', type: 'search', name: __( 'Search' ) },
+				],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -125,39 +167,78 @@ export default function PagePages() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				accessorFn: ( page ) => page._embedded?.author[ 0 ]?.name,
-				cell: ( props ) => {
-					const author = props.row.original._embedded?.author[ 0 ];
+				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				render: ( { item } ) => {
+					const author = item._embedded?.author[ 0 ];
 					return (
 						<a href={ `user-edit.php?user_id=${ author.id }` }>
 							{ author.name }
 						</a>
 					);
 				},
+				filters: [ 'enumeration' ],
+				elements:
+					authors?.map( ( { id, name } ) => ( {
+						value: id,
+						label: name,
+					} ) ) || [],
 			},
 			{
-				header: 'Status',
+				header: __( 'Status' ),
 				id: 'status',
-				cell: ( props ) =>
-					postStatuses[ props.row.original.status ] ??
-					props.row.original.status,
+				getValue: ( { item } ) =>
+					statuses?.find( ( { slug } ) => slug === item.status )
+						?.name ?? item.status,
+				filters: [
+					{
+						type: 'enumeration',
+						id: 'status',
+						resetValue: defaultStatuses,
+					},
+				],
+				elements:
+					statuses?.map( ( { slug, name } ) => ( {
+						value: slug,
+						label: name,
+					} ) ) || [],
+				enableSorting: false,
 			},
 			{
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-				id: 'actions',
-				cell: ( props ) => {
-					const page = props.row.original;
-					return (
-						<PageActions
-							postId={ page.id }
-							onRemove={ () => setResetQuery() }
-						/>
+				header: __( 'Date' ),
+				id: 'date',
+				getValue: ( { item } ) => item.date,
+				render: ( { item } ) => {
+					const formattedDate = dateI18n(
+						getSettings().formats.datetimeAbbreviated,
+						getDate( item.date )
 					);
+					return <time>{ formattedDate }</time>;
 				},
-				enableHiding: false,
 			},
 		],
-		[ postStatuses ]
+		[ statuses, authors ]
+	);
+
+	const trashPostAction = useTrashPostAction();
+	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
+	const onChangeView = useCallback(
+		( viewUpdater ) => {
+			let updatedView =
+				typeof viewUpdater === 'function'
+					? viewUpdater( view )
+					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
+			setView( updatedView );
+		},
+		[ view ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
@@ -165,29 +246,12 @@ export default function PagePages() {
 		<Page title={ __( 'Pages' ) }>
 			<DataViews
 				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
-				fields={ fields }
-				options={ {
-					manualSorting: true,
-					manualFiltering: true,
-					manualPagination: true,
-					enableRowSelection: true,
-					state: {
-						sorting,
-						globalFilter,
-						pagination,
-					},
-					pageCount: paginationInfo?.totalPages,
-					onSortingChange: setSorting,
-					onGlobalFilterChange: ( value ) => {
-						setGlobalFilter( value );
-						setPagination( { pageIndex: 0, pageSize } );
-					},
-					// TODO: check these callbacks and maybe reset the query when needed...
-					onPaginationChange: setPagination,
-					meta: { resetQuery: setResetQuery },
-				} }
+				view={ view }
+				onChangeView={ onChangeView }
 			/>
 		</Page>
 	);

@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -1013,17 +1014,12 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
-		if (
-			! blockAType.merge &&
-			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
-		) {
-			dispatch.selectBlock( blockA.clientId );
-			return;
-		}
-
 		const blockB = select.getBlock( clientIdB );
 
-		if ( ! blockAType.merge ) {
+		if (
+			! blockAType.merge &&
+			getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1087,6 +1083,27 @@ export const mergeBlocks =
 					}
 				}
 			} );
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+			dispatch.removeBlock(
+				clientIdA,
+				select.isBlockSelected( clientIdA )
+			);
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockB ) ) {
+			dispatch.removeBlock(
+				clientIdB,
+				select.isBlockSelected( clientIdB )
+			);
+			return;
+		}
+
+		if ( ! blockAType.merge ) {
+			dispatch.selectBlock( blockA.clientId );
 			return;
 		}
 

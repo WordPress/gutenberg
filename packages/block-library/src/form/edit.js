@@ -107,7 +107,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						help={
 							submissionMethod === 'custom'
 								? __(
-										'Select the method to use for form submissions. Additional options for the "custom" mode can be found in the "Andvanced" section.'
+										'Select the method to use for form submissions. Additional options for the "custom" mode can be found in the "Advanced" section.'
 								  )
 								: __(
 										'Select the method to use for form submissions.'

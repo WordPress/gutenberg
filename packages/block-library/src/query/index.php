@@ -34,7 +34,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 								'loadedText'  => __( 'Page Loaded.' ),
 							),
 						),
-					)
+					),
+					JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 				)
 			);
 			$content = $p->get_updated_html();
@@ -47,7 +48,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$content           = substr_replace(
 				$content,
 				'<div
-					class="wp-block-query__enhanced-pagination-navigation-announce"
+					class="screen-reader-text"
 					aria-live="polite"
 					data-wp-text="context.core.query.message"
 				></div>

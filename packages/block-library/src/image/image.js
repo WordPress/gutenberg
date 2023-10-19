@@ -24,7 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -369,13 +369,15 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSetting = useSetting( 'lightbox' );
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxToggle =
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const lightboxToggleDisabled = linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -555,6 +557,14 @@ export default function Image( {
 										lightbox: { enabled: newValue },
 									} );
 								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
 							/>
 						</ToolsPanelItem>
 					) }

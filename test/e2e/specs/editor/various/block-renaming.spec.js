@@ -145,6 +145,27 @@ test.describe( 'Block Renaming', () => {
 				},
 			] );
 		} );
+
+		test( 'does not allow renaming of blocks that do not support renaming', async ( {
+			// use `core/template-part` as the block
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/navigation',
+			} );
+
+			// Opens the block options menu and check there is not a `Rename` option
+			await editor.clickBlockToolbarButton( 'Options' );
+			//
+
+			const renameMenuItem = page.getByRole( 'menuitem', {
+				name: 'Rename',
+			} );
+
+			// TODO: assert that the locator didn't find a DOM node at all.
+			await expect( renameMenuItem ).toBeHidden();
+		} );
 	} );
 
 	test.describe( 'Block inspector renaming', () => {
@@ -218,6 +239,42 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'does not allow renaming of blocks that do not support renaming', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/navigation',
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsTab = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'tab', { name: 'Settings' } );
+
+			await settingsTab.click();
+
+			const advancedPanelToggle = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'button', {
+					name: 'Advanced',
+					expanded: false,
+				} );
+
+			await advancedPanelToggle.click();
+
+			const nameInput = page.getByRole( 'textbox', {
+				name: 'Block name',
+			} );
+
+			await expect( nameInput ).toBeHidden();
 		} );
 	} );
 } );

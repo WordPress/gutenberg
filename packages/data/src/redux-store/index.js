@@ -235,11 +235,19 @@ export default function createReduxStore( key, options ) {
 					selector.registry = registry;
 				}
 				const boundSelector = ( ...args ) => {
+					args = normalize( selector, args );
 					const state = store.__unstableOriginalGetState();
 					return selector( state.root, ...args );
 				};
 
+				// Expose normalization method on the bound selector
+				// in order that it can be called when fullfilling
+				// the resolver.
+				boundSelector.__unstableNormalizeArgs =
+					selector.__unstableNormalizeArgs;
+
 				const resolver = resolvers[ selectorName ];
+
 				if ( ! resolver ) {
 					boundSelector.hasResolver = false;
 					return boundSelector;
@@ -254,10 +262,24 @@ export default function createReduxStore( key, options ) {
 				);
 			}
 
-			function bindMetadataSelector( selector ) {
+			function bindMetadataSelector( metaDataSelector ) {
 				const boundSelector = ( ...args ) => {
 					const state = store.__unstableOriginalGetState();
-					return selector( state.metadata, ...args );
+
+					const originalSelectorName = args && args[ 0 ];
+					const originalSelectorArgs = args && args[ 1 ];
+					const targetSelector =
+						options?.selectors?.[ originalSelectorName ];
+
+					// Normalize the arguments passed to the target selector.
+					if ( originalSelectorName && targetSelector ) {
+						args[ 1 ] = normalize(
+							targetSelector,
+							originalSelectorArgs
+						);
+					}
+
+					return metaDataSelector( state.metadata, ...args );
 				};
 				boundSelector.hasResolver = false;
 				return boundSelector;
@@ -604,9 +626,29 @@ function mapSelectorWithResolver(
 	}
 
 	const selectorResolver = ( ...args ) => {
+		args = normalize( selector, args );
 		fulfillSelector( args );
 		return selector( ...args );
 	};
 	selectorResolver.hasResolver = true;
 	return selectorResolver;
+}
+
+/**
+ * Applies selector's normalization function to the given arguments
+ * if it exists.
+ *
+ * @param {Object} selector The selector potentially with a normalization method property.
+ * @param {Array}  args     selector arguments to normalize.
+ * @return {Array} Potentially normalized arguments.
+ */
+function normalize( selector, args ) {
+	if (
+		selector.__unstableNormalizeArgs &&
+		typeof selector.__unstableNormalizeArgs === 'function' &&
+		args?.length
+	) {
+		return selector.__unstableNormalizeArgs( args );
+	}
+	return args;
 }
