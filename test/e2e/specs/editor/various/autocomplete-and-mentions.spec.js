@@ -423,8 +423,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 
 	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
 	// When present, the regression will cause this test to time out.
-	// Skiped until https://github.com/WordPress/gutenberg/issues/55118 is addressed.
-	test.skip( 'should insert elements from multiple completers in a single block', async ( {
+	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
 	} ) => {
