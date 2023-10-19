@@ -5,6 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,32 +13,48 @@ import {
 import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
-import TextFilter from './text-filter';
+import Filters from './filters';
 import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
+	filters,
 	actions,
 	data,
 	isLoading = false,
 	paginationInfo,
 } ) {
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
+	const _fields = useMemo( () => {
+		return fields.map( ( field ) => ( {
+			...field,
+			render: field.render || field.getValue,
+		} ) );
+	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 }>
-				<HStack justify="space-between">
-					<TextFilter view={ view } onChangeView={ onChangeView } />
-					<ViewActions
-						fields={ fields }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
+				<HStack>
+					<HStack justify="start">
+						<Filters
+							filters={ filters }
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</HStack>
+					<HStack justify="end">
+						<ViewActions
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</HStack>
 				</HStack>
 				<ViewComponent
-					fields={ fields }
+					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
 					paginationInfo={ paginationInfo }
