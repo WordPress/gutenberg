@@ -72,27 +72,37 @@ function Pagination( {
 				}
 			</Text>
 			{ !! totalItems && (
-				<HStack expanded={ false } spacing={ 1 }>
-					<Button
-						onClick={ () => onChangeView( { ...view, page: 0 } ) }
-						disabled={ view.page === 0 }
-						label={ __( 'First page' ) }
-						icon={ previous }
-						showTooltip
-					/>
-					<Button
-						onClick={ () =>
-							onChangeView( { ...view, page: view.page - 1 } )
-						}
-						disabled={ view.page === 0 }
-						label={ __( 'Previous page' ) }
-						icon={ chevronLeft }
-						showTooltip
-					/>
+				<HStack expanded={ false } spacing={ 3 }>
 					<HStack
 						justify="flex-start"
 						expanded={ false }
 						spacing={ 1 }
+					>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: 0 } )
+							}
+							disabled={ view.page === 0 }
+							label={ __( 'First page' ) }
+							icon={ previous }
+							showTooltip
+							size="compact"
+						/>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: view.page - 1 } )
+							}
+							disabled={ view.page === 0 }
+							label={ __( 'Previous page' ) }
+							icon={ chevronLeft }
+							showTooltip
+							size="compact"
+						/>
+					</HStack>
+					<HStack
+						justify="flex-start"
+						expanded={ false }
+						spacing={ 2 }
 					>
 						{ createInterpolateElement(
 							sprintf(
@@ -129,24 +139,35 @@ function Pagination( {
 							}
 						) }
 					</HStack>
-					<Button
-						onClick={ () =>
-							onChangeView( { ...view, page: view.page + 1 } )
-						}
-						disabled={ view.page >= totalPages - 1 }
-						label={ __( 'Next page' ) }
-						icon={ chevronRight }
-						showTooltip
-					/>
-					<Button
-						onClick={ () =>
-							onChangeView( { ...view, page: totalPages } )
-						}
-						disabled={ view.page >= totalPages - 1 }
-						label={ __( 'Last page' ) }
-						icon={ next }
-						showTooltip
-					/>
+					<HStack
+						justify="flex-start"
+						expanded={ false }
+						spacing={ 1 }
+					>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: view.page + 1 } )
+							}
+							disabled={ view.page >= totalPages - 1 }
+							label={ __( 'Next page' ) }
+							icon={ chevronRight }
+							showTooltip
+							size="compact"
+						/>
+						<Button
+							onClick={ () =>
+								onChangeView( {
+									...view,
+									page: totalPages - 1,
+								} )
+							}
+							disabled={ view.page >= totalPages - 1 }
+							label={ __( 'Last page' ) }
+							icon={ next }
+							showTooltip
+							size="compact"
+						/>
+					</HStack>
 				</HStack>
 			) }
 			<PageSizeControl view={ view } onChangeView={ onChangeView } />
