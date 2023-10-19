@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -99,18 +98,6 @@ function GlobalStylesActionMenu() {
 	);
 }
 
-function RevisionsCountBadge( { className, children } ) {
-	return (
-		<span
-			className={ classnames(
-				className,
-				'edit-site-global-styles-sidebar__revisions-count-badge'
-			) }
-		>
-			{ children }
-		</span>
-	);
-}
 function GlobalStylesRevisionsMenu() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 	const { revisionsCount } = useSelect( ( select ) => {
@@ -128,7 +115,7 @@ function GlobalStylesRevisionsMenu() {
 		};
 	}, [] );
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
-	const [ canReset, onReset ] = useGlobalStylesReset();
+	const [ canReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -143,33 +130,12 @@ function GlobalStylesRevisionsMenu() {
 	return (
 		<GlobalStylesMenuFill>
 			{ canReset || hasRevisions ? (
-				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ hasRevisions && (
-								<MenuItem
-									onClick={ loadRevisions }
-									icon={
-										<RevisionsCountBadge>
-											{ revisionsCount }
-										</RevisionsCountBadge>
-									}
-								>
-									{ __( 'Revision history' ) }
-								</MenuItem>
-							) }
-							<MenuItem
-								onClick={ () => {
-									onReset();
-									onClose();
-								} }
-								disabled={ ! canReset }
-							>
-								{ __( 'Reset to defaults' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
+				<Button
+					label={ __( 'Revisions' ) }
+					icon={ backup }
+					onClick={ loadRevisions }
+					__experimentalIsFocusable
+				/>
 			) : (
 				<Button
 					label={ __( 'Revisions' ) }
