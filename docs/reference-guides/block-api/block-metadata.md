@@ -57,6 +57,7 @@ Starting in WordPress 5.8 release, we recommend using the `block.json` metadata 
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
 	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ],
 	"render": "file:./render.php"
 }
 ```
@@ -560,6 +561,22 @@ It's possible to pass a style handle registered with the [`wp_register_style`](h
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
+### View Style
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewStyle`
+-   Since: `WordPress 6.x.x`
+
+```json
+{ "viewStyle": [ "file:./view.css", "example-view-style" ] }
+```
+
+Block type frontend styles definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
 ### Render
 
 -   Type: `WPDefinedPath` ([learn more](#wpdefinedpath))
@@ -618,7 +635,8 @@ In `block.json`:
 	"script": "file:./script.js",
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./style.css", "example-shared-style" ]
+	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ]
 }
 ```
 
@@ -670,6 +688,7 @@ Starting in the WordPress 5.8 release, it is possible to instruct WordPress to e
 -   `script`
 -   `viewScript`
 -   `style`
+-   `viewStyle` (Added in WordPress 6.x.x)
 
 ## Internationalization
 
