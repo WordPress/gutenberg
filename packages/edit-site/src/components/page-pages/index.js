@@ -29,7 +29,9 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
-	const DEFAULT_STATUSES = 'publish,future,draft,pending,private'; // All statuses but 'trash'.
+	// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+	// The reason for that is to match defaultStatuses because we compare both strings below (see useEffect).
+	const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
 	const [ view, setView ] = useState( {
 		type: 'list',
 		filters: {
@@ -56,6 +58,7 @@ export default function PagePages() {
 			: statuses
 					.filter( ( { slug } ) => slug !== 'trash' )
 					.map( ( { slug } ) => slug )
+					.sort()
 					.join();
 	}, [ statuses ] );
 
@@ -70,10 +73,7 @@ export default function PagePages() {
 		//
 		// By doing so, it avoids a second request to the pages endpoint
 		// upon receiving the statuses when they are the same (most common scenario).
-		if (
-			DEFAULT_STATUSES.split( ',' ).sort().join() !==
-			defaultStatuses.split( ',' ).sort().join()
-		) {
+		if ( DEFAULT_STATUSES !== defaultStatuses ) {
 			setView( {
 				...view,
 				filters: {
