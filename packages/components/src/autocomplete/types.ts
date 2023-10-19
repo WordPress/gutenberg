@@ -29,7 +29,6 @@ export type KeyedOption = {
 	key: string;
 	value: any;
 	label: OptionLabel;
-	textLabel?: string;
 	keywords: Array< string >;
 	isDisabled: boolean;
 };
@@ -73,11 +72,6 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * string or a mixed array of strings, elements, and components.
 	 */
 	getOptionLabel: ( option: TCompleterOption ) => OptionLabel;
-	/**
-	 * A function that returns the text label for a given option. A text label may be a
-	 * string only.
-	 */
-	getOptionTextLabel: ( option: TCompleterOption ) => string;
 	/**
 	 * A function that takes a Range before and a Range after the autocomplete
 	 * trigger and query text and returns a boolean indicating whether the

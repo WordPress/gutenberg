@@ -205,8 +205,7 @@ export function useAutocomplete( {
 				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
 				if ( isAppleOS() ) {
 					speak(
-						filteredOptions[ newIndex ].textLabel ||
-							getNodeText( filteredOptions[ newIndex ].label ),
+						getNodeText( filteredOptions[ newIndex ].label ),
 						'assertive'
 					);
 				}
@@ -218,8 +217,7 @@ export function useAutocomplete( {
 				setSelectedIndex( newIndex );
 				if ( isAppleOS() ) {
 					speak(
-						filteredOptions[ newIndex ].textLabel ||
-							getNodeText( filteredOptions[ newIndex ].label ),
+						getNodeText( filteredOptions[ newIndex ].label ),
 						'assertive'
 					);
 				}

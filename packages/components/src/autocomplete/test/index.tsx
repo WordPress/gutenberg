@@ -38,9 +38,6 @@ describe( 'AutocompleterUI', () => {
 						{ option.name }
 					</span>
 				),
-				getOptionTextLabel: ( option: FruitOption ) => {
-					return option.name;
-				},
 				// Mock useItems function to return a autocomplete item.
 				useItems: ( filterValue: string ) => {
 					const options = autocompleter.options;
@@ -49,8 +46,6 @@ describe( 'AutocompleterUI', () => {
 							key: `${ autocompleter.name }-${ optionIndex }`,
 							value: optionData,
 							label: autocompleter.getOptionLabel( optionData ),
-							textLabel:
-								autocompleter.getOptionTextLabel( optionData ),
 							keywords: [],
 							isDisabled: false,
 						} )
