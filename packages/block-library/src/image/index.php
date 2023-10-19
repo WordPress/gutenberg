@@ -245,7 +245,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			data-wp-style--top="context.core.image.imageButtonTop"
 			style="background: #000"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
 				<path d="M9 5H5V9" stroke="#FFFFFF" stroke-width="1.5"/>
 				<path d="M15 19L19 19L19 15" stroke="#FFFFFF" stroke-width="1.5"/>
 				<path d="M15 5H19V9" stroke="#FFFFFF" stroke-width="1.5"/>
