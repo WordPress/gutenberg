@@ -74,14 +74,12 @@ function Pagination( {
 			{ !! totalItems && (
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
-						variant="tertiary"
-						onClick={ () => onChangeView( { ...view, page: 1 } ) }
-						disabled={ view.page === 1 }
+						onClick={ () => onChangeView( { ...view, page: 0 } ) }
+						disabled={ view.page === 0 }
 						aria-label={ __( 'First page' ) }
 						icon={ previous }
 					/>
 					<Button
-						variant="tertiary"
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page - 1 } )
 						}
@@ -130,7 +128,6 @@ function Pagination( {
 						) }
 					</HStack>
 					<Button
-						variant="tertiary"
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page + 1 } )
 						}
@@ -139,7 +136,6 @@ function Pagination( {
 						icon={ chevronRight }
 					/>
 					<Button
-						variant="tertiary"
 						onClick={ () =>
 							onChangeView( { ...view, page: totalPages } )
 						}
