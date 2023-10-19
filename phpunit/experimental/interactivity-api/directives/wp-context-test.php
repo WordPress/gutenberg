@@ -175,5 +175,4 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 			$context->get_context()
 		);
 	}
-
 }
