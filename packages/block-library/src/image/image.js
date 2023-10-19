@@ -83,6 +83,11 @@ const scaleOptions = [
 	},
 ];
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function Image( {
 	temporaryURL,
 	attributes,
@@ -769,9 +774,7 @@ export default function Image( {
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
-				{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
-				{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-				{ !! href ? <a>{ img }</a> : img }
+				{ img }
 			</ResizableBox>
 		);
 	}
@@ -786,8 +789,13 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
-			{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
-			{ !! href ? <a>{ img }</a> : img }
+			{ !! href ? (
+				<a href={ href } { ...disabledClickProps }>
+					{ img }
+				</a>
+			) : (
+				img
+			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
