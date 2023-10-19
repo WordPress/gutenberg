@@ -8,7 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
@@ -21,7 +21,6 @@ import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
 
 const EMPTY_ARRAY = [];
-const EMPTY_OBJECT = {};
 const defaultConfigPerViewType = {
 	list: {},
 	grid: {
@@ -30,11 +29,14 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
+	// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+	// The reason for that is to match defaultStatuses because we compare both strings below (see useEffect).
+	const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
 	const [ view, setView ] = useState( {
 		type: 'list',
 		filters: {
 			search: '',
-			status: 'publish, draft',
+			status: DEFAULT_STATUSES,
 		},
 		page: 1,
 		perPage: 5,
@@ -48,17 +50,39 @@ export default function PagePages() {
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
 	} );
-	// Request post statuses to get the proper labels.
+
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const postStatuses = useMemo(
-		() =>
-			statuses === null
-				? EMPTY_OBJECT
-				: Object.fromEntries(
-						statuses.map( ( { slug, name } ) => [ slug, name ] )
-				  ),
-		[ statuses ]
-	);
+	const defaultStatuses = useMemo( () => {
+		return statuses === null
+			? DEFAULT_STATUSES
+			: statuses
+					.filter( ( { slug } ) => slug !== 'trash' )
+					.map( ( { slug } ) => slug )
+					.sort()
+					.join();
+	}, [ statuses ] );
+
+	useEffect( () => {
+		// Only update the view if the statuses received from the endpoint
+		// are different from the DEFAULT_STATUSES provided initially.
+		//
+		// The pages endpoint depends on the status endpoint via the status filter.
+		// Initially, this code filters the pages request by DEFAULT_STATUTES,
+		// instead of using the default (publish).
+		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
+		//
+		// By doing so, it avoids a second request to the pages endpoint
+		// upon receiving the statuses when they are the same (most common scenario).
+		if ( DEFAULT_STATUSES !== defaultStatuses ) {
+			setView( {
+				...view,
+				filters: {
+					...view.filters,
+					status: defaultStatuses,
+				},
+			} );
+		}
+	}, [ defaultStatuses ] );
 
 	const queryArgs = useMemo(
 		() => ( {
@@ -163,25 +187,20 @@ export default function PagePages() {
 				header: __( 'Status' ),
 				id: 'status',
 				getValue: ( { item } ) =>
-					postStatuses[ item.status ] ?? item.status,
+					statuses?.find( ( { slug } ) => slug === item.status )
+						?.name ?? item.status,
 				filters: [
 					{
 						type: 'enumeration',
 						id: 'status',
-						resetValue: 'publish,draft',
+						resetValue: defaultStatuses,
 					},
 				],
 				elements:
-					( postStatuses &&
-						Object.entries( postStatuses )
-							.filter( ( [ slug ] ) =>
-								[ 'publish', 'draft' ].includes( slug )
-							)
-							.map( ( [ slug, name ] ) => ( {
-								value: slug,
-								label: name,
-							} ) ) ) ||
-					[],
+					statuses?.map( ( { slug, name } ) => ( {
+						value: slug,
+						label: name,
+					} ) ) || [],
 				enableSorting: false,
 			},
 			{
@@ -197,7 +216,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ postStatuses, authors ]
+		[ statuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
