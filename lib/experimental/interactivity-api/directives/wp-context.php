@@ -18,16 +18,11 @@ function gutenberg_interactivity_process_wp_context( $tags, $context ) {
 	}
 
 	$value = $tags->get_attribute( 'data-wp-context' );
-	if ( null === $value ) {
-		// No data-wp-context directive.
-		return;
-	}
 
-	$new_context = json_decode( $value, true );
-	if ( null === $new_context ) {
-		// If the JSON is not valid, we still add an empty array to the stack.
-		$new_context = array();
-	}
+	$new_context = json_decode(
+		is_string( $value ) && ! empty( $value ) ? $value : '{}',
+		true
+	);
 
-	$context->set_context( $new_context );
+	$context->set_context( $new_context ?? array() );
 }
