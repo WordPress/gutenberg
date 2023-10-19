@@ -9,6 +9,7 @@ const childProcess = require( 'child_process' );
  * Internal dependencies
  */
 const { isAndroid } = require( './__device-tests__/helpers/utils' );
+import { getAndroidEmulatorID } from './__device-tests__/helpers/get-android-emulator-id';
 
 jest.setTimeout( 1000000 ); // In milliseconds.
 
@@ -42,32 +43,6 @@ function deleteRecordingFile( filePath ) {
 	}
 }
 
-function getFirstAvailableAndroidEmulatorID() {
-	try {
-		const adbOutput = childProcess.execSync( 'adb devices -l' ).toString();
-
-		// Split by line and extract the device ID from the first line (excluding the header)
-		const lines = adbOutput
-			.split( '\n' )
-			.filter( ( line ) => line && ! line.startsWith( 'List' ) );
-		if ( lines.length === 0 ) {
-			// eslint-disable-next-line no-console
-			console.error( 'No available devices found.' );
-			return null;
-		}
-		const firstDeviceLine = lines[ 0 ];
-		// Extract device ID from the beginning of the line
-		return firstDeviceLine.split( /\s+/ )[ 0 ];
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error(
-			'Failed to fetch the first available device ID:',
-			error.message
-		);
-		return null;
-	}
-}
-
 let allPassed = true;
 
 // eslint-disable-next-line jest/no-jasmine-globals, no-undef
@@ -77,7 +52,7 @@ jasmine.getEnv().addReporter( {
 			return;
 		}
 
-		androidDeviceID = getFirstAvailableAndroidEmulatorID();
+		androidDeviceID = getAndroidEmulatorID();
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
 
