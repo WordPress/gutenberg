@@ -680,7 +680,7 @@ _Returns_
 
 ### receiveThemeSupports
 
-> **Deprecated** since WP 5.9, this is not useful anymore, use the selector directly.
+> **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
 
 Returns an action object used in signalling that the index has been received.
 
