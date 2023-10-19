@@ -28,7 +28,6 @@ class Gutenberg_REST_Blocks_Controller_6_4 extends Gutenberg_REST_Blocks_Control
 	 * @return array List of link relations.
 	 */
 	protected function get_available_actions( $post, $request ) {
-
 		if ( 'edit' !== $request['context'] ) {
 			return array();
 		}
@@ -60,7 +59,7 @@ class Gutenberg_REST_Blocks_Controller_6_4 extends Gutenberg_REST_Blocks_Control
 		$taxonomies = wp_list_filter( get_object_taxonomies( $this->post_type, 'objects' ), array( 'show_in_rest' => true ) );
 
 		foreach ( $taxonomies as $tax ) {
-			$tax_base   = ! empty( $tax->rest_base ) ? $tax->rest_base : $tax->name;
+			$tax_base = ! empty( $tax->rest_base ) ? $tax->rest_base : $tax->name;
 
 			if ( current_user_can( $tax->cap->edit_terms ) ) {
 				$rels[] = 'https://api.w.org/action-create-' . $tax_base;
