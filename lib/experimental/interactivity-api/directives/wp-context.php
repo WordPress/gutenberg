@@ -25,8 +25,8 @@ function gutenberg_interactivity_process_wp_context( $tags, $context ) {
 
 	$new_context = json_decode( $value, true );
 	if ( null === $new_context ) {
-		// Invalid JSON defined in the directive.
-		return;
+		// If the JSON is not valid, we still add an empty array to the stack.
+		$new_context = array();
 	}
 
 	$context->set_context( $new_context );

@@ -496,4 +496,84 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.type( 'y' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should link selection', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: '<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://wordpress.org/gutenberg">a</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'should auto-link', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>a',
+				},
+			},
+		] );
+	} );
+
+	test( 'should embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
+		] );
+	} );
+
+	test( 'should not link selection for non http(s) protocol', async ( {
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'a',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		pageUtils.setClipboardData( {
+			plainText: 'movie: b',
+			html: 'movie: b',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'movie: b',
+				},
+			},
+		] );
+	} );
 } );

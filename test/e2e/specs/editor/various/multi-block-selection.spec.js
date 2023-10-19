@@ -301,13 +301,7 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: 'test' },
 		} );
 
-		await page.getByRole( 'button', { name: 'Save draft' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Draft saved' } )
-		).toBeVisible();
-
+		await editor.saveDraft();
 		await page.reload();
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
