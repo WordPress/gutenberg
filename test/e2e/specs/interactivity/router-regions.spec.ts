@@ -97,4 +97,21 @@ test.describe( 'Router regions', () => {
 		await page.getByTestId( 'back' ).click();
 		await expect( nestedRegionSsr ).toHaveText( 'content from page 1' );
 	} );
+
+	test( 'Page title is updated', async ( { page } ) => {
+		expect( await page.title() ).toBe(
+			'router regions – page 1 – gutenberg'
+		);
+		await page.getByTestId( 'next' ).click();
+		await page.waitForFunction(
+			() => document.title === 'router regions – page 2 – gutenberg'
+		);
+		expect( await page.title() ).toBe(
+			'router regions – page 2 – gutenberg'
+		);
+		await page.getByTestId( 'back' ).click();
+		expect( await page.title() ).toBe(
+			'router regions – page 1 – gutenberg'
+		);
+	} );
 } );
