@@ -315,7 +315,7 @@ class Gutenberg_HTTP_Signaling_Server {
 	 * @param string $subscriber_to_messages_path The path to the file that contains the messages of the subscribers.
 	 * @param string $connected_subscriber_id     The subscriber id.
 	 */
-	private static function clean_up_old_connections( $topics_to_subscribers_path, $subscriber_to_messages_path, $connected_subscriber_id, ) {
+	private static function clean_up_old_connections( $topics_to_subscribers_path, $subscriber_to_messages_path, $connected_subscriber_id ) {
 		$subscribers_to_last_connection_path = get_temp_dir() . DIRECTORY_SEPARATOR . 'subscribers_to_last_connection.txt';
 		// Example: array( 2323232121 => 34343433323(timestamp) ).
 
