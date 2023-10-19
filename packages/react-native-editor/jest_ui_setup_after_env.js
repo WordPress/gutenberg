@@ -52,11 +52,12 @@ jasmine.getEnv().addReporter( {
 			return;
 		}
 
-		androidDeviceID = getAndroidEmulatorID();
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
 
 		if ( isAndroid() ) {
+			androidDeviceID = getAndroidEmulatorID();
+
 			if ( ! fs.existsSync( ANDROID_RECORDINGS_DIR ) ) {
 				fs.mkdirSync( ANDROID_RECORDINGS_DIR );
 			}
