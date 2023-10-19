@@ -133,7 +133,9 @@ export default function PagePages() {
 						</VStack>
 					);
 				},
-				filters: [ { id: 'search', type: 'search' } ],
+				filters: [
+					{ id: 'search', type: 'search', name: __( 'Search' ) },
+				],
 				maxWidth: 400,
 				sortingFn: 'alphanumeric',
 				enableHiding: false,
@@ -150,27 +152,27 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				filters: [ { id: 'author', type: 'enumeration' } ],
-				elements: [
-					{
-						value: '',
-						label: __( 'All' ),
-					},
-					...( authors?.map( ( { id, name } ) => ( {
+				filters: [ 'enumeration' ],
+				elements:
+					authors?.map( ( { id, name } ) => ( {
 						value: id,
 						label: name,
-					} ) ) || [] ),
-				],
+					} ) ) || [],
 			},
 			{
 				header: __( 'Status' ),
 				id: 'status',
 				getValue: ( { item } ) =>
 					postStatuses[ item.status ] ?? item.status,
-				filters: [ { type: 'enumeration', id: 'status' } ],
-				elements: [
-					{ label: __( 'All' ), value: 'publish,draft' },
-					...( ( postStatuses &&
+				filters: [
+					{
+						type: 'enumeration',
+						id: 'status',
+						resetValue: 'publish,draft',
+					},
+				],
+				elements:
+					( postStatuses &&
 						Object.entries( postStatuses )
 							.filter( ( [ slug ] ) =>
 								[ 'publish', 'draft' ].includes( slug )
@@ -179,8 +181,7 @@ export default function PagePages() {
 								value: slug,
 								label: name,
 							} ) ) ) ||
-						[] ),
-				],
+					[],
 				enableSorting: false,
 			},
 			{

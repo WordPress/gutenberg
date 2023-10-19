@@ -14,21 +14,19 @@ import { unlock } from '../../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export default ( { id, fields, view, onChangeView } ) => {
-	const field = fields.find( ( f ) => f.id === id );
-
+export default ( { filter, view, onChangeView } ) => {
 	return (
 		<SelectControl
-			value={ view.filters[ id ] }
+			value={ view.filters[ filter.id ] }
 			prefix={
 				<InputControlPrefixWrapper
 					as="span"
 					className="dataviews__select-control-prefix"
 				>
-					{ field.header + ':' }
+					{ filter.name + ':' }
 				</InputControlPrefixWrapper>
 			}
-			options={ field?.elements || [] }
+			options={ filter.elements }
 			onChange={ ( value ) => {
 				if ( value === '' ) {
 					value = undefined;
@@ -38,7 +36,7 @@ export default ( { id, fields, view, onChangeView } ) => {
 					...currentView,
 					filters: cleanEmptyObject( {
 						...currentView.filters,
-						[ id ]: value,
+						[ filter.id ]: value,
 					} ),
 				} ) );
 			} }
