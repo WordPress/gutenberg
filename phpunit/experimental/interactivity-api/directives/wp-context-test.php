@@ -124,4 +124,106 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 			$context->get_context()
 		);
 	}
+
+	public function test_directive_keeps_working_with_a_directive_without_value() {
+		$context = new WP_Directive_Context();
+
+		$markup = '
+			<div data-wp-context=\'{ "my-key": "some-value" }\'>
+				<div data-wp-context>
+				</div>
+			</div>
+		';
+		$tags   = new WP_HTML_Tag_Processor( $markup );
+
+		// Parent div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Children div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Still the same context.
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Closing children div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Still the same context.
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Closing parent div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Now the context is empty.
+		$this->assertSame(
+			array(),
+			$context->get_context()
+		);
+	}
+
+	public function test_directive_keeps_working_with_an_empty_directive() {
+		$context = new WP_Directive_Context();
+
+		$markup = '
+			<div data-wp-context=\'{ "my-key": "some-value" }\'>
+				<div data-wp-context="">
+				</div>
+			</div>
+		';
+		$tags   = new WP_HTML_Tag_Processor( $markup );
+
+		// Parent div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Children div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Still the same context.
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Closing children div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Still the same context.
+		$this->assertSame(
+			array( 'my-key' => 'some-value' ),
+			$context->get_context()
+		);
+
+		// Closing parent div.
+		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		gutenberg_interactivity_process_wp_context( $tags, $context );
+
+		// Now the context is empty.
+		$this->assertSame(
+			array(),
+			$context->get_context()
+		);
+	}
 }
