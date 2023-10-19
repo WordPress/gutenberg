@@ -14,7 +14,7 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSetting,
+	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
@@ -318,7 +318,8 @@ function CoverEdit( {
 	const blockProps = useBlockProps( { ref } );
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const hasFontSizes = fontSizes?.length > 0;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
 		fontSize: hasFontSizes ? 'large' : undefined,
 	} );

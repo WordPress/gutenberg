@@ -944,9 +944,11 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.4.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -961,6 +963,26 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
+
+### useSettings
+
+Hook that retrieves the given settings for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
+
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
+_Parameters_
+
+-   _paths_ `string[]`: The paths to the settings.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
 
 ### Warning
 
