@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 
 /**
@@ -10,17 +10,25 @@ import { SearchControl } from '@wordpress/components';
  */
 import useDebouncedInput from '../../utils/use-debounced-input';
 
-export default function TextFilter( { view, onChangeView } ) {
+export default function TextFilter( { filter, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
-		view.search
+		view.filters[ filter.id ]
 	);
+	const onChangeViewRef = useRef( onChangeView );
 	useEffect( () => {
-		onChangeView( ( currentView ) => ( {
+		onChangeViewRef.current = onChangeView;
+	}, [ onChangeView ] );
+	useEffect( () => {
+		onChangeViewRef.current( ( currentView ) => ( {
 			...currentView,
-			search: debouncedSearch,
+			page: 1,
+			filters: {
+				...currentView.filters,
+				[ filter.id ]: debouncedSearch,
+			},
 		} ) );
-	}, [ debouncedSearch, onChangeView ] );
-	const searchLabel = __( 'Filter list' );
+	}, [ debouncedSearch ] );
+	const searchLabel = filter?.name || __( 'Filter list' );
 	return (
 		<SearchControl
 			onChange={ setSearch }
