@@ -28,7 +28,7 @@ export default function TextFilter( { filter, view, onChangeView } ) {
 			},
 		} ) );
 	}, [ debouncedSearch ] );
-	const searchLabel = __( 'Filter list' );
+	const searchLabel = filter?.name || __( 'Filter list' );
 	return (
 		<SearchControl
 			onChange={ setSearch }
