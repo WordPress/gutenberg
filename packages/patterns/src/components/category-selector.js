@@ -16,7 +16,7 @@ export default function CategorySelector( {
 			return (
 				<div
 					key={ category.id }
-					className="patterns-menu-items__convert-modal__terms-choice"
+					className="patterns-category-selector__terms-choice"
 				>
 					<CheckboxControl
 						__nextHasNoMarginBottom
@@ -37,7 +37,7 @@ export default function CategorySelector( {
 				</BaseControl.VisualLabel>
 			) }
 			<div
-				className="patterns-menu-items__convert-modal__terms-list"
+				className="patterns-category-selector__terms-list"
 				tabIndex="0"
 				role="group"
 				aria-label={ __( 'Categories' ) }

@@ -26,20 +26,6 @@
 		border-bottom-left-radius: 2px;
 		border-bottom-right-radius: 2px;
 	}
-
-	.patterns-menu-items__convert-modal__terms-list {
-		max-height: 6rem;
-		overflow: auto;
-		border: 1px solid $gray-600;
-		padding: 8px;
-
-		.patterns-menu-items__convert-modal__terms-choice {
-			margin-bottom: $grid-unit-10;
-			&:last-child {
-				margin-bottom: 2px;
-			}
-		}
-	}
 }
 
 .patterns-create-modal__name-input input[type="text"] {
@@ -56,4 +42,18 @@
 	text-transform: uppercase;
 	display: inline-block;
 	padding: 0;
+}
+
+.patterns-category-selector__terms-list {
+	max-height: 6rem;
+	overflow: auto;
+	border: 1px solid $gray-600;
+	padding: 8px;
+
+	.patterns-category-selector__terms-choice {
+		margin-bottom: $grid-unit-10;
+		&:last-child {
+			margin-bottom: 2px;
+		}
+	}
 }
