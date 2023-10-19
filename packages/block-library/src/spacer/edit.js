@@ -87,12 +87,28 @@ const SpacerEdit = ( {
 	context,
 	__unstableParentLayout: parentLayout,
 	className,
+	clientId,
 } ) => {
 	const disableCustomSpacingSizes = useSelect( ( select ) => {
 		const editorSettings = select( blockEditorStore ).getSettings();
 		return editorSettings?.disableCustomSpacingSizes;
 	} );
-	const { orientation } = context;
+
+	const galleryChildBlocks = useSelect( ( select ) => {
+		const parentBlockId =
+			select( blockEditorStore ).getBlockParents( clientId );
+
+		const parentBlockInstance = select( blockEditorStore ).getBlock(
+			parentBlockId.at( 0 )
+		);
+
+		if ( parentBlockInstance?.name !== 'core/gallery' ) return null;
+
+		return parentBlockInstance.innerBlocks;
+	} );
+
+
+	const { orientation, columns } = context;
 	const { orientation: parentOrientation, type } = parentLayout || {};
 	// Check if the spacer is inside a flex container.
 	const isFlexLayout = type === 'flex';

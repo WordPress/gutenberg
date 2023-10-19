@@ -15,7 +15,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "orientation" ],
+	"usesContext": [ "orientation", "innerGalleryBlocks", "columns" ],
 	"supports": {
 		"anchor": true,
 		"spacing": {
