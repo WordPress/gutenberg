@@ -202,7 +202,7 @@ export default function PagePages() {
 					{
 						type: 'enumeration',
 						id: 'status',
-						resetValue: 'publish,draft',
+						resetValue: defaultStatuses,
 					},
 				],
 				elements:
