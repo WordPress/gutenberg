@@ -20,6 +20,7 @@ const {
 	prefixKeysWithAppium,
 } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
+import { getAndroidEmulatorID } from './get-android-emulator-id';
 
 // Platform setup.
 const defaultPlatform = 'android';
@@ -104,10 +105,14 @@ const setupDriver = async () => {
 	if ( isAndroid() ) {
 		desiredCaps = { ...android };
 		if ( isLocalEnvironment() ) {
+			const androidDeviceID = getAndroidEmulatorID();
 			desiredCaps.app = path.resolve( localAndroidAppPath );
+			desiredCaps.udid = androidDeviceID;
 			try {
 				const androidVersion = childProcess
-					.execSync( 'adb shell getprop ro.build.version.release' )
+					.execSync(
+						`adb -s ${ androidDeviceID } shell getprop ro.build.version.release`
+					)
 					.toString()
 					.replace( /^\s+|\s+$/g, '' );
 				delete desiredCaps.platformVersion;
