@@ -9,12 +9,7 @@ export function getAndroidEmulatorID() {
 
 		const lines = adbOutput
 			.split( '\n' )
-			.filter(
-				( line ) =>
-					line &&
-					! line.startsWith( 'List' ) &&
-					line.includes( 'emulator-' )
-			);
+			.filter( ( line ) => line && line.includes( 'emulator-' ) );
 
 		if ( lines.length === 0 ) {
 			// eslint-disable-next-line no-console
