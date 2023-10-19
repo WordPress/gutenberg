@@ -816,28 +816,20 @@ class EditorPage {
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
 
-	async closePicker() {
-		if ( isAndroid() ) {
-			// Wait for media block picker to load before closing
-			const locator =
-				'//android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup';
-			await waitForVisible( this.driver, locator );
+	async closeMediaPicker() {
+		// Wait for media block picker to load before closing
+		const locator = '~WordPress Media Library';
+		await this.driver.$( locator ).waitForDisplayed();
 
-			const { width, height } = await this.driver.getWindowSize();
-			await this.driver
-				.action( 'pointer', {
-					parameters: { pointerType: 'touch' },
-				} )
-				.move( { x: width * 0.5, y: height * 0.1 } )
-				.down( { button: 0 } )
-				.up( { button: 0 } )
-				.perform();
-		} else {
-			await clickIfClickable(
-				this.driver,
-				'//XCUIElementTypeButton[@name="Cancel"]'
-			);
-		}
+		const { width, height } = await this.driver.getWindowSize();
+		await this.driver
+			.action( 'pointer', {
+				parameters: { pointerType: 'touch' },
+			} )
+			.move( { x: width * 0.5, y: height * 0.1 } )
+			.down( { button: 0 } )
+			.up( { button: 0 } )
+			.perform();
 	}
 
 	// =============================
