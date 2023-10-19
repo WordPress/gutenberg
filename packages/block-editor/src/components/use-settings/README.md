@@ -1,8 +1,8 @@
-## Use Setting
+## Use Settings
 
-`useSetting` is a hook that will retrive the setting for the block instance that's in use. 
+`useSettings` is a hook that will retrieve the settings for the block instance that's in use.
 
-It does the lookup of the setting in the following order:
+It does the lookup of the settings in the following order:
 
 1. Third parties can provide the settings for the block using the filter `blockEditor.useSetting.before`.
 2. If no third parties have provided this setting, then it looks up in the block instance hierachy starting from the current block and working its way upwards to its ancestors.
@@ -20,20 +20,19 @@ It does the lookup of the setting in the following order:
 This will fetch the default color palette based on the block instance.
 
 ```jsx
-import { useSetting } from '@wordpress/block-editor';
+import { useSettings } from '@wordpress/block-editor';
 
-const defaultColorPalette = useSetting( 'color.palette.default' );
+const [ defaultColorPalette ] = useSettings( 'color.palette.default' );
 ```
 
 Refer [here](https://github.com/WordPress/gutenberg/blob/HEAD/docs/how-to-guides/curating-the-editor-experience.md?plain=1#L330) in order to understand how the filter mentioned above `blockEditor.useSetting.before` can be used.
 
 ### Props
 
-This hooks accepts the following props.
+This hooks accepts the following arguments.
 
-#### `path`
+#### `paths`
 
--   **Type:** `String`
--   **Default:** `undefined`
+-   **Type:** `Array<String>`
 
-The path to the setting that is to be used for a block. Ex: `typography.fontSizes`
+Array of paths to the settings to be retrieved. E.g., `[ 'typography.fontSizes' ]`

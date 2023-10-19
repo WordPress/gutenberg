@@ -76,7 +76,7 @@ This is a PHP filter which is applied before sending settings to the WordPress b
 
 You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/).
 
-The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialiation can be filtered by a PHP WordPress plugin before being sent.
+The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialization can be filtered by a PHP WordPress plugin before being sent.
 
 _Example:_
 

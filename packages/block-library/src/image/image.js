@@ -24,7 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -369,7 +369,7 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSetting = useSetting( 'lightbox' );
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxToggle =
 		!! lightbox || lightboxSetting?.allowEditing === true;
