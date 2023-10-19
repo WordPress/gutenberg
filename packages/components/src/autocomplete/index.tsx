@@ -22,6 +22,8 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
+import { speak } from '@wordpress/a11y';
+import { isAppleOS } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -38,6 +40,35 @@ import type {
 	UseAutocompleteProps,
 	WPCompleter,
 } from './types';
+
+const getNodeText = ( node: React.ReactNode ): string => {
+	if ( node === null ) {
+		return '';
+	}
+
+	switch ( typeof node ) {
+		case 'string':
+		case 'number':
+			return node.toString();
+			break;
+		case 'boolean':
+			return '';
+			break;
+		case 'object': {
+			if ( node instanceof Array ) {
+				return node.map( getNodeText ).join( '' );
+			}
+			if ( 'props' in node ) {
+				return getNodeText( node.props.children );
+			}
+			break;
+		}
+		default:
+			return '';
+	}
+
+	return '';
+};
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -163,20 +194,35 @@ export function useAutocomplete( {
 		) {
 			return;
 		}
+
 		switch ( event.key ) {
-			case 'ArrowUp':
-				setSelectedIndex(
+			case 'ArrowUp': {
+				const newIndex =
 					( selectedIndex === 0
 						? filteredOptions.length
-						: selectedIndex ) - 1
-				);
+						: selectedIndex ) - 1;
+				setSelectedIndex( newIndex );
+				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
+				if ( isAppleOS() ) {
+					speak(
+						getNodeText( filteredOptions[ newIndex ].label ),
+						'assertive'
+					);
+				}
 				break;
+			}
 
-			case 'ArrowDown':
-				setSelectedIndex(
-					( selectedIndex + 1 ) % filteredOptions.length
-				);
+			case 'ArrowDown': {
+				const newIndex = ( selectedIndex + 1 ) % filteredOptions.length;
+				setSelectedIndex( newIndex );
+				if ( isAppleOS() ) {
+					speak(
+						getNodeText( filteredOptions[ newIndex ].label ),
+						'assertive'
+					);
+				}
 				break;
+			}
 
 			case 'Escape':
 				setAutocompleter( null );
