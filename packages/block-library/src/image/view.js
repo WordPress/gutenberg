@@ -282,7 +282,8 @@ store(
 									focusableElements.length - 1
 								];
 
-							ref.querySelector( '.close-button' ).focus();
+							// Move focus to the dialog when opening it.
+							ref.focus();
 						}
 					},
 					setButtonStyles: ( { context, ref } ) => {
