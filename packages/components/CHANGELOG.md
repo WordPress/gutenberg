@@ -18,6 +18,7 @@
 
 -   Render a "mouse event trap" when using a `ColorPicker` inside a `Popover` to prevent issues when rendering on top of `iframes` ([#55149](https://github.com/WordPress/gutenberg/pull/55149)).
 -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
+-   `Autocomplete`: Fix disappearing results issue when using multiple triggers inline ([#55301](https://github.com/WordPress/gutenberg/pull/55301))
 
 ### Internal
 
