@@ -107,9 +107,33 @@ const SpacerEdit = ( {
 		return parentBlockInstance.innerBlocks;
 	} );
 
+	function spacerPosition() {
+		return galleryChildBlocks.findIndex(
+			( item ) => item.clientId === clientId
+		);
+	}
 
-	const { orientation, columns } = context;
+	let pos = null;
+
+	if ( galleryChildBlocks?.length ) {
+		pos = spacerPosition();
+		pos += 1;
+	}
+
+	let { orientation, columns } = context;
 	const { orientation: parentOrientation, type } = parentLayout || {};
+
+	if ( pos && columns === 1 ) {
+		orientation = 'vertical';
+	}
+
+	if (
+		galleryChildBlocks?.length % columns !== 0 &&
+		pos === galleryChildBlocks?.length
+	) {
+		orientation = 'vertical';
+	}
+
 	// Check if the spacer is inside a flex container.
 	const isFlexLayout = type === 'flex';
 	// If the spacer is inside a flex container, it should either inherit the orientation
