@@ -69,11 +69,6 @@ export function PatternCategoriesSelector( { slug } ) {
 		return null;
 	}
 
-	/**
-	 * Update terms for post.
-	 *
-	 * @param {number[]} termIds Term ids.
-	 */
 	const onUpdateTerms = ( termIds ) => {
 		editPost( { [ taxonomy.rest_base ]: termIds } );
 	};
