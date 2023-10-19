@@ -257,5 +257,5 @@ require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/behaviors.php';
 
-// Data views
+// Data views.
 require_once __DIR__ . '/experimental/data-views.php';
