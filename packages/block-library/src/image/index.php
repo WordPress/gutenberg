@@ -218,7 +218,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'tabindex', '-1' );
 	$w->set_attribute( 'data-wp-init', 'effects.core.image.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
 	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
