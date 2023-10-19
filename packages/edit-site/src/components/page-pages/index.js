@@ -197,7 +197,9 @@ export default function PagePages() {
 		[ postStatuses, authors ]
 	);
 
-	const filters = useMemo( () => [ { id: 'search', type: 'search' } ] );
+	const filters = useMemo( () => [
+		{ id: 'search', type: 'search', name: __( 'Filter list' ) },
+	] );
 
 	const trashPostAction = useTrashPostAction();
 	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
