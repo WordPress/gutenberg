@@ -25,6 +25,7 @@ import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
 import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import apiFetch from '@wordpress/api-fetch';
 
 const {
 	CompositeV2: Composite,
@@ -48,9 +49,28 @@ function BlockPattern( {
 	showTooltip,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
-	const { blocks, viewportWidth } = pattern;
+
+	const [ patternHTML, setPatternHTML ] = useState( '' );
+
+	const { content, blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
+
+	// post pattern content to the render_blocks endpoint
+	// and get back the rendered html
+	useEffect( () => {
+		const getHTML = async () => {
+			const dataHTML = await apiFetch( {
+				path: '/wp/v2/render_blocks',
+				method: 'POST',
+				data: content,
+			} );
+			setPatternHTML( dataHTML );
+		};
+		getHTML().catch( ( error ) => {
+			return error;
+		} );
+	}, [ blocks ] );
 
 	return (
 		<InserterDraggableBlocks
@@ -116,10 +136,16 @@ function BlockPattern( {
 							} }
 							onMouseLeave={ () => onHover?.( null ) }
 						>
-							<BlockPreview
+							{ /* <BlockPreview
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
-							/>
+							/> */ }
+
+							<div
+								dangerouslySetInnerHTML={ {
+									__html: patternHTML,
+								} }
+							></div>
 
 							<HStack className="block-editor-patterns__pattern-details">
 								{ pattern.type === PATTERN_TYPES.user &&
