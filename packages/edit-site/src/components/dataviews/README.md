@@ -1,6 +1,19 @@
 # DataView
 
-This file aims to document the main APIs related to the DataView component.
+This file aims to document the main APIs related to the DataViews component, which aims to provide an API to render datasets using different views (table, grid, etc.).
+
+```js
+<DataViews
+	data={ pages }
+	isLoading= { isLoadingPages }
+	view={ view }
+	onChangeView={ onChangeView }
+	fields={ fields }
+	filters={ filters }
+	actions={ [ trashPostAction ] }
+	paginationInfo={ { totalItems, totalPages } }
+/>
+```
 
 ## View
 
@@ -92,18 +105,12 @@ The fields describe the dataset. For example:
 	- `resetLabel`: the label for the reset option of the filter. If none provided, `All` is used.
 	- `resetValue`: the value for the reset option of the filter. If none provedid, `''` is used.
 
-## DataViews
+## Filters
 
-The UI component responsible for rendering the dataset.
+Global vs Field filters.
 
-```js
-<DataViews
-	data={ pages }
-	isLoading= { isLoadingPages }
-	fields={ fields }
-	view={ view }
-	onChangeView={ onChangeView }
-	actions={ [ trashPostAction ] }
-	paginationInfo={ { totalItems, totalPages } }
-/>
-```
+Shape of the filter.
+
+## Actions
+
+Record actions.
