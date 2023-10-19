@@ -49,3 +49,7 @@
 		object-fit: cover;
 	}
 }
+
+.dataviews__siderbar-content-add-new-item.edit-site-sidebar-navigation-item.components-item {
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+}

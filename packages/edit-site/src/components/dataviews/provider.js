@@ -25,7 +25,7 @@ const { useLocation } = unlock( routerPrivateApis );
 // (entity request and useEffect to update the view).
 export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
 
-const DEFAULT_VIEWS = {
+export const DEFAULT_VIEWS = {
 	page: {
 		type: 'list',
 		filters: {
@@ -211,6 +211,7 @@ function DataviewsProviderInner( { type, children } ) {
 
 	const value = useMemo( () => {
 		return {
+			type,
 			taxonomyId: dataviewTypeTaxonomyId,
 			dataviews,
 			currentViewId,
