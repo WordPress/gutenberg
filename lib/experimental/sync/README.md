@@ -117,8 +117,10 @@ The server will respond using the [Event stream format](https://developer.mozill
 
 - `retry`: the reconnection time, in ms. The time after which the client should check again for messages.
 - `id`: unique identifier for the server response.
-- `event`: always set to `message`.
-- `data`: a JSON encoded string containing an array of messages that the given client has not read yet. Each message is similar to the published message object but includes an additional property named `clients`. This property specifies the number of clients for which the message was sent. Note it does not indicate whether they have already received/requested it.
+- `event`: one of `message` or `error`.
+- `data`:
+	- If `event` is `message`, data is a JSON encoded string containing an array of messages that the given client has not read yet. Each message is similar to the published message object but includes an additional property named `clients`. This property specifies the number of clients for which the message was sent. Note it does not indicate whether they have already received/requested it.
+	- If `event` is `error`, data is a description of the error.
 
 If there are no pending messages, the server's response only contains the `retry:` field. If there are pending messages, the server will respond including all the fields.
 
