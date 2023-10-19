@@ -268,7 +268,7 @@ function BackgroundImagePanelItem( props ) {
 					variant="secondary"
 				>
 					<MenuItem onClick={ () => resetBackgroundImage( props ) }>
-						{ __( 'Reset ' ) }
+						{ __( 'Reset' ) }
 					</MenuItem>
 				</MediaReplaceFlow>
 				<DropZone
