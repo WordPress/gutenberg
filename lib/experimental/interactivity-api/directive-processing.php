@@ -136,11 +136,11 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	);
 
 	/*
-	 * Check first if the directive path is preceded by a negator operator (!),
+	 * Check first if the directive path is preceded by a negation operator (!),
 	 * indicating that the value obtained from the Interactivity Store (or the
 	 * passed context) using the subsequent path should be negated.
 	 */
-	$should_negate_value = '!' === $path[0];
+	$should_negate_value = strlen( $path ) > 0 && '!' === $path[0];
 
 	$path          = $should_negate_value ? substr( $path, 1 ) : $path;
 	$path_segments = explode( '.', $path );

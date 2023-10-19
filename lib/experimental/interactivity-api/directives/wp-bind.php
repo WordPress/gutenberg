@@ -26,6 +26,7 @@ function gutenberg_interactivity_process_wp_bind( $tags, $context ) {
 		}
 
 		$expr  = $tags->get_attribute( $attr );
+		$expr  = is_string( $expr ) ? $expr : '';
 		$value = gutenberg_interactivity_evaluate_reference( $expr, $context->get_context() );
 		$tags->set_attribute( $bound_attr, $value );
 	}
