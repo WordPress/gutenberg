@@ -21,7 +21,6 @@ import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
 
 const EMPTY_ARRAY = [];
-const EMPTY_OBJECT = {};
 const defaultConfigPerViewType = {
 	list: {},
 	grid: {
@@ -51,22 +50,13 @@ export default function PagePages() {
 	} );
 
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
-	const { postStatuses, defaultStatuses } = useMemo( () => {
-		return {
-			postStatuses:
-				statuses === null
-					? EMPTY_OBJECT
-					: Object.fromEntries(
-							statuses.map( ( { slug, name } ) => [ slug, name ] )
-					  ),
-			defaultStatuses:
-				statuses === null
-					? DEFAULT_STATUSES
-					: statuses
-							.filter( ( { slug } ) => slug !== 'trash' )
-							.map( ( { slug } ) => slug )
-							.join(),
-		};
+	const defaultStatuses = useMemo( () => {
+		return statuses === null
+			? DEFAULT_STATUSES
+			: statuses
+					.filter( ( { slug } ) => slug !== 'trash' )
+					.map( ( { slug } ) => slug )
+					.join();
 	}, [ statuses ] );
 
 	useEffect( () => {
@@ -197,7 +187,8 @@ export default function PagePages() {
 				header: __( 'Status' ),
 				id: 'status',
 				getValue: ( { item } ) =>
-					postStatuses[ item.status ] ?? item.status,
+					statuses?.find( ( { slug } ) => slug === item.status )
+						?.name ?? item.status,
 				filters: [
 					{
 						type: 'enumeration',
@@ -206,13 +197,10 @@ export default function PagePages() {
 					},
 				],
 				elements:
-					( postStatuses &&
-						Object.entries( postStatuses )
-							.map( ( [ slug, name ] ) => ( {
-								value: slug,
-								label: name,
-							} ) ) ) ||
-					[],
+					statuses?.map( ( { slug, name } ) => ( {
+						value: slug,
+						label: name,
+					} ) ) || [],
 				enableSorting: false,
 			},
 			{
@@ -228,7 +216,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ postStatuses, authors ]
+		[ statuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
