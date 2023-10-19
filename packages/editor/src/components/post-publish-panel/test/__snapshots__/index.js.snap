@@ -96,7 +96,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                   post address
                 </label>
                 <input
-                  class="components-text-control__input"
+                  class="post-publish-panel__postpublish-post-address components-text-control__input"
                   id="inspector-text-control-0"
                   readonly=""
                   type="text"
@@ -258,7 +258,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                   post address
                 </label>
                 <input
-                  class="components-text-control__input"
+                  class="post-publish-panel__postpublish-post-address components-text-control__input"
                   id="inspector-text-control-1"
                   readonly=""
                   type="text"
