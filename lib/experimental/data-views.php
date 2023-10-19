@@ -4,7 +4,7 @@ function _gutenberg_register_data_views_post_type() {
 	register_post_type(
 		'wp_dataviews',
 		array(
-			'label'        => _x( 'Datavivews', 'post type general name', 'gutenberg' ),
+			'label'        => _x( 'Dataviews', 'post type general name', 'gutenberg' ),
 			'description'  => __( 'Post which stores the different data views configurations', 'gutenberg' ),
 			'public'       => false,
 			'show_ui'      => false,
