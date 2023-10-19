@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "12.11.1",
+	"version": "12.12.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -72,6 +72,7 @@
 		"dom-scroll-into-view": "^1.2.1",
 		"fast-deep-equal": "^3.1.3",
 		"inherits": "^2.0.3",
+		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^4.5.1",
 		"rememo": "^4.0.2",

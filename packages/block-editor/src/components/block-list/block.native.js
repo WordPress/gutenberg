@@ -38,9 +38,9 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
-const emptyArray = [];
+const EMPTY_ARRAY = [];
 
 // Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
 const wrapperPropsCache = new WeakMap();
@@ -215,7 +215,7 @@ function BlockListBlock( {
 	const parentLayout = useLayout() || {};
 	const defaultColors = useMobileGlobalStylesColors();
 	const globalStyle = useGlobalStyles();
-	const fontSizes = useSetting( 'typography.fontSizes' ) || emptyArray;
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
 	const onRemove = useCallback(
 		() => removeBlock( clientId ),
@@ -257,7 +257,7 @@ function BlockListBlock( {
 			attributes,
 			defaultColors,
 			name,
-			fontSizes
+			fontSizes || EMPTY_ARRAY
 		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [

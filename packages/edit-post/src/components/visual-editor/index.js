@@ -14,7 +14,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	useSetting,
+	useSettings,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -171,7 +171,7 @@ export default function VisualEditor( { styles } ) {
 		borderBottom: 0,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const globalLayoutSettings = useSetting( 'layout' );
+	const [ globalLayoutSettings ] = useSettings( 'layout' );
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode

@@ -24,7 +24,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
@@ -123,7 +123,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 			? { ...layout, type: 'constrained' }
 			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 	const css = fullLayoutType?.getLayoutStyle?.( {
 		blockName,
@@ -142,7 +142,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	} = settings;
 
 	const { layout } = attributes;
-	const defaultThemeLayout = useSetting( 'layout' );
+	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -375,7 +375,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			: null;
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 		const hasBlockGapSupport = blockGapSupport !== null;
 
 		// Get CSS string for the current layout type.

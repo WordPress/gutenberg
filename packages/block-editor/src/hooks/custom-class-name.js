@@ -39,6 +39,30 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+function CustomClassNameControls( { attributes, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				autoComplete="off"
+				label={ __( 'Additional CSS class(es)' ) }
+				value={ attributes.className || '' }
+				onChange={ ( nextValue ) => {
+					setAttributes( {
+						className: nextValue !== '' ? nextValue : undefined,
+					} );
+				} }
+				help={ __( 'Separate multiple classes with spaces.' ) }
+			/>
+		</InspectorControls>
+	);
+}
+
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
@@ -51,42 +75,23 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const blockEditingMode = useBlockEditingMode();
 			const hasCustomClassName = hasBlockSupport(
 				props.name,
 				'customClassName',
 				true
 			);
-			if ( hasCustomClassName && props.isSelected ) {
-				return (
-					<>
-						<BlockEdit { ...props } />
-						{ blockEditingMode === 'default' && (
-							<InspectorControls group="advanced">
-								<TextControl
-									__nextHasNoMarginBottom
-									autoComplete="off"
-									label={ __( 'Additional CSS class(es)' ) }
-									value={ props.attributes.className || '' }
-									onChange={ ( nextValue ) => {
-										props.setAttributes( {
-											className:
-												nextValue !== ''
-													? nextValue
-													: undefined,
-										} );
-									} }
-									help={ __(
-										'Separate multiple classes with spaces.'
-									) }
-								/>
-							</InspectorControls>
-						) }
-					</>
-				);
-			}
 
-			return <BlockEdit { ...props } />;
+			return (
+				<>
+					<BlockEdit { ...props } />
+					{ hasCustomClassName && props.isSelected && (
+						<CustomClassNameControls
+							attributes={ props.attributes }
+							setAttributes={ props.setAttributes }
+						/>
+					) }
+				</>
+			);
 		};
 	},
 	'withInspectorControl'
