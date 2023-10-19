@@ -725,7 +725,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -770,7 +769,9 @@ export default function Image( {
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
-				{ img }
+				{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
+				{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+				{ !! href ? <a>{ img }</a> : img }
 			</ResizableBox>
 		);
 	}
@@ -784,7 +785,9 @@ export default function Image( {
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
-			{ img }
+			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
+			{ /* eslint-disable-next-line jsx-a11y/anchor-is-valid */ }
+			{ !! href ? <a>{ img }</a> : img }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
