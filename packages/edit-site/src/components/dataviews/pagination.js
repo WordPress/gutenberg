@@ -76,16 +76,18 @@ function Pagination( {
 					<Button
 						onClick={ () => onChangeView( { ...view, page: 0 } ) }
 						disabled={ view.page === 0 }
-						aria-label={ __( 'First page' ) }
+						label={ __( 'First page' ) }
 						icon={ previous }
+						showTooltip
 					/>
 					<Button
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page - 1 } )
 						}
-						disabled={ view.page === 1 }
-						aria-label={ __( 'Previous page' ) }
+						disabled={ view.page === 0 }
+						label={ __( 'Previous page' ) }
 						icon={ chevronLeft }
+						showTooltip
 					/>
 					<HStack
 						justify="flex-start"
@@ -131,17 +133,19 @@ function Pagination( {
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page + 1 } )
 						}
-						disabled={ view.page >= totalPages }
-						aria-label={ __( 'Next page' ) }
+						disabled={ view.page >= totalPages - 1 }
+						label={ __( 'Next page' ) }
 						icon={ chevronRight }
+						showTooltip
 					/>
 					<Button
 						onClick={ () =>
 							onChangeView( { ...view, page: totalPages } )
 						}
-						disabled={ view.page >= totalPages }
-						aria-label={ __( 'Last page' ) }
+						disabled={ view.page >= totalPages - 1 }
+						label={ __( 'Last page' ) }
 						icon={ next }
+						showTooltip
 					/>
 				</HStack>
 			) }
