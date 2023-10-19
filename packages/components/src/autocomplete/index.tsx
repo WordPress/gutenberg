@@ -202,6 +202,7 @@ export function useAutocomplete( {
 						? filteredOptions.length
 						: selectedIndex ) - 1;
 				setSelectedIndex( newIndex );
+				// See the related PR as to why this is necessary: https://github.com/WordPress/gutenberg/pull/54902.
 				if ( isAppleOS() ) {
 					speak(
 						filteredOptions[ newIndex ].textLabel ||
