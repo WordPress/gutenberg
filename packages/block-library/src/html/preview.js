@@ -27,7 +27,12 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 	);
 
 	const styles = useMemo(
-		() => [ DEFAULT_STYLES, ...transformStyles( settingStyles ) ],
+		() => [
+			DEFAULT_STYLES,
+			...transformStyles(
+				settingStyles.filter( ( style ) => style.css )
+			),
+		],
 		[ settingStyles ]
 	);
 
