@@ -62,7 +62,6 @@ export {
 export { default as PostTaxonomies } from './post-taxonomies';
 export { FlatTermSelector as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
 export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
-export { PatternCategoriesSelector as PostPatternCategoriesSelector } from './post-taxonomies/pattern-categories-selector';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
