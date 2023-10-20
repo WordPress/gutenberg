@@ -183,7 +183,7 @@ export async function searchGlobalInserter( category, searchTerm ) {
 		case 'Synced patterns': {
 			waitForInsertElement = async () => {
 				return await page.waitForXPath(
-					`//*[@role='button' and contains(., '${ searchTerm }')]`
+					`//*[@role="list" and @class="block-editor-block-patterns-list"]//*[@role="button" and contains(., '${ searchTerm }')]`
 				);
 			};
 			waitForNoResults = async () => {
