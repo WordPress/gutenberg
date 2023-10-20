@@ -8,7 +8,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	useContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
@@ -19,6 +24,8 @@ import Link from '../routes/link';
 import { DataViews } from '../dataviews';
 import useTrashPostAction from '../actions/trash-post';
 import Media from '../media';
+import DataviewsContext from '../dataviews/context';
+import { DEFAULT_STATUSES } from '../dataviews/provider';
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -29,28 +36,8 @@ const defaultConfigPerViewType = {
 };
 
 export default function PagePages() {
-	// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
-	// The reason for that is to match defaultStatuses because we compare both strings below (see useEffect).
-	const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
-	const [ view, setView ] = useState( {
-		type: 'list',
-		filters: {
-			search: '',
-			status: DEFAULT_STATUSES,
-		},
-		page: 1,
-		perPage: 5,
-		sort: {
-			field: 'date',
-			direction: 'desc',
-		},
-		visibleFilters: [ 'search', 'author', 'status' ],
-		// All fields are visible by default, so it's
-		// better to keep track of the hidden ones.
-		hiddenFields: [ 'date', 'featured-image' ],
-		layout: {},
-	} );
-
+	const { view, setView } = useContext( DataviewsContext );
+	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
 		return statuses === null
@@ -239,7 +226,7 @@ export default function PagePages() {
 
 			setView( updatedView );
 		},
-		[ view ]
+		[ view, setView ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
