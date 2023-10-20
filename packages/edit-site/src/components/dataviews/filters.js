@@ -33,11 +33,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				};
 			}
 
-			if (
-				[ 'enumeration_in', 'enumeration_not_in' ].some(
-					( type ) => type === filterIndex[ id ]?.type
-				)
-			) {
+			if ( 'enumeration' === filterIndex[ id ]?.type ) {
 				const elements = [
 					{
 						value: '',

@@ -66,32 +66,22 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 	if ( ! isSortable && ! isHidable ) {
 		return text;
 	}
-	const isFilterable = header.column.columnDef.filters?.length > 0;
-	let filters = null;
-	if ( isFilterable ) {
-		filters = header.column.columnDef.filters.map( ( filter ) => {
-			if ( 'string' === typeof filter ) {
-				filter = {
-					id: header.column.columnDef.id,
-					type: filter,
-					name: header.column.columnDef.header,
-				};
-			} else if ( 'object' === typeof filter && filter.type ) {
-				filter = {
-					id: header.column.columnDef.id,
-					name: header.column.columnDef.header,
-					...filter,
-				};
-			} else {
-				filter = undefined;
-			}
+	const sortedDirection = header.column.getIsSorted();
 
-			if (
-				[ 'enumeration_in', 'enumeration_not_in' ].some(
-					( type ) => type === filter?.type
-				)
-			) {
-				filter.elements = [
+	let filter;
+	if ( header.column.columnDef.filters?.length > 0 ) {
+		filter = header.column.columnDef.filters.find(
+			( f ) =>
+				( 'string' === typeof f && f === 'enumeration' ) ||
+				( 'object' === typeof f && f.type === 'enumeration' )
+		);
+
+		if ( 'string' === typeof filter ) {
+			filter = {
+				id: header.column.columnDef.id,
+				type: filter,
+				name: header.column.columnDef.header,
+				elements: [
 					{
 						value: filter.resetValue || '',
 						label: filter.resetLabel || __( 'All' ),
@@ -99,23 +89,27 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 					...( filter.elements ||
 						header.column.columnDef.elements ||
 						[] ),
-				];
-			}
-
-			// TODO: it only works with filter of type enumeration for now,
-			// remove this check UI is ready.
-			if (
-				! [ 'enumeration_in', 'enumeration_not_in' ].some(
-					( type ) => type === filter?.type
-				)
-			) {
-				return null;
-			}
-
-			return filter;
-		} );
+				],
+			};
+		} else if ( 'object' === typeof filter ) {
+			filter = {
+				id: header.column.columnDef.id,
+				type: filter.type,
+				name: header.column.columnDef.header,
+				elements: [
+					{
+						value: filter.resetValue || '',
+						label: filter.resetLabel || __( 'All' ),
+					},
+					...( filter.elements ||
+						header.column.columnDef.elements ||
+						[] ),
+				],
+			};
+		}
 	}
-	const sortedDirection = header.column.getIsSorted();
+	const isFilterable = !! filter;
+
 	return (
 		<DropdownMenuV2
 			align="start"
@@ -174,57 +168,46 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 				) }
 				{ isFilterable && (
 					<DropdownMenuGroupV2>
-						{ filters.map( ( filter ) => {
-							return (
-								<DropdownSubMenuV2
-									key={ filter.id }
-									trigger={
-										<DropdownSubMenuTriggerV2
-											suffix={
-												<Icon
-													icon={ chevronRightSmall }
-												/>
-											}
-										>
-											{ filter.name +
-												' ' +
-												( filter.type ===
-												'enumeration_in'
-													? __( 'is' )
-													: __( 'is not' ) ) }
-										</DropdownSubMenuTriggerV2>
+						<DropdownSubMenuV2
+							key={ filter.id }
+							trigger={
+								<DropdownSubMenuTriggerV2
+									// TODO: the filter icon is duotone related.
+									// Find one that fits.
+									// prefix={<Icon icon={filterIcon} />}
+									suffix={
+										<Icon icon={ chevronRightSmall } />
 									}
 								>
-									{ filter.elements.map( ( element ) => {
-										const isActive =
-											element.value ===
-											view.filters[ filter.id ];
-										return (
-											<DropdownMenuItemV2
-												key={ element.value }
-												suffix={
-													isActive && (
-														<Icon icon={ check } />
-													)
-												}
-												onSelect={ () => {
-													onChangeView( {
-														...view,
-														filters: {
-															...view.filters,
-															[ filter.id ]:
-																element.value,
-														},
-													} );
-												} }
-											>
-												{ element.label }
-											</DropdownMenuItemV2>
-										);
-									} ) }
-								</DropdownSubMenuV2>
-							);
-						} ) }
+									{ __( 'Filter by' ) }
+								</DropdownSubMenuTriggerV2>
+							}
+						>
+							{ filter.elements.map( ( element ) => {
+								const isActive =
+									element.value === view.filters[ filter.id ];
+								return (
+									<DropdownMenuItemV2
+										key={ element.value }
+										suffix={
+											isActive && <Icon icon={ check } />
+										}
+										onSelect={ () => {
+											onChangeView( {
+												...view,
+												filters: {
+													...view.filters,
+													[ filter.id ]:
+														element.value,
+												},
+											} );
+										} }
+									>
+										{ element.label }
+									</DropdownMenuItemV2>
+								);
+							} ) }
+						</DropdownSubMenuV2>
 					</DropdownMenuGroupV2>
 				) }
 			</WithSeparators>

@@ -26,11 +26,7 @@ export default ( { filter, view, onChangeView } ) => {
 					as="span"
 					className="dataviews__select-control-prefix"
 				>
-					{ filter.name +
-						( filter.type === 'enumeration_not_in'
-							? ' ' + __( 'not' )
-							: '' ) +
-						':' }
+					{ filter.name + ':' }
 				</InputControlPrefixWrapper>
 			}
 			options={ filter.elements }

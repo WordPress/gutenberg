@@ -231,17 +231,7 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				filters: [
-					{
-						id: 'author',
-						type: 'enumeration_in',
-					},
-					{
-						id: 'author_exclude',
-						type: 'enumeration_not_in',
-						resetLabel: 'None',
-					},
-				],
+				filters: [ 'enumeration' ],
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
