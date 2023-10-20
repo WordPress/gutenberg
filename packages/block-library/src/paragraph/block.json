@@ -29,6 +29,10 @@
 		"direction": {
 			"type": "string",
 			"enum": [ "ltr", "rtl" ]
+		},
+		"typewritter": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -42,6 +46,7 @@
 				"text": true
 			}
 		},
+		"interactivity": true,
 		"__experimentalConnections": true,
 		"spacing": {
 			"margin": true,
@@ -69,5 +74,6 @@
 		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-paragraph-editor",
-	"style": "wp-block-paragraph"
+	"style": "wp-block-paragraph",
+	"viewScript": "file:./view.min.js"
 }

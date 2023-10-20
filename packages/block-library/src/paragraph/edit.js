@@ -10,6 +10,7 @@ import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarButton,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
@@ -22,6 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,7 +59,8 @@ function ParagraphBlock( {
 	setAttributes,
 	clientId,
 } ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
+	const { align, content, direction, dropCap, placeholder, typewritter } =
+		attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
@@ -76,6 +79,9 @@ function ParagraphBlock( {
 	} else {
 		helpText = __( 'Toggle to show a large initial letter.' );
 	}
+
+	const [ hasTypewritterEffect, setTypewritterEffect ] =
+		useState( typewritter );
 
 	return (
 		<>
@@ -98,6 +104,26 @@ function ParagraphBlock( {
 					}
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<ToolsPanel label={ __( 'Settings' ) }>
+					<ToolsPanelItem
+						hasValue={ () => !! typewritter }
+						label={ __( 'Typewritter effect' ) }
+						isShownByDefault={ true }
+					>
+						<ToggleControl
+							label={ __( 'Typewritter effectw' ) }
+							checked={ hasTypewritterEffect }
+							onChange={ ( newValue ) => {
+								setTypewritterEffect( ( state ) => ! state );
+								setAttributes( {
+									typewritter: newValue,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			{ isDropCapFeatureEnabled && (
 				<InspectorControls group="typography">
 					<ToolsPanelItem

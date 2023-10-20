@@ -521,8 +521,8 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
--	**Attributes:** align, content, direction, dropCap, placeholder
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Attributes:** align, content, direction, dropCap, placeholder, typewritter
 
 ## Pattern placeholder
 
