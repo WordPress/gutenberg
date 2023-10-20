@@ -67,34 +67,39 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 		return text;
 	}
 	const isFilterable = header.column.columnDef.filters?.length > 0;
-	let filter = null;
+	let filters = null;
 	if ( isFilterable ) {
-		// TODO: take all of them, not only one.
-		filter = header.column.columnDef.filters?.[ 0 ];
-		if ( 'string' === typeof filter ) {
-			filter = {
-				id: header.column.columnDef.id,
-				type: filter,
-				name: header.column.columnDef.header,
-			};
-		} else if ( 'object' === typeof filter && filter.type ) {
-			filter = {
-				id: filter.id || header.column.columnDef.id,
-				type: filter.type,
-				name: filter.name || header.column.columnDef.header,
-			};
-		}
-		if ( 'enumeration' === filter.type ) {
-			filter.elements = [
-				{
-					value: filter.resetValue || '',
-					label: filter.resetLabel || __( 'All' ),
-				},
-				...( filter.elements ||
-					header.column.columnDef.elements ||
-					[] ),
-			];
-		}
+		filters = header.column.columnDef.filters.map( ( filter ) => {
+			if ( 'string' === typeof filter ) {
+				filter = {
+					id: header.column.columnDef.id,
+					type: filter,
+					name: header.column.columnDef.header,
+				};
+			} else if ( 'object' === typeof filter && filter.type ) {
+				filter = {
+					id: filter.id || header.column.columnDef.id,
+					type: filter.type,
+					name: filter.name || header.column.columnDef.header,
+				};
+			} else {
+				filter = undefined;
+			}
+
+			if ( 'enumeration' === filter?.type ) {
+				filter.elements = [
+					{
+						value: filter.resetValue || '',
+						label: filter.resetLabel || __( 'All' ),
+					},
+					...( filter.elements ||
+						header.column.columnDef.elements ||
+						[] ),
+				];
+			}
+
+			return filter;
+		} );
 	}
 	const sortedDirection = header.column.getIsSorted();
 	return (
@@ -154,40 +159,55 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 					</DropdownMenuItemV2>
 				) }
 				{ isFilterable && (
-					<DropdownSubMenuV2
-						trigger={
-							<DropdownSubMenuTriggerV2
-								suffix={ <Icon icon={ chevronRightSmall } /> }
-							>
-								{ __( 'Filter by ' ) +
-									filter.name.toLowerCase() }
-							</DropdownSubMenuTriggerV2>
-						}
-					>
-						{ filter.elements.map( ( element ) => {
-							const isActive =
-								element.value === view.filters[ filter.id ];
+					<DropdownMenuGroupV2>
+						{ filters.map( ( filter ) => {
 							return (
-								<DropdownMenuItemV2
-									key={ element.value }
-									suffix={
-										isActive && <Icon icon={ check } />
+								<DropdownSubMenuV2
+									key={ filter.id }
+									trigger={
+										<DropdownSubMenuTriggerV2
+											suffix={
+												<Icon
+													icon={ chevronRightSmall }
+												/>
+											}
+										>
+											{ __( 'Filter by ' ) +
+												filter.name.toLowerCase() }
+										</DropdownSubMenuTriggerV2>
 									}
-									onSelect={ () => {
-										onChangeView( {
-											...view,
-											filters: {
-												...view.filters,
-												[ filter.id ]: element.value,
-											},
-										} );
-									} }
 								>
-									{ element.label }
-								</DropdownMenuItemV2>
+									{ filter.elements.map( ( element ) => {
+										const isActive =
+											element.value ===
+											view.filters[ filter.id ];
+										return (
+											<DropdownMenuItemV2
+												key={ element.value }
+												suffix={
+													isActive && (
+														<Icon icon={ check } />
+													)
+												}
+												onSelect={ () => {
+													onChangeView( {
+														...view,
+														filters: {
+															...view.filters,
+															[ filter.id ]:
+																element.value,
+														},
+													} );
+												} }
+											>
+												{ element.label }
+											</DropdownMenuItemV2>
+										);
+									} ) }
+								</DropdownSubMenuV2>
 							);
 						} ) }
-					</DropdownSubMenuV2>
+					</DropdownMenuGroupV2>
 				) }
 			</WithSeparators>
 		</DropdownMenuV2>
