@@ -98,19 +98,16 @@ test.describe( 'Router regions', () => {
 		await expect( nestedRegionSsr ).toHaveText( 'content from page 1' );
 	} );
 
-	test( 'Page title is updated', async ( { page } ) => {
-		expect( await page.title() ).toBe(
+	test( 'Page title is updated 2', async ( { page } ) => {
+		await expect( page ).toHaveTitle(
 			'router regions – page 1 – gutenberg'
 		);
 		await page.getByTestId( 'next' ).click();
-		await page.waitForFunction(
-			() => document.title === 'router regions – page 2 – gutenberg'
-		);
-		expect( await page.title() ).toBe(
+		await expect( page ).toHaveTitle(
 			'router regions – page 2 – gutenberg'
 		);
 		await page.getByTestId( 'back' ).click();
-		expect( await page.title() ).toBe(
+		await expect( page ).toHaveTitle(
 			'router regions – page 1 – gutenberg'
 		);
 	} );
