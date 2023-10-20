@@ -651,6 +651,7 @@ export const getUserPatternCategories =
 			{
 				per_page: -1,
 				_fields: 'id,name,description,slug',
+				context: 'view',
 			}
 		);
 

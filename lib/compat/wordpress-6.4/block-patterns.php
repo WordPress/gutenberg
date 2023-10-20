@@ -16,20 +16,21 @@
  */
 function gutenberg_register_taxonomy_patterns() {
 	$args = array(
-		'public'             => true,
-		'publicly_queryable' => false,
-		'hierarchical'       => false,
-		'labels'             => array(
+		'public'                => true,
+		'publicly_queryable'    => false,
+		'hierarchical'          => false,
+		'labels'                => array(
 			'name'          => _x( 'Pattern Categories', 'taxonomy general name' ),
 			'singular_name' => _x( 'Pattern Category', 'taxonomy singular name' ),
 		),
-		'query_var'          => false,
-		'rewrite'            => false,
-		'show_ui'            => true,
-		'_builtin'           => true,
-		'show_in_nav_menus'  => false,
-		'show_in_rest'       => true,
-		'show_admin_column'  => true,
+		'query_var'             => false,
+		'rewrite'               => false,
+		'show_ui'               => true,
+		'_builtin'              => true,
+		'show_in_nav_menus'     => false,
+		'show_in_rest'          => true,
+		'show_admin_column'     => true,
+		'rest_controller_class' => 'Gutenberg_REST_Pattern_Categories_Controller',
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }

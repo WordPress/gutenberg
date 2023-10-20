@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Classic block: Add option to convert to blocks [#55461]
 
 ## 1.106.0
 -   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
