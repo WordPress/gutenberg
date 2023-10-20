@@ -18,12 +18,12 @@
 	text-align: center;
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
-	top: -1px;
+	top: ($grid-unit-05 + 1) * -1;
 	z-index: z-index(".edit-post-block-manager__disabled-blocks-count");
 
 	// Stick the category titles to the bottom
 	~ .edit-post-block-manager__results .edit-post-block-manager__category-title {
-		top: 35px;
+		top: $grid-unit-40 - 1;
 	}
 	.is-link {
 		margin-left: 12px;
