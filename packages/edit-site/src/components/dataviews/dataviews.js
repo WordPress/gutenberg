@@ -20,6 +20,7 @@ export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
+	filters,
 	actions,
 	data,
 	isLoading = false,
@@ -38,6 +39,7 @@ export default function DataViews( {
 				<HStack>
 					<HStack justify="start">
 						<Filters
+							filters={ filters }
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }

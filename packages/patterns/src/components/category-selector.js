@@ -2,65 +2,48 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
-import { useDebounce } from '@wordpress/compose';
+import { CheckboxControl, BaseControl } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 
-const unescapeString = ( arg ) => {
-	return decodeEntities( arg );
-};
-
-export const CATEGORY_SLUG = 'wp_pattern_category';
-
 export default function CategorySelector( {
-	categoryTerms,
 	onChange,
-	categoryMap,
+	isCategorySelected,
+	categoryOptions,
+	showLabel = true,
 } ) {
-	const [ search, setSearch ] = useState( '' );
-	const debouncedSearch = useDebounce( setSearch, 500 );
-
-	const suggestions = useMemo( () => {
-		return Array.from( categoryMap.values() )
-			.map( ( category ) => unescapeString( category.label ) )
-			.filter( ( category ) => {
-				if ( search !== '' ) {
-					return category
-						.toLowerCase()
-						.includes( search.toLowerCase() );
-				}
-				return true;
-			} )
-			.sort( ( a, b ) => a.localeCompare( b ) );
-	}, [ search, categoryMap ] );
-
-	function handleChange( termNames ) {
-		const uniqueTerms = termNames.reduce( ( terms, newTerm ) => {
-			if (
-				! terms.some(
-					( term ) => term.toLowerCase() === newTerm.toLowerCase()
-				)
-			) {
-				terms.push( newTerm );
-			}
-			return terms;
-		}, [] );
-
-		onChange( uniqueTerms );
-	}
+	const renderTerms = ( renderedTerms ) => {
+		return renderedTerms.map( ( category ) => {
+			return (
+				<div
+					key={ category.id }
+					className="patterns-category-selector__terms-choice"
+				>
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						checked={ isCategorySelected( category ) }
+						onChange={ () => onChange( category ) }
+						label={ decodeEntities( category.label ) }
+					/>
+				</div>
+			);
+		} );
+	};
 
 	return (
-		<FormTokenField
-			className="patterns-menu-items__convert-modal-categories"
-			value={ categoryTerms }
-			suggestions={ suggestions }
-			onChange={ handleChange }
-			onInputChange={ debouncedSearch }
-			label={ __( 'Categories' ) }
-			tokenizeOnBlur
-			__experimentalExpandOnFocus
-			__next40pxDefaultSize
-		/>
+		<BaseControl>
+			{ showLabel && (
+				<BaseControl.VisualLabel>
+					{ __( 'Categories' ) }
+				</BaseControl.VisualLabel>
+			) }
+			<div
+				className="patterns-category-selector__terms-list"
+				tabIndex="0"
+				role="group"
+				aria-label={ __( 'Categories' ) }
+			>
+				{ renderTerms( categoryOptions ) }
+			</div>
+		</BaseControl>
 	);
 }

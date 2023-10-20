@@ -9,8 +9,16 @@ import { __ } from '@wordpress/i18n';
 import TextFilter from './text-filter';
 import InFilter from './in-filter';
 
-export default function Filters( { fields, view, onChangeView } ) {
-	const filters = {};
+export default function Filters( { filters, fields, view, onChangeView } ) {
+	const filterIndex = {};
+	filters.forEach( ( filter ) => {
+		if ( 'object' !== typeof filter || ! filter?.id || ! filter?.type ) {
+			return;
+		}
+
+		filterIndex[ filter.id ] = filter;
+	} );
+
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
@@ -19,7 +27,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		field.filters.forEach( ( filter ) => {
 			let id = field.id;
 			if ( 'string' === typeof filter ) {
-				filters[ id ] = {
+				filterIndex[ id ] = {
 					id,
 					name: field.header,
 					type: filter,
@@ -28,14 +36,14 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 			if ( 'object' === typeof filter ) {
 				id = filter.id || field.id;
-				filters[ id ] = {
+				filterIndex[ id ] = {
 					id,
 					name: filter.name || field.header,
 					type: filter.type,
 				};
 			}
 
-			if ( 'enumeration' === filters[ id ]?.type ) {
+			if ( 'enumeration' === filterIndex[ id ]?.type ) {
 				const elements = [
 					{
 						value: filter.resetValue || '',
@@ -43,8 +51,8 @@ export default function Filters( { fields, view, onChangeView } ) {
 					},
 					...( field.elements || [] ),
 				];
-				filters[ id ] = {
-					...filters[ id ],
+				filterIndex[ id ] = {
+					...filterIndex[ id ],
 					elements,
 				};
 			}
@@ -53,7 +61,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 	return (
 		view.visibleFilters?.map( ( filterName ) => {
-			const filter = filters[ filterName ];
+			const filter = filterIndex[ filterName ];
 
 			if ( ! filter ) {
 				return null;

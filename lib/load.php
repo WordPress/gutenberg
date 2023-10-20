@@ -53,6 +53,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.4 compat.
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-blocks-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-pattern-categories-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
@@ -68,6 +70,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/rest-api.php';
 
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
+}
+
+// Experimental signaling server.
+if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
@@ -251,3 +258,6 @@ require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/behaviors.php';
+
+// Data views.
+require_once __DIR__ . '/experimental/data-views.php';

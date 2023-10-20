@@ -83,6 +83,11 @@ const scaleOptions = [
 	},
 ];
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function Image( {
 	temporaryURL,
 	attributes,
@@ -725,7 +730,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -784,7 +788,14 @@ export default function Image( {
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
-			{ img }
+			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
+			{ !! href ? (
+				<a href={ href } { ...disabledClickProps }>
+					{ img }
+				</a>
+			) : (
+				img
+			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
