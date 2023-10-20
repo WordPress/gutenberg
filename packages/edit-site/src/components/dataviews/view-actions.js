@@ -38,6 +38,10 @@ const availableViews = [
 		id: 'grid',
 		label: __( 'Grid' ),
 	},
+	{
+		id: 'side-by-side',
+		label: __( 'Side by side' ),
+	},
 ];
 
 function ViewTypeMenu( { view, onChangeView } ) {
