@@ -221,6 +221,20 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						{ ( { onClose } ) =>
 							showDropDown && (
 								<div className="block-editor-block-switcher__container">
+									{ hasPatternTransformation && (
+										<PatternTransformationsMenu
+											blocks={ blocks }
+											patterns={ patterns }
+											onSelect={ (
+												transformedBlocks
+											) => {
+												onPatternTransform(
+													transformedBlocks
+												);
+												onClose();
+											} }
+										/>
+									) }
 									{ hasBlockOrBlockVariationTransforms && (
 										<BlockTransformationsMenu
 											className="block-editor-block-switcher__transforms__menugroup"
@@ -238,20 +252,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											onSelectVariation={ ( name ) => {
 												onBlockVariationTransform(
 													name
-												);
-												onClose();
-											} }
-										/>
-									) }
-									{ hasPatternTransformation && (
-										<PatternTransformationsMenu
-											blocks={ blocks }
-											patterns={ patterns }
-											onSelect={ (
-												transformedBlocks
-											) => {
-												onPatternTransform(
-													transformedBlocks
 												);
 												onClose();
 											} }
