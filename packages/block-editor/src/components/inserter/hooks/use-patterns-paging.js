@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useAsyncList, usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
 
@@ -54,6 +54,17 @@ export default function usePatternsPaging(
 
 		setCurrentPage( page );
 	};
+
+	useEffect(
+		function scrollToTopOnCategoryChange() {
+			const scrollContainer = getScrollContainer(
+				scrollContainerRef?.current
+			);
+			scrollContainer?.scrollTo( 0, 0 );
+		},
+		[ currentCategory, scrollContainerRef ]
+	);
+
 	return {
 		totalItems,
 		categoryPatterns,

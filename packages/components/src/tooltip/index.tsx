@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import * as Ariakit from '@ariakit/react/tooltip';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -68,20 +69,18 @@ function Tooltip( props: TooltipProps ) {
 		timeout: delay,
 	} );
 
-	const isTooltipOpen = tooltipStore.useState( 'open' );
-
 	return (
 		<>
 			<Ariakit.TooltipAnchor
-				onBlur={ tooltipStore.hide }
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
-			{ isOnlyChild && ( text || shortcut ) && isTooltipOpen && (
+			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
+					unmountOnHide
 					className="components-tooltip"
 					gutter={ 4 }
 					id={ describedById }

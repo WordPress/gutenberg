@@ -12,6 +12,7 @@ import {
 	blockInserterPanel,
 	listViewPanel,
 	hasPageContentFocus,
+	pageContentFocusType,
 } from '../reducer';
 
 import { setIsInserterOpened } from '../actions';
@@ -189,6 +190,23 @@ describe( 'state', () => {
 					hasPageContentFocus: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'pageContentFocusType', () => {
+		it( 'defaults to disableTemplate', () => {
+			expect( pageContentFocusType( undefined, {} ) ).toBe(
+				'disableTemplate'
+			);
+		} );
+
+		it( 'can be set', () => {
+			expect(
+				pageContentFocusType( 'disableTemplate', {
+					type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
+					pageContentFocusType: 'enableTemplate',
+				} )
+			).toBe( 'enableTemplate' );
 		} );
 	} );
 } );

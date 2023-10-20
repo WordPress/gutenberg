@@ -17,12 +17,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { STORE_NAME } from '../../../store/constants';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { store as editSiteStore } from '../../../store';
-
-const entityLabels = {
-	wp_navigation: __( 'Navigation' ),
-	wp_block: __( 'Pattern' ),
-	wp_template: __( 'Template' ),
-};
+import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
 const SettingsHeader = ( { sidebarName } ) => {
 	const { hasPageContentFocus, entityType } = useSelect( ( select ) => {
@@ -35,7 +30,9 @@ const SettingsHeader = ( { sidebarName } ) => {
 		};
 	} );
 
-	const entityLabel = entityLabels[ entityType ] || entityLabels.wp_template;
+	const entityLabel =
+		POST_TYPE_LABELS[ entityType ] ||
+		POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ];
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openTemplateSettings = () =>

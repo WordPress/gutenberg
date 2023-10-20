@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -48,7 +49,7 @@ function ToolbarItem(
 		: Component && <Component>{ children }</Component>;
 
 	return (
-		<BaseToolbarItem
+		<Ariakit.ToolbarItem
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }

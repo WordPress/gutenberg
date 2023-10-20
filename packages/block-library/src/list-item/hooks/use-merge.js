@@ -76,6 +76,24 @@ export default function useMerge( clientId, onMerge ) {
 	}
 
 	return ( forward ) => {
+		function mergeWithNested( clientIdA, clientIdB ) {
+			registry.batch( () => {
+				// When merging a sub list item with a higher next list item, we
+				// also need to move any nested list items. Check if there's a
+				// listed list, and append its nested list items to the current
+				// list.
+				const [ nestedListClientId ] = getBlockOrder( clientIdB );
+				if ( nestedListClientId ) {
+					moveBlocksToPosition(
+						getBlockOrder( nestedListClientId ),
+						nestedListClientId,
+						getBlockRootClientId( clientIdA )
+					);
+				}
+				mergeBlocks( clientIdA, clientIdB );
+			} );
+		}
+
 		if ( forward ) {
 			const nextBlockClientId = getNextId( clientId );
 
@@ -87,14 +105,7 @@ export default function useMerge( clientId, onMerge ) {
 			if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
 			} else {
-				registry.batch( () => {
-					moveBlocksToPosition(
-						getBlockOrder( nextBlockClientId ),
-						nextBlockClientId,
-						getPreviousBlockClientId( nextBlockClientId )
-					);
-					mergeBlocks( clientId, nextBlockClientId );
-				} );
+				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
 			// Merging is only done from the top level. For lowel levels, the
@@ -104,21 +115,7 @@ export default function useMerge( clientId, onMerge ) {
 				outdentListItem( clientId );
 			} else if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
-				registry.batch( () => {
-					// When merging a list item with a previous trailing list
-					// item, we also need to move any nested list items. First,
-					// check if there's a listed list. If there's a nested list,
-					// append its nested list items to the trailing list.
-					const [ nestedListClientId ] = getBlockOrder( clientId );
-					if ( nestedListClientId ) {
-						moveBlocksToPosition(
-							getBlockOrder( nestedListClientId ),
-							nestedListClientId,
-							getBlockRootClientId( trailingId )
-						);
-					}
-					mergeBlocks( trailingId, clientId );
-				} );
+				mergeWithNested( trailingId, clientId );
 			} else {
 				onMerge( forward );
 			}

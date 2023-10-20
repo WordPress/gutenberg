@@ -15,14 +15,16 @@ class Tests_Fonts_WpFontLibrary_SetUploadDir extends WP_UnitTestCase {
 	public function test_should_set_fonts_upload_dir() {
 		$defaults = array(
 			'subdir'  => '/abc',
-			'basedir' => '/var/www/html/wp-content',
-			'baseurl' => 'http://example.com/wp-content',
+			'basedir' => '/any/path',
+			'baseurl' => 'http://example.com/an/arbitrary/url',
+			'path'    => '/any/path/abc',
+			'url'     => 'http://example.com/an/arbitrary/url/abc',
 		);
 		$expected = array(
 			'subdir'  => '/fonts',
-			'basedir' => '/var/www/html/wp-content',
+			'basedir' => WP_CONTENT_DIR,
 			'baseurl' => content_url(),
-			'path'    => '/var/www/html/wp-content/fonts',
+			'path'    => path_join( WP_CONTENT_DIR, 'fonts' ),
 			'url'     => content_url() . '/fonts',
 		);
 		$this->assertSame( $expected, WP_Font_Library::set_upload_dir( $defaults ) );

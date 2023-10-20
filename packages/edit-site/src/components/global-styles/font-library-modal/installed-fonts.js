@@ -9,6 +9,8 @@ import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Spinner,
+	Notice,
+	FlexItem,
 } from '@wordpress/components';
 
 /**
@@ -19,8 +21,8 @@ import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
-import LocalFonts from './local-fonts';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
+import { getNoticeFromUninstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
 
@@ -44,10 +46,14 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( font );
 	};
 
+	const [ notice, setNotice ] = useState( null );
+
 	const handleConfirmUninstall = async () => {
-		const result = await uninstallFont( libraryFontSelected );
+		const response = await uninstallFont( libraryFontSelected );
+		const uninstallNotice = getNoticeFromUninstallResponse( response );
+		setNotice( uninstallNotice );
 		// If the font was succesfully uninstalled it is unselected
-		if ( result ) {
+		if ( ! response?.errors?.length ) {
 			handleUnselectFont();
 		}
 		setIsConfirmDeleteOpen( false );
@@ -72,7 +78,18 @@ function InstalledFonts() {
 
 	useEffect( () => {
 		refreshLibrary();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
+
+	// Reset notice after 5 seconds
+	useEffect( () => {
+		if ( notice ) {
+			const timeout = setTimeout( () => {
+				setNotice( null );
+			}, 5000 );
+			return () => clearTimeout( timeout );
+		}
+	}, [ notice ] );
 
 	return (
 		<TabLayout
@@ -93,6 +110,22 @@ function InstalledFonts() {
 				handleCancelUninstall={ handleCancelUninstall }
 			/>
 
+			{ notice && (
+				<>
+					<FlexItem>
+						<Spacer margin={ 2 } />
+						<Notice
+							isDismissible={ false }
+							status={ notice.type }
+							className="font-library-modal__font-collection__notice"
+						>
+							{ notice.message }
+						</Notice>
+					</FlexItem>
+					<Spacer margin={ 4 } />
+				</>
+			) }
+
 			{ ! libraryFontSelected && (
 				<>
 					{ isResolvingLibrary && <Spinner /> }
@@ -110,12 +143,12 @@ function InstalledFonts() {
 									/>
 								) ) }
 							</FontsGrid>
+							<Spacer margin={ 8 } />
 						</>
 					) }
 
 					{ baseThemeFonts.length > 0 && (
 						<>
-							<Spacer margin={ 8 } />
 							<FontsGrid title={ __( 'Theme Fonts' ) }>
 								{ baseThemeFonts.map( ( font ) => (
 									<LibraryFontCard
@@ -129,9 +162,6 @@ function InstalledFonts() {
 							</FontsGrid>
 						</>
 					) }
-
-					<Spacer margin={ 8 } />
-					<LocalFonts />
 				</>
 			) }
 

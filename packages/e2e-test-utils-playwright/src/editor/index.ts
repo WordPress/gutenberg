@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { Browser, Page, BrowserContext, Frame } from '@playwright/test';
+import type {
+	Browser,
+	Page,
+	BrowserContext,
+	FrameLocator,
+} from '@playwright/test';
 
 /**
  * Internal dependencies
@@ -14,11 +19,13 @@ import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
 import { publishPost } from './publish-post';
+import { saveDraft } from './save-draft';
 import { selectBlocks } from './select-blocks';
 import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
+import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
@@ -36,8 +43,8 @@ export class Editor {
 		this.browser = this.context.browser()!;
 	}
 
-	get canvas(): Frame | Page {
-		return this.page.frame( 'editor-canvas' ) || this.page;
+	get canvas(): FrameLocator {
+		return this.page.frameLocator( '[name="editor-canvas"]' );
 	}
 
 	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
@@ -60,6 +67,8 @@ export class Editor {
 	openPreviewPage: typeof openPreviewPage = openPreviewPage.bind( this );
 	/** @borrows publishPost as this.publishPost */
 	publishPost: typeof publishPost = publishPost.bind( this );
+	/** @borrows saveDraft as this.saveDraft */
+	saveDraft: typeof saveDraft = saveDraft.bind( this );
 	/** @borrows saveSiteEditorEntities as this.saveSiteEditorEntities */
 	saveSiteEditorEntities: typeof saveSiteEditorEntities =
 		saveSiteEditorEntities.bind( this );
@@ -72,6 +81,9 @@ export class Editor {
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
+	/** @borrows switchToLegacyCanvas as this.switchToLegacyCanvas */
+	switchToLegacyCanvas: typeof switchToLegacyCanvas =
+		switchToLegacyCanvas.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
 }

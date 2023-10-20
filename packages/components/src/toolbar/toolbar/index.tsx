@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -16,26 +16,33 @@ import deprecated from '@wordpress/deprecated';
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
-import { ContextSystemProvider } from '../../ui/context';
-
-const CONTEXT_SYSTEM_VALUE = {
-	DropdownMenu: {
-		variant: 'toolbar',
-	},
-	Dropdown: {
-		variant: 'toolbar',
-	},
-};
+import type { WordPressComponentProps } from '../../context';
+import { ContextSystemProvider } from '../../context';
 
 function UnforwardedToolbar(
 	{
 		className,
 		label,
+		variant,
 		...props
 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
+	const isVariantDefined = variant !== undefined;
+	const contextSystemValue = useMemo( () => {
+		if ( isVariantDefined ) {
+			return {};
+		}
+		return {
+			DropdownMenu: {
+				variant: 'toolbar',
+			},
+			Dropdown: {
+				variant: 'toolbar',
+			},
+		};
+	}, [ isVariantDefined ] );
+
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			since: '5.6',
@@ -55,10 +62,12 @@ function UnforwardedToolbar(
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(
 		'components-accessible-toolbar',
-		className
+		className,
+		variant && `is-${ variant }`
 	);
+
 	return (
-		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
+		<ContextSystemProvider value={ contextSystemValue }>
 			<ToolbarContainer
 				className={ finalClassName }
 				label={ label }

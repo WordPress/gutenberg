@@ -1,26 +1,15 @@
+/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * External dependencies
- */
-const path = require( 'path' );
+import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
  */
-const {
-	getTypingEventDurations,
-	getClickEventDurations,
-	getHoverEventDurations,
-	getSelectionEventDurations,
-	getLoadingDurations,
-	loadBlocksFromHtml,
-	load1000Paragraphs,
-	sum,
-} = require( '../utils' );
+import { PerfUtils } from '../fixtures';
+import { sum } from '../utils.js';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
@@ -42,6 +31,15 @@ const results = {
 };
 
 test.describe( 'Post Editor Performance', () => {
+	test.use( {
+		perfUtils: async ( { page }, use ) => {
+			await use( new PerfUtils( { page } ) );
+		},
+		metrics: async ( { page }, use ) => {
+			await use( new Metrics( { page } ) );
+		},
+	} );
+
 	test.afterAll( async ( {}, testInfo ) => {
 		await testInfo.attach( 'results', {
 			body: JSON.stringify( results, null, 2 ),
@@ -49,356 +47,434 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.createNewPost();
-		// Disable auto-save to avoid impacting the metrics.
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
-				autosaveInterval: 100000000000,
-				localAutosaveInterval: 100000000000,
-			} );
+	test.describe( 'Loading', () => {
+		let draftURL = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			draftURL = await perfUtils.saveDraft();
 		} );
-	} );
 
-	test( 'Loading', async ( { browser, page } ) => {
-		// Turn the large post HTML into blocks and insert.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
-
-		// Save the draft.
-		await page
-			.getByRole( 'button', { name: 'Save draft' } )
-			.click( { timeout: 60_000 } );
-		await expect(
-			page.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
-
-		// Get the URL that we will be testing against.
-		const draftURL = page.url();
-
-		// Start the measurements.
 		const samples = 10;
 		const throwaway = 1;
-		const rounds = throwaway + samples;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Open a fresh page in a new context to prevent caching.
-			const testPage = await browser.newPage();
+		const iterations = samples + throwaway;
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				page,
+				perfUtils,
+				metrics,
+			} ) => {
+				// Open the test draft.
+				await page.goto( draftURL );
+				const canvas = await perfUtils.getCanvas();
 
-			// Go to the test page URL.
-			await testPage.goto( draftURL );
+				// Wait for the first block.
+				await canvas.locator( '.wp-block' ).first().waitFor( {
+					timeout: 120_000,
+				} );
 
-			// Get canvas (handles both legacy and iframed canvas).
-			const canvas = await Promise.any( [
-				( async () => {
-					const legacyCanvasLocator = testPage.locator(
-						'.wp-block-post-content'
+				// Get the durations.
+				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					Object.entries( loadingDurations ).forEach(
+						( [ metric, duration ] ) => {
+							if ( metric === 'timeSinceResponseEnd' ) {
+								results.firstBlock.push( duration );
+							} else {
+								results[ metric ].push( duration );
+							}
+						}
 					);
-					await legacyCanvasLocator.waitFor( { timeout: 120_000 } );
-					return legacyCanvasLocator;
-				} )(),
-				( async () => {
-					const iframedCanvasLocator = testPage.frameLocator(
-						'[name=editor-canvas]'
-					);
-					await iframedCanvasLocator
-						.locator( 'body' )
-						.waitFor( { timeout: 120_000 } );
-					return iframedCanvasLocator;
-				} )(),
-			] );
-
-			await canvas.locator( '.wp-block' ).first().waitFor( {
-				timeout: 120_000,
+				}
 			} );
+		}
+	} );
+
+	test.describe( 'Typing', () => {
+		let draftURL = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftURL = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			// The first character typed triggers a longer time (isTyping change).
+			// It can impact the stability of the metric, so we exclude it. It
+			// probably deserves a dedicated metric itself, though.
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+
+			// Start tracing.
+			await metrics.startTracing();
+
+			// Type the testing sequence into the empty paragraph.
+			await paragraph.type( 'x'.repeat( iterations ), {
+				delay: BROWSER_IDLE_WAIT,
+				// The extended timeout is needed because the typing is very slow
+				// and the `delay` value itself does not extend it.
+				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+			} );
+
+			// Stop tracing.
+			await metrics.stopTracing();
+
+			// Get the durations.
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				metrics.getTypingEventDurations();
 
 			// Save the results.
-			if ( i >= throwaway ) {
-				const loadingDurations = await getLoadingDurations( testPage );
-				Object.entries( loadingDurations ).forEach(
-					( [ metric, duration ] ) => {
-						results[ metric ].push( duration );
-					}
+			for ( let i = throwaway; i < iterations; i++ ) {
+				results.type.push(
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 				);
 			}
-
-			await testPage.close();
-		}
+		} );
 	} );
 
-	test( 'Typing', async ( { browser, page, editor } ) => {
-		// Load the large post fixture.
-		await loadBlocksFromHtml(
-			page,
-			path.join( process.env.ASSETS_PATH, 'large-post.html' )
-		);
+	test.describe( 'Typing within containers', () => {
+		let draftURL = null;
 
-		// Append an empty paragraph.
-		await editor.insertBlock( { name: 'core/paragraph' } );
-
-		// Start tracing.
-		await browser.startTracing( page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForSmallPostWithContainers();
+			draftURL = await perfUtils.saveDraft();
 		} );
 
-		// The first character typed triggers a longer time (isTyping change).
-		// It can impact the stability of the metric, so we exclude it. It
-		// probably deserves a dedicated metric itself, though.
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
 
-		// Type the testing sequence into the empty paragraph.
-		await page.keyboard.type( 'x'.repeat( rounds ), {
-			delay: BROWSER_IDLE_WAIT,
-		} );
+			// Select the block where we type in.
+			const firstParagraph = canvas
+				.getByRole( 'document', {
+					name: /Paragraph block|Block: Paragraph/,
+				} )
+				.first();
+			await firstParagraph.click();
 
-		// Stop tracing and save results.
-		const traceBuffer = await browser.stopTracing();
-		const traceResults = JSON.parse( traceBuffer.toString() );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
+			// The first character typed triggers a longer time (isTyping change).
+			// It can impact the stability of the metric, so we exclude it. It
+			// probably deserves a dedicated metric itself, though.
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
 
-		for ( let i = throwaway; i < rounds; i++ ) {
-			results.type.push(
-				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-			);
-		}
-	} );
+			// Start tracing.
+			await metrics.startTracing();
 
-	test( 'Typing within containers', async ( { browser, page, editor } ) => {
-		await loadBlocksFromHtml(
-			page,
-			path.join(
-				process.env.ASSETS_PATH,
-				'small-post-with-containers.html'
-			)
-		);
-
-		// Select the block where we type in
-		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
-			.first()
-			.click();
-
-		await browser.startTracing( page, {
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
-
-		const samples = 10;
-		// The first character typed triggers a longer time (isTyping change).
-		// It can impact the stability of the metric, so we exclude it. It
-		// probably deserves a dedicated metric itself, though.
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		await page.keyboard.type( 'x'.repeat( rounds ), {
-			delay: BROWSER_IDLE_WAIT,
-		} );
-
-		const traceBuffer = await browser.stopTracing();
-		const traceResults = JSON.parse( traceBuffer.toString() );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-
-		for ( let i = throwaway; i < rounds; i++ ) {
-			results.typeContainer.push(
-				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-			);
-		}
-	} );
-
-	test( 'Selecting blocks', async ( { browser, page, editor } ) => {
-		await load1000Paragraphs( page );
-		const paragraphs = editor.canvas.locator( '.wp-block' );
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
+			// Start typing in the middle of the text.
+			await firstParagraph.type( 'x'.repeat( iterations ), {
+				delay: BROWSER_IDLE_WAIT,
+				// The extended timeout is needed because the typing is very slow
+				// and the `delay` value itself does not extend it.
+				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
 			} );
 
-			await paragraphs.nth( i ).click();
+			// Stop tracing.
+			await metrics.stopTracing();
 
-			const traceBuffer = await browser.stopTracing();
+			// Get the durations.
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				metrics.getTypingEventDurations();
 
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const allDurations = getSelectionEventDurations( traceResults );
-				results.focus.push(
-					allDurations.reduce( ( acc, eventDurations ) => {
-						return acc + sum( eventDurations );
-					}, 0 )
+			// Save the results.
+			for ( let i = throwaway; i < iterations; i++ ) {
+				results.typeContainer.push(
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
 				);
 			}
-		}
+		} );
 	} );
 
-	test( 'Opening persistent list view', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const listViewToggle = page.getByRole( 'button', {
-			name: 'Document Overview',
+	test.describe( 'Selecting blocks', () => {
+		let draftURL = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftURL = await perfUtils.saveDraft();
 		} );
 
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraphs = canvas.getByRole( 'document', {
+				name: /Empty block/i,
 			} );
 
-			// Open List View
-			await listViewToggle.click();
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
-			const traceBuffer = await browser.stopTracing();
+				// Start tracing.
+				await metrics.startTracing();
 
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseClickEvents ] =
-					getClickEventDurations( traceResults );
-				results.listViewOpen.push( mouseClickEvents[ 0 ] );
+				// Click the next paragraph.
+				await paragraphs.nth( i ).click();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const allDurations = metrics.getSelectionEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.focus.push(
+						allDurations.reduce( ( acc, eventDurations ) => {
+							return acc + sum( eventDurations );
+						}, 0 )
+					);
+				}
 			}
-
-			// Close List View
-			await listViewToggle.click();
-		}
+		} );
 	} );
 
-	test( 'Opening the inserter', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+	test.describe( 'Opening persistent List View', () => {
+		let draftURL = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftURL = await perfUtils.saveDraft();
 		} );
 
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+
+			const listViewToggle = page.getByRole( 'button', {
+				name: 'Document Overview',
+			} );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Open List View.
+				await listViewToggle.click();
+				await perfUtils.expectExpandedState( listViewToggle, 'true' );
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.listViewOpen.push( mouseClickEvents[ 0 ] );
+				}
+
+				// Close List View
+				await listViewToggle.click();
+				await perfUtils.expectExpandedState( listViewToggle, 'false' );
+			}
+		} );
+	} );
+
+	test.describe( 'Opening Inserter', () => {
+		let draftURL = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftURL = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Open Inserter.
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'true'
+				);
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					results.inserterOpen.push( mouseClickEvents[ 0 ] );
+				}
+
+				// Close Inserter.
+				await globalInserterToggle.click();
+				await perfUtils.expectExpandedState(
+					globalInserterToggle,
+					'false'
+				);
+			}
+		} );
+	} );
+
+	test.describe( 'Searching Inserter', () => {
+		let draftURL = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftURL = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
 			} );
 
 			// Open Inserter.
 			await globalInserterToggle.click();
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
-			const traceBuffer = await browser.stopTracing();
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseClickEvents ] =
-					getClickEventDurations( traceResults );
-				results.inserterOpen.push( mouseClickEvents[ 0 ] );
-			}
+				// Start tracing.
+				await metrics.startTracing();
 
-			// Close Inserter.
-			await globalInserterToggle.click();
-		}
-	} );
+				// Type to trigger search.
+				await page.keyboard.type( 'p' );
 
-	test( 'Searching the inserter', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} );
+				// Stop tracing.
+				await metrics.stopTracing();
 
-		// Open Inserter.
-		await globalInserterToggle.click();
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			await page.keyboard.type( 'p' );
-
-			const traceBuffer = await browser.stopTracing();
-
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
+				// Get the durations.
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-					getTypingEventDurations( traceResults );
-				results.inserterSearch.push(
-					keyDownEvents[ 0 ] + keyPressEvents[ 0 ] + keyUpEvents[ 0 ]
-				);
-			}
+					metrics.getTypingEventDurations();
 
-			await page.keyboard.press( 'Backspace' );
-		}
-
-		// Close Inserter.
-		await globalInserterToggle.click();
-	} );
-
-	test( 'Hovering Inserter Items', async ( { browser, page } ) => {
-		await load1000Paragraphs( page );
-		const globalInserterToggle = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
-		} );
-		const paragraphBlockItem = page.locator(
-			'.block-editor-inserter__menu .editor-block-list-item-paragraph'
-		);
-		const headingBlockItem = page.locator(
-			'.block-editor-inserter__menu .editor-block-list-item-heading'
-		);
-
-		// Open Inserter.
-		await globalInserterToggle.click();
-
-		const samples = 10;
-		const throwaway = 1;
-		const rounds = samples + throwaway;
-		for ( let i = 0; i < rounds; i++ ) {
-			// Wait for the browser to be idle before starting the monitoring.
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( BROWSER_IDLE_WAIT );
-			await browser.startTracing( page, {
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			// Hover Items.
-			await paragraphBlockItem.hover();
-			await headingBlockItem.hover();
-
-			const traceBuffer = await browser.stopTracing();
-
-			if ( i >= throwaway ) {
-				const traceResults = JSON.parse( traceBuffer.toString() );
-				const [ mouseOverEvents, mouseOutEvents ] =
-					getHoverEventDurations( traceResults );
-				for ( let k = 0; k < mouseOverEvents.length; k++ ) {
-					results.inserterHover.push(
-						mouseOverEvents[ k ] + mouseOutEvents[ k ]
+				// Save the results.
+				if ( i > throwaway ) {
+					results.inserterSearch.push(
+						keyDownEvents[ 0 ] +
+							keyPressEvents[ 0 ] +
+							keyUpEvents[ 0 ]
 					);
 				}
-			}
-		}
 
-		// Close Inserter.
-		await globalInserterToggle.click();
+				await page.keyboard.press( 'Backspace' );
+			}
+		} );
+	} );
+
+	test.describe( 'Hovering Inserter items', () => {
+		let draftURL = null;
+
+		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftURL = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+			// Go to the test page.
+			await page.goto( draftURL );
+			await perfUtils.disableAutosave();
+
+			const globalInserterToggle = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const paragraphBlockItem = page.locator(
+				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
+			);
+			const headingBlockItem = page.locator(
+				'.block-editor-inserter__menu .editor-block-list-item-heading'
+			);
+
+			// Open Inserter.
+			await globalInserterToggle.click();
+			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
+
+			const samples = 10;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Hover Inserter items.
+				await paragraphBlockItem.hover();
+				await headingBlockItem.hover();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseOverEvents, mouseOutEvents ] =
+					metrics.getHoverEventDurations();
+
+				// Save the results.
+				if ( i > throwaway ) {
+					for ( let k = 0; k < mouseOverEvents.length; k++ ) {
+						results.inserterHover.push(
+							mouseOverEvents[ k ] + mouseOutEvents[ k ]
+						);
+					}
+				}
+			}
+		} );
 	} );
 } );
+
+/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */

@@ -3,6 +3,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/icons',
 	'@wordpress/interface',
 	'@wordpress/undo-manager',
+	'@wordpress/sync',
 ];
 
 /**

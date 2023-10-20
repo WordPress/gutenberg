@@ -62,13 +62,13 @@ For example:
 
 ```
 // Source file entrypoint.js
-import { Component } from '@wordpress/element';
+import { Component } from 'react';
 
 // Webpack will produce the output output/entrypoint.js
 /* bundled JavaScript output */
 
 // Webpack will also produce output/entrypoint.asset.php declaring script dependencies
-<?php return array('dependencies' => array('wp-element'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
+<?php return array('dependencies' => array('react'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
 By default, the following module requests are handled:

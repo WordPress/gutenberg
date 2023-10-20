@@ -22,6 +22,7 @@ import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function TemplateActions( {
 	postType,
@@ -68,7 +69,7 @@ export default function TemplateActions( {
 			);
 		} catch ( error ) {
 			const fallbackErrorMessage =
-				template.type === 'wp_template'
+				template.type === TEMPLATE_POST_TYPE
 					? __( 'An error occurred while reverting the template.' )
 					: __(
 							'An error occurred while reverting the template part.'

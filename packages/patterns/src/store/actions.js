@@ -69,7 +69,7 @@ export const createPatternFromFile =
 			( parsedContent.syncStatus &&
 				typeof parsedContent.syncStatus !== 'string' )
 		) {
-			throw new Error( 'Invalid Pattern JSON file' );
+			throw new Error( 'Invalid pattern JSON file' );
 		}
 
 		const pattern = await dispatch.createPattern(

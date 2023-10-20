@@ -4,11 +4,16 @@
 import type { Page } from '@playwright/test';
 import * as lighthouse from 'lighthouse/core/index.cjs';
 
+type LighthouseConstructorProps = {
+	page: Page;
+	port: number;
+};
+
 export class Lighthouse {
-	constructor(
-		public readonly page: Page,
-		public readonly port: number
-	) {
+	page: Page;
+	port: number;
+
+	constructor( { page, port }: LighthouseConstructorProps ) {
 		this.page = page;
 		this.port = port;
 	}

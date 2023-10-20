@@ -3,8 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
-import { chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,12 +26,7 @@ function LibraryFontCard( { font, ...props } ) {
 	);
 
 	return (
-		<FontCard
-			font={ font }
-			variantsText={ variantsText }
-			actionHandler={ <Icon icon={ chevronRight } /> }
-			{ ...props }
-		/>
+		<FontCard font={ font } variantsText={ variantsText } { ...props } />
 	);
 }
 

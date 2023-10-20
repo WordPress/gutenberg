@@ -18,6 +18,7 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
 import SidebarButton from '../sidebar-button';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
@@ -32,7 +33,7 @@ export default function SidebarNavigationScreenTemplates() {
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'wp_template',
+		TEMPLATE_POST_TYPE,
 		{
 			per_page: -1,
 		}
@@ -54,7 +55,7 @@ export default function SidebarNavigationScreenTemplates() {
 			actions={
 				canCreate && (
 					<AddNewTemplate
-						templateType={ 'wp_template' }
+						templateType={ TEMPLATE_POST_TYPE }
 						toggleProps={ {
 							as: SidebarButton,
 						} }
@@ -71,7 +72,7 @@ export default function SidebarNavigationScreenTemplates() {
 							) }
 							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
-									postType={ 'wp_template' }
+									postType={ TEMPLATE_POST_TYPE }
 									postId={ template.id }
 									key={ template.id }
 									withChevron

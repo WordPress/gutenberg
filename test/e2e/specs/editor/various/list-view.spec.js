@@ -261,13 +261,6 @@ test.describe( 'List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -275,7 +268,7 @@ test.describe( 'List View', () => {
 		} );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
 
@@ -322,12 +315,9 @@ test.describe( 'List View', () => {
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
 
-		// Focus should now be on the paragraph block since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
+		// Focus should now be on the list view toggle button.
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Paragraph block' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// List View should be closed.

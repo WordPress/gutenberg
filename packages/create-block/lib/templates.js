@@ -241,6 +241,7 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		editorScript: 'file:./index.js',
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
+		transformer: ( view ) => view,
 		...pluginTemplate.defaultValues,
 		...pluginTemplate.variants?.[ variant ],
 		variantVars: getVariantVars( pluginTemplate.variants, variant ),

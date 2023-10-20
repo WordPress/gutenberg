@@ -328,7 +328,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCard( props ) {
 	// Read any derived registered prop from the Context System in the `Card` namespace
@@ -342,7 +342,7 @@ export function useCard( props ) {
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
-import { contextConnect, ContextSystemProvider } from '../../ui/context';
+import { contextConnect, ContextSystemProvider } from '../../context';
 
 function Card( props, forwardedRef ) {
 	const {
@@ -379,7 +379,7 @@ export default ConnectedCard;
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCardBody( props ) {
 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
@@ -581,7 +581,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
 
 		```tsx
-		import type { WordPressComponentProps } from '../ui/context';
+		import type { WordPressComponentProps } from '../context';
 		import type { ComponentOwnProps } from './types';
 
 		function UnconnectedMyComponent(

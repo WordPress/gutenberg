@@ -58,11 +58,15 @@ test.describe( 'Block Renaming', () => {
 				name: 'Rename',
 			} );
 
-			// Check focus is transferred into modal.
-			await expect( renameModal ).toBeFocused();
-
 			// Check the Modal is perceivable.
 			await expect( renameModal ).toBeVisible();
+
+			const nameInput = renameModal.getByRole( 'textbox', {
+				name: 'Block name',
+			} );
+
+			// Check focus is transferred into the input within the Modal.
+			await expect( nameInput ).toBeFocused();
 
 			const saveButton = renameModal.getByRole( 'button', {
 				name: 'Save',
@@ -70,8 +74,6 @@ test.describe( 'Block Renaming', () => {
 			} );
 
 			await expect( saveButton ).toBeDisabled();
-
-			const nameInput = renameModal.getByLabel( 'Block name' );
 
 			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
 
@@ -142,6 +144,27 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'does not allow renaming of blocks that do not support renaming', async ( {
+			// use `core/template-part` as the block
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/navigation',
+			} );
+
+			// Opens the block options menu and check there is not a `Rename` option
+			await editor.clickBlockToolbarButton( 'Options' );
+			//
+
+			const renameMenuItem = page.getByRole( 'menuitem', {
+				name: 'Rename',
+			} );
+
+			// TODO: assert that the locator didn't find a DOM node at all.
+			await expect( renameMenuItem ).toBeHidden();
 		} );
 	} );
 
@@ -216,6 +239,42 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'does not allow renaming of blocks that do not support renaming', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/navigation',
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsTab = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'tab', { name: 'Settings' } );
+
+			await settingsTab.click();
+
+			const advancedPanelToggle = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'button', {
+					name: 'Advanced',
+					expanded: false,
+				} );
+
+			await advancedPanelToggle.click();
+
+			const nameInput = page.getByRole( 'textbox', {
+				name: 'Block name',
+			} );
+
+			await expect( nameInput ).toBeHidden();
 		} );
 	} );
 } );

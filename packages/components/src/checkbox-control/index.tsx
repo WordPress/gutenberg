@@ -17,7 +17,7 @@ import { Icon, check, reset } from '@wordpress/icons';
  */
 import BaseControl from '../base-control';
 import type { CheckboxControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Checkboxes allow the user to select one or more items from a set.

@@ -53,7 +53,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function HeaderEditMode() {
+export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -259,6 +259,7 @@ export default function HeaderEditMode() {
 										/* translators: button label text should, if possible, be under 16 characters. */
 										label={ __( 'List View' ) }
 										onClick={ toggleListView }
+										ref={ setListViewToggleElement }
 										shortcut={ listViewShortcut }
 										showTooltip={ ! showIconLabels }
 										variant={

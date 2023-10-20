@@ -9,11 +9,9 @@ import {
 	FlexItem,
 	SearchControl,
 	TextHighlight,
+	privateApis as componentsPrivateApis,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -21,8 +19,15 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import useDebouncedInput from '../../utils/use-debounced-input';
 import { mapToIHasNameAndId } from './utils';
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -31,22 +36,23 @@ function SuggestionListItem( {
 	search,
 	onSelect,
 	entityForSuggestions,
-	composite,
 } ) {
 	const baseCssClass =
 		'edit-site-custom-template-modal__suggestions_list__list-item';
 	return (
 		<CompositeItem
-			role="option"
-			as={ Button }
-			{ ...composite }
-			className={ baseCssClass }
-			onClick={ () =>
-				onSelect(
-					entityForSuggestions.config.getSpecificTemplate(
-						suggestion
-					)
-				)
+			render={
+				<Button
+					role="option"
+					className={ baseCssClass }
+					onClick={ () =>
+						onSelect(
+							entityForSuggestions.config.getSpecificTemplate(
+								suggestion
+							)
+						)
+					}
+				/>
 			}
 		>
 			<Text
@@ -112,7 +118,7 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 }
 
 function SuggestionList( { entityForSuggestions, onSelect } ) {
-	const composite = useCompositeState( { orientation: 'vertical' } );
+	const composite = useCompositeStore( { orientation: 'vertical' } );
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
 	const suggestions = useSearchSuggestions(
 		entityForSuggestions,
@@ -136,7 +142,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			) }
 			{ !! suggestions?.length && (
 				<Composite
-					{ ...composite }
+					store={ composite }
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
 					aria-label={ __( 'Suggestions list' ) }
@@ -148,7 +154,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 							search={ debouncedSearch }
 							onSelect={ onSelect }
 							entityForSuggestions={ entityForSuggestions }
-							composite={ composite }
 						/>
 					) ) }
 				</Composite>

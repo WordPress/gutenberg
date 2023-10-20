@@ -11,7 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_typography_support( $block_type ) {
-	if ( ! property_exists( $block_type, 'supports' ) ) {
+	if ( ! $block_type instanceof WP_Block_Type ) {
 		return;
 	}
 
@@ -76,7 +76,7 @@ function gutenberg_register_typography_support( $block_type ) {
  * @return array Typography CSS classes and inline styles.
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
-	if ( ! property_exists( $block_type, 'supports' ) ) {
+	if ( ! $block_type instanceof WP_Block_Type ) {
 		return array();
 	}
 

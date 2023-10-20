@@ -74,15 +74,11 @@ test.describe( 'new editor state', () => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await editor.canvas.type(
-			'role=textbox[name="Add title"i]',
-			'Here is the title'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Here is the title' );
 		// Save the post as a draft.
-		await page.click( 'role=button[name="Save draft"i]' );
-		await page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await editor.saveDraft();
 
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();

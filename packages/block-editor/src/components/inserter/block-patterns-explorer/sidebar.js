@@ -4,12 +4,6 @@
 import { Button, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { default as BlockPatternsSourceFilter } from '../block-patterns-source-filter';
-import { allPatternsCategory } from '../block-patterns-tab';
-
 function PatternCategoriesList( {
 	selectedCategory,
 	patternCategories,
@@ -56,8 +50,6 @@ function PatternExplorerSidebar( {
 	selectedCategory,
 	patternCategories,
 	onClickCategory,
-	patternSourceFilter,
-	setPatternSourceFilter,
 	searchValue,
 	setSearchValue,
 } ) {
@@ -67,13 +59,6 @@ function PatternExplorerSidebar( {
 			<PatternsExplorerSearch
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
-			/>
-			<BlockPatternsSourceFilter
-				value={ patternSourceFilter }
-				onChange={ ( value ) => {
-					setPatternSourceFilter( value );
-					onClickCategory( allPatternsCategory.name );
-				} }
 			/>
 			{ ! searchValue && (
 				<PatternCategoriesList

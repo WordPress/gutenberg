@@ -66,13 +66,22 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
 	require_once __DIR__ . '/experimental/rest-api.php';
+
+	require_once __DIR__ . '/experimental/kses-allowed-html.php';
+}
+
+// Experimental signaling server.
+if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
+require __DIR__ . '/compat/plugin/footnotes.php';
 
+require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
@@ -98,6 +107,9 @@ require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
+
+// WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -173,6 +185,16 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
+
+	// Disables the Font Library.
+	// @core-merge: this should not go to core.
+	add_action(
+		'enqueue_block_editor_assets',
+		function () {
+			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
+		}
+	);
+
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );
@@ -233,3 +255,7 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
+require __DIR__ . '/block-supports/behaviors.php';
+
+// Data views.
+require_once __DIR__ . '/experimental/data-views.php';

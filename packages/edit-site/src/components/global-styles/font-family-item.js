@@ -13,7 +13,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { FontLibraryContext } from './font-library-modal/context';
-import { getPreviewStyle } from './font-library-modal/utils';
+import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 
 function FontFamilyItem( { font } ) {
 	const { handleSetLibraryFontSelected, toggleModal } =
@@ -26,7 +26,7 @@ function FontFamilyItem( { font } ) {
 		toggleModal( 'installed-fonts' );
 	};
 
-	const previewStyle = getPreviewStyle( font );
+	const previewStyle = getFamilyPreviewStyle( font );
 
 	return (
 		<Item onClick={ handleClick }>

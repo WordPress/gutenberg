@@ -58,8 +58,8 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		edit: function ( props ) {
@@ -93,7 +93,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			);
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}
@@ -134,8 +134,8 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 {% Plain %}
 
 ```js
-( function ( blocks, element, blockEditor ) {
-	var el = element.createElement;
+( function ( blocks, React, blockEditor ) {
+	var el = React.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		edit: function ( props ) {
@@ -155,7 +155,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			);
 		},
 	} );
-} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+} )( window.wp.blocks, window.React, window.wp.blockEditor );
 ```
 
 {% end %}
@@ -180,8 +180,8 @@ Edit the asset file to include the block-editor dependency for the scripts.
 <?php return
 	array( 'dependencies' =>
 		array(
+			'react',
 			'wp-blocks',
-			'wp-element',
 			'wp-block-editor',
 			'wp-polyfill'
 		),

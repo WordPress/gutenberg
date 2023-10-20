@@ -13,7 +13,8 @@ import {
 	file,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
+import { pipe } from '@wordpress/compose';
 
 const ICONS_MAP = {
 	post: postList,
@@ -44,6 +45,58 @@ function SearchItemIcon( { isURL, suggestion } ) {
 	return null;
 }
 
+/**
+ * Adds a leading slash to a url if it doesn't already have one.
+ * @param {string} url the url to add a leading slash to.
+ * @return {string} the url with a leading slash.
+ */
+function addLeadingSlash( url ) {
+	const trimmedURL = url?.trim();
+
+	if ( ! trimmedURL?.length ) return url;
+
+	return url?.replace( /^\/?/, '/' );
+}
+
+function removeTrailingSlash( url ) {
+	const trimmedURL = url?.trim();
+
+	if ( ! trimmedURL?.length ) return url;
+
+	return url?.replace( /\/$/, '' );
+}
+
+const partialRight =
+	( fn, ...partialArgs ) =>
+	( ...args ) =>
+		fn( ...args, ...partialArgs );
+
+const defaultTo = ( d ) => ( v ) => {
+	return v === null || v === undefined || v !== v ? d : v;
+};
+
+/**
+ * Prepares a URL for display in the UI.
+ * - decodes the URL.
+ * - filters it (removes protocol, www, etc.).
+ * - truncates it if necessary.
+ * - adds a leading slash.
+ * @param {string} url the url.
+ * @return {string} the processed url to display.
+ */
+function getURLForDisplay( url ) {
+	if ( ! url ) return url;
+
+	return pipe(
+		safeDecodeURI,
+		getPath,
+		defaultTo( '' ),
+		partialRight( filterURLForDisplay, 24 ),
+		removeTrailingSlash,
+		addLeadingSlash
+	)( url );
+}
+
 export const LinkControlSearchItem = ( {
 	itemProps,
 	suggestion,
@@ -54,7 +107,7 @@ export const LinkControlSearchItem = ( {
 } ) => {
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
-		: filterURLForDisplay( safeDecodeURI( suggestion?.url ), 24 );
+		: getURLForDisplay( suggestion.url );
 
 	return (
 		<MenuItem
