@@ -18,6 +18,10 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
+		},
+		"showInView": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -41,6 +45,7 @@
 				"text": true
 			}
 		},
+		"interactivity": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
@@ -86,5 +91,6 @@
 		}
 	},
 	"editorStyle": "wp-block-group-editor",
-	"style": "wp-block-group"
+	"style": "wp-block-group",
+	"viewScript": "file:./view.min.js"
 }
