@@ -83,22 +83,11 @@ export const createQueue = () => {
 	 * In the case that a callback adds a new callback to its own context then
 	 * the callback it adds will appear at the end of the iteration and will be
 	 * run only after all other existing contexts have finished executing.
-	 *
-	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
-	 *                                       animation frame timestamp.
 	 */
-	const runWaitingList = ( deadline ) => {
-		for ( const [ nextElement, callback ] of waitingList ) {
-			waitingList.delete( nextElement );
-			callback();
-
-			if (
-				'number' === typeof deadline ||
-				deadline.timeRemaining() <= 0
-			) {
-				break;
-			}
-		}
+	const runWaitingList = () => {
+		const [ nextElement, callback ] = waitingList.entries().next().value;
+		waitingList.delete( nextElement );
+		callback();
 
 		if ( waitingList.size === 0 ) {
 			isRunning = false;
