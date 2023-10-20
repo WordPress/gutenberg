@@ -6,11 +6,10 @@ import { Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon, GlobalStylesContext } from '@wordpress/components';
+import { Icon, useGlobalStyles } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { help, lock } from '@wordpress/icons';
-import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +17,7 @@ import { useContext } from '@wordpress/element';
 import styles from './editor.scss';
 
 function EditTitle( { getStylesFromColorScheme, title } ) {
-	const globalStyles = useContext( GlobalStylesContext );
+	const globalStyles = useGlobalStyles();
 	const baseColors = globalStyles?.baseColors?.color;
 
 	const lockIconStyle = [
