@@ -21,6 +21,7 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
+	chevronRightSmall,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -41,6 +42,8 @@ const {
 	DropdownMenuGroupV2,
 	DropdownMenuItemV2,
 	DropdownMenuSeparatorV2,
+	DropdownSubMenuV2,
+	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -49,7 +52,8 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
-function HeaderMenu( { dataView, header } ) {
+// TODO: why doesn't Header work with view/onChangeView?
+function HeaderMenu( { dataView, header, view, onChangeView } ) {
 	if ( header.isPlaceholder ) {
 		return null;
 	}
@@ -61,6 +65,36 @@ function HeaderMenu( { dataView, header } ) {
 	const isHidable = !! header.column.getCanHide();
 	if ( ! isSortable && ! isHidable ) {
 		return text;
+	}
+	const isFilterable = header.column.columnDef.filters?.length > 0;
+	let filter = null;
+	if ( isFilterable ) {
+		// TODO: take all of them, not only one.
+		filter = header.column.columnDef.filters?.[ 0 ];
+		if ( 'string' === typeof filter ) {
+			filter = {
+				id: header.column.columnDef.id,
+				type: filter,
+				name: header.column.columnDef.header,
+			};
+		} else if ( 'object' === typeof filter && filter.type ) {
+			filter = {
+				id: filter.id || header.column.columnDef.id,
+				type: filter.type,
+				name: filter.name || header.column.columnDef.header,
+			};
+		}
+		if ( 'enumeration' === filter.type ) {
+			filter.elements = [
+				{
+					value: filter.resetValue || '',
+					label: filter.resetLabel || __( 'All' ),
+				},
+				...( filter.elements ||
+					header.column.columnDef.elements ||
+					[] ),
+			];
+		}
 	}
 	const sortedDirection = header.column.getIsSorted();
 	return (
@@ -118,6 +152,42 @@ function HeaderMenu( { dataView, header } ) {
 					>
 						{ __( 'Hide' ) }
 					</DropdownMenuItemV2>
+				) }
+				{ isFilterable && (
+					<DropdownSubMenuV2
+						trigger={
+							<DropdownSubMenuTriggerV2
+								suffix={ <Icon icon={ chevronRightSmall } /> }
+							>
+								{ __( 'Filter by ' ) +
+									filter.name.toLowerCase() }
+							</DropdownSubMenuTriggerV2>
+						}
+					>
+						{ filter.elements.map( ( element ) => {
+							const isActive =
+								element.value === view.filters[ filter.id ];
+							return (
+								<DropdownMenuItemV2
+									key={ element.value }
+									suffix={
+										isActive && <Icon icon={ check } />
+									}
+									onSelect={ () => {
+										onChangeView( {
+											...view,
+											filters: {
+												...view.filters,
+												[ filter.id ]: element.value,
+											},
+										} );
+									} }
+								>
+									{ element.label }
+								</DropdownMenuItemV2>
+							);
+						} ) }
+					</DropdownSubMenuV2>
 				) }
 			</WithSeparators>
 		</DropdownMenuV2>
@@ -306,6 +376,8 @@ function ViewList( {
 										} }
 									>
 										<HeaderMenu
+											view={ view }
+											onChangeView={ onChangeView }
 											dataView={ dataView }
 											header={ header }
 										/>
