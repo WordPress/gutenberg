@@ -53,6 +53,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.4 compat.
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-blocks-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-pattern-categories-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 

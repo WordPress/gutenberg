@@ -24,7 +24,7 @@ import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
  * Internal dependencies
  */
 import { store as patternsStore } from '../store';
-import CategorySelector, { CATEGORY_SLUG } from './category-selector';
+import CategoryEditor, { CATEGORY_SLUG } from './category-editor';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
@@ -42,41 +42,46 @@ export default function CreatePatternModal( {
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const { corePatternCategories, userPatternCategories } = useSelect(
-		( select ) => {
-			const { getUserPatternCategories, getBlockPatternCategories } =
-				select( coreStore );
+	const { corePatternCategories, userPatternCategories, canAddCategories } =
+		useSelect( ( select ) => {
+			const {
+				getUserPatternCategories,
+				getBlockPatternCategories,
+				canUser,
+			} = select( coreStore );
 
 			return {
 				corePatternCategories: getBlockPatternCategories(),
 				userPatternCategories: getUserPatternCategories(),
+				canAddCategories: canUser( 'create', 'wp_pattern_category' ),
 			};
-		}
-	);
+		} );
 
 	const categoryMap = useMemo( () => {
 		// Merge the user and core pattern categories and remove any duplicates.
 		const uniqueCategories = new Map();
-		[ ...userPatternCategories, ...corePatternCategories ].forEach(
-			( category ) => {
-				if (
-					! uniqueCategories.has( category.label ) &&
-					// There are two core categories with `Post` label so explicitly remove the one with
-					// the `query` slug to avoid any confusion.
-					category.name !== 'query'
-				) {
-					// We need to store the name separately as this is used as the slug in the
-					// taxonomy and may vary from the label.
-					uniqueCategories.set( category.label, {
-						label: category.label,
-						value: category.label,
-						name: category.name,
-					} );
-				}
+		[
+			...userPatternCategories,
+			...( canAddCategories ? corePatternCategories : [] ),
+		].forEach( ( category ) => {
+			if (
+				! uniqueCategories.has( category.label ) &&
+				// There are two core categories with `Post` label so explicitly remove the one with
+				// the `query` slug to avoid any confusion.
+				category.name !== 'query'
+			) {
+				// We need to store the name separately as this is used as the slug in the
+				// taxonomy and may vary from the label.
+				uniqueCategories.set( category.label, {
+					label: category.label,
+					value: category.label,
+					name: category.name,
+					id: category.id,
+				} );
 			}
-		);
+		} );
 		return uniqueCategories;
-	}, [ userPatternCategories, corePatternCategories ] );
+	}, [ userPatternCategories, corePatternCategories, canAddCategories ] );
 
 	async function onCreate( patternTitle, sync ) {
 		if ( ! title || isSaving ) {
@@ -85,11 +90,18 @@ export default function CreatePatternModal( {
 
 		try {
 			setIsSaving( true );
-			const categories = await Promise.all(
-				categoryTerms.map( ( termName ) =>
-					findOrCreateTerm( termName )
-				)
-			);
+			let categories;
+			if ( canAddCategories ) {
+				categories = await Promise.all(
+					categoryTerms.map( ( termName ) =>
+						findOrCreateTerm( termName )
+					)
+				);
+			} else {
+				categories = categoryTerms.map(
+					( term ) => categoryMap.get( term ).id
+				);
+			}
 
 			const newPattern = await createPattern(
 				patternTitle,
@@ -167,10 +179,11 @@ export default function CreatePatternModal( {
 						placeholder={ __( 'My pattern' ) }
 						className="patterns-create-modal__name-input"
 					/>
-					<CategorySelector
+					<CategoryEditor
 						categoryTerms={ categoryTerms }
 						onChange={ setCategoryTerms }
 						categoryMap={ categoryMap }
+						canAddCategories={ canAddCategories }
 					/>
 					<ToggleControl
 						label={ __( 'Synced' ) }

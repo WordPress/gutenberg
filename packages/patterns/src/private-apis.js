@@ -4,6 +4,8 @@
 import { lock } from './lock-unlock';
 import CreatePatternModal from './components/create-pattern-modal';
 import PatternsMenuItems from './components';
+import CategorySelector from './components/category-selector';
+
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
@@ -16,6 +18,7 @@ export const privateApis = {};
 lock( privateApis, {
 	CreatePatternModal,
 	PatternsMenuItems,
+	CategorySelector,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
