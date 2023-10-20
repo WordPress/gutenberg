@@ -234,13 +234,11 @@ export default function PagePages() {
 				filters: [
 					{
 						id: 'author',
-						type: 'enumeration',
-						columnLabel: 'Author is',
+						type: 'enumeration_in',
 					},
 					{
 						id: 'author_exclude',
-						type: 'enumeration',
-						columnLabel: 'Author is not',
+						type: 'enumeration_not_in',
 						resetLabel: 'None',
 					},
 				],

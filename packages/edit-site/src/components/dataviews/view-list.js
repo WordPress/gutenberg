@@ -86,7 +86,11 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 				filter = undefined;
 			}
 
-			if ( 'enumeration' === filter?.type ) {
+			if (
+				[ 'enumeration_in', 'enumeration_not_in' ].some(
+					( type ) => type === filter?.type
+				)
+			) {
 				filter.elements = [
 					{
 						value: filter.resetValue || '',
@@ -100,7 +104,11 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 
 			// TODO: it only works with filter of type enumeration for now,
 			// remove this check UI is ready.
-			if ( 'enumeration' !== filter.type ) {
+			if (
+				! [ 'enumeration_in', 'enumeration_not_in' ].some(
+					( type ) => type === filter?.type
+				)
+			) {
 				return null;
 			}
 
@@ -178,8 +186,12 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 												/>
 											}
 										>
-											{ filter.columnLabel ||
-												__( 'Filter by ' ) }
+											{ filter.name +
+												' ' +
+												( filter.type ===
+												'enumeration_in'
+													? __( 'is' )
+													: __( 'is not' ) ) }
 										</DropdownSubMenuTriggerV2>
 									}
 								>
