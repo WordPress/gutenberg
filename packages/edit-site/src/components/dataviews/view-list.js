@@ -78,9 +78,9 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 				};
 			} else if ( 'object' === typeof filter && filter.type ) {
 				filter = {
-					id: filter.id || header.column.columnDef.id,
-					type: filter.type,
-					name: filter.name || header.column.columnDef.header,
+					id: header.column.columnDef.id,
+					name: header.column.columnDef.header,
+					...filter,
 				};
 			} else {
 				filter = undefined;
@@ -172,8 +172,8 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 												/>
 											}
 										>
-											{ __( 'Filter by ' ) +
-												filter.name.toLowerCase() }
+											{ filter.columnLabel ||
+												__( 'Filter by ' ) }
 										</DropdownSubMenuTriggerV2>
 									}
 								>

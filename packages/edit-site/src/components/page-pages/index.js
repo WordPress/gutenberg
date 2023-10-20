@@ -231,7 +231,19 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				filters: [ 'enumeration' ],
+				filters: [
+					{
+						id: 'author',
+						type: 'enumeration',
+						columnLabel: 'Author is',
+					},
+					{
+						id: 'author_exclude',
+						type: 'enumeration',
+						columnLabel: 'Author is not',
+						resetLabel: 'None',
+					},
+				],
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
