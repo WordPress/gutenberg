@@ -73,7 +73,7 @@ To see a list of all of your available iOS devices, use `xcrun simctl list devic
 
 ### Customizing the Demo Editor
 
-By default, the Demo editor renders most of the supported core blocks. This is helpful to showcase the editor's capabilities, but can be distracting when focusing on a specific block or feature. One can customize the editor's intial state by leveraging the `native.block_editor_props` hook in a `packages/react-native-editor/src/setup-local.js` file.
+By default, the Demo editor renders most of the supported core blocks. This is helpful to showcase the editor's capabilities, but can be distracting when focusing on a specific block or feature. One can customize the editor's initial state by leveraging the `native.block_editor_props` hook in a `packages/react-native-editor/src/setup-local.js` file.
 
 <details><summary>Example setup-local.js</summary>
 

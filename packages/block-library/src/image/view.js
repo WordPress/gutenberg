@@ -135,7 +135,7 @@ store(
 							false
 						);
 					},
-					hideLightbox: async ( { context, event } ) => {
+					hideLightbox: async ( { context } ) => {
 						context.core.image.hideAnimationEnabled = true;
 						if ( context.core.image.lightboxEnabled ) {
 							// We want to wait until the close animation is completed
@@ -149,19 +149,15 @@ store(
 									'scroll',
 									scrollCallback
 								);
+								// If we don't delay before changing the focus,
+								// the focus ring will appear on Firefox before
+								// the image has finished animating, which looks broken.
+								context.core.image.lightboxTriggerRef.focus( {
+									preventScroll: true,
+								} );
 							}, 450 );
 
 							context.core.image.lightboxEnabled = false;
-
-							// We want to avoid drawing attention to the button
-							// after the lightbox closes for mouse and touch users.
-							// Note that the `event.pointerType` property returns
-							// as an empty string if a keyboard fired the event.
-							if ( event.pointerType === '' ) {
-								context.core.image.lastFocusedElement.focus( {
-									preventScroll: true,
-								} );
-							}
 						}
 					},
 					handleKeydown: ( { context, actions, event } ) => {
@@ -266,6 +262,10 @@ store(
 				image: {
 					initOriginImage: ( { context, ref } ) => {
 						context.core.image.imageRef = ref;
+						context.core.image.lightboxTriggerRef =
+							ref.parentElement.querySelector(
+								'.lightbox-trigger'
+							);
 						if ( ref.complete ) {
 							context.core.image.imageLoaded = true;
 							context.core.image.imageCurrentSrc = ref.currentSrc;
@@ -282,14 +282,8 @@ store(
 									focusableElements.length - 1
 								];
 
-							// We want to avoid drawing unnecessary attention to the close
-							// button for mouse and touch users. Note that even if opening
-							// the lightbox via keyboard, the event fired is of type
-							// `pointerEvent`, so we need to rely on the `event.pointerType`
-							// property, which returns an empty string for keyboard events.
-							if ( context.core.image.pointerType === '' ) {
-								ref.querySelector( '.close-button' ).focus();
-							}
+							// Move focus to the dialog when opening it.
+							ref.focus();
 						}
 					},
 					setButtonStyles: ( { context, ref } ) => {

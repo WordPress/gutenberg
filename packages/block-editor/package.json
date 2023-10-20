@@ -71,13 +71,14 @@
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
 		"fast-deep-equal": "^3.1.3",
-		"inherits": "^2.0.3",
 		"memize": "^2.1.0",
+		"postcss": "^8.4.21",
+		"postcss-prefixwrap": "^1.41.0",
+		"postcss-urlrebase": "^1.0.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^4.5.1",
 		"rememo": "^4.0.2",
-		"remove-accents": "^0.5.0",
-		"traverse": "^0.6.6"
+		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
