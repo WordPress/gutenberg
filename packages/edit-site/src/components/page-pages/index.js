@@ -27,7 +27,7 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import Editor from './editor';
+import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
@@ -279,7 +279,7 @@ export default function PagePages() {
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ selection.length === 1 && (
-							<Editor
+							<SideEditor
 								postId={ selection[ 0 ] }
 								postType={ postType }
 							/>
