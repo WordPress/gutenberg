@@ -10,18 +10,12 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useEffect,
-	useState,
-	useRef,
-	useCallback,
-	useContext,
-} from '@wordpress/element';
+import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
-	GlobalStylesContext,
+	useGlobalStyles,
 } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -69,7 +63,7 @@ const SocialLinkEdit = ( {
 	const { url, service = name } = attributes;
 	const [ isLinkSheetVisible, setIsLinkSheetVisible ] = useState( false );
 	const [ hasUrl, setHasUrl ] = useState( !! url );
-	const globalStyles = useContext( GlobalStylesContext );
+	const globalStyles = useGlobalStyles();
 	const activeIcon =
 		styles[ `wp-social-link-${ service }` ] ||
 		styles[ `wp-social-link` ] ||
