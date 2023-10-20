@@ -23,7 +23,10 @@ class WP_Interactivity_Initial_State {
 	 *
 	 * @return array The requested state.
 	 */
-	public static function get_state( $namespace ) {
+	public static function get_state( $namespace = null ) {
+		if ( ! $namespace ) {
+			return self::$initial_state;
+		}
 		return self::$initial_state[ $namespace ] ?? array();
 	}
 
@@ -40,6 +43,15 @@ class WP_Interactivity_Initial_State {
 			self::get_state( $namespace ),
 			$data
 		);
+	}
+
+	/**
+	 * Get store data.
+	 *
+	 * @return array
+	 */
+	public static function get_data() {
+		return self::$initial_state;
 	}
 
 	/**

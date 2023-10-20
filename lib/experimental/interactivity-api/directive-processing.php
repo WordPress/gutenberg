@@ -131,7 +131,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
  */
 function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
 	$store = array_merge(
-		WP_Interactivity_Store::get_data(),
+		WP_Interactivity_Initial_State::get_state(),
 		array( 'context' => $context )
 	);
 
