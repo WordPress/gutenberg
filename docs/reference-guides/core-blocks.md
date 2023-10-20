@@ -336,7 +336,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 -	**Name:** core/gallery
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug, spacerMode
 
 ## Group
 
