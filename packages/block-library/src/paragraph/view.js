@@ -22,6 +22,7 @@ store( 'core', {
 									context.dynamicText + characters[ n ];
 								n++;
 								if ( n >= characters.length ) {
+									observer.unobserve( ref );
 									clearInterval( interval );
 								}
 							}, 50 );
