@@ -18,7 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { CATEGORY_SLUG } from './category-selector';
+import { CATEGORY_SLUG } from './category-editor';
 
 export default function RenamePatternCategoryModal( {
 	category,
