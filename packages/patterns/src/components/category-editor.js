@@ -12,9 +12,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import CategorySelector from './category-selector';
 
-const unescapeString = ( arg ) => {
-	return decodeEntities( arg );
-};
+const unescapeString = ( arg ) => decodeEntities( arg );
 
 export const CATEGORY_SLUG = 'wp_pattern_category';
 
