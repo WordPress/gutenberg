@@ -3,7 +3,7 @@ $vertical-tabs-width: 160px;
 .interface-preferences__tabs {
 	.components-tab-panel__tabs {
 		position: absolute;
-		top: $header-height + $grid-unit-30;
+		top: $header-height + $grid-unit-10;
 		// Aligns button text instead of button box.
 		left: $grid-unit-20;
 		width: $vertical-tabs-width;
