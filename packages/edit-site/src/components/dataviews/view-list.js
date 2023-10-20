@@ -98,6 +98,12 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 				];
 			}
 
+			// TODO: it only works with filter of type enumeration for now,
+			// remove this check UI is ready.
+			if ( 'enumeration' !== filter.type ) {
+				return null;
+			}
+
 			return filter;
 		} );
 	}
