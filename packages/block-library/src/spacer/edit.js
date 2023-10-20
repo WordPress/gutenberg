@@ -123,7 +123,7 @@ const SpacerEdit = ( {
 	let { orientation, columns } = context;
 
 	// if we get the coloumns context, we assume that the block is inside a gallery
-	const isInsideGallery = !! columns;
+	const isInsideGallery = !! galleryChildBlocks.length;
 	const { orientation: parentOrientation, type } = parentLayout || {};
 
 	if ( pos && columns === 1 ) {
