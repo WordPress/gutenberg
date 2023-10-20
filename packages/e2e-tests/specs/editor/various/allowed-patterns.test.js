@@ -12,7 +12,7 @@ import {
 const checkPatternExistence = async ( name, available = true ) => {
 	await searchForPattern( name );
 	const patternElement = await page.waitForXPath(
-		`//div[@role = 'option']//div[contains(text(), '${ name }')]`,
+		`//div[@role = 'button']//div[contains(text(), '${ name }')]`,
 		{ timeout: 5000, visible: available, hidden: ! available }
 	);
 	const patternExists = !! patternElement;
