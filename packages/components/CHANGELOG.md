@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+
 ## 25.10.0 (2023-10-18)
 
 ### Enhancements
