@@ -96,6 +96,13 @@
 		height: 100%;
 		width: 100%;
 	}
+
+	// When the Post Featured Image block is linked,
+	// it's wrapped with a disabled <a /> tag.
+	// Restore cursor style so it doesn't appear 'clickable'.
+	> a {
+		cursor: default;
+	}
 }
 
 div[data-type="core/post-featured-image"] {
