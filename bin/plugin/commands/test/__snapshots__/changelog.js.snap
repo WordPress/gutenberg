@@ -89,6 +89,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 ### Performance
 
+- Add search performance measure and make other measures more stable. ([33848](https://github.com/WordPress/gutenberg/pull/33848))
 - Avoid double parsing the content when loading the editor. ([33727](https://github.com/WordPress/gutenberg/pull/33727))
 
 #### Block Library
@@ -170,7 +171,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Scripts: Update webpack to v5 (try 2). ([33818](https://github.com/WordPress/gutenberg/pull/33818))
 
 #### Testing
-- Add search performance measure and make other measures more stable. ([33848](https://github.com/WordPress/gutenberg/pull/33848))
 - E2E: Block Hierarchy Navigation wait for the column to be highlighted. ([33721](https://github.com/WordPress/gutenberg/pull/33721))
 
 

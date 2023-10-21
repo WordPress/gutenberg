@@ -40,10 +40,9 @@ import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
 import { getTextContent } from '../get-text-content';
-import { isEmpty, isEmptyLine } from '../is-empty';
+import { isEmpty } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
-import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import { getFormatColors } from '../get-format-colors';
@@ -436,7 +435,7 @@ export class RichText extends Component {
 		}
 		const isReverse = keyCode === BACKSPACE;
 
-		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+		const { onDelete } = this.props;
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
@@ -450,24 +449,6 @@ export class RichText extends Component {
 			this.onFormatChange( newValue );
 			event.preventDefault();
 			return;
-		}
-
-		if ( multilineTag ) {
-			if (
-				isReverse &&
-				value.start === 0 &&
-				value.end === 0 &&
-				isEmptyLine( value )
-			) {
-				newValue = removeLineSeparator( value, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( value, isReverse );
-			}
-			if ( newValue ) {
-				this.onFormatChange( newValue );
-				event.preventDefault();
-				return;
-			}
 		}
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
@@ -1078,6 +1059,41 @@ export class RichText extends Component {
 			: defaultColor;
 	}
 
+	getPlaceholderTextColor() {
+		const {
+			baseGlobalStyles,
+			getStylesFromColorScheme,
+			placeholderTextColor,
+			style,
+		} = this.props;
+
+		// Default placeholder text color.
+		const placeholderStyle = getStylesFromColorScheme(
+			styles.richTextPlaceholder,
+			styles.richTextPlaceholderDark
+		);
+		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		// Custom 63% opacity for theme and inherited colors.
+		const placeholderOpacity = 'A1';
+
+		// Determine inherited placeholder color if available.
+		const inheritPlaceholderColor = style?.placeholderColor
+			? `${ style.placeholderColor }${ placeholderOpacity }`
+			: undefined;
+
+		// If using block-based themes, derive the placeholder color from global styles.
+		const globalStylesPlaceholderColor = baseGlobalStyles?.color?.text
+			? `${ baseGlobalStyles.color.text }${ placeholderOpacity }`
+			: undefined;
+
+		return (
+			inheritPlaceholderColor ??
+			placeholderTextColor ??
+			globalStylesPlaceholderColor ??
+			defaultPlaceholderTextColor
+		);
+	}
+
 	render() {
 		const {
 			tagName,
@@ -1104,12 +1120,6 @@ export class RichText extends Component {
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
-		const placeholderStyle = getStylesFromColorScheme(
-			styles.richTextPlaceholder,
-			styles.richTextPlaceholderDark
-		);
-
-		const { color: defaultPlaceholderTextColor } = placeholderStyle;
 		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
@@ -1237,12 +1247,7 @@ export class RichText extends Component {
 						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
-					placeholderTextColor={
-						style?.placeholderColor ||
-						this.props.placeholderTextColor ||
-						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
-						defaultPlaceholderTextColor
-					}
+					placeholderTextColor={ this.getPlaceholderTextColor() }
 					deleteEnter={ this.props.deleteEnter }
 					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }

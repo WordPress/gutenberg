@@ -24,6 +24,7 @@ const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 const noop = () => {};
 
 export function DefaultBlockAppender( {
+	baseGlobalStyles,
 	isLocked,
 	isVisible,
 	onAppend,
@@ -34,6 +35,15 @@ export function DefaultBlockAppender( {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
+	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ 'core/paragraph' ];
+	const { fontSize, lineHeight } = blockGlobalStyles?.typography || {};
+
+	const textStyles = blockGlobalStyles?.typography
+		? {
+				...( fontSize && { fontSize } ),
+				...( lineHeight && { lineHeight } ),
+		  }
+		: undefined;
 
 	const value =
 		typeof placeholder === 'string'
@@ -51,7 +61,12 @@ export function DefaultBlockAppender( {
 				{ showSeparator ? (
 					<BlockInsertionPoint />
 				) : (
-					<RichText placeholder={ value } onChange={ noop } />
+					<RichText
+						placeholder={ value }
+						onChange={ noop }
+						tagName="p"
+						style={ textStyles }
+					/>
 				) }
 			</View>
 		</Pressable>
@@ -60,16 +75,24 @@ export function DefaultBlockAppender( {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlockName, isBlockValid, getTemplateLock } =
-			select( blockEditorStore );
+		const {
+			getBlockCount,
+			getBlockName,
+			getSettings,
+			isBlockValid,
+			getTemplateLock,
+		} = select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault =
 			getBlockName( ownProps.lastBlockClientId ) ===
 			getDefaultBlockName();
 		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
+		const globalStylesBaseStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles;
 
 		return {
+			baseGlobalStyles: globalStylesBaseStyles,
 			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
 		};

@@ -142,7 +142,7 @@ function BlockPopover(
 
 				return new window.DOMRect( left, top, width, height );
 			},
-			ownerDocument: selectedElement.ownerDocument,
+			contextElement: selectedElement,
 		};
 	}, [
 		bottomClientId,

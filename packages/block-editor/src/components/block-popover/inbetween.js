@@ -81,10 +81,10 @@ function BlockPopoverInbetween( {
 			return undefined;
 		}
 
-		const { ownerDocument } = previousElement || nextElement;
+		const contextElement = previousElement || nextElement;
 
 		return {
-			ownerDocument,
+			contextElement,
 			getBoundingClientRect() {
 				const previousRect = previousElement
 					? previousElement.getBoundingClientRect()

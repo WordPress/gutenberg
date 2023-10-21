@@ -20,14 +20,14 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
  * available.  Please restrain from investing unnecessary time and effort trying
  * to improve this code.
  */
-class WP_Directive_Processor extends WP_HTML_Tag_Processor {
+class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 
 	/**
 	 * An array of root blocks.
 	 *
 	 * @var array
 	 */
-	static $root_blocks = array();
+	public static $root_blocks = array();
 
 	/**
 	 * Add a root block to the list.
@@ -78,7 +78,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 			)
 		) ) {
 			if ( ! $this->is_tag_closer() ) {
-				$depth++;
+				++$depth;
 				continue;
 			}
 
@@ -86,7 +86,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 				return true;
 			}
 
-			$depth--;
+			--$depth;
 		}
 
 		return false;

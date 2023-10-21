@@ -7,6 +7,7 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
+	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -23,6 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	useSettings,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -81,6 +83,11 @@ const scaleOptions = [
 	},
 ];
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function Image( {
 	temporaryURL,
 	attributes,
@@ -113,6 +120,7 @@ export default function Image( {
 		scale,
 		linkTarget,
 		sizeSlug,
+		lightbox,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -171,6 +179,7 @@ export default function Image( {
 			},
 			[ clientId ]
 		);
+
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -365,6 +374,64 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
+
+	const showLightboxToggle =
+		!! lightbox || lightboxSetting?.allowEditing === true;
+
+	const lightboxChecked =
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const lightboxToggleDisabled = linkDestination !== 'none';
+
+	const dimensionsControl = (
+		<DimensionsTool
+			value={ { width, height, scale, aspectRatio } }
+			onChange={ ( {
+				width: newWidth,
+				height: newHeight,
+				scale: newScale,
+				aspectRatio: newAspectRatio,
+			} ) => {
+				// Rebuilding the object forces setting `undefined`
+				// for values that are removed since setAttributes
+				// doesn't do anything with keys that aren't set.
+				setAttributes( {
+					// CSS includes `height: auto`, but we need
+					// `width: auto` to fix the aspect ratio when
+					// only height is set due to the width and
+					// height attributes set via the server.
+					width: ! newWidth && newHeight ? 'auto' : newWidth,
+					height: newHeight,
+					scale: newScale,
+					aspectRatio: newAspectRatio,
+				} );
+			} }
+			defaultScale="cover"
+			defaultAspectRatio="auto"
+			scaleOptions={ scaleOptions }
+			unitsOptions={ dimensionsUnitsOptions }
+		/>
+	);
+
+	const resetAll = () => {
+		setAttributes( {
+			width: undefined,
+			height: undefined,
+			scale: undefined,
+			aspectRatio: undefined,
+			lightbox: undefined,
+		} );
+	};
+
+	const sizeControls = (
+		<InspectorControls>
+			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				{ isResizable && dimensionsControl }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -443,17 +510,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () =>
-						setAttributes( {
-							width: undefined,
-							height: undefined,
-							scale: undefined,
-							aspectRatio: undefined,
-						} )
-					}
-				>
+				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -482,43 +539,40 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable && (
-						<DimensionsTool
-							value={ { width, height, scale, aspectRatio } }
-							onChange={ ( {
-								width: newWidth,
-								height: newHeight,
-								scale: newScale,
-								aspectRatio: newAspectRatio,
-							} ) => {
-								// Rebuilding the object forces setting `undefined`
-								// for values that are removed since setAttributes
-								// doesn't do anything with keys that aren't set.
-								setAttributes( {
-									// CSS includes `height: auto`, but we need
-									// `width: auto` to fix the aspect ratio when
-									// only height is set due to the width and
-									// height attributes set via the server.
-									width:
-										! newWidth && newHeight
-											? 'auto'
-											: newWidth,
-									height: newHeight,
-									scale: newScale,
-									aspectRatio: newAspectRatio,
-								} );
-							} }
-							defaultScale="cover"
-							defaultAspectRatio="auto"
-							scaleOptions={ scaleOptions }
-							unitsOptions={ dimensionsUnitsOptions }
-						/>
-					) }
+					{ isResizable && dimensionsControl }
 					<ResolutionTool
 						value={ sizeSlug }
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
+					{ showLightboxToggle && (
+						<ToolsPanelItem
+							hasValue={ () => !! lightbox }
+							label={ __( 'Expand on Click' ) }
+							onDeselect={ () => {
+								setAttributes( { lightbox: undefined } );
+							} }
+							isShownByDefault={ true }
+						>
+							<ToggleControl
+								label={ __( 'Expand on Click' ) }
+								checked={ lightboxChecked }
+								onChange={ ( newValue ) => {
+									setAttributes( {
+										lightbox: { enabled: newValue },
+									} );
+								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -676,7 +730,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -726,12 +779,23 @@ export default function Image( {
 		);
 	}
 
+	if ( ! url && ! temporaryURL ) {
+		return sizeControls;
+	}
+
 	return (
 		<>
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
-			{ img }
+			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
+			{ !! href ? (
+				<a href={ href } { ...disabledClickProps }>
+					{ img }
+				</a>
+			) : (
+				img
+			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText

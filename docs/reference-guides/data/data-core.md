@@ -299,6 +299,36 @@ _Returns_
 
 -   `EntityRecord[] | null`: Records.
 
+### getEntityRecordsTotalItems
+
+Returns the Entity's total available records for a given query (ignoring pagination).
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
+### getEntityRecordsTotalPages
+
+Returns the number of available pages for the given query.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
@@ -371,7 +401,7 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 
@@ -402,6 +432,18 @@ _Parameters_
 _Returns_
 
 -   `Optional< any >`: The edit.
+
+### getUserPatternCategories
+
+Retrieve the registered user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 
@@ -618,6 +660,7 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 

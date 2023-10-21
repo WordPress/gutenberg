@@ -42,7 +42,40 @@ type GradientPickerBaseProps = {
 	 * @default 2
 	 */
 	headingLevel?: HeadingSize;
-};
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
+} & (
+	| {
+			/**
+			 * A label to identify the purpose of the control.
+			 *
+			 * @todo [#54055] Either this or `aria-labelledby` should be required
+			 */
+			'aria-label'?: string;
+			'aria-labelledby'?: never;
+	  }
+	| {
+			/**
+			 * An ID of an element to provide a label for the control.
+			 *
+			 * @todo [#54055] Either this or `aria-label` should be required
+			 */
+			'aria-labelledby'?: string;
+			'aria-label'?: never;
+	  }
+);
 
 export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	/**

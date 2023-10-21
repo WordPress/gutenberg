@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))
+
+## 2.5.0 (2023-10-18)
+
+## 2.4.0 (2023-10-05)
+
+## 2.3.0 (2023-09-20)
+
+### Enhancements
+
+-   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
+
+### Bug Fix
+
+-   Remove `role` attribute when set to `null` in `data-wp-bind`. ([#54608](https://github.com/WordPress/gutenberg/pull/54608))
+-   Add `timeout` option to `navigate()`, with a default value of `10000` milliseconds. ([#54474](https://github.com/WordPress/gutenberg/pull/54474))
+
+## 2.2.0 (2023-08-31)
+
+### Enhancements
+
+-   Support keys using `data-wp-key`. ([#53844](https://github.com/WordPress/gutenberg/pull/53844))
+-   Merge new server-side rendered context on client-side navigation. ([#53853](https://github.com/WordPress/gutenberg/pull/53853))
+-   Support region-based client-side navigation. ([#53733](https://github.com/WordPress/gutenberg/pull/53733))
+-   Improve `data-wp-bind` hydration to match Preact's logic. ([#54003](https://github.com/WordPress/gutenberg/pull/54003))
+
+### New Features
+
+-   Add new directives that implement the Slot and Fill pattern: `data-wp-slot-provider`, `data-wp-slot` and `data-wp-fill`. ([#53958](https://github.com/WordPress/gutenberg/pull/53958))
+
 ## 2.1.0 (2023-08-16)
 
 ### New Features

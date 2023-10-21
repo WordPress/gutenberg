@@ -106,25 +106,30 @@ export default function useSiteEditorSettings() {
 		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
 
-	const { restBlockPatterns, restBlockPatternCategories, templateSlug } =
-		useSelect( ( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			return {
-				restBlockPatterns: select( coreStore ).getBlockPatterns(),
-				restBlockPatternCategories:
-					select( coreStore ).getBlockPatternCategories(),
-				templateSlug: _record.slug,
-			};
-		}, [] );
+	const {
+		restBlockPatterns,
+		restBlockPatternCategories,
+		templateSlug,
+		userPatternCategories,
+	} = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
+		const { getEditedEntityRecord, getUserPatternCategories } =
+			select( coreStore );
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		const _record = getEditedEntityRecord(
+			'postType',
+			usedPostType,
+			usedPostId
+		);
+		return {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
+			templateSlug: _record.slug,
+			userPatternCategories: getUserPatternCategories(),
+		};
+	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
 
 	const blockPatterns = useMemo(
@@ -171,6 +176,7 @@ export default function useSiteEditorSettings() {
 			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			__experimentalUserPatternCategories: userPatternCategories,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -179,6 +185,7 @@ export default function useSiteEditorSettings() {
 		storedSettings,
 		blockPatterns,
 		blockPatternCategories,
+		userPatternCategories,
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,

@@ -13,16 +13,10 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
-import {
-	useState,
-	useRef,
-	useEffect,
-	useCallback,
-	memo,
-} from '@wordpress/element';
+import { useState, useRef, useCallback, memo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
-import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,7 +29,7 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import { useListViewContext } from './context';
-import { getBlockPositionDescription } from './utils';
+import { getBlockPositionDescription, focusListItem } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
@@ -72,7 +66,9 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled' );
+	const blockTitle =
+		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
+
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -117,7 +113,6 @@ function ListViewBlock( {
 	);
 
 	const {
-		isTreeGridMounted,
 		expand,
 		collapse,
 		BlockSettingsMenu,
@@ -139,14 +134,19 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
-	// If ListView has experimental features related to the Persistent List View,
-	// only focus the selected list item on mount; otherwise the list would always
-	// try to steal the focus from the editor canvas.
-	useEffect( () => {
-		if ( ! isTreeGridMounted && isSelected ) {
-			cellRef.current.focus();
+	// If multiple blocks are selected, deselect all blocks when the user
+	// presses the escape key.
+	const onKeyDown = ( event ) => {
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			selectedClientIds.length > 0
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			selectBlock( event, undefined );
 		}
-	}, [] );
+	};
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
@@ -171,30 +171,7 @@ function ListViewBlock( {
 				selectBlock( undefined, focusClientId, null, null );
 			}
 
-			const getFocusElement = () => {
-				const row = treeGridElementRef.current?.querySelector(
-					`[role=row][data-block="${ focusClientId }"]`
-				);
-				if ( ! row ) return null;
-				// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
-				return focus.focusable.find( row )[ 0 ];
-			};
-
-			let focusElement = getFocusElement();
-			if ( focusElement ) {
-				focusElement.focus();
-			} else {
-				// The element hasn't been painted yet. Defer focusing on the next frame.
-				// This could happen when all blocks have been deleted and the default block
-				// hasn't been added to the editor yet.
-				window.requestAnimationFrame( () => {
-					focusElement = getFocusElement();
-					// Ignore if the element still doesn't exist.
-					if ( focusElement ) {
-						focusElement.focus();
-					}
-				} );
-			}
+			focusListItem( focusClientId, treeGridElementRef );
 		},
 		[ selectBlock, treeGridElementRef ]
 	);
@@ -255,6 +232,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }

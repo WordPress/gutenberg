@@ -344,3 +344,25 @@ export const usePatterns = ( clientId, name ) => {
 		[ name, clientId ]
 	);
 };
+
+/**
+ * Hook that returns whether the Query Loop with the given `clientId` contains
+ * any third-party block.
+ *
+ * @param {string} clientId The block's client ID.
+ * @return {boolean} True if it contains third-party blocks.
+ */
+export const useContainsThirdPartyBlocks = ( clientId ) => {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
+
+			return getClientIdsOfDescendants( clientId ).some(
+				( descendantClientId ) =>
+					! getBlockName( descendantClientId ).startsWith( 'core/' )
+			);
+		},
+		[ clientId ]
+	);
+};

@@ -320,6 +320,7 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
 
+- background: backgroundImage
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
@@ -968,7 +969,7 @@ You can use `ref: "styles.color.background"`  to re-use the style for a block:
 ```JSON
 {
 	"color": {
-		"text": { ref: "styles.color.background" }
+		"text": { "ref": "styles.color.background" }
 	}
 }
 ```

@@ -58,7 +58,7 @@ describe( 'RenderAppender prop of InnerBlocks', () => {
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
 		const quoteButton = (
 			await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR )
-		 )[ 0 ];
+		)[ 0 ];
 
 		// Insert a quote block.
 		await quoteButton.click();
@@ -93,7 +93,7 @@ describe( 'RenderAppender prop of InnerBlocks', () => {
 		const inserterPopover = await page.$( INSERTER_RESULTS_SELECTOR );
 		const quoteButton = (
 			await inserterPopover.$x( QUOTE_INSERT_BUTTON_SELECTOR )
-		 )[ 0 ];
+		)[ 0 ];
 
 		// Insert a quote block.
 		await quoteButton.click();

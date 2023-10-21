@@ -171,8 +171,19 @@
 	&.has-custom-content-position.has-custom-content-position {
 		.wp-block-cover__inner-container {
 			margin: 0;
-			width: auto;
 		}
+		&.is-position-top-left,
+		&.is-position-top-right,
+		&.is-position-center-left,
+		&.is-position-center-right,
+		&.is-position-bottom-left,
+		&.is-position-bottom-right {
+			.wp-block-cover__inner-container {
+				margin: 0;
+				width: auto;
+			}
+		}
+
 	}
 
 	// Extra specificity for in edit mode where other styles would override it otherwise.

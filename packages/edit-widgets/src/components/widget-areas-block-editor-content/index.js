@@ -39,7 +39,10 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
+				<EditorStyles
+					styles={ styles }
+					scope=".editor-styles-wrapper"
+				/>
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<BlockList className="edit-widgets-main-block-list" />

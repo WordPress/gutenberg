@@ -3,7 +3,6 @@
  */
 import { SlotFillProvider } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,6 +14,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import DataviewsProvider from '../dataviews/provider';
 import { unlock } from '../../lock-unlock';
 
 const { RouterProvider } = unlock( routerPrivateApis );
@@ -35,16 +35,16 @@ export default function App() {
 	}
 
 	return (
-		<ShortcutProvider style={ { height: '100%' } }>
-			<SlotFillProvider>
-				<GlobalStylesProvider>
-					<UnsavedChangesWarning />
-					<RouterProvider>
+		<SlotFillProvider>
+			<GlobalStylesProvider>
+				<UnsavedChangesWarning />
+				<RouterProvider>
+					<DataviewsProvider>
 						<Layout />
 						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
-				</GlobalStylesProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+					</DataviewsProvider>
+				</RouterProvider>
+			</GlobalStylesProvider>
+		</SlotFillProvider>
 	);
 }

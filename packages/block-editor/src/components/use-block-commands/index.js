@@ -12,8 +12,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCommandLoader } from '@wordpress/commands';
 import {
 	copy,
-	edit as remove,
-	create as add,
+	trash as remove,
+	plus as add,
 	group,
 	ungroup,
 	moveTo as move,
@@ -120,34 +120,76 @@ const useActionsCommands = () => {
 			clientIds: selectedBlockClientIds,
 		};
 	}, [] );
+
+	const { getBlockRootClientId, canMoveBlocks, getBlockCount } =
+		useSelect( blockEditorStore );
+
+	const { setBlockMovingClientId, setNavigationMode, selectBlock } =
+		useDispatch( blockEditorStore );
+
+	if ( ! clientIds || clientIds.length < 1 ) {
+		return { isLoading: false, commands: [] };
+	}
+
+	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+
+	const canMove =
+		canMoveBlocks( clientIds, rootClientId ) &&
+		getBlockCount( rootClientId ) !== 1;
+
+	const commands = [];
+
+	if ( canMove ) {
+		commands.push( {
+			name: 'move-to',
+			label: __( 'Move to' ),
+			callback: () => {
+				setNavigationMode( true );
+				selectBlock( clientIds[ 0 ] );
+				setBlockMovingClientId( clientIds[ 0 ] );
+			},
+			icon: move,
+		} );
+	}
+
+	return {
+		isLoading: false,
+		commands: commands.map( ( command ) => ( {
+			...command,
+			name: 'core/block-editor/action-' + command.name,
+			callback: ( { close } ) => {
+				command.callback();
+				close();
+			},
+		} ) ),
+	};
+};
+
+const useQuickActionsCommands = () => {
+	const { clientIds, isUngroupable, isGroupable } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientIds,
+			isUngroupable: _isUngroupable,
+			isGroupable: _isGroupable,
+		} = select( blockEditorStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+
+		return {
+			clientIds: selectedBlockClientIds,
+			isUngroupable: _isUngroupable(),
+			isGroupable: _isGroupable(),
+		};
+	}, [] );
 	const {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlocksByClientId,
-		canMoveBlocks,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
 
 	const blocks = getBlocksByClientId( clientIds );
-	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-
-	const canDuplicate = blocks.every( ( block ) => {
-		return (
-			!! block &&
-			hasBlockSupport( block.name, 'multiple', true ) &&
-			canInsertBlockType( block.name, rootClientId )
-		);
-	} );
-
-	const canInsertDefaultBlock = canInsertBlockType(
-		getDefaultBlockName(),
-		rootClientId
-	);
-
-	const canMove = canMoveBlocks( clientIds, rootClientId );
-	const canRemove = canRemoveBlocks( clientIds, rootClientId );
 
 	const {
 		removeBlocks,
@@ -155,47 +197,8 @@ const useActionsCommands = () => {
 		duplicateBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		setBlockMovingClientId,
-		setNavigationMode,
-		selectBlock,
 	} = useDispatch( blockEditorStore );
 
-	const onDuplicate = () => {
-		if ( ! canDuplicate ) {
-			return;
-		}
-		return duplicateBlocks( clientIds, true );
-	};
-	const onRemove = () => {
-		if ( ! canRemove ) {
-			return;
-		}
-		return removeBlocks( clientIds, true );
-	};
-	const onAddBefore = () => {
-		if ( ! canInsertDefaultBlock ) {
-			return;
-		}
-		const clientId = Array.isArray( clientIds ) ? clientIds[ 0 ] : clientId;
-		insertBeforeBlock( clientId );
-	};
-	const onAddAfter = () => {
-		if ( ! canInsertDefaultBlock ) {
-			return;
-		}
-		const clientId = Array.isArray( clientIds )
-			? clientIds[ clientIds.length - 1 ]
-			: clientId;
-		insertAfterBlock( clientId );
-	};
-	const onMoveTo = () => {
-		if ( ! canMove ) {
-			return;
-		}
-		setNavigationMode( true );
-		selectBlock( clientIds[ 0 ] );
-		setBlockMovingClientId( clientIds[ 0 ] );
-	};
 	const onGroup = () => {
 		if ( ! blocks.length ) {
 			return;
@@ -229,62 +232,96 @@ const useActionsCommands = () => {
 		return { isLoading: false, commands: [] };
 	}
 
-	const commands = [
-		{
-			name: 'ungroup',
-			label: __( 'Ungroup' ),
-			callback: onUngroup,
-			icon: ungroup,
-		},
-		{
+	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+	const canInsertDefaultBlock = canInsertBlockType(
+		getDefaultBlockName(),
+		rootClientId
+	);
+	const canDuplicate = blocks.every( ( block ) => {
+		return (
+			!! block &&
+			hasBlockSupport( block.name, 'multiple', true ) &&
+			canInsertBlockType( block.name, rootClientId )
+		);
+	} );
+	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+
+	const commands = [];
+
+	if ( canDuplicate ) {
+		commands.push( {
+			name: 'duplicate',
+			label: __( 'Duplicate' ),
+			callback: () => duplicateBlocks( clientIds, true ),
+			icon: copy,
+		} );
+	}
+
+	if ( canInsertDefaultBlock ) {
+		commands.push(
+			{
+				name: 'add-before',
+				label: __( 'Add before' ),
+				callback: () => {
+					const clientId = Array.isArray( clientIds )
+						? clientIds[ 0 ]
+						: clientId;
+					insertBeforeBlock( clientId );
+				},
+				icon: add,
+			},
+			{
+				name: 'add-after',
+				label: __( 'Add after' ),
+				callback: () => {
+					const clientId = Array.isArray( clientIds )
+						? clientIds[ clientIds.length - 1 ]
+						: clientId;
+					insertAfterBlock( clientId );
+				},
+				icon: add,
+			}
+		);
+	}
+
+	if ( isGroupable ) {
+		commands.push( {
 			name: 'Group',
 			label: __( 'Group' ),
 			callback: onGroup,
 			icon: group,
-		},
-		{
-			name: 'move-to',
-			label: __( 'Move to' ),
-			callback: onMoveTo,
-			icon: move,
-		},
-		{
-			name: 'add-after',
-			label: __( 'Add after' ),
-			callback: onAddAfter,
-			icon: add,
-		},
-		{
-			name: 'add-before',
-			label: __( 'Add before' ),
-			callback: onAddBefore,
-			icon: add,
-		},
-		{
+		} );
+	}
+
+	if ( isUngroupable ) {
+		commands.push( {
+			name: 'ungroup',
+			label: __( 'Ungroup' ),
+			callback: onUngroup,
+			icon: ungroup,
+		} );
+	}
+
+	if ( canRemove ) {
+		commands.push( {
 			name: 'remove',
-			label: __( 'Remove' ),
-			callback: onRemove,
+			label: __( 'Delete' ),
+			callback: () => removeBlocks( clientIds, true ),
 			icon: remove,
-		},
-		{
-			name: 'duplicate',
-			label: __( 'Duplicate' ),
-			callback: onDuplicate,
-			icon: copy,
-		},
-	].map( ( { name, label, callback, icon } ) => {
-		return {
-			name: 'core/block-editor/action-' + name,
-			label,
-			icon,
+		} );
+	}
+
+	return {
+		isLoading: false,
+		commands: commands.map( ( command ) => ( {
+			...command,
+			name: 'core/block-editor/action-' + command.name,
 			callback: ( { close } ) => {
-				callback();
+				command.callback();
 				close();
 			},
-		};
-	} );
-
-	return { isLoading: false, commands };
+		} ) ),
+	};
 };
 
 export const useBlockCommands = () => {
@@ -295,5 +332,10 @@ export const useBlockCommands = () => {
 	useCommandLoader( {
 		name: 'core/block-editor/blockActions',
 		hook: useActionsCommands,
+	} );
+	useCommandLoader( {
+		name: 'core/block-editor/blockQuickActions',
+		hook: useQuickActionsCommands,
+		context: 'block-selection-edit',
 	} );
 };

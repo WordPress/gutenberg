@@ -43,7 +43,7 @@ export function initializeEditor( id, settings ) {
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
 		( { name } ) => name !== 'core/freeform'
 	);

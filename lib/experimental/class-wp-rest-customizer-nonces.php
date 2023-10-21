@@ -72,5 +72,4 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 			'stylesheet' => $wp_customize->get_stylesheet(),
 		);
 	}
-
 }

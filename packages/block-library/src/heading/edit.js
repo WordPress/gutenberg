@@ -132,7 +132,6 @@ function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side

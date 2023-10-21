@@ -33,6 +33,7 @@ export default function useCommonCommands() {
 		closeGeneralSidebar,
 		switchEditorMode,
 		setIsListViewOpened,
+		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const {
@@ -41,6 +42,7 @@ export default function useCommonCommands() {
 		isListViewOpen,
 		isPublishSidebarEnabled,
 		showBlockBreadcrumbs,
+		isDistractionFree,
 	} = useSelect( ( select ) => {
 		const { getEditorMode, isListViewOpened, isFeatureActive } =
 			select( editPostStore );
@@ -53,6 +55,10 @@ export default function useCommonCommands() {
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
 			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
+			isDistractionFree: select( preferencesStore ).get(
+				editPostStore.name,
+				'distractionFree'
+			),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -92,7 +98,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-distraction-free',
 		label: __( 'Toggle distraction free' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'distractionFree' );
+			toggleDistractionFree();
 			close();
 		},
 	} );
@@ -131,6 +137,9 @@ export default function useCommonCommands() {
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fixedToolbar' );
+			if ( isDistractionFree ) {
+				toggleDistractionFree();
+			}
 			close();
 		},
 	} );

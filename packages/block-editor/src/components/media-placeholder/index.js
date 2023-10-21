@@ -469,7 +469,7 @@ export function MediaPlaceholder( {
 					<FormFileUpload
 						onChange={ onUpload }
 						accept={ accept }
-						multiple={ multiple }
+						multiple={ !! multiple }
 						render={ ( { openFileDialog } ) => {
 							const content = (
 								<>
@@ -508,7 +508,7 @@ export function MediaPlaceholder( {
 						) }
 						onChange={ onUpload }
 						accept={ accept }
-						multiple={ multiple }
+						multiple={ !! multiple }
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>

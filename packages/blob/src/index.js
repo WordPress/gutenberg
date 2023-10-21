@@ -60,7 +60,7 @@ export function revokeBlobURL( url ) {
 /**
  * Check whether a url is a blob url.
  *
- * @param {string} url The URL.
+ * @param {string|undefined} url The URL.
  *
  * @return {boolean} Is the url a blob url?
  */

@@ -73,12 +73,7 @@ const transforms = {
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'enter',
 			regExp: new RegExp( `^/(h|H)${ level }$` ),
-			transform( content ) {
-				return createBlock( 'core/heading', {
-					level,
-					content,
-				} );
-			},
+			transform: () => createBlock( 'core/heading', { level } ),
 		} ) ),
 	],
 	to: [

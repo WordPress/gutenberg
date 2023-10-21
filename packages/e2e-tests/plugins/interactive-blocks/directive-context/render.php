@@ -119,3 +119,16 @@
 		</button>
 	</div>
 </div>
+
+<div
+	data-wp-interactive
+	data-wp-navigation-id="navigation"
+	data-wp-context='{ "text": "first page" }'
+>
+	<div data-testid="navigation text" data-wp-text="context.text"></div>
+	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
+	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
+	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
+	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
+	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
+</div>

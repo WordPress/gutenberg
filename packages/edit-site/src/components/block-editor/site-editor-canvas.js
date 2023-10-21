@@ -10,14 +10,9 @@ import { useRef } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
-	__unstableUseClipboardHandler as useClipboardHandler,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -27,7 +22,10 @@ import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
 import useSiteEditorSettings from './use-site-editor-settings';
 import { store as editSiteStore } from '../../store';
-import { FOCUSABLE_ENTITIES } from './constants';
+import {
+	FOCUSABLE_ENTITIES,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import PageContentFocusManager from '../page-content-focus-manager';
 
@@ -76,9 +74,7 @@ export default function SiteEditorCanvas() {
 		! isMobileViewport;
 
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useClipboardHandler() ] );
-
-	const isTemplateTypeNavigation = templateType === 'wp_navigation';
+	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 
@@ -127,8 +123,7 @@ export default function SiteEditorCanvas() {
 								<EditorCanvas
 									enableResizing={ enableResizing }
 									settings={ settings }
-									contentRef={ mergedRefs }
-									readonly={ isViewMode }
+									contentRef={ contentRef }
 								>
 									{ resizeObserver }
 									<BlockList

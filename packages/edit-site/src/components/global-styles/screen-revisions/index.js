@@ -71,7 +71,6 @@ function ScreenRevisions() {
 		setUserConfig( () => ( {
 			styles: revision?.styles,
 			settings: revision?.settings,
-			behaviors: revision?.behaviors,
 		} ) );
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
@@ -81,7 +80,6 @@ function ScreenRevisions() {
 		setGlobalStylesRevision( {
 			styles: revision?.styles || {},
 			settings: revision?.settings || {},
-			behaviors: revision?.behaviors || {},
 			id: revision?.id,
 		} );
 		setSelectedRevisionId( revision?.id );

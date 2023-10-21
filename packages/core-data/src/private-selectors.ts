@@ -1,9 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { State, UndoEdit } from './selectors';
+import type { State } from './selectors';
 
-type Optional< T > = T | undefined;
 type EntityRecordKey = string | number;
 
 /**
@@ -12,22 +11,10 @@ type EntityRecordKey = string | number;
  *
  * @param state State tree.
  *
- * @return The edit.
+ * @return The undo manager.
  */
-export function getUndoEdits( state: State ): Optional< UndoEdit[] > {
-	return state.undo.list[ state.undo.list.length - 1 + state.undo.offset ];
-}
-
-/**
- * Returns the next edit from the current undo offset
- * for the entity records edits history, if any.
- *
- * @param state State tree.
- *
- * @return The edit.
- */
-export function getRedoEdits( state: State ): Optional< UndoEdit[] > {
-	return state.undo.list[ state.undo.list.length + state.undo.offset ];
+export function getUndoManager( state: State ) {
+	return state.undoManager;
 }
 
 /**

@@ -192,11 +192,12 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'textDecoration' => 'underline',
 						'textTransform'  => 'uppercase',
 						'letterSpacing'  => '2',
+						'writingMode'    => 'vertical-rl',
 					),
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;writing-mode:vertical-rl;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -207,6 +208,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text-decoration' => 'underline',
 						'text-transform'  => 'uppercase',
 						'letter-spacing'  => '2',
+						'writing-mode'    => 'vertical-rl',
 					),
 				),
 			),
@@ -490,6 +492,25 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css'          => 'border-bottom-color:var(--wp--preset--color--terrible-lizard);',
 					'declarations' => array(
 						'border-bottom-color' => 'var(--wp--preset--color--terrible-lizard)',
+					),
+				),
+			),
+
+			'inline_background_image_url_with_background_size' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.com/image.jpg',
+						),
+						'backgroundSize'  => 'cover',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+					'declarations' => array(
+						'background-image' => "url('https://example.com/image.jpg')",
+						'background-size'  => 'cover',
 					),
 				),
 			),

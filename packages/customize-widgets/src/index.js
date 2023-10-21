@@ -49,7 +49,7 @@ export function initialize( editorName, blockEditorSettings ) {
 		welcomeGuide: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
 			DISABLED_BLOCKS.includes( block.name ) ||

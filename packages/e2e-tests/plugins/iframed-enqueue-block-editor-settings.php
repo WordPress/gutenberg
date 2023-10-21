@@ -9,7 +9,7 @@
 
 add_action(
 	'block_editor_settings_all',
-	function( $settings ) {
+	function ( $settings ) {
 		$settings['styles'][] = array(
 			'css'            => 'p { border: 1px solid red }',
 			'__unstableType' => 'plugin',

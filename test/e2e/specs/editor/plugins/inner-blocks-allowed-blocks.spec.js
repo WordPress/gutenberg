@@ -107,7 +107,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await page.keyboard.press( 'Enter' );
 
@@ -140,6 +142,18 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
 			'Gallery',
+			'Video',
+		] );
+
+		await blockListBox.getByRole( 'option', { name: 'Gallery' } ).click();
+
+		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await blockAppender.click();
+
+		// It should display a different allowed block list.
+		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
+			'Gallery',
+			'List',
 			'Video',
 		] );
 	} );

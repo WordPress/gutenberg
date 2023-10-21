@@ -62,3 +62,26 @@
 .pickerPointer {
 	height: 16px;
 }
+
+.hsv-container {
+	justify-content: center;
+	align-items: center;
+}
+
+.gradient-gontainer {
+	overflow: hidden;
+}
+
+.saturation-slider {
+	top: 0;
+	left: 0;
+	position: absolute;
+	border-color: $white;
+}
+
+.hue-slider {
+	position: absolute;
+	background-color: #fff;
+	box-shadow: 0 7px 10px rgba(0, 0, 0, 0.5);
+	z-index: 5;
+}

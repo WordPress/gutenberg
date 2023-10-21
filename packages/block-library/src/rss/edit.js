@@ -69,7 +69,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					>
 						<HStack wrap>
 							<InputControl
-								__next36pxDefaultSize
+								__next40pxDefaultSize
 								placeholder={ __( 'Enter URL here…' ) }
 								value={ feedURL }
 								onChange={ ( value ) =>
@@ -77,7 +77,11 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 								}
 								className="wp-block-rss__placeholder-input"
 							/>
-							<Button variant="primary" type="submit">
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								type="submit"
+							>
 								{ __( 'Use URL' ) }
 							</Button>
 						</HStack>

@@ -10,7 +10,6 @@ import {
 	post,
 	page,
 	layout,
-	symbol,
 	symbolFilled,
 	styles,
 	navigation,
@@ -25,7 +24,7 @@ import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const icons = {
 	post,
@@ -137,6 +136,14 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
+		const location = useLocation();
+
+		const isPatternsPage =
+			location?.params?.path === '/patterns' ||
+			location?.params?.postType === 'wp_block';
+		const didAccessPatternsPage =
+			!! location?.params?.didAccessPatternsPage;
+
 		const isBlockBasedTheme = useIsBlockBasedTheme();
 		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
@@ -185,6 +192,11 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 						const args = {
 							postType: templateType,
 							postId: record.id,
+							didAccessPatternsPage:
+								! isBlockBasedTheme &&
+								( isPatternsPage || didAccessPatternsPage )
+									? 1
+									: undefined,
 							...extraArgs,
 						};
 						const targetUrl = addQueryArgs(
@@ -292,24 +304,6 @@ function useSiteEditorBasicNavigationCommands() {
 			callback: ( { close } ) => {
 				const args = {
 					path: '/wp_template',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-patterns',
-			label: __( 'Patterns' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
 				};
 				const targetUrl = addQueryArgs( 'site-editor.php', args );
 				if ( isSiteEditor ) {

@@ -104,7 +104,6 @@ function Root( { className, ...settings } ) {
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
-				setElement,
 				useTypingObserver(),
 			] ),
 			className: classnames( 'is-root-container', className, {
@@ -119,6 +118,8 @@ function Root( { className, ...settings } ) {
 		<elementContext.Provider value={ element }>
 			<IntersectionObserver.Provider value={ intersectionObserver }>
 				<div { ...innerBlocksProps } />
+				{ /* Ensure element and layout styles are always at the end of the document */ }
+				<div ref={ setElement } />
 			</IntersectionObserver.Provider>
 		</elementContext.Provider>
 	);

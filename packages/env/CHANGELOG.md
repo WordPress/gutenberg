@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `wp-env` now works offline after the environment has been created. Note that many `wp-env` configuration changes involve internet connectivity and may not work in offline mode. [#53547](https://github.com/WordPress/gutenberg/pull/53547)
+
+## 8.10.0 (2023-10-18)
+
+### Bug Fix
+
+-   Corrected `PATH` to include the host user's Composer bin directory.
+-   Replaced `yoast/phpunit-polyfills` with `phpunit/phpunit` to install the required PHPUnit version, avoiding the need for project-specific polyfills.
+
+## 8.9.0 (2023-10-05)
+
+## 8.8.0 (2023-09-20)
+
+## 8.7.0 (2023-08-31)
+
 ## 8.6.0 (2023-08-16)
 
 ## 8.5.0 (2023-08-10)

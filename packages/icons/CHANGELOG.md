@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 9.35.0 (2023-10-18)
+
+## 9.34.0 (2023-10-05)
+
+## 9.33.0 (2023-09-20)
+
+### Enhancement
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
+## 9.32.0 (2023-08-31)
+
+### Bug Fix
+
+-   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
+
 ## 9.31.0 (2023-08-16)
 
 ## 9.30.0 (2023-08-10)

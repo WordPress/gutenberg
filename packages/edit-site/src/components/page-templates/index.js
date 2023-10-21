@@ -20,11 +20,12 @@ import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import TemplateActions from '../template-actions';
 import AddNewTemplate from '../add-new-template';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function PageTemplates() {
 	const { records: templates } = useEntityRecords(
 		'postType',
-		'wp_template',
+		TEMPLATE_POST_TYPE,
 		{
 			per_page: -1,
 		}
@@ -79,7 +80,7 @@ export default function PageTemplates() {
 			title={ __( 'Templates' ) }
 			actions={
 				<AddNewTemplate
-					templateType={ 'wp_template' }
+					templateType={ TEMPLATE_POST_TYPE }
 					showIcon={ false }
 					toggleProps={ { variant: 'primary' } }
 				/>

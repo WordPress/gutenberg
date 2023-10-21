@@ -10,25 +10,37 @@ import { __ } from '@wordpress/i18n';
  */
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
+import { usePatternsCategories } from '../block-patterns-tab';
 
-function PatternsExplorer( { initialCategory, patternCategories } ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
+function PatternsExplorer( { initialCategory, rootClientId } ) {
+	const [ searchValue, setSearchValue ] = useState( '' );
+	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
+
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
 	);
+
+	const patternCategories = usePatternsCategories(
+		rootClientId,
+		patternSourceFilter
+	);
+
 	return (
 		<div className="block-editor-block-patterns-explorer">
 			<PatternExplorerSidebar
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
 				onClickCategory={ setSelectedCategory }
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				searchValue={ searchValue }
+				setSearchValue={ setSearchValue }
+				patternSourceFilter={ patternSourceFilter }
+				setPatternSourceFilter={ setPatternSourceFilter }
 			/>
 			<PatternList
-				filterValue={ filterValue }
+				searchValue={ searchValue }
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
+				patternSourceFilter={ patternSourceFilter }
 			/>
 		</div>
 	);

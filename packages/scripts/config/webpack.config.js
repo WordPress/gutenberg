@@ -10,6 +10,7 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -302,7 +303,9 @@ const config = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							RenderPathsPlugin.renderPaths.includes( filepath )
+							RenderPathsPlugin.renderPaths.includes(
+								realpathSync( filepath ).replace( /\\/g, '/' )
+							)
 						);
 					},
 				},

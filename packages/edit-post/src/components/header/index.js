@@ -22,15 +22,20 @@ import DocumentActions from './document-actions';
 
 const slideY = {
 	hidden: { y: '-50px' },
+	distractionFreeInactive: { y: 0 },
 	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
 const slideX = {
 	hidden: { x: '-100%' },
+	distractionFreeInactive: { x: 0 },
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( { setEntitiesSavedStatesCallback } ) {
+function Header( {
+	setEntitiesSavedStatesCallback,
+	setListViewToggleElement,
+} ) {
 	const isLargeViewport = useViewportMatch( 'large' );
 	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
 		useSelect(
@@ -59,7 +64,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar />
+				<HeaderToolbar
+					setListViewToggleElement={ setListViewToggleElement }
+				/>
 				<div className="edit-post-header__center">
 					<DocumentActions />
 				</div>

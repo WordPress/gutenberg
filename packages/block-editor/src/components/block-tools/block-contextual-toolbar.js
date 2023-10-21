@@ -86,9 +86,15 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const isFullscreen =
 		document.body.classList.contains( 'is-fullscreen-mode' );
 
+	/**
+	 * The following code is a workaround to fix the width of the toolbar
+	 * it should be removed when the toolbar will be rendered inline
+	 * FIXME: remove this layout effect when the toolbar is no longer
+	 * 				absolutely positioned
+	 */
 	useLayoutEffect( () => {
 		// don't do anything if not fixed toolbar
-		if ( ! isFixed || ! blockType ) {
+		if ( ! isFixed ) {
 			return;
 		}
 
@@ -97,6 +103,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		);
 
 		if ( ! blockToolbar ) {
+			return;
+		}
+
+		if ( ! blockType ) {
+			blockToolbar.style.width = 'initial';
 			return;
 		}
 
@@ -112,11 +123,10 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			return;
 		}
 
-		// get the width of the pinned items in the post editor
+		// get the width of the pinned items in the post editor or widget editor
 		const pinnedItems = document.querySelector(
-			'.edit-post-header__settings'
+			'.edit-post-header__settings, .edit-widgets-header__actions'
 		);
-
 		// get the width of the left header in the site editor
 		const leftHeader = document.querySelector(
 			'.edit-site-header-edit-mode__end'
@@ -132,7 +142,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 		const marginLeft = parseFloat( computedToolbarStyle.marginLeft );
 		const pinnedItemsWidth = computedPinnedItemsStyle
-			? parseFloat( computedPinnedItemsStyle.width ) + 10 // 10 is the pinned items padding
+			? parseFloat( computedPinnedItemsStyle.width )
 			: 0;
 		const leftHeaderWidth = computedLeftHeaderStyle
 			? parseFloat( computedLeftHeaderStyle.width )
@@ -143,6 +153,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			leftHeaderWidth +
 			pinnedItemsWidth +
 			marginLeft +
+			( pinnedItems || leftHeader ? 2 : 0 ) + // Prevents button focus border from being cut off
 			( isFullscreen ? 0 : 160 ) // the width of the admin sidebar expanded
 		}px)`;
 	}, [
@@ -177,6 +188,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
+			variant={ isFixed ? 'unstyled' : undefined }
 			{ ...props }
 		>
 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }

@@ -18,7 +18,7 @@ class Tests_Fonts_WpFonts_DoItem extends WP_Fonts_TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_fonts = new WP_Fonts;
+		$this->wp_fonts = new WP_Fonts();
 	}
 
 	public function test_should_return_false_when_provider_not_registered() {
