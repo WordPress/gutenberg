@@ -28,6 +28,29 @@ describe.each( [
 	[ getEntityRecord ],
 	[ __experimentalGetEntityRecordNoResolver ],
 ] )( '%p', ( selector ) => {
+	describe( 'normalizing Post ID passed as recordKey', () => {
+		it( 'normalizes any Post ID recordKey argument to a Number via `__unstableNormalizeArgs` method', async () => {
+			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+				'postType',
+				'some_post',
+				'123',
+			] );
+			expect( normalized ).toEqual( [ 'postType', 'some_post', 123 ] );
+		} );
+
+		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
+			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+				'postType',
+				'some_post',
+				'i-am-a-slug-with-a-number-123',
+			] );
+			expect( normalized ).toEqual( [
+				'postType',
+				'some_post',
+				'i-am-a-slug-with-a-number-123',
+			] );
+		} );
+	} );
 	it( 'should return undefined for unknown entity kind, name', () => {
 		const state = deepFreeze( {
 			entities: {

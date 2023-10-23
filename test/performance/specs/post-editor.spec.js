@@ -70,9 +70,7 @@ test.describe( 'Post Editor Performance', () => {
 				const canvas = await perfUtils.getCanvas();
 
 				// Wait for the first block.
-				await canvas.locator( '.wp-block' ).first().waitFor( {
-					timeout: 120_000,
-				} );
+				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();

@@ -491,7 +491,7 @@ Should there be any situation where you want to provide your own Jest config, yo
 -   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
 -   a `jest` object can be provided in the `package.json` file with the test configuration.
 
-### `test-plyawright`
+### `test-playwright`
 
 Launches the Playwright End-To-End (E2E) test runner. Similar to Puppeteer, it provides a high-level API to control a headless browser.
 

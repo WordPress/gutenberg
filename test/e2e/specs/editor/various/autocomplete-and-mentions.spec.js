@@ -427,16 +427,11 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 		editor,
 	} ) => {
-		// The autocomplete popup is flaky when typing too fast, so we need to
-		// slow it down until it's addressed in the component.
-		// See https://github.com/WordPress/gutenberg/pull/55081
-		const typingDelay = 100;
-
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
 
-		await page.keyboard.type( '@fr', { delay: typingDelay } );
+		await page.keyboard.type( '@fr' );
 		await expect(
 			page.getByRole( 'option', {
 				name: 'Frodo Baggins',
@@ -452,7 +447,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			},
 		] );
 
-		await page.keyboard.type( ' +bi', { delay: typingDelay } );
+		await page.keyboard.type( ' +bi' );
 		await expect(
 			page.getByRole( 'option', {
 				name: 'Bilbo Baggins',

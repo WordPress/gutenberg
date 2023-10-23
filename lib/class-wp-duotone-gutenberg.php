@@ -836,7 +836,6 @@ class WP_Duotone_Gutenberg {
 		$has_global_styles_duotone = array_key_exists( $block['blockName'], self::$global_styles_block_names );
 
 		if (
-			empty( $block_content ) ||
 			! $duotone_selector ||
 			( ! $has_duotone_attribute && ! $has_global_styles_duotone )
 		) {

@@ -218,28 +218,36 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-init', 'effects.core.image.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
 	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
+	// We need to set an event callback on the `img` specifically
+	// because the `figure` element can also contain a caption, and
+	// we don't want to trigger the lightbox when the caption is clicked.
+	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.showLightbox' );
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
-	// Wrap the image in the body content with a button.
+	// Add a button alongside image in the body content.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
 	$button =
 		$img[0]
 		. '<button
+			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.core.image.showLightbox"
-			data-wp-style--width="context.core.image.imageButtonWidth"
-			data-wp-style--height="context.core.image.imageButtonHeight"
-			data-wp-style--left="context.core.image.imageButtonLeft"
+			data-wp-style--right="context.core.image.imageButtonRight"
 			data-wp-style--top="context.core.image.imageButtonTop"
-		></button>';
+			style="background: #000"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+				<Path stroke="#FFFFFF" d="M6 4a2 2 0 0 0-2 2v3h1.5V6a.5.5 0 0 1 .5-.5h3V4H6Zm3 14.5H6a.5.5 0 0 1-.5-.5v-3H4v3a2 2 0 0 0 2 2h3v-1.5Zm6 1.5v-1.5h3a.5.5 0 0 0 .5-.5v-3H20v3a2 2 0 0 1-2 2h-3Zm3-16a2 2 0 0 1 2 2v3h-1.5V6a.5.5 0 0 0-.5-.5h-3V4h3Z" />
+			</svg>
+		</button>';
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
@@ -312,12 +320,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--touchend="actions.core.image.handleTouchEnd"
             data-wp-on--click="actions.core.image.hideLightbox"
+            tabindex="-1"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
-				<div class="lightbox-image-container">$enlarged_image_content</div>
+                <div class="lightbox-image-container">$enlarged_image_content</div>
                 <div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
         </div>
 HTML;

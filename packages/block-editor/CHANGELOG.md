@@ -2,21 +2,25 @@
 
 ## Unreleased
 
+-   Deprecated the `useSetting` function in favor of new `useSettings` one that can retrieve multiple settings at once ([#55337](https://github.com/WordPress/gutenberg/pull/55337)).
+
+## 12.12.0 (2023-10-18)
+
 ## 12.11.0 (2023-10-05)
 
-- Deprecated `CopyHandler`, absorbed into `WritingFlow`.
+-   Deprecated `CopyHandler`, absorbed into `WritingFlow`.
 
 ## 12.10.0 (2023-09-20)
 
-- The Deprecated multiline prop on RichText will now fall back to using multiple
-  rich text instances instead of a single multiline instance. The prop remains
-  deprecated.
+-   The Deprecated multiline prop on RichText will now fall back to using multiple
+    rich text instances instead of a single multiline instance. The prop remains
+    deprecated.
 
 ## 12.9.0 (2023-08-31)
 
 ### Enhancements
 
-- Embed the `ObserveTyping` behavior within the `BlockList` component making to simplify instanciations of third-party block editors.
+-   Embed the `ObserveTyping` behavior within the `BlockList` component making to simplify instanciations of third-party block editors.
 
 ## 12.8.0 (2023-08-16)
 
@@ -30,12 +34,11 @@
 
 ### Enhancements
 
-- Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
+-   Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
 ### Bug Fix
 
 -   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
-
 
 ## 12.3.0 (2023-06-07)
 
@@ -49,10 +52,9 @@
 
 ### Breaking Changes
 
-- Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+-   Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
 
 ## 11.8.0 (2023-04-12)
-
 
 ## 11.7.0 (2023-03-29)
 
@@ -100,7 +102,7 @@
 ### Bug Fix
 
 -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
--   `FocalPointPicker`:  Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+-   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
 
 ## 10.5.0 (2022-11-16)
 

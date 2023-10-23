@@ -29,7 +29,7 @@ import { getFilename } from '@wordpress/url';
  */
 import InspectorControls from '../components/inspector-controls';
 import MediaReplaceFlow from '../components/media-replace-flow';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -281,19 +281,17 @@ function BackgroundImagePanelItem( props ) {
 }
 
 export function BackgroundImagePanel( props ) {
-	const isBackgroundImageSupported =
-		useSetting( 'background.backgroundImage' ) &&
-		hasBackgroundSupport( props.name, 'backgroundImage' );
-
-	if ( ! isBackgroundImageSupported ) {
+	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
+	if (
+		! backgroundImage ||
+		! hasBackgroundSupport( props.name, 'backgroundImage' )
+	) {
 		return null;
 	}
 
 	return (
 		<InspectorControls group="background">
-			{ isBackgroundImageSupported && (
-				<BackgroundImagePanelItem { ...props } />
-			) }
+			<BackgroundImagePanelItem { ...props } />
 		</InspectorControls>
 	);
 }

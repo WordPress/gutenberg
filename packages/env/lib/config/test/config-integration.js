@@ -15,6 +15,8 @@ jest.mock( 'fs', () => ( {
 	promises: {
 		readFile: jest.fn(),
 		stat: jest.fn().mockResolvedValue( true ),
+		mkdir: jest.fn(),
+		writeFile: jest.fn(),
 	},
 } ) );
 
