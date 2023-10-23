@@ -24,3 +24,7 @@ else
     echo 'XCUITest not found, installing...'
     $APPIUM_CMD driver install xcuitest
 fi
+
+# Mitigate conflicts between development server caches and E2E tests
+npm run clean:runtime > /dev/null
+echo 'Runtime cache cleaned.'
