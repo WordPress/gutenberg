@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useContainsThirdPartyBlocks } from '../../utils';
+import { useUnsupportedBlockList } from '../../utils';
 
 export default function EnhancedPaginationControl( {
 	enhancedPagination,
@@ -15,10 +15,10 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const enhancedPaginationNotice = __(
-		"Enhanced pagination doesn't support plugin blocks or blocks that may contain them yet. If you want to enable it, you have to remove all disallowed blocks from the Query Loop."
+		"Enhanced pagination doesn't support plugin blocks or globally synced blocks yet. If you want to enable it, you have to remove all unsupported blocks from the Query Loop."
 	);
 
-	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
+	const unsupported = useUnsupportedBlockList( clientId );
 
 	return (
 		<>
@@ -28,20 +28,25 @@ export default function EnhancedPaginationControl( {
 					'Browsing between pages won’t require a full page reload.'
 				) }
 				checked={ !! enhancedPagination }
-				disabled={ containsThirdPartyBlocks }
+				disabled={ unsupported.length }
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: !! value,
 					} );
 				} }
 			/>
-			{ containsThirdPartyBlocks && (
+			{ !! unsupported.length && (
 				<Notice
 					status="warning"
 					isDismissible={ false }
 					className="wp-block-query__enhanced-pagination-notice"
 				>
 					{ enhancedPaginationNotice }
+					<ul>
+						{ unsupported.map( ( title ) => (
+							<li key={ title }>{ title }</li>
+						) ) }
+					</ul>
 				</Notice>
 			) }
 		</>

@@ -4,9 +4,23 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	store as blocksStore,
+	getBlockType,
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -346,20 +360,20 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that returns whether the Query Loop with the given `clientId` contains
- * any third-party block, or a block that could contain them.
+ * Hook that returns a list of unsupported blocks inside the Query Loop with the
+ * given `clientId`.
  *
  * @param {string} clientId The block's client ID.
- * @return {boolean} True if it contains third-party blocks.
+ * @return {string[]} List of block titles.
  */
-export const useContainsThirdPartyBlocks = ( clientId ) => {
-	return useSelect(
+export const useUnsupportedBlockList = ( clientId ) => {
+	const unsupported = useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
 
-			return getClientIdsOfDescendants( clientId ).some(
-				( descendantClientId ) => {
+			return getClientIdsOfDescendants( clientId )
+				.filter( ( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					return (
 						! blockName.startsWith( 'core/' ) ||
@@ -367,9 +381,26 @@ export const useContainsThirdPartyBlocks = ( clientId ) => {
 						blockName === 'core/template-part' ||
 						blockName === 'core/block'
 					);
-				}
-			);
+				} )
+				.map( ( descendantClientId ) => ( {
+					title: getBlockType( getBlockName( descendantClientId ) )
+						.title,
+					descendantClientId,
+				} ) );
 		},
 		[ clientId ]
 	);
+
+	const titles = unsupported.map( ( { descendantClientId, title } ) => {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const displayTitle = useBlockDisplayTitle( {
+			clientId: descendantClientId,
+		} );
+
+		return title !== displayTitle
+			? `${ displayTitle } (${ title })`
+			: title;
+	} );
+
+	return [ ...new Set( titles ).values() ];
 };
