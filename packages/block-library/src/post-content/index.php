@@ -52,6 +52,12 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$tag_name = $attributes['tagName'];
+
+	if ( ! $tag_name ) {
+		$tag_name = 'div';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
 	return (
