@@ -85,8 +85,11 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {}, layoutClassNames, tagName } =
-		props;
+	const {
+		context: { queryId, postType, postId } = {},
+		layoutClassNames,
+		tagName,
+	} = props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	if ( userCanEdit === undefined ) {
 		return null;
@@ -207,7 +210,7 @@ export default function PostContentEdit( {
 				{ contextPostId && contextPostType ? (
 					<Content
 						context={ context }
-						layoutClassNames={layoutClassNames}
+						layoutClassNames={ layoutClassNames }
 						tagName={ tagName }
 					/>
 				) : (
