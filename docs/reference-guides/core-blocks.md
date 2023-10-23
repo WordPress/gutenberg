@@ -482,7 +482,7 @@ Display your navigation in an overlay. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/navigation-overlay
 -	**Category:** navigation, theme, design
--	**Supports:** inserter
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
 -	**Attributes:** 
 
 ## Submenu
