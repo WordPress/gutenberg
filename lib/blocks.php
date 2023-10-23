@@ -31,6 +31,7 @@ function gutenberg_reregister_core_block_types() {
 				'media-text',
 				'missing',
 				'more',
+				'navigation-overlay',
 				'nextpage',
 				'paragraph',
 				'preformatted',
