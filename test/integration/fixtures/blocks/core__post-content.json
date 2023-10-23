@@ -2,7 +2,9 @@
 	{
 		"name": "core/post-content",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"tagName": "div"
+		},
 		"innerBlocks": []
 	}
 ]
