@@ -73,6 +73,7 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import { createBlock, serialize } from '@wordpress/blocks';
 
 function Navigation( {
 	attributes,
@@ -181,6 +182,7 @@ function Navigation( {
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
 	const {
+		navigationMenu,
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
@@ -517,6 +519,8 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const { saveEntityRecord } = useDispatch( coreStore );
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -562,6 +566,29 @@ function Navigation( {
 							</>
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<Button
+							onClick={ async () => {
+								// Copy the navigation block.
+								const blocks = createBlock( 'core/navigation', {
+									ref,
+								} );
+								// Save entity record with the new type.
+								const record = {
+									title: navigationMenu.title, // Name of the nav block
+									content: serialize( blocks ),
+									status: 'publish',
+								};
+								await saveEntityRecord(
+									'postType',
+									'wp_nav_overlay',
+									record
+								);
+								// Navigate to the new block.
+								console.log( 'hi' );
+							} }
+						>
+							{ __( 'Edit' ) }
+						</Button>
 						<ToggleGroupControl
 							__nextHasNoMarginBottom
 							label={ __( 'Configure overlay menu' ) }
