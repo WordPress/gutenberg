@@ -242,6 +242,9 @@
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 0s;
+		}
 		opacity: 1;
 		background-size: 100px 100%;
 		// Disable reason: This function call looks nicer when each argument is on its own line.
