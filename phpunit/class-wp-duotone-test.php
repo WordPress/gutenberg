@@ -53,7 +53,7 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::render_duotone_support
 	 */
-	public function test_css_declarations_are_generated_even_with_empty_block_content() {
+	public function test_gutenberg_css_declarations_are_generated_even_with_empty_block_content() {
 		$block                           = array(
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => 'var:preset|duotone|blue-orange' ) ) ),
