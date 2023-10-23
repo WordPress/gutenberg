@@ -1,16 +1,44 @@
 # DataView
 
-This file aims to document the main APIs related to the DataView component.
+This file documents the DataViews UI component, which provides an API to render datasets using different view types (table, grid, etc.).
+
+```js
+<DataViews
+	data={ pages }
+	isLoading= { isLoadingPages }
+	view={ view }
+	onChangeView={ onChangeView }
+	fields={ fields }
+	filters={ filters }
+	actions={ [ trashPostAction ] }
+	paginationInfo={ { totalItems, totalPages } }
+/>
+```
+
+## Data
+
+The dataset to work with, represented as a one-dimensional array. 
+
+Example:
+
+```js
+[
+	{ id: 1, title: "Title", ... },
+	{ ... }
+]
+```
 
 ## View
 
-The view is responsible for configuring how the dataset is visible to the user. For example:
+The view object configures how the dataset is visible to the user.
+
+Example:
 
 ```js
 {
 	type: 'list',
-	page: 1,
 	perPage: 5,
+	page: 1,
 	sort: {
 		field: 'date',
 		direction: 'desc',
@@ -26,44 +54,77 @@ The view is responsible for configuring how the dataset is visible to the user. 
 }
 ```
 
-- `type`: one of `list` or `grid`.
-- `page`: the current page.
-- `perPage`: number of records per page.
-- `sort.field`: field used for sorting.
-- `sort.direction`: one of `asc` or `desc`.
-- `filters`: the filters applied to the dataset.
+- `type`: view type, one of `list` or `grid`.
+- `perPage`: number of records to show per page.
+- `page`: the page that is visible.
+- `sort.field`: field used for sorting the dataset.
+- `sort.direction`: the direction to use for sorting, one of `asc` or `desc`.
+- `filters`: the filters applied to the dataset. See filters section.
 - `visibleFilters`: the `id` of the filters that are visible in the UI.
 - `hiddenFields`: the `id` of the fields that are hidden in the UI.
 - `layout`: ...
 
-The view configuration is used to retrieve the corresponding entity that holds the dataset:
+Note that it's the consumer's responsibility to provide the data and make sure the dataset corresponds to the view's config (sort, pagination, filters, etc.).
+
+Example:
 
 ```js
-const {
-	records: pages,
-	isLoading: isLoadingPages,
-	totalItems,
-	totalPages
-} = useEntityRecords( 'postType', 'page', {
-	per_page: view.perPage,
-	page: view.page,
-	order: view.sort?.direction,
-	orderby: view.sort?.field
-	...view.filters
-} );
+function MyCustomPageList() { 
+	const [ view, setView ] = useState( {
+		type: 'list',
+		page: 1,
+		"...": "..."
+	} );
+
+	const queryArgs = useMemo(
+		() => ( {
+			per_page: view.perPage,
+			page: view.page,
+			order: view.sort?.direction,
+			orderby: view.sort?.field
+			...view.filters
+		} ),
+		[ view ]
+	);
+
+	const {
+		records
+	} = useEntityRecords( 'postType', 'page', queryArgs );
+
+	return (
+		<DataViews
+			data={ records }
+			view={ view }
+			onChangeView={ setView }
+			"..."
+		/>
+	);
+}
 ```
 
 ## Fields
 
-The fields describe the dataset. For example:
+The fields describe the visible items for each record in the dataset.
+
+Example:
 
 ```js
 [
 	{
+		id: 'date',
+		header: __( 'Date' ),
+		getValue: ( { item } ) => item.date,
+		render: ( { item } ) => {
+			return (
+				<time>{ getFormattedDate( item.date ) }</time>
+			);
+		}
+	},
+	{
 		id: 'author',
 		header: __( 'Author' ),
 		getValue: ( { item } ) => item.author,
-		render: ( {item} ) => {
+		render: ( { item } ) => {
 			return (
 				<a href="...">{ item.author }</a>
 			);
@@ -73,37 +134,71 @@ The fields describe the dataset. For example:
 			{ value: 2, label: 'User' }
 		]
 		filters: [
-			'enumeration',
+			'enumeration'
 			{ id: 'author_search', type: 'search', name: __( 'Search by author' ) }
 		],
-	},
+	}
 ]
 ```
 
 - `id`: identifier for the field. Unique.
-- `header`: the field name for the UI.
+- `header`: the field's name to be shown in the UI.
 - `getValue`: function that returns the value of the field.
 - `render`: function that renders the field.
-- `elements`: a set of valid values for the field.
-- `filters`: what filters are available for the user to use. A filter contains the following properties:
-	- `id`: unique identifier for the filter. Matches the entity query param. If not provided, the field's `id` is used.
-	- `name`: nice looking name for the filter. If not provided, the field's `header` is used.
-	- `type`: the type of filter. One of `search` or `enumeration`.
-	- `resetLabel`: the label for the reset option of the filter. If none provided, `All` is used.
-	- `resetValue`: the value for the reset option of the filter. If none provedid, `''` is used.
+- `elements`: the set of valid values for the field's value.
+- `filters`: what filters are available for the user to use. See filters section.
 
-## DataViews
+## Filters
 
-The UI component responsible for rendering the dataset.
+Filters describe the conditions a record should match to be listed as part of the dataset.
+
+Filters can be provided globally, as a property of the `DataViews` component, or per field, should they be considered part of a fields' description.
 
 ```js
+const field = [
+	{
+		id: 'author',
+		filters: [
+			'enumeration'
+			{ id: 'author_search', type: 'search', name: __( 'Search by author' ) }
+		],
+	}
+];
+
 <DataViews
-	data={ pages }
-	isLoading= { isLoadingPages }
 	fields={ fields }
-	view={ view }
-	onChangeView={ onChangeView }
-	actions={ [ trashPostAction ] }
-	paginationInfo={ { totalItems, totalPages } }
+	filters={ [
+		{ id: 'search', type: 'search', name: __( 'Filter list' ) }
+	] }
 />
+```
+
+A filter is an object that may contain the following properties:
+
+- `id`: unique identifier for the filter. Matches the entity query param. Field filters may omit it, in which case the field's `id` will be used.
+- `name`: nice looking name for the filter. Field filters may omit it, in which case the field's `header` will be used.
+- `type`: the type of filter. One of `search` or `enumeration`.
+- `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
+	- `value`: what's serialized into the view's filters.
+	- `label`: nice-looking name for users.
+- `resetValue`: for filters of type `enumeration`, this is the value for the reset option. If none is provided, `''` will be used.
+- `resetLabel`: for filters of type `enumeration`, this is the label for the reset option. If none is provided, `All` will be used.
+
+As a convenience, field's filter can provide abbreviated versions for the filter. All of following examples result in the same filter:
+
+```js
+const field = [
+	{
+		id: 'author',
+		header: __( 'Author' ),
+		elements: authors,
+		filters: [
+			'enumeration',
+			{ type: 'enumeration' },
+			{ id: 'author', type: 'enumeration' },
+			{ id: 'author', type: 'enumeration', name: __( 'Author' ) },
+			{ id: 'author', type: 'enumeration', name: __( 'Author' ), elements: authors },
+		],
+	}
+];
 ```
