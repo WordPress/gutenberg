@@ -14,6 +14,9 @@ export default function TextFilter( { filter, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
 		view.filters[ filter.id ]
 	);
+	useEffect( () => {
+		setSearch( view.filters[ filter.id ] );
+	}, [ view ] );
 	const onChangeViewRef = useRef( onChangeView );
 	useEffect( () => {
 		onChangeViewRef.current = onChangeView;
