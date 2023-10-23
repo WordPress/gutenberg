@@ -2,16 +2,13 @@
  * Internal dependencies
  */
 const {
-	doubleTap,
 	isAndroid,
 	isEditorVisible,
-	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
 	swipeUp,
-	tapPasteAboveElement,
 	toggleHtmlMode,
 	typeString,
 	waitForVisible,
@@ -256,21 +253,6 @@ class EditorPage {
 
 		await toggleHtmlMode( this.driver, false );
 		return text;
-	}
-
-	// Set html editor content explicitly.
-	async setHtmlContent( html ) {
-		await toggleHtmlMode( this.driver, true );
-
-		await setClipboard( this.driver, html );
-
-		const htmlContentView = await this.getTextViewForHtmlViewContent();
-
-		await htmlContentView.click();
-		await doubleTap( this.driver, htmlContentView );
-		await tapPasteAboveElement( this.driver, htmlContentView );
-
-		await toggleHtmlMode( this.driver, false );
 	}
 
 	async dismissKeyboard() {
