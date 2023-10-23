@@ -476,6 +476,15 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
+## Navigation Overlay
+
+Display your navigation in an overlay. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-overlay))
+
+-	**Name:** core/navigation-overlay
+-	**Category:** navigation, theme, design
+-	**Supports:** inserter
+-	**Attributes:** 
+
 ## Submenu
 
 Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-submenu))

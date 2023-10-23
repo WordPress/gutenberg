@@ -68,6 +68,7 @@ import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
+import * as navigationOverlay from './navigation-overlay';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
@@ -185,6 +186,7 @@ const getAllBlocks = () => {
 		// theme blocks
 		navigation,
 		navigationLink,
+		navigationOverlay,
 		navigationSubmenu,
 		siteLogo,
 		siteTitle,

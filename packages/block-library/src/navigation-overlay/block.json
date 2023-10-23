@@ -1,0 +1,13 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/navigation-overlay",
+	"title": "Navigation Overlay",
+	"category": "navigation, theme, design",
+	"description": "Display your navigation in an overlay.",
+	"supports": {
+		"inserter": true
+	},
+	"textdomain": "default",
+	"attributes": {}
+}
