@@ -4,8 +4,7 @@
 const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
 import { remote, Key } from 'webdriverio';
-// TODO: Replace usage of wd in favor of WebdriverIO
-const wd = null;
+
 const crypto = require( 'crypto' );
 const path = require( 'path' );
 /**
@@ -46,9 +45,6 @@ const localAppiumPort = serverConfigs.local.port; // Port to spawn appium proces
 let appiumProcess;
 
 const backspace = '\u0008';
-
-// $block-edge-to-content value
-const blockEdgeToContent = 16;
 
 const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
 const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
@@ -232,12 +228,6 @@ const typeString = async ( driver, element, str, clear ) => {
 	}
 };
 
-const doubleTap = async ( driver, element ) => {
-	const action = new wd.TouchAction( driver );
-	action.tap( { el: element, count: 2 } );
-	await action.perform();
-};
-
 /**
  * Returns the mapped keycode for a string to use in `pressKeycode` function.
  *
@@ -311,16 +301,6 @@ const clickBeginningOfElement = async ( driver, element ) => {
 	] );
 };
 
-// Clicks in the top left of a text-based element outside of the TextInput
-const clickElementOutsideOfTextInput = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const y = isAndroid() ? location.y - blockEdgeToContent : location.y;
-	const x = isAndroid() ? location.x - blockEdgeToContent : location.x;
-
-	const action = new wd.TouchAction( driver ).press( { x, y } ).release();
-	await action.perform();
-};
-
 // Long press to activate context menu.
 const longPressMiddleOfElement = async (
 	driver,
@@ -356,49 +336,6 @@ const longPressMiddleOfElement = async (
 		.pause( waitTime )
 		.up()
 		.perform();
-};
-
-// Press "Select All" in floating context menu.
-const tapSelectAllAboveElement = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	const x = location.x + 300;
-	const y = location.y - 50;
-	action.press( { x, y } );
-	action.release();
-	await action.perform();
-};
-
-// Press "Copy" in floating context menu.
-const tapCopyAboveElement = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	const x = location.x + 220;
-	const y = location.y - 50;
-	action.wait( 2000 );
-	action.press( { x, y } );
-	action.wait( 2000 );
-	action.release();
-	await action.perform();
-};
-
-// Press "Paste" in floating context menu.
-const tapPasteAboveElement = async ( driver, element ) => {
-	await longPressMiddleOfElement( driver, element );
-
-	if ( isAndroid() ) {
-		const location = await element.getLocation();
-		const action = await new wd.TouchAction( driver );
-		action.wait( 2000 );
-		action.press( { x: location.x + 100, y: location.y - 50 } );
-		action.wait( 2000 );
-		action.release();
-		await action.perform();
-	} else {
-		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
-		await clickIfClickable( driver, pasteButtonLocator );
-		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
-	}
 };
 
 const tapStatusBariOS = async ( driver ) => {
@@ -818,10 +755,8 @@ module.exports = {
 	backspace,
 	clearClipboard,
 	clickBeginningOfElement,
-	clickElementOutsideOfTextInput,
 	clickIfClickable,
 	clickMiddleOfElement,
-	doubleTap,
 	dragAndDropAfterElement,
 	isAndroid,
 	isEditorVisible,
@@ -836,9 +771,6 @@ module.exports = {
 	swipeDown,
 	swipeFromTo,
 	swipeUp,
-	tapCopyAboveElement,
-	tapPasteAboveElement,
-	tapSelectAllAboveElement,
 	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
