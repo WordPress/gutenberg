@@ -117,7 +117,7 @@ export default function WelcomeGuideStyles() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
-									'New to block themes and styling your site?'
+									'New to block themes and styling your site? '
 								) }
 								<ExternalLink
 									href={ __(
