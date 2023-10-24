@@ -11,7 +11,7 @@ export interface DropdownMenuContext {
 	 */
 	store: Ariakit.MenuStore;
 	/**
-	 * The variant used by the underlying menu popover
+	 * The variant used by the underlying menu popover.
 	 */
 	variant?: 'toolbar';
 }
@@ -22,7 +22,7 @@ export interface DropdownMenuProps {
 	 */
 	trigger: React.ReactElement;
 	/**
-	 * The contents of the dropdown
+	 * The contents of the dropdown.
 	 */
 	children?: React.ReactNode;
 	/**
@@ -81,33 +81,33 @@ export interface DropdownMenuProps {
 
 export interface DropdownMenuGroupProps {
 	/**
-	 * The contents of the group
+	 * The contents of the dropdown menu group.
 	 */
 	children: React.ReactNode;
 }
 
 export interface DropdownMenuGroupLabelProps {
 	/**
-	 * The contents of the label
+	 * The contents of the dropdown menu group label.
 	 */
 	children: React.ReactNode;
 }
 
 export interface DropdownMenuItemProps {
 	/**
-	 * The contents of the label
+	 * The contents of the menu item.
 	 */
 	children: React.ReactNode;
 	/**
-	 * The contents of the item's prefix
+	 * The contents of the menu item's prefix.
 	 */
 	prefix?: React.ReactNode;
 	/**
-	 * The contents of the item's suffix
+	 * The contents of the menu item's suffix.
 	 */
 	suffix?: React.ReactNode;
 	/**
-	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 * Whether to hide the parent menu when the item is clicked.
 	 *
 	 * @default true
 	 */
@@ -121,17 +121,17 @@ export interface DropdownMenuItemProps {
 export interface DropdownMenuCheckboxItemProps
 	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
-	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
 	 * @default false
 	 */
 	hideOnClick?: boolean;
 	/**
-	 * The checkbox item's name.
+	 * The checkbox menu item's name.
 	 */
 	name: string;
 	/**
-	 * The checkbox item's value, useful when using multiple checkbox items
+	 * The checkbox item's value, useful when using multiple checkbox menu items
 	 * associated to the same `name`.
 	 */
 	value?: string;
@@ -153,7 +153,7 @@ export interface DropdownMenuCheckboxItemProps
 export interface DropdownMenuRadioItemProps
 	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
-	 * Whether to hide the dropdown menu when the menu item is clicked.
+	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
 	 * @default false
 	 */
