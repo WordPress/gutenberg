@@ -73,4 +73,10 @@ export type ComboboxControlProps = Pick<
 	 * The current value of the control.
 	 */
 	value?: string | null;
+	/**
+	 * By default the control will filter the options based on the input value.
+	 * but if you're providing filtered options using REST API or something else,
+	 * you may consider disabling the filtering by marking this prop as false.
+	 */
+	shouldFilter?: boolean;
 };

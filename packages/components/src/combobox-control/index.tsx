@@ -120,6 +120,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		help,
 		allowReset = true,
 		className,
+		shouldFilter = true,
 		messages = {
 			selected: __( 'Item selected.' ),
 		},
@@ -156,13 +157,13 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			const index = normalizeTextString( option.label ).indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
-			} else if ( index > 0 ) {
+			} else if ( index > 0 || ! shouldFilter ) {
 				containsMatch.push( option );
 			}
 		} );
 
 		return startsWithMatch.concat( containsMatch );
-	}, [ inputValue, options ] );
+	}, [ shouldFilter, inputValue, options ] );
 
 	const onSuggestionSelected = (
 		newSelectedSuggestion: ComboboxControlOption
