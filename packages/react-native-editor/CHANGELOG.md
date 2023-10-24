@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
 -   [*] Classic block: Add option to convert to blocks [#55461]
 
 ## 1.106.0

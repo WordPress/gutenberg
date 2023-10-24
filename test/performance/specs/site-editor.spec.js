@@ -86,9 +86,7 @@ test.describe( 'Site Editor Performance', () => {
 				const canvas = await perfUtils.getCanvas();
 
 				// Wait for the first block.
-				await canvas.locator( '.wp-block' ).first().waitFor( {
-					timeout: 120_000,
-				} );
+				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -142,7 +140,7 @@ test.describe( 'Site Editor Performance', () => {
 					// Spinner was used instead of the progress bar in an earlier version of the site editor.
 					'.edit-site-canvas-loader, .edit-site-canvas-spinner'
 				)
-				.waitFor( { state: 'hidden', timeout: 120_000 } );
+				.waitFor( { state: 'hidden' } );
 
 			const canvas = await perfUtils.getCanvas();
 
