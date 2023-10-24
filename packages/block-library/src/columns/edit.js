@@ -81,9 +81,16 @@ function ColumnInspectorControls( {
 			const itemProps = { value: count, label: count, key: count };
 			optionList.push( <ToggleGroupControlOption { ...itemProps } /> );
 		}
+		let help;
+		if ( countMin > 6 ) {
+			help = `Options disabled due to six or more columns being nonempty or locked.`;
+		} else if ( countMin > 1 ) {
+			help = `Options for fewer than ${ countMin } disabled due to some columns being nonempty or locked.`;
+		}
 		quantityControl = (
 			<>
 				<ToggleGroupControl
+					help={ help }
 					label={ __( 'Columns' ) }
 					onChange={ updateColumns }
 					value={ count }
