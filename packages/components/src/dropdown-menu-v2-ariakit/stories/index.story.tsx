@@ -507,3 +507,8 @@ InsideModal.args = {
 		return true;
 	},
 };
+InsideModal.parameters = {
+	docs: {
+		source: { type: 'code' },
+	},
+};
