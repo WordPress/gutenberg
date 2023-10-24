@@ -6,11 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
+	getBlockTypes,
 	hasBlockSupport,
+	store as blocksStore,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
@@ -36,6 +39,8 @@ import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { toStyles, getBlockSelectors } from '../components/global-styles';
+import { store as blockEditorStore } from '../store';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -395,23 +400,74 @@ const elementTypes = [
  */
 const withSectionStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
+		const sectionClass = `wp-section-${ useInstanceId( BlockListBlock ) }`;
+		const sectionStyles = props.attributes?.style?.blocks;
+		const settings = useSelect( ( select ) => {
+			return select( blockEditorStore ).getSettings()
+				.__experimentalFeatures;
+		}, [] );
+
+		const sectionConfig = {
+			settings,
+			styles: { blocks: sectionStyles ?? {} },
+		};
+
+		const getBlockStyles = useSelect( ( select ) => {
+			return select( blocksStore ).getBlockStyles;
+		}, [] );
+
+		const blockSelectors = getBlockSelectors(
+			getBlockTypes(),
+			getBlockStyles
+		);
+		const hasBlockGapSupport = false;
+		const hasFallbackGapSupport = true;
+		const disableLayoutStyles = true;
+		const sectionBlockStyles = toStyles(
+			sectionConfig,
+			blockSelectors,
+			hasBlockGapSupport,
+			hasFallbackGapSupport,
+			disableLayoutStyles,
+			{
+				blockStyles: true,
+				marginReset: false,
+				rootPadding: false,
+				layoutStyles: false,
+				blockGap: false,
+				presets: false,
+				scopeSelector: `.${ sectionClass }`,
+			}
+		);
+
+		const element = useContext( BlockList.__unstableElementContext );
+
 		// While exploring section styling the blocks supported will be limited.
 		if ( props.name !== 'core/group' ) {
 			return <BlockListBlock { ...props } />;
 		}
 
-		const sectionClass = `wp-section-${ useInstanceId( BlockListBlock ) }`;
-		const sectionStyles = props.attributes?.style?.blocks;
-
 		return (
-			<BlockListBlock
-				{ ...props }
-				className={
-					sectionStyles
-						? classnames( props.className, sectionClass )
-						: props.className
-				}
-			/>
+			<>
+				{ sectionBlockStyles &&
+					element &&
+					createPortal(
+						<style
+							dangerouslySetInnerHTML={ {
+								__html: sectionBlockStyles,
+							} }
+						/>,
+						element
+					) }
+				<BlockListBlock
+					{ ...props }
+					className={
+						sectionStyles
+							? classnames( props.className, sectionClass )
+							: props.className
+					}
+				/>
+			</>
 		);
 	}
 );

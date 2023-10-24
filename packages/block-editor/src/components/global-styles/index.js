@@ -9,6 +9,8 @@ export {
 export { getBlockCSSSelector } from './get-block-css-selector';
 export {
 	getLayoutStyles,
+	getBlockSelectors,
+	toStyles,
 	useGlobalStylesOutput,
 	useGlobalStylesOutputWithConfig,
 } from './use-global-styles-output';
