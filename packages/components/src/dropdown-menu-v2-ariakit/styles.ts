@@ -84,7 +84,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	` }
 
 	overscroll-behavior: contain;
-	overflow: visible;
+	overflow: auto;
 
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent !important;
