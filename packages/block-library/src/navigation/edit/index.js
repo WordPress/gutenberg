@@ -43,7 +43,10 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
+import { createBlock, serialize } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -73,7 +76,8 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
-import { createBlock, serialize } from '@wordpress/blocks';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function Navigation( {
 	attributes,
@@ -519,6 +523,9 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const { params: locationParams } = useLocation();
+	const history = useHistory();
+
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -567,24 +574,47 @@ function Navigation( {
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<Button
-							onClick={ async () => {
+							onClick={ async ( event ) => {
+								event.preventDefault();
+
 								// Copy the navigation block.
 								const blocks = createBlock( 'core/navigation', {
 									ref,
 								} );
+
 								// Save entity record with the new type.
 								const record = {
 									title: navigationMenu.title, // Name of the nav block
 									content: serialize( blocks ),
 									status: 'publish',
 								};
-								await saveEntityRecord(
+								const navOverlay = await saveEntityRecord(
 									'postType',
 									'wp_nav_overlay',
 									record
 								);
+
+								// Copied from useLink()
+								// TODO
+								// if ( isPreviewingTheme() ) {
+								// 	params = {
+								// 		...params,
+								// 		wp_theme_preview: currentlyPreviewingTheme(),
+								// 	};
+								// }
+
 								// Navigate to the new block.
-								console.log( 'hi' );
+								history.push(
+									{
+										postId: navOverlay.id,
+										postType: 'wp_nav_overlay',
+										canvas: 'edit',
+									},
+									{
+										// this applies to Navigation Menus as well.
+										fromTemplateId: locationParams.postId,
+									}
+								);
 							} }
 						>
 							{ __( 'Edit' ) }
