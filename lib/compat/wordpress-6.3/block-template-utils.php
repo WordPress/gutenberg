@@ -148,3 +148,136 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	return $default_template_types;
 }
 add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10 );
+
+function gutenberg_get_block_templates($query_result, $query, $template_type){
+
+	if ( ! isset( $query['wp_id'] ) ) {
+		/*
+		 * If the query has found some use templates, those have priority
+		 * over the theme-provided ones, so we skip querying and building them.
+		 */
+		$query['slug__not_in'] = wp_list_pluck( $query_result, 'slug' );
+		$template_files        = gutenberg_get_block_templates_files( $template_type, $query );
+		foreach ( $template_files as $template_file ) {
+			$query_result[] = _build_block_template_result_from_file( $template_file, $template_type );
+		}
+	}
+
+	return $query_result;
+
+}
+
+/**
+ * Retrieves the template files from the theme.
+ *
+ * @since 5.9.0
+ * @since 6.3.0 Added the `$query` parameter.
+ * @access private
+ *
+ * @param string $template_type 'wp_template' or 'wp_template_part'.
+ * @param array  $query {
+ *     Arguments to retrieve templates. Optional, empty by default.
+ *
+ *     @type string[] $slug__in     List of slugs to include.
+ *     @type string[] $slug__not_in List of slugs to skip.
+ *     @type string   $area         A 'wp_template_part_area' taxonomy value to filter by (for 'wp_template_part' template type only).
+ *     @type string   $post_type    Post type to get the templates for.
+ * }
+ *
+ * @return array Template
+ */
+function gutenberg_get_block_templates_files( $template_type, $query = array() ) {
+	if ( 'wp_template' !== $template_type && 'wp_template_part' !== $template_type ) {
+		return null;
+	}
+
+	// Prepare metadata from $query.
+	$slugs_to_include = isset( $query['slug__in'] ) ? $query['slug__in'] : array();
+	$slugs_to_skip    = isset( $query['slug__not_in'] ) ? $query['slug__not_in'] : array();
+	$area             = isset( $query['area'] ) ? $query['area'] : null;
+	$post_type        = isset( $query['post_type'] ) ? $query['post_type'] : '';
+
+	$stylesheet = get_stylesheet();
+	$template   = get_template();
+	$themes     = array(
+		$stylesheet => get_stylesheet_directory(),
+	);
+	// Add the parent theme if it's not the same as the current theme.
+	if ( $stylesheet !== $template ) {
+		$themes[ $template ] = get_template_directory();
+	}
+	$template_files = array();
+	foreach ( $themes as $theme_slug => $theme_dir ) {
+		$template_base_paths  = get_block_theme_folders( $theme_slug );
+		$theme_template_files = _get_block_templates_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
+		foreach ( $theme_template_files as $template_file ) {
+			$template_base_path = $template_base_paths[ $template_type ];
+			$template_slug      = substr(
+				$template_file,
+				// Starting position of slug.
+				strpos( $template_file, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
+				// Subtract ending '.html'.
+				-5
+			);
+
+			// Skip this item if its slug doesn't match any of the slugs to include.
+			if ( ! empty( $slugs_to_include ) && ! in_array( $template_slug, $slugs_to_include, true ) ) {
+				continue;
+			}
+
+			// Skip this item if its slug matches any of the slugs to skip.
+			if ( ! empty( $slugs_to_skip ) && in_array( $template_slug, $slugs_to_skip, true ) ) {
+				continue;
+			}
+
+			/*
+			 * The child theme items (stylesheet) are processed before the parent theme's (template).
+			 * If a child theme defines a template, prevent the parent template from being added to the list as well.
+			 */
+			if ( isset( $template_files[ $template_slug ] ) ) {
+				continue;
+			}
+
+			$new_template_item = array(
+				'slug'  => $template_slug,
+				'path'  => $template_file,
+				'theme' => $theme_slug,
+				'type'  => $template_type,
+			);
+
+			if ( 'wp_template_part' === $template_type ) {
+				/*$candidate = _add_block_template_part_area_info( $new_template_item );
+				if ( ! isset( $area ) || ( isset( $area ) && $area === $candidate['area'] ) ) {
+					$template_files[ $template_slug ] = $candidate;
+				}*/
+				$default_headers = array(
+					'title' => 'Title',
+					'area'  => 'Area',
+				);
+				$metadata = get_file_data( $template_file, $default_headers );
+				if ( ! empty( $metadata['title'] ) ) {
+					$candidate[ 'title' ] = translate_with_gettext_context( $metadata['title'], 'Template part title', $theme_slug );
+				}
+				if ( ! empty( $metadata['area'] ) ) {
+					$candidate['area'] = $metadata['area'];
+				}
+				$template_files[ $template_slug ] = $candidate;
+			}
+
+			if ( 'wp_template' === $template_type ) {
+				$candidate = _add_block_template_info( $new_template_item );
+				if (
+					! $post_type ||
+					( $post_type && isset( $candidate['postTypes'] ) && in_array( $post_type, $candidate['postTypes'], true ) )
+				) {
+					$template_files[ $template_slug ] = $candidate;
+				}
+			}
+		}
+	}
+
+	return array_values( $template_files );
+
+}
+
+add_filter( 'get_block_templates', 'gutenberg_get_block_templates', 10, 3 );
