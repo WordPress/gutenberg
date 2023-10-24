@@ -6,8 +6,8 @@ import { share as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
-import edit from './edit';
 import metadata from './block.json';
 import variations from './variations';
 
@@ -17,7 +17,9 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "social-link/editor" */ './edit' )
+	),
 	variations,
 };
 

@@ -7,9 +7,10 @@ import { video as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
+
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -29,7 +30,9 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "video/editor" */ './edit' )
+	),
 	save,
 };
 

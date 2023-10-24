@@ -7,9 +7,10 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
-import edit from './edit';
+
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -61,7 +62,9 @@ export const settings = {
 				( attributesToMerge.content || '' ),
 		};
 	},
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "heading/editor" */ './edit' )
+	),
 	save,
 };
 
