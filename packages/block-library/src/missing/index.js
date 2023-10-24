@@ -6,8 +6,9 @@ import { getBlockType } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
-import edit from './edit';
+
 import metadata from './block.json';
 import save from './save';
 
@@ -32,7 +33,9 @@ export const settings = {
 			return '';
 		}
 	},
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "missing/editor" */ './edit' )
+	),
 	save,
 };
 

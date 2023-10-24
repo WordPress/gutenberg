@@ -6,9 +6,9 @@ import { rss as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
 
 const { name } = metadata;
 
@@ -21,7 +21,9 @@ export const settings = {
 			feedURL: 'https://wordpress.org',
 		},
 	},
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "rss/editor" */ './edit' )
+	),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

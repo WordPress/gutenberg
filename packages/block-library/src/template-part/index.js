@@ -15,9 +15,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import { enhanceTemplatePartVariations } from './variations';
 
 const { name } = metadata;
@@ -46,7 +47,9 @@ export const settings = {
 			capitalCase( entity.slug )
 		);
 	},
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "template-part/editor" */ './edit' )
+	),
 };
 
 export const init = () => {

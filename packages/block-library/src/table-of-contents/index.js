@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import icon from './icon';
 import save from './save';
 
@@ -13,7 +14,9 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "table-of-contents/editor" */ './edit' )
+	),
 	save,
 };
 

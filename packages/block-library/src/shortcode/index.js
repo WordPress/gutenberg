@@ -6,8 +6,8 @@ import { shortcode as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
-import edit from './edit';
 import save from './save';
 import transforms from './transforms';
 import metadata from './block.json';
@@ -19,7 +19,9 @@ export { metadata, name };
 export const settings = {
 	icon,
 	transforms,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "shortcode/editor" */ './edit' )
+	),
 	save,
 };
 

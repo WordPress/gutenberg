@@ -6,9 +6,10 @@ import { mapMarker as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import deprecated from './deprecated';
 import transforms from './transforms';
 
@@ -18,7 +19,9 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "site-title/editor" */ './edit' )
+	),
 	transforms,
 	deprecated,
 };

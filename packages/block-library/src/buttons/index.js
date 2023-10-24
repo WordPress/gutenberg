@@ -7,10 +7,11 @@ import { buttons as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import transforms from './transforms';
-import edit from './edit';
+
 import metadata from './block.json';
 import save from './save';
 
@@ -34,7 +35,9 @@ export const settings = {
 	},
 	deprecated,
 	transforms,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "buttons/editor" */ './edit' )
+	),
 	save,
 };
 

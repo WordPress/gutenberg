@@ -9,9 +9,10 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
@@ -32,7 +33,9 @@ export const settings = {
 		};
 	},
 
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "navigation-link/editor" */ './edit' )
+	),
 
 	save,
 
