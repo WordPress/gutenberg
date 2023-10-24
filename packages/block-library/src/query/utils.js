@@ -4,23 +4,9 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	cloneBlock,
-	store as blocksStore,
-	getBlockType,
-} from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
+import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -367,13 +353,13 @@ export const usePatterns = ( clientId, name ) => {
  * @return {string[]} List of block titles.
  */
 export const useUnsupportedBlockList = ( clientId ) => {
-	const unsupported = useSelect(
+	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
 
-			return getClientIdsOfDescendants( clientId )
-				.filter( ( descendantClientId ) => {
+			return getClientIdsOfDescendants( clientId ).filter(
+				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					return (
 						! blockName.startsWith( 'core/' ) ||
@@ -381,26 +367,9 @@ export const useUnsupportedBlockList = ( clientId ) => {
 						blockName === 'core/template-part' ||
 						blockName === 'core/block'
 					);
-				} )
-				.map( ( descendantClientId ) => ( {
-					title: getBlockType( getBlockName( descendantClientId ) )
-						.title,
-					descendantClientId,
-				} ) );
+				}
+			);
 		},
 		[ clientId ]
 	);
-
-	const titles = unsupported.map( ( { descendantClientId, title } ) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const displayTitle = useBlockDisplayTitle( {
-			clientId: descendantClientId,
-		} );
-
-		return title !== displayTitle
-			? `${ displayTitle } (${ title })`
-			: title;
-	} );
-
-	return [ ...new Set( titles ).values() ];
 };

@@ -3,6 +3,7 @@
  */
 import { ToggleControl, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { BlockTitle } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -14,10 +15,6 @@ export default function EnhancedPaginationControl( {
 	setAttributes,
 	clientId,
 } ) {
-	const enhancedPaginationNotice = __(
-		"Enhanced pagination doesn't support plugin blocks or globally synced blocks yet. If you want to enable it, you have to remove all unsupported blocks from the Query Loop."
-	);
-
 	const unsupported = useUnsupportedBlockList( clientId );
 
 	return (
@@ -41,12 +38,19 @@ export default function EnhancedPaginationControl( {
 					isDismissible={ false }
 					className="wp-block-query__enhanced-pagination-notice"
 				>
-					{ enhancedPaginationNotice }
+					{ __(
+						"Enhanced pagination doesn't support the following blocks:"
+					) }
 					<ul>
-						{ unsupported.map( ( title ) => (
-							<li key={ title }>{ title }</li>
+						{ unsupported.map( ( id ) => (
+							<li key={ id }>
+								<BlockTitle clientId={ id } />
+							</li>
 						) ) }
 					</ul>
+					{ __(
+						'If you want to enable it, you have to remove all unsupported blocks first.'
+					) }
 				</Notice>
 			) }
 		</>

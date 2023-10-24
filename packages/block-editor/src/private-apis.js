@@ -25,7 +25,6 @@ import {
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
-import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -54,5 +53,4 @@ lock( privateApis, {
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
-	useBlockDisplayTitle,
 } );
