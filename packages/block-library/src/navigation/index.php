@@ -675,6 +675,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$responsive_container_classes = array(
 		'wp-block-navigation__responsive-container',
+		'wp-block-navigation-overlay',
 		$is_hidden_by_default ? 'hidden-by-default' : '',
 		implode( ' ', $colors['overlay_css_classes'] ),
 	);

@@ -462,6 +462,10 @@ button.wp-block-navigation-item__content {
 		transform: translateY(0);
 	}
 }
+
+:where(.wp-block-navigation__responsive-container.is-menu-open) {
+	background-color: inherit;
+}
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -498,7 +502,6 @@ button.wp-block-navigation-item__content {
 	&.is-menu-open {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
-		background-color: inherit;
 
 		// Animation.
 		animation: overlay-menu__fade-in-animation 0.1s ease-out;
@@ -631,13 +634,13 @@ button.wp-block-navigation-item__content {
 }
 
 // Default menu background and font color.
-.wp-block-navigation:not(.has-background)
-.wp-block-navigation__responsive-container.is-menu-open {
+:where(.wp-block-navigation:not(.has-background)
+.wp-block-navigation__responsive-container.is-menu-open) {
 	background-color: #fff;
 }
 
-.wp-block-navigation:not(.has-text-color)
-.wp-block-navigation__responsive-container.is-menu-open {
+:where(.wp-block-navigation:not(.has-text-color)
+.wp-block-navigation__responsive-container.is-menu-open) {
 	color: #000;
 }
 
