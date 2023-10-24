@@ -6,8 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Radio from '../radio';
-import RadioGroup from '../';
+import { Radio, RadioGroup } from '../../radio-group-ariakit/';
 
 export default {
 	title: 'Components (Deprecated)/RadioGroup',
