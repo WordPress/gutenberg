@@ -1,6 +1,6 @@
-# Gutenberg for Mobile Apps E2E Tests
+# Mobile Gutenberg E2E Tests
 
-The Gutenberg for Mobile Apps (GMA) project maintains a suite of automated end-to-end (E2E) tests that uses [Appium](https://appium.io/docs/en/2.1/) to facilitate UI automation. The E2E tests run on iOS simulators and Android emulators to simulate an environment similar to that of an end user. This document provides an overview for running these tests on your local development computer.
+The Mobile Gutenberg (MG) project maintains a suite of automated end-to-end (E2E) tests that uses [Appium](https://appium.io/docs/en/2.1/) to facilitate UI automation. The E2E tests run on iOS simulators and Android emulators to simulate an environment similar to that of an end user. This document provides an overview for running these tests on your local development computer.
 
 ## Setup
 
@@ -24,7 +24,7 @@ Before setting up Appium, the required iOS and Android dependencies must be inst
 
 ### Appium
 
-The GMA project provides a script to set up the testing environment, installing the necessary Appium dependencies.
+The MG project provides a script to set up the testing environment, installing the necessary Appium dependencies.
 
 ```shell
 npm run native test:e2e:setup
@@ -97,7 +97,7 @@ TEST_RN_PLATFORM=ios npm run native device-tests:local
 
 Much like other development servers, values outputted to the console via `console.log` should display in the Jest test runner server log.
 
-Occasionally, it is helpful to inspect breakpoints during the execution of a test.The GMA project includes a `device-tests:debug` script which sets the `--inspect` flag required for attaching an inspector. Additional details on attaching an inspector can be found in Node.js’ [Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started).
+Occasionally, it is helpful to inspect breakpoints during the execution of a test.The MG project includes a `device-tests:debug` script which sets the `--inspect` flag required for attaching an inspector. Additional details on attaching an inspector can be found in Node.js’ [Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started).
 
 ## Writing Tests
 

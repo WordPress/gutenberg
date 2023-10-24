@@ -143,6 +143,6 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 ## End-to-End Tests
 
-In addition to unit tests, the Gutenberg for Mobile Apps (GMA) project relies upon end-to-end (E2E) tests to automate testing critical flows in an environment similar to that of an end user. We generally prefer unit tests due to their speed and ease of maintenance. However, assertions that require OS-level features (e.g. complex gestures, text selection) or visual regression testing (e.g. dark mode, contrast levels) we use E2E tests.
+In addition to unit tests, the Mobile Gutenberg (MG) project relies upon end-to-end (E2E) tests to automate testing critical flows in an environment similar to that of an end user. We generally prefer unit tests due to their speed and ease of maintenance. However, assertions that require OS-level features (e.g. complex gestures, text selection) or visual regression testing (e.g. dark mode, contrast levels) we use E2E tests.
 
 The E2E tests are found in the [`packages/react-native-editor/__device-tests__`](/packages/react-native-editor/__device-tests__) directory. Additional documentation on running and contributing to these tests can be found in the [tests directory](/packages/react-native-editor/__device-tests__#readme).
