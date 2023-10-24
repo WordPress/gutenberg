@@ -71,6 +71,7 @@ The contents of the dropdown
 The open state of the dropdown menu when it is initially rendered. Use when not wanting to control its open state.
 
 - Required: no
+- Default: `false`
 
 ##### `open`: `boolean`
 

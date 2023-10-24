@@ -168,7 +168,7 @@ const UnconnectedDropdownMenu = (
 	const {
 		// Store props
 		open,
-		defaultOpen,
+		defaultOpen = false,
 		onOpenChange,
 		placement,
 

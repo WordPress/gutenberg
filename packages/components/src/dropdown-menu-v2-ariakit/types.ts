@@ -28,6 +28,8 @@ export interface DropdownMenuProps {
 	/**
 	 * The open state of the dropdown menu when it is initially rendered. Use when
 	 * not wanting to control its open state.
+	 *
+	 * @default false
 	 */
 	defaultOpen?: boolean;
 	/**
