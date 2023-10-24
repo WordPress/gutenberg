@@ -421,7 +421,7 @@ export default () => {
 
 			if ( ! list.length ) return null;
 
-			return list.map( ( item ) => {
+			element.props.children = list.map( ( item ) => {
 				const currentValue = useRef( deepSignal( {} ) );
 
 				currentValue.current = useMemo( () => {
