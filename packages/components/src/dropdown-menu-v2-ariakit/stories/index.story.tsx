@@ -469,7 +469,13 @@ export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
 	const [ isModalOpen, setModalOpen ] = useState( false );
 	return (
 		<>
-			<Button onClick={ () => setModalOpen( true ) }>Open modal</Button>
+			<Button
+				onClick={ () => setModalOpen( true ) }
+				__next40pxDefaultSize
+				variant="secondary"
+			>
+				Open modal
+			</Button>
 			{ isModalOpen && (
 				<Modal onRequestClose={ () => setModalOpen( false ) }>
 					<DropdownMenu { ...props }>
