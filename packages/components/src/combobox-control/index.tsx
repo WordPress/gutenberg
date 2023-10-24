@@ -152,17 +152,20 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch: ComboboxControlOption[] = [];
 		const containsMatch: ComboboxControlOption[] = [];
+		const others: ComboboxControlOption[] = [];
 		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
 			const index = normalizeTextString( option.label ).indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
-			} else if ( index > 0 || ! shouldFilter ) {
+			} else if ( index > 0 ) {
 				containsMatch.push( option );
+			} else if ( ! shouldFilter ) {
+				others.push( option );
 			}
 		} );
 
-		return startsWithMatch.concat( containsMatch );
+		return startsWithMatch.concat( containsMatch ).concat( others );
 	}, [ shouldFilter, inputValue, options ] );
 
 	const onSuggestionSelected = (
