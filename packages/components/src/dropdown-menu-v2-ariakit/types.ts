@@ -6,7 +6,13 @@ import type * as Ariakit from '@ariakit/react';
 import type { Placement } from '@floating-ui/react-dom';
 
 export interface DropdownMenuContext {
+	/**
+	 * The ariakit store shared across all DropdownMenu subcomponents.
+	 */
 	store: Ariakit.MenuStore;
+	/**
+	 * The variant used by the underlying menu popover
+	 */
 	variant?: 'toolbar';
 }
 
