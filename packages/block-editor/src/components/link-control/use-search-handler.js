@@ -102,8 +102,7 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion,
-	withURLSuggestion
+	withCreateSuggestion
 ) {
 	const { fetchSearchSuggestions, pageOnFront } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -128,7 +127,6 @@ export default function useSearchHandler(
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
 						withCreateSuggestion,
-						withURLSuggestion,
 						pageOnFront
 				  );
 		},
@@ -138,7 +136,6 @@ export default function useSearchHandler(
 			pageOnFront,
 			suggestionsQuery,
 			withCreateSuggestion,
-			withURLSuggestion,
 		]
 	);
 }

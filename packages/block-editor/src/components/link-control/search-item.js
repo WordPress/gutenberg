@@ -11,6 +11,7 @@ import {
 	postList,
 	category,
 	file,
+	home,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -31,6 +32,9 @@ function SearchItemIcon( { isURL, suggestion } ) {
 		icon = globe;
 	} else if ( suggestion.type in ICONS_MAP ) {
 		icon = ICONS_MAP[ suggestion.type ];
+		if ( suggestion.type === 'page' && suggestion.isFrontPage ) {
+			icon = home;
+		}
 	}
 
 	if ( icon ) {
