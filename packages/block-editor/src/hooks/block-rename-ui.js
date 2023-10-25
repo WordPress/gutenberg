@@ -228,8 +228,8 @@ export const withBlockRenameControl = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
-addFilter(
-	'editor.BlockEdit',
-	'core/block-rename-ui/with-block-rename-control',
-	withBlockRenameControl
-);
+// addFilter(
+// 	'editor.BlockEdit',
+// 	'core/block-rename-ui/with-block-rename-control',
+// 	withBlockRenameControl
+// );
