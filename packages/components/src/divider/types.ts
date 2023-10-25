@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { SeparatorProps } from 'reakit';
+import type { SeparatorProps } from '@ariakit/react';
 
 /**
  * Internal dependencies
