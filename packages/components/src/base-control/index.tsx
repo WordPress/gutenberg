@@ -15,7 +15,7 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export { useBaseControlProps } from './hooks';
 

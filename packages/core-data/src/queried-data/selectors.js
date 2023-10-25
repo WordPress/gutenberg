@@ -33,7 +33,7 @@ function getQueriedItemsUncached( state, query ) {
 	let itemIds;
 
 	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ];
+		itemIds = state.queries[ context ][ stableKey ].itemIds;
 	}
 
 	if ( ! itemIds ) {
@@ -68,7 +68,7 @@ function getQueriedItemsUncached( state, query ) {
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 
 				setNestedValue( filteredItem, field, value );
@@ -118,3 +118,9 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 	queriedItemsCache.set( query, items );
 	return items;
 } );
+
+export function getQueriedTotalItems( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}

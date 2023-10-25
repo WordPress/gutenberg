@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
+import { TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
 export function useEditedPostContext() {
 	return useSelect(
@@ -31,10 +32,14 @@ export function useIsPostsPage() {
 function useTemplates() {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-				post_type: 'page',
-			} ),
+			select( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+					post_type: 'page',
+				}
+			),
 		[]
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { TEMPLATE_CUSTOM_SOURCE } from './constants';
+import { TEMPLATE_ORIGINS } from './constants';
 
 /**
  * Check if a template is removable.
@@ -15,6 +15,6 @@ export default function isTemplateRemovable( template ) {
 	}
 
 	return (
-		template.source === TEMPLATE_CUSTOM_SOURCE && ! template.has_theme_file
+		template.source === TEMPLATE_ORIGINS.custom && ! template.has_theme_file
 	);
 }

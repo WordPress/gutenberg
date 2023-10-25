@@ -22,7 +22,7 @@ import {
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
 } from './themes';
-import { deleteAllBlocks } from './blocks';
+import { createBlock, deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
 import {
@@ -35,6 +35,7 @@ import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
+import { deleteAllPatternCategories } from './patterns';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -140,6 +141,8 @@ class RequestUtils {
 	deactivatePlugin: typeof deactivatePlugin = deactivatePlugin.bind( this );
 	/** @borrows activateTheme as this.activateTheme */
 	activateTheme: typeof activateTheme = activateTheme.bind( this );
+	/** @borrows createBlock as this.createBlock */
+	createBlock: typeof createBlock = createBlock.bind( this );
 	/** @borrows deleteAllBlocks as this.deleteAllBlocks */
 	deleteAllBlocks = deleteAllBlocks.bind( this );
 	/** @borrows createPost as this.createPost */
@@ -198,6 +201,8 @@ class RequestUtils {
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
 	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
 		getThemeGlobalStylesRevisions.bind( this );
+	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
+	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
 }
 
 export type { StorageState };

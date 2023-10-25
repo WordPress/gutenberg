@@ -27,8 +27,8 @@ const noop = () => {};
  * mimic the look and feel of the post editor and
  * allow editing of the page content only.
  *
- * @param {Object}    props
- * @param {WPElement} props.children
+ * @param {Object}  props
+ * @param {Element} props.children
  */
 export default function DefaultBlockEditorProvider( { children } ) {
 	const settings = useSiteEditorSettings();
@@ -51,13 +51,18 @@ export default function DefaultBlockEditorProvider( { children } ) {
 		'postType',
 		templateType
 	);
-	const pageContentBlock = usePageContentBlocks( blocks, isTemplateHidden );
+	const pageContentBlocks = usePageContentBlocks( {
+		blocks,
+		isPageContentFocused: isTemplateHidden,
+		wrapPageContent: true,
+	} );
+
 	return (
 		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={
-				isTemplateHidden && pageContentBlock.length
-					? pageContentBlock
+				isTemplateHidden && pageContentBlocks.length
+					? pageContentBlocks
 					: blocks
 			}
 			onInput={ isTemplateHidden ? noop : onInput }

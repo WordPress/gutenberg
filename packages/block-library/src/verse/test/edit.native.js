@@ -78,4 +78,41 @@ describe( 'Verse block', () => {
 		<!-- /wp:verse -->"
 	` );
 	} );
+
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Verse' );
+
+		// Act
+		const verseTextInput =
+			await screen.findByPlaceholderText( 'Write verse…' );
+		typeInRichText( verseTextInput, 'Hello' );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:verse -->
+		<pre class="wp-block-verse">Hello</pre>
+		<!-- /wp:verse -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
 } );

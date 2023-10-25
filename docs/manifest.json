@@ -30,9 +30,15 @@
 		"parent": "devenv"
 	},
 	{
-		"title": "Get started with wp-now",
-		"slug": "get-started-with-wp-now",
-		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-now.md",
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
 		"parent": "devenv"
 	},
 	{
@@ -82,12 +88,6 @@
 		"slug": "submitting-to-block-directory",
 		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
 		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
-		"parent": "getting-started"
 	},
 	{
 		"title": "Glossary",
@@ -498,7 +498,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Hooks",
+		"title": "Block Filters",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
@@ -1233,6 +1233,12 @@
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "../packages/components/src/tab-panel/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Tabs",
+		"slug": "tabs",
+		"markdown_source": "../packages/components/src/tabs/README.md",
 		"parent": "components"
 	},
 	{

@@ -1986,7 +1986,7 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
-				content: reusableBlock.content.raw,
+				content: reusableBlock.content?.raw,
 				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};

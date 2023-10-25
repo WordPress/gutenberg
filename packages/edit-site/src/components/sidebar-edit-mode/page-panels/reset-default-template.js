@@ -37,7 +37,7 @@ export default function ResetDefaultTemplate( { onClick } ) {
 					} );
 				} }
 			>
-				{ __( 'Reset' ) }
+				{ __( 'Use default template' ) }
 			</MenuItem>
 		</MenuGroup>
 	);

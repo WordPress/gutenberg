@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { TEMPLATE_CUSTOM_SOURCE } from './constants';
+import { TEMPLATE_ORIGINS } from './constants';
 
 /**
  * Check if a template is revertable to its original theme-provided template file.
@@ -15,7 +15,7 @@ export default function isTemplateRevertable( template ) {
 	}
 	/* eslint-disable camelcase */
 	return (
-		template?.source === TEMPLATE_CUSTOM_SOURCE && template?.has_theme_file
+		template?.source === TEMPLATE_ORIGINS.custom && template?.has_theme_file
 	);
 	/* eslint-enable camelcase */
 }

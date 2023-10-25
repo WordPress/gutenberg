@@ -16,10 +16,10 @@ class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
 		$font_library = new WP_Font_Library();
 
 		$my_font_collection_config = array(
-			'id'             => 'my-font-collection',
-			'name'           => 'My Font Collection',
-			'description'    => 'Demo about how to a font collection to your WordPress Font Library.',
-			'data_json_file' => path_join( __DIR__, 'my-font-collection-data.json' ),
+			'id'          => 'my-font-collection',
+			'name'        => 'My Font Collection',
+			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
+			'src'         => path_join( __DIR__, 'my-font-collection-data.json' ),
 		);
 
 		$font_library::register_font_collection( $my_font_collection_config );

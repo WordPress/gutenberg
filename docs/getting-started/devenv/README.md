@@ -28,7 +28,7 @@ Node.js and its accompanying development tools allow you to:
 -   Lint, format, and test JavaScript code
 -   Scaffold custom blocks with the `create-block` package
 
-The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) and [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/), that streamline the process and are made possible by Node.js development tools.
+The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](/docs/getting-started/devenv/get-started-with-wp-scripts.md) and [`create-block`](/docs/getting-started/devenv/get-started-with-create-block.md), that streamline the process and are made possible by Node.js development tools.
 
 **The recommended Node.js version for block development is [Active LTS](https://nodejs.dev/en/about/releases/) (Long Term Support)**. However, there are times when you  need to to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 
@@ -41,11 +41,10 @@ To be able to use the Node.js tools and [packages provided by WordPress](https:/
 
 A local WordPress environment (site) provides a controlled, efficient, and secure space for development, allowing you to build and test your code before deploying it to a production site. The [same requirements](https://en-gb.wordpress.org/about/requirements/) for WordPress apply to local sites.
 
-Many tools are available for setting up a local WordPress environment on your computer. The Block Editor Handbook covers `wp-env` and `wp-now`, both of which are open-source and maintained by the WordPress project itself. 
+In the boarder WordPress community, there are many available tools for setting up a local WordPress environment on your computer. The Block Editor Handbook covers `wp-env`, which is open-source and maintained by the WordPress project itself. It's also the recommended tool for Gutenberg development. 
 
-Refer to the individual guides below for setup instructions.
+Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-started-with-wp-env.md) guide for setup instructions.
 
--   [Get started with `wp-env`](/docs/getting-started/devenv/get-started-with-wp-env.md)
--   [Get started with `wp-now`](/docs/getting-started/devenv/get-started-with-wp-now.md)
-
-Of the two, `wp-env` is the more solid and complete solution. It's also the recommended tool for Gutenberg development. On the other hand, `wp-now` offers a simplified setup but is more limited than `wp-env`. Both are valid options, so the choice is yours.
+<div class="callout callout-info">
+    Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now</a></code>. This is a lightweight tool powered by <a hre="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
+</div>

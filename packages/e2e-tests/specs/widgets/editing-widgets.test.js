@@ -738,7 +738,7 @@ describe( 'Widgets screen', () => {
 		await find(
 			{
 				role: 'document',
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 				value: 'First Paragraph',
 			},
 			{
@@ -759,7 +759,7 @@ describe( 'Widgets screen', () => {
 		await find(
 			{
 				role: 'document',
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 				value: 'First Paragraph',
 			},
 			{
@@ -875,7 +875,7 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'First Paragraph' );
 		const updatedParagraphBlockInFirstWidgetArea = await find(
 			{
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 				value: 'First Paragraph',
 			},
 			{

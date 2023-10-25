@@ -17,7 +17,7 @@ import { unlock } from '../lock-unlock';
  * An icon type definition. One of a Dashicon slug, an element,
  * or a component.
  *
- * @typedef {(string|WPElement|WPComponent)} WPIcon
+ * @typedef {(string|Element|Component)} WPIcon
  *
  * @see https://developer.wordpress.org/resource/dashicons/
  */
@@ -112,10 +112,10 @@ import { unlock } from '../lock-unlock';
  * @property {string[]}           [keywords]    Additional keywords to produce block
  *                                              type as result in search interfaces.
  * @property {Object}             [attributes]  Block type attributes.
- * @property {WPComponent}        [save]        Optional component describing
+ * @property {Component}          [save]        Optional component describing
  *                                              serialized markup structure of a
  *                                              block type.
- * @property {WPComponent}        edit          Component rendering an element to
+ * @property {Component}          edit          Component rendering an element to
  *                                              manipulate the attributes of a block
  *                                              in the context of an editor.
  * @property {WPBlockVariation[]} [variations]  The list of block variations.

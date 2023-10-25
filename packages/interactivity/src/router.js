@@ -55,8 +55,8 @@ const regionsToVdom = ( dom ) => {
 		const id = region.getAttribute( attrName );
 		regions[ id ] = toVdom( region );
 	} );
-
-	return { regions };
+	const title = dom.querySelector( 'title' )?.innerText;
+	return { regions, title };
 };
 
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
@@ -76,6 +76,9 @@ const renderRegions = ( page ) => {
 		const fragment = getRegionRootFragment( region );
 		render( page.regions[ id ], fragment );
 	} );
+	if ( page.title ) {
+		document.title = page.title;
+	}
 };
 
 // Variable to store the current navigation.

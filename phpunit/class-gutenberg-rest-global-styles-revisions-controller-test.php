@@ -130,7 +130,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 		);
 
-		wp_update_post( $new_styles_post, true, false );
+		wp_update_post( $new_styles_post, true, true );
 
 		$new_styles_post = array(
 			'ID'           => self::$global_styles_id,
@@ -160,7 +160,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 		);
 
-		wp_update_post( $new_styles_post, true, false );
+		wp_update_post( $new_styles_post, true, true );
 
 		$new_styles_post = array(
 			'ID'           => self::$global_styles_id,
@@ -190,7 +190,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			),
 		);
 
-		wp_update_post( $new_styles_post, true, false );
+		wp_update_post( $new_styles_post, true, true );
 		wp_set_current_user( 0 );
 	}
 

@@ -26,7 +26,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
@@ -197,8 +197,10 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const allowFixed = useSetting( 'position.fixed' );
-	const allowSticky = useSetting( 'position.sticky' );
+	const [ allowFixed, allowSticky ] = useSettings(
+		'position.fixed',
+		'position.sticky'
+	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
 	return ! hasPositionSupport( blockName ) || isDisabled;
@@ -209,7 +211,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Position panel.
+ * @return {Element} Position panel.
  */
 export function PositionPanel( props ) {
 	const {
@@ -296,7 +298,7 @@ export function PositionPanel( props ) {
 					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision

@@ -12,13 +12,22 @@ import { moreVertical } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
 import RenameMenuItem from '../../rename-menu-item';
+import ReplaceTemplateButton from './replace-template-button';
+import { useAvailablePatterns } from './hooks';
 
 export default function Actions( { template } ) {
+	const availablePatterns = useAvailablePatterns( template );
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
-	if ( ! isRevertable && ! template.is_custom ) {
+
+	if (
+		! isRevertable &&
+		! template.is_custom &&
+		( ! availablePatterns.length || availablePatterns.length < 1 )
+	) {
 		return null;
 	}
+
 	return (
 		<DropdownMenu
 			icon={ moreVertical }
@@ -42,6 +51,11 @@ export default function Actions( { template } ) {
 						</MenuItem>
 					) }
 					<RenameMenuItem item={ template } onClose={ onClose } />
+					<ReplaceTemplateButton
+						availableTemplates={ availablePatterns }
+						template={ template }
+						onClick={ onClose }
+					/>
 				</MenuGroup>
 			) }
 		</DropdownMenu>

@@ -32,12 +32,19 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useEditedEntityRecord from '../../use-edited-entity-record';
 import { store as editSiteStore } from '../../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_TYPES,
+	PATTERN_SYNC_TYPES,
+} from '../../../utils/constants';
 
 const typeLabels = {
-	wp_block: __( 'Editing pattern:' ),
-	wp_navigation: __( 'Editing navigation menu:' ),
-	wp_template: __( 'Editing template:' ),
-	wp_template_part: __( 'Editing template part:' ),
+	[ PATTERN_TYPES.user ]: __( 'Editing pattern:' ),
+	[ NAVIGATION_POST_TYPE ]: __( 'Editing navigation menu:' ),
+	[ TEMPLATE_POST_TYPE ]: __( 'Editing template:' ),
+	[ TEMPLATE_PART_POST_TYPE ]: __( 'Editing template part:' ),
 };
 
 export default function DocumentActions() {
@@ -129,9 +136,9 @@ function TemplateDocumentActions( { className, onBack } ) {
 	}
 
 	let typeIcon = icon;
-	if ( record.type === 'wp_navigation' ) {
+	if ( record.type === NAVIGATION_POST_TYPE ) {
 		typeIcon = navigationIcon;
-	} else if ( record.type === 'wp_block' ) {
+	} else if ( record.type === PATTERN_TYPES.user ) {
 		typeIcon = symbol;
 	}
 
@@ -139,13 +146,15 @@ function TemplateDocumentActions( { className, onBack } ) {
 		<BaseDocumentActions
 			className={ classnames( className, {
 				'is-synced-entity':
-					record.wp_pattern_sync_status !== 'unsynced',
+					record.wp_pattern_sync_status !==
+					PATTERN_SYNC_TYPES.unsynced,
 			} ) }
 			icon={ typeIcon }
 			onBack={ onBack }
 		>
 			<VisuallyHidden as="span">
-				{ typeLabels[ record.type ] ?? typeLabels.wp_template }
+				{ typeLabels[ record.type ] ??
+					typeLabels[ TEMPLATE_POST_TYPE ] }
 			</VisuallyHidden>
 			{ getTitle() }
 		</BaseDocumentActions>
