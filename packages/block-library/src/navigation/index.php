@@ -218,7 +218,14 @@ class WP_Navigation_Block {
 		 *
 		 * @param \WP_Block_List $inner_blocks
 		 */
-		return apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
+		$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
+
+		$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
+		if ( $post_ids ) {
+			_prime_post_caches( $post_ids, false, false );
+		}
+
+		return $inner_blocks;
 	}
 
 	/**
@@ -279,6 +286,141 @@ class WP_Navigation_Block {
 	}
 
 	/**
+	 * Return classes for the navigation block.
+	 */
+	private static function get_classes( $attributes, $colors, $font_sizes, $is_responsive_menu ) {
+		// Restore legacy classnames for submenu positioning.
+		$layout_class = WP_Navigation_Block::get_layout_class_for_navigation( $attributes );
+
+		// Manually add block support text decoration as CSS class.
+		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
+		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
+
+		$classes    = array_merge(
+			$colors['css_classes'],
+			$font_sizes['css_classes'],
+			$is_responsive_menu ? array( 'is-responsive' ) : array(),
+			$layout_class ? array( $layout_class ) : array(),
+			$text_decoration ? array( $text_decoration_class ) : array()
+		);
+		return implode( ' ', $classes );
+	}
+
+	/**
+	 * Get the responsive container markup
+	 */
+	private static function get_responsive_container_markup( $attributes, $inner_blocks_html, $colors, $should_load_view_script ) {
+		$modal_unique_id = wp_unique_id( 'modal-' );
+
+		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+
+		$responsive_container_classes = array(
+			'wp-block-navigation__responsive-container',
+			$is_hidden_by_default ? 'hidden-by-default' : '',
+			implode( ' ', $colors['overlay_css_classes'] ),
+		);
+		$open_button_classes          = array(
+			'wp-block-navigation__responsive-container-open',
+			$is_hidden_by_default ? 'always-shown' : '',
+		);
+
+		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+		if ( isset( $attributes['icon'] ) ) {
+			if ( 'menu' === $attributes['icon'] ) {
+				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
+			}
+		}
+		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
+		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
+		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
+		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
+
+		// Add Interactivity API directives to the markup if needed.
+		$open_button_directives          = '';
+		$responsive_container_directives = '';
+		$responsive_dialog_directives    = '';
+		$close_button_directives         = '';
+		if ( $should_load_view_script ) {
+			$open_button_directives          = '
+				data-wp-on--click="actions.core.navigation.openMenuOnClick"
+				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+			';
+			$responsive_container_directives = '
+				data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
+				data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
+				data-wp-effect="effects.core.navigation.initMenu"
+				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+				data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
+				tabindex="-1"
+			';
+			$responsive_dialog_directives    = '
+				data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
+				data-wp-bind--aria-label="selectors.core.navigation.ariaLabel"
+				data-wp-bind--role="selectors.core.navigation.roleAttribute"
+				data-wp-effect="effects.core.navigation.focusFirstElement"
+			';
+			$close_button_directives         = '
+				data-wp-on--click="actions.core.navigation.closeMenuOnClick"
+			';
+		}
+
+		return sprintf(
+			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
+				<div class="%5$s" style="%7$s" id="%1$s" %11$s>
+					<div class="wp-block-navigation__responsive-close" tabindex="-1">
+						<div class="wp-block-navigation__responsive-dialog" %12$s>
+							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
+							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
+								%2$s
+							</div>
+						</div>
+					</div>
+				</div>',
+			esc_attr( $modal_unique_id ),
+			$inner_blocks_html,
+			$toggle_aria_label_open,
+			$toggle_aria_label_close,
+			esc_attr( implode( ' ', $responsive_container_classes ) ),
+			esc_attr( implode( ' ', $open_button_classes ) ),
+			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+			$toggle_button_content,
+			$toggle_close_button_content,
+			$open_button_directives,
+			$responsive_container_directives,
+			$responsive_dialog_directives,
+			$close_button_directives
+		);
+	}
+
+	/**
+	 * Get the nav element directives
+	 */
+	private static function get_nav_element_directives( $should_load_view_script ) {
+		if ( ! $should_load_view_script ) {
+			return '';
+		}
+		$nav_element_context = wp_json_encode(
+			array(
+				'core' => array(
+					'navigation' => array(
+						'overlayOpenedBy' => array(),
+						'type'            => 'overlay',
+						'roleAttribute'   => '',
+						'ariaLabel'       => __( 'Menu' ),
+					),
+				),
+			),
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
+		);
+		return '
+			data-wp-interactive
+			data-wp-context=\'' . $nav_element_context . '\'
+		';
+	}
+
+	/**
 	 * Renders the navigation block.
 	 */
 	static function render( $attributes, $content, $block ) {
@@ -314,31 +456,11 @@ class WP_Navigation_Block {
 			return '';
 		}
 
-		// Restore legacy classnames for submenu positioning.
-		$layout_class = WP_Navigation_Block::get_layout_class_for_navigation( $attributes );
-
-		// Manually add block support text decoration as CSS class.
-		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
-		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
-
-		$colors     = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
-		$classes    = array_merge(
-			$colors['css_classes'],
-			$font_sizes['css_classes'],
-			$is_responsive_menu ? array( 'is-responsive' ) : array(),
-			$layout_class ? array( $layout_class ) : array(),
-			$text_decoration ? array( $text_decoration_class ) : array()
-		);
-
-		$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
-		if ( $post_ids ) {
-			_prime_post_caches( $post_ids, false, false );
-		}
-
+		$colors       = block_core_navigation_build_css_colors( $attributes );
+		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-		$class        = implode( ' ', $classes );
+		$class        = WP_Navigation_Block::get_classes( $attributes, $colors, $font_sizes, $is_responsive_menu );
 
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
@@ -397,106 +519,8 @@ class WP_Navigation_Block {
 			);
 		}
 
-		$modal_unique_id = wp_unique_id( 'modal-' );
-
-		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
-
-		$responsive_container_classes = array(
-			'wp-block-navigation__responsive-container',
-			$is_hidden_by_default ? 'hidden-by-default' : '',
-			implode( ' ', $colors['overlay_css_classes'] ),
-		);
-		$open_button_classes          = array(
-			'wp-block-navigation__responsive-container-open',
-			$is_hidden_by_default ? 'always-shown' : '',
-		);
-
-		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-		if ( isset( $attributes['icon'] ) ) {
-			if ( 'menu' === $attributes['icon'] ) {
-				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-			}
-		}
-		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
-		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
-		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
-
-		// Add Interactivity API directives to the markup if needed.
-		$nav_element_directives          = '';
-		$open_button_directives          = '';
-		$responsive_container_directives = '';
-		$responsive_dialog_directives    = '';
-		$close_button_directives         = '';
-		if ( $should_load_view_script ) {
-			$nav_element_context             = wp_json_encode(
-				array(
-					'core' => array(
-						'navigation' => array(
-							'overlayOpenedBy' => array(),
-							'type'            => 'overlay',
-							'roleAttribute'   => '',
-							'ariaLabel'       => __( 'Menu' ),
-						),
-					),
-				),
-				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
-			);
-			$nav_element_directives          = '
-				data-wp-interactive
-				data-wp-context=\'' . $nav_element_context . '\'
-			';
-			$open_button_directives          = '
-				data-wp-on--click="actions.core.navigation.openMenuOnClick"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-			';
-			$responsive_container_directives = '
-				data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
-				data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
-				data-wp-effect="effects.core.navigation.initMenu"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-				data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
-				tabindex="-1"
-			';
-			$responsive_dialog_directives    = '
-				data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
-				data-wp-bind--aria-label="selectors.core.navigation.ariaLabel"
-				data-wp-bind--role="selectors.core.navigation.roleAttribute"
-				data-wp-effect="effects.core.navigation.focusFirstElement"
-			';
-			$close_button_directives         = '
-				data-wp-on--click="actions.core.navigation.closeMenuOnClick"
-			';
-		}
-
-		$responsive_container_markup = sprintf(
-			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" style="%7$s" id="%1$s" %11$s>
-					<div class="wp-block-navigation__responsive-close" tabindex="-1">
-						<div class="wp-block-navigation__responsive-dialog" %12$s>
-								<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
-							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
-								%2$s
-							</div>
-						</div>
-					</div>
-				</div>',
-			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
-			$toggle_aria_label_open,
-			$toggle_aria_label_close,
-			esc_attr( implode( ' ', $responsive_container_classes ) ),
-			esc_attr( implode( ' ', $open_button_classes ) ),
-			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
-			$toggle_button_content,
-			$toggle_close_button_content,
-			$open_button_directives,
-			$responsive_container_directives,
-			$responsive_dialog_directives,
-			$close_button_directives
-		);
+		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $colors, $should_load_view_script );
+		$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
 
 		return sprintf(
 			'<nav %1$s %3$s>%2$s</nav>',
