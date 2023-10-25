@@ -174,14 +174,6 @@ class WP_Navigation_Block {
 			// Only published posts are valid. If this is changed then a corresponding change
 			// must also be implemented in `use-navigation-menu.js`.
 			if ( 'publish' === $navigation_post->post_status ) {
-				$nav_menu_name = $navigation_post->post_title;
-
-				if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
-					++$seen_menu_names[ $nav_menu_name ];
-				} else {
-					$seen_menu_names[ $nav_menu_name ] = 1;
-				}
-
 				$parsed_blocks = parse_blocks( $navigation_post->post_content );
 
 				// 'parse_blocks' includes a null block with '\n\n' as the content when
@@ -217,6 +209,32 @@ class WP_Navigation_Block {
 		return apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 	}
 
+	private static function get_navigation_name( $attributes, &$seen_menu_names ) {
+		$navigation_name = $attributes['ariaLabel'] ?? '';
+
+		// Load the navigation post.
+		if ( array_key_exists( 'ref', $attributes ) ) {
+			$navigation_post = get_post( $attributes['ref'] );
+			if ( ! isset( $navigation_post ) ) {
+				return $navigation_name;
+			}
+
+			// Only published posts are valid. If this is changed then a corresponding change
+			// must also be implemented in `use-navigation-menu.js`.
+			if ( 'publish' === $navigation_post->post_status ) {
+				$navigation_name = $navigation_post->post_title;
+
+				if ( isset( $seen_menu_names[ $navigation_name ] ) ) {
+					++$seen_menu_names[ $navigation_name ];
+				} else {
+					$seen_menu_names[ $navigation_name ] = 1;
+				}
+			}
+		}
+
+		return $navigation_name;
+	}
+
 	private static function get_layout_class_for_navigation( $attributes ) {
 		$layout_justification = array(
 			'left'          => 'items-justified-left',
@@ -245,7 +263,7 @@ class WP_Navigation_Block {
 	static function render( $attributes, $content, $block ) {
 		static $seen_menu_names = array();
 
-		$nav_menu_name = $attributes['ariaLabel'] ?? '';
+		$nav_menu_name = WP_Navigation_Block::get_navigation_name( $attributes, $seen_menu_names );
 
 		/**
 		 * Deprecated:
