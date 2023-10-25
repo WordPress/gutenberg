@@ -414,25 +414,17 @@ export const WithSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => {
 		<SlotFillProvider>
 			<DropdownMenu { ...props }>
 				<DropdownMenuItem>Item</DropdownMenuItem>
-				<DropdownMenu
-					trigger={ <DropdownMenuItem>Nested</DropdownMenuItem> }
-				>
-					<Slot />
-				</DropdownMenu>
+				<Slot />
 			</DropdownMenu>
 
 			<Fill>
-				<DropdownMenuItem hideOnClick={ false }>
-					Item from fill
-				</DropdownMenuItem>
+				<DropdownMenuItem>Item from fill</DropdownMenuItem>
 				<DropdownMenu
 					trigger={
-						<DropdownMenuItem>Nested in fill</DropdownMenuItem>
+						<DropdownMenuItem>Submenu from fill</DropdownMenuItem>
 					}
 				>
-					<DropdownMenuItem hideOnClick={ false }>
-						Test
-					</DropdownMenuItem>
+					<DropdownMenuItem>Submenu item from fill</DropdownMenuItem>
 				</DropdownMenu>
 			</Fill>
 		</SlotFillProvider>

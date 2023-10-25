@@ -49,6 +49,7 @@ export const DropdownMenuItem = forwardRef<
 	ref
 ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+
 	return (
 		<Styled.DropdownMenuItem
 			ref={ ref }
