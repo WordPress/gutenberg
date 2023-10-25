@@ -301,10 +301,12 @@ class WP_Navigation_Block {
 	/**
 	 * Return classes for the navigation block.
 	 */
-	private static function get_classes( $attributes, $colors, $font_sizes ) {
+	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
 		$layout_class = WP_Navigation_Block::get_layout_class_for_navigation( $attributes );
 
+		$colors             = block_core_navigation_build_css_colors( $attributes );
+		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
 		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
 
 		// Manually add block support text decoration as CSS class.
@@ -322,9 +324,21 @@ class WP_Navigation_Block {
 	}
 
 	/**
+	 * Get styles for the navigation block
+	 */
+	private static function get_styles( $attributes ) {
+		$colors       = block_core_navigation_build_css_colors( $attributes );
+		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
+		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
+
+	}
+
+	/**
 	 * Get the responsive container markup
 	 */
-	private static function get_responsive_container_markup( $attributes, $inner_blocks_html, $colors, $should_load_view_script ) {
+	private static function get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script ) {
+		$colors = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
@@ -466,11 +480,8 @@ class WP_Navigation_Block {
 			return '';
 		}
 
-		$colors       = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
-		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
-		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-		$class        = WP_Navigation_Block::get_classes( $attributes, $colors, $font_sizes );
+		$style        = WP_Navigation_Block::get_styles( $attributes );
+		$class        = WP_Navigation_Block::get_classes( $attributes );
 
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
@@ -529,7 +540,7 @@ class WP_Navigation_Block {
 			);
 		}
 
-		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $colors, $should_load_view_script );
+		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
 		$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
 
 		return sprintf(
