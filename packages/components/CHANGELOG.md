@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InputControl`/`SelectControl`: update `height`/`min-height` to `32px` instead of `30px` to align with modern sizing scale ([#55490](https://github.com/WordPress/gutenberg/pull/55490)).
+
 ### Bug Fix
 
 -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
