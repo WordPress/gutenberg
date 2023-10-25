@@ -6,6 +6,10 @@
 
 -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
 
+### Internal
+
+-   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
+
 ## 25.10.0 (2023-10-18)
 
 ### Enhancements
@@ -27,7 +31,6 @@
 ### Internal
 
 -   Update `@ariakit/react` to version `0.3.5` ([#55365](https://github.com/WordPress/gutenberg/pull/55365))
--   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
 -   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
 
 ### New Features
