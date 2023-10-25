@@ -283,25 +283,27 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x + size.width / 2, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x + size.width / 2, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Long press to activate context menu.
@@ -342,22 +344,15 @@ const longPressMiddleOfElement = async (
 };
 
 const tapStatusBariOS = async ( driver ) => {
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: 20, y: 20 },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 100,
-			},
-		},
-		{
-			action: 'release',
-			options: {},
-		},
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: 20, y: 20 } )
+		.down()
+		.up()
+		.pause( 100 )
+		.perform();
 
 	// Wait for the scroll animation to finish
 	await driver.pause( 3000 );
@@ -484,23 +479,16 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x, y },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 5000,
-			},
-		},
-		{
-			action: 'moveTo',
-			options: { x, y: nextYPosition },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( 5000 )
+		.move( { x, y: nextYPosition, duration: 500 } )
+		.up()
+		.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
