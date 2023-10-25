@@ -14,8 +14,8 @@ Before setting up Appium, the required iOS and Android dependencies must be inst
 -   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Xcode.
 -   Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
 -   Create the required simulators by running the follow scripts in your shell:
-    -   `xcrun simctl create "iPhone 13" "iPhone 13" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
-    -   `xcrun simctl create "iPad Pro (9.7-inch)" "iPad Pro (9.7-inch)" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
+    -   `xcrun simctl create "iPhone 14" "iPhone 14" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
+    -   `xcrun simctl create "iPad (10th generation)" "iPad (10th generation)" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
 
 ### Android
 
