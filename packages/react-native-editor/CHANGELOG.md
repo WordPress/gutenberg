@@ -12,7 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
 -   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
--   [*] Audio block: Fix visibility of upload audio [#TBD]
+-   [*] Audio block: Fix visibility of upload audio [#55627]
 -   [*] Classic block: Add option to convert to blocks [#55461]
 
 ## 1.106.0
