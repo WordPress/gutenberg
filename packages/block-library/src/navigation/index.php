@@ -68,6 +68,72 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 
 class WP_Navigation_Block {
+	private static function does_navigation_have_submenus( $inner_blocks ) {
+		foreach ( $inner_blocks as $inner_block ) {
+			$inner_block_content = $inner_block->render();
+			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
+			if ( $p->next_tag(
+				array(
+					'name'       => 'LI',
+					'class_name' => 'has-child',
+				)
+			) ) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	private static function get_inner_blocks_html( $inner_blocks, $container_attributes ) {
+		$list_item_nav_blocks = array(
+			'core/navigation-link',
+			'core/home-link',
+			'core/site-title',
+			'core/site-logo',
+			'core/navigation-submenu',
+		);
+
+		$needs_list_item_wrapper = array(
+			'core/site-title',
+			'core/site-logo',
+		);
+
+		$inner_blocks_html = '';
+		$is_list_open      = false;
+
+		foreach ( $inner_blocks as $inner_block ) {
+			$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
+
+			if ( $is_list_item && ! $is_list_open ) {
+				$is_list_open       = true;
+				$inner_blocks_html .= sprintf(
+					'<ul %1$s>',
+					$container_attributes
+				);
+			}
+
+			if ( ! $is_list_item && $is_list_open ) {
+				$is_list_open       = false;
+				$inner_blocks_html .= '</ul>';
+			}
+
+			$inner_block_content = $inner_block->render();
+			if ( ! empty( $inner_block_content ) ) {
+				if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
+					$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+				} else {
+					$inner_blocks_html .= $inner_block_content;
+				}
+			}
+		}
+
+		if ( $is_list_open ) {
+			$inner_blocks_html .= '</ul>';
+		}
+
+		return $inner_blocks_html;
+	}
+
 	private static function get_inner_blocks_for_navigation( $block, $attributes ) {
 		$inner_blocks = $block->inner_blocks;
 
@@ -238,19 +304,6 @@ class WP_Navigation_Block {
 			_prime_post_caches( $post_ids, false, false );
 		}
 
-		$list_item_nav_blocks = array(
-			'core/navigation-link',
-			'core/home-link',
-			'core/site-title',
-			'core/site-logo',
-			'core/navigation-submenu',
-		);
-
-		$needs_list_item_wrapper = array(
-			'core/site-title',
-			'core/site-logo',
-		);
-
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 		$class        = implode( ' ', $classes );
@@ -277,48 +330,8 @@ class WP_Navigation_Block {
 			)
 		);
 
-		$inner_blocks_html = '';
-		$is_list_open      = false;
-		$has_submenus      = false;
-		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
-
-			if ( $is_list_item && ! $is_list_open ) {
-				$is_list_open       = true;
-				$inner_blocks_html .= sprintf(
-					'<ul %1$s>',
-					$container_attributes
-				);
-			}
-
-			if ( ! $is_list_item && $is_list_open ) {
-				$is_list_open       = false;
-				$inner_blocks_html .= '</ul>';
-			}
-
-			$inner_block_content = $inner_block->render();
-			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
-			if ( $p->next_tag(
-				array(
-					'name'       => 'LI',
-					'class_name' => 'has-child',
-				)
-			) ) {
-				$has_submenus = true;
-			}
-			if ( ! empty( $inner_block_content ) ) {
-				if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
-					$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-				} else {
-					$inner_blocks_html .= $inner_block_content;
-				}
-			}
-		}
-
-		if ( $is_list_open ) {
-			$inner_blocks_html .= '</ul>';
-		}
-
+		$has_submenus            = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+		$inner_blocks_html       = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $container_attributes );
 		$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 		$view_js_file            = 'wp-block-navigation-view';
 
