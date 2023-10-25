@@ -12,10 +12,10 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContainsThirdPartyBlocks } from '../utils';
+import { useUnsupportedBlockList } from '../utils';
 
 const disableEnhancedPaginationDescription = __(
-	'Plugin blocks are not supported yet. For the enhanced pagination to work, remove the plugin block, then re-enable "Enhanced pagination" in the Query Block settings.'
+	'You have added unsupported blocks. For the enhanced pagination to work, remove them, then re-enable "Enhanced pagination" in the Query Block settings.'
 );
 
 const modalDescriptionId =
@@ -28,11 +28,11 @@ export default function EnhancedPaginationModal( {
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
 
-	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
+	const unsupported = useUnsupportedBlockList( clientId );
 
 	useEffect( () => {
-		setOpen( containsThirdPartyBlocks && enhancedPagination );
-	}, [ containsThirdPartyBlocks, enhancedPagination, setOpen ] );
+		setOpen( !! unsupported.length && enhancedPagination );
+	}, [ unsupported.length, enhancedPagination, setOpen ] );
 
 	return (
 		isOpen && (
@@ -42,6 +42,8 @@ export default function EnhancedPaginationModal( {
 				aria={ {
 					describedby: modalDescriptionId,
 				} }
+				role="alertdialog"
+				focusOnMount="firstElement"
 				isDismissible={ false }
 				shouldCloseOnEsc={ false }
 				shouldCloseOnClickOutside={ false }

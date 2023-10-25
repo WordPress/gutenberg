@@ -346,21 +346,28 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that returns whether the Query Loop with the given `clientId` contains
- * any third-party block.
+ * Hook that returns a list of unsupported blocks inside the Query Loop with the
+ * given `clientId`.
  *
  * @param {string} clientId The block's client ID.
- * @return {boolean} True if it contains third-party blocks.
+ * @return {string[]} List of block titles.
  */
-export const useContainsThirdPartyBlocks = ( clientId ) => {
+export const useUnsupportedBlockList = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
 
-			return getClientIdsOfDescendants( clientId ).some(
-				( descendantClientId ) =>
-					! getBlockName( descendantClientId ).startsWith( 'core/' )
+			return getClientIdsOfDescendants( clientId ).filter(
+				( descendantClientId ) => {
+					const blockName = getBlockName( descendantClientId );
+					return (
+						! blockName.startsWith( 'core/' ) ||
+						blockName === 'core/post-content' ||
+						blockName === 'core/template-part' ||
+						blockName === 'core/block'
+					);
+				}
 			);
 		},
 		[ clientId ]
