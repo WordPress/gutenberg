@@ -33,11 +33,13 @@ function SearchItemIcon( { isURL, suggestion } ) {
 		icon = globe;
 	} else if ( suggestion.type in ICONS_MAP ) {
 		icon = ICONS_MAP[ suggestion.type ];
-		if ( suggestion.type === 'page' && suggestion.isFrontPage ) {
-			icon = home;
-		}
-		if ( suggestion.type === 'page' && suggestion.isBlogHome ) {
-			icon = verse;
+		if ( suggestion.type === 'page' ) {
+			if ( suggestion.isFrontPage ) {
+				icon = home;
+			}
+			if ( suggestion.isBlogHome ) {
+				icon = verse;
+			}
 		}
 	}
 

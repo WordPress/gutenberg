@@ -61,13 +61,10 @@ const handleEntitySearch = async (
 
 	// Identify front page and update type to match.
 	results.map( ( result ) => {
-		console.log( pageForPosts );
 		if ( Number( result.id ) === pageOnFront ) {
 			result.isFrontPage = true;
 			return result;
-		}
-
-		if ( Number( result.id ) === pageForPosts ) {
+		} else if ( Number( result.id ) === pageForPosts ) {
 			result.isBlogHome = true;
 			return result;
 		}
