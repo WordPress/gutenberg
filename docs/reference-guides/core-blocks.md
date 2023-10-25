@@ -32,7 +32,7 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 -	**Name:** core/avatar
 -	**Category:** theme
--	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Supports:** align, color (~~background~~, ~~text~~), spacing (~~margin~~, ~~padding~~), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
 ## Pattern
