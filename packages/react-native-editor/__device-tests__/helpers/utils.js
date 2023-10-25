@@ -293,13 +293,14 @@ const clickMiddleOfElement = async ( driver, element ) => {
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Long press to activate context menu.
