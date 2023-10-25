@@ -12,10 +12,8 @@ import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-/**
- * Internal dependencies
- */
-import { emptyString } from './empty-string';
+
+const isEmptyString = ( testString ) => testString?.trim()?.length === 0;
 
 export default function BlockRenameModal( {
 	blockName,
@@ -27,7 +25,7 @@ export default function BlockRenameModal( {
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
-	const nameIsEmpty = emptyString( editedBlockName );
+	const nameIsEmpty = isEmptyString( editedBlockName );
 
 	const isNameValid = nameHasChanged || nameIsOriginal;
 
