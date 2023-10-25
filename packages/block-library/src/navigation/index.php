@@ -540,24 +540,17 @@ class WP_Navigation_Block {
 
 		WP_Navigation_Block::handle_view_script_loading( $should_load_view_script, $block );
 
-		// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
-		// return early if they don't.
-		if ( ! $is_responsive_menu ) {
-			return sprintf(
-				'<nav %1$s>%2$s</nav>',
-				$wrapper_attributes,
-				$inner_blocks_html
-			);
-		}
-
 		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
 		$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
 
+		if ( $is_responsive_menu ) {
+			$wrapper_attributes .= ' ' . $nav_element_directives;
+		}
+
 		return sprintf(
-			'<nav %1$s %3$s>%2$s</nav>',
+			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
-			$responsive_container_markup,
-			$nav_element_directives
+			$is_responsive_menu ? $responsive_container_markup : $inner_blocks_html
 		);
 	}
 }
