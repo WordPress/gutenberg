@@ -106,7 +106,7 @@ class WP_Navigation_Block {
 	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 */
-	private static function get_inner_blocks_html( $inner_blocks, $attributes ) {
+	private static function get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script ) {
 		$list_item_nav_blocks = array(
 			'core/navigation-link',
 			'core/home-link',
@@ -161,6 +161,12 @@ class WP_Navigation_Block {
 
 		if ( $is_list_open ) {
 			$inner_blocks_html .= '</ul>';
+		}
+
+		// Add directives to the submenu if needed.
+		if ( $has_submenus && $should_load_view_script ) {
+			$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
+			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
 		}
 
 		return $inner_blocks_html;
@@ -460,6 +466,28 @@ class WP_Navigation_Block {
 	}
 
 	/**
+	 * Handle view script loading.
+	 */
+	static private function handle_view_script_loading( $should_load_view_script, $block ) {
+		$view_js_file = 'wp-block-navigation-view';
+
+		// If the script already exists, there is no point in removing it from viewScript.
+		if ( ! wp_script_is( $view_js_file ) ) {
+			$script_handles = $block->block_type->view_script_handles;
+
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			}
+		}
+	}
+
+
+	/**
 	 * Renders the navigation block.
 	 */
 	static function render( $attributes, $content, $block ) {
@@ -509,29 +537,10 @@ class WP_Navigation_Block {
 		);
 
 		$has_submenus            = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
-		$inner_blocks_html       = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes );
 		$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
-		$view_js_file            = 'wp-block-navigation-view';
+		$inner_blocks_html       = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script );
 
-		// If the script already exists, there is no point in removing it from viewScript.
-		if ( ! wp_script_is( $view_js_file ) ) {
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-			}
-		}
-
-		// Add directives to the submenu if needed.
-		if ( $has_submenus && $should_load_view_script ) {
-			$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
-		}
+		WP_Navigation_Block::handle_view_script_loading( $should_load_view_script, $block );
 
 		// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
 		// return early if they don't.
