@@ -295,7 +295,7 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__patterns-category {
 		// Account for the icon on the right so that it's visually balanced.
-		padding-right: 4px;
+		padding-right: $grid-unit-05;
 	}
 }
 
@@ -540,7 +540,7 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__media-tabs__media-category {
 		// Account for the icon on the right so that it's visually balanced.
-		padding-right: 4px;
+		padding-right: $grid-unit-05;
 
 		&.is-selected {
 			color: var(--wp-admin-theme-color);
