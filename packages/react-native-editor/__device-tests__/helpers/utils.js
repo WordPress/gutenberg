@@ -280,13 +280,14 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x + size.width / 2, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x + size.width / 2, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Clicks in the top left of an element.
