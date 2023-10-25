@@ -341,22 +341,15 @@ const longPressMiddleOfElement = async (
 };
 
 const tapStatusBariOS = async ( driver ) => {
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: 20, y: 20 },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 100,
-			},
-		},
-		{
-			action: 'release',
-			options: {},
-		},
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: 20, y: 20 } )
+		.down()
+		.up()
+		.pause( 100 )
+		.perform();
 
 	// Wait for the scroll animation to finish
 	await driver.pause( 3000 );
