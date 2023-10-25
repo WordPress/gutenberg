@@ -26,6 +26,7 @@ import {
 	useTrashPostAction,
 	postRevisionsAction,
 	viewPostAction,
+	useEditPostAction,
 } from '../actions';
 import Media from '../media';
 import DataviewsContext from '../dataviews/context';
@@ -212,9 +213,15 @@ export default function PagePages() {
 	] );
 
 	const trashPostAction = useTrashPostAction();
+	const editPostAction = useEditPostAction();
 	const actions = useMemo(
-		() => [ viewPostAction, trashPostAction, postRevisionsAction ],
-		[ trashPostAction ]
+		() => [
+			viewPostAction,
+			trashPostAction,
+			editPostAction,
+			postRevisionsAction,
+		],
+		[ trashPostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {

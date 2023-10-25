@@ -44,7 +44,7 @@ export default function ItemActions( { item, actions } ) {
 						icon={ action.icon }
 						onClick={ () => action.perform( item ) }
 						isDestructive={ action.isDestructive }
-						size="small"
+						size="compact"
 					/>
 				) ) }
 			{ !! secondaryActions.length && (

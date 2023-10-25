@@ -9,6 +9,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 export function useTrashPostAction() {
 	const { createSuccessNotice, createErrorNotice } =
@@ -55,7 +62,6 @@ export function useTrashPostAction() {
 					createErrorNotice( errorMessage, { type: 'snackbar' } );
 				}
 			},
-			isDestructive: true,
 		} ),
 		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
 	);
@@ -74,6 +80,26 @@ export const viewPostAction = {
 	},
 };
 
+export function useEditPostAction() {
+	const history = useHistory();
+	return useMemo(
+		() => ( {
+			id: 'edit-post',
+			label: __( 'Edit' ),
+			isEligible( { status } ) {
+				return status !== 'trash';
+			},
+			perform( post ) {
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			},
+		} ),
+		[ history ]
+	);
+}
 export const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
