@@ -72,6 +72,18 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  */
 class WP_Navigation_Block {
 	/**
+	 * Returns whether or not this is responsive navigation.
+	 */
+	private static function is_responsive_navigation( $attributes ) {
+		/**
+		 * This is for backwards compatibility after `isResponsive` attribute has been removed.
+		 */
+
+		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
+		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
+	}
+
+	/**
 	 * Returns whether or not a navigation has a submenu.
 	 */
 	private static function does_navigation_have_submenus( $inner_blocks ) {
@@ -446,13 +458,8 @@ class WP_Navigation_Block {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		/**
-		 * This is for backwards compatibility after `isResponsive` attribute has been removed.
-		 */
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
-		$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-
-		$inner_blocks = WP_Navigation_Block::get_inner_blocks_for_navigation( $block, $attributes );
+		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		$inner_blocks       = WP_Navigation_Block::get_inner_blocks_for_navigation( $block, $attributes );
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
 		}
