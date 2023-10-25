@@ -13,7 +13,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
-const isEmptyString = ( testString ) => testString?.trim()?.length === 0;
+/**
+ * Internal dependencies
+ */
+import isEmptyString from './is-empty-string';
 
 export default function BlockRenameModal( {
 	blockName,

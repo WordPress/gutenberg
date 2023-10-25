@@ -5,12 +5,13 @@ import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
-import { emptyString } from './empty-string';
+import isEmptyString from './is-empty-string';
 import BlockRenameModal from './modal';
 
 export default function BlockRenameControl( { clientId } ) {
@@ -65,7 +66,7 @@ export default function BlockRenameControl( { clientId } ) {
 						// the value. Therefore reset the metadata.
 						if (
 							newName === blockInformation?.title ||
-							emptyString( newName )
+							isEmptyString( newName )
 						) {
 							newName = undefined;
 						}
