@@ -521,6 +521,16 @@ class WP_Navigation_Block {
 		}
 	}
 
+	/**
+	 * Returns the markup for the navigation block.
+	 */
+	private static function get_nav_markup( $attributes, $inner_blocks ) {
+		$inner_blocks_html = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes );
+		if ( WP_Navigation_Block::is_responsive_navigation( $attributes ) ) {
+			return WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
+		}
+		return $inner_blocks_html;
+	}
 
 	/**
 	 * Renders the navigation block.
@@ -547,8 +557,8 @@ class WP_Navigation_Block {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
 		$inner_blocks       = WP_Navigation_Block::get_inner_blocks_for_navigation( $block, $attributes );
+		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
 		}
@@ -560,16 +570,14 @@ class WP_Navigation_Block {
 			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 		}
 
-		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes );
-		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
-		$wrapper_attributes          = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
+		$wrapper_attributes = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
 
 		WP_Navigation_Block::handle_view_script_loading( $block, $attributes, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
-			$is_responsive_menu ? $responsive_container_markup : $inner_blocks_html
+			WP_Navigation_Block::get_nav_markup( $attributes, $inner_blocks )
 		);
 	}
 }
