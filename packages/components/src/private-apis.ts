@@ -29,6 +29,15 @@ import {
 	DropdownSubMenu as DropdownSubMenuV2,
 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
 } from './dropdown-menu-v2';
+import {
+	DropdownMenu as DropdownMenuV2Ariakit,
+	DropdownMenuGroup as DropdownMenuGroupV2Ariakit,
+	DropdownMenuGroupLabel as DropdownMenuGroupLabelV2Ariakit,
+	DropdownMenuItem as DropdownMenuItemV2Ariakit,
+	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
+	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
+	DropdownMenuSeparator as DropdownMenuSeparatorV2Ariakit,
+} from './dropdown-menu-v2-ariakit';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
@@ -63,4 +72,11 @@ lock( privateApis, {
 	ProgressBar,
 	Tabs,
 	Theme,
+	DropdownMenuV2Ariakit,
+	DropdownMenuGroupV2Ariakit,
+	DropdownMenuGroupLabelV2Ariakit,
+	DropdownMenuItemV2Ariakit,
+	DropdownMenuCheckboxItemV2Ariakit,
+	DropdownMenuRadioItemV2Ariakit,
+	DropdownMenuSeparatorV2Ariakit,
 } );
