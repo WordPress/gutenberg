@@ -54,7 +54,9 @@ export default function RenamePatternCategoryModal( {
 		// Check existing categories to avoid creating duplicates.
 		if (
 			existingCategories.patternCategories.find( ( existingCategory ) => {
-				return existingCategory.label === name;
+				return (
+					existingCategory.label.toLowerCase() === name.toLowerCase()
+				);
 			} )
 		) {
 			speak( __( 'This category already exists.' ), 'assertive' );
