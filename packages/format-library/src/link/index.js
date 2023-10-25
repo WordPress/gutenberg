@@ -9,6 +9,8 @@ import {
 	removeFormat,
 	slice,
 	isCollapsed,
+	insert,
+	create,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import {
@@ -135,10 +137,6 @@ export const link = {
 		rel: 'rel',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
-		if ( isCollapsed( value ) ) {
-			return value;
-		}
-
 		const pastedText = ( html || plainText )
 			.replace( /<[^>]+>/g, '' )
 			.trim();
@@ -152,12 +150,26 @@ export const link = {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Created link:\n\n', pastedText );
 
-		return applyFormat( value, {
+		const format = {
 			type: name,
 			attributes: {
 				url: decodeEntities( pastedText ),
 			},
-		} );
+		};
+
+		if ( isCollapsed( value ) ) {
+			return insert(
+				value,
+				applyFormat(
+					create( { text: plainText } ),
+					format,
+					0,
+					plainText.length
+				)
+			);
+		}
+
+		return applyFormat( value, format );
 	},
 	edit: Edit,
 };

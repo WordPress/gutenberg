@@ -24,7 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -82,6 +82,11 @@ const scaleOptions = [
 		help: __( 'Image is contained without distortion.' ),
 	},
 ];
+
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
 
 export default function Image( {
 	temporaryURL,
@@ -369,7 +374,7 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSetting = useSetting( 'lightbox' );
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxToggle =
 		!! lightbox || lightboxSetting?.allowEditing === true;
@@ -725,7 +730,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -784,7 +788,14 @@ export default function Image( {
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
-			{ img }
+			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
+			{ !! href ? (
+				<a href={ href } { ...disabledClickProps }>
+					{ img }
+				</a>
+			) : (
+				img
+			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText

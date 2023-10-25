@@ -190,8 +190,7 @@ function useGlobalStylesOpenCssCommands() {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );

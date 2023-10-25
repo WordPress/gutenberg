@@ -21,23 +21,20 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
-	moreVertical,
 } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
 	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import FieldActions from './field-actions';
 
 const {
 	DropdownMenuV2,
@@ -78,53 +75,66 @@ function HeaderMenu( { dataView, header } ) {
 				/>
 			}
 		>
-			{ isSortable && (
-				<DropdownMenuGroupV2>
-					{ Object.entries( sortingItemsInfo ).map(
-						( [ direction, info ] ) => (
-							<DropdownMenuItemV2
-								key={ direction }
-								prefix={ <Icon icon={ info.icon } /> }
-								suffix={
-									sortedDirection === direction && (
-										<Icon icon={ check } />
-									)
-								}
-								onSelect={ ( event ) => {
-									event.preventDefault();
-									if ( sortedDirection === direction ) {
-										dataView.resetSorting();
-									} else {
-										dataView.setSorting( [
-											{
-												id: header.column.id,
-												desc: direction === 'desc',
-											},
-										] );
+			<WithSeparators>
+				{ isSortable && (
+					<DropdownMenuGroupV2>
+						{ Object.entries( sortingItemsInfo ).map(
+							( [ direction, info ] ) => (
+								<DropdownMenuItemV2
+									key={ direction }
+									prefix={ <Icon icon={ info.icon } /> }
+									suffix={
+										sortedDirection === direction && (
+											<Icon icon={ check } />
+										)
 									}
-								} }
-							>
-								{ info.label }
-							</DropdownMenuItemV2>
-						)
-					) }
-				</DropdownMenuGroupV2>
-			) }
-			{ isSortable && isHidable && <DropdownMenuSeparatorV2 /> }
-			{ isHidable && (
-				<DropdownMenuItemV2
-					prefix={ <Icon icon={ unseen } /> }
-					onSelect={ ( event ) => {
-						event.preventDefault();
-						header.column.getToggleVisibilityHandler()( event );
-					} }
-				>
-					{ __( 'Hide' ) }
-				</DropdownMenuItemV2>
-			) }
+									onSelect={ ( event ) => {
+										event.preventDefault();
+										if ( sortedDirection === direction ) {
+											dataView.resetSorting();
+										} else {
+											dataView.setSorting( [
+												{
+													id: header.column.id,
+													desc: direction === 'desc',
+												},
+											] );
+										}
+									} }
+								>
+									{ info.label }
+								</DropdownMenuItemV2>
+							)
+						) }
+					</DropdownMenuGroupV2>
+				) }
+				{ isHidable && (
+					<DropdownMenuItemV2
+						prefix={ <Icon icon={ unseen } /> }
+						onSelect={ ( event ) => {
+							event.preventDefault();
+							header.column.getToggleVisibilityHandler()( event );
+						} }
+					>
+						{ __( 'Hide' ) }
+					</DropdownMenuItemV2>
+				) }
+			</WithSeparators>
 		</DropdownMenuV2>
 	);
 }
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparatorV2 /> }
+				{ child }
+			</Fragment>
+		) );
+}
+
 function ViewList( {
 	view,
 	onChangeView,
@@ -135,37 +145,25 @@ function ViewList( {
 	paginationInfo,
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [ ...fields ];
+		const _columns = fields.map( ( field ) => {
+			const { render, getValue, ...column } = field;
+			column.cell = ( props ) =>
+				render( { item: props.row.original, view } );
+			if ( getValue ) {
+				column.accessorFn = ( item ) => getValue( { item } );
+			}
+			return column;
+		} );
 		if ( actions?.length ) {
 			_columns.push( {
 				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
 				id: 'actions',
 				cell: ( props ) => {
 					return (
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						>
-							{ () => (
-								<MenuGroup>
-									{ actions.map( ( action ) => (
-										<MenuItem
-											key={ action.id }
-											onClick={ () =>
-												action.perform(
-													props.row.original
-												)
-											}
-											isDestructive={
-												action.isDesctructive
-											}
-										>
-											{ action.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-						</DropdownMenu>
+						<FieldActions
+							item={ props.row.original }
+							actions={ actions }
+						/>
 					);
 				},
 				enableHiding: false,
@@ -173,7 +171,7 @@ function ViewList( {
 		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {

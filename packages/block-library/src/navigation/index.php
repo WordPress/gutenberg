@@ -90,6 +90,13 @@ function block_core_navigation_add_directives_to_submenu( $w, $block_attributes 
 		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
 		$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
 		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
+
+		// This is a fix for Safari. Without it, Safari doesn't change the active
+		// element when the user clicks on a button. It can be removed once we add
+		// an overlay to capture the clicks, instead of relying on the focusout
+		// event.
+		$w->set_attribute( 'tabindex', '-1' );
+
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
 			$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
 			$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
@@ -737,7 +744,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" %10$s>%8$s</button>
+		'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s" %11$s>
 				<div class="wp-block-navigation__responsive-close" tabindex="-1">
 					<div class="wp-block-navigation__responsive-dialog" %12$s>
