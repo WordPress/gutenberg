@@ -12,6 +12,7 @@ import {
 	category,
 	file,
 	home,
+	verse,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -34,6 +35,9 @@ function SearchItemIcon( { isURL, suggestion } ) {
 		icon = ICONS_MAP[ suggestion.type ];
 		if ( suggestion.type === 'page' && suggestion.isFrontPage ) {
 			icon = home;
+		}
+		if ( suggestion.type === 'page' && suggestion.isBlogHome ) {
+			icon = verse;
 		}
 	}
 
@@ -137,6 +141,10 @@ export const LinkControlSearchItem = ( {
 function getVisualTypeName( suggestion ) {
 	if ( suggestion.isFrontPage ) {
 		return 'front page';
+	}
+
+	if ( suggestion.isBlogHome ) {
+		return 'blog home';
 	}
 
 	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
