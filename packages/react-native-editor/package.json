@@ -115,7 +115,7 @@
 		"test:e2e:android:local": "npm run test:e2e:bundle:android && npm run test:e2e:build-app:android && TEST_RN_PLATFORM=android npm run device-tests:local",
 		"test:e2e:bundle:ios": "mkdir -p ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app && npm run bundle:ios && cp bundle/ios/App.js ./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle && cp -r bundle/ios/assets ./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/",
 		"test:e2e:build-app:ios": "npm run preios && ./bin/build_e2e_ios_app",
-		"test:e2e:build-wda": "xcodebuild -project ~/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 13' -derivedDataPath ios/build/WDA",
+		"test:e2e:build-wda": "xcodebuild -project ~/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 14' -derivedDataPath ios/build/WDA",
 		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && npm run test:e2e:build-wda && TEST_RN_PLATFORM=ios npm run device-tests:local",
 		"build:gutenberg": "cd gutenberg && npm ci && npm run build",
 		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:metro; npm run clean:watchman",
