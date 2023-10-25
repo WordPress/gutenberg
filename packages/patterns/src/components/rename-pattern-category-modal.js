@@ -22,6 +22,7 @@ import { CATEGORY_SLUG } from './category-selector';
 
 export default function RenamePatternCategoryModal( {
 	category,
+	existingCategories,
 	onClose,
 	onError,
 	onSuccess,
@@ -31,7 +32,6 @@ export default function RenamePatternCategoryModal( {
 	const [ isSaving, setIsSaving ] = useState( false );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
-
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
@@ -39,6 +39,15 @@ export default function RenamePatternCategoryModal( {
 		event.preventDefault();
 
 		if ( ! name || name === category.name || isSaving ) {
+			return;
+		}
+
+		// Check existing categories to avoid creating duplicates.
+		if (
+			existingCategories.patternCategories.find( ( existingCategory ) => {
+				return existingCategory.label === name;
+			} )
+		) {
 			return;
 		}
 
