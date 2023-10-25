@@ -23,49 +23,12 @@ Once done, you can navigate to your application folder and run it locally using 
 To build a block editor, you need to install the following dependencies:
 
  - `@wordpress/block-editor`
- - `@wordpress/element`
  - `@wordpress/block-library`
  - `@wordpress/components`
 
-## Setup vite to use JSX and @wordpress/element as a pragma
+## JSX
 
-We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling.
-
-If you're using vite, you can create a `vite.config.js` file at the root of your application and paste the following content:
-
-```js
-// vite.config.js
-import { defineConfig } from 'vite'
-
-export default defineConfig({
-  esbuild: {
-    jsxFactory: 'createElement',
-    jsxFragment: 'Fragment',
-  },
-  define: {
-    // This is not necessary to make JSX work 
-    // but it's a requirement for some @wordpress packages.
-    'process.env': {}
-  },
-})
-```
-
-With the config above, you should be able to write JSX in your `*.jsx` files, just make sure you import createElement and Fragment at the top of each of your files: `import { createElement, Fragment } from '@wordpress/element';`
-
-We can now check that everything is working as expected:
-
- - Remove the default content created by vite: `main.js` and `counter.js` files.
- - Create an `index.jsx` file at the root of your application containing some JSX, example:
-```jsx
-import { createRoot, createElement } from '@wordpress/element';
-
-// Render your React component instead
-const root = createRoot(document.getElementById('app'));
-root.render(<h1>Hello, world</h1>);
-```
- - Update the script file in your `index.html` to `index.jsx` instead of `main.js`.
-
-After restarting your local build (aka `npm run dev`), you should see the **"Hello, world"** heading appearing in your browser.
+We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling, By default vite supports JSX and and outputs the result as a React pragma. The Block editor uses React so there's no need to configure anything here but if you're using a different bundler/build tool, make sure the JSX transpilation is setup properly.
 
 ## Bootstrap your block editor
 
@@ -73,7 +36,8 @@ It's time to render our first block editor.
 
  - Update your `index.jsx` file with the following code:
 ```jsx
-import { createRoot, createElement, useState } from "@wordpress/element";
+import { createElement, useState } from "react";
+import { createRoot } from 'react-dom/client';
 import {
   BlockEditorProvider,
   BlockCanvas,

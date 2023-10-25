@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { request } from '@playwright/test';
+const { request } = require( '@playwright/test' );
 
 /**
  * WordPress dependencies
  */
-import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+const { RequestUtils } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  *
@@ -32,4 +32,4 @@ async function globalSetup( config ) {
 	await requestContext.dispose();
 }
 
-export default globalSetup;
+module.exports = globalSetup;

@@ -36,7 +36,7 @@ const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
  * @param {Object}   props.scrollViewStyle              Additional style for the ScrollView component.
  * @param {boolean}  props.shouldPreventAutomaticScroll Whether to prevent scrolling when there's a Keyboard offset set.
  * @param {Object}   props...                           Other props to pass to the FlatList component.
- * @return {WPComponent} KeyboardAwareFlatList component.
+ * @return {Component} KeyboardAwareFlatList component.
  */
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,

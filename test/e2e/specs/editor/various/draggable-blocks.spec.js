@@ -42,9 +42,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Paragraph"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -114,9 +114,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Paragraph"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -197,9 +197,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Paragraph"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -278,9 +278,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Paragraph"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -342,13 +342,6 @@ test.describe( 'Draggable block', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -421,7 +414,7 @@ test.describe( 'Draggable block', () => {
 				'Dragging over the empty group block but outside the appender should still show the blue background'
 			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
 
-			await drop();
+			await drop( rowBlock );
 			await expect( rowAppender ).toBeHidden();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -453,7 +446,7 @@ test.describe( 'Draggable block', () => {
 				'rgb(0, 124, 186)'
 			);
 
-			await drop();
+			await drop( columnAppender );
 			await expect( columnAppender ).toBeHidden();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{ name: 'core/group' },

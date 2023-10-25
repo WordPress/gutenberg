@@ -20,7 +20,7 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
  * available.  Please restrain from investing unnecessary time and effort trying
  * to improve this code.
  */
-class WP_Directive_Processor extends WP_HTML_Tag_Processor {
+class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 
 	/**
 	 * An array of root blocks.

@@ -27,11 +27,18 @@ export type Size = 'default' | 'small' | '__unstable-large';
 
 interface BaseProps {
 	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If true, the label will only be visible to screen readers.
@@ -66,7 +73,8 @@ export type InputChangeCallback< P = {} > = (
 	extra: { event: SyntheticEvent } & P
 ) => void;
 
-export interface InputFieldProps extends BaseProps {
+export interface InputFieldProps
+	extends Omit< BaseProps, '__next36pxDefaultSize' > {
 	/**
 	 * Determines the drag axis.
 	 *

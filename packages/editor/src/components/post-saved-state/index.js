@@ -30,7 +30,7 @@ import { store as editorStore } from '../../store';
  * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
  *                                        as dirty.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
- * @return {import('@wordpress/element').WPComponent} The component.
+ * @return {import('react').ComponentType} The component.
  */
 export default function PostSavedState( {
 	forceIsDirty,

@@ -25,16 +25,20 @@ import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 import { useCx } from '../utils';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
 function UnforwardedNumberControl(
-	{
+	props: WordPressComponentProps< NumberControlProps, 'input', false >,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
-		spinControls = 'native',
+		spinControls = hideHTMLArrows ? 'none' : 'native',
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		label,
@@ -49,17 +53,19 @@ function UnforwardedNumberControl(
 		size = 'default',
 		suffix,
 		onChange = noop,
-		...props
-	}: WordPressComponentProps< NumberControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< any >
-) {
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >(
+		props,
+		'wp.components.NumberControl',
+		'6.4'
+	);
+
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
 			alternative: 'spinControls="none"',
 			since: '6.2',
 			version: '6.3',
 		} );
-		spinControls = 'none';
 	}
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
@@ -212,7 +218,7 @@ function UnforwardedNumberControl(
 		<Input
 			autoComplete={ autoComplete }
 			inputMode="numeric"
-			{ ...props }
+			{ ...restProps }
 			className={ classes }
 			dragDirection={ dragDirection }
 			hideHTMLArrows={ spinControls !== 'native' }
