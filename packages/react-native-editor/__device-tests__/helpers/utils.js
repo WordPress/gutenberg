@@ -481,23 +481,16 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x, y },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 5000,
-			},
-		},
-		{
-			action: 'moveTo',
-			options: { x, y: nextYPosition },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( 5000 )
+		.move( { x, y: nextYPosition, duration: 500 } )
+		.up()
+		.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
