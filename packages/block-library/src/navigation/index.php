@@ -439,6 +439,29 @@ class WP_Navigation_Block {
 	}
 
 	/**
+	 * Get the wrapper attributes
+	 */
+	private static function get_nav_wrapper_attributes( $attributes, $nav_menu_name, $should_load_view_script ) {
+		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		$style              = WP_Navigation_Block::get_styles( $attributes );
+		$class              = WP_Navigation_Block::get_classes( $attributes );
+		$wrapper_attributes = get_block_wrapper_attributes(
+			array(
+				'class'      => $class,
+				'style'      => $style,
+				'aria-label' => $nav_menu_name,
+			)
+		);
+
+		if ( $is_responsive_menu ) {
+			$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
+			$wrapper_attributes .= ' ' . $nav_element_directives;
+		}
+
+		return $wrapper_attributes;
+	}
+
+	/**
 	 * Get the nav element directives
 	 */
 	private static function get_nav_element_directives( $should_load_view_script ) {
@@ -524,28 +547,13 @@ class WP_Navigation_Block {
 			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 		}
 
-		$style              = WP_Navigation_Block::get_styles( $attributes );
-		$class              = WP_Navigation_Block::get_classes( $attributes );
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class'      => $class,
-				'style'      => $style,
-				'aria-label' => $nav_menu_name,
-			)
-		);
-
-		$has_submenus            = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
-		$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
-		$inner_blocks_html       = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script );
+		$has_submenus                = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+		$should_load_view_script     = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script );
+		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
+		$wrapper_attributes          = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $nav_menu_name, $should_load_view_script );
 
 		WP_Navigation_Block::handle_view_script_loading( $should_load_view_script, $block );
-
-		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
-		$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
-
-		if ( $is_responsive_menu ) {
-			$wrapper_attributes .= ' ' . $nav_element_directives;
-		}
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
