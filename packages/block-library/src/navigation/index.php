@@ -103,11 +103,18 @@ class WP_Navigation_Block {
 		return $has_submenus;
 	}
 
+	private static function should_load_view_script( $attributes, $inner_blocks ) {
+		$has_submenus = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+	}
+
 	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 */
-	private static function get_inner_blocks_html( $inner_blocks, $attributes, $should_load_view_script ) {
-		$has_submenus = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+	private static function get_inner_blocks_html( $inner_blocks, $attributes ) {
+		$has_submenus            = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
 
 		$list_item_nav_blocks = array(
 			'core/navigation-link',
@@ -354,7 +361,8 @@ class WP_Navigation_Block {
 	/**
 	 * Get the responsive container markup
 	 */
-	private static function get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script ) {
+	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
+		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
 		$colors = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
@@ -443,11 +451,12 @@ class WP_Navigation_Block {
 	/**
 	 * Get the wrapper attributes
 	 */
-	private static function get_nav_wrapper_attributes( $attributes, $nav_menu_name, $should_load_view_script ) {
-		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
-		$style              = WP_Navigation_Block::get_styles( $attributes );
-		$class              = WP_Navigation_Block::get_classes( $attributes );
-		$wrapper_attributes = get_block_wrapper_attributes(
+	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name ) {
+		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
+		$is_responsive_menu      = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		$style                   = WP_Navigation_Block::get_styles( $attributes );
+		$class                   = WP_Navigation_Block::get_classes( $attributes );
+		$wrapper_attributes      = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
 				'style'      => $style,
@@ -492,7 +501,9 @@ class WP_Navigation_Block {
 	/**
 	 * Handle view script loading.
 	 */
-	static private function handle_view_script_loading( $should_load_view_script, $block ) {
+	static private function handle_view_script_loading( $block, $attributes, $inner_blocks ) {
+		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
+
 		$view_js_file = 'wp-block-navigation-view';
 
 		// If the script already exists, there is no point in removing it from viewScript.
@@ -549,13 +560,11 @@ class WP_Navigation_Block {
 			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 		}
 
-		$has_submenus                = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
-		$should_load_view_script     = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
-		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $should_load_view_script );
-		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
-		$wrapper_attributes          = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $nav_menu_name, $should_load_view_script );
+		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes );
+		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
+		$wrapper_attributes          = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
 
-		WP_Navigation_Block::handle_view_script_loading( $should_load_view_script, $block );
+		WP_Navigation_Block::handle_view_script_loading( $block, $attributes, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
