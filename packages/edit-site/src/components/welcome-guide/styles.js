@@ -116,9 +116,12 @@ export default function WelcomeGuideStyles() {
 								{ __( 'Learn more' ) }
 							</h1>
 							<p className="edit-site-welcome-guide__text">
-								{ __(
-									'New to block themes and styling your site? '
-								) }
+								{
+									// translators: Preserve trailing space
+									__(
+										'New to block themes and styling your site? '
+									)
+								}
 								<ExternalLink
 									href={ __(
 										'https://wordpress.org/documentation/article/styles-overview/'
