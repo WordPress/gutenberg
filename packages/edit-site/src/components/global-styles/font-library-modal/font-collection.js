@@ -244,7 +244,7 @@ function FontCollection( { id } ) {
 				! fonts.length && (
 					<Text>
 						{ __(
-							'No fonts found. Try with a different seach term'
+							'No fonts found. Try with a different search term'
 						) }
 					</Text>
 				) }

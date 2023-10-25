@@ -8,7 +8,7 @@ import { StyleSheet, View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { BlockControls, useSetting } from '@wordpress/block-editor';
+import { BlockControls, useSettings } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
 	ToolbarButton,
@@ -72,7 +72,7 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const allowCustomControl = useSetting( 'color.custom' );
+	const [ allowCustomControl ] = useSettings( 'color.custom' );
 	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback(

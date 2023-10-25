@@ -25,7 +25,7 @@ function PageSizeControl( { view, onChangeView } ) {
 			prefix={
 				<InputControlPrefixWrapper
 					as="span"
-					className="dataviews__per-page-control-prefix"
+					className="dataviews__select-control-prefix"
 				>
 					{ label }
 				</InputControlPrefixWrapper>
@@ -36,7 +36,7 @@ function PageSizeControl( { view, onChangeView } ) {
 				label: pageSize,
 			} ) ) }
 			onChange={ ( value ) =>
-				onChangeView( { ...view, perPage: value } )
+				onChangeView( { ...view, perPage: value, page: 1 } )
 			}
 		/>
 	);
@@ -50,7 +50,6 @@ function Pagination( {
 	onChangeView,
 	paginationInfo: { totalItems = 0, totalPages },
 } ) {
-	const currentPage = view.page + 1;
 	if ( ! totalItems || ! totalPages ) {
 		return null;
 	}
@@ -75,8 +74,8 @@ function Pagination( {
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
 						variant="tertiary"
-						onClick={ () => onChangeView( { ...view, page: 0 } ) }
-						disabled={ view.page === 0 }
+						onClick={ () => onChangeView( { ...view, page: 1 } ) }
+						disabled={ view.page === 1 }
 						aria-label={ __( 'First page' ) }
 					>
 						«
@@ -86,7 +85,7 @@ function Pagination( {
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page - 1 } )
 						}
-						disabled={ view.page === 0 }
+						disabled={ view.page === 1 }
 						aria-label={ __( 'Previous page' ) }
 					>
 						‹
@@ -100,7 +99,7 @@ function Pagination( {
 							sprintf(
 								// translators: %1$s: Current page number, %2$s: Total number of pages.
 								_x( '<CurrenPageControl /> of %2$s', 'paging' ),
-								currentPage,
+								view.page,
 								totalPages
 							),
 							{
@@ -110,14 +109,20 @@ function Pagination( {
 										min={ 1 }
 										max={ totalPages }
 										onChange={ ( value ) => {
-											if ( value > totalPages ) return;
+											if (
+												! value ||
+												value < 1 ||
+												value > totalPages
+											) {
+												return;
+											}
 											onChangeView( {
 												...view,
-												page: view.page - 1,
+												page: value,
 											} );
 										} }
 										step="1"
-										value={ currentPage }
+										value={ view.page }
 										isDragEnabled={ false }
 										spinControls="none"
 									/>
@@ -130,7 +135,7 @@ function Pagination( {
 						onClick={ () =>
 							onChangeView( { ...view, page: view.page + 1 } )
 						}
-						disabled={ view.page >= totalPages - 1 }
+						disabled={ view.page >= totalPages }
 						aria-label={ __( 'Next page' ) }
 					>
 						›
@@ -138,9 +143,9 @@ function Pagination( {
 					<Button
 						variant="tertiary"
 						onClick={ () =>
-							onChangeView( { ...view, page: totalPages - 1 } )
+							onChangeView( { ...view, page: totalPages } )
 						}
-						disabled={ view.page >= totalPages - 1 }
+						disabled={ view.page >= totalPages }
 						aria-label={ __( 'Last page' ) }
 					>
 						»
