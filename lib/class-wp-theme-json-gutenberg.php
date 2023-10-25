@@ -1178,6 +1178,17 @@ class WP_Theme_JSON_Gutenberg {
 		// Add the global styles root CSS.
 		$stylesheet = $this->theme_json['styles']['css'] ?? '';
 
+		// Add the global styles elements CSS.
+		if ( isset( $this->theme_json['styles']['elements'] ) ) {
+			foreach ( $this->theme_json['styles']['elements'] as $element => $node ) {
+				$custom_element_css = _wp_array_get( $this->theme_json, array( 'styles', 'elements', $element, 'css' ) );
+				if ( $custom_element_css ) {
+					$selector    = static::ELEMENTS[ $element ];
+					$stylesheet .= $this->process_blocks_custom_css( $custom_element_css, $selector );
+				}
+			}
+		}
+
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
