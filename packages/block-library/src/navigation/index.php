@@ -122,7 +122,6 @@ class WP_Navigation_Block {
 
 		$style = WP_Navigation_Block::get_styles( $attributes );
 		$class = WP_Navigation_Block::get_classes( $attributes );
-
 		$container_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'wp-block-navigation__container ' . $class,
@@ -518,9 +517,6 @@ class WP_Navigation_Block {
 			return '';
 		}
 
-		$style        = WP_Navigation_Block::get_styles( $attributes );
-		$class        = WP_Navigation_Block::get_classes( $attributes );
-
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
 		if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
@@ -528,6 +524,8 @@ class WP_Navigation_Block {
 			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 		}
 
+		$style              = WP_Navigation_Block::get_styles( $attributes );
+		$class              = WP_Navigation_Block::get_classes( $attributes );
 		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
