@@ -11,7 +11,7 @@ import HeadingLevelIcon from './heading-level-icon';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.
@@ -28,7 +28,7 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  *
  * @param {WPHeadingLevelDropdownProps} props Component props.
  *
- * @return {WPComponent} The toolbar.
+ * @return {ComponentType} The toolbar.
  */
 export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,

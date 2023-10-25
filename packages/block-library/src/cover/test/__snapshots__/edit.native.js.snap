@@ -95,3 +95,11 @@ exports[`when an image is attached updates background opacity 1`] = `
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
+
+exports[`when no media is attached and overlay color is set adds image 1`] = `
+"<!-- wp:cover {"url":"https://test.files.wordpress.com/local-image-1.mp4","id":2000,"dimRatio":50,"overlayColor":"cyan-bluish-gray","isUserOverlayColor":true} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-2000" src="https://test.files.wordpress.com/local-image-1.mp4" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;

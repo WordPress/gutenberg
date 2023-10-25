@@ -53,7 +53,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.blockEditor.URLInputButton, {
+		return React.createElement( wp.blockEditor.URLInputButton, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
@@ -63,7 +63,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( 'a', {
+		return React.createElement( 'a', {
 			href: props.attributes.url,
 		}, props.attributes.text );
 	}
@@ -189,7 +189,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.blockEditor.URLInput, {
+		return React.createElement( wp.blockEditor.URLInput, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
@@ -199,7 +199,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( 'a', {
+		return React.createElement( 'a', {
 			href: props.attributes.url,
 		}, props.attributes.text );
 	}

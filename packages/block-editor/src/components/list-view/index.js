@@ -6,7 +6,10 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -32,6 +35,7 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
+import { focusListItem } from './utils';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -132,8 +136,6 @@ function ListViewComponent(
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
-	const isMounted = useRef( false );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -156,7 +158,13 @@ function ListViewComponent(
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
 	useEffect( () => {
-		isMounted.current = true;
+		// If a blocks are already selected when the list view is initially
+		// mounted, shift focus to the first selected block.
+		if ( selectedClientIds?.length ) {
+			focusListItem( selectedClientIds[ 0 ], elementRef );
+		}
+		// Disable reason: Only focus on the selected item when the list view is mounted.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const expand = useCallback(
@@ -204,7 +212,6 @@ function ListViewComponent(
 
 	const contextValue = useMemo(
 		() => ( {
-			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
@@ -253,12 +260,20 @@ function ListViewComponent(
 		return null;
 	}
 
+	const describedById =
+		description && `block-editor-list-view-description-${ instanceId }`;
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
+			{ description && (
+				<VisuallyHidden id={ describedById }>
+					{ description }
+				</VisuallyHidden>
+			) }
 			<TreeGrid
 				id={ id }
 				className="block-editor-list-view-tree"
@@ -268,8 +283,7 @@ function ListViewComponent(
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
-				// eslint-disable-next-line jsx-a11y/aria-props
-				aria-description={ description }
+				aria-describedby={ describedById }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

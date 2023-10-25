@@ -57,7 +57,7 @@ The following example allows us to drag & drop a red square around the entire vi
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback } from 'react';
 import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
 
 const UseDraggingExample = () => {

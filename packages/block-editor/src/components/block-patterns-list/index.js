@@ -180,9 +180,7 @@ function BlockPatternList(
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
-			{ pagingProps && pagingProps.numPages > 1 && (
-				<BlockPatternsPaging { ...pagingProps } />
-			) }
+			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
 }

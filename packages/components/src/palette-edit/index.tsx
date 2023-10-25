@@ -121,6 +121,10 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 			() => ( {
 				shift: true,
 				offset: 20,
+				// Disabling resize as it would otherwise cause the popover to show
+				// scrollbars while dragging the color picker's handle close to the
+				// popover edge.
+				resize: false,
 				placement: 'left-start',
 				...receivedPopoverProps,
 				className: classnames(

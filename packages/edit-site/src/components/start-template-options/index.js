@@ -12,14 +12,14 @@ import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { parse } from '@wordpress/blocks';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {

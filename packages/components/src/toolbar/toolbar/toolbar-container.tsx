@@ -16,7 +16,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 
 function UnforwardedToolbarContainer(
 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,

@@ -18,7 +18,7 @@ export async function fetchInstallFonts( data ) {
 
 export async function fetchUninstallFonts( fonts ) {
 	const data = {
-		fontFamilies: fonts,
+		font_families: fonts,
 	};
 	const config = {
 		path: '/wp/v2/fonts',

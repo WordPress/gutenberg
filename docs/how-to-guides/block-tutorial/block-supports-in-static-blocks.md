@@ -67,8 +67,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 {% Plain %}
 
 ```js
-( function ( blocks, blockEditor, element ) {
-	var el = element.createElement;
+( function ( blocks, blockEditor, React ) {
+	var el = React.createElement;
 	var RichText = blockEditor.RichText;
 	var useBlockProps = blockEditor.useBlockProps;
 
@@ -118,7 +118,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 			);
 		},
 	} );
-} )( window.wp.blocks, window.wp.blockEditor, window.wp.element );
+} )( window.wp.blocks, window.wp.blockEditor, window.React );
 ```
 
 {% end %}

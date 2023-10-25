@@ -4,7 +4,7 @@
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	MenuItem,
 	__experimentalHStack as HStack,
@@ -44,17 +44,21 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 	);
 
 	const handleSubmit = () => {
-		// Must be assertive to immediately announce change.
-		speak(
-			sprintf(
-				/* translators: %1$s: type of update (either reset of changed). %2$s: new name/label for the block */
-				__( 'Block name %1$s to: "%2$s".' ),
-				nameIsOriginal || nameIsEmpty ? __( 'reset' ) : __( 'changed' ),
-				editedBlockName
-			),
-			'assertive'
-		);
+		const message =
+			nameIsOriginal || nameIsEmpty
+				? sprintf(
+						/* translators: %s: new name/label for the block */
+						__( 'Block name reset to: "%s".' ),
+						editedBlockName
+				  )
+				: sprintf(
+						/* translators: %s: new name/label for the block */
+						__( 'Block name changed to: "%s".' ),
+						editedBlockName
+				  );
 
+		// Must be assertive to immediately announce change.
+		speak( message, 'assertive' );
 		onSave( editedBlockName );
 
 		// Immediate close avoids ability to hit save multiple times.
@@ -185,21 +189,13 @@ function BlockRenameControl( props ) {
 
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name, attributes, setAttributes } = props;
+		const { clientId, name, attributes, setAttributes, isSelected } = props;
 
-		const metaDataSupport = getBlockSupport(
-			name,
-			'__experimentalMetadata',
-			false
-		);
-
-		const supportsBlockNaming = !! (
-			true === metaDataSupport || metaDataSupport?.name
-		);
+		const supportsBlockNaming = hasBlockSupport( name, 'renaming', true );
 
 		return (
 			<>
-				{ supportsBlockNaming && (
+				{ isSelected && supportsBlockNaming && (
 					<>
 						<BlockRenameControl
 							clientId={ clientId }
@@ -207,8 +203,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							onChange={ ( newName ) => {
 								setAttributes( {
 									metadata: {
-										...( attributes?.metadata &&
-											attributes?.metadata ),
+										...attributes?.metadata,
 										name: newName,
 									},
 								} );

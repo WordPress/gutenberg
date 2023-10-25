@@ -29,6 +29,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
 	useBlockCommands,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -80,6 +81,7 @@ export default function Layout() {
 	const {
 		isDistractionFree,
 		hasFixedToolbar,
+		hasBlockSelected,
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
@@ -104,6 +106,8 @@ export default function Layout() {
 				'core/edit-site',
 				'distractionFree'
 			),
+			hasBlockSelected:
+				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
 	const isEditing = canvasMode === 'edit';
@@ -152,10 +156,14 @@ export default function Layout() {
 	}
 
 	// Sets the right context for the command palette
-	const commandContext =
-		canvasMode === 'edit' && isEditorPage
-			? 'site-editor-edit'
-			: 'site-editor';
+	let commandContext = 'site-editor';
+
+	if ( canvasMode === 'edit' && isEditorPage ) {
+		commandContext = 'site-editor-edit';
+	}
+	if ( hasBlockSelected ) {
+		commandContext = 'block-selection-edit';
+	}
 	useCommandContext( commandContext );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );

@@ -44,9 +44,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
-		await editor.canvas.click(
-			'role=button[name="Two columns; equal split"i]'
-		);
+		await editor.canvas
+			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.click();
 
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
@@ -99,9 +99,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
-		await editor.canvas.click(
-			'role=button[name="Two columns; equal split"i]'
-		);
+		await editor.canvas
+			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.click();
 
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
@@ -155,7 +155,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'You say goodbye' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## Hello, hello' );
@@ -191,9 +193,11 @@ test.describe( 'Navigating the block hierarchy', () => {
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
-		await editor.canvas.click(
-			'role=button[name="Group: Gather blocks in a container."i]'
-		);
+		await editor.canvas
+			.locator(
+				'role=button[name="Group: Gather blocks in a container."i]'
+			)
+			.click();
 
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
@@ -225,7 +229,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 		] );
 
 		// Deselect the blocks.
-		await editor.canvas.click( 'role=textbox[name="Add title"i]' );
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.click();
 
 		// Open list view and return to the first block.
 		await pageUtils.pressKeys( 'access+o' );

@@ -147,6 +147,14 @@ module.exports = {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
 		path: join( __dirname, '..', '..' ),
+		devtoolModuleFilenameTemplate: ( info ) => {
+			if ( info.resourcePath.includes( '/@wordpress/' ) ) {
+				const resourcePath =
+					info.resourcePath.split( '/@wordpress/' )[ 1 ];
+				return `../../packages/${ resourcePath }`;
+			}
+			return `webpack://${ info.namespace }/${ info.resourcePath }`;
+		},
 	},
 	plugins: [
 		...plugins,

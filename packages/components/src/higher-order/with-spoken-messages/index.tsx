@@ -4,7 +4,7 @@
 import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * A Higher Order Component used to be provide speak and debounced speak
@@ -12,9 +12,9 @@ import { speak } from '@wordpress/a11y';
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak
  *
- * @param {WPComponent} Component The component to be wrapped.
+ * @param {ComponentType} Component The component to be wrapped.
  *
- * @return {WPComponent} The wrapped component.
+ * @return {ComponentType} The wrapped component.
  */
 export default createHigherOrderComponent(
 	( Component ) => ( props ) => (

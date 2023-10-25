@@ -59,7 +59,7 @@ export { default as BlockCaption } from './block-caption';
 export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
-export { default as useSetting } from './use-setting';
+export { useSettings, default as useSetting } from './use-settings';
 export {
 	RecursionProvider as __experimentalRecursionProvider,
 	useHasRecursion as __experimentalUseHasRecursion,
@@ -67,6 +67,7 @@ export {
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
+export { default as UnsupportedBlockDetails } from './unsupported-block-details';
 
 export {
 	BottomSheetSettings,
