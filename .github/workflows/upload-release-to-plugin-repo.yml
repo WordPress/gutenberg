@@ -201,7 +201,7 @@ jobs:
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
                   svn commit -m "Committing version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                   --config-option=servers:global:http-timeout=60
+                   --config-option=servers:global:http-timeout=300
 
             - name: Create the SVN tag
               working-directory: ./trunk
@@ -256,4 +256,4 @@ jobs:
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                  --config-option=servers:global:http-timeout=60
+                  --config-option=servers:global:http-timeout=300
