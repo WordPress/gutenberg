@@ -17,7 +17,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { emptyString } from './empty-string';
 
-export function RenameModal( {
+export default function BlockRenameModal( {
 	blockName,
 	originalBlockName,
 	onClose,
@@ -34,7 +34,7 @@ export function RenameModal( {
 	const autoSelectInputText = ( event ) => event.target.select();
 
 	const dialogDescription = useInstanceId(
-		RenameModal,
+		BlockRenameModal,
 		`block-editor-rename-modal__description`
 	);
 

@@ -22,8 +22,7 @@ import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
-import { BlockRenameControl } from '../block-rename/block-rename-control';
-import { useBlockRename } from '../block-rename/use-block-rename';
+import { BlockRenameControl, useBlockRename } from '../block-rename';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 

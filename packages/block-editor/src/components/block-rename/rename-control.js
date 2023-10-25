@@ -11,9 +11,9 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import { emptyString } from './empty-string';
-import { RenameModal } from './modal';
+import BlockRenameModal from './modal';
 
-export function BlockRenameControl( { clientId } ) {
+export default function BlockRenameControl( { clientId } ) {
 	const [ renamingBlock, setRenamingBlock ] = useState( false );
 
 	const { metadata } = useSelect(
@@ -55,7 +55,7 @@ export function BlockRenameControl( { clientId } ) {
 				{ __( 'Rename' ) }
 			</MenuItem>
 			{ renamingBlock && (
-				<RenameModal
+				<BlockRenameModal
 					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
 					onClose={ () => setRenamingBlock( false ) }

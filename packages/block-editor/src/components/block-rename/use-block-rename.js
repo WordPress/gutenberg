@@ -3,7 +3,7 @@
  */
 import { getBlockSupport } from '@wordpress/blocks';
 
-export function useBlockRename( name ) {
+export default function useBlockRename( name ) {
 	const metaDataSupport = getBlockSupport(
 		name,
 		'__experimentalMetadata',
