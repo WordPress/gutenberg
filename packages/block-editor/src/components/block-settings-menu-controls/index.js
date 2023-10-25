@@ -19,6 +19,7 @@ import {
 	ConvertToGroupButton,
 } from '../convert-to-group-buttons';
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
+import { BlockRenameMenuItem, useBlockRename } from '../block-rename';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
@@ -45,6 +46,8 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const showLockButton = selectedClientIds.length === 1 && canLock;
+	const { canRename } = useBlockRename( selectedClientIds[ 0 ] );
+	const showRenameButton = selectedClientIds.length === 1 && canRename;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -81,6 +84,11 @@ const BlockSettingsMenuControlsSlot = ( {
 						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
+						{ showRenameButton && (
+							<BlockRenameMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
