@@ -322,6 +322,7 @@ const UnconnectedDropdownMenu = (
 				// Align nested menu by the same (but opposite) amount
 				// as the menu container's padding.
 				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
+				// TODO: we may need to expose this
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
