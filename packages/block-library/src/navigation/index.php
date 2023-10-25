@@ -106,7 +106,9 @@ class WP_Navigation_Block {
 	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 */
-	private static function get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script ) {
+	private static function get_inner_blocks_html( $inner_blocks, $attributes, $should_load_view_script ) {
+		$has_submenus = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
+
 		$list_item_nav_blocks = array(
 			'core/navigation-link',
 			'core/home-link',
@@ -549,7 +551,7 @@ class WP_Navigation_Block {
 
 		$has_submenus                = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
 		$should_load_view_script     = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
-		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $has_submenus, $should_load_view_script );
+		$inner_blocks_html           = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes, $should_load_view_script );
 		$responsive_container_markup = WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks_html, $should_load_view_script );
 		$wrapper_attributes          = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $nav_menu_name, $should_load_view_script );
 
