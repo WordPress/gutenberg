@@ -48,11 +48,7 @@ const BlockSettingsMenuControlsSlot = ( {
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
 	const showLockButton = selectedClientIds.length === 1 && canLock;
-	const showRenameButton =
-		selectedClientIds.length === 1 &&
-		// Todo confirm whether following conditional is needed anymore.
-		// clientId === selectedClientIds[ 0 ] &&
-		canRename;
+	const showRenameButton = selectedClientIds.length === 1 && canRename;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
