@@ -218,6 +218,9 @@ const typeString = async ( driver, element, str, clear ) => {
 
 	if ( clear ) {
 		await element.clearValue();
+		// This helps prevent skipping characters when the initial
+		// value was previously removed.
+		await driver.pause( 2000 );
 	}
 
 	await element.addValue( str );
