@@ -141,26 +141,6 @@ const SiteLogo = ( {
 		/>
 	);
 
-	let imgWrapper = img;
-
-	// Disable reason: Image itself is not meant to be interactive, but
-	// should direct focus to block.
-	if ( isLink ) {
-		imgWrapper = (
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-			<a
-				href={ siteUrl }
-				className={ classes }
-				rel="home"
-				title={ title }
-				onClick={ ( event ) => event.preventDefault() }
-			>
-				{ img }
-			</a>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		);
-	}
-
 	let imageWidthWithinContainer;
 
 	if ( clientWidth && naturalWidth && naturalHeight ) {
@@ -169,7 +149,7 @@ const SiteLogo = ( {
 	}
 
 	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		return <div style={ { width, height } }>{ imgWrapper }</div>;
+		return <div style={ { width, height } }>{ img }</div>;
 	}
 
 	// Set the default width to a responsible size.
@@ -272,7 +252,7 @@ const SiteLogo = ( {
 					} );
 				} }
 			>
-				{ imgWrapper }
+				{ img }
 			</ResizableBox>
 		);
 
@@ -360,7 +340,19 @@ const SiteLogo = ( {
 					/>
 				) }
 			</BlockControls>
-			{ imgEdit }
+			{ isLink ? (
+				<a
+					href={ siteUrl }
+					className={ classes }
+					rel="home"
+					title={ title }
+					{ ...disabledClickProps }
+				>
+					{ imgEdit }
+				</a>
+			) : (
+				{ imgEdit }
+			) }
 		</>
 	);
 };
@@ -402,6 +394,11 @@ const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
 			</HStack>
 		</ItemGroup>
 	);
+};
+
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
 };
 
 export default function LogoEdit( {

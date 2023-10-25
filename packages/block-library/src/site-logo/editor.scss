@@ -6,11 +6,6 @@
 }
 
 .wp-block-site-logo {
-	// Make the block selectable.
-	a {
-		pointer-events: none;
-	}
-
 	.custom-logo-link {
 		cursor: inherit;
 
@@ -30,8 +25,8 @@
 	}
 
 	// Make the linked image inside the resize full width
-	.components-resizable-box__container > a,
-	.components-resizable-box__container > a img {
+	a > .components-resizable-box__container,
+	a > .components-resizable-box__container img {
 		width: 100%;
 	}
 }
