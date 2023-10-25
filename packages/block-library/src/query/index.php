@@ -48,7 +48,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$content           = substr_replace(
 				$content,
 				'<div
-					class="wp-block-query__enhanced-pagination-navigation-announce"
+					class="screen-reader-text"
 					aria-live="polite"
 					data-wp-text="context.core.query.message"
 				></div>

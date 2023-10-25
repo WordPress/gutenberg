@@ -47,8 +47,7 @@ function ScreenRoot() {
 			hasVariations:
 				!! __experimentalGetCurrentThemeGlobalStylesVariations()
 					?.length,
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 

@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
+import PluginPostExcerpt from '../plugin-post-excerpt';
 
 /**
  * Module Constants
@@ -44,7 +45,14 @@ export default function PostExcerpt() {
 				opened={ isOpened }
 				onToggle={ toggleExcerptPanel }
 			>
-				<PostExcerptForm />
+				<PluginPostExcerpt.Slot>
+					{ ( fills ) => (
+						<>
+							<PostExcerptForm />
+							{ fills }
+						</>
+					) }
+				</PluginPostExcerpt.Slot>
 			</PanelBody>
 		</PostExcerptCheck>
 	);

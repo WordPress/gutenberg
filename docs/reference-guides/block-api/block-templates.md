@@ -115,7 +115,7 @@ add_action( 'init', 'myplugin_register_template' );
 
 _Options:_
 
--   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overridable by children.
 -   `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 -   `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 

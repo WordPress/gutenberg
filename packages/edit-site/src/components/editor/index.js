@@ -44,6 +44,7 @@ import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
+import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
@@ -220,6 +221,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 											<BlockRemovalWarningModal
 												rules={ blockRemovalRules }
 											/>
+											<PatternModal />
 										</>
 									) }
 									{ editorMode === 'text' &&

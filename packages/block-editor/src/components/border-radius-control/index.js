@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import LinkedButton from './linked-button';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 import {
 	getAllValue,
 	getAllUnit,
@@ -67,8 +67,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
 		)[ 1 ],
 	} );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 	} );
 
 	const unit = getAllUnit( selectedUnits );

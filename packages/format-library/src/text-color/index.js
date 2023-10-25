@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
+import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,
@@ -61,8 +61,10 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const allowCustomControl = useSetting( 'color.custom' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
+		'color.custom',
+		'color.palette'
+	);
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback(
 		() => setIsAddingColor( true ),
