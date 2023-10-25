@@ -83,9 +83,9 @@ The `native test:e2e:(android|ios):local` script performs several steps via asso
 
 While we must run all of these at least once to produce a testable app, it is often not necessary to run them each multiple times over while modifying or writing tests. To speed up multiple test runs, you can invoke the individual scripts as needed.
 
-If you only modified the native app code, you can run `test:e2e:build-app:(ios|android)` followed by `device-tests:local`.
-If you only modified JavaScript app code, you can run `test:e2e:bundle:(ios|android)` followed by `device-tests:local`.
-If you only modified E2E tests code, you can run `device-tests:local`.
+-   If you only modified the native app code, you can run `test:e2e:build-app:(ios|android)` followed by `device-tests:local`.
+-   If you only modified JavaScript app code, you can run `test:e2e:bundle:(ios|android)` followed by `device-tests:local`.
+-   If you only modified E2E tests code, you can run `device-tests:local`.
 
 By default `device-tests:local` runs tests for Android. To run tests on iOS, you can prefix the script with the `TEST_RN_PLATFORM` environment variable.
 
