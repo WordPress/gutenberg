@@ -67,7 +67,13 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	}
 }
 
+/**
+ * Helper functions used to render the navigation block.
+ */
 class WP_Navigation_Block {
+	/**
+	 * Returns whether or not a navigation has a submenu.
+	 */
 	private static function does_navigation_have_submenus( $inner_blocks ) {
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_content = $inner_block->render();
@@ -84,6 +90,9 @@ class WP_Navigation_Block {
 		}
 	}
 
+	/**
+	 * Returns the html for the inner blocks of the navigation block.
+	 */
 	private static function get_inner_blocks_html( $inner_blocks, $container_attributes ) {
 		$list_item_nav_blocks = array(
 			'core/navigation-link',
@@ -134,6 +143,9 @@ class WP_Navigation_Block {
 		return $inner_blocks_html;
 	}
 
+	/**
+	 * Gets the inner blocks for the navigation block.
+	 */
 	private static function get_inner_blocks_for_navigation( $block, $attributes ) {
 		$inner_blocks = $block->inner_blocks;
 
@@ -209,6 +221,9 @@ class WP_Navigation_Block {
 		return apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 	}
 
+	/**
+	 * Gets the name of the current navigation, if it has one.
+	 */
 	private static function get_navigation_name( $attributes, &$seen_menu_names ) {
 		$navigation_name = $attributes['ariaLabel'] ?? '';
 
@@ -235,6 +250,9 @@ class WP_Navigation_Block {
 		return $navigation_name;
 	}
 
+	/**
+	 * Returns the layout class for the navigation block.
+	 */
 	private static function get_layout_class_for_navigation( $attributes ) {
 		$layout_justification = array(
 			'left'          => 'items-justified-left',
@@ -260,6 +278,9 @@ class WP_Navigation_Block {
 		return $layout_class;
 	}
 
+	/**
+	 * Renders the navigation block.
+	 */
 	static function render( $attributes, $content, $block ) {
 		static $seen_menu_names = array();
 
