@@ -6,7 +6,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { chevronRightSmall, check, arrowUp, arrowDown } from '@wordpress/icons';
+import { chevronRightSmall, arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,11 +16,11 @@ import { unlock } from './lock-unlock';
 import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
 
 const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
+	DropdownMenuCheckboxItemV2Ariakit: DropdownMenuCheckboxItem,
 } = unlock( componentsPrivateApis );
 
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
@@ -35,9 +35,9 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	}
 	const activeView = _availableViews.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={
 						<>
 							{ activeView.label }
@@ -46,21 +46,17 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 					}
 				>
 					{ __( 'Layout' ) }
-				</DropdownSubMenuTrigger>
+				</DropdownMenuItem>
 			}
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuRadioItem
 						key={ availableView.type }
-						role="menuitemradio"
-						aria-checked={ availableView.id === view.type }
-						prefix={
-							availableView.type === view.type && (
-								<Icon icon={ check } />
-							)
-						}
-						onSelect={ () => {
+						value={ availableView.type }
+						name="view-actions-available-view"
+						checked={ availableView.type === view.type }
+						onChange={ () => {
 							onChangeView( {
 								...view,
 								type: availableView.type,
@@ -68,19 +64,19 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						} }
 					>
 						{ availableView.label }
-					</DropdownMenuItem>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
 const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={
 						<>
 							{ view.perPage }
@@ -90,29 +86,25 @@ function PageSizeMenu( { view, onChangeView } ) {
 				>
 					{ /* TODO: probably label per view type. */ }
 					{ __( 'Rows per page' ) }
-				</DropdownSubMenuTrigger>
+				</DropdownMenuItem>
 			}
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuRadioItem
 						key={ size }
-						role="menuitemradio"
-						aria-checked={ view.perPage === size }
-						prefix={
-							view.perPage === size && <Icon icon={ check } />
-						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						value={ size }
+						name="view-actions-page-size"
+						checked={ view.perPage === size }
+						onChange={ () => {
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 					>
 						{ size }
-					</DropdownMenuItem>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
@@ -125,27 +117,22 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 		return null;
 	}
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={ <Icon icon={ chevronRightSmall } /> }
 				>
 					{ __( 'Fields' ) }
-				</DropdownSubMenuTrigger>
+				</DropdownMenuItem>
 			}
 		>
 			{ hidableFields?.map( ( field ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuCheckboxItem
 						key={ field.id }
-						role="menuitemcheckbox"
-						prefix={
-							! view.hiddenFields?.includes( field.id ) && (
-								<Icon icon={ check } />
-							)
-						}
-						onSelect={ ( event ) => {
-							event.preventDefault();
+						value={ field.id }
+						checked={ ! view.hiddenFields?.includes( field.id ) }
+						onChange={ () => {
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields?.includes(
@@ -162,10 +149,10 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 						} }
 					>
 						{ field.header }
-					</DropdownMenuItem>
+					</DropdownMenuCheckboxItem>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
@@ -185,9 +172,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 		( field ) => field.id === view.sort?.field
 	);
 	return (
-		<DropdownSubMenu
+		<DropdownMenu
 			trigger={
-				<DropdownSubMenuTrigger
+				<DropdownMenuItem
 					suffix={
 						<>
 							{ currentSortedField?.header }
@@ -196,39 +183,41 @@ function SortMenu( { fields, view, onChangeView } ) {
 					}
 				>
 					{ __( 'Sort by' ) }
-				</DropdownSubMenuTrigger>
+				</DropdownMenuItem>
 			}
 		>
 			{ sortableFields?.map( ( field ) => {
 				const sortedDirection = view.sort?.direction;
 				return (
-					<DropdownSubMenu
+					<DropdownMenu
 						key={ field.id }
 						trigger={
-							<DropdownSubMenuTrigger
+							<DropdownMenuItem
 								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
 								{ field.header }
-							</DropdownSubMenuTrigger>
+							</DropdownMenuItem>
 						}
-						side="left"
+						placement="left-start"
 					>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => {
-								const isActive =
-									currentSortedField &&
+								const isChecked =
+									currentSortedField !== undefined &&
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
+
 								return (
-									<DropdownMenuItem
+									<DropdownMenuRadioItem
 										key={ direction }
-										role="menuitemradio"
-										aria-checked={ isActive }
-										prefix={ <Icon icon={ info.icon } /> }
-										suffix={
-											isActive && <Icon icon={ check } />
-										}
-										onSelect={ ( event ) => {
+										value={ direction }
+										name={ `view-actions-sorting-${ field.id }` }
+										suffix={ <Icon icon={ info.icon } /> }
+										// Note: there is currently a limitation from the DropdownMenu
+										// component where the radio won't unselect when all related
+										// radios are set to false.
+										checked={ isActive }
+										onChange={ ( event ) => {
 											event.preventDefault();
 											onChangeView( {
 												...view,
@@ -240,14 +229,14 @@ function SortMenu( { fields, view, onChangeView } ) {
 										} }
 									>
 										{ info.label }
-									</DropdownMenuItem>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
-					</DropdownSubMenu>
+					</DropdownMenu>
 				);
 			} ) }
-		</DropdownSubMenu>
+		</DropdownMenu>
 	);
 }
 
