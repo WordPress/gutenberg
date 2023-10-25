@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -38,7 +39,15 @@ export default function RenamePatternCategoryModal( {
 	const onRename = async ( event ) => {
 		event.preventDefault();
 
-		if ( ! name || name === category.name || isSaving ) {
+		if ( isSaving ) {
+			return;
+		}
+
+		if ( ! name || name === category.name ) {
+			speak(
+				__( 'Please enter a new name for this category.' ),
+				'assertive'
+			);
 			return;
 		}
 
@@ -48,6 +57,7 @@ export default function RenamePatternCategoryModal( {
 				return existingCategory.label === name;
 			} )
 		) {
+			speak( __( 'This category already exists.' ), 'assertive' );
 			return;
 		}
 
