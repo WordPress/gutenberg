@@ -196,8 +196,6 @@ class WP_Navigation_Block {
 
 		// If there are no inner blocks then fallback to rendering an appropriate fallback.
 		if ( empty( $inner_blocks ) ) {
-			$is_fallback = true; // indicate we are rendering the fallback.
-
 			$fallback_blocks = block_core_navigation_get_fallback_blocks();
 
 			// Fallback my have been filtered so do basic test for validity.
@@ -247,10 +245,6 @@ class WP_Navigation_Block {
 	static function render( $attributes, $content, $block ) {
 		static $seen_menu_names = array();
 
-		// Flag used to indicate whether the rendered output is considered to be
-		// a fallback (i.e. the block has no menu associated with it).
-		$is_fallback = false;
-
 		$nav_menu_name = $attributes['ariaLabel'] ?? '';
 
 		/**
@@ -295,7 +289,6 @@ class WP_Navigation_Block {
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
 			$layout_class ? array( $layout_class ) : array(),
-			$is_fallback ? array( 'is-fallback' ) : array(),
 			$text_decoration ? array( $text_decoration_class ) : array()
 		);
 
