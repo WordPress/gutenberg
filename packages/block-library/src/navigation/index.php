@@ -301,9 +301,11 @@ class WP_Navigation_Block {
 	/**
 	 * Return classes for the navigation block.
 	 */
-	private static function get_classes( $attributes, $colors, $font_sizes, $is_responsive_menu ) {
+	private static function get_classes( $attributes, $colors, $font_sizes ) {
 		// Restore legacy classnames for submenu positioning.
 		$layout_class = WP_Navigation_Block::get_layout_class_for_navigation( $attributes );
+
+		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -468,7 +470,7 @@ class WP_Navigation_Block {
 		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-		$class        = WP_Navigation_Block::get_classes( $attributes, $colors, $font_sizes, $is_responsive_menu );
+		$class        = WP_Navigation_Block::get_classes( $attributes, $colors, $font_sizes );
 
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
