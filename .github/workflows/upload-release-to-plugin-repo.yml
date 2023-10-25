@@ -188,7 +188,7 @@ jobs:
                   path: trunk
 
             - name: Deploy WordPress Plugin
-              uses: 10up/action-wordpress-plugin-deploy@stable
+              uses: 10up/action-wordpress-plugin-deploy@abb939a0d0bfd01063e8d1933833209201557381 # v2.2.2
               with:
                   dry-run: true
 
