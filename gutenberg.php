@@ -33,6 +33,17 @@ function gutenberg_wordpress_version_notice() {
 }
 
 /**
+ * Display a version notice and deactivate the Gutenberg plugin.
+ */
+function gutenberg_wordpress_version_outdated_notice() {
+	echo '<div class="error"><p>';
+	echo __( 'This Gutenberg version is outdated. Please upgrade the plugin to a version that is compatible with your WordPress version.', 'gutenberg' );
+	echo '</p></div>';
+
+	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+}
+
+/**
  * Display a build notice.
  *
  * @since 0.1.0
@@ -66,6 +77,13 @@ function gutenberg_pre_init() {
 	// X.Y for its major releases.
 	if ( version_compare( $version, '5.9', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+		return;
+	}
+
+	// Gutenberg plugin should be disabled on future WordPress versions.
+	// The version here should be updated before the beta 1 of each WordPress release.
+	if ( version_compare( $version, '6.4', '>' ) ) {
+		add_action( 'admin_notices', 'gutenberg_wordpress_version_outdated_notice' );
 		return;
 	}
 
