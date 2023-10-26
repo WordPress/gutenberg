@@ -76,7 +76,7 @@ class WP_Navigation_Block {
 	 */
 	private static function is_responsive_navigation( $attributes ) {
 		/**
-		 * This is for backwards compatibility after `isResponsive` attribute has been removed.
+		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
 
 		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
