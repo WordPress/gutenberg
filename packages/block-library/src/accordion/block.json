@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/accordion",
+	"title": "Accordion",
+	"category": "design",
+	"description": "An accordion.",
+	"keywords": [ "details, accordion" ],
+	"textdomain": "default",
+	"supports": {
+		"html": false
+	},
+	"style": "wp-block-accordion",
+	"viewScript": "file:./view.min.js"
+}

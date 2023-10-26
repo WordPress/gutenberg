@@ -20,6 +20,7 @@ import {
 // production build to make the final bundle smaller.
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+import * as accordion from './accordion';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -140,6 +141,7 @@ const getAllBlocks = () => {
 		quote,
 
 		// Register all remaining core blocks.
+		accordion,
 		archives,
 		audio,
 		button,
