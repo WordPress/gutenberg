@@ -297,7 +297,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the layout class for the navigation block.
 	 */
-	private static function get_layout_class_for_navigation( $attributes ) {
+	private static function get_layout_class( $attributes ) {
 		$layout_justification = array(
 			'left'          => 'items-justified-left',
 			'right'         => 'items-justified-right',
@@ -327,7 +327,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
-		$layout_class = WP_Navigation_Block_Renderer::get_layout_class_for_navigation( $attributes );
+		$layout_class = WP_Navigation_Block_Renderer::get_layout_class( $attributes );
 
 		$colors             = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
