@@ -1,26 +1,23 @@
-const ios = {
-	platformVersion: '16.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
+const ios = ( { iPadDevice = false } ) => ( {
+	deviceName: ! iPadDevice ? 'iPhone 14' : 'iPad (10th generation)',
+	pixelRatio: ! iPadDevice ? 3 : 2,
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
 	processArguments: {
 		args: [ 'uitesting' ],
 	},
 	autoLaunch: false,
-};
+} );
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
-	...ios,
-	deviceName: ! iPadDevice ? 'iPhone 14' : 'iPad (10th generation)',
-	pixelRatio: ! iPadDevice ? 3 : 2,
+	...ios( { iPadDevice } ),
+	platformVersion: '16.2',
 	usePrebuiltWDA: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
-	...ios,
-	deviceName: ! iPadDevice
-		? 'iPhone 14 Simulator'
-		: 'iPad (10th generation) Simulator',
-	pixelRatio: ! iPadDevice ? 3 : 2,
+	...ios( { iPadDevice } ),
+	platformVersion: '16.2',
 } );
 
 exports.android = {
@@ -32,11 +29,6 @@ exports.android = {
 	deviceOrientation: 'portrait',
 	disableWindowAnimation: true,
 	autoLaunch: false,
-};
-
-// SauceLabs config
-exports.sauceOptions = {
-	appiumVersion: '2.0.0',
 };
 
 exports.prefixKeysWithAppium = ( obj ) => {
