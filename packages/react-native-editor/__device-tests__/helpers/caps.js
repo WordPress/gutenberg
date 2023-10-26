@@ -1,5 +1,5 @@
 const ios = {
-	platformVersion: '16.2', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
+	platformVersion: '16.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
 	processArguments: {
