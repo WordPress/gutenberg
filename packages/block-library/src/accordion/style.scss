@@ -1,3 +1,13 @@
 .wp-block-accordion {
 	display: block;
+	border: 1px solid;
+
+	.wp-block-details {
+		padding: 1em;
+		border-bottom: 1px solid;
+
+		&:last-child {
+			border-bottom: 0;
+		}
+	}
 }
