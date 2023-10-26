@@ -17,7 +17,7 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios( { iPadDevice } ),
-	platformVersion: '16.2',
+	platformVersion: '16.4',
 } );
 
 exports.android = {
