@@ -74,7 +74,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 */
-	private static function is_responsive_navigation( $attributes ) {
+	private static function is_responsive( $attributes ) {
 		/**
 		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
 		 */
@@ -105,7 +105,7 @@ class WP_Navigation_Block_Renderer {
 
 	private static function should_load_view_script( $attributes, $inner_blocks ) {
 		$has_submenus = WP_Navigation_Block_Renderer::does_navigation_have_submenus( $inner_blocks );
-		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
+		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
@@ -331,7 +331,7 @@ class WP_Navigation_Block_Renderer {
 
 		$colors             = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
-		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
+		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive( $attributes );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -453,7 +453,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name ) {
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
-		$is_responsive_menu      = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
+		$is_responsive_menu      = WP_Navigation_Block_Renderer::is_responsive( $attributes );
 		$style                   = WP_Navigation_Block_Renderer::get_styles( $attributes );
 		$class                   = WP_Navigation_Block_Renderer::get_classes( $attributes );
 		$wrapper_attributes      = get_block_wrapper_attributes(
@@ -526,7 +526,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_nav_markup( $attributes, $inner_blocks ) {
 		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $inner_blocks, $attributes );
-		if ( WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes ) ) {
+		if ( WP_Navigation_Block_Renderer::is_responsive( $attributes ) ) {
 			return WP_Navigation_Block_Renderer::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
 		}
 		return $inner_blocks_html;
