@@ -248,14 +248,14 @@ function DataviewsProvider( { children } ) {
 	} = useLocation();
 	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
 
-	if ( window?.__experimentalAdminViews && viewType ) {
+	if ( viewType ) {
 		return (
 			<DataviewsProviderInner type={ viewType }>
 				{ children }
 			</DataviewsProviderInner>
 		);
 	}
-	return <> { children }</>;
+	return <>{ children }</>;
 }
 
 let DataviewsProviderExported = Fragment;
