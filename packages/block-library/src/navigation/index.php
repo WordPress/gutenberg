@@ -479,6 +479,7 @@ class WP_Navigation_Block_Renderer {
 		if ( ! $should_load_view_script ) {
 			return '';
 		}
+		// When adding to this array be mindful of security concerns.
 		$nav_element_context = wp_json_encode(
 			array(
 				'core' => array(
