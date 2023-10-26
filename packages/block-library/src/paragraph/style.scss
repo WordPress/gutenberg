@@ -40,6 +40,7 @@ p.has-drop-cap.has-background {
 
 p.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
+	box-sizing: border-box;
 }
 
 // Use :where to contain the specificity of this rule
