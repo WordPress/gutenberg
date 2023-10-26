@@ -28,12 +28,12 @@ if ( ! defined( 'GUTENBERG_MAX_WP_VERSION' ) ) {
 	 * Generally that would be the current WordPress development version from core trunk,
 	 * see: https://core.trac.wordpress.org/browser/trunk/src/wp-includes/version.php.
 	 * This constant should be set to a major (two digits) version. For example,
-	 * whether the current WP development version is 6.4-alpha-12345-src or 6.4-beta4-67890-src,
-	 * the constant would be 6.4.
+	 * whether the current WP development version is 6.4-alpha-12345-src,
+	 * the constant would be 6.3.
 	 * The expectation is that bug fixes and new features from this Gutenberg release will be
 	 * added to the curent WordPress release. If that is not the case, or if the WP version
-	 * from trunk is already RC, the constant should be set to the next major WP version.
-	 * Following the above example that would be 6.5.
+	 * from trunk is already BETA 1, the constant should be set to the next major WP version.
+	 * Following the above example that would be 6.4.
 	 */
 	define( 'GUTENBERG_MAX_WP_VERSION', '6.4' );
 }
@@ -167,24 +167,6 @@ function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 }
 
 /**
- * Add a "Gutenberg version is getting old. Please update!" notice on the Dashboard.
- * This will be shown only when running WordPress fevelopment versions.
- *
- * @since 16.9.0
- */
-function gutenberg_needs_update_notice() {
-	$current_screen = get_current_screen();
-
-	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
-		return;
-	}
-
-	echo '<div class="notice notice-warning is-dismissible"><p>';
-	_e( 'Your version of Gutenberg is getting old. It will stop working after you upgrade WordPress to the next major version. Please update the Gutenberg plugin.', 'gutenberg' );
-	echo '</p></div>';
-}
-
-/**
  * Display a build notice.
  *
  * @since 0.1.0
@@ -227,7 +209,10 @@ function gutenberg_pre_init() {
 
 		// Return early, do not load Gutenberg.
 		return;
-	} elseif ( version_compare( $wp_version, $max_supported_version, '>=' ) ) {
+	} elseif ( version_compare( $wp_version, $max_supported_version, '>=' ) || (
+		version_compare( $wp_version, $max_supported_version, '<' ) &&
+		version_compare( $wp_version, $max_supported_version . '-alpha', '>=' )
+	) ) {
 		/*
 		 * Do not load Gutenebrg in newer, unsupported versions of WordPress. This will prevent incompatibilities,
 		 * PHP fatal errors, etc. Ask the users to update Gutenberg or turn plugin auto-updates on.
@@ -238,13 +223,6 @@ function gutenberg_pre_init() {
 		add_filter( 'plugin_row_meta', 'gutenberg_version_too_old_plugin_row_meta', 10, 2 );
 
 		return;
-	} elseif (
-		version_compare( $wp_version, $max_supported_version, '<' ) &&
-		version_compare( $wp_version, $max_supported_version . '-alpha', '>=' )
-	) {
-		// Running in a newer WordPress aplha/beta/RC.
-		// Gutenberg will stop loading after this version of WordPress is released and the site is upgraded.
-		add_action( 'admin_notices', 'gutenberg_needs_update_notice' );
 	}
 
 	// Check if Gutenberg has been built for the first time.
