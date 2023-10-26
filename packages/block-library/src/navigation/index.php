@@ -70,7 +70,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 /**
  * Helper functions used to render the navigation block.
  */
-class WP_Navigation_Block {
+class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 */
@@ -104,8 +104,8 @@ class WP_Navigation_Block {
 	}
 
 	private static function should_load_view_script( $attributes, $inner_blocks ) {
-		$has_submenus = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
-		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		$has_submenus = WP_Navigation_Block_Renderer::does_navigation_have_submenus( $inner_blocks );
+		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
@@ -113,8 +113,8 @@ class WP_Navigation_Block {
 	 * Returns the html for the inner blocks of the navigation block.
 	 */
 	private static function get_inner_blocks_html( $inner_blocks, $attributes ) {
-		$has_submenus            = WP_Navigation_Block::does_navigation_have_submenus( $inner_blocks );
-		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
+		$has_submenus            = WP_Navigation_Block_Renderer::does_navigation_have_submenus( $inner_blocks );
+		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 
 		$list_item_nav_blocks = array(
 			'core/navigation-link',
@@ -129,8 +129,8 @@ class WP_Navigation_Block {
 			'core/site-logo',
 		);
 
-		$style = WP_Navigation_Block::get_styles( $attributes );
-		$class = WP_Navigation_Block::get_classes( $attributes );
+		$style = WP_Navigation_Block_Renderer::get_styles( $attributes );
+		$class = WP_Navigation_Block_Renderer::get_classes( $attributes );
 		$container_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'wp-block-navigation__container ' . $class,
@@ -327,11 +327,11 @@ class WP_Navigation_Block {
 	 */
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
-		$layout_class = WP_Navigation_Block::get_layout_class_for_navigation( $attributes );
+		$layout_class = WP_Navigation_Block_Renderer::get_layout_class_for_navigation( $attributes );
 
 		$colors             = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
-		$is_responsive_menu = WP_Navigation_Block::is_responsive_navigation( $attributes );
+		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -362,7 +362,7 @@ class WP_Navigation_Block {
 	 * Get the responsive container markup
 	 */
 	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
-		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
+		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 		$colors = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
@@ -452,10 +452,10 @@ class WP_Navigation_Block {
 	 * Get the wrapper attributes
 	 */
 	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name ) {
-		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
-		$is_responsive_menu      = WP_Navigation_Block::is_responsive_navigation( $attributes );
-		$style                   = WP_Navigation_Block::get_styles( $attributes );
-		$class                   = WP_Navigation_Block::get_classes( $attributes );
+		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
+		$is_responsive_menu      = WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes );
+		$style                   = WP_Navigation_Block_Renderer::get_styles( $attributes );
+		$class                   = WP_Navigation_Block_Renderer::get_classes( $attributes );
 		$wrapper_attributes      = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
@@ -465,7 +465,7 @@ class WP_Navigation_Block {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives      = WP_Navigation_Block::get_nav_element_directives( $should_load_view_script );
+			$nav_element_directives      = WP_Navigation_Block_Renderer::get_nav_element_directives( $should_load_view_script );
 			$wrapper_attributes .= ' ' . $nav_element_directives;
 		}
 
@@ -502,7 +502,7 @@ class WP_Navigation_Block {
 	 * Handle view script loading.
 	 */
 	static private function handle_view_script_loading( $block, $attributes, $inner_blocks ) {
-		$should_load_view_script = WP_Navigation_Block::should_load_view_script( $attributes, $inner_blocks );
+		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 
 		$view_js_file = 'wp-block-navigation-view';
 
@@ -525,9 +525,9 @@ class WP_Navigation_Block {
 	 * Returns the markup for the navigation block.
 	 */
 	private static function get_nav_markup( $attributes, $inner_blocks ) {
-		$inner_blocks_html = WP_Navigation_Block::get_inner_blocks_html( $inner_blocks, $attributes );
-		if ( WP_Navigation_Block::is_responsive_navigation( $attributes ) ) {
-			return WP_Navigation_Block::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
+		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $inner_blocks, $attributes );
+		if ( WP_Navigation_Block_Renderer::is_responsive_navigation( $attributes ) ) {
+			return WP_Navigation_Block_Renderer::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
 		}
 		return $inner_blocks_html;
 	}
@@ -538,7 +538,7 @@ class WP_Navigation_Block {
 	static function render( $attributes, $content, $block ) {
 		static $seen_menu_names = array();
 
-		$nav_menu_name = WP_Navigation_Block::get_navigation_name( $attributes, $seen_menu_names );
+		$nav_menu_name = WP_Navigation_Block_Renderer::get_navigation_name( $attributes, $seen_menu_names );
 
 		/**
 		 * Deprecated:
@@ -557,7 +557,7 @@ class WP_Navigation_Block {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$inner_blocks       = WP_Navigation_Block::get_inner_blocks_for_navigation( $block, $attributes );
+		$inner_blocks       = WP_Navigation_Block_Renderer::get_inner_blocks_for_navigation( $block, $attributes );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
@@ -570,14 +570,14 @@ class WP_Navigation_Block {
 			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
 		}
 
-		$wrapper_attributes = WP_Navigation_Block::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
+		$wrapper_attributes = WP_Navigation_Block_Renderer::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
 
-		WP_Navigation_Block::handle_view_script_loading( $block, $attributes, $inner_blocks );
+		WP_Navigation_Block_Renderer::handle_view_script_loading( $block, $attributes, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
-			WP_Navigation_Block::get_nav_markup( $attributes, $inner_blocks )
+			WP_Navigation_Block_Renderer::get_nav_markup( $attributes, $inner_blocks )
 		);
 	}
 }
@@ -909,7 +909,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-	return WP_Navigation_Block::render( $attributes, $content, $block );
+	return WP_Navigation_Block_Renderer::render( $attributes, $content, $block );
 }
 
 /**
