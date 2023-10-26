@@ -24,7 +24,7 @@ const emptyString = ( testString ) => testString?.trim()?.length === 0;
 
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const originalBlockName = blockInformation?.blockName;
+	const originalBlockName = blockInformation?.title;
 
 	const metadata = useSelect(
 		( select ) => {
@@ -34,12 +34,10 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 		[ clientId ]
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const blockName = metadata?.name || '';
+	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 
-	const [ editedBlockName, setEditedBlockName ] = useState(
-		metadata?.name || ''
-	);
-
-	const nameHasChanged = editedBlockName !== metadata?.name;
+	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
 	const nameIsEmpty = emptyString( editedBlockName );
 
@@ -72,7 +70,14 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 		updateBlockAttributes( [ clientId ], {
 			metadata: {
 				...metadata,
-				name: editedBlockName,
+				name:
+					// If the new value is the block's original name (e.g. `Group`)
+					// or it is an empty string then assume the intent is to reset
+					// the value. Therefore reset the metadata.
+					editedBlockName === blockInformation?.title ||
+					emptyString( editedBlockName )
+						? undefined
+						: editedBlockName,
 			},
 		} );
 
