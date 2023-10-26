@@ -502,7 +502,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Handle view script loading.
 	 */
-	static private function handle_view_script_loading( $block, $attributes, $inner_blocks ) {
+	private static function handle_view_script_loading( $block, $attributes, $inner_blocks ) {
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 
 		$view_js_file = 'wp-block-navigation-view';
