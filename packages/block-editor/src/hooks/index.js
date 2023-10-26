@@ -22,7 +22,7 @@ import './metadata';
 import './metadata-name';
 import './custom-fields';
 import './block-hooks';
-import './block-rename-ui';
+import './block-rename';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
