@@ -80,9 +80,9 @@ function Pagination( {
 					>
 						<Button
 							onClick={ () =>
-								onChangeView( { ...view, page: 0 } )
+								onChangeView( { ...view, page: 1 } )
 							}
-							disabled={ view.page === 0 }
+							disabled={ view.page === 1 }
 							label={ __( 'First page' ) }
 							icon={ previous }
 							showTooltip
@@ -92,7 +92,7 @@ function Pagination( {
 							onClick={ () =>
 								onChangeView( { ...view, page: view.page - 1 } )
 							}
-							disabled={ view.page === 0 }
+							disabled={ view.page === 1 }
 							label={ __( 'Previous page' ) }
 							icon={ chevronLeft }
 							showTooltip
@@ -148,7 +148,7 @@ function Pagination( {
 							onClick={ () =>
 								onChangeView( { ...view, page: view.page + 1 } )
 							}
-							disabled={ view.page >= totalPages - 1 }
+							disabled={ view.page >= totalPages }
 							label={ __( 'Next page' ) }
 							icon={ chevronRight }
 							showTooltip
@@ -156,12 +156,9 @@ function Pagination( {
 						/>
 						<Button
 							onClick={ () =>
-								onChangeView( {
-									...view,
-									page: totalPages - 1,
-								} )
+								onChangeView( { ...view, page: totalPages } )
 							}
-							disabled={ view.page >= totalPages - 1 }
+							disabled={ view.page >= totalPages }
 							label={ __( 'Last page' ) }
 							icon={ next }
 							showTooltip
