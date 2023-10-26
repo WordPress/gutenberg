@@ -1,12 +1,16 @@
 .dataviews-wrapper {
 	width: 100%;
+	min-height: calc(100% - 60px);
+	overflow: auto;
 	padding: $grid-unit-40;
+
+	> div {
+		min-height: 100%;
+	}
 }
 
 .dataviews-pagination {
-	position: sticky;
-	bottom: $grid-unit-20;
-	background: $white;
+	margin-top: auto;
 }
 
 .dataviews-list-view {
@@ -34,11 +38,6 @@
 	tr {
 		border-bottom: 1px solid $gray-100;
 	}
-}
-
-.dataviews__select-control-prefix {
-	color: $gray-700;
-	text-wrap: nowrap;
 }
 
 .dataviews-view-grid__media {
