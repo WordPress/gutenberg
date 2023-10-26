@@ -15,7 +15,7 @@ import { default as VideoPlayer } from 'react-native-video';
  */
 import { View } from '@wordpress/primitives';
 import { Icon } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
 import {
@@ -34,7 +34,6 @@ import { parseAudioUrl } from './audio-url-parser.native';
 const isIOS = Platform.OS === 'ios';
 
 function Player( {
-	getStylesFromColorScheme,
 	isUploadInProgress,
 	isUploadFailed,
 	attributes,
@@ -70,14 +69,22 @@ function Player( {
 		}
 	};
 
-	const containerStyle = getStylesFromColorScheme(
+	const isDarkModeEnabled = usePreferredColorScheme() === 'dark';
+
+	const determineEditorColorScheme = ( baseStyle, darkStyle ) =>
+		isDarkModeEnabled ? [ baseStyle, darkStyle ] : [ baseStyle ];
+
+	const containerStyle = determineEditorColorScheme(
 		styles.container,
 		styles.containerDark
 	);
 
-	const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+	const iconStyle = determineEditorColorScheme(
+		styles.icon,
+		styles.iconDark
+	);
 
-	const iconDisabledStyle = getStylesFromColorScheme(
+	const iconDisabledStyle = determineEditorColorScheme(
 		styles.iconDisabled,
 		styles.iconDisabledDark
 	);
@@ -89,7 +96,7 @@ function Player( {
 		...( isDisabled && iconDisabledStyle ),
 	};
 
-	const iconContainerStyle = getStylesFromColorScheme(
+	const iconContainerStyle = determineEditorColorScheme(
 		styles.iconContainer,
 		styles.iconContainerDark
 	);
@@ -99,17 +106,17 @@ function Player( {
 		...( isIOS ? styles.titleContainerIOS : styles.titleContainerAndroid ),
 	};
 
-	const titleStyle = getStylesFromColorScheme(
+	const titleStyle = determineEditorColorScheme(
 		styles.title,
 		styles.titleDark
 	);
 
-	const uploadFailedStyle = getStylesFromColorScheme(
+	const uploadFailedStyle = determineEditorColorScheme(
 		styles.uploadFailed,
 		styles.uploadFailedDark
 	);
 
-	const subtitleStyle = getStylesFromColorScheme(
+	const subtitleStyle = determineEditorColorScheme(
 		styles.subtitle,
 		styles.subtitleDark
 	);
@@ -119,7 +126,7 @@ function Player( {
 		...( isUploadFailed && uploadFailedStyle ),
 	};
 
-	const buttonBackgroundStyle = getStylesFromColorScheme(
+	const buttonBackgroundStyle = determineEditorColorScheme(
 		styles.buttonBackground,
 		styles.buttonBackgroundDark
 	);
@@ -221,4 +228,4 @@ function Player( {
 	);
 }
 
-export default withPreferredColorScheme( Player );
+export default Player;
