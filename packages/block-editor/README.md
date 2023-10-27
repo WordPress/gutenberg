@@ -789,12 +789,22 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
--   _wrapperClassName_ `string`: Wrapper Class Name.
+-   _styles_ `EditorStyle[]`: CSS rules.
+-   _wrapperSelector_ `string`: Wrapper selector.
 
 _Returns_
 
 -   `Array`: converted rules.
+
+_Type Definition_
+
+-   _EditorStyle_ `Object`
+
+_Properties_
+
+-   _css_ `string`: the CSS block(s), as a single string.
+-   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
+-   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 

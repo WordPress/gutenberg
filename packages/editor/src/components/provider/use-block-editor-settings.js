@@ -93,6 +93,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
+		pageForPosts,
 		postType,
 		userPatternCategories,
 	} = useSelect( ( select ) => {
@@ -118,6 +119,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
+			pageForPosts: siteSettings?.page_for_posts,
 			postType: getCurrentPostType(),
 			userPatternCategories: getUserPatternCategories(),
 		};
@@ -218,6 +220,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			pageForPosts,
 			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
@@ -233,6 +236,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			createPageEntity,
 			userCanCreatePages,
 			pageOnFront,
+			pageForPosts,
 		]
 	);
 }

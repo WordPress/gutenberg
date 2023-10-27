@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import FieldActions from './field-actions';
+import ItemActions from './item-actions';
 
 export function ViewGrid( { data, fields, view, actions } ) {
 	const mediaField = fields.find(
@@ -50,7 +50,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 									) ) }
 								</VStack>
 							</FlexBlock>
-							<FieldActions item={ item } actions={ actions } />
+							<ItemActions item={ item } actions={ actions } />
 						</HStack>
 					</VStack>
 				);

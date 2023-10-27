@@ -4,6 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
+	edit,
 	trash,
 	rotateLeft,
 	rotateRight,
@@ -375,7 +376,7 @@ function usePatternCommands() {
 		commands.push( {
 			name: 'core/rename-pattern',
 			label: __( 'Rename pattern' ),
-			icon: symbol,
+			icon: edit,
 			callback: ( { close } ) => {
 				openModal( PATTERN_MODALS.rename );
 				close();
@@ -416,6 +417,7 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/patterns',
 		hook: usePatternCommands,
+		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {

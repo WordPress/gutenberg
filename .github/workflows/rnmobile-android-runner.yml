@@ -36,6 +36,16 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            - name: Restore tests setup cache
+              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              with:
+                  path: |
+                      ~/.appium
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
+
+            - name: Prepare tests setup
+              run: npm run native test:e2e:setup
+
             - name: Gradle cache
               uses: gradle/gradle-build-action@b5126f31dbc19dd434c3269bf8c28c315e121da2 # v2.8.1
 

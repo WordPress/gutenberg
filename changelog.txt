@@ -1,13 +1,13 @@
 == Changelog ==
 
-= 16.9.0-rc.1 =
+= 16.9.0 =
 
 ## Changelog
 
 ### Features
 
 #### Create Block
-- [Create Block] Introduce the transformer property. ([55423](https://github.com/WordPress/gutenberg/pull/55423))
+- Introduce the transformer property. ([55423](https://github.com/WordPress/gutenberg/pull/55423))
 
 #### Data Views
 - Enable users to sort by `date`. ([55388](https://github.com/WordPress/gutenberg/pull/55388))
@@ -53,7 +53,7 @@
 - Remove 16:10 from 10:16 options from AspectRatioDropdown. ([55053](https://github.com/WordPress/gutenberg/pull/55053))
 
 #### Data Views
-- [Data Views]: Add drop down with action in headers. ([55293](https://github.com/WordPress/gutenberg/pull/55293))
+- Add drop down with action in headers. ([55293](https://github.com/WordPress/gutenberg/pull/55293))
 
 #### Icons
 - Update fullscreen icon. ([55021](https://github.com/WordPress/gutenberg/pull/55021))
@@ -74,7 +74,7 @@
 ### Bug Fixes
 
 #### Block Library
-- Bug: PHP notice when an image with lightbox is deleted. ([55370](https://github.com/WordPress/gutenberg/pull/55370))
+- PHP notice when an image with lightbox is deleted. ([55370](https://github.com/WordPress/gutenberg/pull/55370))
 - Cover Block: Check for previously uploaded media before setting the dimRatio. ([55422](https://github.com/WordPress/gutenberg/pull/55422))
 - Cover: Fix media type check in the onSelectMedia hook. ([55168](https://github.com/WordPress/gutenberg/pull/55168))
 - Fix Block Rename UI perf regression. ([55250](https://github.com/WordPress/gutenberg/pull/55250))
@@ -95,7 +95,6 @@
 - Remove duplicate template areas from the site view sidebar. ([54942](https://github.com/WordPress/gutenberg/pull/54942))
 - Site Editor Styles Screen: Fix dancing styles previews. ([55183](https://github.com/WordPress/gutenberg/pull/55183))
 - Use `accessorFn` instead of `cell` to render `status`. ([55196](https://github.com/WordPress/gutenberg/pull/55196))
-- [Data views]: Make `date` header translatable. ([55445](https://github.com/WordPress/gutenberg/pull/55445))
 
 #### Interactivity API
 - Add `aria-label` attribute to navigation block only when it is open. ([54816](https://github.com/WordPress/gutenberg/pull/54816))
@@ -128,7 +127,8 @@
 #### Data Views
 - Add linked title fallback. ([55248](https://github.com/WordPress/gutenberg/pull/55248))
 - PagePages: Fix unintended object mutation inside component. ([55314](https://github.com/WordPress/gutenberg/pull/55314))
-- [Data views]: Fix pagination. ([55387](https://github.com/WordPress/gutenberg/pull/55387))
+- Fix pagination. ([55387](https://github.com/WordPress/gutenberg/pull/55387))
+- Make `date` header translatable. ([55445](https://github.com/WordPress/gutenberg/pull/55445))
 
 #### Patterns
 - Add category selector to pattern creation modal. ([55024](https://github.com/WordPress/gutenberg/pull/55024))
@@ -141,7 +141,7 @@
 - Only suppress admin notices when JavaScript is enabled. ([55403](https://github.com/WordPress/gutenberg/pull/55403))
 
 #### Data Layer
-- Data: Fix `combineReducers()` types. ([55321](https://github.com/WordPress/gutenberg/pull/55321))
+- Fix `combineReducers()` types. ([55321](https://github.com/WordPress/gutenberg/pull/55321))
 - Get the page count as derived data. ([55316](https://github.com/WordPress/gutenberg/pull/55316))
 
 #### Layout
@@ -169,7 +169,7 @@
 - Paste: Only link selection if URL protocol is http(s). ([53000](https://github.com/WordPress/gutenberg/pull/53000))
 
 #### Patterns
-- Patterns: Remove the version enforcement for npm in `engines` field. ([55245](https://github.com/WordPress/gutenberg/pull/55245))
+- Remove the version enforcement for npm in `engines` field. ([55245](https://github.com/WordPress/gutenberg/pull/55245))
 
 #### Code Quality
 - Fix: Use y-webrtc room name terminology instead of docName. ([55260](https://github.com/WordPress/gutenberg/pull/55260))
@@ -193,7 +193,7 @@
 
 #### Block Editor
 - Rich Text: Cleanup excess `focusin`/`focusout` listeners. ([55382](https://github.com/WordPress/gutenberg/pull/55382))
-- Block Editor: Optimize 'customClassName' controls. ([55345](https://github.com/WordPress/gutenberg/pull/55345))
+- Optimize 'customClassName' controls. ([55345](https://github.com/WordPress/gutenberg/pull/55345))
 - useBlockControlsFill: Avoid unneeded store subscriptions. ([55340](https://github.com/WordPress/gutenberg/pull/55340))
 
 #### Parsing
@@ -207,10 +207,10 @@
 
 #### Data Views
 - Add `status` entity and use it in "admin views" experiment. ([55050](https://github.com/WordPress/gutenberg/pull/55050))
-- DataViews: Add Grid Layout. ([55353](https://github.com/WordPress/gutenberg/pull/55353))
-- DataViews: Add featured image field to the page list. ([55246](https://github.com/WordPress/gutenberg/pull/55246))
-- DataViews: Adds a control to the views actions to switch layouts. ([55311](https://github.com/WordPress/gutenberg/pull/55311))
-- DataViews: Fix the actions menu in the list view. ([55426](https://github.com/WordPress/gutenberg/pull/55426))
+- Add Grid Layout. ([55353](https://github.com/WordPress/gutenberg/pull/55353))
+- Add featured image field to the page list. ([55246](https://github.com/WordPress/gutenberg/pull/55246))
+- Adds a control to the views actions to switch layouts. ([55311](https://github.com/WordPress/gutenberg/pull/55311))
+- Fix the actions menu in the list view. ([55426](https://github.com/WordPress/gutenberg/pull/55426))
 
 #### Block Library
 - Introduce experimental form & inputs blocks to allow building basic forms. ([44214](https://github.com/WordPress/gutenberg/pull/44214))
@@ -247,19 +247,19 @@
 - Update LinkControl documentation with advice to memoize value prop. ([54659](https://github.com/WordPress/gutenberg/pull/54659))
 - Update nested-blocks-inner-blocks.md for WP 6.4 release. ([55375](https://github.com/WordPress/gutenberg/pull/55375))
 - docs/get-started-with-wp-env: Diagram and links added. ([55381](https://github.com/WordPress/gutenberg/pull/55381))
-- docs: Update broken anchor link. ([55233](https://github.com/WordPress/gutenberg/pull/55233))
+- Update broken anchor link. ([55233](https://github.com/WordPress/gutenberg/pull/55233))
 
 
 ### Code Quality
 
 #### Data Views
-- DataViews: Allow actions to be provided declaratively as a prop. ([55192](https://github.com/WordPress/gutenberg/pull/55192))
-- DataViews: In list view, automatically insert header menu separators. ([55412](https://github.com/WordPress/gutenberg/pull/55412))
-- DataViews: Update the data views component to pass an view object. ([55154](https://github.com/WordPress/gutenberg/pull/55154))
-- DataViews: Update the view actions menu to be independent from current view APIs. ([55294](https://github.com/WordPress/gutenberg/pull/55294))
-- [Data views]: Normalize `render` fields function. ([55411](https://github.com/WordPress/gutenberg/pull/55411))
-- [Data views]: Rename accessorFn to getValue. ([55434](https://github.com/WordPress/gutenberg/pull/55434))
-- [DataViews]: Update the view configuration to include fields visibility. ([55247](https://github.com/WordPress/gutenberg/pull/55247))
+- Allow actions to be provided declaratively as a prop. ([55192](https://github.com/WordPress/gutenberg/pull/55192))
+- In list view, automatically insert header menu separators. ([55412](https://github.com/WordPress/gutenberg/pull/55412))
+- Update the data views component to pass an view object. ([55154](https://github.com/WordPress/gutenberg/pull/55154))
+- Update the view actions menu to be independent from current view APIs. ([55294](https://github.com/WordPress/gutenberg/pull/55294))
+- Normalize `render` fields function. ([55411](https://github.com/WordPress/gutenberg/pull/55411))
+- Rename accessorFn to getValue. ([55434](https://github.com/WordPress/gutenberg/pull/55434))
+- Update the view configuration to include fields visibility. ([55247](https://github.com/WordPress/gutenberg/pull/55247))
 
 #### Block Library
 - Query block: Remove unnecessary class. ([55438](https://github.com/WordPress/gutenberg/pull/55438))
