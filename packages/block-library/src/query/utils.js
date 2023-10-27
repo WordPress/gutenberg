@@ -363,9 +363,7 @@ export const useUnsupportedBlockList = ( clientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					return (
 						! blockName.startsWith( 'core/' ) ||
-						blockName === 'core/post-content' ||
-						blockName === 'core/template-part' ||
-						blockName === 'core/block'
+						blockName === 'core/post-content'
 					);
 				}
 			);
