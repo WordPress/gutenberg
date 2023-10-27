@@ -12,10 +12,10 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useUnsupportedBlockList } from '../utils';
+import { useContainsThirdPartyBlocks } from '../utils';
 
 const disableEnhancedPaginationDescription = __(
-	'You have added unsupported blocks. For the enhanced pagination to work, remove them, then re-enable "Enhanced pagination" in the Query Block settings.'
+	'Plugin blocks are not supported yet. For the enhanced pagination to work, remove the plugin block, then re-enable "Enhanced pagination" in the Query Block settings.'
 );
 
 const modalDescriptionId =
@@ -28,11 +28,11 @@ export default function EnhancedPaginationModal( {
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
 
-	const unsupported = useUnsupportedBlockList( clientId );
+	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
 
 	useEffect( () => {
-		setOpen( !! unsupported.length && enhancedPagination );
-	}, [ unsupported.length, enhancedPagination, setOpen ] );
+		setOpen( containsThirdPartyBlocks && enhancedPagination );
+	}, [ containsThirdPartyBlocks, enhancedPagination, setOpen ] );
 
 	return (
 		isOpen && (
