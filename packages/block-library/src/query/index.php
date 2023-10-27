@@ -92,7 +92,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 	}
 
 	$block_core_query_level -= 1;
-	if ( 0 === $block_core_query_level ) {
+	if ( 0 === $block_core_query_level && $block_core_query_has_plugin_blocks ) {
 		$block_core_query_has_plugin_blocks = false;
 	}
 
@@ -139,9 +139,11 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 	global $block_core_query_level, $block_core_query_has_plugin_blocks;
 
 	$block_name = $parsed_block['blockName'];
+
 	if ( 'core/query' === $block_name ) {
 		$block_core_query_level += 1;
 	} elseif (
+		0 < $block_core_query_level &&
 		! $block_core_query_has_plugin_blocks &&
 		isset( $block_name ) &&
 		'core/' !== substr( $block_name, 0, 5 )
