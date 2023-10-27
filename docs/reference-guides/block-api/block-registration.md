@@ -197,7 +197,7 @@ example: {
 },
 ```
 
-If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
+If `example` is not defined, the preview will not be shown. So even if no attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
 It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
 
