@@ -12,7 +12,6 @@ const { isAndroid } = require( './__device-tests__/helpers/utils' );
 import { getAndroidEmulatorID } from './__device-tests__/helpers/get-android-emulator-id';
 
 jest.setTimeout( 1000000 ); // In milliseconds.
-jest.retryTimes( 3 );
 
 let iOSScreenRecordingProcess;
 let androidScreenRecordingProcess;
