@@ -17,7 +17,9 @@
  * @return string Returns the modified output of the query block.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	if ( $attributes['enhancedPagination'] ) {
+	global $block_core_query_level, $block_core_query_has_plugin_blocks;
+
+	if ( $attributes['enhancedPagination'] && !  $block_core_query_has_plugin_blocks ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
@@ -89,6 +91,11 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
+	$block_core_query_level -= 1;
+	if ( 0 === $block_core_query_level ) {
+		$block_core_query_has_plugin_blocks = false;
+	}
+
 	return $content;
 }
 
@@ -123,3 +130,25 @@ function register_block_core_query() {
 	);
 }
 add_action( 'init', 'register_block_core_query' );
+
+
+$block_core_query_level             = 0;
+$block_core_query_has_plugin_blocks = false;
+
+function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $parent_block) {
+	global $block_core_query_level, $block_core_query_has_plugin_blocks;
+
+	$block_name = $parsed_block['blockName'];
+	if ( 'core/query' === $block_name ) {
+		$block_core_query_level += 1;
+	} elseif (
+		! $block_core_query_has_plugin_blocks &&
+		isset( $block_name ) &&
+		'core/' !== substr( $block_name, 0, 5 )
+	) {
+		$block_core_query_has_plugin_blocks = true;
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'block_core_query_check_plugin_blocks', 10, 3 );
