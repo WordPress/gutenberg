@@ -10,12 +10,12 @@ const ios = ( { iPadDevice = false } ) => ( {
 		args: [ 'uitesting' ],
 	},
 	autoLaunch: false,
+	usePrebuiltWDA: true,
 } );
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios( { iPadDevice } ),
 	platformVersion: '16.2',
-	usePrebuiltWDA: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
@@ -23,8 +23,8 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 	platformVersion: '16.4',
 	newCommandTimeout: 240,
 	simulatorStartupTimeout: 240,
-	isHeadless: true,
 	commandTimeouts: 240,
+	reduceMotion: true,
 } );
 
 exports.android = {
