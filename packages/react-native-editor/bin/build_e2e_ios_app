@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-DEFAULT_DESTINATION='platform=iOS Simulator,name=iPhone 14'
+DEFAULT_DESTINATION='platform=iOS Simulator,name=iPhone 14,OS=16.2'
 if [[ -z "${RN_EDITOR_E2E_IOS_DESTINATION-}" ]]; then
 	DESTINATION="$DEFAULT_DESTINATION"
 else
