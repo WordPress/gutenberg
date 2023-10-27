@@ -152,8 +152,8 @@ const setupDriver = async () => {
 			}
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
-			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
+		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
 	const workerID = IS_PARALLEL_TESTING
