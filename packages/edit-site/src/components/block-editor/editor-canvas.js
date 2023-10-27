@@ -22,6 +22,7 @@ import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
+import useIsNavigationOverlay from './use-is-navigation-overlay';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
@@ -45,6 +46,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const isNavigationOverlayTemplate = useIsNavigationOverlay();
 
 	useEffect( () => {
 		if ( canvasMode === 'edit' ) {
@@ -72,9 +74,12 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	// Hide the appender when:
 	// - In navigation focus mode (should only allow the root Nav block).
+	// - editing the navigation overlay template.
 	// - In view mode (i.e. not editing).
 	const showBlockAppender =
-		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
+		( isNavigationFocusMode && hasBlocks ) ||
+		isNavigationOverlayTemplate ||
+		canvasMode === 'view'
 			? false
 			: undefined;
 

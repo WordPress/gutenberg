@@ -193,6 +193,15 @@ $color-control-label-height: 20px;
 	}
 }
 
+// Overlay UI controls
+.wp-block-navigation__edit-overlay-button {
+	text-transform: uppercase;
+	font-size: 11px;
+	&.is-link {
+		text-decoration: none;
+	}
+}
+
 // Override inner padding on default appender.
 // This should be a temporary fix, to be replaced by improvements to
 // the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
@@ -644,4 +653,12 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 .wp-block-navigation__menu-inspector-controls__empty-message {
 	margin-left: 24px;
+}
+
+.wp-block-navigation__menu-inspector-controls__overlay-menu {
+	margin-bottom: $grid-unit-20;
+
+	.wp-block-navigation__menu-inspector-controls__overlay-menu-heading {
+		margin-bottom: 0;
+	}
 }

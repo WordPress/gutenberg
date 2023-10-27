@@ -11,6 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	Spinner,
+	Notice,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -138,6 +139,7 @@ const MenuInspectorControls = ( props ) => {
 		onSelectNavigationMenu,
 		isManageMenusButtonDisabled,
 		blockEditingMode,
+		isInheritRefMode,
 	} = props;
 
 	return (
@@ -148,7 +150,9 @@ const MenuInspectorControls = ( props ) => {
 						className="wp-block-navigation-off-canvas-editor__title"
 						level={ 2 }
 					>
-						{ __( 'Menu' ) }
+						{ isInheritRefMode
+							? __( 'Menu (Synced)' )
+							: __( 'Menu' ) }
 					</Heading>
 					{ blockEditingMode === 'default' && (
 						<NavigationMenuSelector
@@ -169,6 +173,13 @@ const MenuInspectorControls = ( props ) => {
 						/>
 					) }
 				</HStack>
+				{ isInheritRefMode && (
+					<Notice isDismissible={ false }>
+						{ __(
+							'Edits to this Navigation Menu will apply across your website.'
+						) }
+					</Notice>
+				) }
 				<MainContent { ...props } />
 			</PanelBody>
 		</InspectorControls>

@@ -1,0 +1,34 @@
+
+// Size of burger and close icons.
+$navigation-icon-size: 24px;
+
+// Menu and close buttons.
+.wp-block-navigation-overlay-close {
+	height: auto; // remove default height applied to button component
+	vertical-align: middle;
+	cursor: pointer;
+	border: none;
+	margin: 0;
+	padding: 0;
+	text-transform: inherit;
+	z-index: 2; // Needs to be above the modal z index itself.
+	background-color: inherit; // remove user agent stylesheet default.
+	color: inherit; // remove user agent stylesheet default.
+
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation-overlay-close {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+
+	svg {
+		fill: currentColor;
+		pointer-events: none;
+		display: block;
+		width: $navigation-icon-size;
+		height: $navigation-icon-size;
+	}
+}
+
