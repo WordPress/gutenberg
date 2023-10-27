@@ -1,4 +1,5 @@
 # React Native Editor
+Oh no, some bug!!!
 
 This package provides a demo application to simplify the environment setup required for the development of Gutenberg for native Android and iOS. The demo application allows running the mobile versions of Gutenberg blocks while avoiding the additional setup steps required by the [WordPress Android](https://github.com/wordpress-mobile/WordPress-Android) and [Wordpress iOS](https://github.com/wordpress-mobile/WordPress-iOS) apps.
 
