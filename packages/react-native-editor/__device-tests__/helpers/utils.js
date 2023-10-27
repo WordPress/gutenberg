@@ -15,6 +15,7 @@ const {
 	iosLocal,
 	android,
 	prefixKeysWithAppium,
+	iOSParallelDevices,
 } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
 import { getAndroidEmulatorID } from './get-android-emulator-id';
@@ -27,6 +28,7 @@ const iPadDevice = process.env.IPAD;
 // Environment setup, local environment or server.
 const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
+const IS_PARALLEL_TESTING = !! process.env.JEST_WORKER_ID;
 
 // Local App Paths.
 const defaultAndroidAppPath =
@@ -83,9 +85,14 @@ const setupDriver = async () => {
 			port: localAppiumPort,
 		} );
 	} catch ( err ) {
-		// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
-		// eslint-disable-next-line no-console
-		await console.log( 'Could not start Appium server', err.toString() );
+		if ( ! IS_PARALLEL_TESTING ) {
+			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
+			// eslint-disable-next-line no-console
+			await console.log(
+				'Could not start Appium server',
+				err.toString()
+			);
+		}
 	}
 
 	let desiredCaps;
@@ -149,12 +156,26 @@ const setupDriver = async () => {
 		}
 	}
 
+	const workerID = IS_PARALLEL_TESTING
+		? parseInt( process.env.JEST_WORKER_ID, 10 ) - 1
+		: undefined;
+	const serverConfig =
+		IS_PARALLEL_TESTING && ! iPadDevice
+			? {
+					'appium:deviceName':
+						iOSParallelDevices[ workerID ].deviceName,
+					'appium:wdaLocalPort':
+						iOSParallelDevices[ workerID ].wdaLocalPort,
+			  }
+			: {};
+
 	const driver = await remote( {
 		...serverConfigs.local,
 		logLevel: 'error',
 		capabilities: {
 			platformName: PLATFORM_NAME,
 			...prefixKeysWithAppium( desiredCaps ),
+			...serverConfig,
 		},
 	} );
 
@@ -162,19 +183,15 @@ const setupDriver = async () => {
 	return driver;
 };
 
-const stopDriver = async ( driver ) => {
+const stopDriver = async () => {
 	if ( ! isLocalEnvironment() ) {
 		// eslint-disable-next-line no-console
 		console.log(
 			'You can view the video of this test run in the artifacts tab'
 		);
 	}
-	if ( driver === undefined ) {
-		return;
-	}
-	await driver.deleteSession();
 
-	if ( appiumProcess !== undefined ) {
+	if ( appiumProcess !== undefined && ! IS_PARALLEL_TESTING ) {
 		await AppiumLocal.stop( appiumProcess );
 	}
 };
