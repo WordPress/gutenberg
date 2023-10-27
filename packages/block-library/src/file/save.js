@@ -10,6 +10,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	getTypographyClassesAndStyles as getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -26,8 +27,8 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
-
 	const hasFilename = ! RichText.isEmpty( fileName );
+	const typographyProps = getTypographyClassesAndStyles( attributes );
 
 	// Only output an `aria-describedby` when the element it's referring to is
 	// actually rendered.
@@ -64,10 +65,12 @@ export default function save( { attributes } ) {
 				) }
 				{ showDownloadButton && (
 					<a
+						{ ...useBlockProps.save() }
 						href={ href }
 						className={ classnames(
 							'wp-block-file__button',
-							__experimentalGetElementClassName( 'button' )
+							__experimentalGetElementClassName( 'button' ),
+							typographyProps.className
 						) }
 						download={ true }
 						aria-describedby={ describedById }

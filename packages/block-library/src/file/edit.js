@@ -22,6 +22,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	getTypographyClassesAndStyles as useTypographyProps,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -82,7 +83,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		} ),
 		[ id ]
 	);
-
+	const typgraphyProps = useTypographyProps( attributes );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -289,13 +290,15 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						>
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
+								{ ...blockProps }
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
 								className={ classnames(
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'
-									)
+									),
+									typgraphyProps.className
 								) }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
