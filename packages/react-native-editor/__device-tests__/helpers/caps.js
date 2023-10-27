@@ -23,7 +23,7 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 	platformVersion: '16.4',
 	newCommandTimeout: 240,
 	simulatorStartupTimeout: 240,
-	isHeadles: true,
+	isHeadless: true,
 	commandTimeouts: 240,
 } );
 
