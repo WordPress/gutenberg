@@ -38,6 +38,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalVStack as VStack,
 	ToggleControl,
+	__experimentalHStack as HStack,
 	Button,
 	Spinner,
 	Notice,
@@ -49,6 +50,7 @@ import { speak } from '@wordpress/a11y';
 import { close, Icon, page } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -80,6 +82,12 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_BLOCK } from '../constants';
+import EditOverlayButton from './edit-overlay-button';
+import useIsWithinOverlay from './use-is-within-overlay';
+import useGoToOverlayEditor from './use-go-to-overlay-editor';
+import useOverlay from './use-overlay';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -239,6 +247,14 @@ function ColorTools( {
 	);
 }
 
+function useInheritedRef() {
+	const {
+		params: { myNavRef },
+	} = useLocation();
+
+	return myNavRef;
+}
+
 function Navigation( {
 	attributes,
 	setAttributes,
@@ -274,7 +290,13 @@ function Navigation( {
 		icon = 'handle',
 	} = attributes;
 
-	const ref = attributes.ref;
+	const [ tempRef, setTempRef ] = useState( null );
+
+	const ref = attributes.ref || tempRef;
+
+	const inheritedRef = useInheritedRef();
+
+	const isInheritRefMode = !! inheritedRef;
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -287,6 +309,15 @@ function Navigation( {
 	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	const blockEditingMode = useBlockEditingMode();
+
+	const isInsideOverlay = useIsWithinOverlay();
+
+	const showOverlayControls = ! isInsideOverlay;
+
+	const customOverlay = useOverlay( attributes?.overlayId );
+	const goToOverlayEditor = useGoToOverlayEditor();
+
+	const hasCustomOverlay = !! customOverlay;
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -399,11 +430,21 @@ function Navigation( {
 		: null;
 
 	useEffect( () => {
+		// Todo: set the ref based on context.
+		if ( isInheritRefMode ) {
+			setTempRef( inheritedRef );
+			return;
+		}
+
 		// If:
 		// - there is an existing menu, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
+		if (
+			( ref && ! isInheritRefMode ) ||
+			hasUnsavedBlocks ||
+			! navigationFallbackId
+		) {
 			return;
 		}
 
@@ -421,6 +462,8 @@ function Navigation( {
 		hasUnsavedBlocks,
 		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
+		isInheritRefMode,
+		inheritedRef,
 	] );
 
 	const navRef = useRef();
@@ -502,6 +545,17 @@ function Navigation( {
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
+	};
+
+	const onToggleOverlayMenu = ( _toggleVal ) => {
+		if ( hasCustomOverlay && _toggleVal ) {
+			// If there is a Custom Overlay and the user is trying to open the menu
+			// then edit the overlay template part.
+			goToOverlayEditor( customOverlay?.id, ref );
+		} else {
+			// Otherwise just toggle the default overlay witin the editor.
+			setResponsiveMenuVisibility( _toggleVal );
+		}
 	};
 
 	useEffect( () => {
@@ -658,7 +712,7 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isResponsive && (
+						{ isResponsive && showOverlayControls && (
 							<>
 								<Button
 									__next40pxDefaultSize
@@ -702,6 +756,21 @@ function Navigation( {
 									</VStack>
 								) }
 							</>
+						) }
+
+						{ showOverlayControls && (
+							<HStack className="wp-block-navigation__menu-inspector-controls__overlay-menu">
+								<h3 className="wp-block-navigation__menu-inspector-controls__overlay-menu-heading">
+									{ __( 'Overlay Menu' ) }
+								</h3>
+								{ isResponsive && (
+									<EditOverlayButton
+										attributes={ attributes }
+										setAttributes={ setAttributes }
+										navRef={ ref }
+									/>
+								) }
+							</HStack>
 						) }
 
 						<ToolsPanelItem
@@ -868,11 +937,12 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
+					isInheritRefMode={ isInheritRefMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
-					onToggle={ setResponsiveMenuVisibility }
+					onToggle={ onToggleOverlayMenu }
 					isOpen={ isResponsiveMenuOpen }
 					hasIcon={ hasIcon }
 					icon={ icon }
@@ -910,6 +980,7 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
+					isInheritRefMode={ isInheritRefMode }
 				/>
 				<DeletedNavigationWarning
 					onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -980,6 +1051,7 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
+					isInheritRefMode={ isInheritRefMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
 				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
@@ -1032,7 +1104,7 @@ function Navigation( {
 							/>
 							<ResponsiveWrapper
 								id={ clientId }
-								onToggle={ setResponsiveMenuVisibility }
+								onToggle={ onToggleOverlayMenu }
 								hasIcon={ hasIcon }
 								icon={ icon }
 								isOpen={ isResponsiveMenuOpen }

@@ -1,0 +1,49 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/navigation-overlay-close",
+	"title": "Navigation Overlay Close",
+	"category": "design",
+	"description": "Add a Close button to your Navigation Overlay.",
+	"textdomain": "default",
+	"icon": "dismiss",
+	"attributes": {
+		"hasIcon": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"usesContext": [
+		"textColor",
+		"customTextColor",
+		"backgroundColor",
+		"customBackgroundColor"
+	],
+	"supports": {
+		"multiple": false,
+		"reusable": false,
+		"html": false,
+		"dimensions": {
+			"width": true,
+			"height": true
+		},
+		"color": {
+			"link": false,
+			"text": true,
+			"background": true
+		},
+		"interactivity": true,
+		"anchor": true,
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"units": [ "px", "em", "rem", "vh", "vw" ],
+			"__experimentalDefaultControls": {
+				"margin": true,
+				"padding": true
+			}
+		}
+	},
+	"editorStyle": "wp-block-navigation-overlay-close-editor",
+	"style": "wp-block-navigation-overlay-close"
+}

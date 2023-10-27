@@ -78,44 +78,17 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	}
 }
 
-/**
- * Registers a new block style for one or more block types.
- *
- * WP_Block_Styles_Registry was marked as `final` in core so it cannot be
- * updated via Gutenberg to allow registration of a style across multiple
- * block types as well as with an optional style object. This function will
- * support the desired functionality until the styles registry can be updated
- * in core.
- *
- * @param string|array $block_name       Block type name including namespace or array of namespaced block type names.
- * @param array        $style_properties Array containing the properties of the style name, label,
- *                                       style_handle (name of the stylesheet to be enqueued),
- *                                       inline_style (string containing the CSS to be added),
- *                                       style_data (theme.json-like object to generate CSS from).
- *
- * @return bool True if all block styles were registered with success and false otherwise.
- */
-function gutenberg_register_block_style( $block_name, $style_properties ) {
-	if ( ! is_string( $block_name ) && ! is_array( $block_name ) ) {
-		_doing_it_wrong(
-			__METHOD__,
-			__( 'Block name must be a string or array.', 'gutenberg' ),
-			'6.6.0'
-		);
-
-		return false;
-	}
-
-	$block_names = is_string( $block_name ) ? array( $block_name ) : $block_name;
-	$result      = true;
-
-	foreach ( $block_names as $name ) {
-		if ( ! WP_Block_Styles_Registry::get_instance()->register( $name, $style_properties ) ) {
-			$result = false;
-		}
-	}
-
-	return $result;
+function gutenberg_add_navigation_overlay_area( $areas ) {
+	$areas[] = array(
+		'area'        => 'navigation-overlay',
+		'label'       => _x( 'Navigation Overlay', 'template part area' ),
+		'description' => __(
+			'An area for navigation overlay content.'
+		),
+		'area_tag'    => 'section',
+		'icon'        => 'handle',
+	);
+	return $areas;
 }
 
 /**
@@ -136,3 +109,55 @@ add_filter(
 	'script_module_data_@wordpress/block-library/form/view',
 	'gutenberg_block_core_form_view_script_module'
 );
+add_filter( 'default_wp_template_part_areas', 'gutenberg_add_navigation_overlay_area', 10, 1 );
+
+function gutenberg_add_default_navigation_overlay_template_part( $block_template, $id, $template_type ) {
+
+	// if the template type is not template part, return the block template
+	if ( 'wp_template_part' !== $template_type ) {
+		return $block_template;
+	}
+
+	// If its not the "Core" Navigation Overlay, return the block template.
+	if ( $id !== 'core//navigation-overlay' ) {
+		return $block_template;
+	}
+
+	// If the block template is not empty, return the "found" block template.
+	// Failure to do this will override any "found" overlay template part from the Theme.
+	if ( ! empty( $block_template ) ) {
+		return $block_template;
+	}
+
+	// Return a default template part for the Navigation Overlay.
+	// This is essentially a "Core" fallback in case the Theme does not provide one.
+	$template = new WP_Block_Template();
+
+	// TODO: should we provide "$theme" here at all as this is a "Core" template.
+	$template->id             = 'core' . '//' . 'navigation-overlay';
+	$template->theme          = 'core';
+	$template->slug           = 'navigation-overlay';
+	$template->source         = 'custom';
+	$template->type           = 'wp_template_part';
+	$template->title          = 'Navigation Overlay';
+	$template->status         = 'publish';
+	$template->has_theme_file = null;
+	$template->is_custom      = false;
+	$template->modified       = null;
+	$template->origin         = null;
+	$template->author         = null;
+
+	// Set the area to match the Navigation Overlay area.
+	$template->area = 'navigation-overlay';
+
+	// The content is the default Navigation Overlay template part. This will only be used
+	// if the Theme does not provide a template part for the Navigation Overlay.
+	// PHP is used here to allow for translation of the default template part.
+	ob_start();
+	include __DIR__ . '/navigation-overlay.php';
+	$template->content = ob_get_clean();
+
+	return $template;
+}
+
+add_filter( 'get_block_file_template', 'gutenberg_add_default_navigation_overlay_template_part', 10, 3 );
