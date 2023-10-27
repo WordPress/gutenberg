@@ -248,7 +248,7 @@ Supports contains a set of options to control features used in the editor. See [
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/reference-guides/block-api/block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file, or a raw DOM node. Take a look at the [Block Transforms API](/docs/reference-guides/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 
