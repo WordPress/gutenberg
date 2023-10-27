@@ -197,7 +197,7 @@ example: {
 },
 ```
 
-If `example` is not defined, the preview will not be shown. So even if no attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
+If `example` is not defined, the preview will not be shown. So even if no attributes are defined, setting an empty example object `example: {}` will trigger the preview to show.
 
 It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
 
@@ -242,7 +242,7 @@ Similarly to how the block's styles can be declared, a block type can define blo
 
 -   **_Type:_** `Object`
 
-Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
+Supports contains a set of options to control features used in the editor. See [the `supports` documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 #### transforms (optional)
 
