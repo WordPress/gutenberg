@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "11.13.9",
+	"version": "11.13.10",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/shortcode",
-	"version": "3.42.9",
+	"version": "3.42.10",
 	"description": "Shortcode module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
