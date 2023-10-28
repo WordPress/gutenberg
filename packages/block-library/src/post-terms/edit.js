@@ -15,7 +15,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Spinner, TextControl } from '@wordpress/components';
+import { Spinner, TextControl, ToggleControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -44,7 +44,7 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, textAlign, separator, prefix, suffix, showTermNoResults } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
@@ -89,6 +89,14 @@ export default function PostTermsEdit( {
 						setAttributes( { separator: nextValue } );
 					} }
 					help={ __( 'Enter character(s) used to separate terms.' ) }
+				/>
+				<ToggleControl
+					label={ __( 'Show "No tags"' ) }
+					help={ __( 'Show/Hide "No tags" message. Note: We show always a message in the editor for easier block access' ) }
+					checked={ showTermNoResults }
+					onChange={() => 
+						setAttributes( { showTermNoResults: !!! showTermNoResults } )
+					}
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -135,8 +143,13 @@ export default function PostTermsEdit( {
 				{ hasPost &&
 					! isLoading &&
 					! hasPostTerms &&
-					( selectedTerm?.labels?.no_terms ||
-						__( 'Term items not found.' ) ) }
+					(
+						showTermNoResults 
+							? selectedTerm?.labels?.no_terms || __( 'Term items not found.' )
+							: __( 'Term items not found.' )
+
+					)
+				}
 				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
