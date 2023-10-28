@@ -45,3 +45,19 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	);
 	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];
 }
+
+/**
+ * Checks if WP generated the specified image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} size
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+export function getMediaSlug( image, size ) {
+	const hasSize =
+		'url' in ( image?.sizes?.[ size ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ size ] ?? {} );
+	return hasSize ? size : 'full';
+}

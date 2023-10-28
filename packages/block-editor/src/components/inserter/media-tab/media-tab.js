@@ -16,6 +16,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
@@ -25,8 +26,9 @@ import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
-import { getBlockAndPreviewFromMedia } from './utils';
+import { getBlockAndPreviewFromMedia, getMediaSlug } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
+import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -38,6 +40,11 @@ function MediaTab( {
 } ) {
 	const mediaCategories = useMediaCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const imageDefaultSize = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return settings.imageDefaultSize;
+	}, [] );
 	const baseCssClass = 'block-editor-inserter__media-tabs';
 	const onSelectMedia = useCallback(
 		( media ) => {
@@ -45,9 +52,16 @@ function MediaTab( {
 				return;
 			}
 			const [ block ] = getBlockAndPreviewFromMedia( media, media.type );
-			onInsert( block );
+
+			onInsert( {
+				...block,
+				attributes: {
+					...block.attributes,
+					sizeSlug: getMediaSlug( media, imageDefaultSize ),
+				},
+			} );
 		},
-		[ onInsert ]
+		[ onInsert, imageDefaultSize ]
 	);
 	const mobileMediaCategories = useMemo(
 		() =>

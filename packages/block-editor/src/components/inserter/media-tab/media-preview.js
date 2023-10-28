@@ -31,7 +31,7 @@ import { isBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
-import { getBlockAndPreviewFromMedia } from './utils';
+import { getBlockAndPreviewFromMedia, getMediaSlug } from './utils';
 import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -124,10 +124,14 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			imageDefaultSize: settings.imageDefaultSize,
+			mediaUpload: settings.mediaUpload,
+		};
+	}, [] );
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
@@ -138,7 +142,13 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 			const { id, url, caption } = clonedBlock.attributes;
 			// Media item already exists in library, so just insert it.
 			if ( !! id ) {
-				onClick( clonedBlock );
+				onClick( {
+					...clonedBlock,
+					attributes: {
+						...clonedBlock.attributes,
+						sizeSlug: getMediaSlug( media, imageDefaultSize ),
+					},
+				} );
 				return;
 			}
 			setIsInserting( true );
@@ -164,6 +174,10 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 									...clonedBlock.attributes,
 									id: img.id,
 									url: img.url,
+									sizeSlug: getMediaSlug(
+										media,
+										imageDefaultSize
+									),
 								},
 							} );
 							createSuccessNotice(
@@ -187,7 +201,9 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 		[
 			isInserting,
 			onClick,
+			media,
 			mediaUpload,
+			imageDefaultSize,
 			createErrorNotice,
 			createSuccessNotice,
 		]
