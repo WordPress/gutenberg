@@ -191,7 +191,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<NavigableToolbar
-					as={ motion.div }
+					render={ <motion.div /> }
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
 					shouldUseKeyboardFocusShortcut={
