@@ -19,6 +19,9 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
+// Supports information is also available in the "edit" context of `/types`.
+const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
+
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
@@ -215,6 +218,7 @@ export const rootEntitiesConfig = [
 		supports: {
 			revisions: true,
 		},
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -304,8 +308,9 @@ async function loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			supports: {
-				// Supports information is also available in the "edit" context.
-				revisions: [ 'post', 'page' ].includes( postType?.slug ),
+				revisions: POST_TYPES_WITH_REVISIONS_SUPPORT.includes(
+					postType?.slug
+				),
 			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>

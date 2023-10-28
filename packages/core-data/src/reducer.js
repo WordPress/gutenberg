@@ -13,11 +13,8 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction, parseEntityName } from './utils';
-import {
-	reducer as queriedDataReducer,
-	revisionsQueriedDataReducer,
-} from './queried-data';
+import { ifMatchingAction, replaceAction } from './utils';
+import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
@@ -230,14 +227,13 @@ function entity( entityConfig ) {
 
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
-		ifMatchingAction( ( action ) => {
-			return (
+		ifMatchingAction(
+			( action ) =>
 				action.name &&
 				action.kind &&
-				parseEntityName( action.name )?.name === entityConfig.name &&
+				action.name === entityConfig.name &&
 				action.kind === entityConfig.kind
-			);
-		} ),
+		),
 
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
@@ -361,7 +357,24 @@ function entity( entityConfig ) {
 
 			// Add revisions to the state tree if the post type supports it.
 			...( entityConfig?.supports?.revisions
-				? { revisions: revisionsQueriedDataReducer }
+				? {
+						revisions: ( state, action ) => {
+							// Use the same queriedDataReducer shape for revisions.
+							if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+								return {
+									...state,
+									[ action.parentId ]: queriedDataReducer(
+										state,
+										{
+											...action,
+											type: 'RECEIVE_ITEMS',
+										}
+									),
+								};
+							}
+							return state;
+						},
+				  }
 				: {} ),
 		} )
 	);

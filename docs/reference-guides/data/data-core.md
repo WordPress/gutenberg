@@ -342,39 +342,6 @@ _Returns_
 
 -   `number | null`: number | null.
 
-### getEntityRevision
-
-Returns a specific Entity revision.
-
-_Parameters_
-
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
--   _key_ `EntityRecordKey`: The Revision's key.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
-
-_Returns_
-
--   Record.
-
-### getEntityRevisions
-
-Returns an Entity's revisions.
-
-_Parameters_
-
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
-
-_Returns_
-
--   Record.
-
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
@@ -452,6 +419,39 @@ _Parameters_
 _Returns_
 
 -   A value whose reference will change only when an edit occurs.
+
+### getRevision
+
+Returns a single, specific revision of a parent Entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _key_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   Record.
+
+### getRevisions
+
+Returns an Entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   Record.
 
 ### getThemeSupports
 
@@ -559,6 +559,22 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a next edit or not.
+
+### hasRevisions
+
+Returns true if revisions have been received for the given set of parameters, or false otherwise.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `boolean`: Whether entity records have been received.
 
 ### hasUndo
 
@@ -732,6 +748,24 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 _Parameters_
 
 -   _fallbackId_ `integer`: the id of the fallback Navigation Menu
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveRevisions
+
+Returns an action object used in signalling that revisions have been received.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _parentId_ `number|string`: Record's key whose revisions you wish to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 

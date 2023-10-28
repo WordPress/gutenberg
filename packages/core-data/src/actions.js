@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { getNestedValue, setNestedValue, parseEntityName } from './utils';
+import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -92,11 +92,9 @@ export function receiveEntityRecords(
 	edits,
 	meta
 ) {
-	const { isRevision } = parseEntityName( name );
-
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
-	if ( ! isRevision && kind === 'postType' ) {
+	if ( kind === 'postType' ) {
 		records = ( Array.isArray( records ) ? records : [ records ] ).map(
 			( record ) =>
 				record.status === 'auto-draft'
@@ -109,10 +107,6 @@ export function receiveEntityRecords(
 		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
 		action = receiveItems( records, edits, meta );
-	}
-
-	if ( isRevision ) {
-		action.type = 'RECEIVE_ITEM_REVISIONS';
 	}
 
 	return {
@@ -928,5 +922,38 @@ export function receiveDefaultTemplateId( query, templateId ) {
 		type: 'RECEIVE_DEFAULT_TEMPLATE',
 		query,
 		templateId,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that revisions have been received.
+ *
+ * @param {string}        kind            Kind of the received entity record revisions.
+ * @param {string}        name            Name of the received entity record revisions.
+ * @param {number|string} parentId        Record's key whose revisions you wish to fetch.
+ * @param {Array|Object}  records         Revisions received.
+ * @param {?Object}       query           Query Object.
+ * @param {?boolean}      invalidateCache Should invalidate query caches.
+ * @param {?Object}       meta            Meta information about pagination.
+ * @return {Object} Action object.
+ */
+export function receiveRevisions(
+	kind,
+	name,
+	parentId,
+	records,
+	query,
+	invalidateCache = false,
+	meta
+) {
+	return {
+		type: 'RECEIVE_ITEM_REVISIONS',
+		items: Array.isArray( records ) ? records : [ records ],
+		parentId,
+		meta,
+		query,
+		kind,
+		name,
+		invalidateCache,
 	};
 }

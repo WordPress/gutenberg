@@ -22,8 +22,8 @@ import {
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
-	getEntityRevisions,
-	getEntityRevision,
+	getRevisions,
+	getRevision,
 } from '../selectors';
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
@@ -899,7 +899,7 @@ describe( 'getCurrentUser', () => {
 	} );
 } );
 
-describe( 'getEntityRevisions', () => {
+describe( 'getRevisions', () => {
 	it( 'should return revisions', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -936,7 +936,7 @@ describe( 'getEntityRevisions', () => {
 			},
 		} );
 
-		expect( getEntityRevisions( state, 'postType', 'post', 1 ) ).toEqual( [
+		expect( getRevisions( state, 'postType', 'post', 1 ) ).toEqual( [
 			{
 				id: 10,
 				content: 'chicken',
@@ -947,7 +947,7 @@ describe( 'getEntityRevisions', () => {
 	} );
 } );
 
-describe( 'getEntityRevision', () => {
+describe( 'getRevision', () => {
 	it( 'should return a specific revision', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -984,13 +984,11 @@ describe( 'getEntityRevision', () => {
 			},
 		} );
 
-		expect( getEntityRevision( state, 'postType', 'post', 1, 10 ) ).toEqual(
-			{
-				id: 10,
-				content: 'chicken',
-				author: 'bob',
-				parent: 1,
-			}
-		);
+		expect( getRevision( state, 'postType', 'post', 1, 10 ) ).toEqual( {
+			id: 10,
+			content: 'chicken',
+			author: 'bob',
+			parent: 1,
+		} );
 	} );
 } );

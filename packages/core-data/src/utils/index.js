@@ -9,4 +9,3 @@ export { default as isRawAttribute } from './is-raw-attribute';
 export { default as setNestedValue } from './set-nested-value';
 export { default as getNestedValue } from './get-nested-value';
 export { default as isNumericID } from './is-numeric-id';
-export { default as parseEntityName } from './parse-entity-name';
