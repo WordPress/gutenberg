@@ -22,7 +22,12 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
-import useTrashPostAction from '../actions/trash-post';
+import {
+	useTrashPostAction,
+	postRevisionsAction,
+	viewPostAction,
+	useEditPostAction,
+} from '../actions';
 import Media from '../media';
 import DataviewsContext from '../dataviews/context';
 import { DEFAULT_STATUSES } from '../dataviews/provider';
@@ -208,7 +213,16 @@ export default function PagePages() {
 	] );
 
 	const trashPostAction = useTrashPostAction();
-	const actions = useMemo( () => [ trashPostAction ], [ trashPostAction ] );
+	const editPostAction = useEditPostAction();
+	const actions = useMemo(
+		() => [
+			viewPostAction,
+			trashPostAction,
+			editPostAction,
+			postRevisionsAction,
+		],
+		[ trashPostAction, editPostAction ]
+	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			let updatedView =
