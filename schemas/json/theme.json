@@ -231,6 +231,16 @@
 							"description": "Allow users to set text colors.",
 							"type": "boolean",
 							"default": true
+						},
+						"heading": {
+							"description": "Allow users to set heading colors.",
+							"type": "boolean",
+							"default": true
+						},
+						"button": {
+							"description": "Allow users to set button colors.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
