@@ -580,6 +580,16 @@ export function switchToBlockType( blocks, name ) {
  * @return {Object} block.
  */
 export const getBlockFromExample = ( name, example ) => {
+	// If a Block is undefined, use the core/missing block as
+	// a placeholder to prevent a crash.
+	if ( undefined === getBlockType( name ) ) {
+		return createBlock( 'core/missing', {
+			originalName: name,
+			originalContent: '',
+			originalUndelimitedContent: '',
+		} );
+	}
+
 	return createBlock(
 		name,
 		example.attributes,
