@@ -14,8 +14,8 @@ Before setting up Appium, the required iOS and Android dependencies must be inst
 -   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Xcode.
 -   Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
 -   Create the required simulators by running the follow scripts in your shell:
-    -   `xcrun simctl create "iPhone 13" "iPhone 13" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
-    -   `xcrun simctl create "iPad Pro (9.7-inch)" "iPad Pro (9.7-inch)" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
+    -   `xcrun simctl create "iPhone 14" "iPhone 14" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
+    -   `xcrun simctl create "iPad (10th generation)" "iPad (10th generation)" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
 
 ### Android
 
@@ -70,7 +70,7 @@ You can filter which test runs by one of two ways:
 npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 
 # Enable watch mode on iOS
-npm run native test:e2e:ios:local -- --watch
+npm run native test:e2e:ios:local -- -- -- --watch
 ```
 
 ## Speeding Up Test Runs
@@ -83,14 +83,18 @@ The `native test:e2e:(android|ios):local` script performs several steps via asso
 
 While we must run all of these at least once to produce a testable app, it is often not necessary to run them each multiple times over while modifying or writing tests. To speed up multiple test runs, you can invoke the individual scripts as needed.
 
-If you only modified the native app code, you can run `test:e2e:build-app:(ios|android)` followed by `device-tests:local`.
-If you only modified JavaScript app code, you can run `test:e2e:bundle:(ios|android)` followed by `device-tests:local`.
-If you only modified E2E tests code, you can run `device-tests:local`.
+-   If you only modified the native app code, you can run `test:e2e:build-app:(ios|android)` followed by `device-tests:local`.
+-   If you only modified JavaScript app code, you can run `test:e2e:bundle:(ios|android)` followed by `device-tests:local`.
+-   If you only modified E2E tests code, you can run `device-tests:local`.
 
 By default `device-tests:local` runs tests for Android. To run tests on iOS, you can prefix the script with the `TEST_RN_PLATFORM` environment variable.
 
 ```shell
+# Run tests on iOS
 TEST_RN_PLATFORM=ios npm run native device-tests:local
+
+# Run tests on iOS with watch mode enabled
+TEST_RN_PLATFORM=ios npm run native device-tests:local -- -- --watch
 ```
 
 ## Debugging Tests

@@ -10,7 +10,7 @@ const ios = {
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
-	deviceName: ! iPadDevice ? 'iPhone 13' : 'iPad Pro (9.7-inch)',
+	deviceName: ! iPadDevice ? 'iPhone 14' : 'iPad (10th generation)',
 	pixelRatio: ! iPadDevice ? 3 : 2,
 	usePrebuiltWDA: true,
 } );
@@ -18,8 +18,8 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice
-		? 'iPhone 13 Simulator'
-		: 'iPad Pro (9.7 inch) Simulator',
+		? 'iPhone 14 Simulator'
+		: 'iPad (10th generation) Simulator',
 	pixelRatio: ! iPadDevice ? 3 : 2,
 } );
 
