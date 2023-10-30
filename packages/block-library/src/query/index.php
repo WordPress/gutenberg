@@ -163,7 +163,7 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 			$render_cb_registered = true;
 		}
 	} elseif (
-		count( $enhanced_query_stack ) > 0 &&
+		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
 		'core/' !== substr( $block_name, 0, 5 )
 	) {
