@@ -95,6 +95,14 @@ Function called when the control's search input value changes. The argument cont
 -   Type: `( value: string ) => void`
 -   Required: No
 
+#### shouldFilter
+
+Function called to determine whether the control should filter the list of displayed options based on the user input or whether it's something that is handled externally by updating the `options` prop when the `onFilterValueChange` callback is called.
+
+-   Type: `boolean`
+-	Required: No
+-	Default: `true`
+
 #### onChange
 
 Function called with the selected value changes.

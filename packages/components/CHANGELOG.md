@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `InputControl`/`SelectControl`: update `height`/`min-height` to `32px` instead of `30px` to align with modern sizing scale ([#55490](https://github.com/WordPress/gutenberg/pull/55490)).
+-   `ComboboxControl`: Add `shouldFilter` prop to allow the options to be controlled and filtered externally ([#55574](https://github.com/WordPress/gutenberg/pull/55574)). 
 
 ### Bug Fix
 
