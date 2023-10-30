@@ -24,6 +24,10 @@
 		"suffix": {
 			"type": "string",
 			"default": ""
+		},
+		"showTermNoResults": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

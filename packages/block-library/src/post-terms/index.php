@@ -24,7 +24,12 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 
 	$post_terms = get_the_terms( $block->context['postId'], $attributes['term'] );
 	if ( is_wp_error( $post_terms ) || empty( $post_terms ) ) {
-		return '';
+		if ( ! $attributes['showTermNoResults'] ) {
+			return '';
+		}
+		$tax = get_taxonomy( $attributes['term'] );
+		$labels = get_taxonomy_labels( $tax );
+		return '<div class="taxonomy-' . $attributes['term'] . ' wp-block-post-terms">' . esc_html( $labels->no_terms ) . '</div>';
 	}
 
 	$classes = array( 'taxonomy-' . $attributes['term'] );
