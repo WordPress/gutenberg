@@ -352,20 +352,71 @@ export const usePatterns = ( clientId, name ) => {
  * @param {string} clientId The block's client ID.
  * @return {string[]} List of block titles.
  */
-export const useUnsupportedBlockList = ( clientId ) => {
+export const useHasBlocksFromPlugins = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
+			return (
+				getClientIdsOfDescendants( clientId ).filter(
+					( descendantClientId ) => {
+						const blockName = getBlockName( descendantClientId );
+						return ! blockName.startsWith( 'core/' );
+					}
+				).length > 0
+			);
+		},
+		[ clientId ]
+	);
+};
 
-			return getClientIdsOfDescendants( clientId ).filter(
-				( descendantClientId ) => {
-					const blockName = getBlockName( descendantClientId );
-					return (
-						! blockName.startsWith( 'core/' ) ||
-						blockName === 'core/post-content'
-					);
-				}
+/**
+ * Hook that returns a list of unsupported blocks inside the Query Loop with the
+ * given `clientId`.
+ *
+ * @param {string} clientId The block's client ID.
+ * @return {string[]} List of block titles.
+ */
+export const useHasPostContentBlock = ( clientId ) => {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
+			return (
+				getClientIdsOfDescendants( clientId ).filter(
+					( descendantClientId ) => {
+						const blockName = getBlockName( descendantClientId );
+						return blockName === 'core/post-content';
+					}
+				).length > 0
+			);
+		},
+		[ clientId ]
+	);
+};
+
+/**
+ * Hook that returns a list of blocks where it's not possible to know if their
+ * inner blocks are supported or not.
+ *
+ * @param {string} clientId The block's client ID.
+ * @return {string[]} List of block titles.
+ */
+export const useHasPatternsOrTemplateParts = ( clientId ) => {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
+			return (
+				getClientIdsOfDescendants( clientId ).filter(
+					( descendantClientId ) => {
+						const blockName = getBlockName( descendantClientId );
+						return (
+							blockName === 'core/template-part' ||
+							blockName === 'core/block'
+						);
+					}
+				).length > 0
 			);
 		},
 		[ clientId ]
