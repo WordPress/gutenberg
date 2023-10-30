@@ -139,7 +139,7 @@ add_action( 'init', 'register_block_core_query' );
 function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $enhanced_query_stack   = array();
 	static $dirty_enhanced_queries = array();
-	static $render_cb_registered   = false;
+	static $render_query_callback  = null;
 
 	$block_name = $parsed_block['blockName'];
 
@@ -149,7 +149,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
-		if ( ! $render_cb_registered ) {
+		if ( ! isset( $render_query_callback ) ) {
 			/**
 			 * Filter that disables the enhanced pagination feature during block
 			 * rendering when a plugin block has been found inside. It does so
@@ -161,7 +161,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 *
 			 * @return string Returns the modified output of the query block.
 			 */
-			$maybe_disable_enhanced_pagination = function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries ) {
+			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries ) {
 				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
 				if ( ! $has_enhanced_pagination ) {
 					return $content;
@@ -180,8 +180,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				return $content;
 			};
 
-			add_filter( 'render_block_core/query', $maybe_disable_enhanced_pagination, 10, 2 );
-			$render_cb_registered = true;
+			add_filter( 'render_block_core/query', $render_query_callback, 10, 2 );
 		}
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
