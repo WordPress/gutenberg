@@ -11,23 +11,23 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	useHasBlocksFromPlugins,
-	useHasPostContentBlock,
-	useHasPatternsOrTemplateParts,
-} from '../../utils';
+import { useUnsupportedBlocks } from '../../utils';
 
 export default function EnhancedPaginationControl( {
 	enhancedPagination,
 	setAttributes,
 	clientId,
 } ) {
-	const hasBlocksFromPlugins = useHasBlocksFromPlugins( clientId );
-	const hasPostContentBlock = useHasPostContentBlock( clientId );
-	const hasSyncedBlocks = useHasPatternsOrTemplateParts( clientId );
+	const {
+		hasBlocksFromPlugins,
+		hasPostContentBlock,
+		hasPatternOrTemplatePartBlocks,
+	} = useUnsupportedBlocks( clientId );
 
 	const showAuto =
-		! hasBlocksFromPlugins && ! hasPostContentBlock && hasSyncedBlocks;
+		! hasBlocksFromPlugins &&
+		! hasPostContentBlock &&
+		hasPatternOrTemplatePartBlocks;
 
 	let notice = null;
 	if ( hasBlocksFromPlugins ) {
@@ -37,7 +37,7 @@ export default function EnhancedPaginationControl( {
 		notice = __(
 			'The Post Content block is not supported yet. For the enhanced pagination to work, remove the block, then re-enable "Enhanced pagination" in the Query Block settings.'
 		);
-	} else if ( enhancedPagination && hasSyncedBlocks ) {
+	} else if ( enhancedPagination && hasPatternOrTemplatePartBlocks ) {
 		notice = __(
 			'Blocks from plugins are not supported yet. Please note that if you add them to the patterns or template parts that are currently inside this Query block, this enhanced pagination will be automatically disabled.'
 		);
@@ -47,7 +47,7 @@ export default function EnhancedPaginationControl( {
 		<>
 			<ToggleGroupControl
 				label={ __( 'Enhanced pagination' ) }
-				value={ enhancedPagination }
+				value={ !! enhancedPagination }
 				help={ __(
 					'Browsing between pages won’t require a full page reload.'
 				) }

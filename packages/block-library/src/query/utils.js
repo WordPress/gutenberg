@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -346,79 +346,69 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that returns a list of unsupported blocks inside the Query Loop with the
- * given `clientId`.
+ * The object returned by useUnsupportedBlocks with info about the type of
+ * unsupported blocks present in the Query block.
+ *
+ * @typedef  {Object}  UnsupportedBlocksInfo
+ * @property {boolean} hasBlocksFromPlugins           True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock            True if a 'core/post-content' block is present.
+ * @property {boolean} hasPatternOrTemplatePartBlocks True if a 'core/block' or 'core/template-part' block is present.
+ * @property {number}  bitSum                         The sum representing the presence of different types of blocks. Increases by 1 if there is a plugin block, 2 if there is a Post Content block and 4 if there is either a Pattern or a Template Part block.
+ * @property {boolean} hasUnsupportedBlocks           True if there are any unsupported blocks (i.e., when bitSum !== 0).
+ */
+
+/**
+ * Hook that returns an object with information about the unsupported blocks
+ * present inside a Query Loop with the given `clientId`. The returned contains
+ * props that are true when a certain type of block is present. It also returns
+ * a bit sum to be able easily compare when the blocks have changed.
  *
  * @param {string} clientId The block's client ID.
- * @return {string[]} List of block titles.
+ * @return {UnsupportedBlocksInfo} The object containing all the info.
  */
-export const useHasBlocksFromPlugins = ( clientId ) => {
+export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			return (
-				getClientIdsOfDescendants( clientId ).filter(
-					( descendantClientId ) => {
-						const blockName = getBlockName( descendantClientId );
-						return ! blockName.startsWith( 'core/' );
+			const blocks = { bitSum: 0 };
+			getClientIdsOfDescendants( clientId ).forEach(
+				( descendantClientId ) => {
+					const blockName = getBlockName( descendantClientId );
+					if ( ! blockName.startsWith( 'core/' ) ) {
+						blocks.hasBlocksFromPlugins = true;
+					} else if ( blockName === 'core/post-content' ) {
+						blocks.hasPostContentBlock = true;
+					} else if (
+						blockName === 'core/block' ||
+						blockName === 'core/template-part'
+					) {
+						blocks.hasPatternOrTemplatePartBlocks = true;
 					}
-				).length > 0
+				}
 			);
+			if ( blocks.hasBlocksFromPlugins ) blocks.bitSum += 1;
+			if ( blocks.hasPostContentBlock ) blocks.bitSum += 2;
+			if ( blocks.hasPatternOrTemplatePartBlocks ) blocks.bitSum += 4;
+			blocks.hasUnsupportedBlocks = blocks.bitSum !== 0;
+			return blocks;
 		},
 		[ clientId ]
 	);
 };
 
 /**
- * Hook that returns a list of unsupported blocks inside the Query Loop with the
- * given `clientId`.
+ * Hook that returns a boolean which checks whether the blocks have changed
+ * inside a Query Loop with the given `clientId`. This hook uses the `bitSum`
+ * value from `useUnsupportedBlocks` to track changes in the blocks.
  *
  * @param {string} clientId The block's client ID.
- * @return {string[]} List of block titles.
+ * @return {boolean} Returns true if the blocks have changed, otherwise false.
  */
-export const useHasPostContentBlock = ( clientId ) => {
-	return useSelect(
-		( select ) => {
-			const { getClientIdsOfDescendants, getBlockName } =
-				select( blockEditorStore );
-			return (
-				getClientIdsOfDescendants( clientId ).filter(
-					( descendantClientId ) => {
-						const blockName = getBlockName( descendantClientId );
-						return blockName === 'core/post-content';
-					}
-				).length > 0
-			);
-		},
-		[ clientId ]
-	);
-};
-
-/**
- * Hook that returns a list of blocks where it's not possible to know if their
- * inner blocks are supported or not.
- *
- * @param {string} clientId The block's client ID.
- * @return {string[]} List of block titles.
- */
-export const useHasPatternsOrTemplateParts = ( clientId ) => {
-	return useSelect(
-		( select ) => {
-			const { getClientIdsOfDescendants, getBlockName } =
-				select( blockEditorStore );
-			return (
-				getClientIdsOfDescendants( clientId ).filter(
-					( descendantClientId ) => {
-						const blockName = getBlockName( descendantClientId );
-						return (
-							blockName === 'core/template-part' ||
-							blockName === 'core/block'
-						);
-					}
-				).length > 0
-			);
-		},
-		[ clientId ]
-	);
+export const useHaveBlocksChanged = ( clientId ) => {
+	const { bitSum } = useUnsupportedBlocks( clientId );
+	const prevBitSum = useRef( bitSum );
+	const haveBlocksChanged = bitSum !== prevBitSum.current;
+	prevBitSum.current = bitSum;
+	return haveBlocksChanged;
 };
