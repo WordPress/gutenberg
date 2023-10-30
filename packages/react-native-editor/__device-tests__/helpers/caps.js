@@ -29,17 +29,17 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice
-		? iOSConfig.server.deviceName
-		: iOSConfig.server.deviceTabletName,
-	platformVersion: iOSConfig.server.platformVersion,
+		? iOSConfig.saucelabs.deviceName
+		: iOSConfig.saucelabs.deviceTabletName,
+	platformVersion: iOSConfig.local.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
 } );
 
 exports.android = {
-	platformVersion: androidConfig.server.platformVersion,
-	deviceName: androidConfig.server.deviceName,
+	platformVersion: androidConfig.local.platformVersion,
+	deviceName: androidConfig.saucelabs.deviceName,
 	automationName: 'UiAutomator2',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
