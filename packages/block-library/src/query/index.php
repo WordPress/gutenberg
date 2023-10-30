@@ -124,11 +124,22 @@ function register_block_core_query() {
 }
 add_action( 'init', 'register_block_core_query' );
 
-
-function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $parent_block) {
-	static $enhanced_query_stack = array();
-	static $with_plugin_blocks   = array();
-	static $render_cb_registered = false;
+/**
+ * Traverse the tree of blocks looking for any plugin block (i.e., a block from
+ * an installed third-party plugin) inside a Query block with the enhanced
+ * pagination enabled. If at least one is found, the enhanced pagination is
+ * effectively disabled to prevent any potential incompatibilities.
+ *
+ * @since 6.4.0
+ *
+ * @param array $parsed_block The block being rendered.
+ *
+ * @return string Returns the parsed block, unmodified.
+ */
+function block_core_query_disable_enhanced_pagination( $parsed_block ) {
+	static $enhanced_query_stack   = array();
+	static $dirty_enhanced_queries = array();
+	static $render_cb_registered   = false;
 
 	$block_name = $parsed_block['blockName'];
 
@@ -140,26 +151,34 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 
 		if ( ! $render_cb_registered ) {
 			/**
-			 * Filter that removes the Interactivity API attributes added to the Query block.
-			 * That effectively disables the enhanced pagination.
+			 * Filter that disables the enhanced pagination feature when a
+			 * plugin block is found inside. It does so by adding an attribute
+			 * called `data-wp-navigation-disabled` which is later handled by
+			 * the front-end logic.
+			 *
+			 * @param string   $content  The block content.
+			 * @param array    $block    The full block, including name and attributes.
+			 *
+			 * @return string Returns the modified output of the query block.
 			 */
-			$render_query_block = function ( $block_content, $block, $instance ) use ( &$enhanced_query_stack, &$with_plugin_blocks ) {
+			$maybe_disable_enhanced_pagination = function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries ) {
 				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
-				if ( ! $has_enhanced_pagination ) return $block_content;
+				if ( ! $has_enhanced_pagination ) return $content;
 
-				if ( isset( $with_plugin_blocks[ $block['attrs']['queryId'] ]) ) {
-					$p = new WP_HTML_Tag_Processor( $block_content );
+				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
+					$p = new WP_HTML_Tag_Processor( $content );
 					if ( $p->next_tag() ) {
 						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
 					}
-					$block_content = $p->get_updated_html();
+					$content = $p->get_updated_html();
 				}
 
 				array_pop( $enhanced_query_stack );
 
-				return $block_content;
+				return $content;
 			};
-			add_filter( 'render_block_core/query', $render_query_block, 999, 3 );
+
+			add_filter( 'render_block_core/query', $maybe_disable_enhanced_pagination, 999, 2 );
 			$render_cb_registered = true;
 		}
 	} elseif (
@@ -168,10 +187,10 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 		'core/' !== substr( $block_name, 0, 5 )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
-			$with_plugin_blocks[ $query_id ] = true;
+			$dirty_enhanced_queries[ $query_id ] = true;
 		}
 	}
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'block_core_query_check_plugin_blocks', 999, 3 );
+add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 999, 1 );
