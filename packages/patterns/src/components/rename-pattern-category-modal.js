@@ -35,7 +35,7 @@ export default function RenamePatternCategoryModal( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ validationMessage, setValidationMessage ] = useState( false );
 	const validationMessageId = validationMessage
-		? `patterns-rename-pattern-category-modal__description-${ id }`
+		? `patterns-rename-pattern-category-modal__validation-message-${ id }`
 		: undefined;
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
@@ -134,20 +134,25 @@ export default function RenamePatternCategoryModal( {
 		>
 			<form onSubmit={ onSave }>
 				<VStack spacing="5">
-					<TextControl
-						ref={ textControlRef }
-						__nextHasNoMarginBottom
-						label={ __( 'Name' ) }
-						value={ name }
-						onChange={ onChange }
-						aria-describedby={ validationMessageId }
-						required
-					/>
-					{ validationMessage && (
-						<span id={ validationMessageId }>
-							{ validationMessage }
-						</span>
-					) }
+					<VStack spacing="2">
+						<TextControl
+							ref={ textControlRef }
+							__nextHasNoMarginBottom
+							label={ __( 'Name' ) }
+							value={ name }
+							onChange={ onChange }
+							aria-describedby={ validationMessageId }
+							required
+						/>
+						{ validationMessage && (
+							<span
+								className="patterns-rename-pattern-category-modal__validation-message"
+								id={ validationMessageId }
+							>
+								{ validationMessage }
+							</span>
+						) }
+					</VStack>
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onRequestClose }>
 							{ __( 'Cancel' ) }
