@@ -27,22 +27,18 @@ function InserterTabs( {
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
-	prioritizePatterns,
 } ) {
 	const tabs = useMemo( () => {
 		const tempTabs = [];
-		if ( prioritizePatterns && showPatterns ) {
-			tempTabs.push( patternsTab );
-		}
 		tempTabs.push( blocksTab );
-		if ( ! prioritizePatterns && showPatterns ) {
+		if ( showPatterns ) {
 			tempTabs.push( patternsTab );
 		}
 		if ( showMedia ) {
 			tempTabs.push( mediaTab );
 		}
 		return tempTabs;
-	}, [ prioritizePatterns, showPatterns, showMedia ] );
+	}, [ showPatterns, showMedia ] );
 
 	return (
 		<TabPanel
