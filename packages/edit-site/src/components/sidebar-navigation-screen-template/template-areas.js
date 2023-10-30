@@ -8,7 +8,7 @@ import {
 	__experimentalTruncate as Truncate,
 	__experimentalItemGroup as ItemGroup,
 } from '@wordpress/components';
-import { header, footer, layout } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -27,11 +27,20 @@ import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};
 
-function TemplateAreaButton( { postId, icon, title } ) {
-	const icons = {
-		header,
-		footer,
-	};
+function TemplateAreaButton( { postId, area, title } ) {
+	const templatePartArea = useSelect(
+		( select ) => {
+			const defaultAreas =
+				select(
+					editorStore
+				).__experimentalGetDefaultTemplatePartAreas();
+
+			return defaultAreas.find(
+				( defaultArea ) => defaultArea.area === area
+			);
+		},
+		[ area ]
+	);
 	const linkInfo = useLink( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		postId,
@@ -41,7 +50,7 @@ function TemplateAreaButton( { postId, icon, title } ) {
 		<SidebarNavigationItem
 			className="edit-site-sidebar-navigation-screen-template__template-area-button"
 			{ ...linkInfo }
-			icon={ icons[ icon ] ?? layout }
+			icon={ templatePartArea?.icon }
 			withChevron
 		>
 			<Truncate
@@ -126,14 +135,14 @@ export default function TemplateAreas() {
 		>
 			<ItemGroup>
 				{ templateAreas.map(
-					( { clientId, label, icon, theme, slug, title } ) => (
+					( { clientId, label, area, theme, slug, title } ) => (
 						<SidebarNavigationScreenDetailsPanelRow
 							key={ clientId }
 						>
 							<TemplateAreaButton
 								postId={ `${ theme }//${ slug }` }
 								title={ title?.rendered || label }
-								icon={ icon }
+								area={ area }
 							/>
 						</SidebarNavigationScreenDetailsPanelRow>
 					)
