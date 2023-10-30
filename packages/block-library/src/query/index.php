@@ -163,7 +163,9 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 */
 			$maybe_disable_enhanced_pagination = function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries ) {
 				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
-				if ( ! $has_enhanced_pagination ) return $content;
+				if ( ! $has_enhanced_pagination ) {
+					return $content;
+				}
 
 				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
 					$p = new WP_HTML_Tag_Processor( $content );
