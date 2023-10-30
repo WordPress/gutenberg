@@ -175,7 +175,10 @@ export default function BlockTools( {
 				) }
 				{ ! isZoomOutMode &&
 					( hasFixedToolbar || ! isLargeViewport ) && (
-						<BlockContextualToolbar isFixed />
+						<BlockContextualToolbar
+							ref={ selectedBlockToolsRef }
+							isFixed
+						/>
 					) }
 
 				{ showEmptyBlockSideInserter && (
