@@ -10,9 +10,16 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { ESCAPE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -94,6 +101,7 @@ function useIsAccessibleToolbar( toolbarRef ) {
 
 function useToolbarFocus(
 	toolbarRef,
+	focusEditorOnEscape,
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
@@ -155,12 +163,43 @@ function useToolbarFocus(
 			onIndexChange( index );
 		};
 	}, [ initialIndex, initialFocusOnMount, toolbarRef, onIndexChange ] );
+
+	const { lastFocus } = useSelect( ( select ) => {
+		const { getLastFocus } = select( blockEditorStore );
+		return {
+			lastFocus: getLastFocus(),
+		};
+	}, [] );
+	/**
+	 * Handles returning focus to the block editor canvas when pressing escape.
+	 */
+	useEffect( () => {
+		const navigableToolbarRef = toolbarRef.current;
+
+		if ( focusEditorOnEscape ) {
+			const handleKeyDown = ( event ) => {
+				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
+					// Focus the last focused element when pressing escape.
+					event.preventDefault();
+					lastFocus.current.focus();
+				}
+			};
+			navigableToolbarRef.addEventListener( 'keydown', handleKeyDown );
+			return () => {
+				navigableToolbarRef.removeEventListener(
+					'keydown',
+					handleKeyDown
+				);
+			};
+		}
+	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
 }
 
 function UnforwardNavigableToolbar(
 	{
 		children,
 		focusOnMount,
+		focusEditorOnEscape = false,
 		shouldUseKeyboardFocusShortcut = true,
 		__experimentalInitialIndex: initialIndex,
 		__experimentalOnIndexChange: onIndexChange,
@@ -175,6 +214,7 @@ function UnforwardNavigableToolbar(
 
 	useToolbarFocus(
 		toolbarRef,
+		focusEditorOnEscape,
 		focusOnMount,
 		isAccessibleToolbar,
 		initialIndex,
