@@ -180,7 +180,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				return $content;
 			};
 
-			add_filter( 'render_block_core/query', $maybe_disable_enhanced_pagination, 999, 2 );
+			add_filter( 'render_block_core/query', $maybe_disable_enhanced_pagination, 10, 2 );
 			$render_cb_registered = true;
 		}
 	} elseif (
@@ -195,4 +195,4 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 999, 1 );
+add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
