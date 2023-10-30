@@ -126,56 +126,54 @@ add_action( 'init', 'register_block_core_query' );
 
 
 function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $parent_block) {
-	static $current_query_level  = 0;
-	static $has_plugin_blocks    = false;
+	static $enhanced_query_stack = array();
+	static $with_plugin_blocks   = array();
 	static $render_cb_registered = false;
 
-	$block_name              = $parsed_block['blockName'];
-	$has_enhanced_pagination = isset( $parsed_block['attrs']['enhancedPagination'] ) && $parsed_block['attrs']['enhancedPagination'];
+	$block_name = $parsed_block['blockName'];
 
-	if ( 'core/query' === $block_name && $has_enhanced_pagination ) {
-		$current_query_level += 1;
+	if (
+		'core/query' === $block_name &&
+		! empty( $parsed_block['attrs']['enhancedPagination'] )
+	) {
+		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
 		if ( ! $render_cb_registered ) {
 			/**
 			 * Filter that removes the Interactivity API attributes added to the Query block.
 			 * That effectively disables the enhanced pagination.
 			 */
-			$render_query_block = function ( $block_content, $block, $instance ) use ( &$current_query_level, &$has_plugin_blocks ) {
-				$has_enhanced_pagination = isset( $block['attrs']['enhancedPagination'] ) && $block['attrs']['enhancedPagination'];
-				$content = $block_content;
+			$render_query_block = function ( $block_content, $block, $instance ) use ( &$enhanced_query_stack, &$with_plugin_blocks ) {
+				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
+				if ( ! $has_enhanced_pagination ) return $block_content;
 
-				if ( ! $has_enhanced_pagination ) return $content;
-
-				if ( $has_plugin_blocks ) {
+				if ( isset( $with_plugin_blocks[ $block['attrs']['queryId'] ]) ) {
 					$p = new WP_HTML_Tag_Processor( $block_content );
 					if ( $p->next_tag() ) {
 						$p->remove_attribute( 'data-wp-interactive' );
 						$p->remove_attribute( 'data-wp-navigation-id' );
 					}
-					$content = $p->get_updated_html();
+					$block_content = $p->get_updated_html();
 				}
 
-				$current_query_level -= 1;
-				if ( 0 === $current_query_level && $has_plugin_blocks ) {
-					$has_plugin_blocks = false;
-				}
+				array_pop( $enhanced_query_stack );
 
-				return $content;
+				return $block_content;
 			};
 
 			add_filter( 'render_block_core/query', $render_query_block, 999, 3 );
 			$render_cb_registered = true;
 		}
 	} elseif (
-		$current_query_level > 0 &&
-		! $has_plugin_blocks &&
+		count( $enhanced_query_stack ) > 0 &&
 		isset( $block_name ) &&
 		'core/' !== substr( $block_name, 0, 5 )
 	) {
-		$has_plugin_blocks = true;
+		foreach ( $enhanced_query_stack as $query_id ) {
+			$with_plugin_blocks[ $query_id ] = true;
+		}
 	}
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'block_core_query_check_plugin_blocks', 10, 3 );
+add_filter( 'render_block_data', 'block_core_query_check_plugin_blocks', 999, 3 );
