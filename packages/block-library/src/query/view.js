@@ -53,12 +53,7 @@ store( {
 							context.core.query.animation = 'start';
 						}, 400 );
 
-						if ( isDisabled ) {
-							window.location.assign( ref.href );
-							await new Promise( () => {} );
-						} else {
-							await navigate( ref.href );
-						}
+						await navigate( ref.href );
 
 						// Dismiss loading message if it hasn't been added yet.
 						clearTimeout( timeout );
