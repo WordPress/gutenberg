@@ -33,13 +33,18 @@ store( {
 		core: {
 			query: {
 				navigate: async ( { event, ref, context } ) => {
-					if ( isValidLink( ref ) && isValidEvent( event ) ) {
+					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
+						.dataset.wpNavigationDisabled;
+
+					if (
+						isValidLink( ref ) &&
+						isValidEvent( event ) &&
+						! isDisabled
+					) {
 						event.preventDefault();
 
-						const {
-							wpNavigationId: id,
-							wpNavigationDisabled: isDisabled,
-						} = ref.closest( '[data-wp-navigation-id]' ).dataset;
+						const id = ref.closest( '[data-wp-navigation-id]' )
+							.dataset.wpNavigationId;
 
 						// Don't announce the navigation immediately, wait 400 ms.
 						const timeout = setTimeout( () => {
