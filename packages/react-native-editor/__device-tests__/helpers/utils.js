@@ -701,16 +701,6 @@ const setClipboard = async ( driver, content, contentType = 'plaintext' ) => {
 	await driver.setClipboard( base64String, contentType );
 };
 
-/**
- * Helper to clear the clipboard
- *
- * @param {Object}               driver      Driver
- * @param {ClipboardContentType} contentType Type of the content
- */
-const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
-	await driver.setClipboard( '', contentType );
-};
-
 const launchApp = async ( driver, initialProps = {} ) => {
 	if ( isAndroid() ) {
 		await driver.execute( 'mobile: startActivity', {
@@ -737,7 +727,6 @@ const launchApp = async ( driver, initialProps = {} ) => {
 
 module.exports = {
 	backspace,
-	clearClipboard,
 	clickBeginningOfElement,
 	clickIfClickable,
 	clickMiddleOfElement,
