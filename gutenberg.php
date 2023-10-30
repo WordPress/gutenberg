@@ -65,7 +65,7 @@ if ( defined( 'ABSPATH' ) ) {
 /**
  * Retiurns the text for the "WordPress version is too old" notices.
  *
- * @since 16.9.0
+ * @since 17.0.0
  *
  * @return string Text for the notices, escaped.
  */
@@ -90,7 +90,7 @@ function gutenberg_wordpress_version_too_old_text() {
 /**
  * Retiurns the text for the "Gutenberg version is too old" notices.
  *
- * @since 16.9.0
+ * @since 17.0.0
  *
  * @return string Text for the notices, escaped.
  */
@@ -124,7 +124,7 @@ function gutenberg_wordpress_version_too_old_notice() {
 /**
  * Display a "Gutenberg version is too old" notice.
  *
- * @since 16.9.0
+ * @since 17.0.0
  */
 function gutenberg_version_too_old_notice() {
 	$current_screen = get_current_screen();
@@ -141,7 +141,7 @@ function gutenberg_version_too_old_notice() {
 /**
  * Add a "WordPress version is too old" plugins list table notice.
  *
- * @since 16.9.0
+ * @since 17.0.0
  *
  * @param string[] $plugin_meta Array of plugin row meta data.
  * @param string   $file        Path to the plugin file relative to the plugins directory.
@@ -164,7 +164,7 @@ function gutenberg_wordpress_version_too_old_plugin_row_meta( $plugin_meta, $fil
 /**
  * Add a "Gutenberg version is too old" plugins list table notice.
  *
- * @since 16.9.0
+ * @since 17.0.0
  *
  * @param string[] $plugin_meta Array of plugin row meta data.
  * @param string   $file        Path to the plugin file relative to the plugins directory.
@@ -182,6 +182,28 @@ function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 	}
 
 	return $plugin_meta;
+}
+
+/**
+ * Add a "(disabled)" notice to the plugin's action links.
+ *
+ * @since 17.0.0
+ *
+ * @param string[] $links Array of plugin action links.
+ * @param string   $file  Path to the plugin file relative to the plugins directory.
+ * @return string[] Updated array of plugin action links.
+ */
+function gutenberg_disabled_action_links_notice( $links, $file ) {
+	$plugin_basename = basename( __DIR__ ) . '/gutenberg.php';
+
+	if ( $file === $plugin_basename ) {
+		// Prevent PHP warnings when a plugin uses this filter incorrectly.
+		$links = (array) $links;
+
+		$links['gutenberg-plugin-notice'] = __( '(disabled)', 'gutenberg' );
+	}
+
+	return $links;
 }
 
 /**
@@ -225,6 +247,10 @@ function gutenberg_pre_init() {
 		// Also add a notice to the plugin's row in the plugins list tables.
 		add_filter( 'plugin_row_meta', 'gutenberg_wordpress_version_too_old_plugin_row_meta', 10, 2 );
 
+		// Add "(disabled)" notice to the plugins action links.
+		add_filter( 'plugin_action_links', 'gutenberg_disabled_action_links_notice', 10, 2 );
+		add_filter( 'network_admin_plugin_action_links', 'gutenberg_disabled_action_links_notice', 10, 2 );
+
 		// Return early, do not load Gutenberg.
 		return;
 	} elseif ( version_compare( $wp_version, $max_supported_version . '-alpha', '>=' ) ) {
@@ -237,6 +263,10 @@ function gutenberg_pre_init() {
 
 		// Also add a notice to the plugin's row in the plugins list table.
 		add_filter( 'plugin_row_meta', 'gutenberg_version_too_old_plugin_row_meta', 10, 2 );
+
+		// Add "(disabled)" notice to the plugins action links.
+		add_filter( 'plugin_action_links', 'gutenberg_disabled_action_links_notice', 10, 2 );
+		add_filter( 'network_admin_plugin_action_links', 'gutenberg_disabled_action_links_notice', 10, 2 );
 
 		return;
 	}
