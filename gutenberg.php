@@ -25,15 +25,33 @@ if ( ! defined( 'GUTENBERG_MIN_WP_VERSION' ) ) {
 if ( ! defined( 'GUTENBERG_MAX_WP_VERSION' ) ) {
 	/*
 	 * The maximum WordPress version that is supported.
-	 * Generally that would be the current WordPress development version from core trunk,
-	 * see: https://core.trac.wordpress.org/browser/trunk/src/wp-includes/version.php.
+	 *
 	 * This constant should be set to a major (two digits) version. For example,
-	 * whether the current WP development version is 6.4-alpha-12345-src,
-	 * the constant would be 6.3.
-	 * The expectation is that bug fixes and new features from this Gutenberg release will be
-	 * added to the curent WordPress release. If that is not the case, or if the WP version
-	 * from trunk is already BETA 1, the constant should be set to the next major WP version.
-	 * Following the above example that would be 6.4.
+	 * whether the current WP version is 6.4-RC2-57007-src, 6.4, 6.4.1-RC1, or 6.4.2
+	 * the constant would be 6.4.
+	 *
+	 * Generally that would be the currently released WordPress version if the WP development
+	 * cycle is in alpha or (early) beta, or the next WordPress version if development is in RC.
+	 * In nearly all cases that would be the two digits version of the latest WP branch,
+	 * see: https://core.trac.wordpress.org/browser/branches.
+	 * The expectation is that the new features, improvements and bug fixes from the current
+	 * Gutenberg version will be synced with the current development WordPress version (alpha, beta)
+	 * before it is released.
+	 *
+	 * If WordPress is in late beta ("late" as in few days before RC), and there are features
+	 * and/or improvements in the current Gutenberg version that will not be synced with this
+	 * WordPress version, the maximum supported WP version should be set to the next release version,
+	 * i.e. the current WordPress development version. Generally in this case, late beta,
+	 * WordPress wouldn't have been branched yet.
+	 * However if WP is currently in RC, it most likely would have been branched already so using
+	 * the version of the latest branch as described above would work as expected.
+	 *
+	 * For example: Currently WordPress 6.4 is in RC. It was branched and development continues
+	 * in the 6.4 branch. At the same time development of WordPress 6.5 has already started in trunk.
+	 * So the max supported WP version for the next Gutenberg release should be set to 6.4
+	 * (same as the latest WP branch). The expectation is that any new features in this Gutenberg
+	 * release will be synced/merged to WP 6.5 so this versions of the Gutenberg plugin
+	 * should not be used there.
 	 */
 	define( 'GUTENBERG_MAX_WP_VERSION', '6.4' );
 }
@@ -55,13 +73,13 @@ function gutenberg_wordpress_version_too_old_text() {
 	if ( current_user_can( 'update_plugins' ) ) {
 		$text = sprintf(
 			/* translators: %s: Minimum required version */
-			__( 'Gutenberg requires WordPress %s or later to function properly and was not loaded. Please upgrade WordPress.', 'gutenberg' ),
+			__( 'Gutenberg requires WordPress %s or later to function properly. It was disabled to prevent errors. Please upgrade WordPress.', 'gutenberg' ),
 			GUTENBERG_MIN_WP_VERSION
 		);
 	} else {
 		$text = sprintf(
 			/* translators: %s: Minimum required version */
-			__( 'Gutenberg requires WordPress %s or later to function properly and was not loaded. Please ask an administrator to upgrade WordPress.', 'gutenberg' ),
+			__( 'Gutenberg requires WordPress %s or later to function properly. It was disabled to prevent errors. Please ask an administrator to upgrade WordPress.', 'gutenberg' ),
 			GUTENBERG_MIN_WP_VERSION
 		);
 	}
@@ -78,9 +96,9 @@ function gutenberg_wordpress_version_too_old_text() {
  */
 function gutenberg_version_too_old_text() {
 	if ( current_user_can( 'update_plugins' ) ) {
-		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please turn the auto-update on or update it manually.', 'gutenberg' );
+		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress and was disabled to prevent errors. Please update it.', 'gutenberg' );
 	} else {
-		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress. Please ask an administrator to update it.', 'gutenberg' );
+		$text = __( 'The Gutenberg plugin cannot be used. It is too old for your version of WordPress and was disabled to prevent errors. Please ask an administrator to update it.', 'gutenberg' );
 	}
 
 	return esc_html( $text );
@@ -209,14 +227,12 @@ function gutenberg_pre_init() {
 
 		// Return early, do not load Gutenberg.
 		return;
-	} elseif ( version_compare( $wp_version, $max_supported_version, '>=' ) || (
-		version_compare( $wp_version, $max_supported_version, '<' ) &&
-		version_compare( $wp_version, $max_supported_version . '-alpha', '>=' )
-	) ) {
+	} elseif ( version_compare( $wp_version, $max_supported_version . '-alpha', '>=' ) ) {
 		/*
-		 * Do not load Gutenebrg in newer, unsupported versions of WordPress. This will prevent incompatibilities,
-		 * PHP fatal errors, etc. Ask the users to update Gutenberg or turn plugin auto-updates on.
-		*/
+		 * Do not load Gutenebrg in newer, unsupported versions of WordPress including development
+		 * versions. This will prevent incompatibilities, PHP fatal errors, etc.
+		 * Ask the users to update Gutenberg.
+		 */
 		add_action( 'admin_notices', 'gutenberg_version_too_old_notice' );
 
 		// Also add a notice to the plugin's row in the plugins list table.
