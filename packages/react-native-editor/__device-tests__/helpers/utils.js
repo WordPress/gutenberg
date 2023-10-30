@@ -682,25 +682,6 @@ const clickIfClickable = async (
 	}
 };
 
-/**
- * Content type definitions.
- * Note: Android only supports plaintext.
- *
- * @typedef {"plaintext" | "image" | "url"} ClipboardContentType
- */
-
-/**
- * Helper to set content in the clipboard.
- *
- * @param {Object}               driver      Driver
- * @param {string}               content     Content to set in the clipboard
- * @param {ClipboardContentType} contentType Type of the content
- */
-const setClipboard = async ( driver, content, contentType = 'plaintext' ) => {
-	const base64String = Buffer.from( content ).toString( 'base64' );
-	await driver.setClipboard( base64String, contentType );
-};
-
 const launchApp = async ( driver, initialProps = {} ) => {
 	if ( isAndroid() ) {
 		await driver.execute( 'mobile: startActivity', {
@@ -738,7 +719,6 @@ module.exports = {
 	launchApp,
 	longPressMiddleOfElement,
 	selectTextFromElement,
-	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
