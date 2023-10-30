@@ -65,13 +65,13 @@ export default function save( { attributes } ) {
 				) }
 				{ showDownloadButton && (
 					<a
-						{ ...useBlockProps.save() }
 						href={ href }
 						className={ classnames(
 							'wp-block-file__button',
 							__experimentalGetElementClassName( 'button' ),
 							typographyProps.className
 						) }
+						style={ typographyProps.style }
 						download={ true }
 						aria-describedby={ describedById }
 					>

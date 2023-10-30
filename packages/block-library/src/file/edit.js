@@ -83,7 +83,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		} ),
 		[ id ]
 	);
-	const typgraphyProps = useTypographyProps( attributes );
+	const typographyProps = useTypographyProps( attributes );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -290,7 +290,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						>
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
-								{ ...blockProps }
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
 								className={ classnames(
@@ -298,8 +297,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 									__experimentalGetElementClassName(
 										'button'
 									),
-									typgraphyProps.className
+									typographyProps.className
 								) }
+								style={ typographyProps.style }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
