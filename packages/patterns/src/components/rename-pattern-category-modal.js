@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useId, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -29,14 +29,27 @@ export default function RenamePatternCategoryModal( {
 	onSuccess,
 	...props
 } ) {
+	const id = useId();
+	const textControlRef = useRef();
 	const [ name, setName ] = useState( decodeEntities( category.name ) );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ validationMessage, setValidationMessage ] = useState( false );
+	const validationMessageId = validationMessage
+		? `patterns-rename-pattern-category-modal__description-${ id }`
+		: undefined;
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const onRename = async ( event ) => {
+	const onChange = ( newName ) => {
+		if ( validationMessage ) {
+			setValidationMessage( undefined );
+		}
+		setName( newName );
+	};
+
+	const onSave = async ( event ) => {
 		event.preventDefault();
 
 		if ( isSaving ) {
@@ -44,22 +57,30 @@ export default function RenamePatternCategoryModal( {
 		}
 
 		if ( ! name || name === category.name ) {
-			speak(
-				__( 'Please enter a new name for this category.' ),
-				'assertive'
-			);
+			const message = __( 'Please enter a new name for this category.' );
+			speak( message, 'assertive' );
+			setValidationMessage( message );
+			textControlRef.current?.focus();
 			return;
 		}
 
 		// Check existing categories to avoid creating duplicates.
 		if (
 			existingCategories.patternCategories.find( ( existingCategory ) => {
+				// Compare the id so that the we don't disallow the user changing the case of their current category
+				// (i.e. renaming 'test' to 'Test').
 				return (
+					existingCategory.id !== category.id &&
 					existingCategory.label.toLowerCase() === name.toLowerCase()
 				);
 			} )
 		) {
-			speak( __( 'This category already exists.' ), 'assertive' );
+			const message = __(
+				'This category already exists. Please use a different name.'
+			);
+			speak( message, 'assertive' );
+			setValidationMessage( message );
+			textControlRef.current?.focus();
 			return;
 		}
 
@@ -111,15 +132,22 @@ export default function RenamePatternCategoryModal( {
 			onRequestClose={ onRequestClose }
 			{ ...props }
 		>
-			<form onSubmit={ onRename }>
+			<form onSubmit={ onSave }>
 				<VStack spacing="5">
 					<TextControl
+						ref={ textControlRef }
 						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ name }
-						onChange={ setName }
+						onChange={ onChange }
+						aria-describedby={ validationMessageId }
 						required
 					/>
+					{ validationMessage && (
+						<span id={ validationMessageId }>
+							{ validationMessage }
+						</span>
+					) }
 					<HStack justify="right">
 						<Button variant="tertiary" onClick={ onRequestClose }>
 							{ __( 'Cancel' ) }
