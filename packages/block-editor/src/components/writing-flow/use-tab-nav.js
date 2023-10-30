@@ -15,14 +15,20 @@ import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
+	const lastBlock = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const lastFocus = useRef();
+
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+
+	const lastFocus = useSelect(
+		( select ) => select( blockEditorStore ).getLastFocus(),
 		[]
 	);
 
@@ -40,7 +46,31 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			lastFocus.current.focus();
+			// If last focus position matches last block, this likely means we're on the last block wrapper. Let's try to find a better place to focus before defaulting to the wrapper.
+			if ( lastBlock.current !== lastFocus.current ) {
+				// Try to focus the last element which had focus.
+				lastFocus.current.focus();
+				// Check to see if focus worked.
+				if (
+					lastFocus.current.ownerDocument.activeElement ===
+					lastFocus.current
+				) {
+					// Looks like yes, return early.
+					return;
+				}
+			}
+			// Last element focus did not work. Now try to find the first tabbable in the last block to focus.
+			const firstBlockTabbable = focus.tabbable.findNext(
+				lastBlock.current
+			);
+			// Check to ensure tabbable is inside the last block and that it is a form element.
+			if ( isInsideRootBlock( lastBlock.current, firstBlockTabbable ) ) {
+				// Focus the found tabbable in the last block.
+				firstBlockTabbable.focus();
+			} else {
+				// Focus the last block wrapper if no tabbable was found.
+				lastBlock.current.focus();
+			}
 		} else {
 			setNavigationMode( true );
 
@@ -158,7 +188,10 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			lastFocus.current = event.target;
+			// Capture the last element with focus.
+			setLastFocus( { ...lastFocus, current: event.target } );
+			// Capture the last known block before focus leaves writing flow.
+			lastBlock.current = event.target.closest( '[data-block]' );
 
 			const { ownerDocument } = node;
 
