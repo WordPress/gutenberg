@@ -36,8 +36,10 @@ store( {
 					if ( isValidLink( ref ) && isValidEvent( event ) ) {
 						event.preventDefault();
 
-						const id = ref.closest( '[data-wp-navigation-id]' )
-							.dataset.wpNavigationId;
+						const {
+							wpNavigationId: id,
+							wpNavigationDisabled: isDisabled,
+						} = ref.closest( '[data-wp-navigation-id]' ).dataset;
 
 						// Don't announce the navigation immediately, wait 400 ms.
 						const timeout = setTimeout( () => {
@@ -46,7 +48,12 @@ store( {
 							context.core.query.animation = 'start';
 						}, 400 );
 
-						await navigate( ref.href );
+						if ( isDisabled ) {
+							window.location.assign( ref.href );
+							await new Promise( () => {} );
+						} else {
+							await navigate( ref.href );
+						}
 
 						// Dismiss loading message if it hasn't been added yet.
 						clearTimeout( timeout );
@@ -70,7 +77,9 @@ store( {
 					}
 				},
 				prefetch: async ( { ref } ) => {
-					if ( isValidLink( ref ) ) {
+					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
+						.dataset.wpNavigationDisabled;
+					if ( isValidLink( ref ) && ! isDisabled ) {
 						await prefetch( ref.href );
 					}
 				},

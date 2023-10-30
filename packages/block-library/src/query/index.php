@@ -150,8 +150,7 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 				if ( isset( $with_plugin_blocks[ $block['attrs']['queryId'] ]) ) {
 					$p = new WP_HTML_Tag_Processor( $block_content );
 					if ( $p->next_tag() ) {
-						$p->remove_attribute( 'data-wp-interactive' );
-						$p->remove_attribute( 'data-wp-navigation-id' );
+						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
 					}
 					$block_content = $p->get_updated_html();
 				}
@@ -160,7 +159,6 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 
 				return $block_content;
 			};
-
 			add_filter( 'render_block_core/query', $render_query_block, 999, 3 );
 			$render_cb_registered = true;
 		}
