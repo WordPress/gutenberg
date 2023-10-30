@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Notice,
-} from '@wordpress/components';
+import { ToggleControl, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -43,28 +39,25 @@ export default function EnhancedPaginationControl( {
 		);
 	}
 
+	const label = showAuto
+		? __( 'Enhanced pagination (auto)' )
+		: __( 'Enhanced pagination' );
+
 	return (
 		<>
-			<ToggleGroupControl
-				label={ __( 'Enhanced pagination' ) }
-				value={ !! enhancedPagination }
+			<ToggleControl
+				label={ label }
 				help={ __(
 					'Browsing between pages won’t require a full page reload.'
 				) }
-				onChange={ ( value ) =>
-					setAttributes( { enhancedPagination: value } )
-				}
-				isBlock
-			>
-				<ToggleGroupControlOption
-					value={ false }
-					label={ __( 'Off' ) }
-				/>
-				<ToggleGroupControlOption
-					value={ true }
-					label={ showAuto ? __( 'Auto' ) : __( 'On' ) }
-				/>
-			</ToggleGroupControl>
+				checked={ !! enhancedPagination }
+				disabled={ hasBlocksFromPlugins || hasPostContentBlock }
+				onChange={ ( value ) => {
+					setAttributes( {
+						enhancedPagination: !! value,
+					} );
+				} }
+			/>
 			{ notice && (
 				<Notice
 					status="warning"
