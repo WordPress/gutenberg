@@ -200,7 +200,10 @@ function gutenberg_disabled_action_links_notice( $links, $file ) {
 		// Prevent PHP warnings when a plugin uses this filter incorrectly.
 		$links = (array) $links;
 
-		$links['gutenberg-plugin-notice'] = __( '(disabled)', 'gutenberg' );
+		$links = array_merge(
+			array( 'gutenberg-plugin-notice' => __( '(disabled)', 'gutenberg' ) ),
+			$links
+		);
 	}
 
 	return $links;
