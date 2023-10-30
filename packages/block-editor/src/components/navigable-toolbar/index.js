@@ -36,6 +36,7 @@ function hasFocusWithin( container ) {
 
 function focusFirstTabbableIn( container ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
+
 	if ( firstTabbable ) {
 		firstTabbable.focus( {
 			// When focusing newly mounted toolbars,
@@ -99,15 +100,15 @@ function useIsAccessibleToolbar( toolbarRef ) {
 	return isAccessibleToolbar;
 }
 
-function useToolbarFocus(
+function useToolbarFocus( {
 	toolbarRef,
-	focusEditorOnEscape,
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
 	onIndexChange,
-	shouldUseKeyboardFocusShortcut
-) {
+	shouldUseKeyboardFocusShortcut,
+	focusEditorOnEscape,
+} ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
@@ -212,15 +213,15 @@ function UnforwardNavigableToolbar(
 	const toolbarRef = ref || maybeRef;
 	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
 
-	useToolbarFocus(
+	useToolbarFocus( {
 		toolbarRef,
-		focusEditorOnEscape,
 		focusOnMount,
 		isAccessibleToolbar,
-		initialIndex,
+		defaultIndex: initialIndex,
 		onIndexChange,
-		shouldUseKeyboardFocusShortcut
-	);
+		shouldUseKeyboardFocusShortcut,
+		focusEditorOnEscape,
+	} );
 
 	if ( isAccessibleToolbar ) {
 		return (
