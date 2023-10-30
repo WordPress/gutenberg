@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalTruncate as Truncate,
 	__experimentalItemGroup as ItemGroup,
@@ -24,8 +23,6 @@ import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
-
-const EMPTY_OBJECT = {};
 
 function TemplateAreaButton( { postId, area, title } ) {
 	const templatePartArea = useSelect(
@@ -68,25 +65,10 @@ function TemplateAreaButton( { postId, area, title } ) {
 export default function TemplateAreas() {
 	const { templatePartAreas, currentTemplateParts } = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( coreStore );
 			const { getSettings, getCurrentTemplateTemplateParts } = unlock(
 				select( editSiteStore )
 			);
-			const siteSettings = getEntityRecord( 'root', 'site' );
-			const _postsPageRecord = siteSettings?.page_for_posts
-				? getEntityRecord(
-						'postType',
-						'page',
-						siteSettings?.page_for_posts
-				  )
-				: EMPTY_OBJECT;
-
 			return {
-				allowCommentsOnNewPosts:
-					siteSettings?.default_comment_status === 'open',
-				postsPageTitle: _postsPageRecord?.title?.rendered,
-				postsPageId: _postsPageRecord?.id,
-				postsPerPage: siteSettings?.posts_per_page,
 				templatePartAreas: getSettings()?.defaultTemplatePartAreas,
 				currentTemplateParts: getCurrentTemplateTemplateParts(),
 			};

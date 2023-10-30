@@ -19,8 +19,6 @@ import {
 	SidebarNavigationScreenDetailsPanel,
 	SidebarNavigationScreenDetailsPanelRow,
 } from '../sidebar-navigation-screen-details-panel';
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 
 const EMPTY_OBJECT = {};
 
@@ -34,9 +32,6 @@ export default function HomeTemplateDetails() {
 		postsPageId,
 	} = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
-		const { getSettings, getCurrentTemplateTemplateParts } = unlock(
-			select( editSiteStore )
-		);
 		const siteSettings = getEntityRecord( 'root', 'site' );
 		const _postsPageRecord = siteSettings?.page_for_posts
 			? getEntityRecord(
@@ -52,8 +47,6 @@ export default function HomeTemplateDetails() {
 			postsPageTitle: _postsPageRecord?.title?.rendered,
 			postsPageId: _postsPageRecord?.id,
 			postsPerPage: siteSettings?.posts_per_page,
-			templatePartAreas: getSettings()?.defaultTemplatePartAreas,
-			currentTemplateParts: getCurrentTemplateTemplateParts(),
 		};
 	}, [] );
 
