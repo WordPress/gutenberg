@@ -151,10 +151,10 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 
 		if ( ! $render_cb_registered ) {
 			/**
-			 * Filter that disables the enhanced pagination feature when a
-			 * plugin block is found inside. It does so by adding an attribute
-			 * called `data-wp-navigation-disabled` which is later handled by
-			 * the front-end logic.
+			 * Filter that disables the enhanced pagination feature during block
+			 * rendering when a plugin block has been found inside. It does so
+			 * by adding an attribute called `data-wp-navigation-disabled` which
+			 * is later handled by the front-end logic.
 			 *
 			 * @param string   $content  The block content.
 			 * @param array    $block    The full block, including name and attributes.
