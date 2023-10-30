@@ -682,13 +682,6 @@ const clickIfClickable = async (
 	}
 };
 
-// Only for Android
-const waitIfAndroid = async () => {
-	if ( isAndroid() ) {
-		await editorPage.driver.sleep( 1000 );
-	}
-};
-
 /**
  * Content type definitions.
  * Note: Android only supports plaintext.
@@ -770,5 +763,4 @@ module.exports = {
 	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
-	waitIfAndroid,
 };
