@@ -142,19 +142,26 @@ function block_core_query_check_plugin_blocks( $parsed_block, $source_block, $pa
 			 * That effectively disables the enhanced pagination.
 			 */
 			$render_query_block = function ( $block_content, $block, $instance ) use ( &$current_query_level, &$has_plugin_blocks ) {
+				$has_enhanced_pagination = isset( $block['attrs']['enhancedPagination'] ) && $block['attrs']['enhancedPagination'];
+				$content = $block_content;
+
+				if ( ! $has_enhanced_pagination ) return $content;
+
 				if ( $has_plugin_blocks ) {
 					$p = new WP_HTML_Tag_Processor( $block_content );
 					if ( $p->next_tag() ) {
 						$p->remove_attribute( 'data-wp-interactive' );
 						$p->remove_attribute( 'data-wp-navigation-id' );
 					}
-					return $p->get_updated_html();
+					$content = $p->get_updated_html();
 				}
 
 				$current_query_level -= 1;
 				if ( 0 === $current_query_level && $has_plugin_blocks ) {
 					$has_plugin_blocks = false;
 				}
+
+				return $content;
 			};
 
 			add_filter( 'render_block_core/query', $render_query_block, 999, 3 );
