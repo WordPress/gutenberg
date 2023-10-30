@@ -52,6 +52,69 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
+
+	const isWeb = Platform.OS === 'web';
+	const textControl = (
+		<TextControl
+			__nextHasNoMarginBottom
+			className="html-anchor-control"
+			label={ __( 'HTML anchor' ) }
+			help={
+				<>
+					{ __(
+						'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+					) }
+
+					{ isWeb && (
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/documentation/article/page-jumps/'
+							) }
+						>
+							{ __( 'Learn more about anchors' ) }
+						</ExternalLink>
+					) }
+				</>
+			}
+			value={ attributes.anchor || '' }
+			placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
+			onChange={ ( nextValue ) => {
+				nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+				setAttributes( {
+					anchor: nextValue,
+				} );
+			} }
+			autoCapitalize="none"
+			autoComplete="off"
+		/>
+	);
+
+	return (
+		<>
+			{ isWeb && blockEditingMode === 'default' && (
+				<InspectorControls group="advanced">
+					{ textControl }
+				</InspectorControls>
+			) }
+			{ /*
+			 * We plan to remove scoping anchors to 'core/heading' to support
+			 * anchors for all eligble blocks. Additionally we plan to explore
+			 * leveraging InspectorAdvancedControls instead of a custom
+			 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
+			 */ }
+			{ ! isWeb && blockName === 'core/heading' && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Heading settings' ) }>
+						{ textControl }
+					</PanelBody>
+				</InspectorControls>
+			) }
+		</>
+	);
+}
+
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
@@ -64,71 +127,19 @@ export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
 			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
-			const blockEditingMode = useBlockEditingMode();
 
-			if ( hasAnchor && props.isSelected ) {
-				const isWeb = Platform.OS === 'web';
-				const textControl = (
-					<TextControl
-						__nextHasNoMarginBottom
-						className="html-anchor-control"
-						label={ __( 'HTML anchor' ) }
-						help={
-							<>
-								{ __(
-									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-								) }
-
-								{ isWeb && (
-									<ExternalLink
-										href={ __(
-											'https://wordpress.org/documentation/article/page-jumps/'
-										) }
-									>
-										{ __( 'Learn more about anchors' ) }
-									</ExternalLink>
-								) }
-							</>
-						}
-						value={ props.attributes.anchor || '' }
-						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
-						onChange={ ( nextValue ) => {
-							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-							props.setAttributes( {
-								anchor: nextValue,
-							} );
-						} }
-						autoCapitalize="none"
-						autoComplete="off"
-					/>
-				);
-
-				return (
-					<>
-						<BlockEdit { ...props } />
-						{ isWeb && blockEditingMode === 'default' && (
-							<InspectorControls group="advanced">
-								{ textControl }
-							</InspectorControls>
-						) }
-						{ /*
-						 * We plan to remove scoping anchors to 'core/heading' to support
-						 * anchors for all eligble blocks. Additionally we plan to explore
-						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
-						 */ }
-						{ ! isWeb && props.name === 'core/heading' && (
-							<InspectorControls>
-								<PanelBody title={ __( 'Heading settings' ) }>
-									{ textControl }
-								</PanelBody>
-							</InspectorControls>
-						) }
-					</>
-				);
-			}
-
-			return <BlockEdit { ...props } />;
+			return (
+				<>
+					<BlockEdit { ...props } />
+					{ hasAnchor && props.isSelected && (
+						<BlockEditAnchorControl
+							blockName={ props.name }
+							attributes={ props.attributes }
+							setAttributes={ props.setAttributes }
+						/>
+					) }
+				</>
+			);
 		};
 	},
 	'withInspectorControl'
