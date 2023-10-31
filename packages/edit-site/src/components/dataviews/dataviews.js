@@ -14,7 +14,7 @@ import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
-import TextFilter from './text-filter';
+import Search from './search';
 import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
@@ -41,7 +41,7 @@ export default function DataViews( {
 				<HStack>
 					<HStack justify="start">
 						{ search && (
-							<TextFilter
+							<Search
 								label={ searchLabel }
 								view={ view }
 								onChangeView={ onChangeView }
