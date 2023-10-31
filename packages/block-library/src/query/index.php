@@ -161,7 +161,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 *
 			 * @return string Returns the modified output of the query block.
 			 */
-			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries ) {
+			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries, &$render_query_callback ) {
 				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
 				if ( ! $has_enhanced_pagination ) {
 					return $content;
@@ -176,6 +176,10 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				}
 
 				array_pop( $enhanced_query_stack );
+				if ( empty( $enhanced_query_stack ) ) {
+					remove_filter( 'render_block_core/query', $render_query_callback );
+					$render_query_callback = null;
+				}
 
 				return $content;
 			};
