@@ -10,11 +10,12 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import EmptyBlockInserter from './empty-block-inserter';
 import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockPopover from './selected-block-popover';
+import SelectedBlockTools from './selected-block-tools';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -144,7 +145,10 @@ export default function BlockTools( {
 					) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }
-				<SelectedBlockPopover
+				<SelectedBlockTools
+					__unstableContentRef={ __unstableContentRef }
+				/>
+				<EmptyBlockInserter
 					__unstableContentRef={ __unstableContentRef }
 				/>
 				{ /* Used for the inline rich text toolbar. */ }

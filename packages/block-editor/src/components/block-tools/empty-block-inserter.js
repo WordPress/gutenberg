@@ -6,21 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import BlockSelectionButton from './block-selection-button';
-import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
-import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
 function selector( select ) {
 	const {
@@ -40,7 +35,7 @@ function selector( select ) {
 	};
 }
 
-function SelectedBlockPopover( {
+function EmptyBlockInserter( {
 	clientId,
 	rootClientId,
 	isEmptyDefaultBlock,
@@ -48,10 +43,7 @@ function SelectedBlockPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { editorMode, hasMultiSelection, isTyping, lastClientId } = useSelect(
-		selector,
-		[]
-	);
+	const { editorMode, isTyping, lastClientId } = useSelect( selector, [] );
 
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
@@ -71,42 +63,9 @@ function SelectedBlockPopover( {
 		},
 		[ clientId ]
 	);
-	const isToolbarForced = useRef( false );
-	const { shouldShowContextualToolbar, canFocusHiddenToolbar } =
-		useShouldContextualToolbarShow();
-
-	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
 		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
-	const shouldShowBreadcrumb =
-		! hasMultiSelection &&
-		( editorMode === 'navigation' || editorMode === 'zoom-out' );
-
-	useShortcut(
-		'core/block-editor/focus-toolbar',
-		() => {
-			isToolbarForced.current = true;
-			stopTyping( true );
-		},
-		{
-			isDisabled: ! canFocusHiddenToolbar,
-		}
-	);
-
-	useEffect( () => {
-		isToolbarForced.current = false;
-	} );
-
-	// Stores the active toolbar item index so the block toolbar can return focus
-	// to it when re-mounting.
-	const initialToolbarItemIndexRef = useRef();
-
-	useEffect( () => {
-		// Resets the index whenever the active block changes so this is not
-		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-		initialToolbarItemIndexRef.current = undefined;
-	}, [ clientId ] );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -139,48 +98,6 @@ function SelectedBlockPopover( {
 						__experimentalIsQuick
 					/>
 				</div>
-			</BlockPopover>
-		);
-	}
-
-	if ( shouldShowBreadcrumb || shouldShowContextualToolbar ) {
-		return (
-			<BlockPopover
-				clientId={ capturingClientId || clientId }
-				bottomClientId={ lastClientId }
-				className={ classnames(
-					'block-editor-block-list__block-popover',
-					{
-						'is-insertion-point-visible': isInsertionPointVisible,
-					}
-				) }
-				__unstablePopoverSlot={ __unstablePopoverSlot }
-				__unstableContentRef={ __unstableContentRef }
-				resize={ false }
-				{ ...popoverProps }
-			>
-				{ shouldShowContextualToolbar && (
-					<BlockContextualToolbar
-						// If the toolbar is being shown because of being forced
-						// it should focus the toolbar right after the mount.
-						focusOnMount={ isToolbarForced.current }
-						__experimentalInitialIndex={
-							initialToolbarItemIndexRef.current
-						}
-						__experimentalOnIndexChange={ ( index ) => {
-							initialToolbarItemIndexRef.current = index;
-						} }
-						// Resets the index whenever the active block changes so
-						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-						key={ clientId }
-					/>
-				) }
-				{ shouldShowBreadcrumb && (
-					<BlockSelectionButton
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-					/>
-				) }
 			</BlockPopover>
 		);
 	}
@@ -230,7 +147,7 @@ function wrapperSelector( select ) {
 	};
 }
 
-export default function WrappedBlockPopover( {
+export default function WrappedEmptyBlockInserter( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
@@ -253,7 +170,7 @@ export default function WrappedBlockPopover( {
 	}
 
 	return (
-		<SelectedBlockPopover
+		<EmptyBlockInserter
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
