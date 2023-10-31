@@ -120,17 +120,20 @@ export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEdit = <BlockEdit key="edit" { ...props } />;
 		const { name: blockName } = props;
-
-		const blockEditingMode = useBlockEditingMode();
-		if ( blockEditingMode !== 'default' ) {
-			return blockEdit;
-		}
-
+		// Compute the block valid alignments by taking into account,
+		// if the theme supports wide alignments or not and the layout's
+		// availble alignments. We do that for conditionally rendering
+		// Slot.
 		const blockAllowedAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
 		);
-		if ( blockAllowedAlignments.length === 0 ) {
+
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
+		).map( ( { name } ) => name );
+		const blockEditingMode = useBlockEditingMode();
+		if ( ! validAlignments.length || blockEditingMode !== 'default' ) {
 			return blockEdit;
 		}
 
@@ -151,7 +154,7 @@ export const withToolbarControls = createHigherOrderComponent(
 					<BlockAlignmentControl
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
-						controls={ blockAllowedAlignments }
+						controls={ validAlignments }
 					/>
 				</BlockControls>
 				{ blockEdit }
