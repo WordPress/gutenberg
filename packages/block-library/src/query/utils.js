@@ -347,22 +347,22 @@ export const usePatterns = ( clientId, name ) => {
 
 /**
  * The object returned by useUnsupportedBlocks with info about the type of
- * unsupported blocks present in the Query block.
+ * unsupported blocks present inside the Query block.
  *
  * @typedef  {Object}  UnsupportedBlocksInfo
  * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
  * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks (i.e., when bitSum !== 0).
+ * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
  */
 
 /**
  * Hook that returns an object with information about the unsupported blocks
- * present inside a Query Loop with the given `clientId`. The returned contains
- * props that are true when a certain type of block is present. It also returns
- * a bit sum to be able easily compare when the blocks have changed.
+ * present inside a Query Loop with the given `clientId`. The returned object
+ * contains props that are true when a certain type of unsupported block is
+ * present.
  *
  * @param {string} clientId The block's client ID.
- * @return {UnsupportedBlocksInfo} The object containing all the info.
+ * @return {UnsupportedBlocksInfo} The object containing the information.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(

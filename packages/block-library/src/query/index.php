@@ -126,9 +126,9 @@ add_action( 'init', 'register_block_core_query' );
 
 /**
  * Traverse the tree of blocks looking for any plugin block (i.e., a block from
- * an installed third-party plugin) inside a Query block with the enhanced
- * pagination enabled. If at least one is found, the enhanced pagination is
- * effectively disabled to prevent any potential incompatibilities.
+ * an installed plugin) inside a Query block with the enhanced pagination
+ * enabled. If at least one is found, the enhanced pagination is effectively
+ * disabled to prevent any potential incompatibilities.
  *
  * @since 6.4.0
  *
@@ -145,7 +145,9 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 
 	if (
 		'core/query' === $block_name &&
-		! empty( $parsed_block['attrs']['enhancedPagination'] )
+		isset( $parsed_block['attrs']['enhancedPagination'] ) &&
+		true === $parsed_block['attrs']['enhancedPagination'] &&
+		isset( $parsed_block['attrs']['queryId'] )
 	) {
 		$enhanced_query_stack[] = $parsed_block['attrs']['queryId'];
 
@@ -162,7 +164,11 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 * @return string Returns the modified output of the query block.
 			 */
 			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries, &$render_query_callback ) {
-				$has_enhanced_pagination = ! empty( $block['attrs']['enhancedPagination'] );
+				$has_enhanced_pagination =
+					isset( $block['attrs']['enhancedPagination'] ) &&
+					true === $block['attrs']['enhancedPagination'] &&
+					isset( $block['attrs']['queryId'] );
+
 				if ( ! $has_enhanced_pagination ) {
 					return $content;
 				}
@@ -176,6 +182,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				}
 
 				array_pop( $enhanced_query_stack );
+
 				if ( empty( $enhanced_query_stack ) ) {
 					remove_filter( 'render_block_core/query', $render_query_callback );
 					$render_query_callback = null;
@@ -198,4 +205,5 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 
 	return $parsed_block;
 }
+
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );

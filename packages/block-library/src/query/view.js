@@ -34,7 +34,7 @@ store( {
 			query: {
 				navigate: async ( { event, ref, context } ) => {
 					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
-						.dataset.wpNavigationDisabled;
+						?.dataset.wpNavigationDisabled;
 
 					if (
 						isValidLink( ref ) &&
@@ -78,7 +78,7 @@ store( {
 				},
 				prefetch: async ( { ref } ) => {
 					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
-						.dataset.wpNavigationDisabled;
+						?.dataset.wpNavigationDisabled;
 					if ( isValidLink( ref ) && ! isDisabled ) {
 						await prefetch( ref.href );
 					}
