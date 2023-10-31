@@ -200,7 +200,8 @@ jobs:
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
                   svn commit -m "Committing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                   --config-option=servers:global:http-timeout=300
 
             - name: Create the SVN tag
               working-directory: ./trunk
@@ -254,4 +255,5 @@ jobs:
             - name: Add the new version directory and commit changes to the SVN repository
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
-                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                  --config-option=servers:global:http-timeout=300

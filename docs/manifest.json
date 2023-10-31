@@ -828,6 +828,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DropdownMenuV2Ariakit",
+		"slug": "dropdown-menu-v2-ariakit",
+		"markdown_source": "../packages/components/src/dropdown-menu-v2-ariakit/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DropdownMenu",
 		"slug": "dropdown-menu",
 		"markdown_source": "../packages/components/src/dropdown-menu/README.md",

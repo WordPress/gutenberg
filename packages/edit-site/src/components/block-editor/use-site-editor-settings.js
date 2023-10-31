@@ -85,19 +85,23 @@ function useArchiveLabel( templateSlug ) {
 
 export default function useSiteEditorSettings() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType } = useSelect(
-		( select ) => {
-			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
-				select( editSiteStore )
-			);
-			return {
-				storedSettings: getSettings( setIsInserterOpened ),
-				canvasMode: getCanvasMode(),
-				templateType: getEditedPostType(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
+	const { storedSettings, canvasMode, templateType, siteSettings } =
+		useSelect(
+			( select ) => {
+				const { canUser, getEntityRecord } = select( coreStore );
+				const { getSettings, getCanvasMode, getEditedPostType } =
+					unlock( select( editSiteStore ) );
+				return {
+					storedSettings: getSettings( setIsInserterOpened ),
+					canvasMode: getCanvasMode(),
+					templateType: getEditedPostType(),
+					siteSettings: canUser( 'read', 'settings' )
+						? getEntityRecord( 'root', 'site' )
+						: undefined,
+				};
+			},
+			[ setIsInserterOpened ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -180,6 +184,8 @@ export default function useSiteEditorSettings() {
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			pageOnFront: siteSettings?.page_on_front,
+			pageForPosts: siteSettings?.page_for_posts,
 		};
 	}, [
 		storedSettings,
@@ -189,5 +195,7 @@ export default function useSiteEditorSettings() {
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		siteSettings?.page_on_front,
+		siteSettings?.page_for_posts,
 	] );
 }

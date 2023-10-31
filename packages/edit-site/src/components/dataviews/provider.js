@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useMemo,
+	Fragment,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -236,18 +242,29 @@ function DataviewsProviderInner( { type, children } ) {
 		</DataviewsContext.Provider>
 	);
 }
-export default function DataviewsProvider( { children } ) {
+function DataviewsProvider( { children } ) {
 	const {
 		params: { path },
 	} = useLocation();
 	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
 
-	if ( window?.__experimentalAdminViews && viewType ) {
+	if ( viewType ) {
 		return (
 			<DataviewsProviderInner type={ viewType }>
 				{ children }
 			</DataviewsProviderInner>
 		);
 	}
-	return <> { children }</>;
+	return <>{ children }</>;
 }
+
+let DataviewsProviderExported = Fragment;
+
+// This condition must stand on its own for correct tree-shaking
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( window?.__experimentalAdminViews ) {
+		DataviewsProviderExported = DataviewsProvider;
+	}
+}
+
+export default DataviewsProviderExported;

@@ -62,10 +62,10 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $link );
 	$processor->next_tag( 'a' );
 	if ( $open_in_new_tab ) {
-		$processor->set_attribute( 'rel', esc_attr( $rel ) . ' noopener nofollow' );
+		$processor->set_attribute( 'rel', trim( $rel . ' noopener nofollow' ) );
 		$processor->set_attribute( 'target', '_blank' );
 	} elseif ( '' !== $rel ) {
-		$processor->set_attribute( 'rel', esc_attr( $rel ) );
+		$processor->set_attribute( 'rel', trim( $rel ) );
 	}
 	return $processor->get_updated_html();
 }

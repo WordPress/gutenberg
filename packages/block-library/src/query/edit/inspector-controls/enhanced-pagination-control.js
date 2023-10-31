@@ -3,22 +3,19 @@
  */
 import { ToggleControl, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { BlockTitle } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useContainsThirdPartyBlocks } from '../../utils';
+import { useUnsupportedBlockList } from '../../utils';
 
 export default function EnhancedPaginationControl( {
 	enhancedPagination,
 	setAttributes,
 	clientId,
 } ) {
-	const enhancedPaginationNotice = __(
-		"Enhanced pagination doesn't support plugin blocks yet. If you want to enable it, you have to remove all plugin blocks from the Query Loop."
-	);
-
-	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
+	const unsupported = useUnsupportedBlockList( clientId );
 
 	return (
 		<>
@@ -28,20 +25,32 @@ export default function EnhancedPaginationControl( {
 					'Browsing between pages won’t require a full page reload.'
 				) }
 				checked={ !! enhancedPagination }
-				disabled={ containsThirdPartyBlocks }
+				disabled={ unsupported.length }
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: !! value,
 					} );
 				} }
 			/>
-			{ containsThirdPartyBlocks && (
+			{ !! unsupported.length && (
 				<Notice
 					status="warning"
 					isDismissible={ false }
 					className="wp-block-query__enhanced-pagination-notice"
 				>
-					{ enhancedPaginationNotice }
+					{ __(
+						"Enhanced pagination doesn't support the following blocks:"
+					) }
+					<ul>
+						{ unsupported.map( ( id ) => (
+							<li key={ id }>
+								<BlockTitle clientId={ id } />
+							</li>
+						) ) }
+					</ul>
+					{ __(
+						'If you want to enable it, you have to remove all unsupported blocks first.'
+					) }
 				</Notice>
 			) }
 		</>
