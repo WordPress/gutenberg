@@ -21,6 +21,8 @@ export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
+	search = true,
+	searchLabel = undefined,
 	actions,
 	data,
 	isLoading = false,
@@ -38,10 +40,13 @@ export default function DataViews( {
 			<VStack spacing={ 4 } justify="flex-start">
 				<HStack>
 					<HStack justify="start">
-						<TextFilter
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
+						{ search && (
+							<TextFilter
+								label={ searchLabel }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
+						) }
 						<Filters
 							fields={ fields }
 							view={ view }
