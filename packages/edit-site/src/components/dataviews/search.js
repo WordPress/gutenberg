@@ -10,7 +10,7 @@ import { SearchControl } from '@wordpress/components';
  */
 import useDebouncedInput from '../../utils/use-debounced-input';
 
-export default function TextFilter( { label, view, onChangeView } ) {
+export default function Search( { label, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
 		view.search
 	);
