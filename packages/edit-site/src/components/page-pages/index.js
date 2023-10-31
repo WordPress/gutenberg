@@ -196,7 +196,6 @@ export default function PagePages() {
 				filters: [
 					{
 						type: 'enumeration',
-						id: 'status',
 						resetValue: defaultStatuses,
 					},
 				],

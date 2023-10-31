@@ -16,7 +16,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		}
 
 		field.filters.forEach( ( filter ) => {
-			let id = field.id;
+			const id = field.id;
 			if ( 'string' === typeof filter ) {
 				filterIndex[ id ] = {
 					id,
@@ -26,7 +26,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 			}
 
 			if ( 'object' === typeof filter ) {
-				id = filter.id || field.id;
 				filterIndex[ id ] = {
 					id,
 					name: filter.name || field.header,
