@@ -270,18 +270,26 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	// Update current selections when the filter input changes.
 	useEffect( () => {
-		const hasMatchingSuggestions = matchingSuggestions.length > 0;
-		const hasSelectedMatchingSuggestions =
-			getIndexOfMatchingSuggestion(
-				selectedSuggestion,
-				matchingSuggestions
-			) > 0;
-
-		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
-			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
-			setSelectedSuggestion( matchingSuggestions[ 0 ] );
+		if ( ! shouldFilter ) {
+			setSelectedSuggestion( null );
+			return;
 		}
-	}, [ matchingSuggestions, selectedSuggestion ] );
+
+		// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
+		setSelectedSuggestion( ( previousSuggetion ) => {
+			const hasMatchingSuggestions = matchingSuggestions.length > 0;
+			const hasSelectedMatchingSuggestions =
+				getIndexOfMatchingSuggestion(
+					previousSuggetion,
+					matchingSuggestions
+				) > 0;
+
+			if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+				return matchingSuggestions[ 0 ];
+			}
+			return previousSuggetion;
+		} );
+	}, [ shouldFilter, matchingSuggestions ] );
 
 	// Announcements.
 	useEffect( () => {
