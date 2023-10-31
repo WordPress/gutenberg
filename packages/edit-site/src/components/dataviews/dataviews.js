@@ -6,7 +6,6 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,12 +16,6 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import TextFilter from './text-filter';
 import { ViewGrid } from './view-grid';
-
-const searchFilter = {
-	id: 'search',
-	type: 'search',
-	name: __( 'Filter list' ),
-};
 
 export default function DataViews( {
 	view,
@@ -46,7 +39,6 @@ export default function DataViews( {
 				<HStack>
 					<HStack justify="start">
 						<TextFilter
-							filter={ searchFilter }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>

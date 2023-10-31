@@ -83,6 +83,7 @@ export default function PagePages() {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
+			search: view.search,
 			...view.filters,
 		} ),
 		[ view ]
