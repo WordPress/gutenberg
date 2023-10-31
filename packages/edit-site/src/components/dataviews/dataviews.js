@@ -35,7 +35,7 @@ export default function DataViews( {
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 4 } justify="flex-start">
 				<HStack>
 					<HStack justify="start">
 						<Filters

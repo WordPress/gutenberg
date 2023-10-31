@@ -50,7 +50,12 @@ export function ViewGrid( { data, fields, view, actions } ) {
 									) ) }
 								</VStack>
 							</FlexBlock>
-							<ItemActions item={ item } actions={ actions } />
+							<FlexBlock>
+								<ItemActions
+									item={ item }
+									actions={ actions }
+								/>
+							</FlexBlock>
 						</HStack>
 					</VStack>
 				);
