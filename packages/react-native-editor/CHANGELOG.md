@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
 -   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
 -   [*] Classic block: Add option to convert to blocks [#55461]
+-   [*] Fix error when pasting deeply nested structure content [#55613]
 
 ## 1.106.0
 -   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
