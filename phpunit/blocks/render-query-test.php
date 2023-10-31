@@ -38,10 +38,24 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 				'post_excerpt' => 'Post 2',
 			)
 		);
+
+		register_block_type(
+			'test/plugin-block',
+			array(
+				'render_callback' => static function () {
+					return '<div class="wp-block-test/plugin-block">Test</div>';
+				},
+			)
+		);
+	}
+
+	public function tear_down() {
+		parent::tear_down();
+		unregister_block_type( 'test/plugin-block' );
 	}
 
 	/**
-	 * Tests that the `core/block` block adds the corresponding directives when
+	 * Tests that the `core/query` block adds the corresponding directives when
 	 * the `enhancedPagination` attribute is set.
 	 */
 	public function test_rendering_query_with_enhanced_pagination() {
@@ -96,10 +110,8 @@ HTML;
 		$this->assertSame( 'selectors.core.query.finishAnimation', $p->get_attribute( 'data-wp-class--finish-animation' ) );
 	}
 
-
-
 	/**
-	 * Tests that the `core/block` block adds an extra attribute to disable the
+	 * Tests that the `core/query` block adds an extra attribute to disable the
 	 * enhanced pagination in the browser when a plugin block is found inside.
 	 */
 	public function test_rendering_query_with_enhanced_pagination_auto_disabled() {
@@ -111,10 +123,6 @@ HTML;
 			<!-- wp:post-template {"align":"wide"} -->
 				<!-- wp:test/plugin-block /-->
 			<!-- /wp:post-template -->
-			<!-- wp:query-pagination -->
-				<!-- wp:query-pagination-previous /-->
-				<!-- wp:query-pagination-next /-->
-			<!-- /wp:query-pagination -->
 		</div>
 		<!-- /wp:query -->
 HTML;
@@ -128,21 +136,71 @@ HTML;
 
 		$wp_the_query = $wp_query;
 
-		register_block_type(
-			'test/plugin-block',
-			array(
-				'render_callback' => static function () {
-					return '<div class="wp-block-test/plugin-block">Test</div>';
-				},
-			)
-		);
-
 		$output = do_blocks( $content );
 
 		$p = new WP_HTML_Tag_Processor( $output );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
+	}
+
+	/**
+	 * Tests that the correct `core/query` blocks get the attribute that
+	 * disables enhanced pagination only if they contain a descendant that is
+	 * not supported (i.e., a plugin block).
+	 */
+	public function test_rendering_nested_queries_with_enhanced_pagination_auto_disabled() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+			<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
+			<div class="wp-block-query">
+				<!-- wp:post-template {"align":"wide"} -->
+					<!-- wp:query {"queryId":1,"query":{"inherit":true},"enhancedPagination":true} -->
+					<div class="wp-block-query">
+						<!-- wp:post-template {"align":"wide"} -->
+						<!-- /wp:post-template -->
+					</div>
+					<!-- /wp:query-pagination -->
+					<!-- wp:query {"queryId":2,"query":{"inherit":true},"enhancedPagination":true} -->
+					<div class="wp-block-query">
+						<!-- wp:post-template {"align":"wide"} -->
+							<!-- wp:test/plugin-block /-->
+						<!-- /wp:post-template -->
+					</div>
+					<!-- /wp:query-pagination -->
+				<!-- /wp:post-template -->
+			</div>
+			<!-- /wp:query -->
+HTML;
+
+		// Set main query to single post.
+		$wp_query = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+
+		// Query 0 contains a plugin block inside query-2 -> disabled.
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
+
+		// Query 1 does not contain a plugin block -> enabled.
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-1', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( null, $p->get_attribute( 'data-wp-navigation-disabled' ) );
+
+		// Query 2 contains a plugin block -> disabled.
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-2', $p->get_attribute( 'data-wp-navigation-id' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 }
