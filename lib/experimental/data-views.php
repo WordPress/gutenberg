@@ -9,6 +9,10 @@
  * Registers the `wp_dataviews` post type and the `wp_dataviews_type` taxonomy.
  */
 function _gutenberg_register_data_views_post_type() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	if ( empty( $gutenberg_experiments ) || ! array_key_exists( 'gutenberg-dataviews', $gutenberg_experiments ) ) {
+		return;
+	}
 	register_post_type(
 		'wp_dataviews',
 		array(
