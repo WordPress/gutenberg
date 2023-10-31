@@ -39,6 +39,17 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 			)
 		);
 
+		self::$post_3 = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_name'    => 'post-2',
+				'post_title'   => 'Post 2',
+				'post_content' => 'Post 2 content',
+				'post_excerpt' => 'Post 2',
+			)
+		);
+
 		register_block_type(
 			'test/plugin-block',
 			array(
@@ -59,7 +70,7 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 	 * the `enhancedPagination` attribute is set.
 	 */
 	public function test_rendering_query_with_enhanced_pagination() {
-		global $wp_query, $wp_the_query;
+		global $wp_query, $wp_the_query, $paged;
 
 		$content = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
@@ -78,12 +89,17 @@ HTML;
 		$wp_query = new WP_Query(
 			array(
 				'posts_per_page' => 1,
+				'paged'          => 2,
 			)
 		);
 
 		$wp_the_query = $wp_query;
+		$prev_paged   = $paged;
+		$paged        = 2;
 
 		$output = do_blocks( $content );
+
+		$paged = $prev_paged;
 
 		$p = new WP_HTML_Tag_Processor( $output );
 
@@ -94,6 +110,12 @@ HTML;
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
 		$this->assertSame( 'post-template-item-' . self::$post_2->ID, $p->get_attribute( 'data-wp-key' ) );
+
+		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-previous' ) );
+		$this->assertSame( 'query-pagination-previous', $p->get_attribute( 'data-wp-key' ) );
+		$this->assertSame( 'actions.core.query.navigate', $p->get_attribute( 'data-wp-on--click' ) );
+		$this->assertSame( 'actions.core.query.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
+		$this->assertSame( 'effects.core.query.prefetch', $p->get_attribute( 'data-wp-effect' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-next' ) );
 		$this->assertSame( 'query-pagination-next', $p->get_attribute( 'data-wp-key' ) );
