@@ -100,8 +100,8 @@ Function called when the control's search input value changes. The argument cont
 Function called to determine whether the control should filter the list of displayed options based on the user input or whether it's something that is handled externally by updating the `options` prop when the `onFilterValueChange` callback is called.
 
 -   Type: `boolean`
--	Required: No
--	Default: `true`
+-   Required: No
+-   Default: `true`
 
 #### onChange
 
