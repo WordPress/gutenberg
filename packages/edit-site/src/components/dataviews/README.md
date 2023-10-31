@@ -9,7 +9,6 @@ This file documents the DataViews UI component, which provides an API to render 
 	view={ view }
 	onChangeView={ onChangeView }
 	fields={ fields }
-	filters={ filters }
 	actions={ [ trashPostAction ] }
 	paginationInfo={ { totalItems, totalPages } }
 />
@@ -43,12 +42,12 @@ Example:
 		field: 'date',
 		direction: 'desc',
 	},
+	search: '',
 	filters: {
-		search: '',
 		author: 2,
 		status: 'publish, draft'
 	},
-	visibleFilters: [ 'search', 'author', 'status' ],
+	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
 }
@@ -59,6 +58,7 @@ Example:
 - `page`: the page that is visible.
 - `sort.field`: field used for sorting the dataset.
 - `sort.direction`: the direction to use for sorting, one of `asc` or `desc`.
+- `search`: the text search applied to the dataset.
 - `filters`: the filters applied to the dataset. See filters section.
 - `visibleFilters`: the `id` of the filters that are visible in the UI.
 - `hiddenFields`: the `id` of the fields that are hidden in the UI.
@@ -82,6 +82,7 @@ function MyCustomPageList() {
 			page: view.page,
 			order: view.sort?.direction,
 			orderby: view.sort?.field
+			search: view.search,
 			...view.filters
 		} ),
 		[ view ]
@@ -133,10 +134,7 @@ Example:
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
 		]
-		filters: [
-			'enumeration'
-			{ id: 'author_search', type: 'search', name: __( 'Search by author' ) }
-		],
+		filters: [ 'enumeration' ],
 	}
 ]
 ```
@@ -150,26 +148,18 @@ Example:
 
 ## Filters
 
-Filters describe the conditions a record should match to be listed as part of the dataset.
-
-Filters can be provided globally, as a property of the `DataViews` component, or per field, should they be considered part of a fields' description.
+Filters describe the conditions a record should match to be listed as part of the dataset. Filters are provided per field.
 
 ```js
 const field = [
 	{
 		id: 'author',
-		filters: [
-			'enumeration'
-			{ id: 'author_search', type: 'search', name: __( 'Search by author' ) }
-		],
+		filters: [ 'enumeration' ],
 	}
 ];
 
 <DataViews
 	fields={ fields }
-	filters={ [
-		{ id: 'search', type: 'search', name: __( 'Filter list' ) }
-	] }
 />
 ```
 
@@ -177,7 +167,7 @@ A filter is an object that may contain the following properties:
 
 - `id`: unique identifier for the filter. Matches the entity query param. Field filters may omit it, in which case the field's `id` will be used.
 - `name`: nice looking name for the filter. Field filters may omit it, in which case the field's `header` will be used.
-- `type`: the type of filter. One of `search` or `enumeration`.
+- `type`: the type of filter. Only `enumeration` is supported at the moment.
 - `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
 	- `value`: what's serialized into the view's filters.
 	- `label`: nice-looking name for users.
