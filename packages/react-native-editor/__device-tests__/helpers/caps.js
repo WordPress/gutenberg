@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
-import deviceConfig from './device-config.json';
-
-const { ios: iOSConfig, android: androidConfig } = deviceConfig;
+import {
+	ios as iOSConfig,
+	android as androidConfig,
+} from './device-config.json';
 
 const ios = {
 	deviceOrientation: 'portrait',
