@@ -163,7 +163,7 @@ function useToolbarFocus( {
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount, toolbarRef, onIndexChange ] );
+	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
 
 	const { lastFocus } = useSelect( ( select ) => {
 		const { getLastFocus } = select( blockEditorStore );
