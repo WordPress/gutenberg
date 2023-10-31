@@ -8,7 +8,6 @@ import type { Meta, StoryFn } from '@storybook/react';
  */
 import { RadioGroup } from '..';
 import { Radio } from '../radio';
-import type { RadioProps } from '../types';
 
 /**
  * WordPress dependencies
@@ -16,11 +15,13 @@ import type { RadioProps } from '../types';
 import { useState } from '@wordpress/element';
 
 const meta: Meta< typeof RadioGroup > = {
+	title: 'Components (Deprecated)/RadioGroup',
 	component: RadioGroup,
-	title: 'Components (Deprecated)/RadioGroup (Ariakit)',
+	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+	subcomponents: { Radio },
 	argTypes: {
 		// 	value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
-		onChange: { action: 'onChange' },
+		onChange: { action: '^on.*' },
 	},
 	parameters: {
 		controls: {
@@ -66,9 +67,8 @@ export const Disabled = () => {
 };
 
 const ControlledRadioGroupWithState = () => {
-	const [ checked, setChecked ] = useState<
-		RadioProps[ 'value' ] | undefined
-	>( 1 );
+	const [ checked, setChecked ] =
+		useState< React.ComponentProps< typeof RadioGroup >[ 'checked' ] >( 1 );
 
 	/* eslint-disable no-restricted-syntax */
 	return (
