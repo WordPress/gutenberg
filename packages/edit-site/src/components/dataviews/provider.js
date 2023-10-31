@@ -28,8 +28,8 @@ export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All s
 const DEFAULT_VIEWS = {
 	page: {
 		type: 'list',
+		search: '',
 		filters: {
-			search: '',
 			status: DEFAULT_STATUSES,
 		},
 		page: 1,
@@ -38,7 +38,7 @@ const DEFAULT_VIEWS = {
 			field: 'date',
 			direction: 'desc',
 		},
-		visibleFilters: [ 'search', 'author', 'status' ],
+		visibleFilters: [ 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
