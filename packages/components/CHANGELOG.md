@@ -15,6 +15,7 @@
 ### Internal
 
 -   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
+-   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
 
 ## 25.10.0 (2023-10-18)
 
