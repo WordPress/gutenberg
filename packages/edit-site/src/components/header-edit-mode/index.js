@@ -183,6 +183,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		ease: 'easeOut',
 	};
 
+	const MotionNavigableToolbar = motion( NavigableToolbar );
+
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
@@ -190,8 +192,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
-				<NavigableToolbar
-					render={ <motion.div /> }
+				<MotionNavigableToolbar
 					className="edit-site-header-edit-mode__start"
 					aria-label={ __( 'Document tools' ) }
 					shouldUseKeyboardFocusShortcut={
@@ -295,7 +296,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 							</>
 						) }
 					</div>
-				</NavigableToolbar>
+				</MotionNavigableToolbar>
 			) }
 
 			{ ! isDistractionFree && (
