@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TextFilter from './text-filter';
 import InFilter from './in-filter';
 
 export default function Filters( { fields, view, onChangeView } ) {
@@ -59,16 +58,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 				return null;
 			}
 
-			if ( filter.type === 'search' ) {
-				return (
-					<TextFilter
-						key={ filterName }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
 			if ( filter.type === 'enumeration' ) {
 				return (
 					<InFilter
