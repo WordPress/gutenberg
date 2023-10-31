@@ -28,6 +28,13 @@ fi
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
 IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
 
+# Throw an error if the required iOS runtime is not installed
+if ! xcrun simctl list runtimes -j | jq -r --arg version "$IOS_PLATFORM_VERSION" '.runtimes | to_entries[] | select(.value.version | contains($version))' > /dev/null; then
+	echo "[error] iOS $IOS_PLATFORM_VERSION runtime not found! Please install the iOS $IOS_PLATFORM_VERSION runtime using Xcode."
+	echo "        https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings"
+	exit 1;
+fi
+
 function detect_or_create_simulator() {
 	local simulator_name=$1
 	local runtime_name_display=$(echo "iOS $IOS_PLATFORM_VERSION")
