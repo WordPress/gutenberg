@@ -208,10 +208,6 @@ export default function PagePages() {
 		[ statuses, authors ]
 	);
 
-	const filters = useMemo( () => [
-		{ id: 'search', type: 'search', name: __( 'Filter list' ) },
-	] );
-
 	const trashPostAction = useTrashPostAction();
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
@@ -249,7 +245,6 @@ export default function PagePages() {
 			<DataViews
 				paginationInfo={ paginationInfo }
 				fields={ fields }
-				filters={ filters }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }

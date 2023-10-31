@@ -9,16 +9,8 @@ import { __ } from '@wordpress/i18n';
 import TextFilter from './text-filter';
 import InFilter from './in-filter';
 
-export default function Filters( { filters, fields, view, onChangeView } ) {
+export default function Filters( { fields, view, onChangeView } ) {
 	const filterIndex = {};
-	filters.forEach( ( filter ) => {
-		if ( 'object' !== typeof filter || ! filter?.id || ! filter?.type ) {
-			return;
-		}
-
-		filterIndex[ filter.id ] = filter;
-	} );
-
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
