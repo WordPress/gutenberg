@@ -17,7 +17,7 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 export default ( { filter, view, onChangeView } ) => {
 	return (
 		<SelectControl
-			value={ view.filters[ filter.id ] }
+			value={ view.filters[ filter.id ]?.in }
 			prefix={
 				<InputControlPrefixWrapper
 					as="span"
@@ -29,7 +29,11 @@ export default ( { filter, view, onChangeView } ) => {
 			options={ filter.elements }
 			onChange={ ( value ) => {
 				if ( value === '' ) {
+					// Reset the filter.
+					// By setting it to undefined, it'll be removed by cleanEmptyObject.
 					value = undefined;
+				} else {
+					value = { in: value };
 				}
 
 				onChangeView( ( currentView ) => ( {

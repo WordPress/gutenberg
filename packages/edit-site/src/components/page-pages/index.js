@@ -78,24 +78,32 @@ export default function PagePages() {
 				...view,
 				filters: {
 					...view.filters,
-					status: defaultStatuses,
+					status: {
+						in: defaultStatuses,
+					},
 				},
 			} );
 		}
 	}, [ defaultStatuses ] );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		if ( view.filters?.status?.in ) {
+			filters.status = view.filters.status.in;
+		}
+		if ( view.filters?.author?.in ) {
+			filters.author = view.filters.author.in;
+		}
+		return {
 			per_page: view.perPage,
 			page: view.page,
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters,
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
