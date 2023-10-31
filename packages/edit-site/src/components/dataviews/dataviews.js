@@ -18,6 +18,12 @@ import Filters from './filters';
 import TextFilter from './text-filter';
 import { ViewGrid } from './view-grid';
 
+const searchFilter = {
+	id: 'search',
+	type: 'search',
+	name: __( 'Filter list' ),
+};
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -27,11 +33,6 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 } ) {
-	const searchFilter = {
-		id: 'search',
-		type: 'search',
-		name: __( 'Filter list' ),
-	};
 	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
