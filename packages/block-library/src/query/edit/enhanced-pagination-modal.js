@@ -38,20 +38,28 @@ export default function EnhancedPaginationModal( {
 	};
 
 	let notice = __(
-		'If you still want to prevent a full page reload, remove that block, then disable "Force page reload" again in the Query Block settings.'
+		'If you still want to prevent full page reloads, remove that block, then disable "Force page reload" again in the Query Block settings.'
 	);
 	if ( hasBlocksFromPlugins ) {
 		notice =
-			__( 'Blocks from plugins are not supported yet.' ) + ' ' + notice;
+			__(
+				'Currently, avoiding full page reloads is not possible when blocks from plugins are present inside the Query block.'
+			) +
+			' ' +
+			notice;
 	} else if ( hasPostContentBlock ) {
 		notice =
-			__( 'The Post Content block is not supported yet.' ) + ' ' + notice;
+			__(
+				'Currently, avoiding full page reloads is not possible when a Content block is present inside the Query block.'
+			) +
+			' ' +
+			notice;
 	}
 
 	return (
 		isOpen && (
 			<Modal
-				title={ __( 'Force page reload has been enabled' ) }
+				title={ __( 'Query block: Force page reload enabled' ) }
 				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
