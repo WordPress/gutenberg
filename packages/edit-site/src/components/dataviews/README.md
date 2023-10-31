@@ -44,8 +44,8 @@ Example:
 	},
 	search: '',
 	filters: {
-		author: 2,
-		status: 'publish, draft'
+		author: { in: 2 },
+		status: { in: 'publish, draft' }
 	},
 	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
@@ -76,17 +76,30 @@ function MyCustomPageList() {
 		"...": "..."
 	} );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		if ( view.filters?.status?.in ) {
+			filters.status = view.filters.status.in;
+		}
+		if ( view.filters?.status?.notIn ) {
+			filters.status_exclude = view.filters.status.notIn;
+		}
+		if ( view.filters?.author?.in ) {
+			filters.author = view.filters.author.in;
+		}
+		if ( view.filters?.author?.notIn ) {
+			filters.author_exclude = view.filters.author.notIn;
+		}
+		return {
 			per_page: view.perPage,
 			page: view.page,
+			_embed: 'author',
 			order: view.sort?.direction,
-			orderby: view.sort?.field
+			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 
 	const {
 		records
