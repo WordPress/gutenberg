@@ -14,27 +14,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Layout from '../layout';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
-import DataviewsProvider from '../dataviews/provider';
 import { unlock } from '../../lock-unlock';
 
-const { RouterProvider, useLocation } = unlock( routerPrivateApis );
-
-const PATH_TO_DATAVIEW_TYPE = {
-	'/pages': 'page',
-};
-
-function DataviewsProviderWithType( { children } ) {
-	const {
-		params: { path },
-	} = useLocation();
-	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
-	if ( ! viewType ) {
-		return <>{ children }</>;
-	}
-	return (
-		<DataviewsProvider type={ viewType }>{ children }</DataviewsProvider>
-	);
-}
+const { RouterProvider } = unlock( routerPrivateApis );
 
 export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -56,10 +38,8 @@ export default function App() {
 			<GlobalStylesProvider>
 				<UnsavedChangesWarning />
 				<RouterProvider>
-					<DataviewsProviderWithType>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</DataviewsProviderWithType>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
 				</RouterProvider>
 			</GlobalStylesProvider>
 		</SlotFillProvider>

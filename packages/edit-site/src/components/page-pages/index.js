@@ -8,13 +8,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	useContext,
-	useMemo,
-	useCallback,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,14 +19,18 @@ import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
 import {
+	DEFAULT_STATUSES,
+	default as DEFAULT_VIEWS,
+} from '../dataviews/default-views';
+import {
 	useTrashPostAction,
 	postRevisionsAction,
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
 import Media from '../media';
-import DataviewsContext from '../dataviews/context';
-import { DEFAULT_STATUSES } from '../dataviews/provider';
+import { unlock } from '../../lock-unlock';
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -40,8 +40,26 @@ const defaultConfigPerViewType = {
 	},
 };
 
+const PATH_TO_DATAVIEW_TYPE = {
+	'/pages': 'page',
+};
+
 export default function PagePages() {
-	const { view, setView } = useContext( DataviewsContext );
+	const {
+		params: { path, currentView = 'all' },
+	} = useLocation();
+	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
+	const initialView = DEFAULT_VIEWS[ viewType ].find(
+		( { slug } ) => slug === currentView
+	).view;
+	const [ view, setView ] = useState( initialView );
+	useEffect( () => {
+		setView(
+			DEFAULT_VIEWS[ viewType ].find(
+				( { slug } ) => slug === currentView
+			).view
+		);
+	}, [ viewType, currentView ] );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
@@ -111,13 +129,13 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item, view: currentView } ) =>
+				render: ( { item, view: iterationView } ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
 							id={ item.featured_media }
 							size={
-								currentView.type === 'list'
+								iterationView.type === 'list'
 									? [ 'thumbnail', 'medium', 'large', 'full' ]
 									: [ 'large', 'full', 'medium', 'thumbnail' ]
 							}
