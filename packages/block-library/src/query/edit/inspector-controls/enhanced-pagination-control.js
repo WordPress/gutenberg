@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToggleControl, ExternalLink } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,22 +14,18 @@ export default function EnhancedPaginationControl( {
 	setAttributes,
 	clientId,
 } ) {
-	const { hasBlocksFromPlugins, hasPostContentBlock } =
-		useUnsupportedBlocks( clientId );
+	const { hasUnsupportedBlocks } = useUnsupportedBlocks( clientId );
 
-	const help = enhancedPagination ? (
-		<>
-			{ __(
-				'Browsing between pages will be seamless unless unexpected content is detected.'
-			) }{ ' ' }
-			<ExternalLink href="https://wordpress.org/">
-				{ __( 'Learn more' ) }
-			</ExternalLink>
-			{ '.' }
-		</>
-	) : (
-		__( 'Browsing between pages requires a full page reload.' )
-	);
+	let help = __( 'Browsing between pages requires a full page reload.' );
+	if ( enhancedPagination ) {
+		help = __(
+			"Browsing between pages won't require a full page reload, unless non-compatible blocks are detected."
+		);
+	} else if ( hasUnsupportedBlocks ) {
+		help = __(
+			"Force page reload can't be disabled because there are non-compatible blocks inside the Query block."
+		);
+	}
 
 	return (
 		<>
@@ -37,7 +33,7 @@ export default function EnhancedPaginationControl( {
 				label={ __( 'Force page reload' ) }
 				help={ help }
 				checked={ ! enhancedPagination }
-				disabled={ hasBlocksFromPlugins || hasPostContentBlock }
+				disabled={ hasUnsupportedBlocks }
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: ! value,

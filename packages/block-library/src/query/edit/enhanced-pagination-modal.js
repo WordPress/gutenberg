@@ -12,7 +12,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useUnsupportedBlocks, useHaveBlocksChanged } from '../utils';
+import { useUnsupportedBlocks } from '../utils';
 
 const modalDescriptionId =
 	'wp-block-query-enhanced-pagination-modal__description';
@@ -23,54 +23,35 @@ export default function EnhancedPaginationModal( {
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-	const {
-		hasBlocksFromPlugins,
-		hasPostContentBlock,
-		hasPatternOrTemplatePartBlocks,
-		hasUnsupportedBlocks,
-	} = useUnsupportedBlocks( clientId );
-	const haveBlocksChanged = useHaveBlocksChanged( clientId );
+	const { hasBlocksFromPlugins, hasPostContentBlock, hasUnsupportedBlocks } =
+		useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		if ( enhancedPagination && haveBlocksChanged && hasUnsupportedBlocks ) {
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
-			if ( hasBlocksFromPlugins || hasPostContentBlock ) {
-				setAttributes( { enhancedPagination: false } );
-			}
 		}
-	}, [
-		enhancedPagination,
-		haveBlocksChanged,
-		hasUnsupportedBlocks,
-		hasBlocksFromPlugins,
-		hasPostContentBlock,
-		setAttributes,
-	] );
+	}, [ enhancedPagination, hasUnsupportedBlocks, setAttributes ] );
 
 	const closeModal = () => {
 		setOpen( false );
 	};
 
-	let notice = null;
-	let title = __( 'Enhanced pagination has been disabled' );
+	let notice = __(
+		'If you still want to prevent a full page reload, remove that block, then disable "Force page reload" again in the Query Block settings.'
+	);
 	if ( hasBlocksFromPlugins ) {
 		notice =
-			'Blocks from plugins are not supported yet. For the enhanced pagination to work, remove the blocks, then re-enable "Enhanced pagination" in the Query Block settings.';
+			__( 'Blocks from plugins are not supported yet.' ) + ' ' + notice;
 	} else if ( hasPostContentBlock ) {
-		notice = __(
-			'The Post Content block is not supported yet. For the enhanced pagination to work, remove the block, then re-enable "Enhanced pagination" in the Query Block settings.'
-		);
-	} else if ( enhancedPagination && hasPatternOrTemplatePartBlocks ) {
-		title = __( 'Enhanced pagination switched to auto' );
-		notice = __(
-			'Blocks from plugins are not supported yet. Please note that if you add them to the patterns or template parts that are currently inside this Query block, this enhanced pagination will be automatically disabled.'
-		);
+		notice =
+			__( 'The Post Content block is not supported yet.' ) + ' ' + notice;
 	}
 
 	return (
 		isOpen && (
 			<Modal
-				title={ title }
+				title={ __( 'Force page reload has been enabled' ) }
 				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
@@ -78,8 +59,6 @@ export default function EnhancedPaginationModal( {
 				role="alertdialog"
 				focusOnMount="firstElement"
 				isDismissible={ false }
-				shouldCloseOnEsc={ true }
-				shouldCloseOnClickOutside={ true }
 				onRequestClose={ closeModal }
 			>
 				<VStack alignment="right" spacing={ 5 }>

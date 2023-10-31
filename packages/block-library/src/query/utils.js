@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -350,11 +350,9 @@ export const usePatterns = ( clientId, name ) => {
  * unsupported blocks present in the Query block.
  *
  * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins           True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock            True if a 'core/post-content' block is present.
- * @property {boolean} hasPatternOrTemplatePartBlocks True if a 'core/block' or 'core/template-part' block is present.
- * @property {number}  bitSum                         The sum representing the presence of different types of blocks. Increases by 1 if there is a plugin block, 2 if there is a Post Content block and 4 if there is either a Pattern or a Template Part block.
- * @property {boolean} hasUnsupportedBlocks           True if there are any unsupported blocks (i.e., when bitSum !== 0).
+ * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
+ * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks (i.e., when bitSum !== 0).
  */
 
 /**
@@ -371,7 +369,7 @@ export const useUnsupportedBlocks = ( clientId ) => {
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			const blocks = { bitSum: 0 };
+			const blocks = {};
 			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
@@ -379,36 +377,13 @@ export const useUnsupportedBlocks = ( clientId ) => {
 						blocks.hasBlocksFromPlugins = true;
 					} else if ( blockName === 'core/post-content' ) {
 						blocks.hasPostContentBlock = true;
-					} else if (
-						blockName === 'core/block' ||
-						blockName === 'core/template-part'
-					) {
-						blocks.hasPatternOrTemplatePartBlocks = true;
 					}
 				}
 			);
-			if ( blocks.hasBlocksFromPlugins ) blocks.bitSum += 1;
-			if ( blocks.hasPostContentBlock ) blocks.bitSum += 2;
-			if ( blocks.hasPatternOrTemplatePartBlocks ) blocks.bitSum += 4;
-			blocks.hasUnsupportedBlocks = blocks.bitSum !== 0;
+			blocks.hasUnsupportedBlocks =
+				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
 			return blocks;
 		},
 		[ clientId ]
 	);
-};
-
-/**
- * Hook that returns a boolean which checks whether the blocks have changed
- * inside a Query Loop with the given `clientId`. This hook uses the `bitSum`
- * value from `useUnsupportedBlocks` to track changes in the blocks.
- *
- * @param {string} clientId The block's client ID.
- * @return {boolean} Returns true if the blocks have changed, otherwise false.
- */
-export const useHaveBlocksChanged = ( clientId ) => {
-	const { bitSum } = useUnsupportedBlocks( clientId );
-	const prevBitSum = useRef( bitSum );
-	const haveBlocksChanged = bitSum !== prevBitSum.current;
-	prevBitSum.current = bitSum;
-	return haveBlocksChanged;
 };
