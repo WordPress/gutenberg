@@ -125,6 +125,10 @@
 			}
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "reverse-mobile", "label": "Reverse on Mobile" }
+	],
 	"editorStyle": "wp-block-media-text-editor",
 	"style": "wp-block-media-text"
 }

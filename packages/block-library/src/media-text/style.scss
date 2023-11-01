@@ -116,4 +116,16 @@
 			grid-row: 2;
 		}
 	}
+
+	.is-style-reverse-mobile.wp-block-media-text.is-stacked-on-mobile {
+		.wp-block-media-text__media {
+			grid-column: 1;
+			grid-row: 2;
+		}
+
+		.wp-block-media-text__content {
+			grid-column: 1;
+			grid-row: 1;
+		}
+	}
 }
