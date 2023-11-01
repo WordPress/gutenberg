@@ -28,7 +28,7 @@ const DEFAULT_PAGE_BASE = {
 };
 
 const DEFAULT_VIEWS = {
-	page: [
+	'/pages': [
 		{
 			title: __( 'All' ),
 			slug: 'all',
@@ -41,6 +41,16 @@ const DEFAULT_VIEWS = {
 				...DEFAULT_PAGE_BASE,
 				filters: {
 					status: 'draft',
+				},
+			},
+		},
+		{
+			title: __( 'Trash' ),
+			slug: 'trash',
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: {
+					status: 'trash',
 				},
 			},
 		},

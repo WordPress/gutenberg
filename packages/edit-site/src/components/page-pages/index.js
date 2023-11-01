@@ -18,10 +18,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
-import {
-	DEFAULT_STATUSES,
-	default as DEFAULT_VIEWS,
-} from '../dataviews/default-views';
+import { DEFAULT_STATUSES, default as DEFAULT_VIEWS } from './default-views';
 import {
 	useTrashPostAction,
 	postRevisionsAction,
@@ -40,26 +37,20 @@ const defaultConfigPerViewType = {
 	},
 };
 
-const PATH_TO_DATAVIEW_TYPE = {
-	'/pages': 'page',
-};
-
 export default function PagePages() {
 	const {
-		params: { path, currentView = 'all' },
+		params: { path, activeView = 'all' },
 	} = useLocation();
-	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
-	const initialView = DEFAULT_VIEWS[ viewType ].find(
-		( { slug } ) => slug === currentView
+	const initialView = DEFAULT_VIEWS[ path ]?.find(
+		( { slug } ) => slug === activeView
 	).view;
 	const [ view, setView ] = useState( initialView );
 	useEffect( () => {
 		setView(
-			DEFAULT_VIEWS[ viewType ].find(
-				( { slug } ) => slug === currentView
-			).view
+			DEFAULT_VIEWS[ path ].find( ( { slug } ) => slug === activeView )
+				.view
 		);
-	}, [ viewType, currentView ] );
+	}, [ path, activeView ] );
 	// Request post statuses to get the proper labels.
 	const { records: statuses } = useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
@@ -129,13 +120,13 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item, view: iterationView } ) =>
+				render: ( { item, view: currentView } ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
 							id={ item.featured_media }
 							size={
-								iterationView.type === 'list'
+								currentView.type === 'list'
 									? [ 'thumbnail', 'medium', 'large', 'full' ]
 									: [ 'large', 'full', 'medium', 'thumbnail' ]
 							}
