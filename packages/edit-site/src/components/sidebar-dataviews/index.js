@@ -19,12 +19,12 @@ function getDataViewIcon( dataview ) {
 	return icons[ dataview.view.type ];
 }
 
-function DataViewItem( { dataview, isActive } ) {
+function DataViewItem( { dataview, isActive, icon } ) {
 	const {
 		params: { path },
 	} = useLocation();
 
-	const icon = getDataViewIcon( dataview );
+	const _icon = icon || getDataViewIcon( dataview );
 
 	const linkInfo = useLink( {
 		path,
@@ -32,7 +32,7 @@ function DataViewItem( { dataview, isActive } ) {
 	} );
 	return (
 		<SidebarNavigationItem
-			icon={ icon }
+			icon={ _icon }
 			{ ...linkInfo }
 			aria-current={ isActive ? 'true' : undefined }
 		>
@@ -55,6 +55,7 @@ export default function DataViewsSidebarContent() {
 				return (
 					<DataViewItem
 						key={ dataview.slug }
+						icon={ dataview.icon }
 						dataview={ dataview }
 						isActive={ dataview.slug === activeView }
 					/>
