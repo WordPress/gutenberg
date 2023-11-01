@@ -57,3 +57,45 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
+
+function recursively_find_block_by_attribute( $blocks, $block_name, $attribute_name, $attribute_value, $found_blocks = array() ) {
+  foreach ( $blocks as $block ) {
+			if ( $block['blockName'] === 'core/navigation' &&isset($block['attrs'][ $attribute_name ]) && $block['attrs'][ $attribute_name ] === $attribute_value ) {
+				$found_blocks[] = $block;
+			}
+      if ( $block['innerBlocks'] ) {
+				$found_blocks = array_merge( $found_blocks, recursively_find_block_by_attribute( $block['innerBlocks'], $block_name, $attribute_name, $attribute_value, $found_blocks) );
+			}
+		}
+  return $found_blocks;
+}
+
+
+function get_template_parts_that_use_menu( $wp_navigation_id ) {
+	// get all wp_template_part posts
+	$wp_template_part_posts = get_posts( array(
+		'post_type' => 'wp_template_part',
+		'posts_per_page' => -1,
+	) );
+	// loop through them and find the ones that have a navigation block
+	// with the ref attribute set to $wp_navigation_id
+	$wp_template_part_posts_with_navigation = array();
+	foreach ( $wp_template_part_posts as $wp_template_part_post ) {
+		$wp_template_part_blocks = parse_blocks( $wp_template_part_post->post_content );
+		$found_avigation = count( recursively_find_block_by_attribute( $wp_template_part_blocks, 'core/navigation', 'ref', $wp_navigation_id) ) > 0;
+    if( $found_avigation ) {
+      $wp_template_part_posts_with_navigation[] = $wp_template_part_post->ID;
+    }
+	}
+	return $wp_template_part_posts_with_navigation;
+}
+
+// register a rest field for posts that returns the template parts that use the menu
+function register_template_parts_that_use_menu_field() {
+	register_rest_field( 'wp_navigation', 'template_parts_that_use_menu', array(
+		'get_callback' => function( $post ) {
+			return get_template_parts_that_use_menu( $post['id'] );
+		},
+	) );
+}
+add_action( 'rest_api_init', 'register_template_parts_that_use_menu_field' );
