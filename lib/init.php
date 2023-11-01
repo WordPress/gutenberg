@@ -75,7 +75,7 @@ function recursively_find_block_by_attribute($blocks, $block_name, $attribute_na
 {
 	foreach ($blocks as $block) {
 		if (
-			$block['blockName'] === 'core/navigation' &&
+			$block['blockName'] === $block_name &&
 			isset($block['attrs'][$attribute_name]) &&
 			$attribute_value === $block['attrs'][$attribute_name]
 		) {
