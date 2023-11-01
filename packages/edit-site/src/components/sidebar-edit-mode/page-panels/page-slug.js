@@ -21,21 +21,21 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import useEditedEntityRecord from '../../use-edited-entity-record';
-
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
 export default function PageSlug( { postType, postId } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { record, isLoaded } = useEditedEntityRecord( postType, postId );
-	const savedSlug = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'postType', postType, postId, {
-				_fields: 'slug',
-			} )?.slug,
+	const { record, savedSlug } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEditedEntityRecord } =
+				select( coreStore );
+			return {
+				record: getEditedEntityRecord( 'postType', postType, postId ),
+				savedSlug: getEntityRecord( 'postType', postType, postId, {
+					_fields: 'slug',
+				} )?.slug,
+			};
+		},
 		[ postType, postId ]
 	);
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -59,7 +59,7 @@ export default function PageSlug( { postType, postId } ) {
 		} ),
 		[ popoverAnchor ]
 	);
-	if ( ! isLoaded ) {
+	if ( ! record ) {
 		return null;
 	}
 	const onSlugChange = ( newValue ) => {
