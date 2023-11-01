@@ -3,7 +3,11 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Popover } from '@wordpress/components';
+import {
+	Fill,
+	__experimentalUseSlot as useSlot,
+	Popover,
+} from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
@@ -90,6 +94,8 @@ export default function BlockTools( {
 
 	const selectedBlockToolsRef = useRef( null );
 
+	const blockToolsSlot = useSlot( '__experimentalSelectedBlockTools' );
+
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
 
@@ -173,14 +179,22 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
+				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
 				{ ! isZoomOutMode &&
-					( hasFixedToolbar || ! isLargeViewport ) && (
+					( hasFixedToolbar || ! isLargeViewport ) &&
+					( blockToolsSlot?.ref?.current ? (
+						<Fill name="__experimentalSelectedBlockTools">
+							<BlockContextualToolbar
+								ref={ selectedBlockToolsRef }
+								isFixed
+							/>
+						</Fill>
+					) : (
 						<BlockContextualToolbar
 							ref={ selectedBlockToolsRef }
 							isFixed
 						/>
-					) }
-
+					) ) }
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
 						__unstableContentRef={ __unstableContentRef }
