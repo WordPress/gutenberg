@@ -33,7 +33,14 @@ store( {
 		core: {
 			query: {
 				navigate: async ( { event, ref, context } ) => {
-					if ( isValidLink( ref ) && isValidEvent( event ) ) {
+					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
+						?.dataset.wpNavigationDisabled;
+
+					if (
+						isValidLink( ref ) &&
+						isValidEvent( event ) &&
+						! isDisabled
+					) {
 						event.preventDefault();
 
 						const id = ref.closest( '[data-wp-navigation-id]' )
@@ -70,7 +77,9 @@ store( {
 					}
 				},
 				prefetch: async ( { ref } ) => {
-					if ( isValidLink( ref ) ) {
+					const isDisabled = ref.closest( '[data-wp-navigation-id]' )
+						?.dataset.wpNavigationDisabled;
+					if ( isValidLink( ref ) && ! isDisabled ) {
 						await prefetch( ref.href );
 					}
 				},
