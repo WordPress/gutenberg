@@ -177,6 +177,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
 					}
 					$content = $p->get_updated_html();
+					$dirty_enhanced_queries[ $block['attrs']['queryId'] ] = null;
 				}
 
 				array_pop( $enhanced_query_stack );
