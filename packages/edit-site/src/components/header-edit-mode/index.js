@@ -111,7 +111,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<DocumentTools
+					blockEditorMode={ blockEditorMode }
+					isDistractionFree={ isDistractionFree }
+					showIconLabels={ showIconLabels }
 					setListViewToggleElement={ setListViewToggleElement }
+					toolbarTransition={ toolbarTransition }
+					toolbarVariants={ toolbarVariants }
 				/>
 			) }
 

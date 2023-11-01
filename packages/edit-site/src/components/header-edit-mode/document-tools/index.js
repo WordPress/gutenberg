@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
-import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	NavigableToolbar,
@@ -35,58 +34,40 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function DocumentTools( { setListViewToggleElement } ) {
+export default function DocumentTools( {
+	blockEditorMode,
+	isDistractionFree,
+	showIconLabels,
+	setListViewToggleElement,
+	toolbarTransition,
+	toolbarVariants,
+} ) {
 	const inserterButton = useRef();
 	const {
 		isInserterOpen,
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
-		isDistractionFree,
-		blockEditorMode,
-		showIconLabels,
 		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
-			getEditedPostType,
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
-
-		const postType = getEditedPostType();
-
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
 
 		const { get: getPreference } = select( preferencesStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			templateType: postType,
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			blockEditorMode: __unstableGetEditorMode(),
-			homeUrl: getUnstableBase()?.home,
-			showIconLabels: getPreference(
-				editSiteStore.name,
-				'showIconLabels'
-			),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
-			isDistractionFree: getPreference(
-				editSiteStore.name,
-				'distractionFree'
-			),
 			hasFixedToolbar: getPreference(
 				editSiteStore.name,
 				'fixedToolbar'
@@ -100,7 +81,6 @@ export default function DocumentTools( { setListViewToggleElement } ) {
 		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-	const disableMotion = useReducedMotion();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -143,19 +123,6 @@ export default function DocumentTools( { setListViewToggleElement } ) {
 	const isZoomedOutViewExperimentEnabled =
 		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
-
-	const toolbarVariants = {
-		isDistractionFree: { y: '-50px' },
-		isDistractionFreeHovering: { y: 0 },
-		view: { y: 0 },
-		edit: { y: 0 },
-	};
-
-	const toolbarTransition = {
-		type: 'tween',
-		duration: disableMotion ? 0 : 0.2,
-		ease: 'easeOut',
-	};
 
 	return (
 		<NavigableToolbar
