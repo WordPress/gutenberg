@@ -41,14 +41,13 @@ export default function PagePages() {
 	const {
 		params: { path, activeView = 'all' },
 	} = useLocation();
-	const initialView = DEFAULT_VIEWS[ path ]?.find(
+	const initialView = DEFAULT_VIEWS.find(
 		( { slug } ) => slug === activeView
 	).view;
 	const [ view, setView ] = useState( initialView );
 	useEffect( () => {
 		setView(
-			DEFAULT_VIEWS[ path ].find( ( { slug } ) => slug === activeView )
-				.view
+			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
 		);
 	}, [ path, activeView ] );
 	// Request post statuses to get the proper labels.

@@ -15,8 +15,8 @@ const { useLocation } = unlock( routerPrivateApis );
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 function getDataViewIcon( dataview ) {
-	const icons = { list: page, grid: columns};
-	return icons[dataview.view.type];
+	const icons = { list: page, grid: columns };
+	return icons[ dataview.view.type ];
 }
 
 function DataViewItem( { dataview, isActive } ) {
@@ -45,13 +45,13 @@ export default function DataViewsSidebarContent() {
 	const {
 		params: { path, activeView = 'all' },
 	} = useLocation();
-	if( ! path || ! DEFAULT_VIEWS[ path ]) {
+	if ( ! path || path !== '/pages' ) {
 		return null;
 	}
 
 	return (
 		<ItemGroup>
-			{ DEFAULT_VIEWS[ path ].map( ( dataview ) => {
+			{ DEFAULT_VIEWS.map( ( dataview ) => {
 				return (
 					<DataViewItem
 						key={ dataview.slug }
