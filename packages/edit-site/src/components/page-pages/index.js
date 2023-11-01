@@ -212,7 +212,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ statuses, authors ]
+		[ defaultStatuses, statuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
