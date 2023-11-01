@@ -294,7 +294,6 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/form-input
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
 
@@ -305,7 +304,6 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** 
 -	**Attributes:** type
 
@@ -316,7 +314,6 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** 
 -	**Attributes:** 
 
