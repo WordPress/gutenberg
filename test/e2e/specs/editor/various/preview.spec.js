@@ -161,6 +161,7 @@ test.describe( 'Preview', () => {
 		await editor.canvas
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Lorem' );
+		await editor.openDocumentSettingsSidebar();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
