@@ -35,9 +35,19 @@ function render_block_core_form( $attributes, $content ) {
 
 	$extra_fields = apply_filters( 'render_block_core_form_extra_fields', '', $attributes );
 
+	// Remove styles and classes, so they can be properly added to the wrapper using `get_block_wrapper_attributes()`.
+	$processed_content->remove_attribute( 'style' );
+	$processed_content->remove_attribute( 'class' );
+
 	return str_replace(
-		'</form>',
-		$extra_fields . '</form>',
+		array(
+			'<form',
+			'</form>'
+		),
+		array(
+			'<form ' . get_block_wrapper_attributes(),
+			$extra_fields . '</form>',
+		),
 		$processed_content->get_updated_html()
 	);
 }
