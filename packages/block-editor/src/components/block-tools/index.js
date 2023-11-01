@@ -212,7 +212,20 @@ export default function BlockTools( {
 				) }
 
 				{ /* Used for the inline rich text toolbar. */ }
-				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
+				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
+				{ blockToolsSlot?.ref?.current ? (
+					<Fill name="__experimentalSelectedBlockTools">
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					</Fill>
+				) : (
+					<Popover.Slot
+						name="block-toolbar"
+						ref={ blockToolbarRef }
+					/>
+				) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
