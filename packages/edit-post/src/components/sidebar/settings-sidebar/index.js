@@ -6,7 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { Platform } from '@wordpress/element';
+import { Platform, useContext } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -29,6 +29,10 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
 import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -72,36 +76,54 @@ const SettingsSidebar = () => {
 		[]
 	);
 
+	const Content = () => {
+		const tabsContextValue = useContext( Tabs.Context );
+
+		return (
+			<PluginSidebarEditPost
+				identifier={ sidebarName }
+				header={
+					<Tabs.Context.Provider value={ tabsContextValue }>
+						<SettingsHeader sidebarName={ sidebarName } />
+					</Tabs.Context.Provider>
+				}
+				closeLabel={ __( 'Close Settings' ) }
+				headerClassName="edit-post-sidebar__panel-tabs"
+				/* translators: button label text should, if possible, be under 16 characters. */
+				title={ __( 'Settings' ) }
+				toggleShortcut={ keyboardShortcut }
+				icon={ isRTL() ? drawerLeft : drawerRight }
+				isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			>
+				<Tabs.Context.Provider value={ tabsContextValue }>
+					<Tabs.TabPanel id={ 'edit-post/document' }>
+						{ ! isTemplateMode && (
+							<>
+								<PostStatus />
+								<PluginDocumentSettingPanel.Slot />
+								<LastRevision />
+								<PostTaxonomies />
+								<FeaturedImage />
+								<PostExcerpt />
+								<DiscussionPanel />
+								<PageAttributes />
+								<MetaBoxes location="side" />
+							</>
+						) }
+						{ isTemplateMode && <TemplateSummary /> }
+					</Tabs.TabPanel>
+					<Tabs.TabPanel id={ 'edit-post/block' }>
+						<BlockInspector />
+					</Tabs.TabPanel>
+				</Tabs.Context.Provider>
+			</PluginSidebarEditPost>
+		);
+	};
+
 	return (
-		<PluginSidebarEditPost
-			identifier={ sidebarName }
-			header={ <SettingsHeader sidebarName={ sidebarName } /> }
-			closeLabel={ __( 'Close Settings' ) }
-			headerClassName="edit-post-sidebar__panel-tabs"
-			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
-			toggleShortcut={ keyboardShortcut }
-			icon={ isRTL() ? drawerLeft : drawerRight }
-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
-		>
-			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
-				<>
-					<PostStatus />
-					<PluginDocumentSettingPanel.Slot />
-					<LastRevision />
-					<PostTaxonomies />
-					<FeaturedImage />
-					<PostExcerpt />
-					<DiscussionPanel />
-					<PageAttributes />
-					<MetaBoxes location="side" />
-				</>
-			) }
-			{ isTemplateMode && sidebarName === 'edit-post/document' && (
-				<TemplateSummary />
-			) }
-			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
-		</PluginSidebarEditPost>
+		<Tabs selectedTabId={ sidebarName }>
+			<Content />
+		</Tabs>
 	);
 };
 
