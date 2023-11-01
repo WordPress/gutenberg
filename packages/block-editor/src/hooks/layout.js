@@ -151,6 +151,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	}, [] );
 	const blockEditingMode = useBlockEditingMode();
 
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
 		layoutBlockSupportKey,
@@ -270,7 +274,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ ! inherit && blockEditingMode === 'default' && layoutType && (
+			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
@@ -331,14 +335,10 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const supportLayout = hasLayoutBlockSupport( blockName );
+		const supportLayout = hasLayoutBlockSupport( props.name );
 
-		const blockEditingMode = useBlockEditingMode();
 		return [
-			supportLayout && blockEditingMode === 'default' && (
-				<LayoutPanel key="layout" { ...props } />
-			),
+			supportLayout && <LayoutPanel key="layout" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
