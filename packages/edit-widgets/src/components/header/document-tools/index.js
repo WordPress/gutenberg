@@ -17,18 +17,17 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import DocumentTools from './document-tools';
-import SaveButton from '../save-button';
-import UndoButton from './undo-redo/undo';
-import RedoButton from './undo-redo/redo';
-import MoreMenu from '../more-menu';
-import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
-import { store as editWidgetsStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import SaveButton from '../../save-button';
+import UndoButton from '../undo-redo/undo';
+import RedoButton from '../undo-redo/redo';
+import MoreMenu from '../../more-menu';
+import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-area';
+import { store as editWidgetsStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
-function Header( { setListViewToggleElement } ) {
+function DocumentTools( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
@@ -88,32 +87,49 @@ function Header( { setListViewToggleElement } ) {
 		fixedToolbarCanBeFocused;
 
 	return (
-		<>
-			<div className="edit-widgets-header">
-				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					{ isMediumViewport && (
-						<h1 className="edit-widgets-header__title">
-							{ __( 'Widgets' ) }
-						</h1>
-					) }
-					{ ! isMediumViewport && (
-						<VisuallyHidden
-							as="h1"
-							className="edit-widgets-header__title"
-						>
-							{ __( 'Widgets' ) }
-						</VisuallyHidden>
-					) }
-					<DocumentTools />
-				</div>
-				<div className="edit-widgets-header__actions">
-					<SaveButton />
-					<PinnedItems.Slot scope="core/edit-widgets" />
-					<MoreMenu />
-				</div>
-			</div>
-		</>
+					<NavigableToolbar
+						className="edit-widgets-header-toolbar"
+						aria-label={ __( 'Document tools' ) }
+						shouldUseKeyboardFocusShortcut={
+							! blockToolbarCanBeFocused
+						}
+					>
+						<ToolbarItem
+							ref={ inserterButton }
+							as={ Button }
+							className="edit-widgets-header-toolbar__inserter-toggle"
+							variant="primary"
+							isPressed={ isInserterOpen }
+							onMouseDown={ ( event ) => {
+								event.preventDefault();
+							} }
+							onClick={ handleClick }
+							icon={ plus }
+							/* translators: button label text should, if possible, be under 16
+					characters. */
+							label={ _x(
+								'Toggle block inserter',
+								'Generic label for block inserter button'
+							) }
+						/>
+						{ isMediumViewport && (
+							<>
+								<UndoButton />
+								<RedoButton />
+								<ToolbarItem
+									as={ Button }
+									className="edit-widgets-header-toolbar__list-view-toggle"
+									icon={ listView }
+									isPressed={ isListViewOpen }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'List View' ) }
+									onClick={ toggleListView }
+									ref={ setListViewToggleElement }
+								/>
+							</>
+						) }
+					</NavigableToolbar>
 	);
 }
 
-export default Header;
+export default DocumentTools;
