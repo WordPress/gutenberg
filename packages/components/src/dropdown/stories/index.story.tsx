@@ -25,8 +25,13 @@ const meta: Meta< typeof Dropdown > = {
 		position: { control: { type: null } },
 		renderContent: { control: { type: null } },
 		renderToggle: { control: { type: null } },
+		open: { control: { type: null } },
+		defaultOpen: { control: { type: null } },
+		onToggle: { control: { type: null } },
+		onClose: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
@@ -34,13 +39,11 @@ const meta: Meta< typeof Dropdown > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof Dropdown > = ( args ) => {
-	return (
-		<div style={ { height: 150 } }>
-			<Dropdown { ...args } />
-		</div>
-	);
-};
+const Template: StoryFn< typeof Dropdown > = ( args ) => (
+	<div style={ { height: 150 } }>
+		<Dropdown { ...args } />
+	</div>
+);
 
 export const Default = Template.bind( {} );
 Default.args = {

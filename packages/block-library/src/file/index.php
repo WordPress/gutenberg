@@ -5,24 +5,6 @@
  * @package WordPress
  */
 
-if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) ) {
-	/**
-	 * Replaces view script for the File block with version using Interactivity API.
-	 *
-	 * @param array $metadata Block metadata as read in via block.json.
-	 *
-	 * @return array Filtered block type metadata.
-	 */
-	function gutenberg_block_core_file_update_interactive_view_script( $metadata ) {
-		if ( 'core/file' === $metadata['name'] ) {
-			$metadata['viewScript']                = array( 'file:./view-interactivity.min.js' );
-			$metadata['supports']['interactivity'] = true;
-		}
-		return $metadata;
-	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_file_update_interactive_view_script', 10, 1 );
-}
-
 /**
  * When the `core/file` block is rendering, check if we need to enqueue the `wp-block-file-view` script.
  *
@@ -72,7 +54,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 	);
 
 	// If it uses the Interactivity API, add the directives.
-	if ( gutenberg_should_block_use_interactivity_api( 'core/file' ) && $should_load_view_script ) {
+	if ( $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '' );
@@ -84,6 +66,25 @@ function render_block_core_file( $attributes, $content, $block ) {
 
 	return $content;
 }
+
+/**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
+ */
+function block_core_file_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-file-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-file-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-file-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_file_ensure_interactivity_dependency' );
 
 /**
  * Registers the `core/file` block on server.

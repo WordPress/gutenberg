@@ -60,7 +60,6 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
-	canRemove,
 	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
@@ -106,8 +105,7 @@ const BlockActionsMenu = ( {
 		selectedBlockClientId ? [ selectedBlockClientId ] : []
 	);
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 	const convertToGroupButtons = useConvertToGroupButtons( {
 		...convertToGroupButtonProps,
 	} );
@@ -348,7 +346,6 @@ export default compose(
 			getSelectedBlockClientIds,
 			canInsertBlockType,
 			getTemplateLock,
-			canRemoveBlock,
 		} = select( blockEditorStore );
 		const block = getBlock( clientId );
 		const blockName = getBlockName( clientId );
@@ -385,7 +382,6 @@ export default compose(
 		const selectedBlockPossibleTransformations = selectedBlock
 			? getBlockTransformItems( selectedBlock, rootClientId )
 			: EMPTY_BLOCK_LIST;
-		const canRemove = canRemoveBlock( selectedBlockClientId );
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType
@@ -411,7 +407,6 @@ export default compose(
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
-			canRemove,
 		};
 	} ),
 	withDispatch(

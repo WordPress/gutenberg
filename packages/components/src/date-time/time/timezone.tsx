@@ -38,7 +38,7 @@ const TimeZone = () => {
 			: `(${ zoneAbbr }) ${ timezone.string.replace( '_', ' ' ) }`;
 
 	return (
-		<Tooltip position="top center" text={ timezoneDetail }>
+		<Tooltip placement="top" text={ timezoneDetail }>
 			<StyledComponent className="components-datetime__timezone">
 				{ zoneAbbr }
 			</StyledComponent>

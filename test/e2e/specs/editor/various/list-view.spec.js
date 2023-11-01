@@ -132,7 +132,7 @@ test.describe( 'List View', () => {
 		// make the inner blocks appear.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
-			.getByRole( 'button', { name: /Color: /i } )
+			.getByRole( 'option', { name: /Color: /i } )
 			.first()
 			.click();
 
@@ -261,13 +261,6 @@ test.describe( 'List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -275,7 +268,7 @@ test.describe( 'List View', () => {
 		} );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
 
@@ -322,16 +315,13 @@ test.describe( 'List View', () => {
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
 
-		// Focus should now be on the paragraph block since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
+		// Focus should now be on the list view toggle button.
 		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Paragraph block' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// List View should be closed.
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -352,7 +342,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -377,7 +367,7 @@ test.describe( 'List View', () => {
 
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 	} );
 
 	test( 'should place focus on the currently selected block in the canvas', async ( {
@@ -431,7 +421,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should duplicate and delete blocks using keyboard', async ( {
+	test( 'should duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -666,6 +656,19 @@ test.describe( 'List View', () => {
 					{ name: 'core/file', selected: false, focused: true },
 				] );
 		}
+
+		// Deselect blocks via Escape key.
+		await page.keyboard.press( 'Escape' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Pressing Escape should deselect blocks'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: false, focused: true },
+			] );
 	} );
 
 	test( 'block settings dropdown menu', async ( {
@@ -771,6 +774,10 @@ test.describe( 'List View', () => {
 		).toBeHidden();
 
 		await optionsForFileToggle.click();
+		await expect(
+			optionsForFileMenu,
+			'Pressing Space should also open the menu dropdown'
+		).toBeVisible();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(

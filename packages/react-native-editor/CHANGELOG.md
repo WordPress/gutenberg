@@ -10,12 +10,44 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.107.0
+-   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
+-   [*] Classic block: Add option to convert to blocks [#55461]
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+
+## 1.106.0
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+-   [*] Fix quote block border visibility when used with block based themes in dark mode [#54964]
+
+## 1.105.0
+-   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
+-   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
+-   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
+
+## 1.104.0
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
+## 1.103.1
+-   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
+
+## 1.103.0
 -   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
 -   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
 -   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
 -   [*] Fix horizontal rule style extensions [#53917]
 -   [*] Add block outline to all Social Link blocks when selected [#54011]
 -   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
 
 ## 1.102.1
 - [**] Fix Voice Over and assistive keyboards [#53895]

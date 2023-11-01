@@ -4,11 +4,7 @@
 
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
-import {
-	LINE_SEPARATOR,
-	OBJECT_REPLACEMENT_CHARACTER,
-	ZWNBSP,
-} from './special-characters';
+import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 
 function restoreOnAttributes( attributes, isEditableTree ) {
 	if ( isEditableTree ) {
@@ -133,7 +129,6 @@ function isEqualUntil( a, b, index ) {
 
 export function toTree( {
 	value,
-	multilineTag,
 	preserveWhiteSpace,
 	createEmpty,
 	append,
@@ -151,21 +146,13 @@ export function toTree( {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
-	const multilineFormat = { type: multilineTag };
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
-	let lastSeparatorFormats;
 	let lastCharacterFormats;
 	let lastCharacter;
 
-	// If we're building a multiline tree, start off with a multiline element.
-	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
-		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
-	} else {
-		append( tree, '' );
-	}
+	append( tree, '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
@@ -173,61 +160,12 @@ export function toTree( {
 			isEditableTree &&
 			// Pad the line if the line is empty.
 			( ! lastCharacter ||
-				lastCharacter === LINE_SEPARATOR ||
 				// Pad the line if the previous character is a line break, otherwise
 				// the line break won't be visible.
 				lastCharacter === '\n' );
 
-		let characterFormats = formats[ i ];
-
-		// Set multiline tags in queue for building the tree.
-		if ( multilineTag ) {
-			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = (
-					replacements[ i ] || []
-				).reduce(
-					( accumulator, format ) => {
-						accumulator.push( format, multilineFormat );
-						return accumulator;
-					},
-					[ multilineFormat ]
-				);
-			} else {
-				characterFormats = [
-					...lastSeparatorFormats,
-					...( characterFormats || [] ),
-				];
-			}
-		}
-
+		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
-
-		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			append( getParent( node ), ZWNBSP );
-		}
-
-		// Set selection for the start of line.
-		if ( lastCharacter === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			if ( onStartIndex && start === i ) {
-				onStartIndex( tree, node );
-			}
-
-			if ( onEndIndex && end === i ) {
-				onEndIndex( tree, node );
-			}
-		}
 
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
@@ -239,11 +177,7 @@ export function toTree( {
 						characterFormats,
 						lastCharacterFormats,
 						formatIndex
-					) &&
-					// Do not reuse the last element if the character is a
-					// line separator.
-					( character !== LINE_SEPARATOR ||
-						characterFormats.length - 1 !== formatIndex )
+					)
 				) {
 					pointer = getLastChild( pointer );
 					return;
@@ -253,9 +187,7 @@ export function toTree( {
 					format;
 
 				const boundaryClass =
-					isEditableTree &&
-					character !== LINE_SEPARATOR &&
-					format === deepestActiveFormat;
+					isEditableTree && format === deepestActiveFormat;
 
 				const parent = getParent( pointer );
 				const newNode = append(
@@ -276,13 +208,6 @@ export function toTree( {
 
 				pointer = append( newNode, '' );
 			} );
-		}
-
-		// No need for further processing if the character is a line separator.
-		if ( character === LINE_SEPARATOR ) {
-			lastCharacterFormats = characterFormats;
-			lastCharacter = character;
-			continue;
 		}
 
 		// If there is selection at 0, handle it before characters are inserted.

@@ -34,7 +34,7 @@ type DialogOptions = {
 
 type useDialogReturn = [
 	RefCallback< HTMLElement >,
-	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >
+	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >,
 ];
 
 /**

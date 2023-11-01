@@ -1,11 +1,14 @@
+/**
+ * Internal dependencies
+ */
+import {
+	ios as iOSConfig,
+	android as androidConfig,
+} from './device-config.json';
+
 const ios = {
-	browserName: '',
-	platformName: 'iOS',
-	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.22.3', // Sauce Labs requires appiumVersion to be specified.
-	app: undefined, // Will be set later, locally this is relative to root of project.
 	processArguments: {
 		args: [ 'uitesting' ],
 	},
@@ -14,31 +17,48 @@ const ios = {
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
-	deviceName: ! iPadDevice ? 'iPhone 13' : 'iPad Pro (9.7-inch)',
-	wdaLaunchTimeout: 240000,
+	deviceName: ! iPadDevice
+		? iOSConfig.local.deviceName
+		: iOSConfig.local.deviceTabletName,
+	platformVersion: iOSConfig.local.platformVersion,
+	pixelRatio: ! iPadDevice
+		? iOSConfig.pixelRatio.iPhone
+		: iOSConfig.pixelRatio.iPad,
 	usePrebuiltWDA: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
-	platformVersion: '15.4', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
 	deviceName: ! iPadDevice
-		? 'iPhone 13 Simulator'
-		: 'iPad Pro (9.7 inch) Simulator',
+		? iOSConfig.saucelabs.deviceName
+		: iOSConfig.saucelabs.deviceTabletName,
+	platformVersion: iOSConfig.local.platformVersion,
+	pixelRatio: ! iPadDevice
+		? iOSConfig.pixelRatio.iPhone
+		: iOSConfig.pixelRatio.iPad,
 } );
 
 exports.android = {
-	browserName: '',
-	platformName: 'Android',
-	platformVersion: '11.0',
-	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
+	platformVersion: androidConfig.local.platformVersion,
+	deviceName: androidConfig.saucelabs.deviceName,
 	automationName: 'UiAutomator2',
-	os: 'Android',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.22.1',
-	app: undefined,
 	disableWindowAnimation: true,
 	autoLaunch: false,
+};
+
+// SauceLabs config
+exports.sauceOptions = {
+	appiumVersion: '2.0.0',
+};
+
+exports.prefixKeysWithAppium = ( obj ) => {
+	return Object.fromEntries(
+		Object.entries( obj ).map( ( [ key, value ] ) => [
+			`appium:${ key }`,
+			value,
+		] )
+	);
 };

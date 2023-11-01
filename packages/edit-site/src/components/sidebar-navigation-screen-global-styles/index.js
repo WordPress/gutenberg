@@ -2,18 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { backup, edit, seen } from '@wordpress/icons';
+import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	Icon,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalVStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -27,6 +21,7 @@ import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 const noop = () => {};
 
@@ -85,39 +80,6 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		>
 			<StyleVariationsContainer />
 		</BlockEditorProvider>
-	);
-}
-
-function SidebarNavigationScreenGlobalStylesFooter( {
-	modifiedDateTime,
-	onClickRevisions,
-} ) {
-	return (
-		<VStack className="edit-site-sidebar-navigation-screen-global-styles__footer">
-			<SidebarNavigationItem
-				className="edit-site-sidebar-navigation-screen-global-styles__revisions"
-				label={ __( 'Revisions' ) }
-				onClick={ onClickRevisions }
-			>
-				<HStack
-					as="span"
-					alignment="center"
-					spacing={ 5 }
-					direction="row"
-					justify="space-between"
-				>
-					<span className="edit-site-sidebar-navigation-screen-global-styles__revisions__label">
-						{ __( 'Last modified' ) }
-					</span>
-					<span>
-						<time dateTime={ modifiedDateTime }>
-							{ humanTimeDiff( modifiedDateTime ) }
-						</time>
-					</span>
-					<Icon icon={ backup } style={ { fill: 'currentcolor' } } />
-				</HStack>
-			</SidebarNavigationItem>
-		</VStack>
 	);
 }
 
@@ -198,9 +160,9 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (
-						<SidebarNavigationScreenGlobalStylesFooter
-							modifiedDateTime={ modifiedDateTime }
-							onClickRevisions={ openRevisions }
+						<SidebarNavigationScreenDetailsFooter
+							record={ revisions?.[ 0 ] }
+							onClick={ openRevisions }
 						/>
 					)
 				}

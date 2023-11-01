@@ -52,6 +52,11 @@ const restrictedImports = [
 			'Please use Reakit API through `@wordpress/components` instead.',
 	},
 	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',

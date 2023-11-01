@@ -5,7 +5,7 @@
 
 
 > **Note**
-> This package enables the API shared at [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). As part of an [Open Source project](https://developer.wordpress.org/block-editor/explanations/faq/#the-gutenberg-project) we encourage participation in helping shape this API and the [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) is the best place to engage.
+> This package enables the API shared at [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) we encourage participation in helping shape this API and the [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) is the best place to engage.
 
 This package can be tested, but it's still very experimental.
 The Interactivity API is [being used in some core blocks](https://github.com/search?q=repo%3AWordPress%2Fgutenberg%20%40wordpress%2Finteractivity&type=code) but its use is still very limited. 

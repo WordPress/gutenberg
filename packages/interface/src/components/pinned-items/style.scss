@@ -7,8 +7,11 @@
 		display: none;
 		margin: 0;
 
-		&:nth-last-child(1),
-		&:nth-last-child(2) {
+		&[aria-controls="edit-post:document"],
+		&[aria-controls="edit-post:block"],
+		&[aria-controls="edit-site:template"],
+		&[aria-controls="edit-site:block-inspector"],
+		&[aria-controls="edit-site:global-styles"] {
 			display: flex;
 		}
 

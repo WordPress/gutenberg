@@ -245,19 +245,20 @@ export const __unstableGetClientIdsTree = createSelector(
  * given. Returned ids are ordered first by the order of the ids given, then
  * by the order that they appear in the editor.
  *
- * @param {Object} state     Global application state.
- * @param {Array}  clientIds Array of blocks to inspect.
+ * @param {Object}          state     Global application state.
+ * @param {string|string[]} clientIds Client ID(s) for which descendant blocks are to be returned.
  *
- * @return {Array} ids of descendants.
+ * @return {Array} Client IDs of descendants.
  */
 export const getClientIdsOfDescendants = createSelector(
 	( state, clientIds ) => {
+		const givenIds = Array.isArray( clientIds ) ? clientIds : [ clientIds ];
 		const collectedIds = [];
-		for ( const givenId of clientIds ) {
+		for ( const givenId of givenIds ) {
 			for ( const descendantId of getBlockOrder( state, givenId ) ) {
 				collectedIds.push(
 					descendantId,
-					...getClientIdsOfDescendants( state, [ descendantId ] )
+					...getClientIdsOfDescendants( state, descendantId )
 				);
 			}
 		}
@@ -281,7 +282,7 @@ export const getClientIdsWithDescendants = createSelector(
 		for ( const topLevelId of getBlockOrder( state ) ) {
 			collectedIds.push(
 				topLevelId,
-				...getClientIdsOfDescendants( state, [ topLevelId ] )
+				...getClientIdsOfDescendants( state, topLevelId )
 			);
 		}
 		return collectedIds;
@@ -1985,7 +1986,7 @@ export const getInserterItems = createSelector(
 				isDisabled: false,
 				utility: 1, // Deprecated.
 				frecency,
-				content: reusableBlock.content.raw,
+				content: reusableBlock.content?.raw,
 				syncStatus: reusableBlock.wp_pattern_sync_status,
 			};
 		};
@@ -2290,31 +2291,44 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
-function getUnsyncedPatterns( state ) {
-	const reusableBlocks =
+function getUserPatterns( state ) {
+	const userPatterns =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-
-	return reusableBlocks
-		.filter(
-			( reusableBlock ) =>
-				reusableBlock.wp_pattern_sync_status === 'unsynced'
-		)
-		.map( ( reusableBlock ) => {
-			return {
-				name: `core/block/${ reusableBlock.id }`,
-				title: reusableBlock.title.raw,
-				categories: [ 'custom' ],
-				content: reusableBlock.content.raw,
-			};
-		} );
+	const userPatternCategories =
+		state?.settings?.__experimentalUserPatternCategories ?? [];
+	const categories = new Map();
+	userPatternCategories.forEach( ( userCategory ) =>
+		categories.set( userCategory.id, userCategory )
+	);
+	return userPatterns.map( ( userPattern ) => {
+		return {
+			name: `core/block/${ userPattern.id }`,
+			id: userPattern.id,
+			title: userPattern.title.raw,
+			categories: userPattern.wp_pattern_category.map( ( catId ) =>
+				categories && categories.get( catId )
+					? categories.get( catId ).slug
+					: catId
+			),
+			content: userPattern.content.raw,
+			syncStatus: userPattern.wp_pattern_sync_status,
+		};
+	} );
 }
+
+export const __experimentalUserPatternCategories = createSelector(
+	( state ) => {
+		return state?.settings?.__experimentalUserPatternCategories;
+	},
+	( state ) => [ state.settings.__experimentalUserPatternCategories ]
+);
 
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const unsyncedPatterns = getUnsyncedPatterns( state );
+		const userPatterns = getUserPatterns( state );
 
-		const pattern = [ ...patterns, ...unsyncedPatterns ].find(
+		const pattern = [ ...patterns, ...userPatterns ].find(
 			( { name } ) => name === patternName
 		);
 		if ( ! pattern ) {
@@ -2330,17 +2344,18 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
+		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
 const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const unsyncedPatterns = getUnsyncedPatterns( state );
+		const userPatterns = getUserPatterns( state );
 
 		const { allowedBlockTypes } = getSettings( state );
 
-		const parsedPatterns = [ ...patterns, ...unsyncedPatterns ]
+		const parsedPatterns = [ ...userPatterns, ...patterns ]
 			.filter( ( { inserter = true } ) => !! inserter )
 			.map( ( { name } ) =>
 				__experimentalGetParsedPattern( state, name )
@@ -2354,6 +2369,7 @@ const getAllAllowedPatterns = createSelector(
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
+		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
@@ -2939,5 +2955,70 @@ export const getBlockEditingMode = createRegistrySelector(
 			}
 			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
+		}
+);
+
+/**
+ * Indicates if a block is ungroupable.
+ * A block is ungroupable if it is a single grouping block with inner blocks.
+ * If a block has an `ungroup` transform, it is also ungroupable, without the
+ * requirement of being the default grouping block.
+ * Additionally a block can only be ungrouped if it has inner blocks and can
+ * be removed.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block. If not passed the selected block's client id will be used.
+ * @return {boolean} True if the block is ungroupable.
+ */
+export const isUngroupable = createRegistrySelector(
+	( select ) =>
+		( state, clientId = '' ) => {
+			const _clientId = clientId || getSelectedBlockClientId( state );
+			if ( ! _clientId ) {
+				return false;
+			}
+			const { getGroupingBlockName } = select( blocksStore );
+			const block = getBlock( state, _clientId );
+			const groupingBlockName = getGroupingBlockName();
+			const _isUngroupable =
+				block &&
+				( block.name === groupingBlockName ||
+					getBlockType( block.name )?.transforms?.ungroup ) &&
+				!! block.innerBlocks.length;
+
+			return _isUngroupable && canRemoveBlock( state, _clientId );
+		}
+);
+
+/**
+ * Indicates if the provided blocks(by client ids) are groupable.
+ * We need to have at least one block, have a grouping block name set and
+ * be able to remove these blocks.
+ *
+ * @param {Object}   state     Global application state.
+ * @param {string[]} clientIds Block client ids. If not passed the selected blocks client ids will be used.
+ * @return {boolean} True if the blocks are groupable.
+ */
+export const isGroupable = createRegistrySelector(
+	( select ) =>
+		( state, clientIds = EMPTY_ARRAY ) => {
+			const { getGroupingBlockName } = select( blocksStore );
+			const groupingBlockName = getGroupingBlockName();
+			const _clientIds = clientIds?.length
+				? clientIds
+				: getSelectedBlockClientIds( state );
+			const rootClientId = _clientIds?.length
+				? getBlockRootClientId( state, _clientIds[ 0 ] )
+				: undefined;
+			const groupingBlockAvailable = canInsertBlockType(
+				state,
+				groupingBlockName,
+				rootClientId
+			);
+			const _isGroupable = groupingBlockAvailable && _clientIds.length;
+			return (
+				_isGroupable &&
+				canRemoveBlocks( state, _clientIds, rootClientId )
+			);
 		}
 );

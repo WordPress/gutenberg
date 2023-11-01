@@ -7,7 +7,7 @@ import type { SeparatorProps } from 'reakit';
 /**
  * Internal dependencies
  */
-import type { SpaceInput } from '../ui/utils/space';
+import type { SpaceInput } from '../utils/space';
 
 export type DividerProps = Omit<
 	SeparatorProps,

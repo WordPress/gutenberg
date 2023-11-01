@@ -31,6 +31,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
@@ -47,12 +48,15 @@ function CopyMenuItem( { blocks, onCopy, label } ) {
 }
 
 export function BlockSettingsDropdown( {
+	block,
 	clientIds,
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
 	...props
 } ) {
+	// Get the client id of the current block for this menu, if one is set.
+	const currentClientId = block?.clientId;
 	const blockClientIds = Array.isArray( clientIds )
 		? clientIds
 		: [ clientIds ];
@@ -101,6 +105,16 @@ export function BlockSettingsDropdown( {
 	);
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
+
+	const openedBlockSettingsMenu = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getOpenedBlockSettingsMenu(),
+		[]
+	);
+
+	const { setOpenedBlockSettingsMenu } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -174,6 +188,32 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
+	// When a currentClientId is in use, treat the menu as a controlled component.
+	// This ensures that only one block settings menu is open at a time.
+	// This is a temporary solution to work around an issue with `onFocusOutside`
+	// where it does not allow a dropdown to be closed if focus was never within
+	// the dropdown to begin with. Examples include a user either CMD+Clicking or
+	// right clicking into an inactive window.
+	// See: https://github.com/WordPress/gutenberg/pull/54083
+	const open = ! currentClientId
+		? undefined
+		: openedBlockSettingsMenu === currentClientId || false;
+
+	const onToggle = useCallback(
+		( localOpen ) => {
+			if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
+				setOpenedBlockSettingsMenu( currentClientId );
+			} else if (
+				! localOpen &&
+				openedBlockSettingsMenu &&
+				openedBlockSettingsMenu === currentClientId
+			) {
+				setOpenedBlockSettingsMenu( undefined );
+			}
+		},
+		[ currentClientId, openedBlockSettingsMenu, setOpenedBlockSettingsMenu ]
+	);
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -199,6 +239,8 @@ export function BlockSettingsDropdown( {
 					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
+					open={ open }
+					onToggle={ onToggle }
 					noIcons
 					menuProps={ {
 						/**
@@ -230,6 +272,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertAfter();
 							} else if (
 								isMatch(
@@ -239,6 +282,7 @@ export function BlockSettingsDropdown( {
 								canInsertDefaultBlock
 							) {
 								event.preventDefault();
+								setOpenedBlockSettingsMenu( undefined );
 								onInsertBefore();
 							}
 						},

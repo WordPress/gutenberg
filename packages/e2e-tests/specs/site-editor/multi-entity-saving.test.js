@@ -77,9 +77,8 @@ describe( 'Multi-entity save flow', () => {
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
-			const multiSaveButton = await page.waitForSelector(
-				multiSaveSelector
-			);
+			const multiSaveButton =
+				await page.waitForSelector( multiSaveSelector );
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {

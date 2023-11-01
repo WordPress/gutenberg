@@ -202,9 +202,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
-				paths: [ tempCwd ],
-			} ) )
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
 		);
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
@@ -239,6 +241,7 @@ const getDefaultValues = ( pluginTemplate, variant ) => {
 		editorScript: 'file:./index.js',
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
+		transformer: ( view ) => view,
 		...pluginTemplate.defaultValues,
 		...pluginTemplate.variants?.[ variant ],
 		variantVars: getVariantVars( pluginTemplate.variants, variant ),

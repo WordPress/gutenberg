@@ -79,18 +79,17 @@ function bootstrappedBlockTypes( state = {}, action ) {
 					};
 				}
 
-				// The `autoInsert` prop is not yet included in the server provided
+				// The `blockHooks` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.4.
 				if (
-					serverDefinition.__experimentalAutoInsert === undefined &&
-					blockType.__experimentalAutoInsert
+					serverDefinition.blockHooks === undefined &&
+					blockType.blockHooks
 				) {
 					newDefinition = {
 						...serverDefinition,
 						...newDefinition,
-						__experimentalAutoInsert:
-							blockType.__experimentalAutoInsert,
+						blockHooks: blockType.blockHooks,
 					};
 				}
 			} else {

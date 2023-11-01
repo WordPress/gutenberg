@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -20,25 +20,52 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 
 describe( 'EditPostPreferencesModal', () => {
 	describe( 'should match snapshot when the modal is active', () => {
+		afterEach( () => {
+			useViewportMatch.mockClear();
+		} );
 		it( 'large viewports', async () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
 			render( <EditPostPreferencesModal /> );
-			await screen.findByRole( 'tab', {
+			const tabPanel = await screen.findByRole( 'tabpanel', {
 				name: 'General',
-				selected: true,
 			} );
+
 			expect(
-				screen.getByRole( 'dialog', { name: 'Preferences' } )
-			).toMatchSnapshot();
+				within( tabPanel ).getByLabelText(
+					'Include pre-publish checklist'
+				)
+			).toBeInTheDocument();
 		} );
-		it( 'small viewports', () => {
+		it( 'small viewports', async () => {
 			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
 			render( <EditPostPreferencesModal /> );
+
+			// The tabpanel is not rendered in small viewports.
 			expect(
-				screen.getByRole( 'dialog', { name: 'Preferences' } )
-			).toMatchSnapshot();
+				screen.queryByRole( 'tabpanel', {
+					name: 'General',
+				} )
+			).not.toBeInTheDocument();
+
+			const dialog = screen.getByRole( 'dialog', {
+				name: 'Preferences',
+			} );
+
+			// Checkbox toggle controls are not rendered in small viewports.
+			expect(
+				within( dialog ).queryByLabelText(
+					'Include pre-publish checklist'
+				)
+			).not.toBeInTheDocument();
+
+			// Individual preference nav buttons are rendered in small viewports.
+			expect(
+				within( dialog ).getByRole( 'button', {
+					name: 'General',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 

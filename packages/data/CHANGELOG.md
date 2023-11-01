@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 9.14.0 (2023-10-18)
+
+## 9.13.1 (2023-10-12)
+
+### Bug Fix
+
+-  Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
+
+## 9.13.0 (2023-10-05)
+
+### Enhancements
+
+-  Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
+
+## 9.12.0 (2023-09-20)
+
 ## 9.11.0 (2023-08-31)
 
 ## 9.10.0 (2023-08-16)

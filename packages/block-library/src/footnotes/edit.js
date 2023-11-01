@@ -48,7 +48,19 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 	return (
 		<ol { ...blockProps }>
 			{ footnotes.map( ( { id, content } ) => (
-				<li key={ id }>
+				/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
+				<li
+					key={ id }
+					onMouseDown={ ( event ) => {
+						// When clicking on the list item (not on descendants),
+						// focus the rich text element since it's only 1px wide when
+						// empty.
+						if ( event.target === event.currentTarget ) {
+							event.target.firstElementChild.focus();
+							event.preventDefault();
+						}
+					} }
+				>
 					<RichText
 						id={ id }
 						tagName="span"

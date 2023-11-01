@@ -46,7 +46,7 @@ const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
  *
  * @param {WidthHeightToolProps} props The component props.
  *
- * @return {import('@wordpress/element').WPElement} The width and height tool.
+ * @return {import('react').ReactElement} The width and height tool.
  */
 export default function WidthHeightTool( {
 	panelId,

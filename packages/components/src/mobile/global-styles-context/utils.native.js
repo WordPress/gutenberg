@@ -9,7 +9,7 @@ import { Dimensions } from 'react-native';
  */
 import {
 	getPxFromCssUnit,
-	useSetting,
+	useSettings,
 	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 
@@ -357,7 +357,7 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 	// Default editor colors/gradients if it's not a block-based theme.
 	const colorPalette =
 		type === 'colors' ? 'color.palette' : 'color.gradients';
-	const editorDefaultPalette = useSetting( colorPalette );
+	const [ editorDefaultPalette ] = useSettings( colorPalette );
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors

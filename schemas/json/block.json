@@ -173,10 +173,6 @@
 							"type": "string",
 							"description": "Use an attribute source to extract the value from an attribute in the markup. The attribute is specified by the attribute field, which must be supplied.\n\nExample: Extract the src attribute from an image found in the block’s markup."
 						},
-						"multiline": {
-							"type": "string",
-							"description": "Use the multiline property to extract the inner HTML of matching tag names for the use in RichText with the multiline prop."
-						},
 						"query": {
 							"type": "object",
 							"description": "Use query to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources."
@@ -258,18 +254,6 @@
 					"description": "ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.",
 					"default": false
 				},
-				"behaviors": {
-					"type": "object",
-					"description": "Behaviors are a way to add additional functionality to a block. They are defined as an object with a name and a set of properties. Curently, only one behavior is supported: lightbox.",
-					"additionalProperties": false,
-					"properties": {
-						"lightbox": {
-							"type": "boolean",
-							"description": "This property adds a 'lightbox' behavior to the block. It allows to open the block's content in a lightbox when clicking on it.",
-							"default": false
-						}
-					}
-				},
 				"className": {
 					"type": "boolean",
 					"description": "By default, the class .wp-block-your-block-name is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.",
@@ -298,6 +282,16 @@
 							"type": "boolean",
 							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, its attributes definition is extended to include two new attributes: textColor and style",
 							"default": true
+						},
+						"heading": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set heading colors in a block, heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"default": false
+						},
+						"button": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set button colors in a block, button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"default": false
 						},
 						"enableContrastChecker": {
 							"type": "boolean",
@@ -698,6 +692,16 @@
 					"description": "Set the inner blocks that should be used within the block example. The blocks should be defined as a nested array like this: \n\n [ [ 'core/heading', { content: 'This is an Example' }, [] ] ]\n\n Where each block itself is an array that contains the block name, the block attributes, and the blocks inner blocks."
 				}
 			}
+		},
+		"blockHooks": {
+			"description": "Block Hooks allow a block to automatically insert itself next to all instances of a given block type.\n\nSee the Block Hooks documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#block-hooks-optional for more details.",
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"enum": [ "before", "after", "firstChild", "lastChild" ]
+				}
+			},
+			"additionalProperties": false
 		},
 		"editorScript": {
 			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",

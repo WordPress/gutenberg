@@ -14,7 +14,7 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { PanelBodyProps, PanelBodyTitleProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';

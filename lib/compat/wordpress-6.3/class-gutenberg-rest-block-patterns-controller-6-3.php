@@ -13,7 +13,15 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Block_Patterns_Controller_6_3 extends Gutenberg_REST_Block_Patterns_Controller_6_2 {
+class Gutenberg_REST_Block_Patterns_Controller_6_3 extends WP_REST_Block_Patterns_Controller {
+	/**
+	 * Defines whether remote patterns should be loaded.
+	 *
+	 * @since 6.0.0
+	 * @var bool
+	 */
+	private $remote_patterns_loaded;
+
 	/**
 	 * Prepare a raw block pattern before it gets output in a REST API response.
 	 *
@@ -157,5 +165,34 @@ class Gutenberg_REST_Block_Patterns_Controller_6_3 extends Gutenberg_REST_Block_
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Retrieves all block patterns.
+	 *
+	 * @since 6.0.0
+	 * @since 6.2.0 Added migration for old core pattern categories to the new ones.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) {
+		if ( ! $this->remote_patterns_loaded ) {
+			// Load block patterns from w.org.
+			gutenberg_load_remote_block_patterns(); // Patterns with the `core` keyword.
+			gutenberg_load_remote_featured_patterns(); // Patterns in the `featured` category.
+			gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
+
+			$this->remote_patterns_loaded = true;
+		}
+
+		$response = array();
+		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
+		foreach ( $patterns as $pattern ) {
+			$migrated_pattern = $this->migrate_pattern_categories( $pattern );
+			$prepared_pattern = $this->prepare_item_for_response( $migrated_pattern, $request );
+			$response[]       = $this->prepare_response_for_collection( $prepared_pattern );
+		}
+		return rest_ensure_response( $response );
 	}
 }

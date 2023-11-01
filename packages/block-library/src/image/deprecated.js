@@ -632,9 +632,6 @@ const v6 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,
@@ -830,9 +827,6 @@ const v7 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,
@@ -947,4 +941,213 @@ const v7 = {
 	},
 };
 
-export default [ v7, v6, v5, v4, v3, v2, v1 ];
+const v8 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		behaviors: {
+			type: 'object',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			__experimentalRole: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: 'figcaption',
+			__experimentalRole: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			__experimentalRole: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			__experimentalRole: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			__experimentalRole: 'content',
+		},
+		width: {
+			type: 'string',
+		},
+		height: {
+			type: 'string',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		anchor: true,
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
+	migrate( { width, height, ...attributes } ) {
+		const {
+			behaviors: {
+				lightbox: { enabled },
+			},
+		} = attributes;
+		const newAttributes = {
+			...attributes,
+			lightbox: {
+				enabled,
+			},
+		};
+		delete newAttributes.behaviors;
+		return newAttributes;
+	},
+	isEligible( attributes ) {
+		return !! attributes.behaviors;
+	},
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = classnames( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					aspectRatio,
+					objectFit: scale,
+					width,
+					height,
+				} }
+				title={ title }
+			/>
+		);
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];

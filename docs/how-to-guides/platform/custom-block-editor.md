@@ -70,7 +70,7 @@ Here is a brief summary of what's going on:
 -   `src/` (directory) - This is where the JavaScript and CSS source files will live. These files are _not_ directly enqueued by the plugin.
 -   `webpack.config.js` - A custom Webpack config extending the defaults provided by the [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) npm package to allow for custom CSS styles (via Sass).
 
-The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin seperately.
+The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin separately.
 
 <div class="callout callout-info">
 	Throughout this guide, filename references will be placed in a comment at the top of each code snippet so you can follow along.
@@ -168,7 +168,7 @@ wp_enqueue_script( $script_handle, $script_url, $script_asset['dependencies'], $
 
 To save time and space, the `$script_` variables assignment has been omitted. You can [review these here](https://github.com/getdave/standalone-block-editor/blob/974a59dcbc539a0595e8fa34670e75ec541853ab/init.php#L19).
 
-Note the third arguement for script dependencies, `$script_asset['dependencies']`. These dependencies are
+Note the third argument for script dependencies, `$script_asset['dependencies']`. These dependencies are
 dynamically generated using [@wordpress/dependency-extraction-webpack-plugin](https://developer.wordpress.org/block-editor/packages/packages-dependency-extraction-webpack-plugin/) which will
 [ensure that](https://developer.wordpress.org/block-editor/packages/packages-scripts/#default-webpack-config) WordPress provided scripts are not included in the built
 bundle.
@@ -215,9 +215,11 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 ```js
 // File: src/index.js
 
+// External dependencies.
+import { createRoot } from 'react-dom';
+
 // WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
-import { render } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 // Internal dependencies.
@@ -233,11 +235,11 @@ Next, once the DOM is ready you will need to run a function which:
 
 ```jsx
 domReady( function () {
+	const root = createRoot( document.getElementById( 'getdave-sbe-block-editor' ) );
 	const settings = window.getdaveSbeSettings || {};
 	registerCoreBlocks();
-	render(
-		<Editor settings={ settings } />,
-		document.getElementById( 'getdave-sbe-block-editor' )
+	root.render(
+		<Editor settings={ settings } />
 	);
 } );
 ```
@@ -332,12 +334,7 @@ return (
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
-				<BlockEditorKeyboardShortcuts />
-				<WritingFlow>
-					<BlockList className="getdavesbe-block-editor__block-list" />
-				</WritingFlow>
-			</div>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	</div>
 );
@@ -419,27 +416,6 @@ Here is roughly how this works together to render the list of blocks:
 
 The `@wordpress/block-editor` package components are among the most complex and involved. Understanding them is crucial if you want to grasp how the editor functions at a fundamental level. Studying these components is strongly advised.
 
-### Utility components in the custom block editor
-
-Jumping back to your custom `<BlockEditor>` component, it is also worth noting the following "utility" components:
-
-```js
-// File: src/components/block-editor/index.js
-
-<div className="editor-styles-wrapper">
-	<BlockEditorKeyboardShortcuts /> /* 1. */
-	<WritingFlow>
-		/* 2. */
-		<BlockList className="getdavesbe-block-editor__block-list" />
-	</WritingFlow>
-</div>
-```
-
-These provide other important elements of functionality for the editor instance.
-
-1. [`<BlockEditorKeyboardShortcuts />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/keyboard-shortcuts/index.js) – Enables and usage of keyboard shortcuts within the editor
-2. [`<WritingFlow>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/writing-flow/index.js) – Handles selection, focus management, and navigation across blocks
-
 ## Reviewing the sidebar
 
 Also within the render of the `<BlockEditor>`, is the `<Sidebar>` component.
@@ -453,9 +429,7 @@ return (
             <Sidebar.InspectorFill> /* <-- SIDEBAR */
                 <BlockInspector />
             </Sidebar.InspectorFill>
-            <div className="editor-styles-wrapper">
-                // snip
-            </div>
+            <BlockCanvas height="400px" />
         </BlockEditorProvider>
     </div>
 );

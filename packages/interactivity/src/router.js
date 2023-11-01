@@ -55,8 +55,8 @@ const regionsToVdom = ( dom ) => {
 		const id = region.getAttribute( attrName );
 		regions[ id ] = toVdom( region );
 	} );
-
-	return { regions };
+	const title = dom.querySelector( 'title' )?.innerText;
+	return { regions, title };
 };
 
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
@@ -76,13 +76,33 @@ const renderRegions = ( page ) => {
 		const fragment = getRegionRootFragment( region );
 		render( page.regions[ id ], fragment );
 	} );
+	if ( page.title ) {
+		document.title = page.title;
+	}
 };
+
+// Variable to store the current navigation.
+let navigatingTo = '';
 
 // Navigate to a new page.
 export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
+	navigatingTo = href;
 	prefetch( url, options );
-	const page = await pages.get( url );
+
+	// Create a promise that resolves when the specified timeout ends. The
+	// timeout value is 10 seconds by default.
+	const timeoutPromise = new Promise( ( resolve ) =>
+		setTimeout( resolve, options.timeout ?? 10000 )
+	);
+
+	const page = await Promise.race( [ pages.get( url ), timeoutPromise ] );
+
+	// Once the page is fetched, the destination URL could have changed (e.g.,
+	// by clicking another link in the meantime). If so, bail out, and let the
+	// newer execution to update the HTML.
+	if ( navigatingTo !== href ) return;
+
 	if ( page ) {
 		renderRegions( page );
 		window.history[ options.replace ? 'replaceState' : 'pushState' ](
@@ -92,6 +112,7 @@ export const navigate = async ( href, options = {} ) => {
 		);
 	} else {
 		window.location.assign( href );
+		await new Promise( () => {} );
 	}
 };
 

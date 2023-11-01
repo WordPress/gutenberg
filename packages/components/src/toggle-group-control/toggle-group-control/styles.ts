@@ -7,10 +7,10 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
-export const ToggleGroupControl = ( {
+export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
 	size,
@@ -24,8 +24,6 @@ export const ToggleGroupControl = ( {
 	min-width: 0;
 	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
@@ -70,21 +68,6 @@ export const toggleGroupControlSize = (
 export const block = css`
 	display: flex;
 	width: 100%;
-`;
-
-export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
-	left: 0;
-	position: absolute;
-	top: 2px;
-	bottom: 2px;
-	transition: transform ${ CONFIG.transitionDurationFast } ease;
-	${ reduceMotion( 'transition' ) }
-	z-index: 1;
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: -3px;
 `;
 
 export const VisualLabelWrapper = styled.div`

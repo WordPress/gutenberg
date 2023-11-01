@@ -4,22 +4,20 @@
  *
  * @package    WordPress
  * @subpackage Fonts
+ *
+ * @since 6.4.0
  */
 
+// @core-merge this line of code is not needed when merging into Core.
 require_once dirname( __DIR__ ) . '/base.php';
 
 /**
- * Tests WP_Font_Face_Resolver::get_fonts_from_theme_json().
- *
- * @package WordPress
- * @subpackage Fonts
- *
- * @since X.X.X
  * @group fonts
  * @group fontface
+ *
  * @covers WP_Font_Face_Resolver::get_fonts_from_theme_json
  */
-class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_TestCase {
+class Tests_Fonts_WPFontFaceResolver_GetFontsFromThemeJson extends WP_Font_Face_UnitTestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
 	public static function set_up_before_class() {

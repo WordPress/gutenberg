@@ -54,8 +54,8 @@ When a user switches a toggle, its corresponding action takes effect immediately
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { FormToggle } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyFormToggle = () => {
 	const [ isChecked, setChecked ] = useState( true );

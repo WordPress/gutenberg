@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { COLORS } from '../utils/colors-values';
 import type { StateReducer } from '../input-control/reducer/state';
 import type { HexInputProps } from './types';

@@ -20,7 +20,6 @@ import { store as editSiteStore } from '../../../store';
 import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
-import EditTemplate from './edit-template';
 
 export default function PagePanels() {
 	const { id, type, hasResolved, status, date, password, title, modified } =
@@ -80,9 +79,6 @@ export default function PagePanels() {
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>
 				<PageContent />
-			</PanelBody>
-			<PanelBody title={ __( 'Template' ) }>
-				<EditTemplate />
 			</PanelBody>
 		</>
 	);

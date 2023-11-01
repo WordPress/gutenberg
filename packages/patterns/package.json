@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "1.2.1-next.5a1d1283.0",
+	"version": "1.5.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0",
-		"npm": ">=8 <9"
+		"node": ">=16.0.0"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -31,6 +30,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
+		"@babel/runtime": "^7.16.0",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -38,6 +38,7 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",

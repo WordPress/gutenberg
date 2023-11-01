@@ -28,7 +28,6 @@ function LastRevision() {
 			<Button
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
-					gutenberg: true,
 				} ) }
 				className="editor-post-last-revision__title"
 				icon={ backup }

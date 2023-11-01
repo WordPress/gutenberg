@@ -4,7 +4,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,7 +19,11 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { STORE_NAME as editSiteStoreName } from './constants';
 import isTemplateRevertable from '../utils/is-template-revertable';
-
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../utils/constants';
 /**
  * Dispatches an action that toggles a feature flag.
  *
@@ -67,14 +71,18 @@ export const setTemplate =
 			try {
 				const template = await registry
 					.resolveSelect( coreStore )
-					.getEntityRecord( 'postType', 'wp_template', templateId );
+					.getEntityRecord(
+						'postType',
+						TEMPLATE_POST_TYPE,
+						templateId
+					);
 				templateSlug = template?.slug;
 			} catch ( error ) {}
 		}
 
 		dispatch( {
 			type: 'SET_EDITED_POST',
-			postType: 'wp_template',
+			postType: TEMPLATE_POST_TYPE,
 			id: templateId,
 			context: { templateSlug },
 		} );
@@ -92,14 +100,14 @@ export const addTemplate =
 	async ( { dispatch, registry } ) => {
 		const newTemplate = await registry
 			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_template', template );
+			.saveEntityRecord( 'postType', TEMPLATE_POST_TYPE, template );
 
 		if ( template.content ) {
 			registry
 				.dispatch( coreStore )
 				.editEntityRecord(
 					'postType',
-					'wp_template',
+					TEMPLATE_POST_TYPE,
 					newTemplate.id,
 					{ blocks: parse( template.content ) },
 					{ undoIgnore: true }
@@ -108,7 +116,7 @@ export const addTemplate =
 
 		dispatch( {
 			type: 'SET_EDITED_POST',
-			postType: 'wp_template',
+			postType: TEMPLATE_POST_TYPE,
 			id: newTemplate.id,
 			context: { templateSlug: newTemplate.slug },
 		} );
@@ -178,7 +186,7 @@ export const removeTemplate =
 export function setTemplatePart( templatePartId ) {
 	return {
 		type: 'SET_EDITED_POST',
-		postType: 'wp_template_part',
+		postType: TEMPLATE_PART_POST_TYPE,
 		id: templatePartId,
 	};
 }
@@ -193,7 +201,7 @@ export function setTemplatePart( templatePartId ) {
 export function setNavigationMenu( navigationMenuId ) {
 	return {
 		type: 'SET_EDITED_POST',
-		postType: 'wp_navigation',
+		postType: NAVIGATION_POST_TYPE,
 		id: navigationMenuId,
 	};
 }
@@ -233,7 +241,7 @@ export function setHomeTemplateId() {
  *
  * @param {Object} context The context object.
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setEditedPostContext( context ) {
 	return {
@@ -257,21 +265,47 @@ export function setEditedPostContext( context ) {
 export const setPage =
 	( page ) =>
 	async ( { dispatch, registry } ) => {
-		if ( ! page.path && page.context?.postId ) {
-			const entity = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord(
-					'postType',
-					page.context.postType || 'post',
-					page.context.postId
-				);
-			// If the entity is undefined for some reason, path will resolve to "/"
-			page.path = getPathAndQueryString( entity?.link );
-		}
+		let template;
+		const getDefaultTemplate = async ( slug ) =>
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/templates/lookup', {
+					slug: `page-${ slug }`,
+				} ),
+			} );
 
-		const template = await registry
-			.resolveSelect( coreStore )
-			.__experimentalGetTemplateForLink( page.path );
+		if ( page.path ) {
+			template = await registry
+				.resolveSelect( coreStore )
+				.__experimentalGetTemplateForLink( page.path );
+		} else {
+			const editedEntity = await registry
+				.resolveSelect( coreStore )
+				.getEditedEntityRecord(
+					'postType',
+					page.context?.postType || 'post',
+					page.context?.postId
+				);
+			const currentTemplateSlug = editedEntity?.template;
+			if ( currentTemplateSlug ) {
+				const currentTemplate = (
+					await registry
+						.resolveSelect( coreStore )
+						.getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+							per_page: -1,
+						} )
+				)?.find( ( { slug } ) => slug === currentTemplateSlug );
+				if ( currentTemplate ) {
+					template = currentTemplate;
+				} else {
+					// If a page has a `template` set and is not included in the list
+					// of the current theme's templates, query for current theme's default template.
+					template = await getDefaultTemplate( editedEntity?.slug );
+				}
+			} else {
+				// Page's `template` is empty, that indicates we need to use the default template for the page.
+				template = await getDefaultTemplate( editedEntity?.slug );
+			}
+		}
 
 		if ( ! template ) {
 			return;
@@ -279,7 +313,7 @@ export const setPage =
 
 		dispatch( {
 			type: 'SET_EDITED_POST',
-			postType: 'wp_template',
+			postType: TEMPLATE_POST_TYPE,
 			id: template.id,
 			context: {
 				...page.context,

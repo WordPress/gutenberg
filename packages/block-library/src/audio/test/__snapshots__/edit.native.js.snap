@@ -133,7 +133,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
           ]
         }
       >
-        <View
+        <RCTAztecView
           accessibilityState={
             {
               "busy": undefined,
@@ -143,73 +143,59 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessibilityValue={
+          accessible={true}
+          activeFormats={[]}
+          blockType={
             {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
+              "tag": "p",
             }
           }
-          accessible={false}
-          collapsable={false}
+          deleteEnter={true}
+          disableEditingMenu={false}
           focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
           onBlur={[Function]}
+          onChange={[Function]}
           onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
           onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-        >
-          <RCTAztecView
-            activeFormats={[]}
-            blockType={
-              {
-                "tag": "p",
-              }
+          placeholder="Add caption"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
             }
-            deleteEnter={true}
-            disableEditingMenu={false}
-            fontFamily="serif"
-            fontSize={14}
-            isMultiline={false}
-            maxImagesWidth={200}
-            onBackspace={[Function]}
-            onBlur={[Function]}
-            onChange={[Function]}
-            onContentSizeChange={[Function]}
-            onEnter={[Function]}
-            onFocus={[Function]}
-            onHTMLContentWithCursor={[Function]}
-            onKeyDown={[Function]}
-            onPaste={[Function]}
-            onSelectionChange={[Function]}
-            placeholder="Add caption"
-            placeholderTextColor="gray"
-            selectionColor="black"
-            style={
-              {
-                "backgroundColor": undefined,
-                "maxWidth": undefined,
-                "minHeight": 0,
-              }
+          }
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "",
             }
-            text={
-              {
-                "eventCount": undefined,
-                "linkTextColor": undefined,
-                "selection": null,
-                "tag": "p",
-                "text": "",
-              }
-            }
-            textAlign="center"
-            triggerKeyCodes={[]}
-          />
-        </View>
+          }
+          textAlign="center"
+          triggerKeyCodes={[]}
+        />
       </View>
     </View>
   </View>
@@ -373,7 +359,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
           ]
         }
       >
-        <View
+        <RCTAztecView
           accessibilityState={
             {
               "busy": undefined,
@@ -383,73 +369,59 @@ exports[`Audio block renders audio file without crashing 1`] = `
               "selected": undefined,
             }
           }
-          accessibilityValue={
+          accessible={true}
+          activeFormats={[]}
+          blockType={
             {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
+              "tag": "p",
             }
           }
-          accessible={false}
-          collapsable={false}
+          deleteEnter={true}
+          disableEditingMenu={false}
           focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
           onBlur={[Function]}
+          onChange={[Function]}
           onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
           onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
           onResponderTerminate={[Function]}
           onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
           onStartShouldSetResponder={[Function]}
-        >
-          <RCTAztecView
-            activeFormats={[]}
-            blockType={
-              {
-                "tag": "p",
-              }
+          placeholder="Add caption"
+          placeholderTextColor="gray"
+          selectionColor="black"
+          style={
+            {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
             }
-            deleteEnter={true}
-            disableEditingMenu={false}
-            fontFamily="serif"
-            fontSize={14}
-            isMultiline={false}
-            maxImagesWidth={200}
-            onBackspace={[Function]}
-            onBlur={[Function]}
-            onChange={[Function]}
-            onContentSizeChange={[Function]}
-            onEnter={[Function]}
-            onFocus={[Function]}
-            onHTMLContentWithCursor={[Function]}
-            onKeyDown={[Function]}
-            onPaste={[Function]}
-            onSelectionChange={[Function]}
-            placeholder="Add caption"
-            placeholderTextColor="gray"
-            selectionColor="black"
-            style={
-              {
-                "backgroundColor": undefined,
-                "maxWidth": undefined,
-                "minHeight": 0,
-              }
+          }
+          text={
+            {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "tag": "p",
+              "text": "",
             }
-            text={
-              {
-                "eventCount": undefined,
-                "linkTextColor": undefined,
-                "selection": null,
-                "tag": "p",
-                "text": "",
-              }
-            }
-            textAlign="center"
-            triggerKeyCodes={[]}
-          />
-        </View>
+          }
+          textAlign="center"
+          triggerKeyCodes={[]}
+        />
       </View>
     </View>
   </View>

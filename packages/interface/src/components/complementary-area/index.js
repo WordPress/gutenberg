@@ -27,10 +27,12 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-function ComplementaryAreaFill( { scope, children, className } ) {
+function ComplementaryAreaFill( { scope, children, className, id } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<div className={ className }>{ children }</div>
+			<div id={ id } className={ className }>
+				{ children }
+			</div>
 		</Fill>
 	);
 }
@@ -200,6 +202,7 @@ function ComplementaryArea( {
 						className
 					) }
 					scope={ scope }
+					id={ identifier.replace( '/', ':' ) }
 				>
 					<ComplementaryAreaHeader
 						className={ headerClassName }

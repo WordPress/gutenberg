@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -21,9 +26,52 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { useRef, useMemo } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref } } ) {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
+
+const useInferredLayout = ( blocks, parentLayout ) => {
+	const initialInferredAlignmentRef = useRef();
+
+	return useMemo( () => {
+		// Exit early if the pattern's blocks haven't loaded yet.
+		if ( ! blocks?.length ) {
+			return {};
+		}
+
+		let alignment = initialInferredAlignmentRef.current;
+
+		// Only track the initial alignment so that temporarily removed
+		// alignments can be reapplied.
+		if ( alignment === undefined ) {
+			const isConstrained = parentLayout?.type === 'constrained';
+			const hasFullAlignment = blocks.some( ( block ) =>
+				fullAlignments.includes( block.attributes.align )
+			);
+
+			alignment = isConstrained && hasFullAlignment ? 'full' : null;
+			initialInferredAlignmentRef.current = alignment;
+		}
+
+		const layout = alignment ? parentLayout : undefined;
+
+		return { alignment, layout };
+	}, [ blocks, parentLayout ] );
+};
+
+export default function ReusableBlockEdit( {
+	name,
+	attributes: { ref },
+	__unstableParentLayout: parentLayout,
+} ) {
+	const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -45,12 +93,20 @@ export default function ReusableBlockEdit( { attributes: { ref } } ) {
 		ref
 	);
 
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const layoutClasses = useLayoutClasses( { layout }, name );
+
 	const blockProps = useBlockProps( {
-		className: 'block-library-block__reusable-block-container',
+		className: classnames(
+			'block-library-block__reusable-block-container',
+			layout && layoutClasses,
+			{ [ `align${ alignment }` ]: alignment }
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
+		layout,
 		onInput,
 		onChange,
 		renderAppender: blocks?.length

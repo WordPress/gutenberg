@@ -28,7 +28,7 @@ $ cd todo-list
 $ npm start
 ```
 
-The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation).
+The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation-1).
 
 
 _(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
@@ -100,7 +100,7 @@ $ npx @wordpress/create-block@latest --template ./path/to/template-directory
 
 #### `--variant`
 
-With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block) based on the built-in template.
+With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/getting-started/glossary/#dynamic-block) based on the built-in template.
 
 ```bash
 $ npx @wordpress/create-block@latest --variant dynamic

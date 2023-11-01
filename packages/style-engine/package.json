@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "1.24.1-next.5a1d1283.0",
+	"version": "1.27.0",
 	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
