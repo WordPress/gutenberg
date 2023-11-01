@@ -3,23 +3,21 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function defer() {
+	let resolve;
+	const deferred = new Promise( ( res ) => {
+		resolve = res;
+	} );
+	deferred.resolve = resolve;
+	return deferred;
+}
+
 test.describe( 'Post publish button', () => {
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.createNewPost();
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).disablePublishSidebar();
-		} );
-	} );
-
-	test.afterEach( async ( { page } ) => {
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/editor' ).enablePublishSidebar();
-		} );
-	} );
-
 	test( 'should be disabled when post is not saveable', async ( {
+		admin,
 		page,
 	} ) => {
+		await admin.createNewPost();
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
@@ -28,9 +26,11 @@ test.describe( 'Post publish button', () => {
 	} );
 
 	test( 'should be disabled when post is being saved', async ( {
+		admin,
 		editor,
 		page,
 	} ) => {
+		await admin.createNewPost();
 		await editor.canvas
 			.getByRole( 'textbox', {
 				name: 'Add title',
@@ -41,18 +41,37 @@ test.describe( 'Post publish button', () => {
 		await expect(
 			topBar.getByRole( 'button', { name: 'Publish' } )
 		).toBeEnabled();
+
+		const postId = new URL( page.url() ).searchParams.get( 'post' );
+		const deferred = defer();
+
+		await page.route(
+			( url ) =>
+				url.searchParams.has(
+					'rest_route',
+					encodeURIComponent( `/wp/v2/posts/${ postId }` )
+				),
+			async ( route ) => {
+				await deferred;
+				await route.continue();
+			}
+		);
 
 		await topBar.getByRole( 'button', { name: 'Save draft' } ).click();
 		await expect(
 			topBar.getByRole( 'button', { name: 'Publish' } )
 		).toBeDisabled();
+		deferred.resolve();
 	} );
 
 	test( 'should be disabled when metabox is being saved', async ( {
-		editor,
+		admin,
 		page,
+		requestUtils,
 	} ) => {
-		await editor.canvas
+		await requestUtils.activatePlugin( 'gutenberg-test-plugin-meta-box' );
+		await admin.createNewPost();
+		await page
 			.getByRole( 'textbox', {
 				name: 'Add title',
 			} )
@@ -63,12 +82,22 @@ test.describe( 'Post publish button', () => {
 			topBar.getByRole( 'button', { name: 'Publish' } )
 		).toBeEnabled();
 
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
-		} );
+		const deferred = defer();
 
+		await page.route(
+			( url ) => url.searchParams.has( 'meta-box-loader', 1 ),
+			async ( route ) => {
+				await deferred;
+				await route.continue();
+			}
+		);
+
+		await topBar.getByRole( 'button', { name: 'Save draft' } ).click();
 		await expect(
 			topBar.getByRole( 'button', { name: 'Publish' } )
 		).toBeDisabled();
+		deferred.resolve();
+
+		await requestUtils.deactivatePlugin( 'gutenberg-test-plugin-meta-box' );
 	} );
 } );
