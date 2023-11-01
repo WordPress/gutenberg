@@ -61,8 +61,8 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		parent::tear_down();
 		unregister_block_type( 'test/plugin-block' );
+		parent::tear_down();
 	}
 
 	/**
