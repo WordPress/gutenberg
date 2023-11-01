@@ -195,7 +195,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
 		isset( $block_name ) &&
-		'core/' !== substr( $block_name, 0, 5 )
+		( ! str_starts_with( $block_name, 'core/' ) || 'core/post-content' === $block_name )
 	) {
 		foreach ( $enhanced_query_stack as $query_id ) {
 			$dirty_enhanced_queries[ $query_id ] = true;

@@ -136,7 +136,7 @@ HTML;
 	 * Tests that the `core/query` block adds an extra attribute to disable the
 	 * enhanced pagination in the browser when a plugin block is found inside.
 	 */
-	public function test_rendering_query_with_enhanced_pagination_auto_disabled() {
+	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_plugins_blocks_are_found() {
 		global $wp_query, $wp_the_query;
 
 		$content = <<<HTML
@@ -144,6 +144,41 @@ HTML;
 		<div class="wp-block-query">
 			<!-- wp:post-template {"align":"wide"} -->
 				<!-- wp:test/plugin-block /-->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+HTML;
+
+		// Set main query to single post.
+		$wp_query = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
+		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
+	}
+
+	/**
+	 * Tests that the `core/query` block adds an extra attribute to disable the
+	 * enhanced pagination in the browser when a post content block is found inside.
+	 */
+	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_post_content_block_is_found() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:post-content /-->
 			<!-- /wp:post-template -->
 		</div>
 		<!-- /wp:query -->
