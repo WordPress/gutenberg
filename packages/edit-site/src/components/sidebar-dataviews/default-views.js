@@ -21,29 +21,35 @@ const DEFAULT_PAGE_BASE = {
 	layout: {},
 };
 
-const DEFAULT_VIEWS = [
-	{
-		title: __( 'All' ),
-		slug: 'all',
-		view: DEFAULT_PAGE_BASE,
-	},
-	{
-		title: __( 'Drafts' ),
-		slug: 'drafts',
-		view: {
-			...DEFAULT_PAGE_BASE,
-			filters: [ { field: 'status', operator: 'in', value: 'draft' } ],
+const DEFAULT_VIEWS = {
+	page: [
+		{
+			title: __( 'All' ),
+			slug: 'all',
+			view: DEFAULT_PAGE_BASE,
 		},
-	},
-	{
-		title: __( 'Trash' ),
-		slug: 'trash',
-		icon: trash,
-		view: {
-			...DEFAULT_PAGE_BASE,
-			filters: [ { field: 'status', operator: 'in', value: 'trash' } ],
+		{
+			title: __( 'Drafts' ),
+			slug: 'drafts',
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{ field: 'status', operator: 'in', value: 'draft' },
+				],
+			},
 		},
-	},
-];
+		{
+			title: __( 'Trash' ),
+			slug: 'trash',
+			icon: trash,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{ field: 'status', operator: 'in', value: 'trash' },
+				],
+			},
+		},
+	],
+};
 
 export default DEFAULT_VIEWS;
