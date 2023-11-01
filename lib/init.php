@@ -96,6 +96,10 @@ function register_template_parts_that_use_menu_field() {
 		'get_callback' => function( $post ) {
 			return get_template_parts_that_use_menu( $post['id'] );
 		},
+		'schema'       => array(
+			'type'     => 'array',
+			'context'  => array( 'edit' ),
+	),
 	) );
 }
 add_action( 'rest_api_init', 'register_template_parts_that_use_menu_field' );
