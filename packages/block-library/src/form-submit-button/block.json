@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": true,
 	"name": "core/form-submit-button",
-	"title": "Form submit button",
+	"title": "Form Submit Button",
 	"category": "common",
 	"icon": "button",
 	"parent": [ "core/form" ],

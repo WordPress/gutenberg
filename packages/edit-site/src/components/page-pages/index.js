@@ -83,6 +83,7 @@ export default function PagePages() {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
+			search: view.search,
 			...view.filters,
 		} ),
 		[ view ]
@@ -94,9 +95,7 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
 
-	const { records: authors } = useEntityRecords( 'root', 'user', {
-		has_published_posts: [ 'page' ],
-	} );
+	const { records: authors } = useEntityRecords( 'root', 'user' );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -208,10 +207,6 @@ export default function PagePages() {
 		[ statuses, authors ]
 	);
 
-	const filters = useMemo( () => [
-		{ id: 'search', type: 'search', name: __( 'Filter list' ) },
-	] );
-
 	const trashPostAction = useTrashPostAction();
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
@@ -249,7 +244,6 @@ export default function PagePages() {
 			<DataViews
 				paginationInfo={ paginationInfo }
 				fields={ fields }
-				filters={ filters }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
 				isLoading={ isLoadingPages }
