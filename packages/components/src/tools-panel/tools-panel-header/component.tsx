@@ -39,7 +39,7 @@ const DefaultControlsGroup = ( {
 	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
 
 	return (
-		<MenuGroup label={ __( 'Defaults' ) }>
+		<>
 			{ items.map( ( [ label, hasValue ] ) => {
 				if ( hasValue ) {
 					return (
@@ -82,7 +82,7 @@ const DefaultControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -95,7 +95,7 @@ const OptionalControlsGroup = ( {
 	}
 
 	return (
-		<MenuGroup label={ __( 'Tools' ) }>
+		<>
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
@@ -143,7 +143,7 @@ const OptionalControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -199,18 +199,27 @@ const ToolsPanelHeader = (
 						isSmall: true,
 						describedBy: dropdownMenuDescriptionText,
 					} }
+					popoverProps={ {
+						placement: 'left-start',
+						offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+						shift: true,
+					} }
 				>
 					{ () => (
 						<>
-							<DefaultControlsGroup
-								items={ defaultItems }
-								toggleItem={ toggleItem }
-								itemClassName={ defaultControlsItemClassName }
-							/>
-							<OptionalControlsGroup
-								items={ optionalItems }
-								toggleItem={ toggleItem }
-							/>
+							<MenuGroup label={ labelText }>
+								<DefaultControlsGroup
+									items={ defaultItems }
+									toggleItem={ toggleItem }
+									itemClassName={
+										defaultControlsItemClassName
+									}
+								/>
+								<OptionalControlsGroup
+									items={ optionalItems }
+									toggleItem={ toggleItem }
+								/>
+							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
 									aria-disabled={ ! canResetAll }
