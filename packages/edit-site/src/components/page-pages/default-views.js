@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { trash } from '@wordpress/icons';
 
 // DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
 // The reason for that is to match the default statuses coming from the endpoint
@@ -46,6 +47,7 @@ const DEFAULT_VIEWS = [
 	{
 		title: __( 'Trash' ),
 		slug: 'trash',
+		icon: trash,
 		view: {
 			...DEFAULT_PAGE_BASE,
 			filters: {
