@@ -40,7 +40,7 @@ test.describe( 'Site Title block', () => {
 		await expect( siteTitleBlock ).toHaveText( 'New Site Title' );
 	} );
 
-	// Reason: Reason: The current e2e test setup doesn't provide an easy way to switch between user roles.
+	// Reason: The current e2e test setup doesn't provide an easy way to switch between user roles.
 	// eslint-disable-next-line playwright/expect-expect
 	test.fixme( 'Cannot edit the site title as editor', async () => {} );
 } );
