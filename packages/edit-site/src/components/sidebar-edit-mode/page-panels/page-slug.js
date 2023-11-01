@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
+import {
+	safeDecodeURIComponent,
+	filterURLForDisplay,
+	cleanForSlug,
+} from '@wordpress/url';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -15,8 +19,7 @@ import {
 	Dropdown,
 	Button,
 } from '@wordpress/components';
-import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,10 +29,15 @@ import useEditedEntityRecord from '../../use-edited-entity-record';
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
 export default function PageSlug( { postType, postId } ) {
-	const { createErrorNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { record, isLoaded } = useEditedEntityRecord( postType, postId );
-	const { record: savedRecord } = useEntityRecord( postType, postId );
+	const savedSlug = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId, {
+				_fields: 'slug',
+			} )?.slug,
+		[ postType, postId ]
+	);
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( record?.permalink_template ) &&
@@ -54,21 +62,10 @@ export default function PageSlug( { postType, postId } ) {
 	if ( ! isLoaded ) {
 		return null;
 	}
-	const onSlugChange = async ( newValue ) => {
-		try {
-			await editEntityRecord( 'postType', postType, postId, {
-				slug: newValue,
-			} );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while updating the status' );
-
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
+	const onSlugChange = ( newValue ) => {
+		editEntityRecord( 'postType', postType, postId, {
+			slug: cleanForSlug( newValue ),
+		} );
 	};
 	return (
 		<HStack className="edit-site-summary-field">
@@ -125,9 +122,7 @@ export default function PageSlug( { postType, postId } ) {
 										onChange={ onSlugChange }
 										onBlur={ ( event ) => {
 											if ( ! event.target.value ) {
-												onSlugChange(
-													savedRecord?.slug
-												);
+												onSlugChange( savedSlug );
 											}
 										} }
 									/>
