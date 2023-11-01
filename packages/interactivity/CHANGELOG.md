@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.5.1-next.0 (2023-11-01)
+
 ### Bug Fix
 
 -   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))

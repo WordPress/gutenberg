@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.12.1-next.0 (2023-11-01)
+
 -   Deprecated the `useSetting` function in favor of new `useSettings` one that can retrieve multiple settings at once ([#55337](https://github.com/WordPress/gutenberg/pull/55337)).
 
 ## 12.12.0 (2023-10-18)
