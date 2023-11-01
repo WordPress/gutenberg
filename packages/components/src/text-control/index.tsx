@@ -48,13 +48,9 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className={ classnames(
-					className,
-					'components-text-control__input',
-					{
-						'is-next-40px-default-size': __next40pxDefaultSize,
-					}
-				) }
+				className={ classnames( 'components-text-control__input', {
+					'is-next-40px-default-size': __next40pxDefaultSize,
+				} ) }
 				type={ type }
 				id={ id }
 				value={ value }
