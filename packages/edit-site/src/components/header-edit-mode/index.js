@@ -20,6 +20,7 @@ import {
 	__unstableMotion as motion,
 	MenuGroup,
 	MenuItem,
+	Slot,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -48,6 +49,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
 			select( editSiteStore );
@@ -73,6 +75,10 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
+			hasFixedToolbar: getPreference(
+				editSiteStore.name,
+				'fixedToolbar'
+			),
 			isDistractionFree: getPreference(
 				editSiteStore.name,
 				'distractionFree'
@@ -120,6 +126,13 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						showIconLabels={ showIconLabels }
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
+					{ hasFixedToolbar && (
+						<Slot
+							className={ 'selected-block-tools-wrapper' }
+							name="__experimentalSelectedBlockTools"
+							bubblesVirtually
+						/>
+					) }
 				</motion.div>
 			) }
 
