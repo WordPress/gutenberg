@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { VisuallyHidden } from '@wordpress/components';
+import { Slot, VisuallyHidden } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -15,6 +17,15 @@ import MoreMenu from '../more-menu';
 
 function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
+	const { hasFixedToolbar } = useSelect(
+		( select ) => ( {
+			hasFixedToolbar: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+		} ),
+		[]
+	);
 
 	return (
 		<>
@@ -36,6 +47,13 @@ function Header( { setListViewToggleElement } ) {
 					<DocumentTools
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
+					{ hasFixedToolbar && (
+						<Slot
+							className="selected-block-tools-wrapper"
+							name="__experimentalSelectedBlockTools"
+							bubblesVirtually
+						/>
+					) }
 				</div>
 				<div className="edit-widgets-header__actions">
 					<SaveButton />
