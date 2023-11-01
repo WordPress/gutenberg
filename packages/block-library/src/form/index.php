@@ -42,7 +42,7 @@ function render_block_core_form( $attributes, $content ) {
 	return str_replace(
 		array(
 			'<form',
-			'</form>'
+			'</form>',
 		),
 		array(
 			'<form ' . get_block_wrapper_attributes(),
