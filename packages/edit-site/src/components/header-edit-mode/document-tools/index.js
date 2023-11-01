@@ -24,9 +24,6 @@ import {
 	__unstableMotion as motion,
 	Button,
 	ToolbarItem,
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -34,19 +31,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
-import SaveButton from '../save-button';
-import UndoButton from './undo-redo/undo';
-import RedoButton from './undo-redo/redo';
-import DocumentActions from './document-actions';
-import DocumentTools from './document-tools';
-import { store as editSiteStore } from '../../store';
+import UndoButton from '../undo-redo/undo';
+import RedoButton from '../undo-redo/redo';
+import { store as editSiteStore } from '../../../store';
 import {
-	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
-} from '../editor-canvas-container';
-import { unlock } from '../../lock-unlock';
-import { FOCUSABLE_ENTITIES } from '../../utils/constants';
+} from '../../editor-canvas-container';
+import { unlock } from '../../../lock-unlock';
+import { FOCUSABLE_ENTITIES } from '../../../utils/constants';
 
 const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
@@ -54,8 +46,8 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function HeaderEditMode( { setListViewToggleElement } ) {
-	const inserterButton = useRef();
+export default function DocumentTools( { setListViewToggleElement } ) {
+    const inserterButton = useRef();
 	const {
 		deviceType,
 		templateType,
@@ -185,72 +177,111 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	};
 
 	return (
-		<div
-			className={ classnames( 'edit-site-header-edit-mode', {
-				'show-icon-labels': showIconLabels,
-			} ) }
-		>
-			{ hasDefaultEditorCanvasView && (
-				<DocumentTools setListViewToggleElement={ setListViewToggleElement }/>
-			) }
-
-			{ ! isDistractionFree && (
-				<div className="edit-site-header-edit-mode__center">
-					{ ! hasDefaultEditorCanvasView ? (
-						getEditorCanvasContainerTitle( editorCanvasView )
-					) : (
-						<DocumentActions />
-					) }
-				</div>
-			) }
-
-			<div className="edit-site-header-edit-mode__end">
-				<motion.div
-					className="edit-site-header-edit-mode__actions"
+		<NavigableToolbar
+					as={ motion.div }
+					className="edit-site-header-edit-mode__start"
+					aria-label={ __( 'Document tools' ) }
+					shouldUseKeyboardFocusShortcut={
+						! blockToolbarCanBeFocused
+					}
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					<div
-						className={ classnames(
-							'edit-site-header-edit-mode__preview-options',
-							{ 'is-zoomed-out': isZoomedOutView }
+					<div className="edit-site-header-edit-mode__toolbar">
+						{ ! isDistractionFree && (
+							<ToolbarItem
+								ref={ inserterButton }
+								as={ Button }
+								className="edit-site-header-edit-mode__inserter-toggle"
+								variant="primary"
+								isPressed={ isInserterOpen }
+								onMouseDown={ preventDefault }
+								onClick={ toggleInserter }
+								disabled={ ! isVisualMode }
+								icon={ plus }
+								label={
+									showIconLabels ? shortLabel : longLabel
+								}
+								showTooltip={ ! showIconLabels }
+								aria-expanded={ isInserterOpen }
+							/>
 						) }
-					>
-						<PreviewOptions
-							deviceType={ deviceType }
-							setDeviceType={ setPreviewDeviceType }
-							label={ __( 'View' ) }
-							isEnabled={
-								! isFocusMode && hasDefaultEditorCanvasView
-							}
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-										onClick={ onClose }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
-							) }
-						</PreviewOptions>
+						{ isLargeViewport && (
+							<>
+								{ ! hasFixedToolbar && (
+									<ToolbarItem
+										as={ ToolSelector }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+										disabled={ ! isVisualMode }
+									/>
+								) }
+								<ToolbarItem
+									as={ UndoButton }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
+								<ToolbarItem
+									as={ RedoButton }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
+								{ ! isDistractionFree && (
+									<ToolbarItem
+										as={ Button }
+										className="edit-site-header-edit-mode__list-view-toggle"
+										disabled={
+											! isVisualMode || isZoomedOutView
+										}
+										icon={ listView }
+										isPressed={ isListViewOpen }
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'List View' ) }
+										onClick={ toggleListView }
+										ref={ setListViewToggleElement }
+										shortcut={ listViewShortcut }
+										showTooltip={ ! showIconLabels }
+										variant={
+											showIconLabels
+												? 'tertiary'
+												: undefined
+										}
+										aria-expanded={ isListViewOpen }
+									/>
+								) }
+								{ isZoomedOutViewExperimentEnabled &&
+									! isDistractionFree &&
+									! hasFixedToolbar && (
+										<ToolbarItem
+											as={ Button }
+											className="edit-site-header-edit-mode__zoom-out-view-toggle"
+											icon={ chevronUpDown }
+											isPressed={ isZoomedOutView }
+											/* translators: button label text should, if possible, be under 16 characters. */
+											label={ __( 'Zoom-out View' ) }
+											onClick={ () => {
+												setPreviewDeviceType(
+													'Desktop'
+												);
+												__unstableSetEditorMode(
+													isZoomedOutView
+														? 'edit'
+														: 'zoom-out'
+												);
+											} }
+										/>
+									) }
+							</>
+						) }
 					</div>
-					<SaveButton />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
-					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
-				</motion.div>
-			</div>
-		</div>
+				</NavigableToolbar>
 	);
-}
+										}
