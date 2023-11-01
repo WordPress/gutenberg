@@ -5,7 +5,8 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion, Slot } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -37,17 +38,23 @@ function Header( {
 	setListViewToggleElement,
 } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
-	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
-		useSelect(
-			( select ) => ( {
-				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-				isPublishSidebarOpened:
-					select( editPostStore ).isPublishSidebarOpened(),
-				showIconLabels:
-					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			} ),
-			[]
-		);
+	const {
+		hasActiveMetaboxes,
+		hasFixedToolbar,
+		isPublishSidebarOpened,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { get: getPreference } = select( preferencesStore );
+
+		return {
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
+			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+		};
+	}, [] );
 
 	return (
 		<div className="edit-post-header">
@@ -65,8 +72,16 @@ function Header( {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar
+					hasFixedToolbar={ hasFixedToolbar }
 					setListViewToggleElement={ setListViewToggleElement }
 				/>
+				{ hasFixedToolbar && (
+					<Slot
+						className="selected-block-tools-wrapper"
+						name="__experimentalSelectedBlockTools"
+						bubblesVirtually
+					/>
+				) }
 				<div className="edit-post-header__center">
 					<DocumentActions />
 				</div>
