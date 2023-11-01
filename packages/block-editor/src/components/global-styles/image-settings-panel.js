@@ -54,13 +54,13 @@ export default function ImageSettingsPanel( {
 					// "RESET" button ONLY when the user has explicitly set a value in the
 					// Global Styles.
 					hasValue={ () => !! value?.lightbox }
-					label={ __( 'Expand on click' ) }
+					label={ __( 'Expand on Click' ) }
 					onDeselect={ resetLightbox }
 					isShownByDefault={ true }
 					panelId={ panelId }
 				>
 					<ToggleControl
-						label={ __( 'Expand on click' ) }
+						label={ __( 'Expand on Click' ) }
 						checked={ lightboxChecked }
 						onChange={ onChangeLightbox }
 					/>

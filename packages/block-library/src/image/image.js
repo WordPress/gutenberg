@@ -548,14 +548,14 @@ export default function Image( {
 					{ showLightboxToggle && (
 						<ToolsPanelItem
 							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on click' ) }
+							label={ __( 'Expand on Click' ) }
 							onDeselect={ () => {
 								setAttributes( { lightbox: undefined } );
 							} }
 							isShownByDefault={ true }
 						>
 							<ToggleControl
-								label={ __( 'Expand on click' ) }
+								label={ __( 'Expand on Click' ) }
 								checked={ lightboxChecked }
 								onChange={ ( newValue ) => {
 									setAttributes( {

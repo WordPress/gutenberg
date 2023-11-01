@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": true,
 	"name": "core/form-input",
-	"title": "Input Field",
+	"title": "Input field",
 	"category": "common",
 	"parent": [ "core/form" ],
 	"description": "The basic building block for forms.",

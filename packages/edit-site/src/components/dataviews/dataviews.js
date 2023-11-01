@@ -14,15 +14,13 @@ import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
-import Search from './search';
 import { ViewGrid } from './view-grid';
 
 export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
-	search = true,
-	searchLabel = undefined,
+	filters,
 	actions,
 	data,
 	isLoading = false,
@@ -40,14 +38,8 @@ export default function DataViews( {
 			<VStack spacing={ 4 } justify="flex-start">
 				<HStack>
 					<HStack justify="start">
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
 						<Filters
+							filters={ filters }
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }

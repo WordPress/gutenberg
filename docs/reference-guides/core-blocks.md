@@ -287,7 +287,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** action, email, method, submissionMethod
 
-## Input Field
+## Input field
 
 The basic building block for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input))
 
@@ -309,7 +309,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Supports:** 
 -	**Attributes:** type
 
-## Form Submit Button
+## Form submit button
 
 A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submit-button))
 

@@ -1,12 +1,5 @@
-/**
- * Internal dependencies
- */
-import {
-	ios as iOSConfig,
-	android as androidConfig,
-} from './device-config.json';
-
 const ios = {
+	platformVersion: '16.2', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
 	processArguments: {
@@ -17,30 +10,22 @@ const ios = {
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
-	deviceName: ! iPadDevice
-		? iOSConfig.local.deviceName
-		: iOSConfig.local.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
-	pixelRatio: ! iPadDevice
-		? iOSConfig.pixelRatio.iPhone
-		: iOSConfig.pixelRatio.iPad,
+	deviceName: ! iPadDevice ? 'iPhone 14' : 'iPad (10th generation)',
+	pixelRatio: ! iPadDevice ? 3 : 2,
 	usePrebuiltWDA: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice
-		? iOSConfig.saucelabs.deviceName
-		: iOSConfig.saucelabs.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
-	pixelRatio: ! iPadDevice
-		? iOSConfig.pixelRatio.iPhone
-		: iOSConfig.pixelRatio.iPad,
+		? 'iPhone 14 Simulator'
+		: 'iPad (10th generation) Simulator',
+	pixelRatio: ! iPadDevice ? 3 : 2,
 } );
 
 exports.android = {
-	platformVersion: androidConfig.local.platformVersion,
-	deviceName: androidConfig.saucelabs.deviceName,
+	platformVersion: '11.0',
+	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',

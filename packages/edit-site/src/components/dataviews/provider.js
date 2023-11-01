@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	useEffect,
 	useState,
@@ -14,7 +15,10 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import DataviewsContext from './context';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 // DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
 // The reason for that is to match the default statuses coming from the endpoint
@@ -24,8 +28,8 @@ export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All s
 const DEFAULT_VIEWS = {
 	page: {
 		type: 'list',
-		search: '',
 		filters: {
+			search: '',
 			status: DEFAULT_STATUSES,
 		},
 		page: 1,
@@ -34,12 +38,16 @@ const DEFAULT_VIEWS = {
 			field: 'date',
 			direction: 'desc',
 		},
-		visibleFilters: [ 'author', 'status' ],
+		visibleFilters: [ 'search', 'author', 'status' ],
 		// All fields are visible by default, so it's
 		// better to keep track of the hidden ones.
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
 	},
+};
+
+const PATH_TO_DATAVIEW_TYPE = {
+	'/pages': 'page',
 };
 
 function useDataviewTypeTaxonomyId( type ) {
@@ -175,7 +183,7 @@ function useDataviews( type, typeTaxonomyId ) {
 	return null;
 }
 
-function DataviewsProvider( { type, children } ) {
+function DataviewsProviderInner( { type, children } ) {
 	const [ currentViewId, setCurrentViewId ] = useState( null );
 	const dataviewTypeTaxonomyId = useDataviewTypeTaxonomyId( type );
 	const dataviews = useDataviews( type, dataviewTypeTaxonomyId );
@@ -233,6 +241,21 @@ function DataviewsProvider( { type, children } ) {
 			{ children }
 		</DataviewsContext.Provider>
 	);
+}
+function DataviewsProvider( { children } ) {
+	const {
+		params: { path },
+	} = useLocation();
+	const viewType = PATH_TO_DATAVIEW_TYPE[ path ];
+
+	if ( viewType ) {
+		return (
+			<DataviewsProviderInner type={ viewType }>
+				{ children }
+			</DataviewsProviderInner>
+		);
+	}
+	return <>{ children }</>;
 }
 
 let DataviewsProviderExported = Fragment;
