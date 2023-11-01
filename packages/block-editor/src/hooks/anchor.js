@@ -126,18 +126,17 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
-
 			return (
 				<>
 					<BlockEdit { ...props } />
-					{ hasAnchor && props.isSelected && (
-						<BlockEditAnchorControl
-							blockName={ props.name }
-							attributes={ props.attributes }
-							setAttributes={ props.setAttributes }
-						/>
-					) }
+					{ props.isSelected &&
+						hasBlockSupport( props.name, 'anchor' ) && (
+							<BlockEditAnchorControl
+								blockName={ props.name }
+								attributes={ props.attributes }
+								setAttributes={ props.setAttributes }
+							/>
+						) }
 				</>
 			);
 		};
