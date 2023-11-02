@@ -10,15 +10,15 @@ else
 fi
 
 function log_info() {
-	printf "[info] $1\n"
+	printf "ℹ️  $1\n"
 }
 
 function log_success {
-	printf "[success] $1\n"
+	printf "✅ $1\n"
 }
 
 function log_error() {
-	printf "[error] $1\n"
+	printf "❌ $1\n"
 }
 
 output=$($APPIUM_CMD driver list --installed --json)
@@ -42,7 +42,7 @@ IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
 
 # Throw an error if the required iOS runtime is not installed
 if ! xcrun simctl list runtimes -j | jq -r --arg version "$IOS_PLATFORM_VERSION" '.runtimes | to_entries[] | select(.value.version | contains($version))' > /dev/null; then
-	log_error "iOS $IOS_PLATFORM_VERSION runtime not found! Please install the iOS $IOS_PLATFORM_VERSION runtime using Xcode.\n         https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings"
+	log_error "iOS $IOS_PLATFORM_VERSION runtime not found! Please install the iOS $IOS_PLATFORM_VERSION runtime using Xcode.\n    https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings"
 	exit 1;
 fi
 
