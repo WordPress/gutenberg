@@ -1,16 +1,16 @@
 <?php
 /**
- * Test WP_Font_Library::get_font_collections().
+ * Test WP_Font_Collection::get_font_collections().
  *
  * @package WordPress
- * @subpackage Font Library
+ * @subpackage Fonts
  *
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Library::get_font_collection
+ * @covers WP_Font_Collection::get_font_collection
  */
-class Tests_Fonts_WpFontLibrary_GetFontCollection extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_GetFontCollection extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		$my_font_collection_config = array(

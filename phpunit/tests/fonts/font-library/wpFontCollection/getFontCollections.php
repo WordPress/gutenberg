@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Library::get_font_collections().
+ * Test WP_Font_Collection::get_font_collections().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,9 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Library::get_font_collections
+ * @covers WP_Font_Collection::get_font_collections
  */
-class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_GetFontCollections extends WP_UnitTestCase {
 
 	public static function set_up_before_class() {
 		$font_library = new WP_Font_Library();

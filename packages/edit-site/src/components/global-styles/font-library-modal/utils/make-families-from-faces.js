@@ -1,15 +1,26 @@
-export default function makeFamiliesFromFaces( fontFaces ) {
-	const fontFamiliesObject = fontFaces.reduce( ( acc, item ) => {
-		if ( ! acc[ item.fontFamily ] ) {
-			acc[ item.fontFamily ] = {
-				name: item.fontFamily,
-				fontFamily: item.fontFamily,
-				slug: item.fontFamily.replace( /\s+/g, '-' ).toLowerCase(),
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+export default function makeFamilyFromFaces( fontFaces ) {
+	let fontFamilyObject = null;
+	fontFaces.forEach( ( fontFace ) => {
+		if ( ! fontFamilyObject ) {
+			fontFamilyObject = {
+				name: fontFace.fontFamily,
+				fontFamily: fontFace.fontFamily,
+				slug: fontFace.fontFamily.replace( /\s+/g, '-' ).toLowerCase(),
 				fontFace: [],
 			};
+		} else if ( fontFamilyObject.name !== fontFace.fontFamily ) {
+			throw new Error(
+				__(
+					'You may only batch upload fonts from the same font family.'
+				)
+			);
 		}
-		acc[ item.fontFamily ].fontFace.push( item );
-		return acc;
-	}, {} );
-	return Object.values( fontFamiliesObject );
+		fontFamilyObject.fontFace.push( fontFace );
+	} );
+	return fontFamilyObject;
 }

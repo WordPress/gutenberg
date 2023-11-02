@@ -20,12 +20,11 @@ import { useContext, useState, useEffect } from '@wordpress/element';
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
-import makeFamiliesFromFaces from './utils/make-families-from-faces';
+import makeFamilyFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
 function LocalFonts() {
-	const { installFonts } = useContext( FontLibraryContext );
+	const { installFont } = useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
 	const supportedFormats =
 		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
@@ -146,10 +145,19 @@ function LocalFonts() {
 	 * @return {void}
 	 */
 	const handleInstall = async ( fontFaces ) => {
-		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		const response = await installFonts( fontFamilies );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+		try {
+			const fontFamily = makeFamilyFromFaces( fontFaces );
+			await installFont( fontFamily );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
 	};
 
 	return (

@@ -105,11 +105,9 @@ class WP_Font_Family {
 	 */
 	public function uninstall() {
 		$post = $this->get_data_from_post();
-		if ( null === $post ) {
-			return new WP_Error(
-				'font_family_not_found',
-				__( 'The font family could not be found.', 'gutenberg' )
-			);
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
 		}
 
 		if (
@@ -444,11 +442,11 @@ class WP_Font_Family {
 
 		$posts_query = new WP_Query( $args );
 
-		if ( $posts_query->have_posts() ) {
-			return $posts_query->posts[0];
+		if ( ! $posts_query->have_posts() ) {
+			return null;
 		}
 
-		return null;
+		return $posts_query->posts[0];
 	}
 
 	/**
@@ -457,17 +455,36 @@ class WP_Font_Family {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return WP_Post|null The post for this font family object or
-	 *                      null if the post does not exist.
+	 * @return WP_Post|WP_Error The post for this font family object if it exists and has valid JSON content.
 	 */
-	private function get_data_from_post() {
+	public function get_data_from_post() {
 		$post = $this->get_font_post();
-		if ( $post ) {
-			$this->data = json_decode( $post->post_content, true );
-			return $post;
+
+		if ( ! $post ) {
+			return new WP_Error(
+				'font_family_slug_not_found',
+				__( 'Font Family with that slug was not found.' ),
+				array(
+					'status' => 404,
+				)
+			);
 		}
 
-		return null;
+		$decoded_content = json_decode( $post->post_content, true );
+
+		if ( ! $decoded_content ) {
+			return new WP_Error(
+				'font_family_invalid_json_content',
+				__( 'The JSON content of the font family is invalid.' ),
+				array(
+					'status' => 500,
+				)
+			);
+		}
+
+		$this->data = $decoded_content;
+
+		return $post;
 	}
 
 	/**

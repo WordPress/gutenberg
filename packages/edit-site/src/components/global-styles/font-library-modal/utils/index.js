@@ -129,29 +129,32 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-export function makeFormDataFromFontFamilies( fontFamilies ) {
+export function makeFormDataFromFontFamily( fontFamily ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
-		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
-				if ( face.file ) {
-					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ familyIndex }-${ faceIndex }`;
-					// Add the files to the formData
-					formData.append( fileId, face.file, face.file.name );
-					// remove the file object from the face object the file is referenced by the uploadedFile key
-					const { file, ...faceWithoutFileProperty } = face;
-					const newFace = {
-						...faceWithoutFileProperty,
-						uploadedFile: fileId,
-					};
-					return newFace;
-				}
-				return face;
-			} );
-		}
-		return family;
-	} );
-	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
+
+	formData.append( 'slug', fontFamily.slug );
+	formData.append( 'name', fontFamily.name );
+	formData.append( 'fontFamily', fontFamily.fontFamily );
+
+	if ( fontFamily.fontFace ) {
+		fontFamily.fontFace = fontFamily.fontFace.map( ( face, faceIndex ) => {
+			if ( face.file ) {
+				// Slugified file name because the it might contain spaces or characters treated differently on the server.
+				const fileId = `file-${ faceIndex }`;
+				// Add the files to the formData
+				formData.append( fileId, face.file, face.file.name );
+				// remove the file object from the face object the file is referenced by the uploadedFile key
+				const { file, ...faceWithoutFileProperty } = face;
+				const newFace = {
+					...faceWithoutFileProperty,
+					uploadedFile: fileId,
+				};
+				return newFace;
+			}
+			return face;
+		} );
+		formData.append( 'fontFace', JSON.stringify( fontFamily.fontFace ) );
+	}
+
 	return formData;
 }

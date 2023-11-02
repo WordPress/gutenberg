@@ -14,8 +14,8 @@ import {
  * Internal dependencies
  */
 import {
-	fetchInstallFonts,
-	fetchUninstallFonts,
+	fetchInstallFont,
+	fetchUninstallFont,
 	fetchFontCollections,
 	fetchFontCollection,
 } from './resolvers';
@@ -26,10 +26,9 @@ import {
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
-	makeFormDataFromFontFamilies,
+	makeFormDataFromFontFamily,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
-import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -192,22 +191,15 @@ function FontLibraryProvider( { children } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
-	async function installFonts( fonts ) {
+	async function installFont( fontFamily ) {
 		setIsInstalling( true );
 		try {
 			// Prepare formData to install.
-			const formData = makeFormDataFromFontFamilies( fonts );
-			// Install the fonts (upload the font files to the server and create the post in the database).
-			const response = await fetchInstallFonts( formData );
-			const fontsInstalled = response?.successes || [];
-			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
-			// (to avoid activating a non installed font).
-			const fontToBeActivated = getIntersectingFontFaces(
-				fontsInstalled,
-				fonts
-			);
+			const formData = makeFormDataFromFontFamily( fontFamily );
+			// Install the font (upload the font files to the server and create the post in the database).
+			const response = await fetchInstallFont( formData );
 			// Activate the font families (add the font families to the global styles).
-			activateCustomFontFamilies( fontToBeActivated );
+			activateCustomFontFamilies( [ response ] );
 			// Save the global styles to the database.
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',
@@ -216,29 +208,24 @@ function FontLibraryProvider( { children } ) {
 			setIsInstalling( false );
 
 			return response;
-		} catch ( error ) {
+		} finally {
 			setIsInstalling( false );
-			return {
-				errors: [ error ],
-			};
 		}
 	}
 
 	async function uninstallFont( font ) {
 		try {
 			// Uninstall the font (remove the font files from the server and the post from the database).
-			const response = await fetchUninstallFonts( [ font ] );
+			const response = await fetchUninstallFont( font );
 			// Deactivate the font family (remove the font family from the global styles).
-			if ( ! response.errors ) {
-				deactivateFontFamily( font );
-				// Save the global styles to the database.
-				await saveSpecifiedEntityEdits(
-					'root',
-					'globalStyles',
-					globalStylesId,
-					[ 'settings.typography.fontFamilies' ]
-				);
-			}
+			deactivateFontFamily( font );
+			// Save the global styles to the database.
+			await saveSpecifiedEntityEdits(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				[ 'settings.typography.fontFamilies' ]
+			);
 			// Refresh the library (the the library font families from database).
 			refreshLibrary();
 			return response;
@@ -358,7 +345,7 @@ function FontLibraryProvider( { children } ) {
 				isFontActivated,
 				getFontFacesActivated,
 				loadFontFaceAsset,
-				installFonts,
+				installFont,
 				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
