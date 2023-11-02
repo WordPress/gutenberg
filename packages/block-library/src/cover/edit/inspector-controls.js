@@ -20,7 +20,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
-	useSetting,
+	useSettings,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
@@ -42,14 +42,9 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 

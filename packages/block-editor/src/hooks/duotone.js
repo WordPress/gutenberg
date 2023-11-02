@@ -25,7 +25,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
-	useSetting,
+	useSettings,
 } from '../components';
 import {
 	getDuotoneFilter,
@@ -56,20 +56,20 @@ const isSafari =
 extend( [ namesPlugin ] );
 
 function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
-	const disableDefault = ! useSetting( defaultSetting );
-	const userPresets =
-		useSetting( `${ presetSetting }.custom` ) || EMPTY_ARRAY;
-	const themePresets =
-		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
-	const defaultPresets =
-		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+	const [ enableDefault, userPresets, themePresets, defaultPresets ] =
+		useSettings(
+			defaultSetting,
+			`${ presetSetting }.custom`,
+			`${ presetSetting }.theme`,
+			`${ presetSetting }.default`
+		);
 	return useMemo(
 		() => [
-			...userPresets,
-			...themePresets,
-			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
+			...( userPresets || EMPTY_ARRAY ),
+			...( themePresets || EMPTY_ARRAY ),
+			...( ( enableDefault && defaultPresets ) || EMPTY_ARRAY ),
 		],
-		[ disableDefault, userPresets, themePresets, defaultPresets ]
+		[ enableDefault, userPresets, themePresets, defaultPresets ]
 	);
 }
 
@@ -102,6 +102,7 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	const style = attributes?.style;
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
+	const blockEditingMode = useBlockEditingMode();
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -111,12 +112,20 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
 	} );
-	const disableCustomColors = ! useSetting( 'color.custom' );
+	const [ enableCustomColors, enableCustomDuotone ] = useSettings(
+		'color.custom',
+		'color.customDuotone'
+	);
+	const disableCustomColors = ! enableCustomColors;
 	const disableCustomDuotone =
-		! useSetting( 'color.customDuotone' ) ||
+		! enableCustomDuotone ||
 		( colorPalette?.length === 0 && disableCustomColors );
 
 	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
+
+	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 
@@ -215,17 +224,13 @@ const withDuotoneControls = createHigherOrderComponent(
 			'filter.duotone'
 		);
 
-		const blockEditingMode = useBlockEditingMode();
-
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && blockEditingMode === 'default' && (
-					<DuotonePanel { ...props } />
-				) }
+				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 				<BlockEdit { ...props } />
 			</>
 		);

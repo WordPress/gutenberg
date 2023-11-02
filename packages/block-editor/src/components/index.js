@@ -165,7 +165,7 @@ export { useBlockEditingMode } from './block-editing-mode';
  */
 
 export { default as BlockEditorProvider } from './provider';
-export { default as useSetting } from './use-setting';
+export { useSettings, useSetting } from './use-settings';
 export { useBlockCommands } from './use-block-commands';
 
 /*

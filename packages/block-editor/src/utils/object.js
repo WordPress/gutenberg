@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { paramCase } from 'change-case';
+import memoize from 'memize';
 
 /**
  * Converts a path to an array of its fragments.
@@ -112,6 +113,8 @@ export function setImmutably( object, path, value ) {
 	return newObject;
 }
 
+const stringToPath = memoize( ( path ) => path.split( '.' ) );
+
 /**
  * Helper util to return a value from a certain path of the object.
  * Path is specified as either:
@@ -125,7 +128,7 @@ export function setImmutably( object, path, value ) {
  * @return {*} Value of the object property at the specified path.
  */
 export const getValueFromObjectPath = ( object, path, defaultValue ) => {
-	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
+	const normalizedPath = Array.isArray( path ) ? path : stringToPath( path );
 	let value = object;
 	normalizedPath.forEach( ( fieldName ) => {
 		value = value?.[ fieldName ];

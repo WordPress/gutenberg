@@ -46,7 +46,9 @@ function getPageDetails( page ) {
 			label: __( 'Slug' ),
 			value: (
 				<Truncate numberOfLines={ 1 }>
-					{ safeDecodeURIComponent( page.slug ) }
+					{ safeDecodeURIComponent(
+						page.slug || page.generated_slug
+					) }
 				</Truncate>
 			),
 		},

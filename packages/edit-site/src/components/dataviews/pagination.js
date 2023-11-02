@@ -6,45 +6,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalNumberControl as NumberControl,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	SelectControl,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf, __, _x, _n } from '@wordpress/i18n';
+import { chevronRight, chevronLeft, previous, next } from '@wordpress/icons';
 
-const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
-function PageSizeControl( { view, onChangeView } ) {
-	const label = __( 'Rows per page:' );
-	return (
-		<SelectControl
-			__nextHasNoMarginBottom
-			label={ label }
-			hideLabelFromVision
-			// TODO: This should probably use a label based on the wanted design
-			// and we could remove InputControlPrefixWrapper usage.
-			prefix={
-				<InputControlPrefixWrapper
-					as="span"
-					className="dataviews__select-control-prefix"
-				>
-					{ label }
-				</InputControlPrefixWrapper>
-			}
-			value={ view.perPage }
-			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
-				value: pageSize,
-				label: pageSize,
-			} ) ) }
-			onChange={ ( value ) =>
-				onChangeView( { ...view, perPage: value, page: 1 } )
-			}
-		/>
-	);
-}
-
-// For now this is copied from the patterns list Pagination component, because
-// the datatable pagination starts from index zero(`0`). Eventually all lists will be
-// using this one.
 function Pagination( {
 	view,
 	onChangeView,
@@ -71,29 +37,37 @@ function Pagination( {
 				}
 			</Text>
 			{ !! totalItems && (
-				<HStack expanded={ false } spacing={ 1 }>
-					<Button
-						variant="tertiary"
-						onClick={ () => onChangeView( { ...view, page: 1 } ) }
-						disabled={ view.page === 1 }
-						aria-label={ __( 'First page' ) }
-					>
-						«
-					</Button>
-					<Button
-						variant="tertiary"
-						onClick={ () =>
-							onChangeView( { ...view, page: view.page - 1 } )
-						}
-						disabled={ view.page === 1 }
-						aria-label={ __( 'Previous page' ) }
-					>
-						‹
-					</Button>
+				<HStack expanded={ false } spacing={ 3 }>
 					<HStack
 						justify="flex-start"
 						expanded={ false }
 						spacing={ 1 }
+					>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: 1 } )
+							}
+							disabled={ view.page === 1 }
+							label={ __( 'First page' ) }
+							icon={ previous }
+							showTooltip
+							size="compact"
+						/>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: view.page - 1 } )
+							}
+							disabled={ view.page === 1 }
+							label={ __( 'Previous page' ) }
+							icon={ chevronLeft }
+							showTooltip
+							size="compact"
+						/>
+					</HStack>
+					<HStack
+						justify="flex-start"
+						expanded={ false }
+						spacing={ 2 }
 					>
 						{ createInterpolateElement(
 							sprintf(
@@ -130,29 +104,34 @@ function Pagination( {
 							}
 						) }
 					</HStack>
-					<Button
-						variant="tertiary"
-						onClick={ () =>
-							onChangeView( { ...view, page: view.page + 1 } )
-						}
-						disabled={ view.page >= totalPages }
-						aria-label={ __( 'Next page' ) }
+					<HStack
+						justify="flex-start"
+						expanded={ false }
+						spacing={ 1 }
 					>
-						›
-					</Button>
-					<Button
-						variant="tertiary"
-						onClick={ () =>
-							onChangeView( { ...view, page: totalPages } )
-						}
-						disabled={ view.page >= totalPages }
-						aria-label={ __( 'Last page' ) }
-					>
-						»
-					</Button>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: view.page + 1 } )
+							}
+							disabled={ view.page >= totalPages }
+							label={ __( 'Next page' ) }
+							icon={ chevronRight }
+							showTooltip
+							size="compact"
+						/>
+						<Button
+							onClick={ () =>
+								onChangeView( { ...view, page: totalPages } )
+							}
+							disabled={ view.page >= totalPages }
+							label={ __( 'Last page' ) }
+							icon={ next }
+							showTooltip
+							size="compact"
+						/>
+					</HStack>
 				</HStack>
 			) }
-			<PageSizeControl view={ view } onChangeView={ onChangeView } />
 		</HStack>
 	);
 }

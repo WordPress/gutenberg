@@ -34,7 +34,7 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import FieldActions from './field-actions';
+import ItemActions from './item-actions';
 
 const {
 	DropdownMenuV2,
@@ -160,7 +160,7 @@ function ViewList( {
 				id: 'actions',
 				cell: ( props ) => {
 					return (
-						<FieldActions
+						<ItemActions
 							item={ props.row.original }
 							actions={ actions }
 						/>

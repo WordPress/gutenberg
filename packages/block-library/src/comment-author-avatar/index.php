@@ -23,7 +23,7 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 		return '';
 	}
 
-	// This is the only way to retreive style and classes on different instances.
+	// This is the only way to retrieve style and classes on different instances.
 	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
 
 	/**
