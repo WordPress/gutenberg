@@ -43,10 +43,10 @@ Example:
 		direction: 'desc',
 	},
 	search: '',
-	filters: {
-		author: 2,
-		status: 'publish, draft'
-	},
+	filters: [
+		{ field: 'author', operator: 'in', value: 2 },
+		{ field: 'status', operator: 'in', value: 'publish,draft' }
+	],
 	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
@@ -76,17 +76,26 @@ function MyCustomPageList() {
 		"...": "..."
 	} );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
+		return {
 			per_page: view.perPage,
 			page: view.page,
+			_embed: 'author',
 			order: view.sort?.direction,
-			orderby: view.sort?.field
+			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 
 	const {
 		records

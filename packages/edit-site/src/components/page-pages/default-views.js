@@ -12,9 +12,7 @@ export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All s
 const DEFAULT_PAGE_BASE = {
 	type: 'list',
 	search: '',
-	filters: {
-		status: DEFAULT_STATUSES,
-	},
+	filters: [ { field: 'status', operator: 'in', value: DEFAULT_STATUSES } ],
 	page: 1,
 	perPage: 5,
 	sort: {
@@ -39,9 +37,7 @@ const DEFAULT_VIEWS = [
 		slug: 'drafts',
 		view: {
 			...DEFAULT_PAGE_BASE,
-			filters: {
-				status: 'draft',
-			},
+			filters: [ { field: 'status', operator: 'in', value: 'draft' } ],
 		},
 	},
 	{
@@ -50,9 +46,7 @@ const DEFAULT_VIEWS = [
 		icon: trash,
 		view: {
 			...DEFAULT_PAGE_BASE,
-			filters: {
-				status: 'trash',
-			},
+			filters: [ { field: 'status', operator: 'in', value: 'trash' } ],
 		},
 	},
 ];

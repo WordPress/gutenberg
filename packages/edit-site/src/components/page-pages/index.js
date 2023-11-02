@@ -76,26 +76,36 @@ export default function PagePages() {
 		if ( DEFAULT_STATUSES !== defaultStatuses ) {
 			setView( {
 				...view,
-				filters: {
-					...view.filters,
-					status: defaultStatuses,
-				},
+				filters: [
+					...view.filters.filter(
+						( f ) => f.field !== 'status' || f.operator !== 'in'
+					),
+					{ field: 'status', operator: 'in', value: defaultStatuses },
+				],
 			} );
 		}
 	}, [ defaultStatuses ] );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
+		return {
 			per_page: view.perPage,
 			page: view.page,
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters,
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
@@ -188,7 +198,6 @@ export default function PagePages() {
 				filters: [
 					{
 						type: 'enumeration',
-						id: 'status',
 						resetValue: defaultStatuses,
 					},
 				],
