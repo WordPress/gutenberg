@@ -576,11 +576,11 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Handle view script loading.
 	 *
-	 * @param WP_Block      $block        The parsed block.
 	 * @param array         $attributes   The block attributes.
+	 * @param WP_Block      $block        The parsed block.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 */
-	private static function handle_view_script_loading( $block, $attributes, $inner_blocks ) {
+	private static function handle_view_script_loading( $attributes, $block, $inner_blocks ) {
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 
 		$view_js_file = 'wp-block-navigation-view';
@@ -660,7 +660,7 @@ class WP_Navigation_Block_Renderer {
 
 		$wrapper_attributes = WP_Navigation_Block_Renderer::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
 
-		WP_Navigation_Block_Renderer::handle_view_script_loading( $block, $attributes, $inner_blocks );
+		WP_Navigation_Block_Renderer::handle_view_script_loading( $attributes, $block, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
