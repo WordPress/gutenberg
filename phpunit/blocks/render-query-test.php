@@ -10,45 +10,10 @@
  */
 class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
-	private static $post_1;
-	private static $post_2;
-	private static $post_3;
+	private static $posts;
 
-	public function set_up() {
-		parent::set_up();
-
-		self::$post_1 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-1',
-				'post_title'   => 'Post 1',
-				'post_content' => 'Post 1 content',
-				'post_excerpt' => 'Post 1',
-			)
-		);
-
-		self::$post_2 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-2',
-				'post_title'   => 'Post 2',
-				'post_content' => 'Post 2 content',
-				'post_excerpt' => 'Post 2',
-			)
-		);
-
-		self::$post_3 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-2',
-				'post_title'   => 'Post 2',
-				'post_content' => 'Post 2 content',
-				'post_excerpt' => 'Post 2',
-			)
-		);
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$posts = $factory->post->create_many( 3 );
 
 		register_block_type(
 			'test/plugin-block',
@@ -60,9 +25,8 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 		);
 	}
 
-	public function tear_down() {
+	public static function wpTearDownAfterClass() {
 		unregister_block_type( 'test/plugin-block' );
-		parent::tear_down();
 	}
 
 	/**
@@ -109,7 +73,7 @@ HTML;
 		$this->assertSame( true, $p->get_attribute( 'data-wp-interactive' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
-		$this->assertSame( 'post-template-item-' . self::$post_2->ID, $p->get_attribute( 'data-wp-key' ) );
+		$this->assertSame( 'post-template-item-' . self::$posts[1], $p->get_attribute( 'data-wp-key' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-previous' ) );
 		$this->assertSame( 'query-pagination-previous', $p->get_attribute( 'data-wp-key' ) );
