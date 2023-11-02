@@ -82,7 +82,7 @@ export default function PageSlug( { postType, postId } ) {
 	);
 	const onSlugChange = ( newValue ) => {
 		editEntityRecord( 'postType', postType, postId, {
-			slug: cleanForSlug( newValue ),
+			slug: newValue,
 		} );
 	};
 	return (
@@ -153,7 +153,10 @@ export default function PageSlug( { postType, postId } ) {
 										} }
 										onBlur={ ( event ) => {
 											onSlugChange(
-												event.target.value || savedSlug
+												cleanForSlug(
+													event.target.value ||
+														savedSlug
+												)
 											);
 											if ( forceEmptyField ) {
 												setForceEmptyField( false );
