@@ -6,28 +6,48 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import EmptyBlockInserter from './empty-block-inserter';
 import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockPopover from './selected-block-popover';
+import SelectedBlockTools from './selected-block-tools';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
 function selector( select ) {
-	const { __unstableGetEditorMode, getSettings, isTyping } =
-		select( blockEditorStore );
+	const {
+		getSelectedBlockClientId,
+		getFirstMultiSelectedBlockClientId,
+		getBlock,
+		getSettings,
+		__unstableGetEditorMode,
+		isTyping,
+	} = select( blockEditorStore );
+
+	const clientId =
+		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+	const { name = '', attributes = {} } = getBlock( clientId ) || {};
 
 	return {
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
+		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		showEmptyBlockSideInserter:
+			clientId &&
+			! isTyping() &&
+			__unstableGetEditorMode() === 'edit' &&
+			isUnmodifiedDefaultBlock( { name, attributes } ),
 	};
 }
 
@@ -46,10 +66,14 @@ export default function BlockTools( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
-		selector,
-		[]
-	);
+	const {
+		clientId,
+		hasFixedToolbar,
+		hasSelectedBlock,
+		isTyping,
+		isZoomOutMode,
+		showEmptyBlockSideInserter,
+	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -142,11 +166,22 @@ export default function BlockTools( {
 					( hasFixedToolbar || ! isLargeViewport ) && (
 						<BlockContextualToolbar isFixed />
 					) }
+
+				{ showEmptyBlockSideInserter && (
+					<EmptyBlockInserter
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }
-				<SelectedBlockPopover
-					__unstableContentRef={ __unstableContentRef }
-				/>
+				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
+					<SelectedBlockTools
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
+
 				{ /* Used for the inline rich text toolbar. */ }
 				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
 				{ children }
