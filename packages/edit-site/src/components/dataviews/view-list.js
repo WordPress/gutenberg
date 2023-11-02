@@ -163,9 +163,6 @@ function HeaderMenu( { dataView, header } ) {
 							key={ filter.id }
 							trigger={
 								<DropdownSubMenuTriggerV2
-									// TODO: the filter icon is duotone related.
-									// Find one that fits.
-									// prefix={<Icon icon={filterIcon} />}
 									suffix={
 										<Icon icon={ chevronRightSmall } />
 									}
