@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -72,7 +72,6 @@ export default function Layout() {
 	useCommonCommands();
 	useBlockCommands();
 
-	const hubRef = useRef();
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
@@ -226,13 +225,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						variants={ {
-							isDistractionFree: { x: '-100%' },
-							isDistractionFreeHovering: { x: 0 },
-							view: { x: 0 },
-							edit: { x: 0 },
-						} }
-						ref={ hubRef }
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
