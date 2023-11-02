@@ -87,6 +87,12 @@ export default function PageSlug( { postType, postId } ) {
 				popoverProps={ popoverProps }
 				focusOnMount
 				ref={ setPopoverAnchor }
+				onClose={ () => {
+					if ( forceEmptyField ) {
+						onSlugChange( cleanForSlug( savedSlug ) );
+						setForceEmptyField( false );
+					}
+				} }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
 						className="edit-site-summary-field__trigger"
