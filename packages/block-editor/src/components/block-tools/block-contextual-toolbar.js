@@ -7,16 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import {
-	ToolbarItem,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
-import { next, previous } from '@wordpress/icons';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,55 +23,41 @@ function UnforwardedBlockContextualToolbar(
 	{ focusOnMount, isFixed, ...props },
 	ref
 ) {
-	// When the toolbar is fixed it can be collapsed
-	const [ isCollapsed, setIsCollapsed ] = useState( false );
-	const toolbarButtonRef = useRef();
+	const { blockType, blockEditingMode, hasParents, showParentSelector } =
+		useSelect( ( select ) => {
+			const {
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientIds,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
+			const { getBlockType } = select( blocksStore );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const parents = getBlockParents( _selectedBlockClientId );
+			const firstParentClientId = parents[ parents.length - 1 ];
+			const parentBlockName = getBlockName( firstParentClientId );
+			const parentBlockType = getBlockType( parentBlockName );
 
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		blockType,
-		blockEditingMode,
-		hasParents,
-		showParentSelector,
-		selectedBlockClientId,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockParents,
-			getSelectedBlockClientIds,
-			getBlockEditingMode,
-		} = select( blockEditorStore );
-		const { getBlockType } = select( blocksStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( _selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
-		const parentBlockType = getBlockType( parentBlockName );
-
-		return {
-			selectedBlockClientId: _selectedBlockClientId,
-			blockType:
-				_selectedBlockClientId &&
-				getBlockType( getBlockName( _selectedBlockClientId ) ),
-			blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
-			hasParents: parents.length,
-			showParentSelector:
-				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
-				hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				) &&
-				selectedBlockClientIds.length <= 1 &&
-				getBlockEditingMode( _selectedBlockClientId ) === 'default',
-		};
-	}, [] );
-
-	useEffect( () => {
-		setIsCollapsed( false );
-	}, [ selectedBlockClientId ] );
+			return {
+				selectedBlockClientId: _selectedBlockClientId,
+				blockType:
+					_selectedBlockClientId &&
+					getBlockType( getBlockName( _selectedBlockClientId ) ),
+				blockEditingMode: getBlockEditingMode( _selectedBlockClientId ),
+				hasParents: parents.length,
+				showParentSelector:
+					parentBlockType &&
+					getBlockEditingMode( firstParentClientId ) === 'default' &&
+					hasBlockSupport(
+						parentBlockType,
+						'__experimentalParentSelector',
+						true
+					) &&
+					selectedBlockClientIds.length <= 1 &&
+					getBlockEditingMode( _selectedBlockClientId ) === 'default',
+			};
+		}, [] );
 
 	const isToolbarEnabled =
 		blockType &&
@@ -95,7 +74,6 @@ function UnforwardedBlockContextualToolbar(
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
 		'has-parent': hasParents && showParentSelector,
 		'is-fixed': isFixed,
-		'is-collapsed': isCollapsed,
 	} );
 
 	return (
@@ -109,31 +87,7 @@ function UnforwardedBlockContextualToolbar(
 			variant={ isFixed ? 'unstyled' : undefined }
 			{ ...props }
 		>
-			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
-			{ isFixed && isLargeViewport && blockType && (
-				<ToolbarGroup
-					className={
-						isCollapsed
-							? 'block-editor-block-toolbar__group-expand-fixed-toolbar'
-							: 'block-editor-block-toolbar__group-collapse-fixed-toolbar'
-					}
-				>
-					<ToolbarItem
-						as={ ToolbarButton }
-						ref={ toolbarButtonRef }
-						icon={ isCollapsed ? next : previous }
-						onClick={ () => {
-							setIsCollapsed( ( collapsed ) => ! collapsed );
-							toolbarButtonRef.current.focus();
-						} }
-						label={
-							isCollapsed
-								? __( 'Show block tools' )
-								: __( 'Hide block tools' )
-						}
-					/>
-				</ToolbarGroup>
-			) }
+			<BlockToolbar hideDragHandle={ isFixed } />
 		</NavigableToolbar>
 	);
 }
