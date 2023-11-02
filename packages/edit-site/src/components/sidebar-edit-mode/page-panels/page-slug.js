@@ -168,7 +168,6 @@ export default function PageSlug( { postType, postId } ) {
 									<ExternalLink
 										className="editor-post-url__link"
 										href={ record.link }
-										target="_blank"
 									>
 										{ permaLink }
 									</ExternalLink>
