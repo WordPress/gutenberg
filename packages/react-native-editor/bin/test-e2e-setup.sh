@@ -42,11 +42,11 @@ function detect_or_create_simulator() {
 	local simulators=$(xcrun simctl list devices -j | jq -r --arg runtime "$runtime_name" '.devices | to_entries[] | select(.key | contains($runtime)) | .value[] | .name + "," + .udid')
 
 	if ! echo "$simulators" | grep -q "$simulator_name"; then
-		echo "[info] $simulator_name simulator running $runtime_name_display not found, creating..."
+		echo "[info] $simulator_name ($runtime_name_display) not available, creating..."
 		xcrun simctl create "$simulator_name" "$simulator_name" "com.apple.CoreSimulator.SimRuntime.$runtime_name" > /dev/null
-		echo "[info] $simulator_name simulator running $runtime_name_display created."
+		echo "[info] $simulator_name ($runtime_name_display) created."
 	else
-		echo "[info] $simulator_name simulator running $runtime_name_display found."
+		echo "[info] $simulator_name ($runtime_name_display) available."
 	fi
 }
 
