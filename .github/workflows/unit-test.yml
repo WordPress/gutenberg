@@ -126,7 +126,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@7fdd3ece872ec7ec4c098ae5ab7637d5e0a96067 # v2.26.0
+              uses: shivammathur/setup-php@81cd5ae0920b34eef300e1775313071038a53429 # v2.27.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -226,7 +226,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@7fdd3ece872ec7ec4c098ae5ab7637d5e0a96067 # v2.26.0
+              uses: shivammathur/setup-php@81cd5ae0920b34eef300e1775313071038a53429 # v2.27.0
               with:
                   php-version: '7.4'
                   coverage: none
