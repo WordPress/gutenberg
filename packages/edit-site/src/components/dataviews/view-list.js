@@ -84,9 +84,7 @@ function HeaderMenu( { dataView, header } ) {
 						value: filter.resetValue || '',
 						label: filter.resetLabel || __( 'All' ),
 					},
-					...( filter.elements ||
-						header.column.columnDef.elements ||
-						[] ),
+					...( header.column.columnDef.elements || [] ),
 				],
 			};
 		} else if ( 'object' === typeof filter ) {
@@ -98,9 +96,7 @@ function HeaderMenu( { dataView, header } ) {
 						value: filter.resetValue || '',
 						label: filter.resetLabel || __( 'All' ),
 					},
-					...( filter.elements ||
-						header.column.columnDef.elements ||
-						[] ),
+					...( header.column.columnDef.elements || [] ),
 				],
 			};
 		}
