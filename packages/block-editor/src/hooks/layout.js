@@ -481,7 +481,7 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { style: { layout = {} } = {} } = props.attributes;
+		const layout = props.attributes.style?.layout ?? {};
 		const { selfStretch, flexSize } = layout;
 		const hasChildLayout = selfStretch || flexSize;
 
