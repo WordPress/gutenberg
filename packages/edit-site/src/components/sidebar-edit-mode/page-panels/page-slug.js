@@ -23,25 +23,40 @@ import { store as coreStore } from '@wordpress/core-data';
 
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
+function usePostPermalink( record, isEditable ) {
+	if ( ! record?.permalink_template ) {
+		return;
+	}
+	const slug = record?.slug || record?.generated_slug;
+	const [ prefix, suffix ] = record.permalink_template.split(
+		PERMALINK_POSTNAME_REGEX
+	);
+	const permalink = isEditable ? prefix + slug + suffix : prefix;
+	return filterURLForDisplay( safeDecodeURIComponent( permalink ) );
+}
+
 export default function PageSlug( { postType, postId } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { record, savedSlug } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } =
 				select( coreStore );
+			const savedRecord = getEntityRecord( 'postType', postType, postId, {
+				_fields: 'slug,generated_slug',
+			} );
 			return {
 				record: getEditedEntityRecord( 'postType', postType, postId ),
-				savedSlug: getEntityRecord( 'postType', postType, postId, {
-					_fields: 'slug',
-				} )?.slug,
+				savedSlug: savedRecord?.slug || savedRecord?.generated_slug,
 			};
 		},
 		[ postType, postId ]
 	);
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( record?.permalink_template ) &&
 		record?._links?.[ 'wp:action-publish' ];
+	const permaLink = usePostPermalink( record, isEditable );
 	const viewPostLabel = useSelect(
 		( select ) => {
 			const postTypeObject = select( coreStore ).getPostType( postType );
@@ -62,6 +77,9 @@ export default function PageSlug( { postType, postId } ) {
 	if ( ! record ) {
 		return null;
 	}
+	const recordSlug = safeDecodeURIComponent(
+		record?.slug || record?.generated_slug
+	);
 	const onSlugChange = ( newValue ) => {
 		editEntityRecord( 'postType', postType, postId, {
 			slug: cleanForSlug( newValue ),
@@ -83,9 +101,7 @@ export default function PageSlug( { postType, postId } ) {
 						variant="tertiary"
 						onClick={ onToggle }
 					>
-						{ filterURLForDisplay(
-							safeDecodeURIComponent( record.link )
-						) }
+						{ permaLink }
 					</Button>
 				) }
 				renderContent={ ( { onClose } ) => {
@@ -100,9 +116,9 @@ export default function PageSlug( { postType, postId } ) {
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Permalink' ) }
-										value={ safeDecodeURIComponent(
-											record.slug
-										) }
+										value={
+											forceEmptyField ? '' : recordSlug
+										}
 										autoComplete="off"
 										spellCheck="false"
 										help={
@@ -119,10 +135,28 @@ export default function PageSlug( { postType, postId } ) {
 												</ExternalLink>
 											</>
 										}
-										onChange={ onSlugChange }
+										onChange={ ( newValue ) => {
+											onSlugChange( newValue );
+											// When we delete the field the permalink gets
+											// reverted to the original value.
+											// The forceEmptyField logic allows the user to have
+											// the field temporarily empty while typing.
+											if ( ! newValue ) {
+												if ( ! forceEmptyField ) {
+													setForceEmptyField( true );
+												}
+												return;
+											}
+											if ( forceEmptyField ) {
+												setForceEmptyField( false );
+											}
+										} }
 										onBlur={ ( event ) => {
-											if ( ! event.target.value ) {
-												onSlugChange( savedSlug );
+											onSlugChange(
+												event.target.value || savedSlug
+											);
+											if ( forceEmptyField ) {
+												setForceEmptyField( false );
 											}
 										} }
 									/>
@@ -141,7 +175,7 @@ export default function PageSlug( { postType, postId } ) {
 										href={ record.link }
 										target="_blank"
 									>
-										{ record.link }
+										{ permaLink }
 									</ExternalLink>
 								</VStack>
 							</VStack>
