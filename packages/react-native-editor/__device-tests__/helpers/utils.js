@@ -38,8 +38,6 @@ const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
-const SERVER_APP_PATH =
-	process.env.APP_PATH && path.resolve( process.env.APP_PATH );
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs.
 let appiumProcess;
@@ -92,9 +90,9 @@ const setupDriver = async () => {
 	let desiredCaps;
 	if ( isAndroid() ) {
 		desiredCaps = { ...android };
+		desiredCaps.app = path.resolve( localAndroidAppPath );
 		if ( isLocalEnvironment() ) {
 			const androidDeviceID = getAndroidEmulatorID();
-			desiredCaps.app = path.resolve( localAndroidAppPath );
 			desiredCaps.udid = androidDeviceID;
 			try {
 				const androidVersion = childProcess
@@ -113,12 +111,9 @@ const setupDriver = async () => {
 			} catch ( error ) {
 				// Ignore error.
 			}
-		} else {
-			desiredCaps.app = SERVER_APP_PATH;
 		}
 	} else {
 		desiredCaps = iosServer( { iPadDevice } );
-		desiredCaps.app = SERVER_APP_PATH;
 		if ( isLocalEnvironment() ) {
 			desiredCaps = iosLocal( { iPadDevice } );
 
@@ -144,9 +139,8 @@ const setupDriver = async () => {
 					`Using iOS ${ desiredCaps.platformVersion } platform version`
 				);
 			}
-
-			desiredCaps.app = path.resolve( localIOSAppPath );
 		}
+		desiredCaps.app = path.resolve( localIOSAppPath );
 		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
