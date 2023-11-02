@@ -2,8 +2,8 @@
 
 set -o pipefail
 
-# If TEST_RN_PLATFORM is empty or equal to "android", launch the Android emulator.
-if [ -z "$TEST_RN_PLATFORM" ] || [ "$TEST_RN_PLATFORM" = "android" ]; then
+# If TEST_RN_PLATFORM is empty or equal to "android" and not the CI server, launch the Android emulator.
+if [ -z "$TEST_RN_PLATFORM" ] || [ "$TEST_RN_PLATFORM" = "android" ] && [ -z "$GITHUB_ACTIONS" ]; then
 	# Load configurations from JSON file
 	CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
 	ANDROID_DEVICE_NAME=$(jq -r '.android.local.deviceName' "$CONFIG_FILE")
