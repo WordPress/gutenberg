@@ -96,7 +96,7 @@ if ( ! function_exists( 'recursively_find_block_by_attribute' ) ) {
 	}
 }
 
-if ( !function_exists( 'get_template_parts_that_use_menu' ) ) {
+if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 	/**
 	 * Get all template parts that use a menu.
 	 *
@@ -145,7 +145,7 @@ if ( ! function_exists( 'register_template_parts_that_use_menu_field' ) ) {
 				'get_callback' => function ( $post ) {
 					return get_template_parts_that_use_menu( $post['id'] );
 				},
-				'schema' => array(
+				'schema'       => array(
 					'type'    => 'array',
 					'context' => array( 'edit' ),
 				),
