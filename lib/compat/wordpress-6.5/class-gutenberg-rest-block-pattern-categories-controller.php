@@ -1,38 +1,57 @@
 <?php
+/**
+ * REST API: WP_REST_Block_Pattern_Categories_Controller class
+ *
+ * @package    WordPress
+ * @subpackage REST_API
+ * @since      6.0.0
+ */
 
+/**
+ * Core class used to access block pattern categories via the REST API.
+ *
+ * @since 6.0.0
+ *
+ * @see WP_REST_Controller
+ */
 class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_Pattern_Categories_Controller {
 	/**
 	 * Retrieves all block pattern categories.
 	 *
 	 * @since 6.0.0
-     * @since 6.5 Added user added categories from wp_pattern_category taxonomy
+	 * @since 6.5 Added user added categories from wp_pattern_category taxonomy
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$response   = array();
-        $unique_categories = array();
-		$categories = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered();
-        $user_categories = get_terms( array(
-			'taxonomy'   => 'wp_pattern_category',
-			'hide_empty' => false,
-		) );
+		$response          = array();
+		$unique_categories = array();
+		$categories        = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered();
+		$user_categories   = get_terms(
+			array(
+				'taxonomy'   => 'wp_pattern_category',
+				'hide_empty' => false,
+			)
+		);
 
-        foreach ( $user_categories as $user_category ) {
-			$prepared_category   = $this->prepare_item_for_response( array( 
-                'name'        => $user_category->slug,
-                'label'       => $user_category->name,
-                'description' => $user_category->description,
-                'id'          => $user_category->term_id,
-            ), $request );
+		foreach ( $user_categories as $user_category ) {
+			$prepared_category   = $this->prepare_item_for_response(
+				array(
+					'name'        => $user_category->slug,
+					'label'       => $user_category->name,
+					'description' => $user_category->description,
+					'id'          => $user_category->term_id,
+				),
+				$request
+			);
 			$response[]          = $this->prepare_response_for_collection( $prepared_category );
-            $unique_categories[] = $user_category->name;
+			$unique_categories[] = $user_category->name;
 		}
 		foreach ( $categories as $category ) {
-            if ( in_array( $category['label'], $unique_categories ) || 'query' === $category['name'] ) {
-                continue;
-            }
+			if ( in_array( $category['label'], $unique_categories ) || 'query' === $category['name'] ) {
+				continue;
+			}
 			$prepared_category = $this->prepare_item_for_response( $category, $request );
 			$response[]        = $this->prepare_response_for_collection( $prepared_category );
 		}
@@ -40,11 +59,11 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 		return rest_ensure_response( $response );
 	}
 
-    /**
+	/**
 	 * Prepare a raw block pattern category before it gets output in a REST API response.
 	 *
 	 * @since 6.0.0
-     * @since 6.5 Added `id` field for identifying user categories
+	 * @since 6.5 Added `id` field for identifying user categories
 	 *
 	 * @param array           $item    Raw category as registered, before any changes.
 	 * @param WP_REST_Request $request Request object.
@@ -67,11 +86,11 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 		return rest_ensure_response( $data );
 	}
 
-    /**
+	/**
 	 * Retrieves the block pattern category schema, conforming to JSON Schema.
 	 *
 	 * @since 6.0.0
-     * @since 6.5 Added `id` field for identifying user categories
+	 * @since 6.5 Added `id` field for identifying user categories
 	 *
 	 * @return array Item schema data.
 	 */
@@ -103,11 +122,11 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-                'id' => array(
-					'id' => __( 'An optional category id, currently used to provide id for user wp_pattern_category terms' ),
-					'type'        => 'number',
-					'readonly'    => true,
-					'context'     => array( 'view', 'edit', 'embed' ),
+				'id'          => array(
+					'id'       => __( 'An optional category id, currently used to provide id for user wp_pattern_category terms' ),
+					'type'     => 'number',
+					'readonly' => true,
+					'context'  => array( 'view', 'edit', 'embed' ),
 				),
 			),
 		);
