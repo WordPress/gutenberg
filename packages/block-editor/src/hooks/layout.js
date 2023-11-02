@@ -333,7 +333,7 @@ export function addAttribute( settings ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withInspectorControls = createHigherOrderComponent(
+export const withLayoutControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const supportLayout = hasLayoutBlockSupport( props.name );
 
@@ -342,7 +342,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withInspectorControls'
+	'withLayoutControls'
 );
 
 /**
@@ -501,5 +501,5 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/layout/with-inspector-controls',
-	withInspectorControls
+	withLayoutControls
 );

@@ -354,7 +354,7 @@ export function addEditProps( settings ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withBlockControls = createHigherOrderComponent(
+export const withBlockStyleControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( ! hasStyleSupport( props.name ) ) {
 			return <BlockEdit key="edit" { ...props } />;
@@ -378,7 +378,7 @@ export const withBlockControls = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withBlockStyleControls'
 );
 
 // Defines which element types are supported, including their hover styles or
@@ -537,7 +537,7 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/style/with-block-controls',
-	withBlockControls
+	withBlockStyleControls
 );
 
 addFilter(

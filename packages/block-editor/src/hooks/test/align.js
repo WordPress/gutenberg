@@ -22,7 +22,7 @@ import BlockEdit from '../../components/block-edit';
 import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
-	withToolbarControls,
+	withAlignmentControls,
 	withDataAlign,
 	addAssignedAlign,
 } from '../align';
@@ -157,7 +157,7 @@ describe( 'align', () => {
 		} );
 	} );
 
-	describe( 'withToolbarControls', () => {
+	describe( 'withAlignControls', () => {
 		const componentProps = {
 			name: 'core/foo',
 			attributes: {},
@@ -167,7 +167,7 @@ describe( 'align', () => {
 		it( 'should do nothing if no valid alignments', () => {
 			registerBlockType( 'core/foo', blockSettings );
 
-			const EnhancedComponent = withToolbarControls(
+			const EnhancedComponent = withAlignmentControls(
 				( { wrapperProps } ) => <div { ...wrapperProps } />
 			);
 
@@ -197,7 +197,7 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withToolbarControls(
+			const EnhancedComponent = withAlignmentControls(
 				( { wrapperProps } ) => <div { ...wrapperProps } />
 			);
 
