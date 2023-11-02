@@ -13,6 +13,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { addFilter } from '@wordpress/hooks';
 
 const { name } = metadata;
 
@@ -56,4 +57,21 @@ export const settings = {
 	deprecated,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	addFilter(
+		'editor.hooks.updateAlignment',
+		'core/image/update-alignment',
+		( nextAlign, blockName ) =>
+			blockName === 'core/image' &&
+			[ 'wide', 'full' ].includes( nextAlign )
+				? {
+						width: undefined,
+						height: undefined,
+						aspectRatio: undefined,
+						scale: undefined,
+						align: nextAlign,
+				  }
+				: { align: nextAlign }
+	);
+	initBlock( { name, metadata, settings } );
+};

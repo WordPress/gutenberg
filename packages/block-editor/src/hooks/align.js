@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter } from '@wordpress/hooks';
+import { addFilter, applyFilters } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	getBlockType,
@@ -138,7 +138,15 @@ function BlockEditAlignmentToolbarControls( {
 				nextAlign = '';
 			}
 		}
-		setAttributes( { align: nextAlign } );
+
+		const filteredAttributes = applyFilters(
+			'editor.hooks.updateAlignment',
+			nextAlign,
+			blockName,
+			attributes
+		);
+
+		setAttributes( filteredAttributes );
 	};
 
 	return (
