@@ -68,36 +68,24 @@ function HeaderMenu( { dataView, header } ) {
 	const sortedDirection = header.column.getIsSorted();
 
 	let filter;
-	if ( header.column.columnDef.filters?.length > 0 ) {
-		filter = header.column.columnDef.filters.find(
+	if (
+		header.column.columnDef.filters?.length > 0 &&
+		header.column.columnDef.filters.some(
 			( f ) =>
 				( 'string' === typeof f && f === 'enumeration' ) ||
 				( 'object' === typeof f && f.type === 'enumeration' )
-		);
-
-		if ( 'string' === typeof filter ) {
-			filter = {
-				id: header.column.columnDef.id,
-				elements: [
-					{
-						value: filter.resetValue || '',
-						label: filter.resetLabel || __( 'All' ),
-					},
-					...( header.column.columnDef.elements || [] ),
-				],
-			};
-		} else if ( 'object' === typeof filter ) {
-			filter = {
-				id: header.column.columnDef.id,
-				elements: [
-					{
-						value: filter.resetValue || '',
-						label: filter.resetLabel || __( 'All' ),
-					},
-					...( header.column.columnDef.elements || [] ),
-				],
-			};
-		}
+		)
+	) {
+		filter = {
+			id: header.column.columnDef.id,
+			elements: [
+				{
+					value: filter?.resetValue || '',
+					label: filter?.resetLabel || __( 'All' ),
+				},
+				...( header.column.columnDef.elements || [] ),
+			],
+		};
 	}
 	const isFilterable = !! filter;
 
