@@ -78,7 +78,6 @@ function HeaderMenu( { dataView, header } ) {
 		if ( 'string' === typeof filter ) {
 			filter = {
 				id: header.column.columnDef.id,
-				type: filter,
 				elements: [
 					{
 						value: filter.resetValue || '',
@@ -90,7 +89,6 @@ function HeaderMenu( { dataView, header } ) {
 		} else if ( 'object' === typeof filter ) {
 			filter = {
 				id: header.column.columnDef.id,
-				type: filter.type,
 				elements: [
 					{
 						value: filter.resetValue || '',
