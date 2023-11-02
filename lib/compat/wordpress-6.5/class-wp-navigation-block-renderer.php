@@ -6,6 +6,9 @@
 class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not this is responsive navigation.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return bool Returns whether or not this is responsive navigation.
 	 */
 	private static function is_responsive( $attributes ) {
 		/**
