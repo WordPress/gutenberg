@@ -525,7 +525,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the markup for the navigation block.
 	 */
-	private static function get_nav_markup( $attributes, $inner_blocks ) {
+	private static function get_wrapper_markup( $attributes, $inner_blocks ) {
 		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $inner_blocks, $attributes );
 		if ( WP_Navigation_Block_Renderer::is_responsive( $attributes ) ) {
 			return WP_Navigation_Block_Renderer::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
@@ -578,7 +578,7 @@ class WP_Navigation_Block_Renderer {
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
 			$wrapper_attributes,
-			WP_Navigation_Block_Renderer::get_nav_markup( $attributes, $inner_blocks )
+			WP_Navigation_Block_Renderer::get_wrapper_markup( $attributes, $inner_blocks )
 		);
 	}
 }
