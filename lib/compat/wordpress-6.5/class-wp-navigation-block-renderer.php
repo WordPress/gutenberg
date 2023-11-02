@@ -1,4 +1,14 @@
 <?php
+/**
+ * WP_Navigation_Block_Renderer class
+ *
+ * @package gutenberg
+ * @since 6.5.0
+ */
+
+if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
+	return;
+}
 
 /**
  * Helper functions used to render the navigation block.
@@ -50,7 +60,7 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function should_load_view_script( $attributes, $inner_blocks ) {
-		$has_submenus = WP_Navigation_Block_Renderer::has_submenus( $inner_blocks );
+		$has_submenus       = WP_Navigation_Block_Renderer::has_submenus( $inner_blocks );
 		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive( $attributes );
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
@@ -79,8 +89,8 @@ class WP_Navigation_Block_Renderer {
 			'core/site-logo',
 		);
 
-		$style = WP_Navigation_Block_Renderer::get_styles( $attributes );
-		$class = WP_Navigation_Block_Renderer::get_classes( $attributes );
+		$style                = WP_Navigation_Block_Renderer::get_styles( $attributes );
+		$class                = WP_Navigation_Block_Renderer::get_classes( $attributes );
 		$container_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'wp-block-navigation__container ' . $class,
@@ -269,6 +279,9 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Returns the layout class for the navigation block.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string Returns the layout class for the navigation block.
 	 */
 	private static function get_layout_class( $attributes ) {
 		$layout_justification = array(
@@ -303,8 +316,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
-		$layout_class = WP_Navigation_Block_Renderer::get_layout_class( $attributes );
-
+		$layout_class       = WP_Navigation_Block_Renderer::get_layout_class( $attributes );
 		$colors             = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
 		$is_responsive_menu = WP_Navigation_Block_Renderer::is_responsive( $attributes );
@@ -313,7 +325,7 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
-		$classes    = array_merge(
+		$classes = array_merge(
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
@@ -333,8 +345,7 @@ class WP_Navigation_Block_Renderer {
 		$colors       = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
-		$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-
+		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 	}
 
 	/**
@@ -343,12 +354,12 @@ class WP_Navigation_Block_Renderer {
 	 * @param array         $attributes The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @param string        $inner_blocks_html The markup for the inner blocks.
- 	 * @return string Returns the container markup.
+	 * @return string Returns the container markup.
 	 */
 	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
-		$colors = block_core_navigation_build_css_colors( $attributes );
-		$modal_unique_id = wp_unique_id( 'modal-' );
+		$colors                  = block_core_navigation_build_css_colors( $attributes );
+		$modal_unique_id         = wp_unique_id( 'modal-' );
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
@@ -437,8 +448,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @param array         $attributes    The block attributes.
 	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
- 	 * @param string        $nav_menu_name The name of the navigation menu.
- 	 * @return string Returns the navigation block markup.
+	 * @param string        $nav_menu_name The name of the navigation menu.
+	 * @return string Returns the navigation block markup.
 	 */
 	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name ) {
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
@@ -454,8 +465,8 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives      = WP_Navigation_Block_Renderer::get_nav_element_directives( $should_load_view_script );
-			$wrapper_attributes .= ' ' . $nav_element_directives;
+			$nav_element_directives = WP_Navigation_Block_Renderer::get_nav_element_directives( $should_load_view_script );
+			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
 		return $wrapper_attributes;
@@ -465,7 +476,7 @@ class WP_Navigation_Block_Renderer {
 	 * Get the nav element directives
 	 *
 	 * @param bool $should_load_view_script Whether or not the view script should be loaded.
- 	 * @return string the directives for the navigation element.
+	 * @return string the directives for the navigation element.
 	 */
 	private static function get_nav_element_directives( $should_load_view_script ) {
 		if ( ! $should_load_view_script ) {
@@ -523,7 +534,7 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @param array         $attributes The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
- 	 * @return string Returns the navigation wrapper markup.
+	 * @return string Returns the navigation wrapper markup.
 	 */
 	private static function get_wrapper_markup( $attributes, $inner_blocks ) {
 		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $attributes, $inner_blocks );
@@ -539,9 +550,9 @@ class WP_Navigation_Block_Renderer {
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content    The saved content.
 	 * @param WP_Block $block      The parsed block.
- 	 * @return string Returns the navigation block markup.
+	 * @return string Returns the navigation block markup.
 	 */
-	static function render( $attributes, $content, $block ) {
+	public static function render( $attributes, $content, $block ) {
 		static $seen_menu_names = array();
 
 		$nav_menu_name = WP_Navigation_Block_Renderer::get_navigation_name( $attributes, $seen_menu_names );
