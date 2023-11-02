@@ -71,61 +71,61 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * Add Interactivity API directives to the navigation-submenu and page-list
  * blocks markup using the Tag Processor.
  *
- * @param WP_HTML_Tag_Processor $w                Markup of the navigation block.
+ * @param WP_HTML_Tag_Processor $tags             Markup of the navigation block.
  * @param array                 $block_attributes Block attributes.
  *
  * @return string Submenu markup with the directives injected.
  */
-function block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
-	while ( $w->next_tag(
+function block_core_navigation_add_directives_to_submenu( $tags, $block_attributes ) {
+	while ( $tags->next_tag(
 		array(
 			'tag_name'   => 'LI',
 			'class_name' => 'has-child',
 		)
 	) ) {
 		// Add directives to the parent `<li>`.
-		$w->set_attribute( 'data-wp-interactive', true );
-		$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenedBy": {}, "type": "submenu" } } }' );
-		$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-		$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
-		$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
+		$tags->set_attribute( 'data-wp-interactive', true );
+		$tags->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "submenuOpenedBy": {}, "type": "submenu" } } }' );
+		$tags->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
+		$tags->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
+		$tags->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
 
 		// This is a fix for Safari. Without it, Safari doesn't change the active
 		// element when the user clicks on a button. It can be removed once we add
 		// an overlay to capture the clicks, instead of relying on the focusout
 		// event.
-		$w->set_attribute( 'tabindex', '-1' );
+		$tags->set_attribute( 'tabindex', '-1' );
 
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-			$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
-			$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
-		if ( $w->next_tag(
+		if ( $tags->next_tag(
 			array(
 				'tag_name'   => 'BUTTON',
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
-			$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
+			$tags->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
 		// Add directives to the submenu.
-		if ( $w->next_tag(
+		if ( $tags->next_tag(
 			array(
 				'tag_name'   => 'UL',
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$w->set_attribute( 'data-wp-on--focus', 'actions.core.navigation.openMenuOnFocus' );
+			$tags->set_attribute( 'data-wp-on--focus', 'actions.core.navigation.openMenuOnFocus' );
 		}
 
 		// Iterate through subitems if exist.
-		block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
+		block_core_navigation_add_directives_to_submenu( $tags, $block_attributes );
 	}
-	return $w->get_updated_html();
+	return $tags->get_updated_html();
 }
 
 /**

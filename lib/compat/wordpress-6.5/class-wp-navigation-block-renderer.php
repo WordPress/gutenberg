@@ -123,8 +123,8 @@ class WP_Navigation_Block_Renderer {
 
 		// Add directives to the submenu if needed.
 		if ( $has_submenus && $should_load_view_script ) {
-			$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $w, $attributes );
+			$tags              = new WP_HTML_Tag_Processor( $inner_blocks_html );
+			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $tags, $attributes );
 		}
 
 		return $inner_blocks_html;
