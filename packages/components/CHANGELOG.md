@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.11.0 (2023-11-02)
+
 ### Enhancements
 
 -   `InputControl`/`SelectControl`: update `height`/`min-height` to `32px` instead of `30px` to align with modern sizing scale ([#55490](https://github.com/WordPress/gutenberg/pull/55490)).
