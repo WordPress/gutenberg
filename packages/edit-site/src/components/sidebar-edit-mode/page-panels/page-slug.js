@@ -23,7 +23,7 @@ import { store as coreStore } from '@wordpress/core-data';
 
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
-function usePostPermalink( record, isEditable ) {
+function getPostPermalink( record, isEditable ) {
 	if ( ! record?.permalink_template ) {
 		return;
 	}
@@ -56,7 +56,6 @@ export default function PageSlug( { postType, postId } ) {
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( record?.permalink_template ) &&
 		record?._links?.[ 'wp:action-publish' ];
-	const permaLink = usePostPermalink( record, isEditable );
 	const viewPostLabel = useSelect(
 		( select ) => {
 			const postTypeObject = select( coreStore ).getPostType( postType );
@@ -80,6 +79,7 @@ export default function PageSlug( { postType, postId } ) {
 	const recordSlug = safeDecodeURIComponent(
 		record?.slug || record?.generated_slug
 	);
+	const permaLink = getPostPermalink( record, isEditable );
 	const onSlugChange = ( newValue ) => {
 		editEntityRecord( 'postType', postType, postId, {
 			slug: newValue,
