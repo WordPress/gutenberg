@@ -196,7 +196,7 @@ function useToolbarFocus( {
 	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
 }
 
-function UnforwardNavigableToolbar(
+function UnforwardedNavigableToolbar(
 	{
 		children,
 		focusOnMount,
@@ -247,4 +247,6 @@ function UnforwardNavigableToolbar(
 	);
 }
 
-export default forwardRef( UnforwardNavigableToolbar );
+export const NavigableToolbar = forwardRef( UnforwardedNavigableToolbar );
+
+export default NavigableToolbar;

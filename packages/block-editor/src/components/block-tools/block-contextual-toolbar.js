@@ -32,7 +32,7 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-function UnforwardBlockContextualToolbar(
+function UnforwardedBlockContextualToolbar(
 	{ focusOnMount, isFixed, ...props },
 	ref
 ) {
@@ -226,4 +226,8 @@ function UnforwardBlockContextualToolbar(
 	);
 }
 
-export default forwardRef( UnforwardBlockContextualToolbar );
+export const BlockContextualToolbar = forwardRef(
+	UnforwardedBlockContextualToolbar
+);
+
+export default BlockContextualToolbar;
