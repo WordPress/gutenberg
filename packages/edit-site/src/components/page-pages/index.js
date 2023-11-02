@@ -76,24 +76,26 @@ export default function PagePages() {
 		if ( DEFAULT_STATUSES !== defaultStatuses ) {
 			setView( {
 				...view,
-				filters: {
-					...view.filters,
-					status: {
-						in: defaultStatuses,
-					},
-				},
+				filters: [
+					...view.filters.filter(
+						( f ) => f.field !== 'status' || f.operator !== 'in'
+					),
+					{ field: 'status', operator: 'in', value: defaultStatuses },
+				],
 			} );
 		}
 	}, [ defaultStatuses ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
-		if ( view.filters?.status?.in ) {
-			filters.status = view.filters.status.in;
-		}
-		if ( view.filters?.author?.in ) {
-			filters.author = view.filters.author.in;
-		}
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
 		return {
 			per_page: view.perPage,
 			page: view.page,
