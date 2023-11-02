@@ -442,12 +442,12 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
 
 	let css = '';
 	if ( selfStretch === 'fixed' && flexSize ) {
-		css += `${ selector } {
+		css = `${ selector } {
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;
 	} else if ( selfStretch === 'fill' ) {
-		css += `${ selector } {
+		css = `${ selector } {
 				flex-grow: 1;
 			}`;
 	}
