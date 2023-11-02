@@ -37,7 +37,7 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 
 exports.android = {
 	platformVersion: androidConfig.local.platformVersion,
-	deviceName: androidConfig.saucelabs.deviceName,
+	deviceName: androidConfig.local.deviceName,
 	automationName: 'UiAutomator2',
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
