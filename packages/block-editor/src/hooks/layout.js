@@ -345,7 +345,7 @@ export const withLayoutControls = createHigherOrderComponent(
 	'withLayoutControls'
 );
 
-function BlockListWithLayoutStyles( { block: BlockListBlock, props } ) {
+function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;
 	const disableLayoutStyles = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -423,16 +423,13 @@ export const withLayoutStyles = createHigherOrderComponent(
 		}
 
 		return (
-			<BlockListWithLayoutStyles
-				block={ BlockListBlock }
-				props={ props }
-			/>
+			<BlockWithLayoutStyles block={ BlockListBlock } props={ props } />
 		);
 	},
 	'withLayoutStyles'
 );
 
-function BlockListWithChildLayoutStyles( { block: BlockListBlock, props } ) {
+function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
 	const { style: { layout = {} } = {} } = props.attributes;
 	const { selfStretch, flexSize } = layout;
 	const disableLayoutStyles = useSelect( ( select ) => {
@@ -493,7 +490,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		}
 
 		return (
-			<BlockListWithChildLayoutStyles
+			<BlockWithChildLayoutStyles
 				block={ BlockListBlock }
 				props={ props }
 			/>
