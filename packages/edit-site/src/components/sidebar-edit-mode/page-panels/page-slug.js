@@ -37,9 +37,9 @@ function getPostPermalink( record, isEditable ) {
 
 export default function PageSlug( { postType, postId } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { record, savedSlug } = useSelect(
+	const { record, savedSlug, viewPostLabel } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } =
+			const { getEntityRecord, getEditedEntityRecord, getPostType } =
 				select( coreStore );
 			const savedRecord = getEntityRecord( 'postType', postType, postId, {
 				_fields: 'slug,generated_slug',
@@ -47,6 +47,7 @@ export default function PageSlug( { postType, postId } ) {
 			return {
 				record: getEditedEntityRecord( 'postType', postType, postId ),
 				savedSlug: savedRecord?.slug || savedRecord?.generated_slug,
+				viewPostLabel: getPostType( postType )?.labels.view_item,
 			};
 		},
 		[ postType, postId ]
@@ -56,13 +57,6 @@ export default function PageSlug( { postType, postId } ) {
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( record?.permalink_template ) &&
 		record?._links?.[ 'wp:action-publish' ];
-	const viewPostLabel = useSelect(
-		( select ) => {
-			const postTypeObject = select( coreStore ).getPostType( postType );
-			return postTypeObject?.labels.view_item;
-		},
-		[ postType ]
-	);
 	const popoverProps = useMemo(
 		() => ( {
 			// Anchor the popover to the middle of the entire row so that it doesn't
