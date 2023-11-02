@@ -25,6 +25,10 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
 	usePrebuiltWDA: true,
+	newCommandTimeout: 240,
+	simulatorStartupTimeout: 240,
+	commandTimeouts: 240,
+	reduceMotion: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
