@@ -358,7 +358,7 @@ const selectTextFromElement = async ( driver, element ) => {
 		const selectAllElement = await driver.$(
 			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
-		await selectAllElement.waitForDisplayed( { timeout } );
+		await selectAllElement.waitForDisplayed( { timeout: 3000 } );
 		await selectAllElement.click();
 	}
 };
