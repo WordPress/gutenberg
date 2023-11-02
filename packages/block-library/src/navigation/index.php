@@ -181,6 +181,59 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Gets the inner blocks for the navigation block from the unstable location attribute.
+	 */
+	private static function get_inner_blocks_from_unstable_location( $attributes ) {
+		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
+		if ( empty( $menu_items ) ) {
+			return '';
+		}
+
+		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
+		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		return new WP_Block_List( $parsed_blocks, $attributes );
+
+	}
+
+	/**
+	 * Gets the inner blocks for the navigation block from the navigation post.
+	 */
+	private static function get_inner_blocks_from_navigation_post( $attributes ) {
+		$navigation_post = get_post( $attributes['ref'] );
+		if ( ! isset( $navigation_post ) ) {
+			return '';
+		}
+
+		// Only published posts are valid. If this is changed then a corresponding change
+		// must also be implemented in `use-navigation-menu.js`.
+		if ( 'publish' === $navigation_post->post_status ) {
+			$parsed_blocks = parse_blocks( $navigation_post->post_content );
+
+			// 'parse_blocks' includes a null block with '\n\n' as the content when
+			// it encounters whitespace. This code strips it.
+			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+			// TODO - this uses the full navigation block attributes for the
+			// context which could be refined.
+			return new WP_Block_List( $compacted_blocks, $attributes );
+		}
+	}
+
+	/**
+	 * Gets the inner blocks for the navigation block from the fallback.
+	 */
+	private static function get_inner_blocks_from_fallback( $attributes ) {
+		$fallback_blocks = block_core_navigation_get_fallback_blocks();
+
+		// Fallback my have been filtered so do basic test for validity.
+		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
+			return '';
+		}
+
+		return new WP_Block_List( $fallback_blocks, $attributes );
+	}
+
+	/**
 	 * Gets the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks( $block, $attributes ) {
@@ -203,48 +256,17 @@ class WP_Navigation_Block_Renderer {
 			! array_key_exists( 'ref', $attributes ) &&
 			! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 		) {
-			$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
-			if ( empty( $menu_items ) ) {
-				return '';
-			}
-
-			$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
-			$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
-			$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
+			$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks_from_unstable_location( $attributes );
 		}
 
 		// Load inner blocks from the navigation post.
 		if ( array_key_exists( 'ref', $attributes ) ) {
-			$navigation_post = get_post( $attributes['ref'] );
-			if ( ! isset( $navigation_post ) ) {
-				return '';
-			}
-
-			// Only published posts are valid. If this is changed then a corresponding change
-			// must also be implemented in `use-navigation-menu.js`.
-			if ( 'publish' === $navigation_post->post_status ) {
-				$parsed_blocks = parse_blocks( $navigation_post->post_content );
-
-				// 'parse_blocks' includes a null block with '\n\n' as the content when
-				// it encounters whitespace. This code strips it.
-				$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-
-				// TODO - this uses the full navigation block attributes for the
-				// context which could be refined.
-				$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
-			}
+			$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks_from_navigation_post( $attributes );
 		}
 
 		// If there are no inner blocks then fallback to rendering an appropriate fallback.
 		if ( empty( $inner_blocks ) ) {
-			$fallback_blocks = block_core_navigation_get_fallback_blocks();
-
-			// Fallback my have been filtered so do basic test for validity.
-			if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
-				return '';
-			}
-
-			$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
+			$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks_from_fallback( $attributes );
 		}
 
 		/**
