@@ -186,11 +186,20 @@ function HeaderMenu( { dataView, header } ) {
 											':'
 										)[ 0 ] === filter.id
 								);
+
+								// Set the reset filter as active if there is no filter set.
+								if ( ! columnFilter && element.value === '' ) {
+									isActive = true;
+								}
+
 								if ( columnFilter ) {
 									const value =
 										Object.values( columnFilter )[ 0 ];
-									isActive = element.value === value;
+									// Intentionally use loose comparison, so it does type conversion.
+									// This covers the case where a top-level filter for the same field converts a number into a string.
+									isActive = element.value == value; // eslint-disable-line eqeqeq
 								}
+
 								return (
 									<DropdownMenuItemV2
 										key={ element.value }
