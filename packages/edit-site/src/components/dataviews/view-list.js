@@ -182,7 +182,7 @@ function HeaderMenu( { dataView, header } ) {
 										)[ 0 ] === filter.id
 								);
 
-								// Set the reset filter as active if there is no filter set.
+								// Set the empty item as active if the filter is not set.
 								if ( ! columnFilter && element.value === '' ) {
 									isActive = true;
 								}
