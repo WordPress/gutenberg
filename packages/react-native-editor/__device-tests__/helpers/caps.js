@@ -14,9 +14,7 @@ const ios = {
 	},
 	autoLaunch: false,
 	usePrebuiltWDA: true,
-	newCommandTimeout: 240,
 	simulatorStartupTimeout: 240,
-	commandTimeouts: 240,
 	reduceMotion: true,
 };
 
@@ -33,6 +31,9 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
+	deviceName: ! iPadDevice
+		? iOSConfig.local.deviceName
+		: iOSConfig.local.deviceTabletName,
 	platformVersion: iOSConfig.buildkite.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
