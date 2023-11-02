@@ -21,11 +21,10 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-function UnforwardSelectedBlockTools( {
-	clientId,
-	showEmptyBlockSideInserter,
-	__unstableContentRef,
-}, ref ) {
+function UnforwardSelectedBlockTools(
+	{ clientId, showEmptyBlockSideInserter, __unstableContentRef },
+	ref
+) {
 	const {
 		capturingClientId,
 		isInsertionPointVisible,
