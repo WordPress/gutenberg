@@ -43,7 +43,6 @@ export default function useSelectedBlockToolProps( clientId ) {
 			);
 
 			let isInsertionPointVisible = false;
-
 			if ( isBlockInsertionPointVisible() ) {
 				const insertionPoint = getBlockInsertionPoint();
 				const order = getBlockOrder( insertionPoint.rootClientId );
