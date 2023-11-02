@@ -41,9 +41,7 @@ export default function PageSlug( { postType, postId } ) {
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord, getPostType } =
 				select( coreStore );
-			const savedRecord = getEntityRecord( 'postType', postType, postId, {
-				_fields: 'slug,generated_slug',
-			} );
+			const savedRecord = getEntityRecord( 'postType', postType, postId );
 			return {
 				record: getEditedEntityRecord( 'postType', postType, postId ),
 				savedSlug: savedRecord?.slug || savedRecord?.generated_slug,
