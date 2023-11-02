@@ -65,6 +65,23 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		return $menu_items_by_parent_id;
 	}
+
+	/**
+	 * Gets the inner blocks for the navigation block from the unstable location attribute.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return WP_Block_List Returns the inner blocks for the navigation block.
+	 */
+	function block_core_navigation_get_inner_blocks_from_unstable_location( $attributes ) {
+		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
+		if ( empty( $menu_items ) ) {
+			return '';
+		}
+
+		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
+		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		return new WP_Block_List( $parsed_blocks, $attributes );
+	}
 }
 
 /**
