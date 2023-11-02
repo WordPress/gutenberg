@@ -38,7 +38,8 @@ const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
-const SERVER_APP_PATH = path.resolve( process.env.APP_PATH );
+const SERVER_APP_PATH =
+	process.env.APP_PATH && path.resolve( process.env.APP_PATH );
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs.
 let appiumProcess;
