@@ -79,19 +79,14 @@ const PLATFORM_NAME = isAndroid() ? 'Android' : 'iOS';
 
 // Initialises the driver and desired capabilities for appium.
 const setupDriver = async () => {
-	if ( isLocalEnvironment() ) {
-		try {
-			appiumProcess = await AppiumLocal.start( {
-				port: localAppiumPort,
-			} );
-		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
-			// eslint-disable-next-line no-console
-			await console.log(
-				'Could not start Appium server',
-				err.toString()
-			);
-		}
+	try {
+		appiumProcess = await AppiumLocal.start( {
+			port: localAppiumPort,
+		} );
+	} catch ( err ) {
+		// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
+		// eslint-disable-next-line no-console
+		await console.log( 'Could not start Appium server', err.toString() );
 	}
 
 	let desiredCaps;
@@ -151,8 +146,8 @@ const setupDriver = async () => {
 			}
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
-			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
+		desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 	}
 
 	const driver = await remote( {
