@@ -122,10 +122,11 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @param array         $attributes   The block attributes.
+	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @return string Returns the html for the inner blocks of the navigation block.
 	 */
-	private static function get_inner_blocks_html( $inner_blocks, $attributes ) {
+	private static function get_inner_blocks_html( $attributes, $inner_blocks ) {
 		$has_submenus            = WP_Navigation_Block_Renderer::has_submenus( $inner_blocks );
 		$should_load_view_script = WP_Navigation_Block_Renderer::should_load_view_script( $attributes, $inner_blocks );
 
@@ -607,7 +608,7 @@ class WP_Navigation_Block_Renderer {
  	 * @return string Returns the navigation wrapper markup.
 	 */
 	private static function get_wrapper_markup( $attributes, $inner_blocks ) {
-		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $inner_blocks, $attributes );
+		$inner_blocks_html = WP_Navigation_Block_Renderer::get_inner_blocks_html( $attributes, $inner_blocks );
 		if ( WP_Navigation_Block_Renderer::is_responsive( $attributes ) ) {
 			return WP_Navigation_Block_Renderer::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
 		}
