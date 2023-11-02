@@ -104,7 +104,6 @@ export function ImageEdit( {
 		url = '',
 		alt,
 		caption,
-		align,
 		id,
 		width,
 		height,
@@ -277,20 +276,6 @@ export function ImageEdit( {
 			} );
 		}
 	}, [] );
-
-	useEffect( () => {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( align )
-			? {
-					width: undefined,
-					height: undefined,
-					aspectRatio: undefined,
-					scale: undefined,
-			  }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-		} );
-	}, [ align, setAttributes ] );
 
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
