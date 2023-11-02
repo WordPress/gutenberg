@@ -347,11 +347,6 @@ export const withLayoutControls = createHigherOrderComponent(
 
 function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;
-	const disableLayoutStyles = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().disableLayoutStyles;
-	} );
-
 	const id = useInstanceId( BlockListBlock );
 	const { layout } = attributes;
 	const { default: defaultBlockLayout } =
@@ -369,22 +364,19 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 
 	// Get CSS string for the current layout type.
 	// The CSS and `style` element is only output if it is not empty.
-	let css;
-	if ( ! disableLayoutStyles ) {
-		const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-		css = fullLayoutType?.getLayoutStyle?.( {
-			blockName: name,
-			selector,
-			layout: usedLayout,
-			style: attributes?.style,
-			hasBlockGapSupport,
-		} );
-	}
+	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
+	const css = fullLayoutType?.getLayoutStyle?.( {
+		blockName: name,
+		selector,
+		layout: usedLayout,
+		style: attributes?.style,
+		hasBlockGapSupport,
+	} );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
 	const layoutClassNames = classnames(
 		{
-			[ `wp-container-${ id }` ]: ! disableLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `wp-container-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
 		},
 		layoutClasses
 	);
@@ -418,7 +410,21 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		if ( ! hasLayoutBlockSupport( props.name ) ) {
+		const blockSupportsLayout = hasLayoutBlockSupport( props.name );
+		const shouldRenderLayoutStyles = useSelect(
+			( select ) => {
+				// The callback returns early to avoid block editor subscription.
+				if ( ! blockSupportsLayout ) {
+					return false;
+				}
+
+				return ! select( blockEditorStore ).getSettings()
+					.disableLayoutStyles;
+			},
+			[ blockSupportsLayout ]
+		);
+
+		if ( ! shouldRenderLayoutStyles ) {
 			return <BlockListBlock { ...props } />;
 		}
 
@@ -432,10 +438,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
 	const { style: { layout = {} } = {} } = props.attributes;
 	const { selfStretch, flexSize } = layout;
-	const disableLayoutStyles = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().disableLayoutStyles;
-	} );
 
 	const id = useInstanceId( BlockListBlock );
 	const selector = `.wp-container-content-${ id }`;
@@ -453,8 +455,8 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
 	}
 
 	// Attach a `wp-container-content` id-based classname.
-	const className = classnames( props?.className, {
-		[ `wp-container-content-${ id }` ]: ! disableLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+	const className = classnames( props.className, {
+		[ `wp-container-content-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
 	} );
 
 	const { setStyleOverride, deleteStyleOverride } = unlock(
@@ -485,7 +487,20 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		const { selfStretch, flexSize } = layout;
 		const hasChildLayout = selfStretch || flexSize;
 
-		if ( ! hasChildLayout ) {
+		const shouldRenderChildLayoutStyles = useSelect(
+			( select ) => {
+				// The callback returns early to avoid block editor subscription.
+				if ( ! hasChildLayout ) {
+					return false;
+				}
+
+				return ! select( blockEditorStore ).getSettings()
+					.disableLayoutStyles;
+			},
+			[ hasChildLayout ]
+		);
+
+		if ( ! shouldRenderChildLayoutStyles ) {
 			return <BlockListBlock { ...props } />;
 		}
 
