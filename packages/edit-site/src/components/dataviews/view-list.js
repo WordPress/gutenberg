@@ -52,8 +52,7 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
-// TODO: why doesn't Header work with view/onChangeView?
-function HeaderMenu( { dataView, header, view, onChangeView } ) {
+function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
 		return null;
 	}
@@ -80,7 +79,6 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 			filter = {
 				id: header.column.columnDef.id,
 				type: filter,
-				name: header.column.columnDef.header,
 				elements: [
 					{
 						value: filter.resetValue || '',
@@ -95,7 +93,6 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 			filter = {
 				id: header.column.columnDef.id,
 				type: filter.type,
-				name: header.column.columnDef.header,
 				elements: [
 					{
 						value: filter.resetValue || '',
@@ -184,8 +181,20 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 							}
 						>
 							{ filter.elements.map( ( element ) => {
-								const isActive =
-									element.value === view.filters[ filter.id ];
+								let isActive = false;
+								const columnFilters =
+									dataView.getState().columnFilters;
+								const columnFilter = columnFilters.find(
+									( f ) =>
+										Object.keys( f )[ 0 ].split(
+											':'
+										)[ 0 ] === filter.id
+								);
+								if ( columnFilter ) {
+									const value =
+										Object.values( columnFilter )[ 0 ];
+									isActive = element.value === value;
+								}
 								return (
 									<DropdownMenuItemV2
 										key={ element.value }
@@ -193,14 +202,37 @@ function HeaderMenu( { dataView, header, view, onChangeView } ) {
 											isActive && <Icon icon={ check } />
 										}
 										onSelect={ () => {
-											onChangeView( {
-												...view,
-												filters: {
-													...view.filters,
-													[ filter.id ]:
-														element.value,
-												},
-											} );
+											const otherFilters =
+												columnFilters?.filter(
+													( f ) => {
+														const [
+															field,
+															operator,
+														] =
+															Object.keys(
+																f
+															)[ 0 ].split( ':' );
+														return (
+															field !==
+																filter.id ||
+															operator !== 'in'
+														);
+													}
+												);
+
+											if ( element.value === '' ) {
+												dataView.setColumnFilters(
+													otherFilters
+												);
+											} else {
+												dataView.setColumnFilters( [
+													...otherFilters,
+													{
+														[ filter.id + ':in' ]:
+															element.value,
+													},
+												] );
+											}
 										} }
 									>
 										{ element.label }
@@ -277,6 +309,58 @@ function ViewList( {
 		);
 	}, [ view.hiddenFields ] );
 
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01' },
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * @param {Array} filters The view filters to transform.
+	 * @return {Array} The transformed TanStack column filters.
+	 */
+	const toTanStackColumnFilters = ( filters ) =>
+		filters.map( ( filter ) => ( {
+			[ filter.field + ':' + filter.operator ]: filter.value,
+		} ) );
+
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01'},
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * @param {Array} filters The TanStack column filters to transform.
+	 * @return {Array} The transformed view filters.
+	 */
+	const fromTanStackColumnFilters = ( filters ) =>
+		filters.map( ( filter ) => {
+			const [ key, value ] = Object.entries( filter )[ 0 ];
+			const [ field, operator ] = key.split( ':' );
+			return { field, operator, value };
+		} );
+
 	const dataView = useReactTable( {
 		data,
 		columns,
@@ -294,6 +378,7 @@ function ViewList( {
 				  ]
 				: [],
 			globalFilter: view.search,
+			columnFilters: toTanStackColumnFilters( view.filters ),
 			pagination: {
 				pageIndex: view.page,
 				pageSize: view.perPage,
@@ -354,6 +439,12 @@ function ViewList( {
 		onGlobalFilterChange: ( value ) => {
 			onChangeView( { ...view, search: value, page: 0 } );
 		},
+		onColumnFiltersChange: ( columnFiltersUpdater ) => {
+			onChangeView( {
+				...view,
+				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
+			} );
+		},
 		onPaginationChange: ( paginationUpdater ) => {
 			onChangeView( ( currentView ) => {
 				const { pageIndex, pageSize } = paginationUpdater( {
@@ -397,8 +488,6 @@ function ViewList( {
 										} }
 									>
 										<HeaderMenu
-											view={ view }
-											onChangeView={ onChangeView }
 											dataView={ dataView }
 											header={ header }
 										/>
