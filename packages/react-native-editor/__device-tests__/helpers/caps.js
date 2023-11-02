@@ -29,10 +29,7 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
 	...ios,
-	deviceName: ! iPadDevice
-		? iOSConfig.saucelabs.deviceName
-		: iOSConfig.saucelabs.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
+	platformVersion: iOSConfig.buildkite.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
@@ -47,11 +44,6 @@ exports.android = {
 	deviceOrientation: 'portrait',
 	disableWindowAnimation: true,
 	autoLaunch: false,
-};
-
-// SauceLabs config
-exports.sauceOptions = {
-	appiumVersion: '2.0.0',
 };
 
 exports.prefixKeysWithAppium = ( obj ) => {
