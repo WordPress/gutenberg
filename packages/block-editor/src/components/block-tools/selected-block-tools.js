@@ -21,7 +21,7 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-function UnforwardSelectedBlockTools(
+function UnforwardedSelectedBlockTools(
 	{ clientId, showEmptyBlockSideInserter, __unstableContentRef },
 	ref
 ) {
@@ -129,4 +129,6 @@ function UnforwardSelectedBlockTools(
 	return null;
 }
 
-export default forwardRef( UnforwardSelectedBlockTools );
+export const SelectedBlockTools = forwardRef( UnforwardedSelectedBlockTools );
+
+export default SelectedBlockTools;
