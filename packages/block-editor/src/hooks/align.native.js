@@ -36,8 +36,8 @@ addFilter(
 				...settings.attributes,
 				align: {
 					type: 'string',
-					// Allow for '' since it is used by updateAlignment function
-					// in withToolbarControls for special cases with defined default values.
+					// Allow for '' since it is used by the `updateAlignment` function
+					// in toolbar controls for special cases with defined default values.
 					enum: [ ...ALIGNMENTS, '' ],
 				},
 			};
