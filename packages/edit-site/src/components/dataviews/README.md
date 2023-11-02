@@ -43,10 +43,10 @@ Example:
 		direction: 'desc',
 	},
 	search: '',
-	filters: {
-		author: { in: 2 },
-		status: { in: 'publish, draft' }
-	},
+	filters: [
+		{ field: 'author', operator: 'in', value: 2 },
+		{ field: 'status', operator: 'in', value: 'publish,draft' }
+	],
 	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
@@ -78,18 +78,14 @@ function MyCustomPageList() {
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
-		if ( view.filters?.status?.in ) {
-			filters.status = view.filters.status.in;
-		}
-		if ( view.filters?.status?.notIn ) {
-			filters.status_exclude = view.filters.status.notIn;
-		}
-		if ( view.filters?.author?.in ) {
-			filters.author = view.filters.author.in;
-		}
-		if ( view.filters?.author?.notIn ) {
-			filters.author_exclude = view.filters.author.notIn;
-		}
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
 		return {
 			per_page: view.perPage,
 			page: view.page,
