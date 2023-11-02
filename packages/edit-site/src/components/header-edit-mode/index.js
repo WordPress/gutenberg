@@ -6,17 +6,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalPreviewOptions as PreviewOptions,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import { external } from '@wordpress/icons';
+import { external, next, previous } from '@wordpress/icons';
 import {
+	Button,
 	__unstableMotion as motion,
 	MenuGroup,
 	MenuItem,
@@ -46,6 +48,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		templateType,
 		isDistractionFree,
 		blockEditorMode,
+		blockSelectionStart,
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
@@ -53,7 +56,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	} = useSelect( ( select ) => {
 		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
 			select( editSiteStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { getBlockSelectionStart, __unstableGetEditorMode } =
+			select( blockEditorStore );
 
 		const postType = getEditedPostType();
 
@@ -67,6 +71,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			templateType: postType,
 			blockEditorMode: __unstableGetEditorMode(),
+			blockSelectionStart: getBlockSelectionStart(),
 			homeUrl: getUnstableBase()?.home,
 			showIconLabels: getPreference(
 				editSiteStore.name,
@@ -86,6 +91,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		};
 	}, [] );
 
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
 		useDispatch( editSiteStore );
 	const disableMotion = useReducedMotion();
@@ -95,6 +102,18 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
 
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	const hasBlockSelected = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
 
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
@@ -117,6 +136,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<motion.div
+					className="edit-site-header-edit-mode__start"
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
@@ -127,17 +147,52 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
 					{ hasFixedToolbar && (
-						<Slot
-							className={ 'selected-block-tools-wrapper' }
-							name="__experimentalSelectedBlockTools"
-							bubblesVirtually
-						/>
+						<>
+							<Slot
+								className={ classnames(
+									'selected-block-tools-wrapper',
+									{
+										'is-collapsed':
+											isBlockToolsCollapsed &&
+											isLargeViewport,
+									}
+								) }
+								name="__experimentalSelectedBlockTools"
+								bubblesVirtually
+							/>
+							{ isLargeViewport && hasBlockSelected && (
+								<Button
+									className="edit-site-header-edit-mode__block-tools-toggle"
+									icon={
+										isBlockToolsCollapsed ? next : previous
+									}
+									onClick={ () => {
+										setIsBlockToolsCollapsed(
+											( collapsed ) => ! collapsed
+										);
+									} }
+									label={
+										isBlockToolsCollapsed
+											? __( 'Show block tools' )
+											: __( 'Hide block tools' )
+									}
+								/>
+							) }
+						</>
 					) }
 				</motion.div>
 			) }
 
 			{ ! isDistractionFree && (
-				<div className="edit-site-header-edit-mode__center">
+				<div
+					className={ classnames(
+						'edit-site-header-edit-mode__center',
+						{
+							'is-collapsed':
+								! isBlockToolsCollapsed && isLargeViewport,
+						}
+					) }
+				>
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (

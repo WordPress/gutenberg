@@ -111,7 +111,7 @@ export default function DocumentTools( {
 
 	return (
 		<NavigableToolbar
-			className="edit-site-header-edit-mode__start"
+			className="edit-site-header-edit-mode__document-tools"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 		>
