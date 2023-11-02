@@ -305,6 +305,8 @@ class WP_Navigation_Block_Renderer {
 			if ( 'publish' === $navigation_post->post_status ) {
 				$navigation_name = $navigation_post->post_title;
 
+				// This is used to count the number of times a navigation name has been seen,
+				// so that we can ensure every navigation has a unique id.
 				if ( isset( $seen_menu_names[ $navigation_name ] ) ) {
 					++$seen_menu_names[ $navigation_name ];
 				} else {
