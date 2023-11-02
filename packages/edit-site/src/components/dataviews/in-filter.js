@@ -34,6 +34,7 @@ export default ( { filter, view, onChangeView } ) => {
 
 				onChangeView( ( currentView ) => ( {
 					...currentView,
+					page: 1,
 					filters: cleanEmptyObject( {
 						...currentView.filters,
 						[ filter.id ]: value,
