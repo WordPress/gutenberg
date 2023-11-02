@@ -32,7 +32,7 @@ import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = memo( ( { isTransparent, ...restProps } ) => {
+const SiteHub = memo( ( { isTransparent, className } ) => {
 	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
 		( select ) => {
 			const { getCanvasMode, getSettings } = unlock(
@@ -84,11 +84,7 @@ const SiteHub = memo( ( { isTransparent, ...restProps } ) => {
 
 	return (
 		<motion.div
-			{ ...restProps }
-			className={ classnames(
-				'edit-site-site-hub',
-				restProps.className
-			) }
+			className={ classnames( 'edit-site-site-hub', className ) }
 			variants={ {
 				isDistractionFree: { x: '-100%' },
 				isDistractionFreeHovering: { x: 0 },
