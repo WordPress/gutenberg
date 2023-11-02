@@ -5,7 +5,7 @@
 	"name": "core/form-input",
 	"title": "Input Field",
 	"category": "common",
-	"parent": [ "core/form" ],
+	"ancestor": [ "core/form" ],
 	"description": "The basic building block for forms.",
 	"keywords": [ "input", "form" ],
 	"textdomain": "default",
