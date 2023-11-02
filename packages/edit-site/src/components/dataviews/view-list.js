@@ -22,6 +22,7 @@ import {
 	arrowUp,
 	arrowDown,
 	chevronRightSmall,
+	funnel,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -151,6 +152,7 @@ function HeaderMenu( { dataView, header } ) {
 							key={ filter.id }
 							trigger={
 								<DropdownSubMenuTriggerV2
+									prefix={ <Icon icon={ funnel } /> }
 									suffix={
 										<Icon icon={ chevronRightSmall } />
 									}
