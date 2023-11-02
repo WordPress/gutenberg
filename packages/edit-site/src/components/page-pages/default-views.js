@@ -13,7 +13,7 @@ const DEFAULT_PAGE_BASE = {
 	type: 'list',
 	search: '',
 	filters: {
-		status: DEFAULT_STATUSES,
+		status: { in: DEFAULT_STATUSES },
 	},
 	page: 1,
 	perPage: 5,
@@ -40,7 +40,7 @@ const DEFAULT_VIEWS = [
 		view: {
 			...DEFAULT_PAGE_BASE,
 			filters: {
-				status: 'draft',
+				status: { in: 'draft' },
 			},
 		},
 	},
@@ -51,7 +51,7 @@ const DEFAULT_VIEWS = [
 		view: {
 			...DEFAULT_PAGE_BASE,
 			filters: {
-				status: 'trash',
+				status: { in: 'trash' },
 			},
 		},
 	},
