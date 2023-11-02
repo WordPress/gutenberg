@@ -13,6 +13,11 @@ const ios = {
 		args: [ 'uitesting' ],
 	},
 	autoLaunch: false,
+	usePrebuiltWDA: true,
+	newCommandTimeout: 240,
+	simulatorStartupTimeout: 240,
+	commandTimeouts: 240,
+	reduceMotion: true,
 };
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
@@ -24,11 +29,6 @@ exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
-	usePrebuiltWDA: true,
-	newCommandTimeout: 240,
-	simulatorStartupTimeout: 240,
-	commandTimeouts: 240,
-	reduceMotion: true,
 } );
 
 exports.iosServer = ( { iPadDevice = false } ) => ( {
