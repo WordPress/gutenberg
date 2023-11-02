@@ -20,13 +20,11 @@ const meta: Meta< typeof RadioGroup > = {
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Radio },
 	argTypes: {
-		// 	value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
-		onChange: { action: '^on.*' },
+		onChange: { control: { type: null } },
 	},
 	parameters: {
-		controls: {
-			expanded: true,
-		},
+		actions: { argTypesRegex: '^on.*' },
+		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
