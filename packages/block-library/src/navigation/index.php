@@ -582,7 +582,7 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$inner_blocks       = WP_Navigation_Block_Renderer::get_inner_blocks( $block, $attributes );
+		$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks( $block, $attributes );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
