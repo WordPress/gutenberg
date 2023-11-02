@@ -259,11 +259,11 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the inner blocks for the navigation block.
 	 *
-	 * @param WP_Block $block The parsed block.
 	 * @param array    $attributes The block attributes.
+	 * @param WP_Block $block The parsed block.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
-	private static function get_inner_blocks( $block, $attributes ) {
+	private static function get_inner_blocks( $attributes, $block ) {
 		$inner_blocks = $block->inner_blocks;
 
 		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
@@ -645,7 +645,7 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-		$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks( $block, $attributes );
+		$inner_blocks = WP_Navigation_Block_Renderer::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
