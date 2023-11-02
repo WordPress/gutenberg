@@ -139,6 +139,167 @@ describe( 'entities', () => {
 				.map( ( [ , cfg ] ) => cfg )
 		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
+
+	describe( 'entity revisions', () => {
+		const stateWithConfig = entities( undefined, {
+			type: 'ADD_ENTITIES',
+			entities: [
+				{
+					kind: 'root',
+					name: 'postType',
+					supports: { revisions: true },
+				},
+			],
+		} );
+		it( 'appends revisions state', () => {
+			expect( stateWithConfig.records.root.postType ).toHaveProperty(
+				'revisions',
+				undefined
+			);
+		} );
+
+		it( 'returns with received revisions', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 1, parent: 2 } ],
+				kind: 'root',
+				name: 'postType',
+				parentId: 2,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
+
+		it( 'returns with appended received revisions at the parent level', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 3, parent: 4 } ],
+				kind: 'root',
+				name: 'postType',
+				parentId: 4,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+				4: {
+					items: {
+						default: {
+							3: { id: 3, parent: 4 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							3: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
+
+		it( 'returns with appended received revision items', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 7, parent: 2 } ],
+				kind: 'root',
+				name: 'postType',
+				parentId: 2,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+							7: { id: 7, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+							7: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
+	} );
 } );
 
 describe( 'embedPreviews()', () => {

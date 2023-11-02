@@ -62,10 +62,12 @@ interface QueriedData {
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
 
+type RevisionRecord =
+	| Record< ET.Context, Record< number, ET.PostRevision > >
+	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+
 interface RevisionsQueriedData {
-	items:
-		| Record< ET.Context, Record< number, ET.PostRevision > >
-		| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+	items: RevisionRecord;
 	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
@@ -78,7 +80,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
-	revisions: RevisionsQueriedData;
+	revisions?: RevisionsQueriedData;
 }
 
 interface EntityConfig {
@@ -1401,7 +1403,7 @@ export const getRevisions = (
 	name: string,
 	parentId: EntityRecordKey,
 	query?: GetRecordsHttpQuery
-) => {
+): RevisionRecord[] | null => {
 	const queriedStateRevisions =
 		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
 	if ( ! queriedStateRevisions ) {
@@ -1432,11 +1434,11 @@ export const getRevision = createSelector(
 		parentId: EntityRecordKey,
 		key: EntityRecordKey,
 		query?: GetRecordsHttpQuery
-	) => {
-		const queriedRevisionsState =
+	): RevisionRecord | Record< PropertyKey, never > | undefined => {
+		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
 
-		if ( ! queriedRevisionsState ) {
+		if ( ! queriedState ) {
 			return undefined;
 		}
 
@@ -1444,45 +1446,39 @@ export const getRevision = createSelector(
 
 		if ( query === undefined ) {
 			// If expecting a complete item, validate that completeness.
-			if ( ! queriedRevisionsState.itemIsComplete[ context ]?.[ key ] ) {
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 				return undefined;
 			}
 
-			return queriedRevisionsState.items[ context ][ key ];
+			return queriedState.items[ context ][ key ];
 		}
 
-		return queriedRevisionsState.items[ context ]?.[ key ];
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value?.[ fieldName ];
+				} );
+				setNestedValue( filteredItem, field, value );
+			}
+
+			return filteredItem;
+		}
+
+		return item;
 	},
 	( state: State, kind, name, parentId, key, query ) => {
 		const context = query?.context ?? 'default';
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ]
-				?.items[ key ],
-			state.entities.records?.[ kind ]?.[ name ]?.revisions[ parentId ]
-				?.itemIsComplete[ context ]?.[ key ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ]
+				?.items?.[ context ]?.[ key ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ]
+				?.itemIsComplete?.[ context ]?.[ key ],
 		];
 	}
 );
-
-/**
- * Returns true if revisions have been received for the given set of parameters,
- * or false otherwise.
- *
- *
- * @param state    State tree
- * @param kind     Entity kind.
- * @param name     Entity name.
- * @param parentId Record's key whose revisions you wish to fetch.
- * @param query    Optional query. If requesting specific
- *                 fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
- * @return  Whether entity records have been received.
- */
-export function hasRevisions(
-	state: State,
-	kind: string,
-	name: string,
-	parentId: EntityRecordKey,
-	query?: GetRecordsHttpQuery
-): boolean {
-	return Array.isArray( getRevisions( state, kind, name, parentId, query ) );
-}

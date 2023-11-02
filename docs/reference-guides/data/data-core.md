@@ -435,7 +435,7 @@ _Parameters_
 
 _Returns_
 
--   Record.
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
 
 ### getRevisions
 
@@ -451,7 +451,7 @@ _Parameters_
 
 _Returns_
 
--   Record.
+-   `RevisionRecord[] | null`: Record.
 
 ### getThemeSupports
 
@@ -559,22 +559,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a next edit or not.
-
-### hasRevisions
-
-Returns true if revisions have been received for the given set of parameters, or false otherwise.
-
-_Parameters_
-
--   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
-
-_Returns_
-
--   `boolean`: Whether entity records have been received.
 
 ### hasUndo
 

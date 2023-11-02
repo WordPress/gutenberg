@@ -752,12 +752,25 @@ export const getRevisions =
 		);
 
 		try {
+			if ( query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
+
 			const path = addQueryArgs(
 				entityConfig.getRevisionsUrl( parentId ),
-				{
-					...entityConfig.revisionURLParams,
-					...query,
-				}
+				query
 			);
 
 			let records, meta;
@@ -771,6 +784,21 @@ export const getRevisions =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+			}
+
+			// If we request fields but the result doesn't contain the fields,
+			// explicitly set these fields as "undefined"
+			// that way we consider the query "fulfilled".
+			if ( query._fields ) {
+				records = records.map( ( record ) => {
+					query._fields.split( ',' ).forEach( ( field ) => {
+						if ( ! record.hasOwnProperty( field ) ) {
+							record[ field ] = undefined;
+						}
+					} );
+
+					return record;
+				} );
 			}
 
 			dispatch.receiveRevisions(
@@ -787,17 +815,13 @@ export const getRevisions =
 		}
 	};
 
-getRevisions.shouldInvalidate = ( action, kind, name, parentId ) => {
-	// Invalidate cache when a new revision is created.
-	if ( action.type === 'SAVE_ENTITY_RECORD_FINISH' ) {
-		return (
-			name === action.name &&
-			kind === action.kind &&
-			! action.error &&
-			parentId === action.recordId
-		);
-	}
-};
+// Invalidate cache when a new revision is created.
+getRevisions.shouldInvalidate = ( action, kind, name, parentId ) =>
+	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+	name === action.name &&
+	kind === action.kind &&
+	! action.error &&
+	parentId === action.recordId;
 
 /**
  * Requests a specific Entity revision from the REST API.
@@ -812,7 +836,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, parentId ) => {
  */
 export const getRevision =
 	( kind, name, parentId, key, query = {} ) =>
-	async ( { select, dispatch } ) => {
+	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -833,31 +857,25 @@ export const getRevision =
 		);
 
 		try {
+			if ( query !== undefined && query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
 			const path = addQueryArgs(
 				entityConfig.getRevisionsUrl( parentId, key ),
-				{
-					...entityConfig.revisionURLParams,
-					...query,
-				}
+				query
 			);
-
-			if ( query !== undefined ) {
-				query = { ...query, include: [ key ] };
-
-				// The resolution cache won't consider query as reusable based on the
-				// fields, so it's tested here, prior to initiating the REST request,
-				// and without causing `getEntityRecords` resolution to occur.
-				const hasRecords = select.hasRevisions(
-					kind,
-					name,
-					parentId,
-					query
-				);
-
-				if ( hasRecords ) {
-					return;
-				}
-			}
 
 			const record = await apiFetch( { path } );
 			dispatch.receiveRevisions( kind, name, parentId, record, query );

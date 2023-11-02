@@ -361,15 +361,16 @@ function entity( entityConfig ) {
 						revisions: ( state, action ) => {
 							// Use the same queriedDataReducer shape for revisions.
 							if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+								const newState = queriedDataReducer(
+									state?.[ action.parentId ],
+									{
+										...action,
+										type: 'RECEIVE_ITEMS',
+									}
+								);
 								return {
 									...state,
-									[ action.parentId ]: queriedDataReducer(
-										state,
-										{
-											...action,
-											type: 'RECEIVE_ITEMS',
-										}
-									),
+									[ action.parentId ]: newState,
 								};
 							}
 							return state;
