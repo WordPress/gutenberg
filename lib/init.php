@@ -58,29 +58,42 @@ function gutenberg_menu() {
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
-// Define the callback function
-function custom_rest_endpoint_callback($request) {
-	// Get the JSON data from the request
-	$blocks = parse_blocks( $request->get_json_params() );
-	
-	 // Initialize an empty string to store the rendered HTML
-	 $rendered_html = '';
+if ( ! function_exists( 'gutenberg_render_blocks_from_request' ) ) {
+	/**
+	 * Render blocks from a REST API request.
+	 *
+	 * @param mixed $request The current request.
+	 *
+	 * @return string
+	 */
+	function gutenberg_render_blocks_from_request( $request ) {
+		$blocks        = parse_blocks( $request->get_json_params() );
+		$rendered_html = '';
+		foreach ( $blocks as $block ) {
+				$rendered_block = render_block( $block );
+				$rendered_html .= $rendered_block;
+		}
 
-	 // Render each block
-	 foreach ($blocks as $block) {
-			 $rendered_block = render_block($block);
-			 $rendered_html .= $rendered_block;
-	 }
-
-	 return $rendered_html;
+		return $rendered_html;
+	}
 }
 
-// Register the REST API endpoint
-function register_custom_rest_endpoint() {
-	register_rest_route('wp/v2', '/render_blocks', array(
-			'methods' => 'POST',
-			'callback' => 'custom_rest_endpoint_callback',
-	));
+if ( ! function_exists( 'register_gutenberg_render_blocks_endpoint' ) ) {
+	/**
+	 * Register custom REST endpoint for rendering blocks.
+	 *
+	 * @return void
+	 */
+	function register_gutenberg_render_blocks_endpoint() {
+		register_rest_route(
+			'wp/v2',
+			'/render_blocks',
+			array(
+				'methods'  => 'POST',
+				'callback' => 'gutenberg_render_blocks_from_request',
+			)
+		);
+	}
 }
 
-add_action('rest_api_init', 'register_custom_rest_endpoint');
+add_action( 'rest_api_init', 'register_gutenberg_render_blocks_endpoint' );
