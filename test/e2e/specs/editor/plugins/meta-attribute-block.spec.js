@@ -10,11 +10,15 @@ const VARIATIONS = [
 
 test.describe( 'Block with a meta attribute', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin( 'gutenberg-test-block-context' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-meta-attribute-block'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-block-context' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-meta-attribute-block'
+		);
 	} );
 
 	for ( const [ title, blockName ] of VARIATIONS ) {
