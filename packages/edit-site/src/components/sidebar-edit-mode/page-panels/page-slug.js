@@ -12,7 +12,6 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { __ } from '@wordpress/i18n';
 import {
 	TextControl,
-	ExternalLink,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
@@ -31,21 +30,20 @@ function getPostPermalink( record, isEditable ) {
 	const [ prefix, suffix ] = record.permalink_template.split(
 		PERMALINK_POSTNAME_REGEX
 	);
-	const permalink = isEditable ? prefix + slug + suffix : prefix;
+	const permalink = isEditable ? prefix + slug + suffix : record.link;
 	return filterURLForDisplay( safeDecodeURIComponent( permalink ) );
 }
 
 export default function PageSlug( { postType, postId } ) {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { record, savedSlug, viewPostLabel } = useSelect(
+	const { record, savedSlug } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord, getPostType } =
+			const { getEntityRecord, getEditedEntityRecord } =
 				select( coreStore );
 			const savedRecord = getEntityRecord( 'postType', postType, postId );
 			return {
 				record: getEditedEntityRecord( 'postType', postType, postId ),
 				savedSlug: savedRecord?.slug || savedRecord?.generated_slug,
-				viewPostLabel: getPostType( postType )?.labels.view_item,
 			};
 		},
 		[ postType, postId ]
@@ -65,7 +63,7 @@ export default function PageSlug( { postType, postId } ) {
 		} ),
 		[ popoverAnchor ]
 	);
-	if ( ! record ) {
+	if ( ! record || ! isEditable ) {
 		return null;
 	}
 	const recordSlug = safeDecodeURIComponent(
@@ -110,74 +108,41 @@ export default function PageSlug( { postType, postId } ) {
 								onClose={ onClose }
 							/>
 							<VStack spacing={ 5 }>
-								{ isEditable && (
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Permalink' ) }
-										value={
-											forceEmptyField ? '' : recordSlug
+								<TextControl
+									__nextHasNoMarginBottom
+									label={ __( 'Permalink' ) }
+									hideLabelFromVision
+									value={ forceEmptyField ? '' : recordSlug }
+									autoComplete="off"
+									spellCheck="false"
+									help={ __( 'The last part of the URL.' ) }
+									onChange={ ( newValue ) => {
+										onSlugChange( newValue );
+										// When we delete the field the permalink gets
+										// reverted to the original value.
+										// The forceEmptyField logic allows the user to have
+										// the field temporarily empty while typing.
+										if ( ! newValue ) {
+											if ( ! forceEmptyField ) {
+												setForceEmptyField( true );
+											}
+											return;
 										}
-										autoComplete="off"
-										spellCheck="false"
-										help={
-											<>
-												{ __(
-													'The last part of the URL.'
-												) }{ ' ' }
-												<ExternalLink
-													href={ __(
-														'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-													) }
-												>
-													{ __( 'Learn more.' ) }
-												</ExternalLink>
-											</>
+										if ( forceEmptyField ) {
+											setForceEmptyField( false );
 										}
-										onChange={ ( newValue ) => {
-											onSlugChange( newValue );
-											// When we delete the field the permalink gets
-											// reverted to the original value.
-											// The forceEmptyField logic allows the user to have
-											// the field temporarily empty while typing.
-											if ( ! newValue ) {
-												if ( ! forceEmptyField ) {
-													setForceEmptyField( true );
-												}
-												return;
-											}
-											if ( forceEmptyField ) {
-												setForceEmptyField( false );
-											}
-										} }
-										onBlur={ ( event ) => {
-											onSlugChange(
-												cleanForSlug(
-													event.target.value ||
-														savedSlug
-												)
-											);
-											if ( forceEmptyField ) {
-												setForceEmptyField( false );
-											}
-										} }
-									/>
-								) }
-								<VStack spacing={ 1 }>
-									<Text
-										size="11"
-										lineHeight={ 1.4 }
-										weight={ 500 }
-										upperCase={ true }
-									>
-										{ viewPostLabel || __( 'View post' ) }
-									</Text>
-									<ExternalLink
-										className="editor-post-url__link"
-										href={ record.link }
-									>
-										{ permaLink }
-									</ExternalLink>
-								</VStack>
+									} }
+									onBlur={ ( event ) => {
+										onSlugChange(
+											cleanForSlug(
+												event.target.value || savedSlug
+											)
+										);
+										if ( forceEmptyField ) {
+											setForceEmptyField( false );
+										}
+									} }
+								/>
 							</VStack>
 						</>
 					);
