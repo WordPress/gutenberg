@@ -8,13 +8,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	useContext,
-	useMemo,
-	useCallback,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -22,15 +18,18 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
+import { default as DEFAULT_VIEWS } from './default-views';
 import {
 	useTrashPostAction,
+	usePermanentlyDeletePostAction,
+	useRestorePostAction,
 	postRevisionsAction,
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
 import Media from '../media';
-import DataviewsContext from '../dataviews/context';
-import { DEFAULT_STATUSES } from '../dataviews/provider';
+import { unlock } from '../../lock-unlock';
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -40,10 +39,25 @@ const defaultConfigPerViewType = {
 	},
 };
 
+// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+// The reason for that is to match the default statuses coming from the endpoint (entity request).
+export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
+
 export default function PagePages() {
-	const { view, setView } = useContext( DataviewsContext );
-	// Request post statuses to get the proper labels.
-	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const {
+		params: { path, activeView = 'all' },
+	} = useLocation();
+	const initialView = DEFAULT_VIEWS.find(
+		( { slug } ) => slug === activeView
+	).view;
+	const [ view, setView ] = useState( initialView );
+	useEffect( () => {
+		setView(
+			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
+		);
+	}, [ path, activeView ] );
+	const { records: statuses, isResolving: isLoadingStatus } =
+		useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
 		return statuses === null
 			? DEFAULT_STATUSES
@@ -54,39 +68,32 @@ export default function PagePages() {
 					.join();
 	}, [ statuses ] );
 
-	useEffect( () => {
-		// Only update the view if the statuses received from the endpoint
-		// are different from the DEFAULT_STATUSES provided initially.
-		//
-		// The pages endpoint depends on the status endpoint via the status filter.
-		// Initially, this code filters the pages request by DEFAULT_STATUTES,
-		// instead of using the default (publish).
-		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
-		//
-		// By doing so, it avoids a second request to the pages endpoint
-		// upon receiving the statuses when they are the same (most common scenario).
-		if ( DEFAULT_STATUSES !== defaultStatuses ) {
-			setView( {
-				...view,
-				filters: {
-					...view.filters,
-					status: defaultStatuses,
-				},
-			} );
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
+		// We want to provide a different default item for the status filter
+		// than the REST API provides.
+		if ( ! filters.status || filters.status === '' ) {
+			filters.status = defaultStatuses;
 		}
-	}, [ defaultStatuses ] );
 
-	const queryArgs = useMemo(
-		() => ( {
+		return {
 			per_page: view.perPage,
 			page: view.page,
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
-			...view.filters,
-		} ),
-		[ view ]
-	);
+			search: view.search,
+			...filters,
+		};
+	}, [ view, defaultStatuses ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
@@ -94,9 +101,8 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
 
-	const { records: authors } = useEntityRecords( 'root', 'user', {
-		has_published_posts: [ 'page' ],
-	} );
+	const { records: authors, isResolving: isLoadingAuthors } =
+		useEntityRecords( 'root', 'user' );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -178,13 +184,7 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					statuses?.find( ( { slug } ) => slug === item.status )
 						?.name ?? item.status,
-				filters: [
-					{
-						type: 'enumeration',
-						id: 'status',
-						resetValue: defaultStatuses,
-					},
-				],
+				filters: [ 'enumeration' ],
 				elements:
 					statuses?.map( ( { slug, name } ) => ( {
 						value: slug,
@@ -208,20 +208,25 @@ export default function PagePages() {
 		[ statuses, authors ]
 	);
 
-	const filters = useMemo( () => [
-		{ id: 'search', type: 'search', name: __( 'Filter list' ) },
-	] );
-
 	const trashPostAction = useTrashPostAction();
+	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
+	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
 			viewPostAction,
 			trashPostAction,
+			restorePostAction,
+			permanentlyDeletePostAction,
 			editPostAction,
 			postRevisionsAction,
 		],
-		[ trashPostAction, editPostAction ]
+		[
+			trashPostAction,
+			permanentlyDeletePostAction,
+			restorePostAction,
+			editPostAction,
+		]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
@@ -249,10 +254,11 @@ export default function PagePages() {
 			<DataViews
 				paginationInfo={ paginationInfo }
 				fields={ fields }
-				filters={ filters }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
-				isLoading={ isLoadingPages }
+				isLoading={
+					isLoadingPages || isLoadingStatus || isLoadingAuthors
+				}
 				view={ view }
 				onChangeView={ onChangeView }
 			/>

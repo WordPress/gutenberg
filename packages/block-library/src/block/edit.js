@@ -35,6 +35,7 @@ import { useRef, useMemo } from '@wordpress/element';
  */
 import { unlock } from '../lock-unlock';
 
+const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
@@ -71,7 +72,6 @@ export default function ReusableBlockEdit( {
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
 } ) {
-	const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',

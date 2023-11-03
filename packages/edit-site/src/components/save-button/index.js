@@ -22,15 +22,20 @@ export default function SaveButton( {
 	__next40pxDefaultSize = false,
 } ) {
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
-		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
-			select( coreStore );
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+			isResolving,
+		} = select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		const { isSaveViewOpened } = select( editSiteStore );
+		const isActivatingTheme = isResolving( 'activateTheme' );
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
-			isSaving: dirtyEntityRecords.some( ( record ) =>
-				isSavingEntityRecord( record.kind, record.name, record.key )
-			),
+			isSaving:
+				dirtyEntityRecords.some( ( record ) =>
+					isSavingEntityRecord( record.kind, record.name, record.key )
+				) || isActivatingTheme,
 			isSaveViewOpen: isSaveViewOpened(),
 		};
 	}, [] );

@@ -44,13 +44,7 @@ npm run native test:e2e:ios:local
 
 ### Android
 
-Before running E2E tests on Android, launch the emulator using the following script.
-
-```shell
-emulator -avd Pixel_3_XL_API_30 -noaudio
-```
-
-The following script will run all of the E2E tests.
+The following script will launch the correct Android emulator and run all of the E2E tests.
 
 ```shell
 npm run native test:e2e:android:local

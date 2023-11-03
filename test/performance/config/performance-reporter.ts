@@ -32,6 +32,7 @@ export interface WPRawPerformanceResults {
 	inserterSearch: number[];
 	inserterHover: number[];
 	listViewOpen: number[];
+	navigate: number[];
 }
 
 export interface WPPerformanceResults {
@@ -65,6 +66,7 @@ export interface WPPerformanceResults {
 	listViewOpen?: number;
 	minListViewOpen?: number;
 	maxListViewOpen?: number;
+	navigate?: number;
 }
 
 /**
@@ -108,6 +110,7 @@ export function curateResults(
 		listViewOpen: average( results.listViewOpen ),
 		minListViewOpen: minimum( results.listViewOpen ),
 		maxListViewOpen: maximum( results.listViewOpen ),
+		navigate: median( results.navigate ),
 	};
 
 	return (
