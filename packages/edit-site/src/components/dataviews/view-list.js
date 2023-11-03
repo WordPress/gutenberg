@@ -81,8 +81,8 @@ function HeaderMenu( { dataView, header } ) {
 			id: header.column.columnDef.id,
 			elements: [
 				{
-					value: filter?.resetValue || '',
-					label: filter?.resetLabel || __( 'All' ),
+					value: '',
+					label: __( 'All' ),
 				},
 				...( header.column.columnDef.elements || [] ),
 			],
