@@ -9,12 +9,40 @@
 	@include break-small {
 		overflow: visible;
 	}
+
+	.selected-block-tools-wrapper {
+		display: flex;
+		flex-shrink: 2;
+		overflow-x: hidden;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed {
+		position: fixed;
+		top: $admin-bar-height-big + $header-height + 1px; // +1px to avoid overlap with the header border
+		left: 0;
+		width: 100%;
+
+		@include break-medium() {
+			width: auto;
+			position: static;
+			// remove the border
+			border: none;
+			display: flex; // Allow for flex-shrink on the block toolbar
+			flex-shrink: 2;
+		}
+
+		.block-editor-block-toolbar {
+			overflow-x: auto; // Allow only the block tools to overflow scroll to make room in the header.
+		}
+	}
 }
 
 .edit-widgets-header__navigable-toolbar-wrapper {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 2;
+	overflow-x: hidden;
 	padding-left: $grid-unit-20;
 }
 
