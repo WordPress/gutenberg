@@ -76,7 +76,10 @@ function Player( {
 		const editorColors = globalStyles?.baseColors?.color;
 		const editorBackgroundColor = editorColors?.background;
 
-		if ( typeof editorBackgroundColor === 'undefined' ) {
+		if (
+			typeof editorBackgroundColor === 'undefined' ||
+			editorBackgroundColor === 'undefined'
+		) {
 			return getStylesFromColorScheme( baseStyle, darkStyle );
 		}
 
