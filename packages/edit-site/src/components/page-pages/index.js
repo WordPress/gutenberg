@@ -96,6 +96,12 @@ export default function PagePages() {
 				filters.author = filter.value;
 			}
 		} );
+		// We want to provide a different default item for the status filter
+		// than the REST API provides.
+		if ( ! filters.status || filters.status === '' ) {
+			filters.status = defaultStatuses;
+		}
+
 		return {
 			per_page: view.perPage,
 			page: view.page,
@@ -195,12 +201,7 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					statuses?.find( ( { slug } ) => slug === item.status )
 						?.name ?? item.status,
-				filters: [
-					{
-						type: 'enumeration',
-						resetValue: defaultStatuses,
-					},
-				],
+				filters: [ 'enumeration' ],
 				elements:
 					statuses?.map( ( { slug, name } ) => ( {
 						value: slug,
