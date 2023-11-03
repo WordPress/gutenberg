@@ -3,15 +3,23 @@
  */
 import { NavigableMenu, Toolbar } from '@wordpress/components';
 import {
+	forwardRef,
 	useState,
 	useRef,
 	useLayoutEffect,
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { ESCAPE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -28,6 +36,7 @@ function hasFocusWithin( container ) {
 
 function focusFirstTabbableIn( container ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
+
 	if ( firstTabbable ) {
 		firstTabbable.focus( {
 			// When focusing newly mounted toolbars,
@@ -38,7 +47,7 @@ function focusFirstTabbableIn( container ) {
 	}
 }
 
-function useIsAccessibleToolbar( ref ) {
+function useIsAccessibleToolbar( toolbarRef ) {
 	/*
 	 * By default, we'll assume the starting accessible state of the Toolbar
 	 * is true, as it seems to be the most common case.
@@ -62,7 +71,7 @@ function useIsAccessibleToolbar( ref ) {
 	);
 
 	const determineIsAccessibleToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( ref.current );
+		const tabbables = focus.tabbable.find( toolbarRef.current );
 		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
@@ -73,7 +82,7 @@ function useIsAccessibleToolbar( ref ) {
 			} );
 		}
 		setIsAccessibleToolbar( onlyToolbarItem );
-	}, [] );
+	}, [ toolbarRef ] );
 
 	useLayoutEffect( () => {
 		// Toolbar buttons may be rendered asynchronously, so we use
@@ -81,28 +90,32 @@ function useIsAccessibleToolbar( ref ) {
 		const observer = new window.MutationObserver(
 			determineIsAccessibleToolbar
 		);
-		observer.observe( ref.current, { childList: true, subtree: true } );
+		observer.observe( toolbarRef.current, {
+			childList: true,
+			subtree: true,
+		} );
 		return () => observer.disconnect();
-	}, [ isAccessibleToolbar ] );
+	}, [ determineIsAccessibleToolbar, isAccessibleToolbar, toolbarRef ] );
 
 	return isAccessibleToolbar;
 }
 
-function useToolbarFocus(
-	ref,
+function useToolbarFocus( {
+	toolbarRef,
 	focusOnMount,
 	isAccessibleToolbar,
 	defaultIndex,
 	onIndexChange,
-	shouldUseKeyboardFocusShortcut
-) {
+	shouldUseKeyboardFocusShortcut,
+	focusEditorOnEscape,
+} ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
 
 	const focusToolbar = useCallback( () => {
-		focusFirstTabbableIn( ref.current );
-	}, [] );
+		focusFirstTabbableIn( toolbarRef.current );
+	}, [ toolbarRef ] );
 
 	const focusToolbarViaShortcut = () => {
 		if ( shouldUseKeyboardFocusShortcut ) {
@@ -121,7 +134,7 @@ function useToolbarFocus(
 
 	useEffect( () => {
 		// Store ref so we have access on useEffect cleanup: https://legacy.reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
-		const navigableToolbarRef = ref.current;
+		const navigableToolbarRef = toolbarRef.current;
 		// If initialIndex is passed, we focus on that toolbar item when the
 		// toolbar gets mounted and initial focus is not forced.
 		// We have to wait for the next browser paint because block controls aren't
@@ -150,32 +163,73 @@ function useToolbarFocus(
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount ] );
+	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
+
+	const { lastFocus } = useSelect( ( select ) => {
+		const { getLastFocus } = select( blockEditorStore );
+		return {
+			lastFocus: getLastFocus(),
+		};
+	}, [] );
+	/**
+	 * Handles returning focus to the block editor canvas when pressing escape.
+	 */
+	useEffect( () => {
+		const navigableToolbarRef = toolbarRef.current;
+
+		if ( focusEditorOnEscape ) {
+			const handleKeyDown = ( event ) => {
+				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
+					// Focus the last focused element when pressing escape.
+					event.preventDefault();
+					lastFocus.current.focus();
+				}
+			};
+			navigableToolbarRef.addEventListener( 'keydown', handleKeyDown );
+			return () => {
+				navigableToolbarRef.removeEventListener(
+					'keydown',
+					handleKeyDown
+				);
+			};
+		}
+	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
 }
 
-function NavigableToolbar( {
-	children,
-	focusOnMount,
-	shouldUseKeyboardFocusShortcut = true,
-	__experimentalInitialIndex: initialIndex,
-	__experimentalOnIndexChange: onIndexChange,
-	...props
-} ) {
-	const ref = useRef();
-	const isAccessibleToolbar = useIsAccessibleToolbar( ref );
+function UnforwardedNavigableToolbar(
+	{
+		children,
+		focusOnMount,
+		focusEditorOnEscape = false,
+		shouldUseKeyboardFocusShortcut = true,
+		__experimentalInitialIndex: initialIndex,
+		__experimentalOnIndexChange: onIndexChange,
+		...props
+	},
+	ref
+) {
+	const maybeRef = useRef();
+	// If a ref was not forwarded, we create one.
+	const toolbarRef = ref || maybeRef;
+	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
 
-	useToolbarFocus(
-		ref,
+	useToolbarFocus( {
+		toolbarRef,
 		focusOnMount,
 		isAccessibleToolbar,
-		initialIndex,
+		defaultIndex: initialIndex,
 		onIndexChange,
-		shouldUseKeyboardFocusShortcut
-	);
+		shouldUseKeyboardFocusShortcut,
+		focusEditorOnEscape,
+	} );
 
 	if ( isAccessibleToolbar ) {
 		return (
-			<Toolbar label={ props[ 'aria-label' ] } ref={ ref } { ...props }>
+			<Toolbar
+				label={ props[ 'aria-label' ] }
+				ref={ toolbarRef }
+				{ ...props }
+			>
 				{ children }
 			</Toolbar>
 		);
@@ -185,12 +239,14 @@ function NavigableToolbar( {
 		<NavigableMenu
 			orientation="horizontal"
 			role="toolbar"
-			ref={ ref }
+			ref={ toolbarRef }
 			{ ...props }
 		>
 			{ children }
 		</NavigableMenu>
 	);
 }
+
+export const NavigableToolbar = forwardRef( UnforwardedNavigableToolbar );
 
 export default NavigableToolbar;

@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import {
+	forwardRef,
 	useLayoutEffect,
 	useEffect,
 	useRef,
@@ -31,7 +32,10 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+function UnforwardedBlockContextualToolbar(
+	{ focusOnMount, isFixed, ...props },
+	ref
+) {
 	// When the toolbar is fixed it can be collapsed
 	const [ isCollapsed, setIsCollapsed ] = useState( false );
 	const toolbarButtonRef = useRef();
@@ -184,7 +188,9 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	return (
 		<NavigableToolbar
+			ref={ ref }
 			focusOnMount={ focusOnMount }
+			focusEditorOnEscape
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
@@ -219,5 +225,9 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		</NavigableToolbar>
 	);
 }
+
+export const BlockContextualToolbar = forwardRef(
+	UnforwardedBlockContextualToolbar
+);
 
 export default BlockContextualToolbar;

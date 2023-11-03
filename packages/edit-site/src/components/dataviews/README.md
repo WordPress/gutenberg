@@ -43,10 +43,10 @@ Example:
 		direction: 'desc',
 	},
 	search: '',
-	filters: {
-		author: 2,
-		status: 'publish, draft'
-	},
+	filters: [
+		{ field: 'author', operator: 'in', value: 2 },
+		{ field: 'status', operator: 'in', value: 'publish,draft' }
+	],
 	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
@@ -76,17 +76,26 @@ function MyCustomPageList() {
 		"...": "..."
 	} );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
+		return {
 			per_page: view.perPage,
 			page: view.page,
+			_embed: 'author',
 			order: view.sort?.direction,
-			orderby: view.sort?.field
+			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 
 	const {
 		records
@@ -165,8 +174,6 @@ const field = [
 
 A filter is an object that may contain the following properties:
 
-- `id`: unique identifier for the filter. Matches the entity query param. Field filters may omit it, in which case the field's `id` will be used.
-- `name`: nice looking name for the filter. Field filters may omit it, in which case the field's `header` will be used.
 - `type`: the type of filter. Only `enumeration` is supported at the moment.
 - `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
 	- `value`: what's serialized into the view's filters.
@@ -185,9 +192,7 @@ const field = [
 		filters: [
 			'enumeration',
 			{ type: 'enumeration' },
-			{ id: 'author', type: 'enumeration' },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ) },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ), elements: authors },
+			{ type: 'enumeration', elements: authors },
 		],
 	}
 ];
