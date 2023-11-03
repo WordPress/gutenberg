@@ -9,13 +9,12 @@ import {
 	Platform,
 } from 'react-native';
 import { default as VideoPlayer } from 'react-native-video';
-import { colord } from 'colord';
 
 /**
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-import { Icon, useGlobalStyles } from '@wordpress/components';
+import { Icon, useEditorColorScheme } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
@@ -35,7 +34,6 @@ import { parseAudioUrl } from './audio-url-parser.native';
 const isIOS = Platform.OS === 'ios';
 
 function Player( {
-	getStylesFromColorScheme,
 	isUploadInProgress,
 	isUploadFailed,
 	attributes,
@@ -69,25 +67,6 @@ function Player( {
 					);
 				} );
 		}
-	};
-
-	const useEditorColorScheme = ( baseStyle, darkStyle ) => {
-		const globalStyles = useGlobalStyles();
-		const editorColors = globalStyles?.baseColors?.color;
-		const editorBackgroundColor = editorColors?.background;
-
-		if (
-			typeof editorBackgroundColor === 'undefined' ||
-			editorBackgroundColor === 'undefined'
-		) {
-			return getStylesFromColorScheme( baseStyle, darkStyle );
-		}
-
-		const isEditorBackgroundDark = colord( editorBackgroundColor ).isDark();
-
-		return isEditorBackgroundDark
-			? { ...baseStyle, ...darkStyle }
-			: baseStyle;
 	};
 
 	const containerStyle = useEditorColorScheme(
