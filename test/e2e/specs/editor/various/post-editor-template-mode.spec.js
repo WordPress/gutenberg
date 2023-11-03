@@ -153,7 +153,7 @@ class PostEditorTemplateMode {
 	}
 
 	async createPostAndSaveDraft() {
-		await this.admin.visitPostEditor();
+		await this.admin.createNewPost();
 		// Create a random post.
 		await this.page.keyboard.type( 'Just an FSE Post' );
 		await this.page.keyboard.press( 'Enter' );

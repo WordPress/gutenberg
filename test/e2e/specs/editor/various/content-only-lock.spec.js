@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Content-only lock', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should be able to edit the content of blocks with content-only lock', async ( {

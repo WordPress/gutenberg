@@ -11,7 +11,7 @@ test.describe( 'iframed block editor settings styles', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

@@ -17,7 +17,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'allows all blocks if the allowed blocks setting was not set', async ( {

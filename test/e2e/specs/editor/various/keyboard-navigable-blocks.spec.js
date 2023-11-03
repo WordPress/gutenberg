@@ -13,7 +13,7 @@ test.use( {
 
 test.describe( 'Order of block keyboard navigation', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'permits tabbing through paragraph blocks in the expected order', async ( {

@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Group', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'can be created using the block inserter', async ( {

@@ -11,7 +11,7 @@ test.describe( 'Inner blocks templates', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

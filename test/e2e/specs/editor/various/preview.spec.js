@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'Preview', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should open a preview window for a new post', async ( {
@@ -217,7 +217,7 @@ test.describe( 'Preview', () => {
 
 test.describe( 'Preview with Custom Fields enabled', () => {
 	test.beforeEach( async ( { admin, previewUtils } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await previewUtils.toggleCustomFieldsOption( true );
 	} );
 
@@ -294,7 +294,7 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.visitPostEditor( {
+		await admin.createNewPost( {
 			postType: 'not_public',
 			title: 'aaaaa',
 		} );

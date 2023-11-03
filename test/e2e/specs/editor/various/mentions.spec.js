@@ -15,7 +15,7 @@ test.describe( 'autocomplete mentions', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

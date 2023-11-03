@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Iframed block', () => {
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-iframed-block' );
-		await admin.visitPostEditor( { postType: 'page' } );
+		await admin.createNewPost( { postType: 'page' } );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

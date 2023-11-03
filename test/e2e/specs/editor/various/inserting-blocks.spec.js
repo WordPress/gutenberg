@@ -30,7 +30,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
 
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
@@ -108,7 +108,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
@@ -174,7 +174,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
 
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
@@ -244,7 +244,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		editor,
 		insertingBlocksUtils,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
@@ -308,7 +308,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
@@ -354,7 +354,7 @@ test.describe( 'insert media from inserter', () => {
 		page,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'

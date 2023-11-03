@@ -13,7 +13,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'adding inline tokens', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should insert inline image', async ( {

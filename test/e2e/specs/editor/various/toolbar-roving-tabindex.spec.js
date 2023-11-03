@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'Toolbar roving tabindex', () => {
 	test.beforeEach( async ( { admin, editor, page } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'First block' );
 

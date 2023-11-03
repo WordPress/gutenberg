@@ -17,7 +17,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 	} );
 
 	test( 'Should save the changes', async ( { admin, editor, page } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		// Add title to enable valid non-empty post save.
 		await page

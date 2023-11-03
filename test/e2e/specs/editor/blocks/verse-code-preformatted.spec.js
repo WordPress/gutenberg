@@ -7,7 +7,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 [ 'core/verse', 'core/code', 'core/preformatted' ].forEach( ( blockName ) => {
 	test.describe( blockName, () => {
 		test.beforeEach( async ( { admin } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 		} );
 
 		test( 'should exit on triple Enter and merge back', async ( {

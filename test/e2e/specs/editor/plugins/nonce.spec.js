@@ -14,7 +14,7 @@ test.describe( 'Nonce', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeFocused();

@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Duplicating blocks', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should duplicate blocks using the block settings menu and keyboard shortcut', async ( {

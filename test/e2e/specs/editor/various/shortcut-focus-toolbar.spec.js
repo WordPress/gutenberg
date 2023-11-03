@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'Focuses correct toolbar in default view options in edit mode', async ( {

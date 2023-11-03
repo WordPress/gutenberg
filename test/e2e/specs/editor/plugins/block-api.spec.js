@@ -16,7 +16,7 @@ test.describe( 'Using Block API', () => {
 		admin,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await editor.insertBlock( { name: 'e2e-tests/hello-world' } );
 

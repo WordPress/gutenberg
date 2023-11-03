@@ -16,7 +16,7 @@ test.use( {
 
 test.describe( 'Paragraph', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should output unwrapped editable paragraph', async ( {

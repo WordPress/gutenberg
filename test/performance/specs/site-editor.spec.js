@@ -60,7 +60,7 @@ test.describe( 'Site Editor Performance', () => {
 		let draftURL = null;
 
 		test( 'Setup the test page', async ( { page, admin, perfUtils } ) => {
-			await admin.visitPostEditor( { postType: 'page' } );
+			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
 			await perfUtils.saveDraft();
 
@@ -115,7 +115,7 @@ test.describe( 'Site Editor Performance', () => {
 			editor,
 			perfUtils,
 		} ) => {
-			await admin.visitPostEditor( { postType: 'page' } );
+			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await perfUtils.saveDraft();

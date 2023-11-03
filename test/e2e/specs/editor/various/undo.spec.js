@@ -11,7 +11,7 @@ test.use( {
 
 test.describe( 'undo', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should undo typing after a pause', async ( {

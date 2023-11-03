@@ -11,7 +11,7 @@ test.describe( 'iframed multiple block stylesheets', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor( { postType: 'page' } );
+		await admin.createNewPost( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

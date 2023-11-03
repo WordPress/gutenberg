@@ -21,7 +21,7 @@ test.describe( 'Query block', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor( {
+		await admin.createNewPost( {
 			postType: 'page',
 			title: 'Query Page',
 		} );

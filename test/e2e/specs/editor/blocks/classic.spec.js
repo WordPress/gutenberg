@@ -19,7 +19,7 @@ test.use( {
 
 test.describe( 'Classic', () => {
 	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();
 	} );

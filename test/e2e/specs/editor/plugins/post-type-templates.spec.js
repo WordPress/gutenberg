@@ -12,7 +12,7 @@ test.describe( 'Post type templates', () => {
 		} );
 
 		test.beforeEach( async ( { admin } ) => {
-			await admin.visitPostEditor( { postType: 'book' } );
+			await admin.createNewPost( { postType: 'book' } );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -99,7 +99,7 @@ test.describe( 'Post type templates', () => {
 			admin,
 			editor,
 		} ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:image -->
@@ -112,7 +112,7 @@ test.describe( 'Post type templates', () => {
 			page,
 			editor,
 		} ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
@@ -133,7 +133,7 @@ test.describe( 'Post type templates', () => {
 			admin,
 			editor,
 		} ) => {
-			await admin.visitPostEditor( { postType: 'page' } );
+			await admin.createNewPost( { postType: 'page' } );
 
 			await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		} );

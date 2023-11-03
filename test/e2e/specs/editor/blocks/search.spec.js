@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Search', () => {
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllMenus();
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

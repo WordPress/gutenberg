@@ -20,7 +20,7 @@ test.use( {
 
 test.describe( 'Draggable block', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'can drag and drop to the top of a vertical block list', async ( {

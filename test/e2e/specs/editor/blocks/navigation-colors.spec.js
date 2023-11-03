@@ -25,7 +25,7 @@ test.describe( 'Navigation colors', () => {
 			attributes: { openSubmenusOnClick: true },
 		} );
 
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await editor.insertBlock( {
 			name: 'core/navigation',

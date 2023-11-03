@@ -13,7 +13,7 @@ test.describe( 'Using Format API', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'Clicking the control wraps the selected text properly with HTML code', async ( {

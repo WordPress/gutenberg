@@ -13,7 +13,7 @@ test.describe( 'Post visibility', () => {
 		} ) => {
 			await pageUtils.setBrowserViewport( viewport );
 
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 
 			await editor.openDocumentSettingsSidebar();
 
@@ -42,7 +42,7 @@ test.describe( 'Post visibility', () => {
 		} ) => {
 			await pageUtils.setBrowserViewport( viewport );
 
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 
 			await editor.openDocumentSettingsSidebar();
 
@@ -75,7 +75,7 @@ test.describe( 'Post visibility', () => {
 		admin,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		// Enter a title for this post.
 		await editor.canvas

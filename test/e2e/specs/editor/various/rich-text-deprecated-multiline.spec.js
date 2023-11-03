@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'RichText deprecated multiline', () => {
 	test.beforeEach( async ( { admin, page, editor } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 		await page.evaluate( () => {
 			const registerBlockType = window.wp.blocks.registerBlockType;
 			const { useBlockProps, RichText } = window.wp.blockEditor;

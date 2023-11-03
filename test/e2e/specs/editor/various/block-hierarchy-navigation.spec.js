@@ -34,7 +34,7 @@ const COLUMNS_BLOCK = [
 
 test.describe( 'Navigating the block hierarchy', () => {
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'should navigate using the list view sidebar', async ( {

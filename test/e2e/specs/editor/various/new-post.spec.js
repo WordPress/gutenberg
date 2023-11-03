@@ -21,7 +21,7 @@ test.describe( 'new editor state', () => {
 		page,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await expect( page ).toHaveURL( /post-new.php/ );
 
@@ -45,7 +45,7 @@ test.describe( 'new editor state', () => {
 	} );
 
 	test( 'should have no history', async ( { admin, page } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await expect(
 			page.locator( 'role=button[name="Undo"i]' )
@@ -59,7 +59,7 @@ test.describe( 'new editor state', () => {
 		admin,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		await expect(
 			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
@@ -71,7 +71,7 @@ test.describe( 'new editor state', () => {
 		page,
 		editor,
 	} ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 
 		// Enter a title for this post.
 		await editor.canvas
@@ -93,7 +93,7 @@ test.describe( 'new editor state', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.visitPostEditor( { title: 'Here is the title' } );
+		await admin.createNewPost( { title: 'Here is the title' } );
 
 		// Verify saveable by presence of the Save Draft button.
 		const saveDraftButton = page.locator(

@@ -14,7 +14,7 @@ test.describe( 'Using Hooks API', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'Should contain a reset block button on the sidebar', async ( {

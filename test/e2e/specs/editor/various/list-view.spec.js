@@ -11,7 +11,7 @@ test.describe( 'List View', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test( 'allows a user to drag a block to a new sibling position', async ( {

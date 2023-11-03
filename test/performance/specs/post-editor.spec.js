@@ -51,7 +51,7 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			draftId = await perfUtils.saveDraft();
 		} );
@@ -66,7 +66,7 @@ test.describe( 'Post Editor Performance', () => {
 				metrics,
 			} ) => {
 				// Open the test draft.
-				await admin.visitPostEditor( { postId: draftId } );
+				await admin.editPost( draftId );
 				const canvas = await perfUtils.getCanvas();
 
 				// Wait for the first block.
@@ -95,14 +95,14 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -148,13 +148,13 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.loadBlocksForSmallPostWithContainers();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -204,13 +204,13 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -254,13 +254,13 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 
 			const listViewToggle = page.getByRole( 'button', {
@@ -304,14 +304,14 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Toggle block inserter',
@@ -360,14 +360,14 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Toggle block inserter',
@@ -416,14 +416,14 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
-			await admin.visitPostEditor();
+			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
 			draftId = await perfUtils.saveDraft();
 		} );
 
 		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await admin.visitPostEditor( { postId: draftId } );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 
 			const globalInserterToggle = page.getByRole( 'button', {

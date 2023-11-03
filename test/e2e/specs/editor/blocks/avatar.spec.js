@@ -19,7 +19,7 @@ test.describe( 'Avatar', () => {
 			password: 'gravatargravatar123magic',
 		} );
 
-		await admin.visitPostEditor();
+		await admin.createNewPost();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
