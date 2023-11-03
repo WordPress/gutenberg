@@ -99,7 +99,8 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', 'page', queryArgs );
 
-	const { records: authors } = useEntityRecords( 'root', 'user' );
+	const { records: authors, isResolving: isLoadingAuthors } =
+		useEntityRecords( 'root', 'user' );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -244,7 +245,9 @@ export default function PagePages() {
 				fields={ fields }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
-				isLoading={ isLoadingPages || isLoadingStatus }
+				isLoading={
+					isLoadingPages || isLoadingStatus || isLoadingAuthors
+				}
 				view={ view }
 				onChangeView={ onChangeView }
 			/>
