@@ -55,7 +55,7 @@ function getQueriedItemsUncached( state, query ) {
 
 		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
-			return null;
+			continue;
 		}
 
 		const item = state.items[ context ][ itemId ];
