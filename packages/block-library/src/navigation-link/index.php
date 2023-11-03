@@ -332,6 +332,8 @@ function register_block_core_navigation_link_variation( $variation ) {
 	// Directly set the variations on the registered block type
 	// because there's no server side registration for variations (see #47170).
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
+	// If the block is not registered yet, bail early.
+	// Variation will be registered in register_block_core_navigation_link then.
 	if ( ! $navigation_block_type ) {
 		return;
 	}
@@ -347,7 +349,7 @@ function register_block_core_navigation_link_variation( $variation ) {
  */
 function register_block_core_navigation_link() {
 	// This will only handle post types and taxonomies registered until this point (init on priority 9).
-	// See action hooks at the end of this function for other post types and taxonomies.
+	// See action hooks below for other post types and taxonomies.
 	// See https://github.com/WordPress/gutenberg/issues/53826 for details.
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
@@ -387,14 +389,12 @@ function register_block_core_navigation_link() {
 			'variations'      => array_merge( $built_ins, $variations ),
 		)
 	);
-
-	// Register actions for all post types and taxonomies that may not yet be registered.
-	// This needs to happen in this function, because otherwise any post types/taxonomies
-	// registered **before** this block will attempt to register on a block that does not yet exist.
-	add_action( 'registered_post_type', 'register_block_core_navigation_link_post_type_variation', 10, 2 );
-	add_action( 'registered_taxonomy', 'register_block_core_navigation_link_taxonomy_variation', 10, 3 );
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+// Register actions for all post types and taxonomies, to add variations when they are registered.
+// All post types/taxonomies registered before register_block_core_navigation_link, will be handled by that function.
+add_action( 'registered_post_type', 'register_block_core_navigation_link_post_type_variation', 10, 2 );
+add_action( 'registered_taxonomy', 'register_block_core_navigation_link_taxonomy_variation', 10, 3 );
 
 /**
  * Register custom post type variations for navigation link on post type registration
