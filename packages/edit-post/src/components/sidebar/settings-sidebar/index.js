@@ -77,6 +77,9 @@ const SettingsSidebar = () => {
 	);
 
 	const Content = () => {
+		// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+		// need to forward the `Tabs` context so it can be passed through the
+		// underlying slot/fill.
 		const tabsContextValue = useContext( Tabs.Context );
 
 		return (

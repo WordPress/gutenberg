@@ -33,23 +33,23 @@ const SettingsHeader = ( { sidebarName } ) => {
 		};
 	}, [] );
 
-	const [ documentAriaLabel ] =
+	const documentAriaLabel =
 		sidebarName === 'edit-post/document'
 			? // translators: ARIA label for the Document sidebar tab, selected. %s: Document label.
-			  [ sprintf( __( '%s (selected)' ), documentLabel ), 'is-active' ]
-			: [ documentLabel, '' ];
+			  sprintf( __( '%s (selected)' ), documentLabel )
+			: documentLabel;
 
-	const [ blockAriaLabel ] =
+	const blockAriaLabel =
 		sidebarName === 'edit-post/block'
 			? // translators: ARIA label for the Block Settings Sidebar tab, selected.
-			  [ __( 'Block (selected)' ), 'is-active' ]
+			  __( 'Block (selected)' )
 			: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
-			  [ __( 'Block' ), '' ];
+			  __( 'Block' );
 
-	const [ templateAriaLabel ] =
+	const templateAriaLabel =
 		sidebarName === 'edit-post/document'
-			? [ __( 'Template (selected)' ), 'is-active' ]
-			: [ __( 'Template' ), '' ];
+			? __( 'Template (selected)' )
+			: __( 'Template' );
 
 	return (
 		<>
@@ -60,14 +60,12 @@ const SettingsHeader = ( { sidebarName } ) => {
 						isTemplateMode ? (
 							<Button
 								onClick={ openDocumentSettings }
-								className={ `edit-post-sidebar__panel-tab` }
 								aria-label={ templateAriaLabel }
 								data-label={ __( 'Template' ) }
 							/>
 						) : (
 							<Button
 								onClick={ openDocumentSettings }
-								className={ `edit-post-sidebar__panel-tab` }
 								aria-label={ documentAriaLabel }
 								data-label={ documentLabel }
 							/>
@@ -81,13 +79,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 					render={
 						<Button
 							onClick={ openBlockSettings }
-							className={ `edit-post-sidebar__panel-tab` }
 							aria-label={ blockAriaLabel }
 							// translators: Data label for the Block Settings Sidebar tab.
 							data-label={ __( 'Block' ) }
-						>
-							{  }
-						</Button>
+						/>
 					}
 				>
 					{ /* translators: Text label for the Block Settings Sidebar tab. */ }
