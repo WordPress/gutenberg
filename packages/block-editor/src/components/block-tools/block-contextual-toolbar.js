@@ -169,7 +169,7 @@ function UnforwardBlockContextualToolbar(
 	] );
 
 	const isToolbarEnabled =
-		! blockType ||
+		blockType &&
 		hasBlockSupport( blockType, '__experimentalToolbar', true );
 	const hasAnyBlockControls = useHasAnyBlockControls();
 	if (
