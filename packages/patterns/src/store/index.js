@@ -10,6 +10,7 @@ import reducer from './reducer';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
 import * as selectors from './selectors';
+import * as resolvers from './resolvers';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -21,6 +22,7 @@ import { unlock } from '../lock-unlock';
  */
 export const storeConfig = {
 	reducer,
+	resolvers,
 };
 
 /**

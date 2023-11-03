@@ -14,6 +14,16 @@ export function isEditingPattern( state = {}, action ) {
 	return state;
 }
 
+export function patternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	isEditingPattern,
+	patternCategories,
 } );

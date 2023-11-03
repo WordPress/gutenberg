@@ -8,3 +8,13 @@
 export function isEditingPattern( state, clientId ) {
 	return state.isEditingPattern[ clientId ];
 }
+
+/**
+ * Retrieve the list of registered block pattern categories.
+ *
+ * @param {Object} state Data state.
+ * @return {Array} Block pattern category list.
+ */
+export function getPatternCategories( state ) {
+	return state.patternCategories;
+}
