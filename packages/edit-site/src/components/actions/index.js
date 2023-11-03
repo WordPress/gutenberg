@@ -133,14 +133,10 @@ export function useRestorePostAction() {
 				return status === 'trash';
 			},
 			async perform( post ) {
+				await editEntityRecord( 'postType', post.type, post.id, {
+					status: 'draft',
+				} );
 				try {
-					await editEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{ status: 'draft' },
-						{ throwOnError: true }
-					);
 					await saveEditedEntityRecord(
 						'postType',
 						post.type,

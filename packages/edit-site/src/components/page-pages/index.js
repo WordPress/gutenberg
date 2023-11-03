@@ -225,8 +225,8 @@ export default function PagePages() {
 		() => [
 			viewPostAction,
 			trashPostAction,
-			permanentlyDeletePostAction,
 			restorePostAction,
+			permanentlyDeletePostAction,
 			editPostAction,
 			postRevisionsAction,
 		],
