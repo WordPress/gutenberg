@@ -18,4 +18,3 @@ function gutenberg_register_rest_block_patterns_routes() {
 	$block_patterns->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns_routes' );
-
