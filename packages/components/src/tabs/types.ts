@@ -73,14 +73,6 @@ export type TabListProps = {
 	 * The children elements, which should be a series of `Tabs.TabPanel` components.
 	 */
 	children?: React.ReactNode;
-	/**
-	 * The class name to apply to the tablist.
-	 */
-	className?: string;
-	/**
-	 * Custom CSS styles for the rendered tablist.
-	 */
-	style?: React.CSSProperties;
 };
 
 export type TabProps = {
@@ -89,17 +81,9 @@ export type TabProps = {
 	 */
 	id: string;
 	/**
-	 * Custom CSS styles for the tab.
-	 */
-	style?: React.CSSProperties;
-	/**
 	 * The children elements, generally the text to display on the tab.
 	 */
 	children?: React.ReactNode;
-	/**
-	 * The class name to apply to the tab button.
-	 */
-	className?: string;
 	/**
 	 * Determines if the tab button should be disabled.
 	 *
@@ -122,14 +106,6 @@ export type TabPanelProps = {
 	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
 	 */
 	id: string;
-	/**
-	 * The class name to apply to the tabpanel.
-	 */
-	className?: string;
-	/**
-	 * Custom CSS styles for the rendered `TabPanel` component.
-	 */
-	style?: React.CSSProperties;
 	/**
 	 * Determines whether or not the tabpanel element should be focusable.
 	 * If `false`, pressing the tab key will skip over the tabpanel, and instead
