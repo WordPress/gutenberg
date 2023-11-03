@@ -159,19 +159,6 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
 
 -   Required: No
 
-###### `className`: `string`
-
-The class name to apply to the tablist.
-
--   Required: No
--   Default: ''
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tablist.
-
-- Required: No
-
 #### Tab
 
 ##### Props
@@ -182,21 +169,9 @@ The id of the tab, which is prepended with the `Tabs` instance ID.
 
 - Required: Yes
 
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
-
-- Required: No
-
 ###### `children`: `React.ReactNode`
 
 The children elements, generally the text to display on the tab.
-
-- Required: No
-
-###### `className`: `string`
-
-The class name to apply to the tab.
 
 - Required: No
 
@@ -228,18 +203,6 @@ The children elements, generally the content to display on the tabpanel.
 The id of the tabpanel, which is combined with the `Tabs` instance ID and the suffix `-view`
 
 - Required: Yes
-
-###### `className`: `string`
-
-The class name to apply to the tabpanel.
-
-- Required: No
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
-
-- Required: No
 
 ###### `focusable`: `boolean`
 
