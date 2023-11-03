@@ -475,6 +475,7 @@ function ViewList( {
 												header.column.columnDef
 													.maxWidth || undefined,
 										} }
+										data-field-id={ header.id }
 									>
 										<HeaderMenu
 											dataView={ dataView }
