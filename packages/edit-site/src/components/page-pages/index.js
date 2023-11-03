@@ -18,7 +18,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import Link from '../routes/link';
 import { DataViews } from '../dataviews';
-import { DEFAULT_STATUSES, default as DEFAULT_VIEWS } from './default-views';
+import { default as DEFAULT_VIEWS } from './default-views';
 import {
 	useTrashPostAction,
 	postRevisionsAction,
@@ -36,6 +36,10 @@ const defaultConfigPerViewType = {
 		mediaField: 'featured-image',
 	},
 };
+
+// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+// The reason for that is to match the default statuses coming from the endpoint (entity request).
+export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
 
 export default function PagePages() {
 	const {
@@ -61,30 +65,6 @@ export default function PagePages() {
 					.sort()
 					.join();
 	}, [ statuses ] );
-
-	useEffect( () => {
-		// Only update the view if the statuses received from the endpoint
-		// are different from the DEFAULT_STATUSES provided initially.
-		//
-		// The pages endpoint depends on the status endpoint via the status filter.
-		// Initially, this code filters the pages request by DEFAULT_STATUTES,
-		// instead of using the default (publish).
-		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
-		//
-		// By doing so, it avoids a second request to the pages endpoint
-		// upon receiving the statuses when they are the same (most common scenario).
-		if ( DEFAULT_STATUSES !== defaultStatuses ) {
-			setView( {
-				...view,
-				filters: [
-					...view.filters.filter(
-						( f ) => f.field !== 'status' || f.operator !== 'in'
-					),
-					{ field: 'status', operator: 'in', value: defaultStatuses },
-				],
-			} );
-		}
-	}, [ defaultStatuses ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -222,7 +202,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ defaultStatuses, statuses, authors ]
+		[ statuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
