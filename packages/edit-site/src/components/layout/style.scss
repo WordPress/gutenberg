@@ -157,9 +157,14 @@
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
-.edit-site-layout__canvas .interface-interface-skeleton {
+.edit-site-layout__canvas .interface-interface-skeleton,
+.edit-site-page-pages-preview .interface-interface-skeleton {
 	position: relative !important;
 	min-height: 100% !important;
+}
+
+.edit-site-page-pages-preview {
+	height: 100%;
 }
 
 .edit-site-layout__view-mode-toggle.components-button {

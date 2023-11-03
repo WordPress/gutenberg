@@ -20,8 +20,7 @@ import {
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function useInitEditedEntityFromURL() {
-	const { params: { postId, postType } = {} } = useLocation();
+export function useInitEditedEntity( { postId, postType } ) {
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
@@ -91,4 +90,9 @@ export default function useInitEditedEntityFromURL() {
 		setTemplatePart,
 		setNavigationMenu,
 	] );
+}
+
+export default function useInitEditedEntityFromURL() {
+	const { params = {} } = useLocation();
+	return useInitEditedEntity( params );
 }
