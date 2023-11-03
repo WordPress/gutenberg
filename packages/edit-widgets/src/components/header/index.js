@@ -17,6 +17,7 @@ import MoreMenu from '../more-menu';
 
 function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const { hasFixedToolbar } = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: !! select( preferencesStore ).get(
@@ -47,7 +48,7 @@ function Header( { setListViewToggleElement } ) {
 					<DocumentTools
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
-					{ hasFixedToolbar && (
+					{ hasFixedToolbar && isLargeViewport && (
 						<Slot
 							className="selected-block-tools-wrapper"
 							name="__experimentalSelectedBlockTools"

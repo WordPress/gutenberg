@@ -75,7 +75,7 @@ function Header( {
 					hasFixedToolbar={ hasFixedToolbar }
 					setListViewToggleElement={ setListViewToggleElement }
 				/>
-				{ hasFixedToolbar && (
+				{ hasFixedToolbar && isLargeViewport && (
 					<Slot
 						className="selected-block-tools-wrapper"
 						name="__experimentalSelectedBlockTools"
