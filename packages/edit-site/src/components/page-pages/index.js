@@ -54,8 +54,8 @@ export default function PagePages() {
 			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
 		);
 	}, [ path, activeView ] );
-	// Request post statuses to get the proper labels.
-	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	const { records: statuses, isResolving: isLoadingStatus } =
+		useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
 		return statuses === null
 			? DEFAULT_STATUSES
@@ -91,7 +91,7 @@ export default function PagePages() {
 			search: view.search,
 			...filters,
 		};
-	}, [ view ] );
+	}, [ view, defaultStatuses ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
@@ -244,7 +244,7 @@ export default function PagePages() {
 				fields={ fields }
 				actions={ actions }
 				data={ pages || EMPTY_ARRAY }
-				isLoading={ isLoadingPages }
+				isLoading={ isLoadingPages || isLoadingStatus }
 				view={ view }
 				onChangeView={ onChangeView }
 			/>
