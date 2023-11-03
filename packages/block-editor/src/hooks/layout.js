@@ -436,7 +436,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 );
 
 function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
-	const { style: { layout = {} } = {} } = props.attributes;
+	const layout = props.attributes.style?.layout ?? {};
 	const { selfStretch, flexSize } = layout;
 
 	const id = useInstanceId( BlockListBlock );
