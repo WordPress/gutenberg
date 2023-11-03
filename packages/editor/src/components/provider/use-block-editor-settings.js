@@ -9,6 +9,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as patternsStore } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -95,13 +97,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		pageOnFront,
 		pageForPosts,
 		postType,
-		userPatternCategories,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML, getCurrentPostType } =
 			select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord, getUserPatternCategories } =
-			select( coreStore );
+		const { canUser, getEntityRecord } = select( coreStore );
 
 		const siteSettings = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )
@@ -121,7 +121,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			pageOnFront: siteSettings?.page_on_front,
 			pageForPosts: siteSettings?.page_for_posts,
 			postType: getCurrentPostType(),
-			userPatternCategories: getUserPatternCategories(),
 		};
 	}, [] );
 
@@ -135,8 +134,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
+			restBlockPatternCategories: unlock(
+				select( patternsStore )
+			).getPatternCategories(),
 		} ),
 		[]
 	);
@@ -209,7 +209,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -227,7 +226,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
-			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,

@@ -2294,12 +2294,14 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 function getUserPatterns( state ) {
 	const userPatterns =
 		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const userPatternCategories =
-		state?.settings?.__experimentalUserPatternCategories ?? [];
+	const patternCategories =
+		state?.settings?.__experimentalBlockPatternCategories ?? [];
 	const categories = new Map();
-	userPatternCategories.forEach( ( userCategory ) =>
-		categories.set( userCategory.id, userCategory )
-	);
+	patternCategories.forEach( ( category ) => {
+		if ( category.id ) {
+			categories.set( category.id, category );
+		}
+	} );
 	return userPatterns.map( ( userPattern ) => {
 		return {
 			name: `core/block/${ userPattern.id }`,
@@ -2307,7 +2309,7 @@ function getUserPatterns( state ) {
 			title: userPattern.title.raw,
 			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )
-					? categories.get( catId ).slug
+					? categories.get( catId ).name
 					: catId
 			),
 			content: userPattern.content.raw,
@@ -2315,13 +2317,6 @@ function getUserPatterns( state ) {
 		};
 	} );
 }
-
-export const __experimentalUserPatternCategories = createSelector(
-	( state ) => {
-		return state?.settings?.__experimentalUserPatternCategories;
-	},
-	( state ) => [ state.settings.__experimentalUserPatternCategories ]
-);
 
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
@@ -2344,7 +2339,6 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
-		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
@@ -2369,7 +2363,6 @@ const getAllAllowedPatterns = createSelector(
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
-		state?.settings?.__experimentalUserPatternCategories,
 	]
 );
 
