@@ -60,7 +60,7 @@ export const init = () => {
 	const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromPostTemplates',
+		'core/block-library/removeTemplatePartsFromPostTemplates',
 		(
 			canInsert,
 			blockType,
