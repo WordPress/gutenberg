@@ -28,7 +28,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 			if ( 'object' === typeof filter ) {
 				filterIndex[ id ] = {
 					id,
-					name: filter.name || field.header,
+					name: field.header,
 					type: filter.type,
 				};
 			}
