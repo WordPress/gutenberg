@@ -572,6 +572,29 @@ export function themeGlobalStyleRevisions( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the template lookup per slug.
+ *
+ * @param {Record<string, Record<string, string>>} state  Current state.
+ * @param {Object}                                 action Dispatched action.
+ *
+ * @return {Record<string, Record<string, string>>} Updated state.
+ */
+export function defaultTemplates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_DEFAULT_TEMPLATE':
+			return {
+				...state,
+				[ action.postType ]: {
+					...state[ action.postType ],
+					[ action.slug ]: action.templateId,
+				},
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -592,4 +615,5 @@ export default combineReducers( {
 	blockPatternCategories,
 	userPatternCategories,
 	navigationFallbackId,
+	defaultTemplates,
 } );

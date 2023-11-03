@@ -14,14 +14,18 @@ import BlockEditorProvider from './block-editor-provider';
 
 import { unlock } from '../../lock-unlock';
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
-export default function BlockEditor() {
+export default function BlockEditor( { postType, postId, context } ) {
 	return (
-		<BlockEditorProvider>
+		<BlockEditorProvider postType={ postType } postId={ postId }>
 			<TemplatePartConverter />
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<SiteEditorCanvas />
+			<SiteEditorCanvas
+				postType={ postType }
+				postId={ postId }
+				context={ context }
+			/>
 			<PatternsMenuItems />
 		</BlockEditorProvider>
 	);

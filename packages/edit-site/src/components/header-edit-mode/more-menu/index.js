@@ -34,7 +34,7 @@ import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import { store as siteEditorStore } from '../../../store';
 
-export default function MoreMenu( { showIconLabels } ) {
+export default function MoreMenu( { postType, postId, showIconLabels } ) {
 	const registry = useRegistry();
 	const isDistractionFree = useSelect(
 		( select ) =>
@@ -134,7 +134,10 @@ export default function MoreMenu( { showIconLabels } ) {
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
 							<WelcomeGuideMenuItem />
-							<CopyContentMenuItem />
+							<CopyContentMenuItem
+								postType={ postType }
+								postId={ postId }
+							/>
 							<MenuItem
 								icon={ external }
 								role="menuitem"

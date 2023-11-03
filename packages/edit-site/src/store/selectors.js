@@ -18,10 +18,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../utils/constants';
+import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
@@ -128,8 +125,6 @@ export const getSettings = createSelector(
 			),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
-			__experimentalPreferPatternsOnRoot:
-				TEMPLATE_POST_TYPE === getEditedPostType( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -155,7 +150,6 @@ export const getSettings = createSelector(
 		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
 		__unstableGetPreference( state, 'showIconLabels' ),
 		getReusableBlocks( state ),
-		getEditedPostType( state ),
 	]
 );
 
@@ -375,5 +369,6 @@ export function isPage( state ) {
  * @return {boolean} Whether or not focus is on editing page content.
  */
 export function hasPageContentFocus( state ) {
-	return isPage( state ) ? state.hasPageContentFocus : false;
+	// Check calls to this.
+	return state.hasPageContentFocus;
 }

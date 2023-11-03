@@ -11,26 +11,27 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function WelcomeGuideTemplate() {
+export default function WelcomeGuideTemplate( { context } ) {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const isVisible = useSelect( ( select ) => {
-		const isTemplateActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuideTemplate'
-		);
-		const isEditorActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuide'
-		);
-		const { isPage, hasPageContentFocus } = select( editSiteStore );
-		return (
-			isTemplateActive &&
-			! isEditorActive &&
-			isPage() &&
-			! hasPageContentFocus()
-		);
-	}, [] );
+	const isVisible = useSelect(
+		( select ) => {
+			const isTemplateActive = !! select( preferencesStore ).get(
+				'core/edit-site',
+				'welcomeGuideTemplate'
+			);
+			const isEditorActive = !! select( preferencesStore ).get(
+				'core/edit-site',
+				'welcomeGuide'
+			);
+			const { hasPageContentFocus } = select( editSiteStore );
+			return (
+				!! context?.postId,
+				isTemplateActive && ! isEditorActive && ! hasPageContentFocus()
+			);
+		},
+		[ context ]
+	);
 
 	if ( ! isVisible ) {
 		return null;

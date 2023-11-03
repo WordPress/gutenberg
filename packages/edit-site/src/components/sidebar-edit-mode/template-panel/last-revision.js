@@ -12,8 +12,11 @@ import { PostTypeSupportCheck } from '@wordpress/editor';
  */
 import useEditedEntityRecord from '../../use-edited-entity-record';
 
-const useRevisionData = () => {
-	const { record: currentTemplate } = useEditedEntityRecord();
+const useRevisionData = ( postType, postId ) => {
+	const { record: currentTemplate } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 
 	const lastRevisionId =
 		currentTemplate?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
@@ -28,8 +31,11 @@ const useRevisionData = () => {
 	};
 };
 
-function PostLastRevisionCheck( { children } ) {
-	const { lastRevisionId, revisionsCount } = useRevisionData();
+function PostLastRevisionCheck( { postType, postId, children } ) {
+	const { lastRevisionId, revisionsCount } = useRevisionData(
+		postType,
+		postId
+	);
 
 	if ( ! process.env.IS_GUTENBERG_PLUGIN ) {
 		return null;
@@ -46,11 +52,14 @@ function PostLastRevisionCheck( { children } ) {
 	);
 }
 
-const PostLastRevision = () => {
-	const { lastRevisionId, revisionsCount } = useRevisionData();
+const PostLastRevision = ( { postType, postId } ) => {
+	const { lastRevisionId, revisionsCount } = useRevisionData(
+		postType,
+		postId
+	);
 
 	return (
-		<PostLastRevisionCheck>
+		<PostLastRevisionCheck postType={ postType } postId={ postId }>
 			<PanelRow
 				header={ __( 'Editing history' ) }
 				className="edit-site-template-revisions"
@@ -73,10 +82,10 @@ const PostLastRevision = () => {
 	);
 };
 
-export default function LastRevision() {
+export default function LastRevision( props ) {
 	return (
-		<PostLastRevisionCheck>
-			<PostLastRevision />
+		<PostLastRevisionCheck { ...props }>
+			<PostLastRevision { ...props } />
 		</PostLastRevisionCheck>
 	);
 }

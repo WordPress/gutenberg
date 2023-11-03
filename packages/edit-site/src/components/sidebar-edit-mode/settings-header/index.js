@@ -19,20 +19,18 @@ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { store as editSiteStore } from '../../../store';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
-const SettingsHeader = ( { sidebarName } ) => {
-	const { hasPageContentFocus, entityType } = useSelect( ( select ) => {
-		const { getEditedPostType, hasPageContentFocus: _hasPageContentFocus } =
+const SettingsHeader = ( { postType, sidebarName } ) => {
+	const { hasPageContentFocus } = useSelect( ( select ) => {
+		const { hasPageContentFocus: _hasPageContentFocus } =
 			select( editSiteStore );
 
 		return {
 			hasPageContentFocus: _hasPageContentFocus(),
-			entityType: getEditedPostType(),
 		};
 	} );
 
 	const entityLabel =
-		POST_TYPE_LABELS[ entityType ] ||
-		POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ];
+		POST_TYPE_LABELS[ postType ] || POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ];
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openTemplateSettings = () =>

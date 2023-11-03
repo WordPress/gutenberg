@@ -908,3 +908,21 @@ export function receiveNavigationFallbackId( fallbackId ) {
 		fallbackId,
 	};
 }
+
+/**
+ * Returns an action object used to set the template for a given post type and slug.
+ *
+ * @param {string} postType   The post type.
+ * @param {string} slug       The post slug.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( postType, slug, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		postType,
+		slug,
+		templateId,
+	};
+}

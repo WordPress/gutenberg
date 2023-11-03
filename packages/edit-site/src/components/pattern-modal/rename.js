@@ -14,8 +14,8 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 
 const { RenamePatternModal } = unlock( patternsPrivateApis );
 
-export default function PatternRenameModal() {
-	const { record: pattern } = useEditedEntityRecord();
+export default function PatternRenameModal( { postType, postId } ) {
+	const { record: pattern } = useEditedEntityRecord( postType, postId );
 	const { closeModal } = useDispatch( interfaceStore );
 	const isActive = useSelect( ( select ) =>
 		select( interfaceStore ).isModalActive( PATTERN_MODALS.rename )

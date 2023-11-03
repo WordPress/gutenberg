@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
@@ -10,32 +10,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useAsyncList } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
-
 export default function ReplaceTemplateButton( {
+	template,
 	onClick,
 	availableTemplates,
+	context,
 } ) {
+	// todo check this one.
 	const { editEntityRecord } = useDispatch( coreStore );
 	const [ showModal, setShowModal ] = useState( false );
 	const onClose = () => {
 		setShowModal( false );
 	};
 
-	const { postId, postType } = useSelect( ( select ) => {
-		return {
-			postId: select( editSiteStore ).getEditedPostId(),
-			postType: select( editSiteStore ).getEditedPostType(),
-		};
-	}, [] );
-
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		onClose(); // Close the template suggestions modal first.
 		onClick();
-		await editEntityRecord( 'postType', postType, postId, {
+		await editEntityRecord( 'postType', template.type, template.id, {
 			blocks: selectedTemplate.blocks,
 			content: serialize( selectedTemplate.blocks ),
 		} );
@@ -65,6 +56,7 @@ export default function ReplaceTemplateButton( {
 				>
 					<div className="edit-site-template-panel__replace-template-modal__content">
 						<TemplatesList
+							context={ context }
 							availableTemplates={ availableTemplates }
 							onSelect={ onTemplateSelect }
 						/>

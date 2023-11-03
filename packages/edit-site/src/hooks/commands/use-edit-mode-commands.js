@@ -37,21 +37,23 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import useEditedEntityForParams from '../use-edited-entity-from-params';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
-	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
+	const { params } = useLocation();
+	const { postType, postId, context } = useEditedEntityForParams( params );
+	const { record: template } = useEditedEntityRecord( postType, postId );
+	const { canvasMode, hasPageContentFocus } = useSelect(
 		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		} ),
 		[]
 	);
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
-
+	const isPage = context?.postId;
 	if ( ! isPage || canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
 	}
@@ -119,7 +121,12 @@ function useEditorModeCommands() {
 }
 
 function useManipulateDocumentCommands() {
-	const { isLoaded, record: template } = useEditedEntityRecord();
+	const { params } = useLocation();
+	const { postType, postId } = useEditedEntityForParams( params );
+	const { isLoaded, record: template } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const history = useHistory();
 	const hasPageContentFocus = useSelect(
@@ -363,7 +370,12 @@ function useEditUICommands() {
 }
 
 function usePatternCommands() {
-	const { isLoaded, record: pattern } = useEditedEntityRecord();
+	const { params } = useLocation();
+	const { postType, postId } = useEditedEntityForParams( params );
+	const { isLoaded, record: pattern } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 	const { openModal } = useDispatch( interfaceStore );
 
 	if ( ! isLoaded ) {

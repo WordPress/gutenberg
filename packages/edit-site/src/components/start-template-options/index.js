@@ -19,7 +19,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
@@ -37,19 +36,19 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 	return templateContent;
 }
 
-function useStartPatterns( fallbackContent ) {
-	const { slug, patterns } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEntityRecord } = select( coreStore );
-		const postId = getEditedPostId();
-		const postType = getEditedPostType();
-		const record = getEntityRecord( 'postType', postType, postId );
-		const { getSettings } = select( blockEditorStore );
-		return {
-			slug: record.slug,
-			patterns: getSettings().__experimentalBlockPatterns,
-		};
-	}, [] );
+function useStartPatterns( fallbackContent, postType, postId ) {
+	const { slug, patterns } = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			const record = getEntityRecord( 'postType', postType, postId );
+			const { getSettings } = select( blockEditorStore );
+			return {
+				slug: record.slug,
+				patterns: getSettings().__experimentalBlockPatterns,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const currentThemeStylesheet = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme().stylesheet
@@ -111,9 +110,14 @@ function useStartPatterns( fallbackContent ) {
 	}, [ fallbackContent, slug, patterns ] );
 }
 
-function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
+function PatternSelection( {
+	fallbackContent,
+	onChoosePattern,
+	postType,
+	postId,
+} ) {
 	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
-	const blockPatterns = useStartPatterns( fallbackContent );
+	const blockPatterns = useStartPatterns( fallbackContent, postType, postId );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	return (
 		<BlockPatternsList
@@ -127,7 +131,7 @@ function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
 	);
 }
 
-function StartModal( { slug, isCustom, onClose, postType } ) {
+function StartModal( { slug, isCustom, onClose, postType, postId } ) {
 	const fallbackContent = useFallbackTemplateContent( slug, isCustom );
 	if ( ! fallbackContent ) {
 		return null;
@@ -147,6 +151,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 					slug={ slug }
 					isCustom={ isCustom }
 					postType={ postType }
+					postId={ postId }
 					onChoosePattern={ () => {
 						onClose();
 					} }
@@ -172,26 +177,22 @@ const START_TEMPLATE_MODAL_STATES = {
 	CLOSED: 'CLOSED',
 };
 
-export default function StartTemplateOptions() {
+export default function StartTemplateOptions( { postType, postId } ) {
 	const [ modalState, setModalState ] = useState(
 		START_TEMPLATE_MODAL_STATES.INITIAL
 	);
-	const { shouldOpenModal, slug, isCustom, postType } = useSelect(
+	const { shouldOpenModal, slug, isCustom } = useSelect(
 		( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const _postType = getEditedPostType();
-			const postId = getEditedPostId();
 			const { getEditedEntityRecord, hasEditsForEntityRecord } =
 				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
-				_postType,
+				postType,
 				postId
 			);
 			const hasEdits = hasEditsForEntityRecord(
 				'postType',
-				_postType,
+				postType,
 				postId
 			);
 
@@ -199,17 +200,16 @@ export default function StartTemplateOptions() {
 				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
-					TEMPLATE_POST_TYPE === _postType &&
+					TEMPLATE_POST_TYPE === postType &&
 					! select( preferencesStore ).get(
 						'core/edit-site',
 						'welcomeGuide'
 					),
 				slug: templateRecord.slug,
 				isCustom: templateRecord.is_custom,
-				postType: _postType,
 			};
 		},
-		[]
+		[ postType, postId ]
 	);
 
 	if (
@@ -225,6 +225,7 @@ export default function StartTemplateOptions() {
 			slug={ slug }
 			isCustom={ isCustom }
 			postType={ postType }
+			postId={ postId }
 			onClose={ () =>
 				setModalState( START_TEMPLATE_MODAL_STATES.CLOSED )
 			}

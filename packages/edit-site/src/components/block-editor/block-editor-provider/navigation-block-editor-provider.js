@@ -35,8 +35,12 @@ const noop = () => {};
  * @param {number} navigationMenuId the navigation menu ID
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export default function NavigationBlockEditorProvider( { children } ) {
-	const defaultSettings = useSiteEditorSettings();
+export default function NavigationBlockEditorProvider( {
+	postType,
+	postId,
+	children,
+} ) {
+	const defaultSettings = useSiteEditorSettings( postType, postId );
 
 	const navigationMenuId = useEntityId( 'postType', NAVIGATION_POST_TYPE );
 

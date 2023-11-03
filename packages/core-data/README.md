@@ -205,6 +205,20 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given post type and slug.
+
+_Parameters_
+
+-   _postType_ `string`: The post type.
+-   _slug_ `string`: The post slug.
+-   _templateId_ `string`: The resolved template id.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -443,6 +457,10 @@ _Parameters_
 _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
+
+### getDefaultTemplateId
+
+Undocumented declaration.
 
 ### getEditedEntityRecord
 

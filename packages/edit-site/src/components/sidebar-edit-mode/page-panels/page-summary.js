@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -15,7 +17,13 @@ export default function PageSummary( {
 	password,
 	postId,
 	postType,
+	templateType,
+	templateId,
 } ) {
+	const context = useMemo(
+		() => ( { postId, postType } ),
+		[ postId, postType ]
+	);
 	return (
 		<VStack>
 			<PageStatus
@@ -31,7 +39,11 @@ export default function PageSummary( {
 				postId={ postId }
 				postType={ postType }
 			/>
-			<EditTemplate />
+			<EditTemplate
+				postType={ templateType }
+				postId={ templateId }
+				context={ context }
+			/>
 		</VStack>
 	);
 }

@@ -6,13 +6,13 @@ import WelcomeGuideStyles from './styles';
 import WelcomeGuidePage from './page';
 import WelcomeGuideTemplate from './template';
 
-export default function WelcomeGuide() {
+export default function WelcomeGuide( { context } ) {
 	return (
 		<>
 			<WelcomeGuideEditor />
 			<WelcomeGuideStyles />
 			<WelcomeGuidePage />
-			<WelcomeGuideTemplate />
+			<WelcomeGuideTemplate context={ context } />
 		</>
 	);
 }

@@ -13,8 +13,6 @@ import { safeDecodeURIComponent } from '@wordpress/url';
  * Internal dependencies
  */
 import StatusLabel from './status-label';
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import {
 	SidebarNavigationScreenDetailsPanel,
 	SidebarNavigationScreenDetailsPanelRow,
@@ -22,6 +20,7 @@ import {
 	SidebarNavigationScreenDetailsPanelValue,
 } from '../sidebar-navigation-screen-details-panel';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import useEditedEntityForParams from '../../hooks/use-edited-entity-from-params';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
@@ -102,11 +101,13 @@ function getPageDetails( page ) {
 }
 
 export default function PageDetails( { id } ) {
+	const { context } = useEditedEntityForParams( {
+		postType: 'page',
+		postId: id,
+	} );
 	const { record } = useEntityRecord( 'postType', 'page', id );
 	const { parentTitle, templateTitle, isPostsPage } = useSelect(
 		( select ) => {
-			const { getEditedPostContext } = unlock( select( editSiteStore ) );
-			const postContext = getEditedPostContext();
 			const templates = select( coreStore ).getEntityRecords(
 				'postType',
 				TEMPLATE_POST_TYPE,
@@ -116,8 +117,8 @@ export default function PageDetails( { id } ) {
 			const templateSlug =
 				// Checks that the post type matches the current theme's post type, otherwise
 				// the templateSlug returns 'home'.
-				postContext?.postType === 'page'
-					? postContext?.templateSlug
+				context?.postType === 'page'
+					? context?.templateSlug // todo: check where to get the template slug properly.
 					: null;
 			const _templateTitle =
 				templates && templateSlug
@@ -147,7 +148,7 @@ export default function PageDetails( { id } ) {
 				isPostsPage: record?.id === siteSettings?.page_for_posts,
 			};
 		},
-		[ record?.parent, record?.id ]
+		[ record?.parent, record?.id, context ]
 	);
 	return (
 		<SidebarNavigationScreenDetailsPanel

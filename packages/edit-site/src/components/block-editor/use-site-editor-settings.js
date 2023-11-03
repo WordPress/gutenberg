@@ -83,25 +83,24 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
+export default function useSiteEditorSettings( postType, postId ) {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType, siteSettings } =
-		useSelect(
-			( select ) => {
-				const { canUser, getEntityRecord } = select( coreStore );
-				const { getSettings, getCanvasMode, getEditedPostType } =
-					unlock( select( editSiteStore ) );
-				return {
-					storedSettings: getSettings( setIsInserterOpened ),
-					canvasMode: getCanvasMode(),
-					templateType: getEditedPostType(),
-					siteSettings: canUser( 'read', 'settings' )
-						? getEntityRecord( 'root', 'site' )
-						: undefined,
-				};
-			},
-			[ setIsInserterOpened ]
-		);
+	const { storedSettings, canvasMode, siteSettings } = useSelect(
+		( select ) => {
+			const { canUser, getEntityRecord } = select( coreStore );
+			const { getSettings, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			return {
+				storedSettings: getSettings( setIsInserterOpened ),
+				canvasMode: getCanvasMode(),
+				siteSettings: canUser( 'read', 'settings' )
+					? getEntityRecord( 'root', 'site' )
+					: undefined,
+			};
+		},
+		[ setIsInserterOpened ]
+	);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -115,25 +114,25 @@ export default function useSiteEditorSettings() {
 		restBlockPatternCategories,
 		templateSlug,
 		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord, getUserPatternCategories } =
-			select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-			templateSlug: _record.slug,
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
+	} = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getUserPatternCategories } =
+				select( coreStore );
+			const _record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			return {
+				restBlockPatterns: select( coreStore ).getBlockPatterns(),
+				restBlockPatternCategories:
+					select( coreStore ).getBlockPatternCategories(),
+				templateSlug: _record.slug,
+				userPatternCategories: getUserPatternCategories(),
+			};
+		},
+		[ postType, postId ]
+	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 
 	const blockPatterns = useMemo(
@@ -150,10 +149,10 @@ export default function useSiteEditorSettings() {
 					return (
 						! postTypes ||
 						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
+							postTypes.includes( postType ) )
 					);
 				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
+		[ settingsBlockPatterns, restBlockPatterns, postType ]
 	);
 
 	const blockPatternCategories = useMemo(
@@ -186,6 +185,7 @@ export default function useSiteEditorSettings() {
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 			pageOnFront: siteSettings?.page_on_front,
 			pageForPosts: siteSettings?.page_for_posts,
+			__experimentalPreferPatternsOnRoot: 'wp_template' === postType,
 		};
 	}, [
 		storedSettings,
@@ -197,5 +197,6 @@ export default function useSiteEditorSettings() {
 		archiveLabels.archiveNameLabel,
 		siteSettings?.page_on_front,
 		siteSettings?.page_for_posts,
+		postType,
 	] );
 }

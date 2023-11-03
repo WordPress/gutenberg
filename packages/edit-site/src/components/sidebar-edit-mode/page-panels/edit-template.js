@@ -28,26 +28,17 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-export default function EditTemplate() {
-	const { hasResolved, template, isTemplateHidden, postType } = useSelect(
+export default function EditTemplate( { postType, postId, context } ) {
+	const { hasResolved, template, isTemplateHidden } = useSelect(
 		( select ) => {
-			const { getEditedPostContext, getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
 			const { getCanvasMode, getPageContentFocusType } = unlock(
 				select( editSiteStore )
 			);
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const _context = getEditedPostContext();
-			const _postType = getEditedPostType();
-			const queryArgs = [
-				'postType',
-				getEditedPostType(),
-				getEditedPostId(),
-			];
+			const queryArgs = [ 'postType', postType, postId ];
 
 			return {
-				context: _context,
 				hasResolved: hasFinishedResolution(
 					'getEditedEntityRecord',
 					queryArgs
@@ -56,10 +47,9 @@ export default function EditTemplate() {
 				isTemplateHidden:
 					getCanvasMode() === 'edit' &&
 					getPageContentFocusType() === 'hideTemplate',
-				postType: _postType,
 			};
 		},
-		[]
+		[ postType, postId ]
 	);
 
 	const [ blocks ] = useEntityBlockEditor( 'postType', postType );
@@ -105,9 +95,15 @@ export default function EditTemplate() {
 							>
 								{ __( 'Edit template' ) }
 							</MenuItem>
-							<SwapTemplateButton onClick={ onClose } />
+							<SwapTemplateButton
+								context={ context }
+								onClick={ onClose }
+							/>
 						</MenuGroup>
-						<ResetDefaultTemplate onClick={ onClose } />
+						<ResetDefaultTemplate
+							onClick={ onClose }
+							context={ context }
+						/>
 						{ !! pageContentBlocks?.length && (
 							<MenuGroup>
 								<MenuItem

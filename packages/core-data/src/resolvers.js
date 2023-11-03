@@ -707,3 +707,16 @@ export const getNavigationFallbackId =
 			] );
 		}
 	};
+
+export const getDefaultTemplateId =
+	( postType, slug ) =>
+	async ( { dispatch } ) => {
+		const template = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/templates/lookup', {
+				slug: `${ postType }-${ slug }`,
+			} ),
+		} );
+		if ( template ) {
+			dispatch.receiveDefaultTemplateId( postType, slug, template?.id );
+		}
+	};

@@ -150,6 +150,10 @@ _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
 
+### getDefaultTemplateId
+
+Undocumented declaration.
+
 ### getEditedEntityRecord
 
 Returns the specified entity record, merged with its edits.
@@ -643,6 +647,20 @@ _Parameters_
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given post type and slug.
+
+_Parameters_
+
+-   _postType_ `string`: The post type.
+-   _slug_ `string`: The post slug.
+-   _templateId_ `string`: The resolved template id.
 
 _Returns_
 

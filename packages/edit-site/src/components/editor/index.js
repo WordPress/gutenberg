@@ -46,6 +46,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 
@@ -72,17 +73,20 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( {
+	postType,
+	postId,
+	context,
+	listViewToggleElement,
+} ) {
+	const isLoading = useIsSiteEditorLoading( postType, postId );
 	const {
 		record: editedPost,
 		getTitle,
 		isLoaded: hasLoadedPost,
-	} = useEditedEntityRecord();
-
-	const { id: editedPostId, type: editedPostType } = editedPost;
+	} = useEditedEntityRecord( postType, postId );
 
 	const {
-		context,
 		editorMode,
 		canvasMode,
 		blockEditorMode,
@@ -94,7 +98,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		hasPageContentFocus,
 	} = useSelect( ( select ) => {
 		const {
-			getEditedPostContext,
 			getEditorMode,
 			getCanvasMode,
 			isInserterOpened,
@@ -107,7 +110,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
-			context: getEditedPostContext(),
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
 			blockEditorMode: __unstableGetEditorMode(),
@@ -143,7 +145,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		? __( 'List View' )
 		: __( 'Block Library' );
 	const blockContext = useMemo( () => {
-		const { postType, postId, ...nonPostFields } = context ?? {};
+		const { postType: _a, postId: _b, ...nonPostFields } = context ?? {};
 		return {
 			...( hasPageContentFocus ? context : nonPostFields ),
 			queryContext: [
@@ -166,7 +168,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s ‹ Editor' ),
 			getTitle(),
-			POST_TYPE_LABELS[ editedPostType ] ??
+			POST_TYPE_LABELS[ postType ] ??
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
@@ -190,16 +192,21 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	return (
 		<>
 			{ isLoading ? <CanvasLoader id={ loadingProgressId } /> : null }
-			{ isEditMode && <WelcomeGuide /> }
+			{ isEditMode && <WelcomeGuide context={ context } /> }
 			<EntityProvider kind="root" type="site">
-				<EntityProvider
-					kind="postType"
-					type={ editedPostType }
-					id={ editedPostId }
-				>
+				<EntityProvider kind="postType" type={ postType } id={ postId }>
 					<BlockContextProvider value={ blockContext }>
-						<SidebarComplementaryAreaFills />
-						{ isEditMode && <StartTemplateOptions /> }
+						<SidebarComplementaryAreaFills
+							postType={ postType }
+							postId={ postId }
+							context={ context }
+						/>
+						{ isEditMode && (
+							<StartTemplateOptions
+								postType={ postType }
+								postId={ postId }
+							/>
+						) }
 						<InterfaceSkeleton
 							isDistractionFree={ true }
 							enableRegionNavigation={ false }
@@ -217,16 +224,28 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 									{ isEditMode && <EditorNotices /> }
 									{ showVisualEditor && editedPost && (
 										<>
-											<BlockEditor />
+											<BlockEditor
+												postType={ postType }
+												postId={ postId }
+												context={ context }
+											/>
 											<BlockRemovalWarningModal
 												rules={ blockRemovalRules }
 											/>
-											<PatternModal />
+											<PatternModal
+												postType={ postType }
+												postId={ postId }
+											/>
 										</>
 									) }
 									{ editorMode === 'text' &&
 										editedPost &&
-										isEditMode && <CodeEditor /> }
+										isEditMode && (
+											<CodeEditor
+												postType={ postType }
+												postId={ postId }
+											/>
+										) }
 									{ hasLoadedPost && ! editedPost && (
 										<Notice
 											status="warning"

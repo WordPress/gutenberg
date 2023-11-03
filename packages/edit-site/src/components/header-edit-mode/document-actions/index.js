@@ -47,24 +47,22 @@ const typeLabels = {
 	[ TEMPLATE_PART_POST_TYPE ]: __( 'Editing template part:' ),
 };
 
-export default function DocumentActions() {
-	const isPage = useSelect(
-		( select ) => select( editSiteStore ).isPage(),
-		[]
+export default function DocumentActions( props ) {
+	const isPage = props.context?.postId;
+	return isPage ? (
+		<PageDocumentActions { ...props } />
+	) : (
+		<TemplateDocumentActions { ...props } />
 	);
-	return isPage ? <PageDocumentActions /> : <TemplateDocumentActions />;
 }
 
-function PageDocumentActions() {
+function PageDocumentActions( { postType, postId, context } ) {
 	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
 		( select ) => {
-			const {
-				hasPageContentFocus: _hasPageContentFocus,
-				getEditedPostContext,
-			} = select( editSiteStore );
+			const { hasPageContentFocus: _hasPageContentFocus } =
+				select( editSiteStore );
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const context = getEditedPostContext();
 			const queryArgs = [ 'postType', context.postType, context.postId ];
 			const page = getEditedEntityRecord( ...queryArgs );
 			return {
@@ -77,7 +75,7 @@ function PageDocumentActions() {
 				title: page?.title,
 			};
 		},
-		[]
+		[ context ]
 	);
 
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
@@ -116,12 +114,17 @@ function PageDocumentActions() {
 		<TemplateDocumentActions
 			className="is-animated"
 			onBack={ () => setHasPageContentFocus( true ) }
+			postType={ postType }
+			postId={ postId }
 		/>
 	);
 }
 
-function TemplateDocumentActions( { className, onBack } ) {
-	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord();
+function TemplateDocumentActions( { className, onBack, postType, postId } ) {
+	const { isLoaded, record, getTitle, icon } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 
 	if ( ! isLoaded ) {
 		return null;

@@ -305,6 +305,8 @@ export const setPage =
 				// Page's `template` is empty, that indicates we need to use the default template for the page.
 				template = await getDefaultTemplate( editedEntity?.slug );
 			}
+
+			// If we're not rendering a specific page, use the front page template.
 		}
 
 		if ( ! template ) {

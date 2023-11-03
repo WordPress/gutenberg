@@ -12,8 +12,11 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 
 const MAX_LOADING_TIME = 10000; // 10 seconds
 
-export function useIsSiteEditorLoading() {
-	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
+export function useIsSiteEditorLoading( postType, postId ) {
+	const { isLoaded: hasLoadedPost } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 	const [ loaded, setLoaded ] = useState( false );
 	const inLoadingPause = useSelect(
 		( select ) => {

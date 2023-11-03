@@ -39,22 +39,22 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-export default function HeaderEditMode( { setListViewToggleElement } ) {
+export default function HeaderEditMode( {
+	setListViewToggleElement,
+	postType,
+	postId,
+	context,
+} ) {
 	const {
 		deviceType,
-		templateType,
 		isDistractionFree,
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
 		editorCanvasView,
 	} = useSelect( ( select ) => {
-		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
-			select( editSiteStore );
+		const { __experimentalGetPreviewDeviceType } = select( editSiteStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
-
-		const postType = getEditedPostType();
-
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
@@ -63,7 +63,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			templateType: postType,
 			blockEditorMode: __unstableGetEditorMode(),
 			homeUrl: getUnstableBase()?.home,
 			showIconLabels: getPreference(
@@ -86,7 +85,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 
-	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
+	const isFocusMode = FOCUSABLE_ENTITIES.includes( postType );
 
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
@@ -125,7 +124,11 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
-						<DocumentActions />
+						<DocumentActions
+							postType={ postType }
+							postId={ postId }
+							context={ context }
+						/>
 					) }
 				</div>
 			) }
@@ -174,7 +177,11 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					<MoreMenu
+						showIconLabels={ showIconLabels }
+						postType={ postType }
+						postId={ postId }
+					/>
 				</motion.div>
 			</div>
 		</div>

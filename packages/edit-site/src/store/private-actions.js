@@ -11,7 +11,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 export const setCanvasMode =
 	( mode ) =>
-	( { registry, dispatch, select } ) => {
+	( { registry, dispatch } ) => {
 		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
@@ -30,8 +30,9 @@ export const setCanvasMode =
 		) {
 			dispatch.setIsListViewOpened( true );
 		}
+		// Todo check this.
 		// Switch focus away from editing the template when switching to view mode.
-		if ( mode === 'view' && select.isPage() ) {
+		if ( mode === 'view' ) {
 			dispatch.setHasPageContentFocus( true );
 		}
 	};

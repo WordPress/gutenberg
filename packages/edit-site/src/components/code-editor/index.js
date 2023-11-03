@@ -20,24 +20,30 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function CodeEditor() {
+export default function CodeEditor( { postType, postId } ) {
 	const instanceId = useInstanceId( CodeEditor );
-	const { shortcut, content, blocks, type, id } = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const _type = getEditedPostType();
-		const _id = getEditedPostId();
-		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
+	const { shortcut, content, blocks } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
+			const { getShortcutRepresentation } = select(
+				keyboardShortcutsStore
+			);
+			const editedRecord = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
 
-		return {
-			shortcut: getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-			content: editedRecord?.content,
-			blocks: editedRecord?.blocks,
-			type: _type,
-			id: _id,
-		};
-	}, [] );
+			return {
+				shortcut: getShortcutRepresentation(
+					'core/edit-site/toggle-mode'
+				),
+				content: editedRecord?.content,
+				blocks: editedRecord?.blocks,
+			};
+		},
+		[ postType, postId ]
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
 	// Replicates the logic found in getEditedPostContent().
 	const realContent = useMemo( () => {
@@ -77,7 +83,7 @@ export default function CodeEditor() {
 					dir="auto"
 					value={ realContent }
 					onChange={ ( event ) => {
-						editEntityRecord( 'postType', type, id, {
+						editEntityRecord( 'postType', postType, postId, {
 							content: event.target.value,
 							blocks: undefined,
 							selection: undefined,

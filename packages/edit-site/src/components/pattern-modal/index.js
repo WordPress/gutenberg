@@ -9,11 +9,11 @@ export const PATTERN_MODALS = {
 	duplicate: 'edit-site/pattern-duplicate',
 };
 
-export default function PatternModal() {
+export default function PatternModal( props ) {
 	return (
 		<>
-			<PatternDuplicateModal />
-			<PatternRenameModal />
+			<PatternDuplicateModal { ...props } />
+			<PatternRenameModal { ...props } />
 		</>
 	);
 }

@@ -18,8 +18,8 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 const { DuplicatePatternModal } = unlock( patternsPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function PatternDuplicateModal() {
-	const { record } = useEditedEntityRecord();
+export default function PatternDuplicateModal( { postType, postId } ) {
+	const { record } = useEditedEntityRecord( postType, postId );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const { closeModal } = useDispatch( interfaceStore );
 	const history = useHistory();

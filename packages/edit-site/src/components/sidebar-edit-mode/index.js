@@ -27,7 +27,7 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 );
 export const SidebarInspectorFill = InspectorFill;
 
-export function SidebarComplementaryAreaFills() {
+export function SidebarComplementaryAreaFills( { postType, postId, context } ) {
 	const {
 		sidebar,
 		isEditorSidebarOpened,
@@ -80,15 +80,28 @@ export function SidebarComplementaryAreaFills() {
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
 				closeLabel={ __( 'Close Settings' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
+				header={
+					<SettingsHeader
+						postType={ postType }
+						sidebarName={ sidebarName }
+					/>
+				}
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<>
 						{ hasPageContentFocus ? (
-							<PagePanels />
+							<PagePanels
+								postType={ postType }
+								postId={ postId }
+								context={ context }
+							/>
 						) : (
-							<TemplatePanel />
+							<TemplatePanel
+								postType={ postType }
+								postId={ postId }
+								context={ context }
+							/>
 						) }
 						<PluginTemplateSettingPanel.Slot />
 					</>

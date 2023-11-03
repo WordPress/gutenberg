@@ -46,6 +46,7 @@ export interface State {
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
+	defaultTemplates: Record< string, Record< string, string > >;
 }
 
 type EntityRecordKey = string | number;
@@ -1350,4 +1351,12 @@ export function getCurrentThemeGlobalStylesRevisions(
 	}
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
+}
+
+export function getDefaultTemplateId(
+	state: State,
+	postType: string,
+	slug: string
+): string {
+	return state.defaultTemplates[ postType ]?.[ slug ];
 }

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
 import { MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
@@ -9,19 +8,13 @@ import { useEntityRecord } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import {
-	useCurrentTemplateSlug,
-	useEditedPostContext,
-	useIsPostsPage,
-} from './hooks';
-import { store as editSiteStore } from '../../../store';
+import { useCurrentTemplateSlug, useIsPostsPage } from './hooks';
 
-export default function ResetDefaultTemplate( { onClick } ) {
-	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPage = useIsPostsPage();
-	const { postType, postId } = useEditedPostContext();
+export default function ResetDefaultTemplate( { onClick, context } ) {
+	const currentTemplateSlug = useCurrentTemplateSlug( context );
+	const isPostsPage = useIsPostsPage( context?.postId );
+	const { postType, postId } = context;
 	const entity = useEntityRecord( 'postType', postType, postId );
-	const { setPage } = useDispatch( editSiteStore );
 	// The default template in a post is indicated by an empty string.
 	if ( ! currentTemplateSlug || isPostsPage ) {
 		return null;
@@ -32,9 +25,6 @@ export default function ResetDefaultTemplate( { onClick } ) {
 				onClick={ async () => {
 					entity.edit( { template: '' }, { undoIgnore: true } );
 					onClick();
-					await setPage( {
-						context: { postType, postId },
-					} );
 				} }
 			>
 				{ __( 'Use default template' ) }

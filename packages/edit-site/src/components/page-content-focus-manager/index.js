@@ -12,7 +12,7 @@ import EditTemplateNotification from './edit-template-notification';
 import BackToPageNotification from './back-to-page-notification';
 import { unlock } from '../../lock-unlock';
 
-export default function PageContentFocusManager( { contentRef } ) {
+export default function PageContentFocusManager( { contentRef, context } ) {
 	const { hasPageContentFocus, pageContentFocusType, canvasMode } = useSelect(
 		( select ) => {
 			const { getPageContentFocusType, getCanvasMode } = unlock(
@@ -45,7 +45,7 @@ export default function PageContentFocusManager( { contentRef } ) {
 		<>
 			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
 			<EditTemplateNotification contentRef={ contentRef } />
-			<BackToPageNotification />
+			<BackToPageNotification context={ context } />
 		</>
 	);
 }

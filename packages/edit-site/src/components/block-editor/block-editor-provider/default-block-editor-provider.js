@@ -28,18 +28,22 @@ const noop = () => {};
  * allow editing of the page content only.
  *
  * @param {Object}  props
+ * @param {string}  props.postType
+ * @param {string}  props.postId
  * @param {Element} props.children
  */
-export default function DefaultBlockEditorProvider( { children } ) {
-	const settings = useSiteEditorSettings();
+export default function DefaultBlockEditorProvider( {
+	postType,
+	postId,
+	children,
+} ) {
+	const settings = useSiteEditorSettings( postType, postId );
 
-	const { templateType, isTemplateHidden } = useSelect( ( select ) => {
-		const { getEditedPostType } = select( editSiteStore );
+	const { isTemplateHidden } = useSelect( ( select ) => {
 		const { getPageContentFocusType, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
 		return {
-			templateType: getEditedPostType(),
 			isTemplateHidden:
 				getCanvasMode() === 'edit' &&
 				getPageContentFocusType() === 'hideTemplate',
@@ -49,7 +53,7 @@ export default function DefaultBlockEditorProvider( { children } ) {
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		templateType
+		postType
 	);
 	const pageContentBlocks = usePageContentBlocks( {
 		blocks,

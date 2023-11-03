@@ -35,26 +35,20 @@ const LAYOUT = {
 	alignments: [],
 };
 
-export default function SiteEditorCanvas() {
+export default function SiteEditorCanvas( { postType, postId, context } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-
-		const _templateType = getEditedPostType();
+	const isFocusMode = FOCUSABLE_ENTITIES.includes( postType );
+	const { isViewMode } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
 		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
 			isViewMode: getCanvasMode() === 'view',
 		};
 	}, [] );
 
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
-	const settings = useSiteEditorSettings();
+	const settings = useSiteEditorSettings( postType, postId );
 
 	const { hasBlocks } = useSelect( ( select ) => {
 		const { getBlockCount } = select( blockEditorStore );
@@ -74,7 +68,7 @@ export default function SiteEditorCanvas() {
 		! isMobileViewport;
 
 	const contentRef = useRef();
-	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
+	const isTemplateTypeNavigation = postType === NAVIGATION_POST_TYPE;
 
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 
@@ -143,7 +137,10 @@ export default function SiteEditorCanvas() {
 					)
 				}
 			</EditorCanvasContainer.Slot>
-			<PageContentFocusManager contentRef={ contentRef } />
+			<PageContentFocusManager
+				contentRef={ contentRef }
+				context={ context }
+			/>
 		</>
 	);
 }

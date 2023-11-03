@@ -9,22 +9,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
-
-export default function CopyContentMenuItem() {
+export default function CopyContentMenuItem( { postType, postId } ) {
 	const { createNotice } = useDispatch( noticesStore );
-	const { getEditedPostId, getEditedPostType } = useSelect( editSiteStore );
 	const { getEditedEntityRecord } = useSelect( coreStore );
 
 	function getText() {
-		const record = getEditedEntityRecord(
-			'postType',
-			getEditedPostType(),
-			getEditedPostId()
-		);
+		const record = getEditedEntityRecord( 'postType', postType, postId );
 		if ( ! record ) {
 			return '';
 		}

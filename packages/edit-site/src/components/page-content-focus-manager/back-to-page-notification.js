@@ -14,20 +14,24 @@ import { store as editSiteStore } from '../../store';
 /**
  * Component that displays a 'You are editing a template' notification when the
  * user switches from focusing on editing page content to editing a template.
+ *
+ * @param {Object} props         The component props.
+ * @param {Object} props.context The context of the current page.
  */
-export default function BackToPageNotification() {
-	useBackToPageNotification();
+export default function BackToPageNotification( { context } ) {
+	useBackToPageNotification( context );
 	return null;
 }
 
 /**
  * Hook that displays a 'You are editing a template' notification when the user
  * switches from focusing on editing page content to editing a template.
+ *
+ * @param {Object} context The context of the current page.
  */
-export function useBackToPageNotification() {
-	const { isPage, hasPageContentFocus } = useSelect(
+export function useBackToPageNotification( context ) {
+	const { hasPageContentFocus } = useSelect(
 		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
 			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
 		} ),
 		[]
@@ -38,6 +42,7 @@ export function useBackToPageNotification() {
 
 	const { createInfoNotice } = useDispatch( noticesStore );
 	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	const isPage = !! context?.postId;
 
 	useEffect( () => {
 		if (

@@ -12,7 +12,6 @@ import { getQueryArgs } from '@wordpress/url';
  */
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -26,9 +25,6 @@ export default function SidebarNavigationScreenPattern() {
 	} = navigator;
 	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
-	useInitEditedEntityFromURL();
-
 	const patternDetails = usePatternDetails( postType, postId );
 
 	// The absence of a category type in the query params for template parts

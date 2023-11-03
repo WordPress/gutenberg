@@ -11,7 +11,6 @@ import { navigation, symbol } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
 import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
 import LastRevision from './last-revision';
@@ -24,18 +23,17 @@ const CARD_ICONS = {
 	wp_navigation: navigation,
 };
 
-export default function TemplatePanel() {
-	const { title, description, icon, record, postType } = useSelect(
+export default function TemplatePanel( { postType, postId, context } ) {
+	const { title, description, icon, record } = useSelect(
 		( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
 			const { getEditedEntityRecord } = select( coreStore );
 			const { __experimentalGetTemplateInfo: getTemplateInfo } =
 				select( editorStore );
-
-			const type = getEditedPostType();
-			const postId = getEditedPostId();
-			const _record = getEditedEntityRecord( 'postType', type, postId );
+			const _record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
 			const info = getTemplateInfo( _record );
 
 			return {
@@ -43,10 +41,9 @@ export default function TemplatePanel() {
 				description: info.description,
 				icon: info.icon,
 				record: _record,
-				postType: type,
 			};
 		},
-		[]
+		[ postType, postId ]
 	);
 
 	if ( ! title && ! description ) {
@@ -60,11 +57,13 @@ export default function TemplatePanel() {
 				title={ decodeEntities( title ) }
 				icon={ CARD_ICONS[ record?.type ] ?? icon }
 				description={ decodeEntities( description ) }
-				actions={ <TemplateActions template={ record } /> }
+				actions={
+					<TemplateActions template={ record } context={ context } />
+				}
 			>
 				<TemplateAreas />
 			</SidebarCard>
-			<LastRevision />
+			<LastRevision postType={ postType } postId={ postId } />
 			{ postType === PATTERN_TYPES.user && (
 				<PatternCategories post={ record } />
 			) }

@@ -14,7 +14,7 @@ import isTemplateRevertable from '../../../utils/is-template-revertable';
 import ReplaceTemplateButton from './replace-template-button';
 import { useAvailablePatterns } from './hooks';
 
-export default function Actions( { template } ) {
+export default function Actions( { template, context } ) {
 	const availablePatterns = useAvailablePatterns( template );
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const isRevertable = isTemplateRevertable( template );
@@ -52,6 +52,7 @@ export default function Actions( { template } ) {
 						availableTemplates={ availablePatterns }
 						template={ template }
 						onClick={ onClose }
+						context={ context }
 					/>
 				</MenuGroup>
 			) }

@@ -8,18 +8,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
 import { TEMPLATE_POST_TYPE } from '../../../utils/constants';
 
-export function useEditedPostContext() {
-	return useSelect(
-		( select ) => select( editSiteStore ).getEditedPostContext(),
-		[]
-	);
-}
-
-export function useIsPostsPage() {
-	const { postId } = useEditedPostContext();
+export function useIsPostsPage( postId ) {
 	return useSelect(
 		( select ) =>
 			+postId ===
@@ -44,9 +35,9 @@ function useTemplates() {
 	);
 }
 
-export function useAvailableTemplates() {
-	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPage = useIsPostsPage();
+export function useAvailableTemplates( context ) {
+	const currentTemplateSlug = useCurrentTemplateSlug( context );
+	const isPostsPage = useIsPostsPage( context?.postId );
 	const templates = useTemplates();
 	return useMemo(
 		() =>
@@ -62,8 +53,8 @@ export function useAvailableTemplates() {
 	);
 }
 
-export function useCurrentTemplateSlug() {
-	const { postType, postId } = useEditedPostContext();
+export function useCurrentTemplateSlug( context ) {
+	const { postType, postId } = context;
 	const templates = useTemplates();
 	const entityTemplate = useSelect(
 		( select ) => {
