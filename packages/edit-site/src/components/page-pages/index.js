@@ -21,6 +21,8 @@ import { DataViews } from '../dataviews';
 import { DEFAULT_STATUSES, default as DEFAULT_VIEWS } from './default-views';
 import {
 	useTrashPostAction,
+	usePermanentlyDeletePostAction,
+	useRestorePostAction,
 	postRevisionsAction,
 	viewPostAction,
 	useEditPostAction,
@@ -225,15 +227,24 @@ export default function PagePages() {
 	);
 
 	const trashPostAction = useTrashPostAction();
+	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
+	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
 			viewPostAction,
 			trashPostAction,
+			restorePostAction,
+			permanentlyDeletePostAction,
 			editPostAction,
 			postRevisionsAction,
 		],
-		[ trashPostAction, editPostAction ]
+		[
+			trashPostAction,
+			permanentlyDeletePostAction,
+			restorePostAction,
+			editPostAction,
+		]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
