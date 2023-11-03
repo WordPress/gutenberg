@@ -4,15 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 
-// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
-// The reason for that is to match the default statuses coming from the endpoint
-// (entity request and useEffect to update the view).
-export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
-
 const DEFAULT_PAGE_BASE = {
 	type: 'list',
 	search: '',
-	filters: [ { field: 'status', operator: 'in', value: DEFAULT_STATUSES } ],
+	filters: [],
 	page: 1,
 	perPage: 5,
 	sort: {

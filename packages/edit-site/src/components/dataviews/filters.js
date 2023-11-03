@@ -36,8 +36,8 @@ export default function Filters( { fields, view, onChangeView } ) {
 			if ( 'enumeration' === filterIndex[ id ]?.type ) {
 				const elements = [
 					{
-						value: filter.resetValue || '',
-						label: filter.resetLabel || __( 'All' ),
+						value: '',
+						label: __( 'All' ),
 					},
 					...( field.elements || [] ),
 				];
