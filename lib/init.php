@@ -91,6 +91,7 @@ if ( ! function_exists( 'register_gutenberg_render_blocks_endpoint' ) ) {
 			array(
 				'methods'  => 'POST',
 				'callback' => 'gutenberg_render_blocks_from_request',
+				'permission_callback' => '__return_true',
 			)
 		);
 	}
