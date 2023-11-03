@@ -174,7 +174,6 @@ const field = [
 
 A filter is an object that may contain the following properties:
 
-- `id`: unique identifier for the filter. Matches the entity query param. Field filters may omit it, in which case the field's `id` will be used.
 - `name`: nice looking name for the filter. Field filters may omit it, in which case the field's `header` will be used.
 - `type`: the type of filter. Only `enumeration` is supported at the moment.
 - `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
@@ -194,9 +193,9 @@ const field = [
 		filters: [
 			'enumeration',
 			{ type: 'enumeration' },
-			{ id: 'author', type: 'enumeration' },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ) },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ), elements: authors },
+			{ type: 'enumeration' },
+			{ type: 'enumeration', name: __( 'Author' ) },
+			{ type: 'enumeration', name: __( 'Author' ), elements: authors },
 		],
 	}
 ];
