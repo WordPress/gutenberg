@@ -52,19 +52,9 @@
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed {
-		position: fixed;
-		top: $admin-bar-height-big + $header-height + 1px; // +1px to avoid overlap with the header border
-		left: 0;
-		width: 100%;
-
-		@include break-medium() {
-			width: auto;
-			position: static;
-			// remove the border
-			border: none;
-			flex-shrink: 2;
-			display: flex; // Allow for flex-shrink on the block toolbar
-		}
+		border: none;
+		flex-shrink: 2;
+		display: flex; // Allow for flex-shrink on the block toolbar
 
 		.block-editor-block-toolbar {
 			overflow-x: auto; // Allow only the block tools to overflow scroll to make room in the header.

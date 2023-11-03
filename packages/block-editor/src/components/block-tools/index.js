@@ -170,6 +170,13 @@ export default function BlockTools( {
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
+	// Conditions for fixed toolbar
+	// 1. Not zoom out mode
+	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
+	// 3. Fixed toolbar is enabled
+	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
+	const isTopToolbarFill = isTopToolbar && blockToolsSlot?.ref?.current;
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
@@ -180,21 +187,23 @@ export default function BlockTools( {
 					/>
 				) }
 				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-				{ ! isZoomOutMode &&
-					( hasFixedToolbar || ! isLargeViewport ) &&
-					( blockToolsSlot?.ref?.current ? (
-						<Fill name="__experimentalSelectedBlockTools">
-							<BlockContextualToolbar
-								ref={ selectedBlockToolsRef }
-								isFixed
-							/>
-						</Fill>
-					) : (
+				{ isTopToolbarFill && (
+					<Fill name="__experimentalSelectedBlockTools">
 						<BlockContextualToolbar
 							ref={ selectedBlockToolsRef }
 							isFixed
 						/>
-					) ) }
+					</Fill>
+				) }
+
+				{ ! isTopToolbarFill &&
+					( isTopToolbar || ! isLargeViewport ) && ( // Small viewports always get a fixed toolbar
+						<BlockContextualToolbar
+							ref={ selectedBlockToolsRef }
+							isFixed
+						/>
+					) }
+
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
 						__unstableContentRef={ __unstableContentRef }
@@ -212,8 +221,8 @@ export default function BlockTools( {
 				) }
 
 				{ /* Used for the inline rich text toolbar. */ }
-				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-				{ blockToolsSlot?.ref?.current ? (
+				{ /* Only render in the fill if we're also using the top toolbar fill */ }
+				{ isTopToolbarFill ? (
 					<Fill name="__experimentalSelectedBlockTools">
 						<Popover.Slot
 							name="block-toolbar"

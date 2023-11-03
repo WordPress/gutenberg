@@ -146,21 +146,19 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						showIconLabels={ showIconLabels }
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
-					{ hasFixedToolbar && (
+					{ hasFixedToolbar && isLargeViewport && (
 						<>
 							<Slot
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
-										'is-collapsed':
-											isBlockToolsCollapsed &&
-											isLargeViewport,
+										'is-collapsed': isBlockToolsCollapsed,
 									}
 								) }
 								name="__experimentalSelectedBlockTools"
 								bubblesVirtually
 							/>
-							{ isLargeViewport && hasBlockSelected && (
+							{ hasBlockSelected && (
 								<Button
 									className="edit-site-header-edit-mode__block-tools-toggle"
 									icon={
