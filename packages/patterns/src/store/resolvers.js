@@ -15,9 +15,10 @@ export const getPatternCategories =
 		} );
 		const mappedUserCategories =
 			userCategories?.map( ( userCategory ) => ( {
-				...userCategory,
 				label: decodeEntities( userCategory.name ),
 				name: userCategory.slug,
+				id: userCategory.id,
+				description: userCategory.description,
 			} ) ) || [];
 		const uniqueCategories = new Map();
 		[ ...mappedUserCategories, ...coreCategories ].forEach(
@@ -28,12 +29,10 @@ export const getPatternCategories =
 					// the `query` slug to avoid any confusion.
 					category.name !== 'query'
 				) {
-					// We need to store the name separately as this is used as the slug in the
-					// taxonomy and may vary from the label.
 					uniqueCategories.set( category.label, {
 						label: category.label,
-						value: category.label,
 						name: category.name,
+						description: category.description,
 						id: category.id,
 					} );
 				}
