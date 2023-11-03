@@ -168,22 +168,27 @@
 	button {
 		opacity: 0;
 		border: none;
-		background: #000;
+		background-color: rgb(90 90 90 / 25%);
+		backdrop-filter: blur($grid-unit-20) saturate(180%);
 		cursor: zoom-in;
-		width: 24px;
-		height: 24px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 20px;
+		height: 20px;
 		position: absolute;
 		z-index: 100;
-		top: 10px;
-		right: 10px;
+		top: 16px;
+		right: 16px;
 		text-align: center;
 		padding: 0;
-		border-radius: 10%;
+		border-radius: 4px;
+		transition: opacity 0.2s ease;
 
 		&:focus-visible {
-			outline: 5px auto #212121;
-			outline: 5px auto -webkit-focus-ring-color;
-			outline-offset: 5px;
+			outline: 3px auto rgb(90 90 90 / 25%);
+			outline: 3px auto -webkit-focus-ring-color;
+			outline-offset: 3px;
 		}
 
 		&:hover {
@@ -198,7 +203,7 @@
 		&:hover,
 		&:focus,
 		&:not(:hover):not(:active):not(.has-background) {
-			background: #000;
+			background-color: rgb(90 90 90 / 25%);
 			border: none;
 		}
 	}
