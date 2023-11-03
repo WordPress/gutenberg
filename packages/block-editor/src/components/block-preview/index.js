@@ -22,6 +22,7 @@ import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
+	html,
 	viewportWidth = 1200,
 	minHeight,
 	additionalStyles = [],
@@ -73,6 +74,7 @@ export function BlockPreview( {
 		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
+				html={ html }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>

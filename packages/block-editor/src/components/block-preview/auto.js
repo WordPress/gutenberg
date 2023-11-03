@@ -21,6 +21,7 @@ const MAX_HEIGHT = 2000;
 
 function ScaledBlockPreview( {
 	viewportWidth,
+	html,
 	containerWidth,
 	minHeight,
 	additionalStyles = [],
@@ -110,7 +111,12 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
+				<div
+					dangerouslySetInnerHTML={ {
+						__html: html,
+					} }
+				></div>
+				{ /* <MemoizedBlockList renderAppender={ false } /> */ }
 			</Iframe>
 		</Disabled>
 	);
