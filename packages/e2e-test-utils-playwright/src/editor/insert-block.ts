@@ -9,6 +9,17 @@ interface BlockRepresentation {
 	innerBlocks?: BlockRepresentation[];
 }
 
+interface InsertedBlock {
+	clientId: string;
+	name: string;
+	isValid: boolean;
+	attributes: {
+		content: string;
+		dropCap: boolean;
+	};
+	innerBlocks: InsertedBlock[];
+}
+
 /**
  * Insert a block.
  *
@@ -23,12 +34,12 @@ async function insertBlock(
 		() => window?.wp?.blocks && window?.wp?.data
 	);
 
-	await this.page.evaluate( ( _blockRepresentation ) => {
+	const { clientId } = await this.page.evaluate( ( _blockRepresentation ) => {
 		function recursiveCreateBlock( {
 			name,
 			attributes = {},
 			innerBlocks = [],
-		}: BlockRepresentation ): Object {
+		}: BlockRepresentation ): InsertedBlock {
 			return window.wp.blocks.createBlock(
 				name,
 				attributes,
@@ -40,7 +51,11 @@ async function insertBlock(
 		const block = recursiveCreateBlock( _blockRepresentation );
 
 		window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
+
+		return block;
 	}, blockRepresentation );
+
+	return this.canvas.locator( `#block-${ clientId }` );
 }
 
 export type { BlockRepresentation };
