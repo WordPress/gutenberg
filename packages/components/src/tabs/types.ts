@@ -4,11 +4,6 @@
 // eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 
-/**
- * Internal dependencies
- */
-import type { IconType } from '../icon';
-
 export type TabsContextProps =
 	| {
 			/**
@@ -105,10 +100,6 @@ export type TabProps = {
 	 * The class name to apply to the tab button.
 	 */
 	className?: string;
-	/**
-	 * The icon used for the tab button.
-	 */
-	icon?: IconType;
 	/**
 	 * Determines if the tab button should be disabled.
 	 *
