@@ -27,6 +27,7 @@ const results = {
 	inserterHover: [],
 	inserterSearch: [],
 	listViewOpen: [],
+	navigate: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -106,6 +107,7 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 		}
 	} );
+
 	test.describe( 'Typing', () => {
 		let draftURL = null;
 
@@ -186,6 +188,58 @@ test.describe( 'Site Editor Performance', () => {
 				);
 			}
 		} );
+	} );
+
+	test.describe( 'Navigating', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentythree' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		const iterations = 5;
+		for ( let i = 1; i <= iterations; i++ ) {
+			test( `Run the test (${ i } of ${ iterations })`, async ( {
+				admin,
+				page,
+				metrics,
+			} ) => {
+				await admin.visitSiteEditor( {
+					path: '/wp_template',
+				} );
+
+				// Wait for the loader overlay to disappear. This is necessary
+				// because the overlay is still visible for a while after the editor
+				// canvas is ready, and we don't want it to affect the typing
+				// timings.
+				await page
+					.locator(
+						// Spinner was used instead of the progress bar in an earlier version of the site editor.
+						'.edit-site-canvas-loader, .edit-site-canvas-spinner'
+					)
+					.waitFor( { state: 'hidden' } );
+				// Additional time to ensure the browser is completely idle.
+				// eslint-disable-next-line playwright/no-wait-for-timeout
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				await page
+					.getByRole( 'button', { name: 'Single Posts' } )
+					.click();
+
+				// Stop tracing.
+				await metrics.stopTracing();
+
+				// Get the durations.
+				const [ mouseClickEvents ] = metrics.getClickEventDurations();
+
+				// Save the results.
+				results.navigate.push( mouseClickEvents[ 0 ] );
+			} );
+		}
 	} );
 } );
 

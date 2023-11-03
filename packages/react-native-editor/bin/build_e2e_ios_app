@@ -2,7 +2,12 @@
 
 set -o pipefail
 
-DEFAULT_DESTINATION='platform=iOS Simulator,name=iPhone 14'
+# Load configurations from JSON file
+CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
+IOS_DEVICE_NAME=$(jq -r '.ios.local.deviceName' "$CONFIG_FILE")
+IOS_PLATFORM_VERSION=$(jq -r '.ios.local.platformVersion' "$CONFIG_FILE")
+
+DEFAULT_DESTINATION="platform=iOS Simulator,name=$IOS_DEVICE_NAME,OS=$IOS_PLATFORM_VERSION"
 if [[ -z "${RN_EDITOR_E2E_IOS_DESTINATION-}" ]]; then
 	DESTINATION="$DEFAULT_DESTINATION"
 else

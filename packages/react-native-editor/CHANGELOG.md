@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix error when pasting deeply nested structure content [#55613]
 
 ## 1.107.0
 -   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]

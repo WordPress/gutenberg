@@ -72,7 +72,7 @@ function CustomClassNameControls( { attributes, setAttributes } ) {
  *
  * @return {Component} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent(
+export const withCustomClassNameControls = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
 			const hasCustomClassName = hasBlockSupport(
@@ -94,7 +94,7 @@ export const withInspectorControl = createHigherOrderComponent(
 			);
 		};
 	},
-	'withInspectorControl'
+	'withCustomClassNameControls'
 );
 
 /**
@@ -163,17 +163,17 @@ export function addTransforms( result, source, index, results ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/custom-class-name/attribute',
+	'core/editor/custom-class-name/attribute',
 	addAttribute
 );
 addFilter(
 	'editor.BlockEdit',
-	'core/editor/custom-class-name/with-inspector-control',
-	withInspectorControl
+	'core/editor/custom-class-name/with-inspector-controls',
+	withCustomClassNameControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',
-	'core/custom-class-name/save-props',
+	'core/editor/custom-class-name/save-props',
 	addSaveProps
 );
 

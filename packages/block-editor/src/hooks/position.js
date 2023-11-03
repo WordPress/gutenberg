@@ -329,7 +329,7 @@ export function PositionPanel( props ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withInspectorControls = createHigherOrderComponent(
+export const withPositionControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
 		const positionSupport = hasBlockSupport(
@@ -346,7 +346,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withInspectorControls'
+	'withPositionControls'
 );
 
 /**
@@ -413,5 +413,5 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/position/with-inspector-controls',
-	withInspectorControls
+	withPositionControls
 );

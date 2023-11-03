@@ -81,7 +81,17 @@ require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/footnotes.php';
 
+/*
+ * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
+ * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
+ * always be loaded so that Gutenberg code can run the newest version of the Tag Processor.
+ */
 require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
+
+/*
+ * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
+ * WordPress before it was introduced, these verbatim Core files will be missing.
+ */
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
@@ -94,7 +104,6 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';

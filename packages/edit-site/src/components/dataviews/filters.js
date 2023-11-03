@@ -6,26 +6,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TextFilter from './text-filter';
 import InFilter from './in-filter';
 
-export default function Filters( { filters, fields, view, onChangeView } ) {
+export default function Filters( { fields, view, onChangeView } ) {
 	const filterIndex = {};
-	filters.forEach( ( filter ) => {
-		if ( 'object' !== typeof filter || ! filter?.id || ! filter?.type ) {
-			return;
-		}
-
-		filterIndex[ filter.id ] = filter;
-	} );
-
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
 		}
 
 		field.filters.forEach( ( filter ) => {
-			let id = field.id;
+			const id = field.id;
 			if ( 'string' === typeof filter ) {
 				filterIndex[ id ] = {
 					id,
@@ -35,7 +26,6 @@ export default function Filters( { filters, fields, view, onChangeView } ) {
 			}
 
 			if ( 'object' === typeof filter ) {
-				id = filter.id || field.id;
 				filterIndex[ id ] = {
 					id,
 					name: filter.name || field.header,
@@ -67,16 +57,6 @@ export default function Filters( { filters, fields, view, onChangeView } ) {
 				return null;
 			}
 
-			if ( filter.type === 'search' ) {
-				return (
-					<TextFilter
-						key={ filterName }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
 			if ( filter.type === 'enumeration' ) {
 				return (
 					<InFilter

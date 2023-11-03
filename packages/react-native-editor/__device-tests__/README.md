@@ -70,7 +70,7 @@ You can filter which test runs by one of two ways:
 npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 
 # Enable watch mode on iOS
-npm run native test:e2e:ios:local -- --watch
+npm run native test:e2e:ios:local -- -- -- --watch
 ```
 
 ## Speeding Up Test Runs
@@ -90,7 +90,11 @@ While we must run all of these at least once to produce a testable app, it is of
 By default `device-tests:local` runs tests for Android. To run tests on iOS, you can prefix the script with the `TEST_RN_PLATFORM` environment variable.
 
 ```shell
+# Run tests on iOS
 TEST_RN_PLATFORM=ios npm run native device-tests:local
+
+# Run tests on iOS with watch mode enabled
+TEST_RN_PLATFORM=ios npm run native device-tests:local -- -- --watch
 ```
 
 ## Debugging Tests
