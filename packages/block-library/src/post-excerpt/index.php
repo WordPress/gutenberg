@@ -84,15 +84,16 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * Returns 100 because 100 is the max length in the setting.
  */
 add_action(
-	'rest_api_init', 
+	'rest_api_init',
 	static function () {
-	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-		add_filter(
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			add_filter(
 			'editor_excerpt_length',
-			static function ( $value ) {
+			static function () {
 				return 100;
 			},
 			PHP_INT_MAX
-		);
+			);
+		}
 	}
-});
+);
