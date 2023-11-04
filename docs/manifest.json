@@ -1536,6 +1536,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-quick-start-template",
+		"slug": "packages-create-block-quick-start-template",
+		"markdown_source": "../packages/create-block-quick-start-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-tutorial-template",
 		"slug": "packages-create-block-tutorial-template",
 		"markdown_source": "../packages/create-block-tutorial-template/README.md",
