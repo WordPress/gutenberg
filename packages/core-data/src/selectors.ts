@@ -1386,14 +1386,14 @@ export function getDefaultTemplateId(
 }
 
 /**
- * Returns an Entity's revisions.
+ * Returns an entity's revisions.
  *
- * @param state    State tree
- * @param kind     Entity kind.
- * @param name     Entity name.
- * @param parentId Record's key whose revisions you wish to fetch.
- * @param query    Optional query. If requesting specific
- *                 fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ * @param state     State tree
+ * @param kind      Entity kind.
+ * @param name      Entity name.
+ * @param recordKey The key of the entity record whose revisions you want to fetch.
+ * @param query     Optional query. If requesting specific
+ *                  fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
  *
  * @return Record.
  */
@@ -1401,11 +1401,11 @@ export const getRevisions = (
 	state: State,
 	kind: string,
 	name: string,
-	parentId: EntityRecordKey,
+	recordKey: EntityRecordKey,
 	query?: GetRecordsHttpQuery
 ): RevisionRecord[] | null => {
 	const queriedStateRevisions =
-		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
 	if ( ! queriedStateRevisions ) {
 		return null;
 	}
@@ -1414,15 +1414,15 @@ export const getRevisions = (
 };
 
 /**
- * Returns a single, specific revision of a parent Entity.
+ * Returns a single, specific revision of a parent entity.
  *
- * @param state    State tree
- * @param kind     Entity kind.
- * @param name     Entity name.
- * @param parentId Record's key whose revisions you wish to fetch.
- * @param key      The revision's key.
- * @param query    Optional query. If requesting specific
- *                 fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query. If requesting specific
+ *                    fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
  *
  * @return Record.
  */
@@ -1431,12 +1431,14 @@ export const getRevision = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		parentId: EntityRecordKey,
-		key: EntityRecordKey,
+		recordKey: EntityRecordKey,
+		revisionKey: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): RevisionRecord | Record< PropertyKey, never > | undefined => {
 		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ];
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
+				recordKey
+			];
 
 		if ( ! queriedState ) {
 			return undefined;
@@ -1446,14 +1448,14 @@ export const getRevision = createSelector(
 
 		if ( query === undefined ) {
 			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 				return undefined;
 			}
 
-			return queriedState.items[ context ][ key ];
+			return queriedState.items[ context ][ revisionKey ];
 		}
 
-		const item = queriedState.items[ context ]?.[ key ];
+		const item = queriedState.items[ context ]?.[ revisionKey ];
 		if ( item && query._fields ) {
 			const filteredItem = {};
 			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
@@ -1472,13 +1474,13 @@ export const getRevision = createSelector(
 
 		return item;
 	},
-	( state: State, kind, name, parentId, key, query ) => {
+	( state: State, kind, name, recordKey, revisionKey, query ) => {
 		const context = query?.context ?? 'default';
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ]
-				?.items?.[ context ]?.[ key ],
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ parentId ]
-				?.itemIsComplete?.[ context ]?.[ key ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.items?.[ context ]?.[ revisionKey ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.itemIsComplete?.[ context ]?.[ revisionKey ],
 		];
 	}
 );

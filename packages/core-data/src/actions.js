@@ -930,7 +930,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
  *
  * @param {string}        kind            Kind of the received entity record revisions.
  * @param {string}        name            Name of the received entity record revisions.
- * @param {number|string} parentId        Record's key whose revisions you wish to fetch.
+ * @param {number|string} recordKey       The key of the entity record whose revisions you want to fetch.
  * @param {Array|Object}  records         Revisions received.
  * @param {?Object}       query           Query Object.
  * @param {?boolean}      invalidateCache Should invalidate query caches.
@@ -940,7 +940,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export function receiveRevisions(
 	kind,
 	name,
-	parentId,
+	recordKey,
 	records,
 	query,
 	invalidateCache = false,
@@ -949,7 +949,7 @@ export function receiveRevisions(
 	return {
 		type: 'RECEIVE_ITEM_REVISIONS',
 		items: Array.isArray( records ) ? records : [ records ],
-		parentId,
+		recordKey,
 		meta,
 		query,
 		kind,

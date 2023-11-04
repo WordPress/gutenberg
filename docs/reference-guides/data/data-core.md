@@ -422,16 +422,16 @@ _Returns_
 
 ### getRevision
 
-Returns a single, specific revision of a parent Entity.
+Returns a single, specific revision of a parent entity.
 
 _Parameters_
 
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
--   _key_ `EntityRecordKey`: The revision's key.
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
 
 _Returns_
 
@@ -439,14 +439,14 @@ _Returns_
 
 ### getRevisions
 
-Returns an Entity's revisions.
+Returns an entity's revisions.
 
 _Parameters_
 
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _parentId_ `EntityRecordKey`: Record's key whose revisions you wish to fetch.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
 -   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
@@ -745,7 +745,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the received entity record revisions.
 -   _name_ `string`: Name of the received entity record revisions.
--   _parentId_ `number|string`: Record's key whose revisions you wish to fetch.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
 -   _records_ `Array|Object`: Revisions received.
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.

@@ -358,11 +358,13 @@ function entity( entityConfig ) {
 			// Add revisions to the state tree if the post type supports it.
 			...( entityConfig?.supports?.revisions
 				? {
-						revisions: ( state, action ) => {
+						revisions: ( state = {}, action ) => {
 							// Use the same queriedDataReducer shape for revisions.
 							if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+								const recordKey = action.recordKey;
+								delete action.recordKey;
 								const newState = queriedDataReducer(
-									state?.[ action.parentId ],
+									state[ recordKey ],
 									{
 										...action,
 										type: 'RECEIVE_ITEMS',
@@ -370,7 +372,7 @@ function entity( entityConfig ) {
 								);
 								return {
 									...state,
-									[ action.parentId ]: newState,
+									[ recordKey ]: newState,
 								};
 							}
 							return state;

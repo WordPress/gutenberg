@@ -19,7 +19,8 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-// Supports information is also available in the "edit" context of `/types`.
+// A hardcoded list of post types that support revisions.
+// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
 const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
 
 export const rootEntitiesConfig = [

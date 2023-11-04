@@ -154,7 +154,7 @@ describe( 'entities', () => {
 		it( 'appends revisions state', () => {
 			expect( stateWithConfig.records.root.postType ).toHaveProperty(
 				'revisions',
-				undefined
+				{}
 			);
 		} );
 
@@ -168,7 +168,7 @@ describe( 'entities', () => {
 				items: [ { id: 1, parent: 2 } ],
 				kind: 'root',
 				name: 'postType',
-				parentId: 2,
+				recordKey: 2,
 			} );
 			expect( state.records.root.postType.revisions ).toEqual( {
 				2: {
@@ -217,7 +217,7 @@ describe( 'entities', () => {
 				items: [ { id: 3, parent: 4 } ],
 				kind: 'root',
 				name: 'postType',
-				parentId: 4,
+				recordKey: 4,
 			} );
 			expect( state.records.root.postType.revisions ).toEqual( {
 				2: {
@@ -279,7 +279,7 @@ describe( 'entities', () => {
 				items: [ { id: 7, parent: 2 } ],
 				kind: 'root',
 				name: 'postType',
-				parentId: 2,
+				recordKey: 2,
 			} );
 			expect( state.records.root.postType.revisions ).toEqual( {
 				2: {
