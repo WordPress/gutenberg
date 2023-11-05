@@ -62,13 +62,13 @@ export default function PostDateEdit( {
 		'site',
 		'time_format'
 	);
-	const [ date, setDate ] = useEntityProp(
+	const [ postTypeDate, setDate ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		displayType,
 		postId
 	);
-	date ??= new Date();
+	const date = postTypeDate || new Date();
 
 	const postType = useSelect(
 		( select ) =>
