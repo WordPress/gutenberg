@@ -88,11 +88,11 @@ add_action(
 	static function () {
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 			add_filter(
-			'editor_excerpt_length',
-			static function () {
-				return 100;
-			},
-			PHP_INT_MAX
+			    'editor_excerpt_length',
+			    static function () {
+				    return 100;
+			    },
+			    PHP_INT_MAX
 			);
 		}
 	}
