@@ -9,7 +9,6 @@ export const PATTERN_CORE_SOURCES = [
 	'core',
 	'pattern-directory/core',
 	'pattern-directory/featured',
-	'pattern-directory/theme',
 ];
 export const PATTERN_SYNC_TYPES = {
 	full: 'fully',
