@@ -68,6 +68,7 @@ export default function PostDateEdit( {
 		displayType,
 		postId
 	);
+	date ??= new Date();
 
 	const postType = useSelect(
 		( select ) =>
