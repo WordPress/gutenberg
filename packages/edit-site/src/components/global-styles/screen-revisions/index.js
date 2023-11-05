@@ -95,7 +95,7 @@ function ScreenRevisions() {
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
 				description={ __(
-					'Revisions are added to the timeline when style changes are saved.'
+					'Restore styles from an earlier version of changes that was automatically added to this timeline when new styles were saved.'
 				) }
 			/>
 			{ isLoading && (
