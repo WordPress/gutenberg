@@ -23,10 +23,6 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$rel         = ( isset( $attributes['rel'] ) ) ? $attributes['rel'] : '';
 	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
-	// Don't render a link if there is no URL set.
-	if ( ! $url ) {
-		return '';
-	}
 
 	/**
 	 * Prepend emails with `mailto:` if not set.
