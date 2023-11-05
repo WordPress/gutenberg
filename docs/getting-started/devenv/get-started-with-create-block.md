@@ -57,7 +57,7 @@ See the `wp-scripts` [package documentation](https://developer.wordpress.org/blo
 
 ### Interactive mode
 
-For developers who prefer a more guided experience, the `create-block package` provides an interactive mode. Instead of manually specifying all options upfront, like the `slug` in the above example, this mode will prompt you for inputs step-by-step.
+For developers who prefer a more guided experience, the `create-block` package provides an interactive mode. Instead of manually specifying all options upfront, like the `slug` in the above example, this mode will prompt you for inputs step-by-step.
 
 To use this mode, run the command:
 
