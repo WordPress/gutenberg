@@ -29,9 +29,6 @@
 			"type": "string",
 			"default": "none"
 		},
-		"excludedTerms": {
-			"type": "string"
-		},
 		"inSameTerm": {
 			"type": "boolean"
 		},

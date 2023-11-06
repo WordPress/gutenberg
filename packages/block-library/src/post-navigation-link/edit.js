@@ -12,7 +12,6 @@ import {
 	ToggleControl,
 	SelectControl,
 	PanelBody,
-	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -34,7 +33,6 @@ export default function PostNavigationLinkEdit( {
 		linkLabel,
 		arrow,
 		taxonomy,
-		excludedTerms,
 	},
 	setAttributes,
 } ) {
@@ -164,32 +162,22 @@ export default function PostNavigationLinkEdit( {
 						/>
 					</ToggleGroupControl>
 				</PanelBody>
-				<PanelBody title={ __( 'Filters' ) }>
-					<SelectControl
-						label={ __( 'Filter by taxonomy' ) }
-						value={ taxonomy }
-						options={ getTaxonomyOptions() }
-						onChange={ ( value ) =>
-							setAttributes( {
-								taxonomy: value,
-								inSameTerm: value === '' ? false : true,
-							} )
-						}
-						help={ __(
-							'Only link to posts that have the same taxonomy terms as the current post. For example the same categories.'
-						) }
-					/>
-					<InputControl
-						label={ __( 'Add terms to exclude' ) }
-						value={ excludedTerms }
-						onChange={ ( value ) =>
-							setAttributes( { excludedTerms: value } )
-						}
-						help={ __(
-							'Exclude terms from any taxonomy by entering the term name, slug, or ID. Separate multiple terms with a comma. Posts with excluded terms will not be linked to, even if they have other matching terms.'
-						) }
-					/>
-				</PanelBody>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					label={ __( 'Filter by taxonomy' ) }
+					value={ taxonomy }
+					options={ getTaxonomyOptions() }
+					onChange={ ( value ) =>
+						setAttributes( {
+							taxonomy: value,
+							inSameTerm: value === '' ? false : true,
+						} )
+					}
+					help={ __(
+						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
+					) }
+				/>
 			</InspectorControls>
 			<BlockControls>
 				<AlignmentToolbar
