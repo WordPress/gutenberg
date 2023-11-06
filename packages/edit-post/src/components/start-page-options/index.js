@@ -88,7 +88,7 @@ function StartPageOptionsModal( { onClose } ) {
 }
 
 export default function StartPageOptions() {
-	const [ modalState, setModalState ] = useState( 'initial' );
+	const [ isClosed, setIsClosed ] = useState( false );
 	const shouldEnableModal = useSelect( ( select ) => {
 		const { isCleanNewPost } = select( editorStore );
 		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
@@ -100,11 +100,9 @@ export default function StartPageOptions() {
 		);
 	}, [] );
 
-	if ( ! shouldEnableModal || modalState === 'closed' ) {
+	if ( ! shouldEnableModal || isClosed ) {
 		return null;
 	}
 
-	return (
-		<StartPageOptionsModal onClose={ () => setModalState( 'closed' ) } />
-	);
+	return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
 }
