@@ -16,7 +16,7 @@ import {
 	myPatternsCategory,
 } from './utils';
 
-export function usePatternsCategories( rootClientId, sourceFilter = 'all' ) {
+export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 	const [ patterns, allCategories ] = usePatternsState(
 		undefined,
 		rootClientId

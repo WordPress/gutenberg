@@ -25,7 +25,7 @@ const getShouldDisableNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
 
-export function BlockPatternsSyncFilter( {
+export function PatternsFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
 	patternSyncFilter,

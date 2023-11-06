@@ -25,7 +25,7 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternsCategoryPreviewPanel } from './block-patterns-tab/category-preview-panel';
+import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useDebouncedInput from './hooks/use-debounced-input';
@@ -296,7 +296,7 @@ function InserterMenu(
 				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 			{ showPatternPanel && (
-				<PatternsCategoryPreviewPanel
+				<PatternCategoryPreviewPanel
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					onHover={ onHoverPattern }

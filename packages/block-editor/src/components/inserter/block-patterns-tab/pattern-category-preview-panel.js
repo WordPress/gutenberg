@@ -9,9 +9,9 @@ import { focus } from '@wordpress/dom';
  * Internal dependencies
  */
 
-import { PatternsCategoryPreviews } from './category-previews';
+import { PatternCategoryPreviews } from './pattern-category-previews';
 
-export function PatternsCategoryPreviewPanel( {
+export function PatternCategoryPreviewPanel( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -34,7 +34,7 @@ export function PatternsCategoryPreviewPanel( {
 			ref={ container }
 			className="block-editor-inserter__patterns-category-dialog"
 		>
-			<PatternsCategoryPreviews
+			<PatternCategoryPreviews
 				key={ category.name }
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }

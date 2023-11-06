@@ -24,8 +24,8 @@ import {
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
-import { BlockPatternsSyncFilter } from './patterns-filter';
-import { usePatternsCategories } from './use-patterns-categories';
+import { PatternsFilter } from './patterns-filter';
+import { usePatternCategories } from './use-pattern-categories';
 import {
 	isPatternFiltered,
 	allPatternsCategory,
@@ -34,7 +34,7 @@ import {
 
 const noop = () => {};
 
-export function PatternsCategoryPreviews( {
+export function PatternCategoryPreviews( {
 	rootClientId,
 	onInsert,
 	onHover = noop,
@@ -48,7 +48,7 @@ export function PatternsCategoryPreviews( {
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 
-	const availableCategories = usePatternsCategories(
+	const availableCategories = usePatternCategories(
 		rootClientId,
 		patternSourceFilter
 	);
@@ -135,7 +135,7 @@ export function PatternsCategoryPreviews( {
 							{ category.label }
 						</Heading>
 					</FlexBlock>
-					<BlockPatternsSyncFilter
+					<PatternsFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
 						setPatternSyncFilter={ onSetPatternSyncFilter }

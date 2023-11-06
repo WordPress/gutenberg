@@ -16,10 +16,10 @@ import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import PatternsExplorerModal from '../block-patterns-explorer/explorer';
+import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
-import { PatternsCategoryPreviews } from './category-previews';
-import { usePatternsCategories } from './use-patterns-categories';
+import { PatternCategoryPreviews } from './pattern-category-previews';
+import { usePatternCategories } from './use-pattern-categories';
 
 function BlockPatternsTab( {
 	onSelectCategory,
@@ -29,7 +29,7 @@ function BlockPatternsTab( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 
-	const categories = usePatternsCategories( rootClientId );
+	const categories = usePatternCategories( rootClientId );
 
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -93,7 +93,7 @@ function BlockPatternsTab( {
 			{ isMobile && (
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
-						<PatternsCategoryPreviews
+						<PatternCategoryPreviews
 							key={ category.name }
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
