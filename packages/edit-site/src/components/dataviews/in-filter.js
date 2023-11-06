@@ -9,13 +9,15 @@ import {
 const OPERATOR_IN = 'in';
 
 export default ( { filter, view, onChangeView } ) => {
-	let activeValue = view.filters.find(
+	const valueFound = view.filters.find(
 		( f ) => f.field === filter.id && f.operator === OPERATOR_IN
-	)?.value;
+	);
 
-	if ( ! activeValue ) {
-		activeValue = '';
-	}
+	const activeValue =
+		! valueFound || ! valueFound.hasOwnProperty( 'value' )
+			? ''
+			: valueFound.value;
+
 	return (
 		<SelectControl
 			value={ activeValue }
