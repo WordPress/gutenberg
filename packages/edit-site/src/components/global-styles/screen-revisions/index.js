@@ -55,13 +55,37 @@ function ScreenRevisions() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const selectedRevisionMatchesEditorStyles = areGlobalStyleConfigsEqual(
+		globalStylesRevision,
+		userConfig
+	);
+	const shouldSelectFirstItem =
+		! selectedRevisionMatchesEditorStyles &&
+		( ! selectedRevisionId || 'unsaved' === selectedRevisionId );
 
 	useEffect( () => {
 		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
 			goTo( '/' ); // Return to global styles main panel.
 			setEditorCanvasContainerView( editorCanvasContainerView );
+			return;
 		}
-	}, [ editorCanvasContainerView ] );
+
+		/*
+			Ensure that the first item is selected where no revision is selected
+			and the selected styles don't match the current editor styles.
+			This is required in case editor styles are changed outside the revisions panel,
+			e.g., via the reset styles function of useGlobalStylesReset().
+			See: https://github.com/WordPress/gutenberg/issues/55866
+		*/
+		if ( shouldSelectFirstItem ) {
+			setGlobalStylesRevision( revisions[ 0 ] );
+		}
+	}, [
+		editorCanvasContainerView,
+		shouldSelectFirstItem,
+		revisions[ 0 ],
+		setGlobalStylesRevision,
+	] );
 
 	const onCloseRevisions = () => {
 		goTo( '/' ); // Return to global styles main panel.
@@ -85,9 +109,9 @@ function ScreenRevisions() {
 		setSelectedRevisionId( revision?.id );
 	};
 
+	// Only display load button if there is a revision to load and it is different from the current editor styles.
 	const isLoadButtonEnabled =
-		!! globalStylesRevision?.id &&
-		! areGlobalStyleConfigsEqual( globalStylesRevision, userConfig );
+		!! globalStylesRevision?.id && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
 
 	return (
