@@ -128,7 +128,7 @@ export type TabPanelProps = {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * A unique identifier for the TabPanel, which is used to generate a unique `id` for the underlying element.
+	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
 	 */
 	id: string;
 	/**
