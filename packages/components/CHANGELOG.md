@@ -6,6 +6,9 @@
 
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
 
+### Experimental
+-   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
+
 ## 25.11.0 (2023-11-02)
 
 ### Enhancements
@@ -19,9 +22,6 @@
 ### Internal
 
 -   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
-
-### Experimental
--   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
 
 ## 25.10.0 (2023-10-18)
 
