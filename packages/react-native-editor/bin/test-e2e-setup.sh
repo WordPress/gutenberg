@@ -69,6 +69,25 @@ IOS_DEVICE_TABLET_NAME=$(jq -r '.ios.local.deviceTabletName' "$CONFIG_FILE")
 detect_or_create_simulator "$IOS_DEVICE_NAME"
 detect_or_create_simulator "$IOS_DEVICE_TABLET_NAME"
 
+function detect_or_create_emulator() {
+	local emulator_name=$1
+	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
+	local emulator=$(emulator -list-avds | grep "$emulator_id")
+
+	if [[ -z $emulator ]]; then
+		log_info "$emulator_name not available, creating..."
+		avdmanager create avd -n "$emulator_id" -k "system-images;android-30;google_apis;arm64-v8a" -d "pixel_3_xl" > /dev/null
+		log_success "$emulator_name created."
+	else
+		log_info "$emulator_name available."
+	fi
+}
+
+ANDROID_DEVICE_NAME=$(jq -r '.android.local.deviceName' "$CONFIG_FILE")
+
+# Create the required Android emulators, if they don't exist
+detect_or_create_emulator $ANDROID_DEVICE_NAME
+
 # Mitigate conflicts between development server caches and E2E tests
 npm run clean:runtime > /dev/null
 log_info 'Runtime cache cleaned.'
