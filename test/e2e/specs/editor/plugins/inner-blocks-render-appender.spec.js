@@ -31,9 +31,9 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 		const customAppender = page.locator( '.my-custom-awesome-appender' );
 
 		// Verify if the custom block appender text is the expected one.
-		await expect(
-			customAppender.getByText( 'My custom awesome appender' )
-		).toBeVisible();
+		await expect( customAppender ).toContainText(
+			'My custom awesome appender'
+		);
 
 		// Open the inserter of our custom block appender.
 		await customAppender
@@ -77,9 +77,9 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 		} );
 
 		// Verify if the custom block appender text is the expected one.
-		await expect(
-			dynamimcAppender.getByText( 'Empty Blocks Appender' )
-		).toBeVisible();
+		await expect( dynamimcAppender ).toContainText(
+			'Empty Blocks Appender'
+		);
 
 		// Open the inserter of our custom block appender.
 		await addBlockBtn.click();
