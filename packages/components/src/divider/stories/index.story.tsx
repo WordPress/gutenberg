@@ -23,6 +23,9 @@ const meta: Meta< typeof Divider > = {
 		marginEnd: {
 			control: { type: 'text' },
 		},
+		wrapElement: {
+			control: { type: null },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
