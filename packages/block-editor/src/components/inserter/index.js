@@ -186,7 +186,6 @@ class PrivateInserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
-				prioritizePatterns={ prioritizePatterns }
 			/>
 		);
 	}
