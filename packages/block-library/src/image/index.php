@@ -16,11 +16,13 @@
  * @return string The block content with the data-id attribute added.
  */
 function render_block_core_image( $attributes, $content, $block ) {
+	if ( false === stripos( $content, '<img' ) ) {
+		return '';
+	}
 
 	$processor = new WP_HTML_Tag_Processor( $content );
-	$processor->next_tag( 'img' );
 
-	if ( $processor->get_attribute( 'src' ) === null ) {
+	if ( ! $processor->next_tag( 'img' ) || null === $processor->get_attribute( 'src' ) ) {
 		return '';
 	}
 
@@ -32,45 +34,47 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
-	$lightbox_enabled  = false;
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
-	// If the lightbox is enabled and the image is not linked, flag the lightbox to be rendered.
-	if ( isset( $lightbox_settings ) && 'none' === $link_destination ) {
+	$view_js_file_handle = 'wp-block-image-view';
+	$script_handles      = $block->block_type->view_script_handles;
 
-		if ( isset( $lightbox_settings['enabled'] ) && true === $lightbox_settings['enabled'] ) {
-			$lightbox_enabled = true;
-		}
-	}
-
-	// If at least one block in the page has the lightbox, mark the block type as interactive.
-	if ( $lightbox_enabled ) {
+	/*
+	 * If the lightbox is enabled and the image is not linked, add the filter
+	 * and the JavaScript view file.
+	 */
+	if (
+		isset( $lightbox_settings ) &&
+		'none' === $link_destination &&
+		isset( $lightbox_settings['enabled'] ) &&
+		true === $lightbox_settings['enabled']
+	) {
 		$block->block_type->supports['interactivity'] = true;
-	}
 
-	// Determine whether the view script should be enqueued or not.
-	$view_js_file = 'wp-block-image-view';
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $lightbox_enabled && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		if ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
 		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $lightbox_enabled && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-		}
-	}
 
-	if ( $lightbox_enabled ) {
-		// This render needs to happen in a filter with priority 15 to ensure that it
-		// runs after the duotone filter and that duotone styles are applied to the image
-		// in the lightbox. We also need to ensure that the lightbox works with any plugins
-		// that might use filters as well. We can consider removing this in the future if the
-		// way the blocks are rendered changes, or if a new kind of filter is introduced.
+		/*
+		 * This render needs to happen in a filter with priority 15 to ensure
+		 * that it runs after the duotone filter and that duotone styles are
+		 * applied to the image in the lightbox. We also need to ensure that the
+		 * lightbox works with any plugins that might use filters as well. We
+		 * can consider removing this in the future if the way the blocks are
+		 * rendered changes, or if a new kind of filter is introduced.
+		 */
 		add_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15, 2 );
+	} else {
+		/*
+		 * Remove the filter and the JavaScript view file if previously added by
+		 * other Image blocks.
+		 */
+		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
+		}
 	}
 
 	return $processor->get_updated_html();
@@ -123,11 +127,28 @@ function block_core_image_get_lightbox_settings( $block ) {
  * @return string Filtered block content.
  */
 function block_core_image_render_lightbox( $block_content, $block ) {
+	/*
+	 * If it's not possible that an IMG element exists then return the given
+	 * block content as-is. It may be that there's no actual image in the block
+	 * or it could be that another plugin already modified this HTML.
+	 */
+	if ( false === stripos( $block_content, '<img' ) ) {
+		return $block_content;
+	}
+
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
 	$aria_label = __( 'Enlarge image' );
 
-	$processor->next_tag( 'img' );
+	/*
+	 * If there's definitely no IMG element in the block then return the given
+	 * block content as-is. There's nothing that this code can knowingly modify
+	 * to add the lightbox behavior.
+	 */
+	if ( ! $processor->next_tag( 'img' ) ) {
+		return $block_content;
+	}
+
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
 	// An empty alt attribute `alt=""` is valid for decorative images.
@@ -149,8 +170,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
-		$img_width        = $img_metadata['width'];
-		$img_height       = $img_metadata['height'];
+		$img_width        = $img_metadata['width'] ?? 'none';
+		$img_height       = $img_metadata['height'] ?? 'none';
 	} else {
 		$img_uploaded_src = $processor->get_attribute( 'src' );
 		$img_width        = 'none';
@@ -197,28 +218,35 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-init', 'effects.core.image.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
 	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
+	// We need to set an event callback on the `img` specifically
+	// because the `figure` element can also contain a caption, and
+	// we don't want to trigger the lightbox when the caption is clicked.
+	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.showLightbox' );
 	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
-	// Wrap the image in the body content with a button.
+	// Add a button alongside image in the body content.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
 	$button =
 		$img[0]
 		. '<button
+			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.core.image.showLightbox"
-			data-wp-style--width="context.core.image.imageButtonWidth"
-			data-wp-style--height="context.core.image.imageButtonHeight"
-			data-wp-style--left="context.core.image.imageButtonLeft"
+			data-wp-style--right="context.core.image.imageButtonRight"
 			data-wp-style--top="context.core.image.imageButtonTop"
-		></button>';
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
+				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
+			</svg>
+		</button>';
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
@@ -274,7 +302,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		}
 	}
 
-	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
@@ -291,12 +319,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-on--touchmove="actions.core.image.handleTouchMove"
             data-wp-on--touchend="actions.core.image.handleTouchEnd"
             data-wp-on--click="actions.core.image.hideLightbox"
+            tabindex="-1"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
                     $close_button_icon
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
-				<div class="lightbox-image-container">$enlarged_image_content</div>
+                <div class="lightbox-image-container">$enlarged_image_content</div>
                 <div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
         </div>
 HTML;
@@ -310,8 +339,6 @@ HTML;
  * @since 6.4.0
  *
  * @global WP_Scripts $wp_scripts
- *
- * @return void
  */
 function block_core_image_ensure_interactivity_dependency() {
 	global $wp_scripts;
@@ -327,8 +354,6 @@ add_action( 'wp_print_scripts', 'block_core_image_ensure_interactivity_dependenc
 
 /**
  * Registers the `core/image` block on server.
- *
- * @return void
  */
 function register_block_core_image() {
 	register_block_type_from_metadata(

@@ -69,7 +69,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 ## Allowed Blocks
 
-Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `allowedBlocks` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -86,6 +86,16 @@ By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A v
 ```
 
 Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
+
+## Default Block
+
+By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` when the block appender is clicked. You can modify the default block and its attributes that are inserted when the initial block appender is clicked by using the `defaultBlock` property. For example:
+
+```js
+<InnerBlocks defaultBlock={['core/paragraph', {placeholder: "Lorem ipsum..."}]} directInsert />
+```
+
+By default this behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
 
 ## Template
 

@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
+import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
@@ -113,7 +114,11 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const disabledRef = useDisabled();
@@ -128,6 +133,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
+			<EditorStyles />
 			<BlockListItems renderAppender={ false } layout={ layout } />
 		</ExperimentalBlockEditorProvider>
 	);

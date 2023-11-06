@@ -85,8 +85,8 @@ const sizeStyles = ( {
 
 	if ( ! __next40pxDefaultSize ) {
 		sizes.default = {
-			height: 30,
-			minHeight: 30,
+			height: 32,
+			minHeight: 32,
 			paddingTop: 0,
 			paddingBottom: 0,
 		};

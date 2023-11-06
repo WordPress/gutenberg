@@ -187,7 +187,7 @@ const { createHigherOrderComponent } = wp.compose;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
@@ -198,12 +198,12 @@ const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withInspectorControl' );
+}, 'withMyPluginControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'my-plugin/with-inspector-controls',
-	withInspectorControls
+	withMyPluginControls
 );
 ```
 
@@ -212,7 +212,7 @@ wp.hooks.addFilter(
 ```js
 var el = React.createElement;
 
-var withInspectorControls = wp.compose.createHigherOrderComponent( function (
+var withMyPluginControls = wp.compose.createHigherOrderComponent( function (
 	BlockEdit
 ) {
 	return function ( props ) {
@@ -227,17 +227,39 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function (
 			)
 		);
 	};
-},
-'withInspectorControls' );
+}, 'withMyPluginControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'my-plugin/with-inspector-controls',
-	withInspectorControls
+	withMyPluginControls
 );
 ```
 
 {% end %}
+
+Note that as this hook is run for _all blocks_, consuming it has potential for performance regressions particularly around block selection metrics.
+
+To mitigate this, consider whether any work you perform can be altered to run only under certain conditions.
+
+For example, if you are adding components that only need to render when the block is _selected_, then you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
+
+```js
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ props.isSelected && {
+					<InspectorControls>
+						<PanelBody>My custom control</PanelBody>
+					</InspectorControls>
+				}}
+			</>
+		);
+	};
+}, 'withMyPluginControls' );
+```
 
 #### `editor.BlockListBlock`
 
@@ -288,8 +310,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
 
 		return el( BlockListBlock, newProps );
 	};
-},
-'withClientIdClassName' );
+}, 'withClientIdClassName' );
 
 wp.hooks.addFilter(
 	'editor.BlockListBlock',

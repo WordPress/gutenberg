@@ -187,15 +187,15 @@ function BlockRenameControl( props ) {
 	);
 }
 
-export const withBlockRenameControl = createHigherOrderComponent(
+export const withBlockRenameControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name, attributes, setAttributes } = props;
+		const { clientId, name, attributes, setAttributes, isSelected } = props;
 
 		const supportsBlockNaming = hasBlockSupport( name, 'renaming', true );
 
 		return (
 			<>
-				{ supportsBlockNaming && (
+				{ isSelected && supportsBlockNaming && (
 					<>
 						<BlockRenameControl
 							clientId={ clientId }
@@ -203,8 +203,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							onChange={ ( newName ) => {
 								setAttributes( {
 									metadata: {
-										...( attributes?.metadata &&
-											attributes?.metadata ),
+										...attributes?.metadata,
 										name: newName,
 									},
 								} );
@@ -217,11 +216,11 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withBlockRenameControls'
 );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/block-rename-ui/with-block-rename-control',
-	withBlockRenameControl
+	'core/block-rename-ui/with-block-rename-controls',
+	withBlockRenameControls
 );

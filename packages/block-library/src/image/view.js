@@ -103,12 +103,10 @@ store(
 						context.core.image.lastFocusedElement =
 							window.document.activeElement;
 						context.core.image.scrollDelta = 0;
+						context.core.image.pointerType = event.pointerType;
 
 						context.core.image.lightboxEnabled = true;
-						setStyles(
-							context,
-							event.target.previousElementSibling
-						);
+						setStyles( context, context.core.image.imageRef );
 
 						context.core.image.scrollTopReset =
 							window.pageYOffset ||
@@ -151,12 +149,15 @@ store(
 									'scroll',
 									scrollCallback
 								);
+								// If we don't delay before changing the focus,
+								// the focus ring will appear on Firefox before
+								// the image has finished animating, which looks broken.
+								context.core.image.lightboxTriggerRef.focus( {
+									preventScroll: true,
+								} );
 							}, 450 );
 
 							context.core.image.lightboxEnabled = false;
-							context.core.image.lastFocusedElement.focus( {
-								preventScroll: true,
-							} );
 						}
 					},
 					handleKeydown: ( { context, actions, event } ) => {
@@ -191,11 +192,12 @@ store(
 							}
 						}
 					},
-					handleLoad: ( { state, context, effects, ref } ) => {
+					// This is fired just by lazily loaded
+					// images on the page, not all images.
+					handleLoad: ( { context, effects, ref } ) => {
 						context.core.image.imageLoaded = true;
 						context.core.image.imageCurrentSrc = ref.currentSrc;
 						effects.core.image.setButtonStyles( {
-							state,
 							context,
 							ref,
 						} );
@@ -258,17 +260,18 @@ store(
 		effects: {
 			core: {
 				image: {
-					setCurrentSrc: ( { context, ref } ) => {
+					initOriginImage: ( { context, ref } ) => {
+						context.core.image.imageRef = ref;
+						context.core.image.lightboxTriggerRef =
+							ref.parentElement.querySelector(
+								'.lightbox-trigger'
+							);
 						if ( ref.complete ) {
 							context.core.image.imageLoaded = true;
 							context.core.image.imageCurrentSrc = ref.currentSrc;
 						}
 					},
 					initLightbox: async ( { context, ref } ) => {
-						context.core.image.figureRef =
-							ref.querySelector( 'figure' );
-						context.core.image.imageRef =
-							ref.querySelector( 'img' );
 						if ( context.core.image.lightboxEnabled ) {
 							const focusableElements =
 								ref.querySelectorAll( focusableSelectors );
@@ -279,10 +282,11 @@ store(
 									focusableElements.length - 1
 								];
 
-							ref.querySelector( '.close-button' ).focus();
+							// Move focus to the dialog when opening it.
+							ref.focus();
 						}
 					},
-					setButtonStyles: ( { state, context, ref } ) => {
+					setButtonStyles: ( { context, ref } ) => {
 						const {
 							naturalWidth,
 							naturalHeight,
@@ -291,54 +295,71 @@ store(
 						} = ref;
 
 						// If the image isn't loaded yet, we can't
-						// calculate how big the button should be.
+						// calculate where the button should be.
 						if ( naturalWidth === 0 || naturalHeight === 0 ) {
 							return;
 						}
 
-						// Subscribe to the window dimensions so we can
-						// recalculate the styles if the window is resized.
-						if (
-							( state.core.image.windowWidth ||
-								state.core.image.windowHeight ) &&
-							context.core.image.scaleAttr === 'contain'
-						) {
-							// In the case of an image with object-fit: contain, the
-							// size of the img element can be larger than the image itself,
-							// so we need to calculate the size of the button to match.
+						const figure = ref.parentElement;
+						const figureWidth = ref.parentElement.clientWidth;
 
+						// We need special handling for the height because
+						// a caption will cause the figure to be taller than
+						// the image, which means we need to account for that
+						// when calculating the placement of the button in the
+						// top right corner of the image.
+						let figureHeight = ref.parentElement.clientHeight;
+						const caption = figure.querySelector( 'figcaption' );
+						if ( caption ) {
+							const captionComputedStyle =
+								window.getComputedStyle( caption );
+							figureHeight =
+								figureHeight -
+								caption.offsetHeight -
+								parseFloat( captionComputedStyle.marginTop ) -
+								parseFloat( captionComputedStyle.marginBottom );
+						}
+
+						const buttonOffsetTop = figureHeight - offsetHeight;
+						const buttonOffsetRight = figureWidth - offsetWidth;
+
+						// In the case of an image with object-fit: contain, the
+						// size of the <img> element can be larger than the image itself,
+						// so we need to calculate where to place the button.
+						if ( context.core.image.scaleAttr === 'contain' ) {
 							// Natural ratio of the image.
 							const naturalRatio = naturalWidth / naturalHeight;
 							// Offset ratio of the image.
 							const offsetRatio = offsetWidth / offsetHeight;
 
-							if ( naturalRatio > offsetRatio ) {
+							if ( naturalRatio >= offsetRatio ) {
 								// If it reaches the width first, keep
-								// the width and recalculate the height.
-								context.core.image.imageButtonWidth =
-									offsetWidth;
-								const buttonHeight = offsetWidth / naturalRatio;
-								context.core.image.imageButtonHeight =
-									buttonHeight;
+								// the width and compute the height.
+								const referenceHeight =
+									offsetWidth / naturalRatio;
 								context.core.image.imageButtonTop =
-									( offsetHeight - buttonHeight ) / 2;
+									( offsetHeight - referenceHeight ) / 2 +
+									buttonOffsetTop +
+									16;
+								context.core.image.imageButtonRight =
+									buttonOffsetRight + 16;
 							} else {
 								// If it reaches the height first, keep
-								// the height and recalculate the width.
-								context.core.image.imageButtonHeight =
-									offsetHeight;
-								const buttonWidth = offsetHeight * naturalRatio;
-								context.core.image.imageButtonWidth =
-									buttonWidth;
-								context.core.image.imageButtonLeft =
-									( offsetWidth - buttonWidth ) / 2;
+								// the height and compute the width.
+								const referenceWidth =
+									offsetHeight * naturalRatio;
+								context.core.image.imageButtonTop =
+									buttonOffsetTop + 16;
+								context.core.image.imageButtonRight =
+									( offsetWidth - referenceWidth ) / 2 +
+									buttonOffsetRight +
+									16;
 							}
 						} else {
-							// In all other cases, we can trust that the size of
-							// the image is the right size for the button as well.
-
-							context.core.image.imageButtonWidth = offsetWidth;
-							context.core.image.imageButtonHeight = offsetHeight;
+							context.core.image.imageButtonTop =
+								buttonOffsetTop + 16;
+							context.core.image.imageButtonRight =
+								buttonOffsetRight + 16;
 						}
 					},
 					setStylesOnResize: ( { state, context, ref } ) => {

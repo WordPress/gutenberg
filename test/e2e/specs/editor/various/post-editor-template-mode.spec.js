@@ -121,10 +121,8 @@ class PostEditorTemplateMode {
 
 	async disableTemplateWelcomeGuide() {
 		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuideTemplate', false );
+		await this.editor.setPreferences( 'core/edit-post', {
+			welcomeGuideTemplate: false,
 		} );
 	}
 
@@ -169,10 +167,7 @@ class PostEditorTemplateMode {
 		// Save the post
 		// Saving shouldn't be necessary but unfortunately,
 		// there's a template resolution bug forcing us to do so.
-		await this.page.click( 'role=button[name="Save draft"i]' );
-		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await this.editor.saveDraft();
 	}
 
 	async createNewTemplate( templateName ) {

@@ -31,6 +31,10 @@ const useRevisionData = () => {
 function PostLastRevisionCheck( { children } ) {
 	const { lastRevisionId, revisionsCount } = useRevisionData();
 
+	if ( ! process.env.IS_GUTENBERG_PLUGIN ) {
+		return null;
+	}
+
 	if ( ! lastRevisionId || revisionsCount < 2 ) {
 		return null;
 	}
