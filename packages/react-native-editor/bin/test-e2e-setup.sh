@@ -90,4 +90,4 @@ detect_or_create_emulator $ANDROID_DEVICE_NAME
 
 # Mitigate conflicts between development server caches and E2E tests
 npm run clean:runtime > /dev/null
-log_info 'Runtime cache cleaned.'
+log_info 'Runtime cache cleared.'
