@@ -75,6 +75,11 @@ function detect_or_create_emulator() {
 		return
 	fi
 
+	if [[ -z $(command -v avdmanager) ]]; then
+		log_error "avdmanager not found! Please install the Android SDK command-line tools.\n    https://developer.android.com/tools/"
+		exit 1;
+	fi
+
 	local emulator_name=$1
 	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
 	local emulator=$(emulator -list-avds | grep "$emulator_id")
