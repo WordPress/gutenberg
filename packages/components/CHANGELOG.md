@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+
 ## 25.11.0 (2023-11-02)
 
 ### Enhancements
