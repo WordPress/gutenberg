@@ -427,12 +427,13 @@ function ViewList( {
 			} );
 		},
 		onGlobalFilterChange: ( value ) => {
-			onChangeView( { ...view, search: value, page: 0 } );
+			onChangeView( { ...view, search: value, page: 1 } );
 		},
 		onColumnFiltersChange: ( columnFiltersUpdater ) => {
 			onChangeView( {
 				...view,
 				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
+				page: 1,
 			} );
 		},
 		onPaginationChange: ( paginationUpdater ) => {
