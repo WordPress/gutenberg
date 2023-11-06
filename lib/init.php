@@ -117,7 +117,7 @@ if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 		$wp_template_part_posts_with_navigation = array();
 		foreach ( $wp_template_part_posts as $wp_template_part_post ) {
 			$wp_template_part_blocks = parse_blocks( $wp_template_part_post->post_content );
-			$found_avigation = count(
+			$found_avigation         = count(
 				recursively_find_block_by_attribute(
 					$wp_template_part_blocks,
 					'core/navigation',
