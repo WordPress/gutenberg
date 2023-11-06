@@ -59,21 +59,38 @@ Example:
 - `sort.field`: field used for sorting the dataset.
 - `sort.direction`: the direction to use for sorting, one of `asc` or `desc`.
 - `search`: the text search applied to the dataset.
-- `filters`: the filters applied to the dataset. See filters section.
+- `filters`: the filters applied to the dataset. Each item describes:
+	- `field`: which field this filter is bound to.
+	- `operator`: which type of filter it is. Only `in` available at the moment.
+	- `vaule`: the actual value selected by the user.
 - `visibleFilters`: the `id` of the filters that are visible in the UI.
 - `hiddenFields`: the `id` of the fields that are hidden in the UI.
 - `layout`: ...
 
-Note that it's the consumer's responsibility to provide the data and make sure the dataset corresponds to the view's config (sort, pagination, filters, etc.).
+### View <=> data
 
-Example:
+The view is a representation of the visible state of the dataset. Note, however, that it's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected.
+
+The following example shows how a view object is used to query the WordPress REST API via the entities abstraction. The same can be done with any other data provider.
 
 ```js
 function MyCustomPageList() { 
 	const [ view, setView ] = useState( {
 		type: 'list',
+		perPage: 5,
 		page: 1,
-		"...": "..."
+		sort: {
+			field: 'date',
+			direction: 'desc',
+		},
+		search: '',
+		filters: [
+			{ field: 'author', operator: 'in', value: 2 },
+			{ field: 'status', operator: 'in', value: 'publish,draft' }
+		],
+		visibleFilters: [ 'author', 'status' ],
+		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
 
 	const queryArgs = useMemo( () => {
@@ -143,7 +160,7 @@ Example:
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
 		]
-		filters: [ 'enumeration' ],
+		filters: [ 'in' ],
 	}
 ]
 ```
@@ -153,45 +170,4 @@ Example:
 - `getValue`: function that returns the value of the field.
 - `render`: function that renders the field.
 - `elements`: the set of valid values for the field's value.
-- `filters`: what filters are available for the user to use. See filters section.
-
-## Filters
-
-Filters describe the conditions a record should match to be listed as part of the dataset. Filters are provided per field.
-
-```js
-const field = [
-	{
-		id: 'author',
-		filters: [ 'enumeration' ],
-	}
-];
-
-<DataViews
-	fields={ fields }
-/>
-```
-
-A filter is an object that may contain the following properties:
-
-- `type`: the type of filter. Only `enumeration` is supported at the moment.
-- `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
-	- `value`: what's serialized into the view's filters.
-	- `label`: nice-looking name for users.
-
-As a convenience, field's filter can provide abbreviated versions for the filter. All of following examples result in the same filter:
-
-```js
-const field = [
-	{
-		id: 'author',
-		header: __( 'Author' ),
-		elements: authors,
-		filters: [
-			'enumeration',
-			{ type: 'enumeration' },
-			{ type: 'enumeration', elements: authors },
-		],
-	}
-];
-```
+- `filters`: what filter operators are available for the user to use over this field. Only `in` available at the moment.
