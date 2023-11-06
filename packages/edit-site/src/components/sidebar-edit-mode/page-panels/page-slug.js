@@ -11,7 +11,8 @@ import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
-	TextControl,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
@@ -108,10 +109,16 @@ export default function PageSlug( { postType, postId } ) {
 								onClose={ onClose }
 							/>
 							<VStack spacing={ 5 }>
-								<TextControl
+								<InputControl
 									__nextHasNoMarginBottom
+									__next40pxDefaultSize
 									label={ __( 'Permalink' ) }
 									hideLabelFromVision
+									prefix={
+										<InputControlPrefixWrapper>
+											/
+										</InputControlPrefixWrapper>
+									}
 									value={ forceEmptyField ? '' : recordSlug }
 									autoComplete="off"
 									spellCheck="false"
