@@ -175,13 +175,18 @@ module.exports = async function start( {
 				memcachedFile,
 				path.join(
 					config.env.development.coreSource.path,
-					'wp-content'
+					'wp-content',
+					'object-cache.php'
 				)
 			);
 
 			fs.copyFile(
 				memcachedFile,
-				path.join( config.env.tests.coreSource.path, 'wp-content' )
+				path.join(
+					config.env.tests.coreSource.path,
+					'wp-content',
+					'object-cache.php'
+				)
 			);
 		}
 	}
