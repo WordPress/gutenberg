@@ -12,11 +12,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, chevronUpDown } from '@wordpress/icons';
-import {
-	__unstableMotion as motion,
-	Button,
-	ToolbarItem,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -39,8 +35,6 @@ export default function DocumentTools( {
 	isDistractionFree,
 	showIconLabels,
 	setListViewToggleElement,
-	toolbarTransition,
-	toolbarVariants,
 } ) {
 	const inserterButton = useRef();
 	const {
@@ -125,103 +119,92 @@ export default function DocumentTools( {
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
-		<motion.div
-			variants={ toolbarVariants }
-			transition={ toolbarTransition }
+		<NavigableToolbar
+			className="edit-site-header-edit-mode__start"
+			aria-label={ __( 'Document tools' ) }
+			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 		>
-			<NavigableToolbar
-				className="edit-site-header-edit-mode__start"
-				aria-label={ __( 'Document tools' ) }
-				shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
-			>
-				<div className="edit-site-header-edit-mode__toolbar">
-					{ ! isDistractionFree && (
+			<div className="edit-site-header-edit-mode__toolbar">
+				{ ! isDistractionFree && (
+					<ToolbarItem
+						ref={ inserterButton }
+						as={ Button }
+						className="edit-site-header-edit-mode__inserter-toggle"
+						variant="primary"
+						isPressed={ isInserterOpen }
+						onMouseDown={ preventDefault }
+						onClick={ toggleInserter }
+						disabled={ ! isVisualMode }
+						icon={ plus }
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+						aria-expanded={ isInserterOpen }
+					/>
+				) }
+				{ isLargeViewport && (
+					<>
+						{ ! hasFixedToolbar && (
+							<ToolbarItem
+								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								disabled={ ! isVisualMode }
+							/>
+						) }
 						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-site-header-edit-mode__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ preventDefault }
-							onClick={ toggleInserter }
-							disabled={ ! isVisualMode }
-							icon={ plus }
-							label={ showIconLabels ? shortLabel : longLabel }
+							as={ UndoButton }
 							showTooltip={ ! showIconLabels }
-							aria-expanded={ isInserterOpen }
+							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
-					) }
-					{ isLargeViewport && (
-						<>
-							{ ! hasFixedToolbar && (
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									disabled={ ! isVisualMode }
-								/>
-							) }
+						<ToolbarItem
+							as={ RedoButton }
+							showTooltip={ ! showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+						/>
+						{ ! isDistractionFree && (
 							<ToolbarItem
-								as={ UndoButton }
+								as={ Button }
+								className="edit-site-header-edit-mode__list-view-toggle"
+								disabled={ ! isVisualMode || isZoomedOutView }
+								icon={ listView }
+								isPressed={ isListViewOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'List View' ) }
+								onClick={ toggleListView }
+								ref={ setListViewToggleElement }
+								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
+								aria-expanded={ isListViewOpen }
 							/>
-							<ToolbarItem
-								as={ RedoButton }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-							/>
-							{ ! isDistractionFree && (
+						) }
+						{ isZoomedOutViewExperimentEnabled &&
+							! isDistractionFree &&
+							! hasFixedToolbar && (
 								<ToolbarItem
 									as={ Button }
-									className="edit-site-header-edit-mode__list-view-toggle"
-									disabled={
-										! isVisualMode || isZoomedOutView
-									}
-									icon={ listView }
-									isPressed={ isListViewOpen }
+									className="edit-site-header-edit-mode__zoom-out-view-toggle"
+									icon={ chevronUpDown }
+									isPressed={ isZoomedOutView }
 									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									ref={ setListViewToggleElement }
-									shortcut={ listViewShortcut }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									aria-expanded={ isListViewOpen }
+									label={ __( 'Zoom-out View' ) }
+									onClick={ () => {
+										setPreviewDeviceType( 'Desktop' );
+										__unstableSetEditorMode(
+											isZoomedOutView
+												? 'edit'
+												: 'zoom-out'
+										);
+									} }
 								/>
 							) }
-							{ isZoomedOutViewExperimentEnabled &&
-								! isDistractionFree &&
-								! hasFixedToolbar && (
-									<ToolbarItem
-										as={ Button }
-										className="edit-site-header-edit-mode__zoom-out-view-toggle"
-										icon={ chevronUpDown }
-										isPressed={ isZoomedOutView }
-										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'Zoom-out View' ) }
-										onClick={ () => {
-											setPreviewDeviceType( 'Desktop' );
-											__unstableSetEditorMode(
-												isZoomedOutView
-													? 'edit'
-													: 'zoom-out'
-											);
-										} }
-									/>
-								) }
-						</>
-					) }
-				</div>
-			</NavigableToolbar>
-		</motion.div>
+					</>
+				) }
+			</div>
+		</NavigableToolbar>
 	);
 }
