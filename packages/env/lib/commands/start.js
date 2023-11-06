@@ -169,7 +169,10 @@ module.exports = async function start( {
 
 		if ( 'memcached' === config.env.development.objectCache ) {
 			// Set up object cache drop-in if configured.
-			const memcachedFile = path.resolve( __dirname, '../memcached.php' );
+			const memcachedFile = path.resolve(
+				__dirname,
+				'../object-cache/memcached.php'
+			);
 
 			fs.copyFile(
 				memcachedFile,
