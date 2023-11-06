@@ -192,7 +192,7 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 		categories: patternBlock.wp_pattern_category.map(
 			( patternCategoryId ) =>
 				categories && categories.get( patternCategoryId )
-					? categories.get( patternCategoryId ).slug
+					? categories.get( patternCategoryId ).name
 					: patternCategoryId
 		),
 	} ),
@@ -211,7 +211,7 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
-		const { getEntityRecords, getIsResolving, getUserPatternCategories } =
+		const { getEntityRecords, getIsResolving, getPatternCategories } =
 			select( coreStore );
 
 		const query = { per_page: -1 };
@@ -220,11 +220,13 @@ const selectUserPatterns = createSelector(
 			PATTERN_TYPES.user,
 			query
 		);
-		const userPatternCategories = getUserPatternCategories();
+		const patternCategories = getPatternCategories();
 		const categories = new Map();
-		userPatternCategories.forEach( ( userCategory ) =>
-			categories.set( userCategory.id, userCategory )
-		);
+		patternCategories.forEach( ( category ) => {
+			if ( category.id ) {
+				categories.set( category.id, category );
+			}
+		} );
 		let patterns = records
 			? records.map( ( record ) =>
 					patternBlockToPattern( record, categories )
@@ -249,11 +251,10 @@ const selectUserPatterns = createSelector(
 			// to be in the category.
 			hasCategory: () => true,
 		} );
-
 		return {
 			patterns,
 			isResolving,
-			categories: userPatternCategories,
+			categories: patternCategories,
 		};
 	},
 	( select ) => [

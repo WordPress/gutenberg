@@ -106,7 +106,7 @@ export default function usePatternDetails( postType, postId ) {
 		if ( record.wp_pattern_category?.length > 0 ) {
 			const patternCategoriesMap = new Map();
 			patternCategories.forEach( ( userCategory ) =>
-				patternCategories.set( userCategory.id, userCategory )
+				patternCategoriesMap.set( userCategory.id, userCategory )
 			);
 
 			const categories = record.wp_pattern_category
