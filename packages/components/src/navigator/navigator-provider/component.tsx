@@ -65,7 +65,7 @@ function UnconnectedNavigatorProvider(
 		className,
 		...otherProps
 	} = useContextSystem( props, 'NavigatorProvider' );
-	const [ location, updatedLocation ] = useControlledValue( {
+	const [ location, updateLocation ] = useControlledValue( {
 		onChange,
 		value: locationProp,
 		defaultValue: { path: initialPath },
@@ -217,22 +217,22 @@ function UnconnectedNavigatorProvider(
 			return;
 		}
 
-		updatedLocation( {
+		updateLocation( {
 			isBack: true,
 			path: currentLocationHistory.current[
 				currentLocationHistory.current.length - 2
 			].path,
 		} );
-	}, [ updatedLocation ] );
+	}, [ updateLocation ] );
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( destinationPath, options = {} ) => {
-			updatedLocation( {
+			updateLocation( {
 				...options,
 				path: destinationPath,
 			} );
 		},
-		[ updatedLocation ]
+		[ updateLocation ]
 	);
 
 	const goToParent: NavigatorContextType[ 'goToParent' ] = useCallback(
