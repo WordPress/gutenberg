@@ -18,7 +18,11 @@ import type { WordPressComponentProps } from '../context';
 import type { RadioProps } from './types';
 
 function UnforwardedRadio(
-	{ value, children }: WordPressComponentProps< RadioProps, 'button', false >,
+	{
+		value,
+		children,
+		...props
+	}: WordPressComponentProps< RadioProps, 'button', false >,
 	ref: React.ForwardedRef< any >
 ) {
 	const { store, disabled } = useContext( RadioGroupContext );
@@ -33,7 +37,10 @@ function UnforwardedRadio(
 			ref={ ref }
 			value={ value }
 			render={
-				<Button variant={ isChecked ? 'primary' : 'secondary' } />
+				<Button
+					variant={ isChecked ? 'primary' : 'secondary' }
+					{ ...props }
+				/>
 			}
 		>
 			{ children || value }
