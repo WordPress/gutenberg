@@ -131,6 +131,44 @@ HTML;
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 
+
+	/**
+	 * Tests that the `core/query` last tag is rendered with the tagName attribute
+	 * if is defined, having a div as default.
+	 */
+	public function test_enhanced_query_markup_rendering_at_bottom_on_custom_html_element_tags() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"tagName":"aside","enhancedPagination":true} -->
+		<aside class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:test/plugin-block /-->
+			<!-- /wp:post-template -->
+		</aside>
+		<!-- /wp:query -->
+HTML;
+
+		// Set main query to single post.
+		$wp_query = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$aside_closing_tag    = '</aside>';
+		$pos                  = strrpos( $output, $aside_closing_tag );
+		$last_closing_tag_pos = strrpos( $output, '>', -( strlen( $output ) - $pos ) );
+		$last_opening_tag_pos = strrpos( $output, '<', -( strlen( $output ) - $last_closing_tag_pos ) );
+		$previous_tag         = substr( $output, $last_opening_tag_pos, $last_closing_tag_pos - $last_opening_tag_pos + 1 );
+
+		$this->assertSame( '</div>', $previous_tag );
+	}
+
 	/**
 	 * Tests that the `core/query` block adds an extra attribute to disable the
 	 * enhanced pagination in the browser when a post content block is found inside.
