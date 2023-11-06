@@ -56,8 +56,13 @@ function Header( {
 		};
 	}, [] );
 
+	const hasToolbarSlot = hasFixedToolbar && isLargeViewport;
+
 	return (
-		<div className="edit-post-header">
+		<div
+			role={ hasToolbarSlot ? 'menu' : undefined }
+			className="edit-post-header"
+		>
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }
@@ -75,7 +80,7 @@ function Header( {
 					hasFixedToolbar={ hasFixedToolbar }
 					setListViewToggleElement={ setListViewToggleElement }
 				/>
-				{ hasFixedToolbar && isLargeViewport && (
+				{ hasToolbarSlot && (
 					<Slot
 						className="selected-block-tools-wrapper"
 						name="__experimentalSelectedBlockTools"

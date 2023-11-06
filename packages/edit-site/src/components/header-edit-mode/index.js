@@ -128,8 +128,11 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		ease: 'easeOut',
 	};
 
+	const hasToolbarSlot = hasFixedToolbar && isLargeViewport;
+
 	return (
 		<div
+			role={ hasToolbarSlot ? 'menu' : undefined }
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
@@ -146,7 +149,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						showIconLabels={ showIconLabels }
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
-					{ hasFixedToolbar && isLargeViewport && (
+					{ hasToolbarSlot && (
 						<>
 							<Slot
 								className={ classnames(

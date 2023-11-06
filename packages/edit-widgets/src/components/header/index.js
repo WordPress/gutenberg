@@ -28,10 +28,15 @@ function Header( { setListViewToggleElement } ) {
 		[]
 	);
 
+	const hasToolbarSlot = hasFixedToolbar && isLargeViewport;
+
 	return (
 		<>
 			<div className="edit-widgets-header">
-				<div className="edit-widgets-header__navigable-toolbar-wrapper">
+				<div
+					role={ hasToolbarSlot ? 'menu' : undefined }
+					className="edit-widgets-header__navigable-toolbar-wrapper"
+				>
 					{ isMediumViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }
@@ -48,7 +53,7 @@ function Header( { setListViewToggleElement } ) {
 					<DocumentTools
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
-					{ hasFixedToolbar && isLargeViewport && (
+					{ hasToolbarSlot && (
 						<Slot
 							className="selected-block-tools-wrapper"
 							name="__experimentalSelectedBlockTools"
