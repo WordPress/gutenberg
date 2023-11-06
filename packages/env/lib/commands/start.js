@@ -169,12 +169,7 @@ module.exports = async function start( {
 
 		if ( 'memcached' === config.env.development.objectCache ) {
 			// Set up object cache drop-in if configured.
-			const memcachedFile = require.resolve(
-				'@wordpress/env/lib/object-cache/memcached.php',
-				{
-					paths: [ process.cwd(), __dirname ],
-				}
-			);
+			const memcachedFile = path.resolve( __dirname, '../memcached.php' );
 
 			fs.copyFile(
 				memcachedFile,
