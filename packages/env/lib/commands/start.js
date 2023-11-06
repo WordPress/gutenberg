@@ -166,6 +166,29 @@ module.exports = async function start( {
 			spinner,
 			debug
 		);
+
+		if ( 'memcached' === config.env.development.objectCache ) {
+			// Set up object cache drop-in if configured.
+			const memcachedFile = require.resolve(
+				'@wordpress/env/lib/object-cache/memcached.php',
+				{
+					paths: [ process.cwd(), __dirname ],
+				}
+			);
+
+			fs.copyFile(
+				memcachedFile,
+				path.join(
+					config.env.development.coreSource.path,
+					'wp-content'
+				)
+			);
+
+			fs.copyFile(
+				memcachedFile,
+				path.join( config.env.tests.coreSource.path, 'wp-content' )
+			);
+		}
 	}
 
 	spinner.text = 'Starting WordPress.';
