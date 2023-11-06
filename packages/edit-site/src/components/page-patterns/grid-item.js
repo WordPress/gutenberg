@@ -200,7 +200,7 @@ function GridItem( { categoryId, item, ...props } ) {
 					<BlockPreview
 						blocks={ item.blocks }
 						additionalStyles={ additionalStyles }
-						viewportWidth={ item?.viewportWidth }
+						viewportWidth={ item.viewportWidth }
 					/>
 				) }
 			</button>
