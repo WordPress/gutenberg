@@ -37,6 +37,7 @@
 			"default": ""
 		}
 	},
+	"usesContext": [ "postType" ],
 	"supports": {
 		"reusable": false,
 		"html": false,

@@ -25,6 +25,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function PostNavigationLinkEdit( {
+	context: { postType },
 	attributes: {
 		type,
 		label,
@@ -59,14 +60,6 @@ export default function PostNavigationLinkEdit( {
 		} ),
 	} );
 
-	// We need to know the post type in order to get all supported taxonomies.
-	const postType = useSelect(
-		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		( select ) => select( 'core/editor' ).getCurrentPostType(),
-		[]
-	);
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
@@ -85,7 +78,11 @@ export default function PostNavigationLinkEdit( {
 			value: '',
 		};
 		const taxonomyOptions = ( taxonomies ?? [] )
-			.filter( ( tax ) => tax.slug !== 'nav_menu' )
+			.filter(
+				( tax ) =>
+					tax.slug !== 'nav_menu' &&
+					tax.slug !== 'wp_pattern_category'
+			)
 			.map( ( item ) => {
 				return {
 					value: item.slug,
