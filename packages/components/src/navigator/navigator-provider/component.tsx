@@ -105,6 +105,7 @@ function UnconnectedNavigatorProvider(
 			].path === destinationPath;
 
 		if ( isNavigatingToPreviousPath ) {
+			// Navigating back to previous location
 			setLocationHistory( ( prevLocationHistory ) => {
 				if ( prevLocationHistory.length <= 1 ) {
 					return prevLocationHistory;
@@ -120,48 +121,50 @@ function UnconnectedNavigatorProvider(
 					},
 				];
 			} );
-			return;
+		} else {
+			// Navigating to a new location
+			setLocationHistory( ( prevLocationHistory ) => {
+				const newLocation = {
+					...restOptions,
+					path: destinationPath,
+					isBack,
+					hasRestoredFocus: false,
+					skipFocus,
+				};
+
+				if ( prevLocationHistory.length === 0 ) {
+					return replace ? [] : [ newLocation ];
+				}
+
+				// Form the new location history array.
+				// Start by picking all previous history items, apart from the last one.
+				// A check is in place to make sure that the array doesn't grow
+				// beyond a max length.
+				const newLocationHistory = prevLocationHistory.slice(
+					prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
+					-1
+				);
+
+				// If we're not replacing history, add the last location history item (the
+				// one what was just navigated from). We also assign it a
+				// `focusTargetSelector` for enhanced focus restoration when navigating
+				// back to it.
+				if ( ! replace ) {
+					newLocationHistory.push( {
+						...prevLocationHistory[
+							prevLocationHistory.length - 1
+						],
+						focusTargetSelector,
+					} );
+				}
+
+				// In any case, append the new location to the array (the one that
+				// was just navigated to)
+				newLocationHistory.push( newLocation );
+
+				return newLocationHistory;
+			} );
 		}
-
-		setLocationHistory( ( prevLocationHistory ) => {
-			const newLocation = {
-				...restOptions,
-				path: destinationPath,
-				isBack,
-				hasRestoredFocus: false,
-				skipFocus,
-			};
-
-			if ( prevLocationHistory.length === 0 ) {
-				return replace ? [] : [ newLocation ];
-			}
-
-			// Form the new location history array.
-			// Start by picking all previous history items, apart from the last one.
-			// A check is in place to make sure that the array doesn't grow
-			// beyond a max length.
-			const newLocationHistory = prevLocationHistory.slice(
-				prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
-				-1
-			);
-
-			// If we're not replacing history, add the last location history item (the
-			// one what was just navigated from). We also assign it a
-			// `focusTargetSelector` for enhanced focus restoration when navigating
-			// back to it.
-			if ( ! replace ) {
-				newLocationHistory.push( {
-					...prevLocationHistory[ prevLocationHistory.length - 1 ],
-					focusTargetSelector,
-				} );
-			}
-
-			// In any case, append the new location to the array (the one that
-			// was just navigated to)
-			newLocationHistory.push( newLocation );
-
-			return newLocationHistory;
-		} );
 	}, [ location ] );
 
 	const currentMatch = useRef< MatchedPath >();
