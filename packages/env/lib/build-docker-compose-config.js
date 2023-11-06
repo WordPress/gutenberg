@@ -261,6 +261,36 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
+			'object-cache': {
+				depends_on: [ 'wordpress' ],
+				build: {
+					context: '.',
+					dockerfile: 'ObjectCache.Dockerfile',
+					args: imageBuildArgs,
+				},
+				volumes: developmentMounts,
+				user: hostUser.fullUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.development,
+				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
+			},
+			'tests-object-cache': {
+				depends_on: [ 'tests-wordpress' ],
+				build: {
+					context: '.',
+					dockerfile: 'Tests-ObjectCache.Dockerfile',
+					args: imageBuildArgs,
+				},
+				volumes: testsMounts,
+				user: hostUser.fullUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.tests,
+				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
+			},
 		},
 		volumes: {
 			...( ! config.env.development.coreSource && { wordpress: {} } ),

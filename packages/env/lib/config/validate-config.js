@@ -26,6 +26,30 @@ function checkString( configFile, configKey, value ) {
 }
 
 /**
+ * Validates the string is one of the supported options.
+ *
+ * @param {string}   configFile The config file we're validating.
+ * @param {string}   configKey  The configuration key we're validating.
+ * @param {string}   value      The value to check.
+ * @param {string[]} options    The supported options.
+ */
+function checkOneOfStrings( configFile, configKey, value, options ) {
+	if ( typeof version !== 'string' ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be a string.`
+		);
+	}
+
+	if ( ! options.includes( value ) ) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "${ configKey }" must be one of ${ options.join(
+				','
+			) }`
+		);
+	}
+}
+
+/**
  * Validates the port and throws if it isn't valid.
  *
  * @param {string} configFile The configuration file we're validating.
@@ -173,6 +197,7 @@ function checkValidURL( configFile, configKey, url ) {
 module.exports = {
 	ValidationError,
 	checkString,
+	checkOneOfStrings,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,

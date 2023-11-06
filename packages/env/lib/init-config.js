@@ -81,20 +81,41 @@ module.exports = async function initConfig( {
 		);
 
 		// Write four Dockerfiles for each service we provided.
-		// (WordPress and CLI services, then a development and test environment for each.)
-		for ( const imageType of [ 'WordPress', 'CLI' ] ) {
+		// (WordPress, CLI, and Object Cache services, then a development and test environment for each.)
+		for ( const imageType of [ 'WordPress', 'CLI', 'ObjectCache' ] ) {
 			for ( const envType of [ 'development', 'tests' ] ) {
-				await writeFile(
-					path.resolve(
-						config.workDirectoryPath,
-						`${
-							envType === 'tests' ? 'Tests-' : ''
-						}${ imageType }.Dockerfile`
-					),
-					imageType === 'WordPress'
-						? wordpressDockerFileContents( envType, config )
-						: cliDockerFileContents( envType, config )
-				);
+				let fileContents = '';
+				switch ( imageType ) {
+					case 'WordPress':
+						fileContents = wordpressDockerFileContents(
+							envType,
+							config
+						);
+						break;
+					case 'CLI':
+						fileContents = cliDockerFileContents( envType, config );
+						break;
+					case 'ObjectCache':
+						fileContents = objectCacheDockerFileContents(
+							envType,
+							config
+						);
+						break;
+					default:
+						break;
+				}
+
+				if ( fileContents ) {
+					await writeFile(
+						path.resolve(
+							config.workDirectoryPath,
+							`${
+								envType === 'tests' ? 'Tests-' : ''
+							}${ imageType }.Dockerfile`
+						),
+						fileContents
+					);
+				}
 			}
 		}
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
@@ -178,6 +199,24 @@ CMD [ "/bin/sh", "-c", "while true; do sleep 2073600; done" ]
 }
 
 /**
+ * Generates the Dockerfile used by wp-env's `object-cache` and `tests-object-cache` instances.
+ *
+ * @param {string}   env    The environment we're installing -- development or tests.
+ * @param {WPConfig} config The configuration object.
+ * @return {string} The dockerfile contents.
+ */
+function objectCacheDockerFileContents( env, config ) {
+	if ( 'memcached' === config.env[ env ].objectCache ) {
+		return `FROM memcached
+
+CMD ["memcached"]
+		`;
+	}
+
+	return '';
+}
+
+/**
  * Generates content for the Dockerfile to install dependencies.
  *
  * @param {string}   service The kind of service that we're installing dependencies on ('wordpress' or 'cli').
@@ -207,6 +246,11 @@ RUN apt-get -qy install git
 # Set up sudo so they can have root access.
 RUN apt-get -qy install sudo
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+
+			if ( 'memcached' === config.env[ env ].objectCache ) {
+				dockerFileContent += 'RUN apt-get -qy install libmemcached-dev';
+			}
+
 			break;
 		}
 		case 'cli': {
@@ -220,6 +264,11 @@ RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+
+			if ( 'memcached' === config.env[ env ].objectCache ) {
+				dockerFileContent += 'RUN apk add libmemcached-dev';
+			}
+
 			break;
 		}
 		default: {
@@ -231,6 +280,10 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 		config.xdebug,
 		config.env[ env ].phpVersion
 	);
+
+	if ( 'memcached' === config.env[ env ].objectCache ) {
+		dockerFileContent += 'RUN pecl install memcached-3.1.5';
+	}
 
 	// Add better PHP settings.
 	dockerFileContent += `
