@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 
 set -o pipefail
 
@@ -70,6 +70,11 @@ detect_or_create_simulator "$IOS_DEVICE_NAME"
 detect_or_create_simulator "$IOS_DEVICE_TABLET_NAME"
 
 function detect_or_create_emulator() {
+	if [[ "${CI}" ]]; then
+		log_info "Detected CI server, skipping Android emulator creation."
+		return
+	fi
+
 	local emulator_name=$1
 	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
 	local emulator=$(emulator -list-avds | grep "$emulator_id")
