@@ -89,8 +89,8 @@ if ( ! function_exists( 'register_gutenberg_render_blocks_endpoint' ) ) {
 			'wp/v2',
 			'/render_blocks',
 			array(
-				'methods'  => 'POST',
-				'callback' => 'gutenberg_render_blocks_from_request',
+				'methods'             => 'POST',
+				'callback'            => 'gutenberg_render_blocks_from_request',
 				'permission_callback' => '__return_true',
 			)
 		);
