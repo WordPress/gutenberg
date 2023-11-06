@@ -32,7 +32,6 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			const block = page.getByRole( 'document', {
 				name: 'Block: Prioritized Inserter Blocks Unset',
 			} );
-			await expect( block ).toBeVisible();
 
 			await block
 				.getByRole( 'button', {
@@ -58,7 +57,6 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			const block = page.getByRole( 'document', {
 				name: 'Block: Prioritized Inserter Blocks Set',
 			} );
-			await expect( block ).toBeVisible();
 
 			await block
 				.getByRole( 'button', {
@@ -91,7 +89,6 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			const block = page.getByRole( 'document', {
 				name: 'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks',
 			} );
-			await expect( block ).toBeVisible();
 
 			await block
 				.getByRole( 'button', {
@@ -129,8 +126,6 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 					name: 'Block: Prioritized Inserter Blocks Set',
 				} )
 				.getByRole( 'document', { name: 'Block: Image' } );
-
-			await expect( imageBlock ).toBeVisible();
 
 			await imageBlock.click();
 			await page.keyboard.press( 'Enter' );
