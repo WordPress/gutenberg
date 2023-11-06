@@ -12,7 +12,6 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as InputControl,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
@@ -114,11 +113,6 @@ export default function PageSlug( { postType, postId } ) {
 									__next40pxDefaultSize
 									label={ __( 'Permalink' ) }
 									hideLabelFromVision
-									prefix={
-										<InputControlPrefixWrapper>
-											/
-										</InputControlPrefixWrapper>
-									}
 									value={ forceEmptyField ? '' : recordSlug }
 									autoComplete="off"
 									spellCheck="false"
