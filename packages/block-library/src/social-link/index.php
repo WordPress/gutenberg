@@ -17,12 +17,11 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service     = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url         = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label       = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
-	$rel         = ( isset( $attributes['rel'] ) ) ? $attributes['rel'] : '';
-	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
-
+    $service     = (isset($attributes['service'])) ? $attributes['service'] : 'Icon';
+    $url         = (isset($attributes['url'])) ? $attributes['url'] : false;
+    $label       = (isset($attributes['label'])) ? $attributes['label'] : block_core_social_link_get_name($service);
+    $rel         = (isset($attributes['rel'])) ? $attributes['rel'] : '';
+    $show_labels = array_key_exists('showLabels', $block->context) ? $block->context['showLabels'] : false;
 
 	/**
 	 * Prepend emails with `mailto:` if not set.
