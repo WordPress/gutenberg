@@ -52,10 +52,12 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
+		if ( itemId === undefined ) {
+			continue;
+		}
 		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
-			continue;
+			return null;
 		}
 
 		const item = state.items[ context ][ itemId ];
