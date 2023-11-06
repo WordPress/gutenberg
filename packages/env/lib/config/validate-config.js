@@ -34,7 +34,7 @@ function checkString( configFile, configKey, value ) {
  * @param {string[]} options    The supported options.
  */
 function checkOneOfStrings( configFile, configKey, value, options ) {
-	if ( typeof version !== 'string' ) {
+	if ( typeof value !== 'string' ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a string.`
 		);
