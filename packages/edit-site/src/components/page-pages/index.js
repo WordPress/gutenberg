@@ -6,11 +6,12 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,7 +19,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import Link from '../routes/link';
 import { DataViews, viewTypeSupportsMap } from '../dataviews';
-import { default as DEFAULT_VIEWS } from './default-views';
+import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	useTrashPostAction,
 	usePermanentlyDeletePostAction,
@@ -44,21 +45,69 @@ const defaultConfigPerViewType = {
 // The reason for that is to match the default statuses coming from the endpoint (entity request).
 export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
 
+function useView( type ) {
+	const {
+		params: { activeView = 'all', isCustom = 'false' },
+	} = useLocation();
+	const selectedDefaultView =
+		isCustom === 'false' &&
+		DEFAULT_VIEWS[ type ].find( ( { slug } ) => slug === activeView )?.view;
+	const [ view, setView ] = useState( selectedDefaultView );
+
+	useEffect( () => {
+		if ( selectedDefaultView ) {
+			setView( selectedDefaultView );
+		}
+	}, [ selectedDefaultView ] );
+	const editedViewRecord = useSelect(
+		( select ) => {
+			if ( isCustom !== 'true' ) {
+				return;
+			}
+			const { getEditedEntityRecord } = select( coreStore );
+			const dataviewRecord = getEditedEntityRecord(
+				'postType',
+				'wp_dataviews',
+				Number( activeView )
+			);
+			return dataviewRecord;
+		},
+		[ activeView, isCustom ]
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
+
+	const customView = useMemo( () => {
+		return (
+			editedViewRecord?.content && JSON.parse( editedViewRecord?.content )
+		);
+	}, [ editedViewRecord?.content ] );
+	const setCustomView = useCallback(
+		( viewToSet ) => {
+			editEntityRecord(
+				'postType',
+				'wp_dataviews',
+				editedViewRecord?.id,
+				{
+					content: JSON.stringify( viewToSet ),
+				}
+			);
+		},
+		[ editEntityRecord, editedViewRecord?.id ]
+	);
+
+	if ( isCustom === 'false' ) {
+		return [ view, setView ];
+	} else if ( isCustom === 'true' && customView ) {
+		return [ customView, setCustomView ];
+	}
+	// Loading state where no the view was not found on custom views or default views.
+	return [ DEFAULT_VIEWS[ type ][ 0 ].view, setView ];
+}
+
 export default function PagePages() {
 	const postType = 'page';
+	const [ view, setView ] = useView( postType );
 	const [ selection, setSelection ] = useState( [] );
-	const {
-		params: { path, activeView = 'all' },
-	} = useLocation();
-	const initialView = DEFAULT_VIEWS.find(
-		( { slug } ) => slug === activeView
-	).view;
-	const [ view, setView ] = useState( initialView );
-	useEffect( () => {
-		setView(
-			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
-		);
-	}, [ path, activeView ] );
 	const { records: statuses, isResolving: isLoadingStatus } =
 		useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
