@@ -231,7 +231,7 @@ export default function PagePages() {
 						</a>
 					);
 				},
-				filters: [ 'enumeration' ],
+				filters: [ 'in' ],
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -244,7 +244,7 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					statuses?.find( ( { slug } ) => slug === item.status )
 						?.name ?? item.status,
-				filters: [ 'enumeration' ],
+				filters: [ 'in' ],
 				elements:
 					statuses?.map( ( { slug, name } ) => ( {
 						value: slug,
