@@ -51,6 +51,7 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		nestedListedConverter,
 		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
