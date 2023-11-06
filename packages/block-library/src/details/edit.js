@@ -24,10 +24,13 @@ const TEMPLATE = [
 function DetailsEdit( { attributes, setAttributes, clientId } ) {
 	const { showContent, summary } = attributes;
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-		__experimentalCaptureToolbars: true,
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			template: TEMPLATE,
+			__experimentalCaptureToolbars: true,
+		}
+	);
 
 	// Check if either the block or the inner blocks are selected.
 	const hasSelection = useSelect(
@@ -58,10 +61,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<details
-				{ ...innerBlocksProps }
-				open={ hasSelection || showContent }
-			>
+			<details { ...blockProps } open={ hasSelection || showContent }>
 				<summary onClick={ ( event ) => event.preventDefault() }>
 					<RichText
 						aria-label={ __( 'Write summary' ) }
@@ -75,7 +75,13 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						multiline={ false }
 					/>
 				</summary>
-				{ innerBlocksProps.children }
+				{
+					// In Chrome, the details content needs a wrapper div for
+					// multiselection to work. Chrome internally uses HTML slots
+					// so this might be an issues when making everything
+					// `contenteditable`.
+				 }
+				<div { ...innerBlocksProps } />
 			</details>
 		</>
 	);
