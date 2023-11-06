@@ -26,6 +26,11 @@ const meta: Meta< typeof Divider > = {
 		wrapElement: {
 			control: { type: null },
 		},
+		ref: {
+			table: {
+				disable: true,
+			},
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
