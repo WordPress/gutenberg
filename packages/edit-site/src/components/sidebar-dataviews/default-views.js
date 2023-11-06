@@ -9,7 +9,7 @@ const DEFAULT_PAGE_BASE = {
 	search: '',
 	filters: [],
 	page: 1,
-	perPage: 5,
+	perPage: 6,
 	sort: {
 		field: 'date',
 		direction: 'desc',
