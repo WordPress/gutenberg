@@ -145,8 +145,10 @@ HTML;
 			<!-- wp:post-template {"align":"wide"} -->
 				<!-- wp:test/plugin-block /-->
 			<!-- /wp:post-template -->
+			<span>Helper to get last HTML Tag</span>
 		</aside>
 		<!-- /wp:query -->
+
 HTML;
 
 		// Set main query to single post.
@@ -160,13 +162,16 @@ HTML;
 
 		$output = do_blocks( $content );
 
-		$aside_closing_tag    = '</aside>';
-		$pos                  = strrpos( $output, $aside_closing_tag );
-		$last_closing_tag_pos = strrpos( $output, '>', -( strlen( $output ) - $pos ) );
-		$last_opening_tag_pos = strrpos( $output, '<', -( strlen( $output ) - $last_closing_tag_pos ) );
-		$previous_tag         = substr( $output, $last_opening_tag_pos, $last_closing_tag_pos - $last_opening_tag_pos + 1 );
+		$p = new WP_HTML_Tag_Processor( $output );
 
-		$this->assertSame( '</div>', $previous_tag );
+		$p->next_tag( 'span' );
+
+		// Test that there is a div added just after the last tag inside the aside.
+		$this->assertSame( $p->next_tag(), true );
+		// Test that that div is the accesibility one.
+		$this->assertSame( 'screen-reader-text', $p->get_attribute( 'class' ) );
+		$this->assertSame( 'context.core.query.message', $p->get_attribute( 'data-wp-text' ) );
+		$this->assertSame( 'polite', $p->get_attribute( 'aria-live' ) );
 	}
 
 	/**
