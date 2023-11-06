@@ -36,6 +36,13 @@
 	.components-button {
 		transition: none;
 	}
+
+	// When the Image block is linked,
+	// it's wrapped with a disabled <a /> tag.
+	// Restore cursor style so it doesn't appear 'clickable'.
+	> a {
+		cursor: default;
+	}
 }
 
 
