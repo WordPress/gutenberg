@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { DisclosureContentProps } from './types';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Accessible Disclosure component that controls visibility of a section of
@@ -24,13 +25,21 @@ import type { DisclosureContentProps } from './types';
  * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
  */
 const UnforwardedDisclosureContent = (
-	{ visible, children }: DisclosureContentProps,
+	{
+		visible,
+		children,
+		...props
+	}: WordPressComponentProps< DisclosureContentProps, 'div', false >,
 	ref: React.ForwardedRef< any >
 ) => {
 	const disclosure = Ariakit.useDisclosureStore( { open: visible } );
 
 	return (
-		<Ariakit.DisclosureContent store={ disclosure } ref={ ref }>
+		<Ariakit.DisclosureContent
+			store={ disclosure }
+			ref={ ref }
+			{ ...props }
+		>
 			{ children }
 		</Ariakit.DisclosureContent>
 	);
