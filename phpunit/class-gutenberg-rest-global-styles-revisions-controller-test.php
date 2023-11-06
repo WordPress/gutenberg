@@ -304,6 +304,8 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	}
 
 	/**
+	 * @ticket 59810
+	 *
 	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_item
 	 */
 	public function test_get_item() {
@@ -315,6 +317,22 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 
 		$this->assertSame( 200, $response->get_status(), 'Response status is 200.' );
 		$this->check_get_revision_response( $data, $this->revision_1 );
+	}
+
+	/**
+	 * @ticket 59810
+	 *
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_revision
+	 */
+	public function test_get_item_invalid_revision_id_should_error() {
+		wp_set_current_user( self::$admin_id );
+
+		$expected_error  = 'rest_post_invalid_id';
+		$expected_status = 404;
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions/20000001' );
+		$response        = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( $expected_error, $response, $expected_status );
 	}
 
 	/**
