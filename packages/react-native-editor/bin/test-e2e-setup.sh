@@ -24,14 +24,14 @@ function log_error() {
 output=$($APPIUM_CMD driver list --installed --json)
 
 if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 is installed, skipping installation."
+	log_info "UiAutomator2 is available."
 else
 	log_info "UiAutomator2 not found, installing..."
 	$APPIUM_CMD driver install uiautomator2
 fi
 
 if echo "$output" | grep -q 'xcuitest'; then
-	log_info "XCUITest is installed, skipping installation."
+	log_info "XCUITest is available."
 else
 	log_info "XCUITest not found, installing..."
 	$APPIUM_CMD driver install xcuitest
