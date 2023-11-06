@@ -82,11 +82,13 @@ function detect_or_create_emulator() {
 
 	local emulator_name=$1
 	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
+	local device_id=$(echo "$emulator_id" | awk -F '_' '{print tolower($1)"_"tolower($2)"_"tolower($3)}')
+	local runtime_api=$(echo "$emulator_id" | awk -F '_' '{print $NF}')
 	local emulator=$(emulator -list-avds | grep "$emulator_id")
 
 	if [[ -z $emulator ]]; then
 		log_info "$emulator_name not available, creating..."
-		avdmanager create avd -n "$emulator_id" -k "system-images;android-30;google_apis;arm64-v8a" -d "pixel_3_xl" > /dev/null
+		avdmanager create avd -n "$emulator_id" -k "system-images;android-$runtime_api;google_apis;arm64-v8a" -d "$device_id" > /dev/null
 		log_success "$emulator_name created."
 	else
 		log_info "$emulator_name available."
