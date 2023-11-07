@@ -60,33 +60,19 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 /**
  * Action that sets a template, optionally fetching it from REST API.
  *
- * @param {number} templateId   The template ID.
- * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export const setTemplate =
-	( templateId, templateSlug ) =>
-	async ( { dispatch, registry } ) => {
-		if ( ! templateSlug ) {
-			try {
-				const template = await registry
-					.resolveSelect( coreStore )
-					.getEntityRecord(
-						'postType',
-						TEMPLATE_POST_TYPE,
-						templateId
-					);
-				templateSlug = template?.slug;
-			} catch ( error ) {}
-		}
+export function setTemplate() {
+	deprecated( "dispatch( 'core/edit-site' ).setTemplate", {
+		since: '6.5',
+		version: '6.8',
+		hint: 'The setTemplate is not needed anymore, the correct entity is resolved from the URL automatically.',
+	} );
 
-		dispatch( {
-			type: 'SET_EDITED_POST',
-			postType: TEMPLATE_POST_TYPE,
-			id: templateId,
-			context: { templateSlug },
-		} );
+	return {
+		type: 'NOTHING',
 	};
+}
 
 /**
  * Action that adds a new template and sets it as the current template.
@@ -211,14 +197,16 @@ export function setNavigationMenu( navigationMenuId ) {
  *
  * @param {string} postType The entity's post type.
  * @param {string} postId   The entity's ID.
+ * @param {Object} context  The entity's context.
  *
  * @return {Object} Action object.
  */
-export function setEditedEntity( postType, postId ) {
+export function setEditedEntity( postType, postId, context ) {
 	return {
 		type: 'SET_EDITED_POST',
 		postType,
 		id: postId,
+		context,
 	};
 }
 
@@ -254,85 +242,19 @@ export function setEditedPostContext( context ) {
  * Resolves the template for a page and displays both. If no path is given, attempts
  * to use the postId to generate a path like `?p=${ postId }`.
  *
- * @param {Object} page         The page object.
- * @param {string} page.type    The page type.
- * @param {string} page.slug    The page slug.
- * @param {string} page.path    The page path.
- * @param {Object} page.context The page context.
+ * @deprecated
  *
  * @return {number} The resolved template ID for the page route.
  */
-export const setPage =
-	( page ) =>
-	async ( { dispatch, registry } ) => {
-		let template;
-		const getDefaultTemplate = async ( slug ) => {
-			const templateId = await registry
-				.resolveSelect( coreStore )
-				.getDefaultTemplateId( {
-					slug: `page-${ slug }`,
-				} );
-			return templateId
-				? await registry
-						.resolveSelect( coreStore )
-						.getEntityRecord(
-							'postType',
-							TEMPLATE_POST_TYPE,
-							templateId
-						)
-				: undefined;
-		};
+export function setPage() {
+	deprecated( "dispatch( 'core/edit-site' ).setPage", {
+		since: '6.5',
+		version: '6.8',
+		hint: 'The setPage is not needed anymore, the correct entity is resolved from the URL automatically.',
+	} );
 
-		if ( page.path ) {
-			template = await registry
-				.resolveSelect( coreStore )
-				.__experimentalGetTemplateForLink( page.path );
-		} else {
-			const editedEntity = await registry
-				.resolveSelect( coreStore )
-				.getEditedEntityRecord(
-					'postType',
-					page.context?.postType || 'post',
-					page.context?.postId
-				);
-			const currentTemplateSlug = editedEntity?.template;
-			if ( currentTemplateSlug ) {
-				const currentTemplate = (
-					await registry
-						.resolveSelect( coreStore )
-						.getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-							per_page: -1,
-						} )
-				)?.find( ( { slug } ) => slug === currentTemplateSlug );
-				if ( currentTemplate ) {
-					template = currentTemplate;
-				} else {
-					// If a page has a `template` set and is not included in the list
-					// of the current theme's templates, query for current theme's default template.
-					template = await getDefaultTemplate( editedEntity?.slug );
-				}
-			} else {
-				// Page's `template` is empty, that indicates we need to use the default template for the page.
-				template = await getDefaultTemplate( editedEntity?.slug );
-			}
-		}
-
-		if ( ! template ) {
-			return;
-		}
-
-		dispatch( {
-			type: 'SET_EDITED_POST',
-			postType: TEMPLATE_POST_TYPE,
-			id: template.id,
-			context: {
-				...page.context,
-				templateSlug: template.slug,
-			},
-		} );
-
-		return template.id;
-	};
+	return { type: 'NOTHING' };
+}
 
 /**
  * Action that sets the active navigation panel menu.
