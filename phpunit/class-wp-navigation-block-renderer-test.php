@@ -10,8 +10,6 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 	public function test_gutenberg_get_markup_for_inner_block_navigation_link() {
 
-		// if site title or site logo, we manually add list items
-
 		$parsed_blocks         = parse_blocks(
 			'<!-- wp:navigation-link {"label":"Sample Page","type":"page","kind":"post-type","url":"/hello-world"} /-->'
 		);
@@ -33,6 +31,33 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
 		$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		$this->assertSame( $expected, $result );
+	}
+
+	public function test_gutenberg_get_markup_for_inner_block_site_title() {
+
+		// We are testing the site title block because we manually add list items around it
+		$parsed_blocks         = parse_blocks(
+			'<!-- wp:site-title /-->'
+		);
+		$parsed_block          = $parsed_blocks[0];
+		$context               = array();
+		$site_title_block = new WP_Block( $parsed_block, $context );
+
+		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
+		/**
+		 * Returns the markup for a single inner block.
+		 *
+		 * @param WP_Block $inner_block The inner block.
+		 * @return string Returns the markup for a single inner block.
+		 */
+		$method = $reflection->getMethod( 'get_markup_for_inner_block' );
+		$method->setAccessible( true );
+		// Invoke the private method
+		$result = $method->invoke( $reflection, $site_title_block );
+
+		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://localhost:8889" target="_self" rel="home">Test Blog</a></h1></li>';
 		$this->assertSame( $expected, $result );
 	}
 }
