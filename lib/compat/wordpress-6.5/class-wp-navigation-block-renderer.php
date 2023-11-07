@@ -50,7 +50,6 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not a navigation has a submenu.
 	 */
 	private static function has_submenus( $inner_blocks ) {
-		$has_submenus = false;
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_content = $inner_block->render();
 			$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
@@ -60,10 +59,10 @@ class WP_Navigation_Block_Renderer {
 					'class_name' => 'has-child',
 				)
 			) ) {
-				$has_submenus = true;
+				return true;
 			}
 		}
-		return $has_submenus;
+		return false;
 	}
 
 	/**
