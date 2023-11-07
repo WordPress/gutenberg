@@ -251,7 +251,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 				dockerFileContent += `
 
 # Install Memcached library
-RUN apt-get -qy install zlib1g-dev libmemcached-dev memcached libmemcached-tools`;
+RUN apt-get -qy install zlib1g-dev libmemcached-dev memcached libmemcached-tools libssl-dev`;
 			}
 
 			break;
