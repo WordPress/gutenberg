@@ -13,6 +13,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import getGlobalStylesChanges from './get-revision-changes';
+
+const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
+
+/**
  * Returns a button label for the revision.
  *
  * @param {Object} revision A revision object.
@@ -65,10 +72,14 @@ function getRevisionLabel( revision ) {
  * @return {JSX.Element} The modal component.
  */
 function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
-	const currentTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme(),
-		[]
-	);
+	const { currentTheme, currentUser } = useSelect( ( select ) => {
+		const { getCurrentTheme, getCurrentUser } = select( coreStore );
+		return {
+			currentTheme: getCurrentTheme(),
+			currentUser: getCurrentUser(),
+		};
+	}, [] );
+
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
@@ -77,13 +88,21 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 		>
 			{ userRevisions.map( ( revision, index ) => {
 				const { id, author, modified } = revision;
-				const authorDisplayName = author?.name || __( 'User' );
-				const authorAvatar = author?.avatar_urls?.[ '48' ];
 				const isUnsaved = 'unsaved' === revision?.id;
+				// Unsaved changes are created by the current user.
+				const revisionAuthor = isUnsaved ? currentUser : author;
+				const authorDisplayName = revisionAuthor?.name || __( 'User' );
+				const authorAvatar = revisionAuthor?.avatar_urls?.[ '48' ];
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === revision?.id
 					: index === 0;
 				const isReset = 'parent' === revision?.id;
+				const displayDate =
+					modified &&
+					getDate().getTime() - getDate( modified ).getTime() >
+						DAY_IN_MILLISECONDS
+						? dateI18n( 'M j Y', getDate( modified ) )
+						: humanTimeDiff( modified );
 
 				return (
 					<li
@@ -115,9 +134,18 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							) : (
 								<span className="edit-site-global-styles-screen-revisions__description">
 									<time dateTime={ modified }>
-										{ humanTimeDiff( modified ) }
+										Saved { displayDate }
 									</time>
+									<span className="edit-site-global-styles-screen-revisions__changes">
+										{ getGlobalStylesChanges(
+											revision
+										).join( ', ' ) }
+									</span>
 									<span className="edit-site-global-styles-screen-revisions__meta">
+										<img
+											alt={ authorDisplayName }
+											src={ authorAvatar }
+										/>
 										{ isUnsaved
 											? sprintf(
 													/* translators: %s author display name */
@@ -131,11 +159,6 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 													__( 'Changes saved by %s' ),
 													authorDisplayName
 											  ) }
-
-										<img
-											alt={ author?.name }
-											src={ authorAvatar }
-										/>
 									</span>
 								</span>
 							) }
