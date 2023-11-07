@@ -80,6 +80,23 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns the markup for a single inner block.
+	 *
+	 * @param WP_Block $inner_block The inner block.
+	 * @return string Returns the markup for a single inner block.
+	 */
+	private static function get_markup_for_inner_block( $inner_block ) {
+		$inner_block_content = $inner_block->render();
+		if ( ! empty( $inner_block_content ) ) {
+			if ( in_array( $inner_block->name, static::$needs_list_item_wrapper, true ) ) {
+				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+			}
+
+			return $inner_block_content;
+		}
+	}
+
+	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
 	 * @param array         $attributes   The block attributes.
@@ -118,14 +135,7 @@ class WP_Navigation_Block_Renderer {
 				$inner_blocks_html .= '</ul>';
 			}
 
-			$inner_block_content = $inner_block->render();
-			if ( ! empty( $inner_block_content ) ) {
-				if ( in_array( $inner_block->name, static::$needs_list_item_wrapper, true ) ) {
-					$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-				} else {
-					$inner_blocks_html .= $inner_block_content;
-				}
-			}
+			$inner_blocks_html .= static::get_markup_for_inner_block( $inner_block );
 		}
 
 		if ( $is_list_open ) {
