@@ -23,7 +23,7 @@ class WP_Navigation_Block_Renderer {
 		'core/navigation-submenu',
 	);
 
-	static $needs_list_item_wrapper = array(
+	private static $needs_list_item_wrapper = array(
 		'core/site-title',
 		'core/site-logo',
 	);
