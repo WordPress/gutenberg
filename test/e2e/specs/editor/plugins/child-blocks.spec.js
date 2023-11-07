@@ -36,9 +36,15 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-unrestricted-parent',
 		} );
 
-		await page.click(
-			'[data-type="test/child-blocks-unrestricted-parent"] .block-editor-default-block-appender'
-		);
+		await page
+			.getByRole( 'document', {
+				name: 'Block: Child Blocks Unrestricted Parent',
+			} )
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
+
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Toggle block inserter' } );
