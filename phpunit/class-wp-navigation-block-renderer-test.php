@@ -8,6 +8,13 @@
 
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
+	/**
+	 * Test that navigation links are wrapped in list items to preserve accessible markup
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
+	 */
 	public function test_gutenberg_get_markup_for_inner_block_navigation_link() {
 
 		$parsed_blocks         = parse_blocks(
@@ -28,6 +35,13 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $result );
 	}
 
+	/**
+	 * Test that the site-title block is wrapped in a list item to preserve accessible markup
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
+	 */
 	public function test_gutenberg_get_markup_for_inner_block_site_title() {
 
 		// We are testing the site title block because we manually add list items around it
