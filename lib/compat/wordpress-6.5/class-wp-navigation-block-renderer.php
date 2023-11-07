@@ -14,6 +14,20 @@ if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
  * Helper functions used to render the navigation block.
  */
 class WP_Navigation_Block_Renderer {
+
+	static $list_item_nav_blocks = array(
+		'core/navigation-link',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	);
+
+	static $needs_list_item_wrapper = array(
+		'core/site-title',
+		'core/site-logo',
+	);
+
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 *
@@ -76,19 +90,6 @@ class WP_Navigation_Block_Renderer {
 		$has_submenus            = static::has_submenus( $inner_blocks );
 		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
 
-		$list_item_nav_blocks = array(
-			'core/navigation-link',
-			'core/home-link',
-			'core/site-title',
-			'core/site-logo',
-			'core/navigation-submenu',
-		);
-
-		$needs_list_item_wrapper = array(
-			'core/site-title',
-			'core/site-logo',
-		);
-
 		$style                = static::get_styles( $attributes );
 		$class                = static::get_classes( $attributes );
 		$container_attributes = get_block_wrapper_attributes(
@@ -102,7 +103,7 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
+			$is_list_item = in_array( $inner_block->name, static::$list_item_nav_blocks, true );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -119,7 +120,7 @@ class WP_Navigation_Block_Renderer {
 
 			$inner_block_content = $inner_block->render();
 			if ( ! empty( $inner_block_content ) ) {
-				if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
+				if ( in_array( $inner_block->name, static::$needs_list_item_wrapper, true ) ) {
 					$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 				} else {
 					$inner_blocks_html .= $inner_block_content;
