@@ -59,19 +59,25 @@ export const settings = {
 
 export const init = () => {
 	addFilter(
-		'editor.hooks.updateAlignment',
-		'core/image/update-alignment',
-		( nextAlign, blockName ) =>
-			blockName === 'core/image' &&
-			[ 'wide', 'full' ].includes( nextAlign )
-				? {
+		'block-library.image.alignmentUpdate',
+		'core/block-library/filters',
+		( blockName, updatedAttributes ) => {
+			if ( blockName !== 'core/image' ) {
+				return updatedAttributes;
+			}
+			if ( [ 'wide', 'full' ].includes( updatedAttributes.align ) ) {
+				return {
+					...updatedAttributes,
+					...{
 						width: undefined,
 						height: undefined,
 						aspectRatio: undefined,
 						scale: undefined,
-						align: nextAlign,
-				  }
-				: { align: nextAlign }
+					},
+				};
+			}
+			return updatedAttributes;
+		}
 	);
 	initBlock( { name, metadata, settings } );
 };
