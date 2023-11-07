@@ -102,7 +102,6 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 	} );
 

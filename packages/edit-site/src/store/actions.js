@@ -104,7 +104,6 @@ export const addTemplate =
 			type: 'SET_EDITED_POST',
 			postType: TEMPLATE_POST_TYPE,
 			id: newTemplate.id,
-			context: { templateSlug: newTemplate.slug },
 		} );
 	};
 

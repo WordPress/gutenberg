@@ -104,8 +104,6 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		[ homepageId, isRequestingSite, url, postId, postType ]
 	);
 
-	// todo add template slug in context.
-
 	const context = useMemo( () => {
 		if ( postTypesWithoutParentTemplate.includes( postType ) ) {
 			return {};
