@@ -79,6 +79,12 @@ class WP_Navigation_Block_Renderer {
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
+	/**
+	 * Returns whether or not a block needs a list item wrapper.
+	 *
+	 * @param WP_Block $block The block.
+	 * @return bool Returns whether or not a block needs a list item wrapper.
+	 */
 	private static function does_block_need_a_list_item_wrapper( $block ) {
 		return in_array( $block->name, static::$needs_list_item_wrapper, true );
 	}
