@@ -17,14 +17,7 @@
 	}
 
 	.block-editor-block-contextual-toolbar.is-fixed {
-		// remove the border
 		border: none;
-		display: flex; // Allow for flex-shrink on the block toolbar
-		flex-shrink: 2;
-
-		.block-editor-block-toolbar {
-			overflow-x: auto; // Allow only the block tools to overflow scroll to make room in the header.
-		}
 	}
 }
 

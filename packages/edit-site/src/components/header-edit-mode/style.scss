@@ -46,6 +46,10 @@ $header-toolbar-min-width: 335px;
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
 	}
+
+	.block-editor-block-contextual-toolbar.is-fixed {
+		border: none;
+	}
 }
 
 .edit-site-header-edit-mode__toolbar {
@@ -78,16 +82,6 @@ $header-toolbar-min-width: 335px;
 				transform: rotate(45deg);
 			}
 		}
-	}
-}
-
-.block-editor-block-contextual-toolbar.is-fixed {
-	width: 100%;
-
-	@include break-medium() {
-		width: auto;
-		// remove the border
-		border: none;
 	}
 }
 

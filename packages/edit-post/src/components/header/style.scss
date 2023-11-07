@@ -53,12 +53,6 @@
 
 	.block-editor-block-contextual-toolbar.is-fixed {
 		border: none;
-		flex-shrink: 2;
-		display: flex; // Allow for flex-shrink on the block toolbar
-
-		.block-editor-block-toolbar {
-			overflow-x: auto; // Allow only the block tools to overflow scroll to make room in the header.
-		}
 	}
 
 	.selected-block-tools-wrapper {
