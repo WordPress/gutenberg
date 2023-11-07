@@ -33,8 +33,11 @@ import Pagination from './pagination';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SYNC_FILTERS = {
+	// translators: Button label, when clicked it shows "All patterns".
 	all: __( 'All' ),
+	// translators: Button label, when clicked it shows all "Synced patterns".
 	[ PATTERN_SYNC_TYPES.full ]: __( 'Synced' ),
+	// translators: Button label, when click it shows all "Not synced patterns".
 	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Not synced' ),
 };
 

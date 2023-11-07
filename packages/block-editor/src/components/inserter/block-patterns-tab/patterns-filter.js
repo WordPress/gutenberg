@@ -55,14 +55,17 @@ export function PatternsFilter( {
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
+			// translators: Button label, when clicked it shows "All patterns".
 			{ value: SYNC_TYPES.all, label: __( 'All' ) },
 			{
 				value: SYNC_TYPES.full,
+				// translators: Button label, when clicked it shows all "Synced patterns".
 				label: __( 'Synced' ),
 				disabled: shouldDisableSyncFilter,
 			},
 			{
 				value: SYNC_TYPES.unsynced,
+				// translators: Button label, when click it shows all "Not synced patterns".
 				label: __( 'Not synced' ),
 				disabled: shouldDisableSyncFilter,
 			},
