@@ -29,6 +29,9 @@ test.describe( 'Child Blocks', () => {
 		expect( blockLibrary.getByRole( 'option' ) ).not.toContain( [
 			'Child Blocks Child',
 		] );
+		expect(
+			await blockLibrary.getByRole( 'option' ).count()
+		).toBeGreaterThan( 10 );
 	} );
 
 	test( 'shows up in a parent block', async ( { page, editor } ) => {
@@ -41,7 +44,7 @@ test.describe( 'Child Blocks', () => {
 				name: 'Block: Child Blocks Unrestricted Parent',
 			} )
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add default block',
 			} )
 			.click();
 
@@ -54,6 +57,9 @@ test.describe( 'Child Blocks', () => {
 
 		await blockInserter.click();
 		await expect( blockLibrary ).toBeVisible();
+		await expect( blockLibrary.getByRole( 'option' ) ).toContainText( [
+			'Child Blocks Child',
+		] );
 		expect(
 			await blockLibrary.getByRole( 'option' ).count()
 		).toBeGreaterThan( 10 );
@@ -67,9 +73,14 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-restricted-parent',
 		} );
 
-		await page.click(
-			'[data-type="test/child-blocks-restricted-parent"] .block-editor-default-block-appender'
-		);
+		await page
+			.getByRole( 'document', {
+				name: 'Block: Child Blocks Restricted Parent',
+			} )
+			.getByRole( 'button', {
+				name: 'Add default block',
+			} )
+			.click();
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
