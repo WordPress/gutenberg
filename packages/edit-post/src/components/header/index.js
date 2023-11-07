@@ -60,7 +60,7 @@ function Header( {
 
 	return (
 		<div
-			role={ hasToolbarSlot ? 'menu' : undefined }
+			role={ hasToolbarSlot ? 'menubar' : undefined }
 			className="edit-post-header"
 		>
 			<MainDashboardButton.Slot>

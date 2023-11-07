@@ -34,7 +34,7 @@ function Header( { setListViewToggleElement } ) {
 		<>
 			<div className="edit-widgets-header">
 				<div
-					role={ hasToolbarSlot ? 'menu' : undefined }
+					role={ hasToolbarSlot ? 'menubar' : undefined }
 					className="edit-widgets-header__navigable-toolbar-wrapper"
 				>
 					{ isMediumViewport && (

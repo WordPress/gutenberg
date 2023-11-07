@@ -132,7 +132,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 
 	return (
 		<div
-			role={ hasToolbarSlot ? 'menu' : undefined }
+			role={ hasToolbarSlot ? 'menubar' : undefined }
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
