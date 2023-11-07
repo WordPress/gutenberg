@@ -266,12 +266,22 @@ export const setPage =
 	( page ) =>
 	async ( { dispatch, registry } ) => {
 		let template;
-		const getDefaultTemplate = async ( slug ) =>
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/templates/lookup', {
+		const getDefaultTemplate = async ( slug ) => {
+			const templateId = await registry
+				.resolveSelect( coreStore )
+				.getDefaultTemplateId( {
 					slug: `page-${ slug }`,
-				} ),
-			} );
+				} );
+			return templateId
+				? await registry
+						.resolveSelect( coreStore )
+						.getEntityRecord(
+							'postType',
+							TEMPLATE_POST_TYPE,
+							templateId
+						)
+				: undefined;
+		};
 
 		if ( page.path ) {
 			template = await registry
