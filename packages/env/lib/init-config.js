@@ -248,7 +248,10 @@ RUN apt-get -qy install sudo
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 
 			if ( 'memcached' === config.env[ env ].objectCache ) {
-				dockerFileContent += 'RUN apt-get -qy install libmemcached-dev';
+				dockerFileContent += `
+
+# Install Memcached
+RUN apt-get -qy install libmemcached-dev`;
 			}
 
 			break;
@@ -266,7 +269,10 @@ RUN apk --no-cache add sudo linux-headers
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 
 			if ( 'memcached' === config.env[ env ].objectCache ) {
-				dockerFileContent += 'RUN apk add libmemcached-dev';
+				dockerFileContent += `
+
+# Install Memcached
+RUN apk add libmemcached-dev`;
 			}
 
 			break;
