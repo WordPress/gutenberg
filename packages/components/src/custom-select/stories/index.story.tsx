@@ -30,21 +30,17 @@ export default meta;
 const Template: StoryFn< typeof CustomSelect > = () => {
 	return (
 		<CustomSelect label="Label">
-			<CustomSelect.Item style={ { fontSize: '50%' } } value="small">
-				Small
+			<CustomSelect.Item>
+				<span style={ { fontSize: '75%' } }>Small</span>
 			</CustomSelect.Item>
-			<CustomSelect.Item
-				className="can-apply-custom-class-to-option"
-				style={ { fontSize: '100%' } }
-				value="default"
-			>
-				Default
+			<CustomSelect.Item>
+				<span style={ { fontSize: '100%' } }>Default</span>
 			</CustomSelect.Item>
-			<CustomSelect.Item style={ { fontSize: '200%' } } value="large">
-				Large
+			<CustomSelect.Item>
+				<span style={ { fontSize: '150%' } }>Large</span>
 			</CustomSelect.Item>
-			<CustomSelect.Item style={ { fontSize: '300%' } } value="huge">
-				Huge
+			<CustomSelect.Item>
+				<span style={ { fontSize: '200%' } }>Huge</span>
 			</CustomSelect.Item>
 		</CustomSelect>
 	);
