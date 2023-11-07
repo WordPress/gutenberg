@@ -2,8 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Modal, TabPanel } from '@wordpress/components';
-import { useContext } from '@wordpress/element';
+import {
+	Modal,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+import { useState, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +15,9 @@ import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
 import { FontLibraryContext } from './context';
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TABS = [
 	{
@@ -41,6 +47,7 @@ function FontLibraryModal( {
 	initialTabName = 'installed-fonts',
 } ) {
 	const { collections } = useContext( FontLibraryContext );
+	const [ selectedTab, setSelectedTab ] = useState( initialTabName );
 
 	const tabs = [
 		...DEFAULT_TABS,
@@ -54,22 +61,30 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<TabPanel
-				className="font-library-modal__tab-panel"
-				initialTabName={ initialTabName }
-				tabs={ tabs }
-			>
-				{ ( tab ) => {
-					switch ( tab.name ) {
-						case 'upload-fonts':
-							return <UploadFonts />;
-						case 'installed-fonts':
-							return <InstalledFonts />;
-						default:
-							return <FontCollection id={ tab.name } />;
-					}
-				} }
-			</TabPanel>
+			<Tabs selectedTabId={ selectedTab } onSelect={ setSelectedTab }>
+				<Tabs.TabList className="font-library-modal__tab-list">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab
+							key={ tab.name }
+							tabId={ tab.name }
+							className={ tab.className }
+						>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				<Tabs.TabPanel tabId={ 'installed-fonts' }>
+					<InstalledFonts />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ 'upload-fonts' }>
+					<UploadFonts />
+				</Tabs.TabPanel>
+				{ tabsFromCollections( collections || [] ).map( ( tab ) => (
+					<Tabs.TabPanel key={ tab.name } tabId={ tab.name }>
+						<FontCollection id={ tab.name } />
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
 		</Modal>
 	);
 }

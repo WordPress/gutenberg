@@ -75,8 +75,8 @@
 	padding-bottom: 1rem;
 }
 
-.font-library-modal__tab-panel {
-	[role="tablist"] {
+.font-library-modal__tab-list {
+	&[role="tablist"] {
 		position: sticky;
 		top: 0;
 		width: calc(100% + 64px);
