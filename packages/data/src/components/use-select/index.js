@@ -193,7 +193,11 @@ function useStaticSelect( storeName ) {
 function useMappingSelect( suspense, mapSelect, deps ) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const store = useMemo( () => Store( registry, suspense ), [ registry ] );
+	const store = useMemo(
+		() => Store( registry, suspense ),
+		[ registry, suspense ]
+	);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
 	const { subscribe, getValue } = store( selector, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );
