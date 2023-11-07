@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { page, columns } from '@wordpress/icons';
+import { page, columns, pullRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -13,7 +13,7 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 function getDataViewIcon( type ) {
-	const icons = { list: page, grid: columns };
+	const icons = { list: page, grid: columns, 'side-by-side': pullRight };
 	return icons[ type ];
 }
 
