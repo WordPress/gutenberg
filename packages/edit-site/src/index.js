@@ -110,3 +110,4 @@ export { default as PluginSidebarMoreMenuItem } from './components/header-edit-m
 export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
+export { GlobalStylesProvider } from './components/global-styles/global-styles-provider';

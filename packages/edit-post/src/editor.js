@@ -14,6 +14,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
+import { GlobalStylesProvider } from '@wordpress/edit-site';
 
 /**
  * Internal dependencies
@@ -151,21 +152,23 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 
 	return (
 		<SlotFillProvider>
-			<ExperimentalEditorProvider
-				settings={ editorSettings }
-				post={ post }
-				initialEdits={ initialEdits }
-				useSubRegistry={ false }
-				__unstableTemplate={ isTemplateMode ? template : undefined }
-				{ ...props }
-			>
-				<ErrorBoundary>
-					<CommandMenu />
-					<EditorInitialization postId={ postId } />
-					<Layout />
-				</ErrorBoundary>
-				<PostLockedModal />
-			</ExperimentalEditorProvider>
+			<GlobalStylesProvider>
+				<ExperimentalEditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					__unstableTemplate={ isTemplateMode ? template : undefined }
+					{ ...props }
+				>
+					<ErrorBoundary>
+						<CommandMenu />
+						<EditorInitialization postId={ postId } />
+						<Layout />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</ExperimentalEditorProvider>
+			</GlobalStylesProvider>
 		</SlotFillProvider>
 	);
 }

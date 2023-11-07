@@ -32,6 +32,7 @@ import {
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
+import { useGlobalStyle } from '../components/global-styles';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -293,6 +294,17 @@ export function ColorEdit( props ) {
 	const { clientId, name, attributes, setAttributes } = props;
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasColorPanel( settings );
+
+	const [ blockValue ] = useGlobalStyle( 'color.text', props.name, 'user' );
+	const [ globalStylesValue ] = useGlobalStyle(
+		'color.text',
+		undefined,
+		'user'
+	);
+
+	console.log( 'blockValue', blockValue );
+	console.log( 'globalStylesValue', globalStylesValue );
+
 	const value = useMemo( () => {
 		return attributesToStyle( {
 			style: attributes.style,

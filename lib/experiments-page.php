@@ -138,6 +138,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+		add_settings_field(
+			'gutenberg-styles-inheritance-ui',
+			__( 'Styles Inheritance UI', 'gutenberg' ),
+			'gutenberg_display_experiment_field',
+			'gutenberg-experiments',
+			'gutenberg_experiments_section',
+			array(
+				'label' => __( 'Styles Inheritance UI', 'gutenberg' ),
+				'id'    => 'gutenberg-styles-inheritance-ui',
+			)
+		);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
