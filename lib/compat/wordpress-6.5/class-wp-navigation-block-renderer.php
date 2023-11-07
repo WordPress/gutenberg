@@ -15,7 +15,7 @@ if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
  */
 class WP_Navigation_Block_Renderer {
 
-	static $list_item_nav_blocks = array(
+	private static $list_item_nav_blocks = array(
 		'core/navigation-link',
 		'core/home-link',
 		'core/site-title',
