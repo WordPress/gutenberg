@@ -14,7 +14,9 @@ if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
  * Helper functions used to render the navigation block.
  */
 class WP_Navigation_Block_Renderer {
-
+	/**
+	 * Used to determine which blocks are wrapped in an <li>.
+	 */
 	private static $nav_blocks_wrapped_in_list_item = array(
 		'core/navigation-link',
 		'core/home-link',
@@ -23,11 +25,17 @@ class WP_Navigation_Block_Renderer {
 		'core/navigation-submenu',
 	);
 
+	/**
+	 * Used to determine which blocks need an <li> wrapper.
+	 */
 	private static $needs_list_item_wrapper = array(
 		'core/site-title',
 		'core/site-logo',
 	);
 
+	/**
+	 * Keeps track of all the navigation names that have been seen.
+	 */
 	private static $seen_menu_names = array();
 
 	/**
@@ -268,7 +276,6 @@ class WP_Navigation_Block_Renderer {
 	 * Gets the name of the current navigation, if it has one.
 	 *
 	 * @param array $attributes The block attributes.
-	 * @param array $seen_menu_names The list of seen menu names, passed by reference so they can be updated.
 	 * @return string Returns the name of the navigation.
 	 */
 	private static function get_navigation_name( $attributes ) {
