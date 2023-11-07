@@ -24,14 +24,14 @@ function log_error() {
 output=$($APPIUM_CMD driver list --installed --json)
 
 if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 is available."
+	log_info "UiAutomator2 available."
 else
 	log_info "UiAutomator2 not found, installing..."
 	$APPIUM_CMD driver install uiautomator2
 fi
 
 if echo "$output" | grep -q 'xcuitest'; then
-	log_info "XCUITest is available."
+	log_info "XCUITest available."
 else
 	log_info "XCUITest not found, installing..."
 	$APPIUM_CMD driver install xcuitest
@@ -54,7 +54,7 @@ function detect_or_create_simulator() {
 	local simulators=$(xcrun simctl list devices -j | jq -r --arg runtime "$runtime_name" '.devices | to_entries[] | select(.key | contains($runtime)) | .value[] | .name + "," + .udid')
 
 	if ! echo "$simulators" | grep -q "$simulator_name"; then
-		log_info "$simulator_name ($runtime_name_display) not available, creating..."
+		log_info "$simulator_name ($runtime_name_display) not found, creating..."
 		xcrun simctl create "$simulator_name" "$simulator_name" "com.apple.CoreSimulator.SimRuntime.$runtime_name" > /dev/null
 		log_success "$simulator_name ($runtime_name_display) created."
 	else
@@ -87,7 +87,7 @@ function detect_or_create_emulator() {
 	local emulator=$(emulator -list-avds | grep "$emulator_id")
 
 	if [[ -z $emulator ]]; then
-		log_info "$emulator_name not available, creating..."
+		log_info "$emulator_name not found, creating..."
 		avdmanager create avd -n "$emulator_id" -k "system-images;android-$runtime_api;google_apis;arm64-v8a" -d "$device_id" > /dev/null
 		log_success "$emulator_name created."
 	else
