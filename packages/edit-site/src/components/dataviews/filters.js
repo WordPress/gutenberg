@@ -7,6 +7,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { default as InFilter, OPERATOR_IN } from './in-filter';
+import ResetFilters from './reset-filters';
+
 const VALID_OPERATORS = [ OPERATOR_IN ];
 
 export default function Filters( { fields, view, onChangeView } ) {
@@ -34,7 +36,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} );
 	} );
 
-	return view.visibleFilters?.map( ( fieldName ) => {
+	const visibleFilters = view.visibleFilters?.map( ( fieldName ) => {
 		const visibleFiltersForField = filtersRegistered.filter(
 			( f ) => f.field === fieldName
 		);
@@ -56,5 +58,11 @@ export default function Filters( { fields, view, onChangeView } ) {
 			}
 			return null;
 		} );
-	} );
+	} ).filter( Boolean );
+
+	if ( visibleFilters.length > 0 ) {
+		visibleFilters.push( <ResetFilters onChangeView={ onChangeView } /> );
+	}
+
+	return visibleFilters;
 }
