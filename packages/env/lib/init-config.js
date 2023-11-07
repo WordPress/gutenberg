@@ -251,7 +251,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 				dockerFileContent += `
 
 # Install Memcached library
-RUN apt-get -qy install zlib1g-dev libmemcached-dev`;
+RUN apt-get -qy install zlib1g-dev libmemcached-dev memcached libmemcached-tools`;
 			}
 
 			break;
@@ -272,7 +272,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 				dockerFileContent += `
 
 # Install Memcached library
-RUN apk add zlib-dev libmemcached-dev`;
+RUN apk add zlib-dev libmemcached-dev memcached`;
 			}
 
 			break;
@@ -313,7 +313,6 @@ RUN rm /tmp/composer-setup.php`;
 	dockerFileContent += `
 USER $HOST_UID:$HOST_GID
 ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
-RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
 USER root`;
 
 	return dockerFileContent;
