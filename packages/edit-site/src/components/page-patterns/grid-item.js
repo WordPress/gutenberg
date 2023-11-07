@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import downloadjs from 'downloadjs';
 import { paramCase as kebabCase } from 'change-case';
 
 /**
@@ -51,6 +50,25 @@ import {
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import { unlock } from '../../lock-unlock';
+
+/**
+ * Downloads a file.
+ * Also used in packages/list-reusable-blocks/src/utils/file.js.
+ *
+ * @param {string} fileName    File Name.
+ * @param {string} content     File Content.
+ * @param {string} contentType File mime type.
+ */
+function download( fileName, content, contentType ) {
+	const file = new window.Blob( [ content ], { type: contentType } );
+	const a = document.createElement( 'a' );
+	a.href = URL.createObjectURL( file );
+	a.download = fileName;
+	a.style.display = 'none';
+	document.body.appendChild( a );
+	a.click();
+	document.body.removeChild( a );
+}
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -118,9 +136,9 @@ function GridItem( { categoryId, item, ...props } ) {
 			syncStatus: item.patternBlock.wp_pattern_sync_status,
 		};
 
-		return downloadjs(
-			JSON.stringify( json, null, 2 ),
+		return download(
 			`${ kebabCase( item.title || item.name ) }.json`,
+			JSON.stringify( json, null, 2 ),
 			'application/json'
 		);
 	};
