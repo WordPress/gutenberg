@@ -131,6 +131,49 @@ HTML;
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
 	}
 
+
+	/**
+	 * Tests that the `core/query` last tag is rendered with the tagName attribute
+	 * if is defined, having a div as default.
+	 */
+	public function test_enhanced_query_markup_rendering_at_bottom_on_custom_html_element_tags() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"tagName":"aside","enhancedPagination":true} -->
+		<aside class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:test/plugin-block /-->
+			<!-- /wp:post-template -->
+			<span>Helper to get last HTML Tag</span>
+		</aside>
+		<!-- /wp:query -->
+
+HTML;
+
+		// Set main query to single post.
+		$wp_query = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+
+		$p->next_tag( 'span' );
+
+		// Test that there is a div added just after the last tag inside the aside.
+		$this->assertSame( $p->next_tag(), true );
+		// Test that that div is the accesibility one.
+		$this->assertSame( 'screen-reader-text', $p->get_attribute( 'class' ) );
+		$this->assertSame( 'context.core.query.message', $p->get_attribute( 'data-wp-text' ) );
+		$this->assertSame( 'polite', $p->get_attribute( 'aria-live' ) );
+	}
+
 	/**
 	 * Tests that the `core/query` block adds an extra attribute to disable the
 	 * enhanced pagination in the browser when a post content block is found inside.
