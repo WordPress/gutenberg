@@ -168,7 +168,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	return {
+	const dockerComposeConfig = {
 		version: '3.7',
 		services: {
 			mysql: {
@@ -194,10 +194,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
-				depends_on: [
-					'mysql',
-					config.env.development.objectCache && 'object-cache',
-				].filter( Boolean ),
+				depends_on: [ 'mysql' ],
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -215,10 +212,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [
-					'tests-mysql',
-					config.env.development.objectCache && 'tests-object-cache',
-				].filter( Boolean ),
+				depends_on: [ 'tests-mysql' ],
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',
@@ -267,40 +261,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
-			'object-cache': config.env.development.objectCache
-				? {
-						depends_on: [],
-						build: {
-							context: '.',
-							dockerfile: 'ObjectCache.Dockerfile',
-							args: imageBuildArgs,
-						},
-						volumes: developmentMounts,
-						user: hostUser.fullUser,
-						environment: {
-							...dbEnv.credentials,
-							...dbEnv.development,
-						},
-						extra_hosts: [ 'host.docker.internal:host-gateway' ],
-				  }
-				: undefined,
-			'tests-object-cache': config.env.tests.objectCache
-				? {
-						depends_on: [],
-						build: {
-							context: '.',
-							dockerfile: 'Tests-ObjectCache.Dockerfile',
-							args: imageBuildArgs,
-						},
-						volumes: testsMounts,
-						user: hostUser.fullUser,
-						environment: {
-							...dbEnv.credentials,
-							...dbEnv.tests,
-						},
-						extra_hosts: [ 'host.docker.internal:host-gateway' ],
-				  }
-				: undefined,
 		},
 		volumes: {
 			...( ! config.env.development.coreSource && { wordpress: {} } ),
@@ -311,4 +271,48 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'tests-user-home': {},
 		},
 	};
+
+	if ( config.env.development.objectCache ) {
+		dockerComposeConfig.services.wordpress.depends_on.push(
+			'object-cache'
+		);
+		dockerComposeConfig.services[ 'object-cache' ] = {
+			depends_on: [],
+			build: {
+				context: '.',
+				dockerfile: 'ObjectCache.Dockerfile',
+				args: imageBuildArgs,
+			},
+			volumes: developmentMounts,
+			user: hostUser.fullUser,
+			environment: {
+				...dbEnv.credentials,
+				...dbEnv.development,
+			},
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		};
+	}
+
+	if ( config.env.tests.objectCache ) {
+		dockerComposeConfig.services[ 'tests-wordpress' ].depends_on.push(
+			'tests-object-cache'
+		);
+		dockerComposeConfig.services[ 'tests-object-cache' ] = {
+			depends_on: [],
+			build: {
+				context: '.',
+				dockerfile: 'Tests-ObjectCache.Dockerfile',
+				args: imageBuildArgs,
+			},
+			volumes: testsMounts,
+			user: hostUser.fullUser,
+			environment: {
+				...dbEnv.credentials,
+				...dbEnv.tests,
+			},
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		};
+	}
+
+	return dockerComposeConfig;
 };

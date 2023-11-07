@@ -132,6 +132,26 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
 	} );
 
+	it( 'should not create "object-cache" and "tests-object-cache" entries by default', () => {
+		const envConfig = {
+			...CONFIG,
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
+			env: { development: envConfig, tests: envConfig },
+		} );
+
+		expect( dockerConfig.services[ 'object-cache' ] ).not.toBeDefined();
+		expect(
+			dockerConfig.services[ 'tests-object-cache' ]
+		).not.toBeDefined();
+		expect( dockerConfig.services.wordpress.depends_on ).not.toContain(
+			'object-cache'
+		);
+		expect(
+			dockerConfig.services[ 'tests-wordpress' ].depends_on
+		).not.toContain( 'tests-object-cache' );
+	} );
 	it( 'should create "object-cache" and "tests-object-cache" entries', () => {
 		const envConfig = {
 			...CONFIG,
