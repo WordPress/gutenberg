@@ -28,6 +28,8 @@ class WP_Navigation_Block_Renderer {
 		'core/site-logo',
 	);
 
+	private static $seen_menu_names = array();
+
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 *
@@ -269,7 +271,8 @@ class WP_Navigation_Block_Renderer {
 	 * @param array $seen_menu_names The list of seen menu names, passed by reference so they can be updated.
 	 * @return string Returns the name of the navigation.
 	 */
-	private static function get_navigation_name( $attributes, &$seen_menu_names ) {
+	private static function get_navigation_name( $attributes ) {
+
 		$navigation_name = $attributes['ariaLabel'] ?? '';
 
 		// Load the navigation post.
@@ -286,10 +289,10 @@ class WP_Navigation_Block_Renderer {
 
 				// This is used to count the number of times a navigation name has been seen,
 				// so that we can ensure every navigation has a unique id.
-				if ( isset( $seen_menu_names[ $navigation_name ] ) ) {
-					++$seen_menu_names[ $navigation_name ];
+				if ( isset( static::$seen_menu_names[ $navigation_name ] ) ) {
+					++static::$seen_menu_names[ $navigation_name ];
 				} else {
-					$seen_menu_names[ $navigation_name ] = 1;
+					static::$seen_menu_names[ $navigation_name ] = 1;
 				}
 			}
 		}
@@ -468,10 +471,10 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @param array         $attributes    The block attributes.
 	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
-	 * @param string        $nav_menu_name The name of the navigation menu.
 	 * @return string Returns the navigation block markup.
 	 */
-	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name ) {
+	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks ) {
+		$nav_menu_name           = static::get_unique_navigation_name( $attributes );
 		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
 		$is_responsive_menu      = static::is_responsive( $attributes );
 		$style                   = static::get_styles( $attributes );
@@ -565,6 +568,25 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns a unique name for the navigation.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string Returns a unique name for the navigation.
+	 */
+	private static function get_unique_navigation_name( $attributes ) {
+		$nav_menu_name = static::get_navigation_name( $attributes );
+
+		// If the menu name has been used previously then append an ID
+		// to the name to ensure uniqueness across a given post.
+		if ( isset( static::$seen_menu_names[ $nav_menu_name ] ) && static::$seen_menu_names[ $nav_menu_name ] > 1 ) {
+			$count         = static::$seen_menu_names[ $nav_menu_name ];
+			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
+		}
+
+		return $nav_menu_name;
+	}
+
+	/**
 	 * Renders the navigation block.
 	 *
 	 * @param array    $attributes The block attributes.
@@ -573,10 +595,6 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the navigation block markup.
 	 */
 	public static function render( $attributes, $content, $block ) {
-		static $seen_menu_names = array();
-
-		$nav_menu_name = static::get_navigation_name( $attributes, $seen_menu_names );
-
 		/**
 		 * Deprecated:
 		 * The rgbTextColor and rgbBackgroundColor attributes
@@ -600,20 +618,11 @@ class WP_Navigation_Block_Renderer {
 			return '';
 		}
 
-		// If the menu name has been used previously then append an ID
-		// to the name to ensure uniqueness across a given post.
-		if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
-			$count         = $seen_menu_names[ $nav_menu_name ];
-			$nav_menu_name = $nav_menu_name . ' ' . ( $count );
-		}
-
-		$wrapper_attributes = static::get_nav_wrapper_attributes( $attributes, $inner_blocks, $nav_menu_name );
-
 		static::handle_view_script_loading( $attributes, $block, $inner_blocks );
 
 		return sprintf(
 			'<nav %1$s>%2$s</nav>',
-			$wrapper_attributes,
+			static::get_nav_wrapper_attributes( $attributes, $inner_blocks ),
 			static::get_wrapper_markup( $attributes, $inner_blocks )
 		);
 	}
