@@ -16,6 +16,8 @@ if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
 class WP_Navigation_Block_Renderer {
 	/**
 	 * Used to determine which blocks are wrapped in an <li>.
+	 *
+	 * @var array
 	 */
 	private static $nav_blocks_wrapped_in_list_item = array(
 		'core/navigation-link',
@@ -27,6 +29,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Used to determine which blocks need an <li> wrapper.
+	 *
+	 * @var array
 	 */
 	private static $needs_list_item_wrapper = array(
 		'core/site-title',
@@ -35,6 +39,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Keeps track of all the navigation names that have been seen.
+	 *
+	 * @var array
 	 */
 	private static $seen_menu_names = array();
 
