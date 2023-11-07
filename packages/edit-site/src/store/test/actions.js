@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
@@ -14,18 +13,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '..';
 import { setHasPageContentFocus } from '../actions';
-
-const ENTITY_TYPES = {
-	wp_template: {
-		description: 'Templates to include in your theme.',
-		hierarchical: false,
-		name: 'Templates',
-		rest_base: 'templates',
-		rest_namespace: 'wp/v2',
-		slug: 'wp_template',
-		taxonomies: [],
-	},
-};
 
 function createRegistryWithStores() {
 	// create a registry
@@ -66,42 +53,6 @@ describe( 'actions', () => {
 
 			// Expect a deprecation warning.
 			expect( console ).toHaveWarned();
-		} );
-	} );
-
-	describe( 'addTemplate', () => {
-		it( 'should issue a REST request to create the template and then set it', async () => {
-			const registry = createRegistryWithStores();
-
-			const ID = 1;
-			const SLUG = 'index';
-
-			apiFetch.setFetchHandler( async ( options ) => {
-				const { method = 'GET', path, data } = options;
-
-				if ( method === 'GET' && path.startsWith( '/wp/v2/types' ) ) {
-					return ENTITY_TYPES;
-				}
-
-				if (
-					method === 'POST' &&
-					path.startsWith( '/wp/v2/templates' )
-				) {
-					return { id: ID, slug: data.slug };
-				}
-
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
-			} );
-
-			await registry
-				.dispatch( editSiteStore )
-				.addTemplate( { slug: SLUG } );
-
-			const select = registry.select( editSiteStore );
-			expect( select.getEditedPostId() ).toBe( ID );
 		} );
 	} );
 

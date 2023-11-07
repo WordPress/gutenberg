@@ -79,11 +79,19 @@ export function setTemplate() {
  *
  * @param {Object} template The template.
  *
+ * @deprecated
+ *
  * @return {Object} Action object used to set the current template.
  */
 export const addTemplate =
 	( template ) =>
 	async ( { dispatch, registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).addTemplate", {
+			since: '6.5',
+			version: '6.8',
+			hint: 'use saveEntityRecord directly',
+		} );
+
 		const newTemplate = await registry
 			.dispatch( coreStore )
 			.saveEntityRecord( 'postType', TEMPLATE_POST_TYPE, template );

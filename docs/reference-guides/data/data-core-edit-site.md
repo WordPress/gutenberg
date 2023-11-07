@@ -222,6 +222,8 @@ _Returns_
 
 ### addTemplate
 
+> **Deprecated**
+
 Action that adds a new template and sets it as the current template.
 
 _Parameters_
