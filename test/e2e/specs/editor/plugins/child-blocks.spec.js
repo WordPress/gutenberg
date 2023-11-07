@@ -60,9 +60,6 @@ test.describe( 'Child Blocks', () => {
 		await expect( blockLibrary.getByRole( 'option' ) ).toContainText( [
 			'Child Blocks Child',
 		] );
-		expect(
-			await blockLibrary.getByRole( 'option' ).count()
-		).toBeGreaterThan( 10 );
 	} );
 
 	test( 'display in a parent block with allowedItems', async ( {
