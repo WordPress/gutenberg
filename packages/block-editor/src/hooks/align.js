@@ -138,12 +138,15 @@ function BlockEditAlignmentToolbarControls( {
 				nextAlign = '';
 			}
 		}
-
+		/**
+		 * This filter exists so that the image block can reset
+		 * its aspect ratio and custom size when the alignment is set
+		 * to either wide or full.
+		 */
 		const filteredAttributes = applyFilters(
-			'editor.hooks.updateAlignment',
-			nextAlign,
+			'block-library.image.alignmentUpdate',
 			blockName,
-			attributes
+			{ ...attributes, align: nextAlign }
 		);
 
 		setAttributes( filteredAttributes );
