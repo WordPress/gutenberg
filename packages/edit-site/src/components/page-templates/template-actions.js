@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { backup } from '@wordpress/icons';
+import { backup, trash } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { store as editSiteStore } from '../../store';
 import isTemplateRevertable from '../../utils/is-template-revertable';
+import isTemplateRemovable from '../../utils/is-template-removable';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export function useResetTemplateAction() {
@@ -72,5 +73,23 @@ export function useResetTemplateAction() {
 			revertTemplate,
 			saveEditedEntityRecord,
 		]
+	);
+}
+
+export function useTrashTemplateAction() {
+	const { removeTemplate } = useDispatch( editSiteStore );
+	return useMemo(
+		() => ( {
+			id: 'delete-template',
+			label: __( 'Delete template' ),
+			isPrimary: true,
+			icon: trash,
+			isEligible: isTemplateRemovable,
+			perform( template ) {
+				// TODO: needs modal..
+				removeTemplate( template, { allowUndo: false } );
+			},
+		} ),
+		[ removeTemplate ]
 	);
 }

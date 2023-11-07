@@ -24,7 +24,10 @@ import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
-import { useResetTemplateAction } from './template-actions';
+import {
+	useResetTemplateAction,
+	useTrashTemplateAction,
+} from './template-actions';
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -164,9 +167,10 @@ export default function DataviewsTemplates() {
 		[]
 	);
 	const resetTemplateAction = useResetTemplateAction();
+	const trashTemplateAction = useTrashTemplateAction();
 	const actions = useMemo(
-		() => [ resetTemplateAction ],
-		[ resetTemplateAction ]
+		() => [ resetTemplateAction, trashTemplateAction ],
+		[ resetTemplateAction, trashTemplateAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
