@@ -128,7 +128,7 @@ export type TabPanelProps = {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * A unique identifier for the TabPanel, which is used to generate a unique `id` for the underlying element.
+	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
 	 */
 	id: string;
 	/**
@@ -139,4 +139,12 @@ export type TabPanelProps = {
 	 * Custom CSS styles for the rendered `TabPanel` component.
 	 */
 	style?: React.CSSProperties;
+	/**
+	 * Determines whether or not the tabpanel element should be focusable.
+	 * If `false`, pressing the tab key will skip over the tabpanel, and instead
+	 * focus on the first focusable element in the panel (if there is one).
+	 *
+	 * @default true
+	 */
+	focusable?: boolean;
 };

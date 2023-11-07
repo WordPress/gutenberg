@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -14,12 +12,16 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { TabPanelProps } from './types';
+import { TabPanel as StyledTabPanel } from './styles';
 
 import warning from '@wordpress/warning';
 import { TabsContext } from './context';
 
 export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
-	function TabPanel( { children, id, className, style }, ref ) {
+	function TabPanel(
+		{ children, id, className, style, focusable = true },
+		ref
+	) {
 		const context = useContext( TabsContext );
 		if ( ! context ) {
 			warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
@@ -28,7 +30,8 @@ export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
 		const { store, instanceId } = context;
 
 		return (
-			<Ariakit.TabPanel
+			<StyledTabPanel
+				focusable={ focusable }
 				ref={ ref }
 				style={ style }
 				store={ store }
@@ -36,7 +39,7 @@ export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
 				className={ className }
 			>
 				{ children }
-			</Ariakit.TabPanel>
+			</StyledTabPanel>
 		);
 	}
 );

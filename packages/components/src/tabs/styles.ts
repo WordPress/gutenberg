@@ -101,3 +101,19 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 	}
 `;
+
+export const TabPanel = styled( Ariakit.TabPanel )`
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:focus-visible {
+		border-radius: 2px;
+		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			${ COLORS.theme.accent };
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: 0;
+	}
+`;
