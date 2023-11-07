@@ -19,19 +19,13 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
-		/**
-		 * Returns the markup for a single inner block.
-		 *
-		 * @param WP_Block $inner_block The inner block.
-		 * @return string Returns the markup for a single inner block.
-		 */
 		$method = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
 		$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		$this->assertSame( $expected, $result );
+		$this->assertEquals( $expected, $result );
 	}
 
 	public function test_gutenberg_get_markup_for_inner_block_site_title() {
@@ -46,18 +40,12 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
-		/**
-		 * Returns the markup for a single inner block.
-		 *
-		 * @param WP_Block $inner_block The inner block.
-		 * @return string Returns the markup for a single inner block.
-		 */
 		$method = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method
 		$result = $method->invoke( $reflection, $site_title_block );
 
 		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://localhost:8889" target="_self" rel="home">Test Blog</a></h1></li>';
-		$this->assertSame( $expected, $result );
+		$this->assertEquals( $expected, $result );
 	}
 }
