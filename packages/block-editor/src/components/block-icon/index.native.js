@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 /**
  * WordPress dependencies
@@ -28,18 +27,6 @@ export function BlockIcon( { icon, fill, size, showColors = false } ) {
 		styles.iconPlaceholderDark
 	)?.fill;
 	const iconForeground = showColors ? icon?.foreground : undefined;
-
-	// Use XML string for rendering the icon.
-	if ( typeof icon?.src === 'string' && icon.src.startsWith( '<svg' ) ) {
-		return (
-			<SvgXml
-				xml={ icon.src }
-				fill={ fill || iconForeground || defaultFill }
-				{ ...( size && { width: size } ) }
-				{ ...( size && { height: size } ) }
-			/>
-		);
-	}
 
 	const renderedIcon = (
 		<Icon
