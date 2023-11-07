@@ -9,13 +9,13 @@ import * as Ariakit from '@ariakit/react';
 // import { type CustomSelectProps } from './types';
 import { CustomSelectButton, CustomSelectPopover } from './styles';
 import CustomSelectItem from './custom-select-item';
+import type { CustomSelectProps } from './types';
 
-function CustomSelect( props: any ) {
-	const { children, defaultValue, label, onChange, value } = props;
+function CustomSelect( props: CustomSelectProps ) {
+	const { children, defaultValue, label, onChange } = props;
 
 	const store = Ariakit.useSelectStore( {
 		setValue: ( nextValue ) => onChange?.( nextValue ),
-		value,
 		defaultValue,
 	} );
 
