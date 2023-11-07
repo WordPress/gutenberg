@@ -108,42 +108,49 @@ export default function PageSlug( { postType, postId } ) {
 								onClose={ onClose }
 							/>
 							<VStack spacing={ 5 }>
-								<InputControl
-									__nextHasNoMarginBottom
-									__next40pxDefaultSize
-									label={ __( 'Permalink' ) }
-									hideLabelFromVision
-									value={ forceEmptyField ? '' : recordSlug }
-									autoComplete="off"
-									spellCheck="false"
-									help={ __( 'The last part of the URL.' ) }
-									onChange={ ( newValue ) => {
-										onSlugChange( newValue );
-										// When we delete the field the permalink gets
-										// reverted to the original value.
-										// The forceEmptyField logic allows the user to have
-										// the field temporarily empty while typing.
-										if ( ! newValue ) {
-											if ( ! forceEmptyField ) {
-												setForceEmptyField( true );
+								<form onSubmit={ onClose }>
+									<InputControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __( 'Permalink' ) }
+										hideLabelFromVision
+										value={
+											forceEmptyField ? '' : recordSlug
+										}
+										autoComplete="off"
+										spellCheck="false"
+										help={ __(
+											'The last part of the URL.'
+										) }
+										onChange={ ( newValue ) => {
+											onSlugChange( newValue );
+											// When we delete the field the permalink gets
+											// reverted to the original value.
+											// The forceEmptyField logic allows the user to have
+											// the field temporarily empty while typing.
+											if ( ! newValue ) {
+												if ( ! forceEmptyField ) {
+													setForceEmptyField( true );
+												}
+												return;
 											}
-											return;
-										}
-										if ( forceEmptyField ) {
-											setForceEmptyField( false );
-										}
-									} }
-									onBlur={ ( event ) => {
-										onSlugChange(
-											cleanForSlug(
-												event.target.value || savedSlug
-											)
-										);
-										if ( forceEmptyField ) {
-											setForceEmptyField( false );
-										}
-									} }
-								/>
+											if ( forceEmptyField ) {
+												setForceEmptyField( false );
+											}
+										} }
+										onBlur={ ( event ) => {
+											onSlugChange(
+												cleanForSlug(
+													event.target.value ||
+														savedSlug
+												)
+											);
+											if ( forceEmptyField ) {
+												setForceEmptyField( false );
+											}
+										} }
+									/>
+								</form>
 							</VStack>
 						</>
 					);
