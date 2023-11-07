@@ -318,7 +318,7 @@ function ViewList( {
 	 * @return {Array} The transformed TanStack column filters.
 	 */
 	const toTanStackColumnFilters = ( filters ) =>
-		filters.map( ( filter ) => ( {
+		filters?.map( ( filter ) => ( {
 			[ filter.field + ':' + filter.operator ]: filter.value,
 		} ) );
 

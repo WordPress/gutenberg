@@ -12,10 +12,9 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -25,11 +24,7 @@ import Link from '../routes/link';
 import AddedBy from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
-import DEFAULT_VIEWS from './default-views';
 import { useResetTemplateAction } from './template-actions';
-import { unlock } from '../../lock-unlock';
-
-const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -37,23 +32,24 @@ const defaultConfigPerViewType = {
 	grid: {},
 };
 
+const DEFAULT_VIEW = {
+	type: 'list',
+	search: '',
+	page: 1,
+	perPage: 5, //20,
+	// All fields are visible by default, so it's
+	// better to keep track of the hidden ones.
+	hiddenFields: [],
+	layout: {},
+};
+
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
 export default function DataviewsTemplates() {
-	const {
-		params: { path, activeView = 'all' },
-	} = useLocation();
-	const initialView = DEFAULT_VIEWS.find(
-		( { slug } ) => slug === activeView
-	).view;
-	const [ view, setView ] = useState( initialView );
-	useEffect( () => {
-		setView(
-			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
-		);
-	}, [ path, activeView ] );
+	const [ view, setView ] = useState( DEFAULT_VIEW );
+
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
@@ -130,11 +126,6 @@ export default function DataviewsTemplates() {
 									) || __( '(no title)' ) }
 								</Link>
 							</Heading>
-							{ item.description && (
-								<Text variant="muted">
-									{ decodeEntities( item.description ) }
-								</Text>
-							) }
 						</VStack>
 					);
 				},
@@ -143,8 +134,23 @@ export default function DataviewsTemplates() {
 				enableHiding: false,
 			},
 			{
-				header: __( 'Added by' ),
-				id: 'added-by',
+				header: __( 'Description' ),
+				id: 'description',
+				getValue: ( { item } ) => item.description,
+				render: ( { item } ) => {
+					return (
+						item.description && (
+							<Text variant="muted">
+								{ decodeEntities( item.description ) }
+							</Text>
+						)
+					);
+				},
+				enableSorting: false,
+			},
+			{
+				header: __( 'Author' ),
+				id: 'author',
 				getValue: () => {},
 				render: ( { item } ) => {
 					return (
