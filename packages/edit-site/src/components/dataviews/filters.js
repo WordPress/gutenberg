@@ -28,7 +28,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 			if ( 'object' === typeof filter ) {
 				filterIndex[ id ] = {
 					id,
-					name: filter.name || field.header,
+					name: field.header,
 					type: filter.type,
 				};
 			}
@@ -36,8 +36,8 @@ export default function Filters( { fields, view, onChangeView } ) {
 			if ( 'enumeration' === filterIndex[ id ]?.type ) {
 				const elements = [
 					{
-						value: filter.resetValue || '',
-						label: filter.resetLabel || __( 'All' ),
+						value: '',
+						label: __( 'All' ),
 					},
 					...( field.elements || [] ),
 				];
@@ -49,26 +49,24 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} );
 	} );
 
-	return (
-		view.visibleFilters?.map( ( filterName ) => {
-			const filter = filterIndex[ filterName ];
+	return view.visibleFilters?.map( ( filterName ) => {
+		const filter = filterIndex[ filterName ];
 
-			if ( ! filter ) {
-				return null;
-			}
-
-			if ( filter.type === 'enumeration' ) {
-				return (
-					<InFilter
-						key={ filterName }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
-
+		if ( ! filter ) {
 			return null;
-		} ) || __( 'No filters available' )
-	);
+		}
+
+		if ( filter.type === 'enumeration' ) {
+			return (
+				<InFilter
+					key={ filterName }
+					filter={ filter }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+			);
+		}
+
+		return null;
+	} );
 }

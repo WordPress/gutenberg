@@ -6,19 +6,20 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews } from '../dataviews';
-import { DEFAULT_STATUSES, default as DEFAULT_VIEWS } from './default-views';
+import { DataViews, viewTypeSupportsMap } from '../dataviews';
+import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	useTrashPostAction,
 	usePermanentlyDeletePostAction,
@@ -27,6 +28,7 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
+import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
@@ -39,21 +41,75 @@ const defaultConfigPerViewType = {
 	},
 };
 
-export default function PagePages() {
+// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
+// The reason for that is to match the default statuses coming from the endpoint (entity request).
+export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
+
+function useView( type ) {
 	const {
-		params: { path, activeView = 'all' },
+		params: { activeView = 'all', isCustom = 'false' },
 	} = useLocation();
-	const initialView = DEFAULT_VIEWS.find(
-		( { slug } ) => slug === activeView
-	).view;
-	const [ view, setView ] = useState( initialView );
+	const selectedDefaultView =
+		isCustom === 'false' &&
+		DEFAULT_VIEWS[ type ].find( ( { slug } ) => slug === activeView )?.view;
+	const [ view, setView ] = useState( selectedDefaultView );
+
 	useEffect( () => {
-		setView(
-			DEFAULT_VIEWS.find( ( { slug } ) => slug === activeView ).view
+		if ( selectedDefaultView ) {
+			setView( selectedDefaultView );
+		}
+	}, [ selectedDefaultView ] );
+	const editedViewRecord = useSelect(
+		( select ) => {
+			if ( isCustom !== 'true' ) {
+				return;
+			}
+			const { getEditedEntityRecord } = select( coreStore );
+			const dataviewRecord = getEditedEntityRecord(
+				'postType',
+				'wp_dataviews',
+				Number( activeView )
+			);
+			return dataviewRecord;
+		},
+		[ activeView, isCustom ]
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
+
+	const customView = useMemo( () => {
+		return (
+			editedViewRecord?.content && JSON.parse( editedViewRecord?.content )
 		);
-	}, [ path, activeView ] );
-	// Request post statuses to get the proper labels.
-	const { records: statuses } = useEntityRecords( 'root', 'status' );
+	}, [ editedViewRecord?.content ] );
+	const setCustomView = useCallback(
+		( viewToSet ) => {
+			editEntityRecord(
+				'postType',
+				'wp_dataviews',
+				editedViewRecord?.id,
+				{
+					content: JSON.stringify( viewToSet ),
+				}
+			);
+		},
+		[ editEntityRecord, editedViewRecord?.id ]
+	);
+
+	if ( isCustom === 'false' ) {
+		return [ view, setView ];
+	} else if ( isCustom === 'true' && customView ) {
+		return [ customView, setCustomView ];
+	}
+	// Loading state where no the view was not found on custom views or default views.
+	return [ DEFAULT_VIEWS[ type ][ 0 ].view, setView ];
+}
+
+export default function PagePages() {
+	const postType = 'page';
+	const [ view, setView ] = useView( postType );
+	const [ selection, setSelection ] = useState( [] );
+	const { records: statuses, isResolving: isLoadingStatus } =
+		useEntityRecords( 'root', 'status' );
 	const defaultStatuses = useMemo( () => {
 		return statuses === null
 			? DEFAULT_STATUSES
@@ -63,30 +119,6 @@ export default function PagePages() {
 					.sort()
 					.join();
 	}, [ statuses ] );
-
-	useEffect( () => {
-		// Only update the view if the statuses received from the endpoint
-		// are different from the DEFAULT_STATUSES provided initially.
-		//
-		// The pages endpoint depends on the status endpoint via the status filter.
-		// Initially, this code filters the pages request by DEFAULT_STATUTES,
-		// instead of using the default (publish).
-		// https://developer.wordpress.org/rest-api/reference/pages/#list-pages
-		//
-		// By doing so, it avoids a second request to the pages endpoint
-		// upon receiving the statuses when they are the same (most common scenario).
-		if ( DEFAULT_STATUSES !== defaultStatuses ) {
-			setView( {
-				...view,
-				filters: [
-					...view.filters.filter(
-						( f ) => f.field !== 'status' || f.operator !== 'in'
-					),
-					{ field: 'status', operator: 'in', value: defaultStatuses },
-				],
-			} );
-		}
-	}, [ defaultStatuses ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -98,6 +130,12 @@ export default function PagePages() {
 				filters.author = filter.value;
 			}
 		} );
+		// We want to provide a different default item for the status filter
+		// than the REST API provides.
+		if ( ! filters.status || filters.status === '' ) {
+			filters.status = defaultStatuses;
+		}
+
 		return {
 			per_page: view.perPage,
 			page: view.page,
@@ -107,15 +145,16 @@ export default function PagePages() {
 			search: view.search,
 			...filters,
 		};
-	}, [ view ] );
+	}, [ view, defaultStatuses ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
 		totalItems,
 		totalPages,
-	} = useEntityRecords( 'postType', 'page', queryArgs );
+	} = useEntityRecords( 'postType', postType, queryArgs );
 
-	const { records: authors } = useEntityRecords( 'root', 'user' );
+	const { records: authors, isResolving: isLoadingAuthors } =
+		useEntityRecords( 'root', 'user' );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -149,7 +188,7 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => {
+				render: ( { item, view: { type } } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
@@ -158,6 +197,14 @@ export default function PagePages() {
 										postId: item.id,
 										postType: item.type,
 										canvas: 'edit',
+									} }
+									onClick={ ( event ) => {
+										if (
+											viewTypeSupportsMap[ type ].preview
+										) {
+											event.preventDefault();
+											setSelection( [ item.id ] );
+										}
 									} }
 								>
 									{ decodeEntities(
@@ -197,12 +244,7 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					statuses?.find( ( { slug } ) => slug === item.status )
 						?.name ?? item.status,
-				filters: [
-					{
-						type: 'enumeration',
-						resetValue: defaultStatuses,
-					},
-				],
+				filters: [ 'enumeration' ],
 				elements:
 					statuses?.map( ( { slug, name } ) => ( {
 						value: slug,
@@ -223,7 +265,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ defaultStatuses, statuses, authors ]
+		[ statuses, authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
@@ -268,16 +310,45 @@ export default function PagePages() {
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
-		<Page title={ __( 'Pages' ) }>
-			<DataViews
-				paginationInfo={ paginationInfo }
-				fields={ fields }
-				actions={ actions }
-				data={ pages || EMPTY_ARRAY }
-				isLoading={ isLoadingPages }
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
-		</Page>
+		<>
+			<Page title={ __( 'Pages' ) }>
+				<DataViews
+					paginationInfo={ paginationInfo }
+					fields={ fields }
+					actions={ actions }
+					data={ pages || EMPTY_ARRAY }
+					isLoading={
+						isLoadingPages || isLoadingStatus || isLoadingAuthors
+					}
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+			</Page>
+			{ viewTypeSupportsMap[ view.type ].preview && (
+				<Page>
+					<div className="edit-site-page-pages-preview">
+						{ selection.length === 1 && (
+							<SideEditor
+								postId={ selection[ 0 ] }
+								postType={ postType }
+							/>
+						) }
+						{ selection.length !== 1 && (
+							<div
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									justifyContent: 'center',
+									textAlign: 'center',
+									height: '100%',
+								} }
+							>
+								<p>{ __( 'Select a page to preview' ) }</p>
+							</div>
+						) }
+					</div>
+				</Page>
+			) }
+		</>
 	);
 }

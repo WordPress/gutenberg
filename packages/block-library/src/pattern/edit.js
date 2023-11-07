@@ -20,7 +20,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	);
 
 	const currentThemeStylesheet = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme().stylesheet
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet
 	);
 
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =

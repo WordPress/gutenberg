@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+
+### Enhancements
+
+-   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
+
 ## 25.11.0 (2023-11-02)
 
 ### Enhancements

@@ -12,11 +12,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, chevronUpDown } from '@wordpress/icons';
-import {
-	__unstableMotion as motion,
-	Button,
-	ToolbarItem,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -39,8 +35,6 @@ export default function DocumentTools( {
 	isDistractionFree,
 	showIconLabels,
 	setListViewToggleElement,
-	toolbarTransition,
-	toolbarVariants,
 } ) {
 	const inserterButton = useRef();
 	const {
@@ -126,12 +120,9 @@ export default function DocumentTools( {
 
 	return (
 		<NavigableToolbar
-			as={ motion.div }
 			className="edit-site-header-edit-mode__start"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
-			variants={ toolbarVariants }
-			transition={ toolbarTransition }
 		>
 			<div className="edit-site-header-edit-mode__toolbar">
 				{ ! isDistractionFree && (

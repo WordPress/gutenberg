@@ -21,6 +21,8 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
+	chevronRightSmall,
+	funnel,
 } from '@wordpress/icons';
 import {
 	Button,
@@ -41,6 +43,8 @@ const {
 	DropdownMenuGroupV2,
 	DropdownMenuItemV2,
 	DropdownMenuSeparatorV2,
+	DropdownSubMenuV2,
+	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -63,6 +67,29 @@ function HeaderMenu( { dataView, header } ) {
 		return text;
 	}
 	const sortedDirection = header.column.getIsSorted();
+
+	let filter;
+	if (
+		header.column.columnDef.filters?.length > 0 &&
+		header.column.columnDef.filters.some(
+			( f ) =>
+				( 'string' === typeof f && f === 'enumeration' ) ||
+				( 'object' === typeof f && f.type === 'enumeration' )
+		)
+	) {
+		filter = {
+			id: header.column.columnDef.id,
+			elements: [
+				{
+					value: '',
+					label: __( 'All' ),
+				},
+				...( header.column.columnDef.elements || [] ),
+			],
+		};
+	}
+	const isFilterable = !! filter;
+
 	return (
 		<DropdownMenuV2
 			align="start"
@@ -118,6 +145,92 @@ function HeaderMenu( { dataView, header } ) {
 					>
 						{ __( 'Hide' ) }
 					</DropdownMenuItemV2>
+				) }
+				{ isFilterable && (
+					<DropdownMenuGroupV2>
+						<DropdownSubMenuV2
+							key={ filter.id }
+							trigger={
+								<DropdownSubMenuTriggerV2
+									prefix={ <Icon icon={ funnel } /> }
+									suffix={
+										<Icon icon={ chevronRightSmall } />
+									}
+								>
+									{ __( 'Filter by' ) }
+								</DropdownSubMenuTriggerV2>
+							}
+						>
+							{ filter.elements.map( ( element ) => {
+								let isActive = false;
+								const columnFilters =
+									dataView.getState().columnFilters;
+								const columnFilter = columnFilters.find(
+									( f ) =>
+										Object.keys( f )[ 0 ].split(
+											':'
+										)[ 0 ] === filter.id
+								);
+
+								// Set the empty item as active if the filter is not set.
+								if ( ! columnFilter && element.value === '' ) {
+									isActive = true;
+								}
+
+								if ( columnFilter ) {
+									const value =
+										Object.values( columnFilter )[ 0 ];
+									// Intentionally use loose comparison, so it does type conversion.
+									// This covers the case where a top-level filter for the same field converts a number into a string.
+									isActive = element.value == value; // eslint-disable-line eqeqeq
+								}
+
+								return (
+									<DropdownMenuItemV2
+										key={ element.value }
+										suffix={
+											isActive && <Icon icon={ check } />
+										}
+										onSelect={ () => {
+											const otherFilters =
+												columnFilters?.filter(
+													( f ) => {
+														const [
+															field,
+															operator,
+														] =
+															Object.keys(
+																f
+															)[ 0 ].split( ':' );
+														return (
+															field !==
+																filter.id ||
+															operator !== 'in'
+														);
+													}
+												);
+
+											if ( element.value === '' ) {
+												dataView.setColumnFilters(
+													otherFilters
+												);
+											} else {
+												dataView.setColumnFilters( [
+													...otherFilters,
+													{
+														[ filter.id + ':in' ]:
+															element.value,
+													},
+												] );
+											}
+										} }
+									>
+										{ element.label }
+									</DropdownMenuItemV2>
+								);
+							} ) }
+						</DropdownSubMenuV2>
+					</DropdownMenuGroupV2>
 				) }
 			</WithSeparators>
 		</DropdownMenuV2>
@@ -186,6 +299,58 @@ function ViewList( {
 		);
 	}, [ view.hiddenFields ] );
 
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01' },
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * @param {Array} filters The view filters to transform.
+	 * @return {Array} The transformed TanStack column filters.
+	 */
+	const toTanStackColumnFilters = ( filters ) =>
+		filters.map( ( filter ) => ( {
+			[ filter.field + ':' + filter.operator ]: filter.value,
+		} ) );
+
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01'},
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * @param {Array} filters The TanStack column filters to transform.
+	 * @return {Array} The transformed view filters.
+	 */
+	const fromTanStackColumnFilters = ( filters ) =>
+		filters.map( ( filter ) => {
+			const [ key, value ] = Object.entries( filter )[ 0 ];
+			const [ field, operator ] = key.split( ':' );
+			return { field, operator, value };
+		} );
+
 	const dataView = useReactTable( {
 		data,
 		columns,
@@ -203,6 +368,7 @@ function ViewList( {
 				  ]
 				: [],
 			globalFilter: view.search,
+			columnFilters: toTanStackColumnFilters( view.filters ),
 			pagination: {
 				pageIndex: view.page,
 				pageSize: view.perPage,
@@ -261,7 +427,14 @@ function ViewList( {
 			} );
 		},
 		onGlobalFilterChange: ( value ) => {
-			onChangeView( { ...view, search: value, page: 0 } );
+			onChangeView( { ...view, search: value, page: 1 } );
+		},
+		onColumnFiltersChange: ( columnFiltersUpdater ) => {
+			onChangeView( {
+				...view,
+				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
+				page: 1,
+			} );
 		},
 		onPaginationChange: ( paginationUpdater ) => {
 			onChangeView( ( currentView ) => {

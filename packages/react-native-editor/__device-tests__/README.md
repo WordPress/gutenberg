@@ -4,7 +4,7 @@ The Mobile Gutenberg (MG) project maintains a suite of automated end-to-end (E2E
 
 ## Setup
 
-Before setting up Appium, the required iOS and Android dependencies must be installed.
+Before setting up the E2E test environment, the required iOS and Android dependencies must be installed.
 
 > **Note**
 > The required dependencies change overtime. We do our best to update the scripts documented below, but it is best to review the [Appium capabilities](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js) configuration to identify the currently required `deviceName` and `platformVersion` for each of the iOS and Android platforms.
@@ -13,18 +13,15 @@ Before setting up Appium, the required iOS and Android dependencies must be inst
 
 -   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Xcode.
 -   Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
--   Create the required simulators by running the follow scripts in your shell:
-    -   `xcrun simctl create "iPhone 14" "iPhone 14" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
-    -   `xcrun simctl create "iPad (10th generation)" "iPad (10th generation)" "com.apple.CoreSimulator.SimRuntime.iOS-16-2"`
 
 ### Android
 
 -   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Android Studio and the Android SDK.
 -   Open Android Studio and [create an emulator](https://developer.android.com/studio/run/managing-avds) for a Pixel 3 XL running Android 11.0 with the “Enable Device Frame” option disabled.
 
-### Appium
+### Test Environment
 
-The MG project provides a script to set up the testing environment, installing the necessary Appium dependencies.
+After installing the iOS and Android dependencies, the MG project provides a script to set up the testing environment, verifying necessary dependencies are available.
 
 ```shell
 npm run native test:e2e:setup
@@ -44,13 +41,7 @@ npm run native test:e2e:ios:local
 
 ### Android
 
-Before running E2E tests on Android, launch the emulator using the following script.
-
-```shell
-emulator -avd Pixel_3_XL_API_30 -noaudio
-```
-
-The following script will run all of the E2E tests.
+The following script will launch the correct Android emulator and run all of the E2E tests.
 
 ```shell
 npm run native test:e2e:android:local

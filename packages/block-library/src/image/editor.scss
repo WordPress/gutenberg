@@ -62,6 +62,13 @@ figure.wp-block-image:not(.wp-block) {
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}
+
+	// When the Image block is linked,
+	// it's wrapped with a disabled <a /> tag.
+	// Restore cursor style so it doesn't appear 'clickable'.
+	> a {
+		cursor: default;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
