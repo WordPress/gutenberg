@@ -16,7 +16,7 @@ import { calendar } from '@wordpress/icons';
  * Internal dependencies
  */
 import Edit from './edit';
-import Save from './save';
+import save from './save';
 import metadata from './block.json';
 
 registerBlockType( metadata.name, {
@@ -28,5 +28,5 @@ registerBlockType( metadata.name, {
 	/**
 	 * @see ./save.js
 	 */
-	save: Save,
+	save,
 } );
