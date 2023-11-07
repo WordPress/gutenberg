@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 
 set -o pipefail
 
@@ -24,14 +24,14 @@ function log_error() {
 output=$($APPIUM_CMD driver list --installed --json)
 
 if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 is installed, skipping installation."
+	log_info "UiAutomator2 available."
 else
 	log_info "UiAutomator2 not found, installing..."
 	$APPIUM_CMD driver install uiautomator2
 fi
 
 if echo "$output" | grep -q 'xcuitest'; then
-	log_info "XCUITest is installed, skipping installation."
+	log_info "XCUITest available."
 else
 	log_info "XCUITest not found, installing..."
 	$APPIUM_CMD driver install xcuitest
@@ -54,7 +54,7 @@ function detect_or_create_simulator() {
 	local simulators=$(xcrun simctl list devices -j | jq -r --arg runtime "$runtime_name" '.devices | to_entries[] | select(.key | contains($runtime)) | .value[] | .name + "," + .udid')
 
 	if ! echo "$simulators" | grep -q "$simulator_name"; then
-		log_info "$simulator_name ($runtime_name_display) not available, creating..."
+		log_info "$simulator_name ($runtime_name_display) not found, creating..."
 		xcrun simctl create "$simulator_name" "$simulator_name" "com.apple.CoreSimulator.SimRuntime.$runtime_name" > /dev/null
 		log_success "$simulator_name ($runtime_name_display) created."
 	else
@@ -69,6 +69,37 @@ IOS_DEVICE_TABLET_NAME=$(jq -r '.ios.local.deviceTabletName' "$CONFIG_FILE")
 detect_or_create_simulator "$IOS_DEVICE_NAME"
 detect_or_create_simulator "$IOS_DEVICE_TABLET_NAME"
 
+function detect_or_create_emulator() {
+	if [[ "${CI}" ]]; then
+		log_info "Detected CI server, skipping Android emulator creation."
+		return
+	fi
+
+	if [[ -z $(command -v avdmanager) ]]; then
+		log_error "avdmanager not found! Please install the Android SDK command-line tools.\n    https://developer.android.com/tools/"
+		exit 1;
+	fi
+
+	local emulator_name=$1
+	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
+	local device_id=$(echo "$emulator_id" | awk -F '_' '{print tolower($1)"_"tolower($2)"_"tolower($3)}')
+	local runtime_api=$(echo "$emulator_id" | awk -F '_' '{print $NF}')
+	local emulator=$(emulator -list-avds | grep "$emulator_id")
+
+	if [[ -z $emulator ]]; then
+		log_info "$emulator_name not found, creating..."
+		avdmanager create avd -n "$emulator_id" -k "system-images;android-$runtime_api;google_apis;arm64-v8a" -d "$device_id" > /dev/null
+		log_success "$emulator_name created."
+	else
+		log_info "$emulator_name available."
+	fi
+}
+
+ANDROID_DEVICE_NAME=$(jq -r '.android.local.deviceName' "$CONFIG_FILE")
+
+# Create the required Android emulators, if they don't exist
+detect_or_create_emulator $ANDROID_DEVICE_NAME
+
 # Mitigate conflicts between development server caches and E2E tests
 npm run clean:runtime > /dev/null
-log_info 'Runtime cache cleaned.'
+log_info 'Runtime cache cleared.'

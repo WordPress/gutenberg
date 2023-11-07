@@ -4,28 +4,9 @@ The Mobile Gutenberg (MG) project maintains a suite of automated end-to-end (E2E
 
 ## Setup
 
-Before setting up the E2E test environment, the required iOS and Android dependencies must be installed.
-
-> **Note**
-> The required dependencies change overtime. We do our best to update the scripts documented below, but it is best to review the [Appium capabilities](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js) configuration to identify the currently required `deviceName` and `platformVersion` for each of the iOS and Android platforms.
-
-### iOS
-
--   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Xcode.
--   Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
-
-### Android
-
--   Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide, which covers installing and setting up Android Studio and the Android SDK.
--   Open Android Studio and [create an emulator](https://developer.android.com/studio/run/managing-avds) for a Pixel 3 XL running Android 11.0 with the “Enable Device Frame” option disabled.
-
-### Test Environment
-
-After installing the iOS and Android dependencies, the MG project provides a script to set up the testing environment, verifying necessary dependencies are available.
-
-```shell
-npm run native test:e2e:setup
-```
+1. Complete the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide for both iOS and Android, which covers setting up Xcode, Android Studio, the Android SDK.
+1. Open [Xcode settings](https://developer.apple.com/documentation/xcode/installing-additional-simulator-runtimes#Install-and-manage-Simulator-runtimes-in-settings) to install the iOS 16.2 simulator runtime.
+1. `npm run native test:e2e:setup`
 
 ## Running Tests
 
