@@ -15,7 +15,7 @@ if ( class_exists( 'WP_Navigation_Block_Renderer' ) ) {
  */
 class WP_Navigation_Block_Renderer {
 
-	private static $list_item_nav_blocks = array(
+	private static $nav_blocks_wrapped_in_list_item = array(
 		'core/navigation-link',
 		'core/home-link',
 		'core/site-title',
@@ -131,7 +131,7 @@ class WP_Navigation_Block_Renderer {
 		$is_list_open      = false;
 
 		foreach ( $inner_blocks as $inner_block ) {
-			$is_list_item = in_array( $inner_block->name, static::$list_item_nav_blocks, true );
+			$is_list_item = in_array( $inner_block->name, static::$nav_blocks_wrapped_in_list_item, true );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
