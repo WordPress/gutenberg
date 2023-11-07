@@ -72,13 +72,11 @@ function HeaderMenu( { dataView, header } ) {
 	if (
 		header.column.columnDef.filters?.length > 0 &&
 		header.column.columnDef.filters.some(
-			( f ) =>
-				( 'string' === typeof f && f === 'enumeration' ) ||
-				( 'object' === typeof f && f.type === 'enumeration' )
+			( f ) => 'string' === typeof f && f === 'in'
 		)
 	) {
 		filter = {
-			id: header.column.columnDef.id,
+			field: header.column.columnDef.id,
 			elements: [
 				{
 					value: '',
@@ -149,7 +147,7 @@ function HeaderMenu( { dataView, header } ) {
 				{ isFilterable && (
 					<DropdownMenuGroupV2>
 						<DropdownSubMenuV2
-							key={ filter.id }
+							key={ filter.field }
 							trigger={
 								<DropdownSubMenuTriggerV2
 									prefix={ <Icon icon={ funnel } /> }
@@ -169,7 +167,7 @@ function HeaderMenu( { dataView, header } ) {
 									( f ) =>
 										Object.keys( f )[ 0 ].split(
 											':'
-										)[ 0 ] === filter.id
+										)[ 0 ] === filter.field
 								);
 
 								// Set the empty item as active if the filter is not set.
@@ -204,7 +202,7 @@ function HeaderMenu( { dataView, header } ) {
 															)[ 0 ].split( ':' );
 														return (
 															field !==
-																filter.id ||
+																filter.field ||
 															operator !== 'in'
 														);
 													}
@@ -218,8 +216,8 @@ function HeaderMenu( { dataView, header } ) {
 												dataView.setColumnFilters( [
 													...otherFilters,
 													{
-														[ filter.id + ':in' ]:
-															element.value,
+														[ filter.field +
+														':in' ]: element.value,
 													},
 												] );
 											}
