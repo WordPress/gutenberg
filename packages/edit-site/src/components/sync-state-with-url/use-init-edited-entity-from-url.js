@@ -79,7 +79,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 					}
 				}
 
-				// If the no template is assigned, use the default template.
+				// If no template is assigned, use the default template.
 				return getDefaultTemplateId( {
 					slug: `${ postTypeToResolve }-${ editedEntity?.slug }`,
 				} );
