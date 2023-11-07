@@ -9,4 +9,5 @@ export type CustomSelectProps = {
 
 export type CustomSelectItemProps = {
 	children: React.ReactNode;
+	value?: any;
 };

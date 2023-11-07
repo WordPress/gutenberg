@@ -48,7 +48,23 @@ const Template: StoryFn< typeof CustomSelect > = () => {
 
 export const Default = Template.bind( {} );
 
-const RenderChildrenTemplate = () => {
+const AsValueTemplate: StoryFn< typeof CustomSelect > = () => {
+	return (
+		<CustomSelect label="Label" defaultValue="In my defense, I have none">
+			<CustomSelect.Item value="If the story’s over, why am I still writing pages?" />
+			<CustomSelect.Item value="In my defense, I have none" />
+			<CustomSelect.Item value="I was so ahead of the curve, the curve became a sphere" />
+			<CustomSelect.Item value="Sometimes you just don’t know the answer" />
+			<CustomSelect.Item value="Are you really gonna talk about timing in times like these?" />
+			<CustomSelect.Item value="This scene feels like what I once saw on a screen" />
+			<CustomSelect.Item value="Everything you lose is a step you take" />
+		</CustomSelect>
+	);
+};
+
+export const AsValue = AsValueTemplate.bind( {} );
+
+const AsChildrenTemplate = () => {
 	function renderValue( gravatar: string ) {
 		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 		return (
@@ -86,4 +102,4 @@ const RenderChildrenTemplate = () => {
 	);
 };
 
-export const RenderChildren = RenderChildrenTemplate.bind( {} );
+export const AsChildren = AsChildrenTemplate.bind( {} );
