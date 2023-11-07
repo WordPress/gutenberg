@@ -86,7 +86,7 @@ function ViewTypeMenu( { view, onChangeView } ) {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+const PAGE_SIZE_VALUES = [ 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2

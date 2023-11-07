@@ -85,3 +85,10 @@
 		min-width: 240px;
 	}
 }
+
+.edit-site-page-panels-edit-slug__dropdown {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}
