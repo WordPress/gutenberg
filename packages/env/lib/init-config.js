@@ -250,7 +250,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			if ( 'memcached' === config.env[ env ].objectCache ) {
 				dockerFileContent += `
 
-# Install Memcached
+# Install Memcached library
 RUN apt-get -qy install libmemcached-dev`;
 			}
 
@@ -271,7 +271,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 			if ( 'memcached' === config.env[ env ].objectCache ) {
 				dockerFileContent += `
 
-# Install Memcached
+# Install Memcached library
 RUN apk add libmemcached-dev`;
 			}
 
@@ -288,7 +288,10 @@ RUN apk add libmemcached-dev`;
 	);
 
 	if ( 'memcached' === config.env[ env ].objectCache ) {
-		dockerFileContent += 'RUN pecl install memcached-3.1.5';
+		dockerFileContent += `
+
+# Install Memcached PHP extension
+RUN pecl install memcached-3.1.5`;
 	}
 
 	// Add better PHP settings.
