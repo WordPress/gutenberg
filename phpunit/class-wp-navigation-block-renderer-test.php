@@ -19,7 +19,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
-		$method = $reflection->getMethod( 'get_markup_for_inner_block' );
+		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method
 		$result = $method->invoke( $reflection, $navigation_link_block );
@@ -31,16 +31,16 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_markup_for_inner_block_site_title() {
 
 		// We are testing the site title block because we manually add list items around it
-		$parsed_blocks         = parse_blocks(
+		$parsed_blocks    = parse_blocks(
 			'<!-- wp:site-title /-->'
 		);
-		$parsed_block          = $parsed_blocks[0];
-		$context               = array();
+		$parsed_block     = $parsed_blocks[0];
+		$context          = array();
 		$site_title_block = new WP_Block( $parsed_block, $context );
 
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
-		$method = $reflection->getMethod( 'get_markup_for_inner_block' );
+		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
 		// Invoke the private method
 		$result = $method->invoke( $reflection, $site_title_block );
