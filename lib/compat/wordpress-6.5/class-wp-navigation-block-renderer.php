@@ -79,6 +79,10 @@ class WP_Navigation_Block_Renderer {
 		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
+	private static function does_block_need_a_list_item_wrapper( $block ) {
+		return in_array( $block->name, static::$needs_list_item_wrapper, true );
+	}
+
 	/**
 	 * Returns the markup for a single inner block.
 	 *
@@ -88,7 +92,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_markup_for_inner_block( $inner_block ) {
 		$inner_block_content = $inner_block->render();
 		if ( ! empty( $inner_block_content ) ) {
-			if ( in_array( $inner_block->name, static::$needs_list_item_wrapper, true ) ) {
+			if ( static::does_block_need_a_list_item_wrapper( $inner_block ) ) {
 				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 			}
 
