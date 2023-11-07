@@ -524,6 +524,9 @@ describe( 'Tabs', () => {
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
+			// This assertion ensures the component has had time to fully
+			// render, preventing flakiness.
+			// see https://github.com/WordPress/gutenberg/pull/55950
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'tab', { name: 'Beta' } )
@@ -854,6 +857,9 @@ describe( 'Tabs', () => {
 				// highlighted, but not selected.
 				await user.keyboard( '[Tab]' );
 
+				// This assertion ensures focus has time to move to the first
+				// tab before the test proceeds, preventing flakiness.
+				// see https://github.com/WordPress/gutenberg/pull/55950
 				await waitFor( () =>
 					expect(
 						screen.getByRole( 'tab', { name: 'Alpha' } )
