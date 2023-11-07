@@ -40,11 +40,13 @@ function checkOneOfStrings( configFile, configKey, value, options ) {
 		);
 	}
 
+	const validOptions = options
+		.map( ( option ) => `"${ option }"` )
+		.join( ',' );
+
 	if ( ! options.includes( value ) ) {
 		throw new ValidationError(
-			`Invalid ${ configFile }: "${ configKey }" must be one of ${ options.join(
-				','
-			) }`
+			`Invalid ${ configFile }: "${ configKey }" must be one of: ${ validOptions }.`
 		);
 	}
 }

@@ -131,4 +131,26 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
 	} );
+
+	it( 'should create "object-cache" and "tests-object-cache" entries', () => {
+		const envConfig = {
+			...CONFIG,
+			objectCache: 'memcached',
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
+			env: { development: envConfig, tests: envConfig },
+		} );
+
+		expect( dockerConfig.services[ 'object-cache' ] ).not.toBe( undefined );
+		expect( dockerConfig.services[ 'tests-object-cache' ] ).not.toBe(
+			undefined
+		);
+		expect( dockerConfig.services.wordpress.depends_on ).toContain(
+			'object-cache'
+		);
+		expect(
+			dockerConfig.services[ 'tests-wordpress' ].depends_on
+		).toContain( 'tests-object-cache' );
+	} );
 } );

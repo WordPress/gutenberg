@@ -46,6 +46,7 @@ const DEFAULT_CONFIG = {
 		WP_SITEURL: 'http://localhost',
 		WP_HOME: 'http://localhost',
 	},
+	objectCache: null,
 	mappings: {},
 	lifecycleScripts: {
 		afterStart: null,
@@ -385,6 +386,33 @@ describe( 'parseConfig', () => {
 			expect( error ).toEqual(
 				new ValidationError(
 					`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
+				)
+			);
+		}
+	} );
+
+	it( 'throws for invalid object-cache config option', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					objectCache: 'doesnotexist',
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		expect.assertions( 1 );
+		try {
+			await parseConfig( '/test/gutenberg', '/cache' );
+		} catch ( error ) {
+			expect( error ).toEqual(
+				new ValidationError(
+					`Invalid /test/gutenberg/.wp-env.json: "objectCache" must be one of: "memcached".`
 				)
 			);
 		}

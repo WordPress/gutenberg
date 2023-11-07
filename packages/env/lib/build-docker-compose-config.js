@@ -194,7 +194,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
-				depends_on: [ 'mysql' ],
+				depends_on: [
+					'mysql',
+					config.env.development.objectCache && 'object-cache',
+				].filter( Boolean ),
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -212,7 +215,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [ 'tests-mysql' ],
+				depends_on: [
+					'tests-mysql',
+					config.env.development.objectCache && 'tests-object-cache',
+				].filter( Boolean ),
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',
@@ -261,36 +267,40 @@ module.exports = function buildDockerComposeConfig( config ) {
 				},
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
-			'object-cache': {
-				depends_on: [ 'wordpress' ],
-				build: {
-					context: '.',
-					dockerfile: 'ObjectCache.Dockerfile',
-					args: imageBuildArgs,
-				},
-				volumes: developmentMounts,
-				user: hostUser.fullUser,
-				environment: {
-					...dbEnv.credentials,
-					...dbEnv.development,
-				},
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
-			'tests-object-cache': {
-				depends_on: [ 'tests-wordpress' ],
-				build: {
-					context: '.',
-					dockerfile: 'Tests-ObjectCache.Dockerfile',
-					args: imageBuildArgs,
-				},
-				volumes: testsMounts,
-				user: hostUser.fullUser,
-				environment: {
-					...dbEnv.credentials,
-					...dbEnv.tests,
-				},
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
+			'object-cache': config.env.development.objectCache
+				? {
+						depends_on: [],
+						build: {
+							context: '.',
+							dockerfile: 'ObjectCache.Dockerfile',
+							args: imageBuildArgs,
+						},
+						volumes: developmentMounts,
+						user: hostUser.fullUser,
+						environment: {
+							...dbEnv.credentials,
+							...dbEnv.development,
+						},
+						extra_hosts: [ 'host.docker.internal:host-gateway' ],
+				  }
+				: undefined,
+			'tests-object-cache': config.env.tests.objectCache
+				? {
+						depends_on: [],
+						build: {
+							context: '.',
+							dockerfile: 'Tests-ObjectCache.Dockerfile',
+							args: imageBuildArgs,
+						},
+						volumes: testsMounts,
+						user: hostUser.fullUser,
+						environment: {
+							...dbEnv.credentials,
+							...dbEnv.tests,
+						},
+						extra_hosts: [ 'host.docker.internal:host-gateway' ],
+				  }
+				: undefined,
 		},
 		volumes: {
 			...( ! config.env.development.coreSource && { wordpress: {} } ),
