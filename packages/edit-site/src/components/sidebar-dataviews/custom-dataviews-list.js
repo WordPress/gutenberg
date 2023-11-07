@@ -1,24 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import DataViewItem from './dataview-item';
 import AddNewItem from './add-new-view';
+import { unlock } from '../../lock-unlock';
+
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 function CustomDataViewItem( { dataviewId, isActive } ) {
+	const {
+		params: { path },
+	} = useLocation();
+	const history = useHistory();
 	const { dataview } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( coreStore );
@@ -32,6 +44,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 		},
 		[ dataviewId ]
 	);
+	const { deleteEntityRecord } = useDispatch( coreStore );
 	const type = useMemo( () => {
 		const viewContent = JSON.parse( dataview.content );
 		return viewContent.type;
@@ -43,6 +56,43 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 			isActive={ isActive }
 			isCustom="true"
 			customViewId={ dataviewId }
+			suffix={
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+					toggleProps={ {
+						style: {
+							color: 'inherit',
+						},
+					} }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							<MenuItem
+								onClick={ async () => {
+									await deleteEntityRecord(
+										'postType',
+										'wp_dataviews',
+										dataview.id,
+										{
+											force: true,
+										}
+									);
+									if ( isActive ) {
+										history.replace( {
+											path,
+										} );
+									}
+									onClose();
+								} }
+								isDestructive
+							>
+								{ __( 'Delete' ) }
+							</MenuItem>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+			}
 		/>
 	);
 }
