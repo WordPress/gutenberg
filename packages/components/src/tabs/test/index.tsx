@@ -524,6 +524,12 @@ describe( 'Tabs', () => {
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tab', { name: 'Beta' } )
+				).toHaveAttribute( 'tabindex', '-1' )
+			);
+
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
 			// Instead, focus should go to the currently selected tabpanel (alpha).
@@ -847,6 +853,13 @@ describe( 'Tabs', () => {
 				// onSelect should not be called since the disabled tab is
 				// highlighted, but not selected.
 				await user.keyboard( '[Tab]' );
+
+				await waitFor( () =>
+					expect(
+						screen.getByRole( 'tab', { name: 'Alpha' } )
+					).toHaveFocus()
+				);
+
 				await user.keyboard( '[ArrowLeft]' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
