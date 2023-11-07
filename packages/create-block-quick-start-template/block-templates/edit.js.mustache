@@ -61,12 +61,12 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+				<PanelBody title={ __( 'Settings', '{{textdomain}}' ) }>
 					<ToggleControl
 						checked={ showStartingYear }
 						label={ __(
 							'Show starting year',
-							'copyright-date-block'
+							'{{textdomain}}'
 						) }
 						onChange={ () =>
 							setAttributes( {
@@ -78,7 +78,7 @@ export default function Edit( { attributes, setAttributes } ) {
 						<TextControl
 							label={ __(
 								'Starting year',
-								'copyright-date-block'
+								'{{textdomain}}'
 							) }
 							value={ startingYear }
 							onChange={ ( year ) =>
