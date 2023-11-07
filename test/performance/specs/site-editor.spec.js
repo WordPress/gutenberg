@@ -58,19 +58,13 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 
 	test.describe( 'Loading', () => {
-		let draftURL = null;
+		let draftId = null;
 
-		test( 'Setup the test page', async ( { page, admin, perfUtils } ) => {
+		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
-			await perfUtils.saveDraft();
 
-			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
-				postType: 'page',
-			} );
-
-			draftURL = page.url();
+			draftId = await perfUtils.saveDraft();
 		} );
 
 		const samples = 10;
@@ -78,15 +72,18 @@ test.describe( 'Site Editor Performance', () => {
 		const iterations = samples + throwaway;
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
-				page,
+				admin,
 				perfUtils,
 				metrics,
 			} ) => {
 				// Go to the test draft.
-				await page.goto( draftURL );
-				const canvas = await perfUtils.getCanvas();
+				await admin.visitSiteEditor( {
+					postId: draftId,
+					postType: 'page',
+				} );
 
 				// Wait for the first block.
+				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Get the durations.
@@ -109,44 +106,25 @@ test.describe( 'Site Editor Performance', () => {
 	} );
 
 	test.describe( 'Typing', () => {
-		let draftURL = null;
+		let draftId = null;
 
-		test( 'Setup the test post', async ( {
-			page,
-			admin,
-			editor,
-			perfUtils,
-		} ) => {
+		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
 			await admin.createNewPost( { postType: 'page' } );
 			await perfUtils.loadBlocksForLargePost();
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await perfUtils.saveDraft();
 
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			// Go to the test draft.
 			await admin.visitSiteEditor( {
-				postId: new URL( page.url() ).searchParams.get( 'post' ),
+				postId: draftId,
 				postType: 'page',
 			} );
 
-			draftURL = page.url();
-		} );
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
-			await perfUtils.disableAutosave();
-
-			// Wait for the loader overlay to disappear. This is necessary
-			// because the overlay is still visible for a while after the editor
-			// canvas is ready, and we don't want it to affect the typing
-			// timings.
-			await page
-				.locator(
-					// Spinner was used instead of the progress bar in an earlier version of the site editor.
-					'.edit-site-canvas-loader, .edit-site-canvas-spinner'
-				)
-				.waitFor( { state: 'hidden' } );
-
-			const canvas = await perfUtils.getCanvas();
-
 			// Enter edit mode (second click is needed for the legacy edit mode).
+			const canvas = await perfUtils.getCanvas();
 			await canvas.locator( 'body' ).click();
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
@@ -209,19 +187,6 @@ test.describe( 'Site Editor Performance', () => {
 				await admin.visitSiteEditor( {
 					path: '/wp_template',
 				} );
-
-				// Wait for the loader overlay to disappear. This is necessary
-				// because the overlay is still visible for a while after the editor
-				// canvas is ready, and we don't want it to affect the typing
-				// timings.
-				await page
-					.locator(
-						// Spinner was used instead of the progress bar in an earlier version of the site editor.
-						'.edit-site-canvas-loader, .edit-site-canvas-spinner'
-					)
-					.waitFor( { state: 'hidden' } );
-				// Additional time to ensure the browser is completely idle.
-				// eslint-disable-next-line playwright/no-wait-for-timeout
 
 				// Start tracing.
 				await metrics.startTracing();
