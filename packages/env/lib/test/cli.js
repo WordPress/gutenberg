@@ -9,6 +9,12 @@ const env = require( '../env' );
  * Mocked dependencies
  */
 jest.spyOn( process, 'exit' ).mockImplementation( () => {} );
+jest.mock( 'child_process', () => {
+	return {
+		exec: jest.fn( Promise.resolve.bind( Promise ) ),
+		execSync: jest.fn( () => 'Success!' ),
+	};
+} );
 jest.mock( 'ora', () => () => ( {
 	start() {
 		return { text: '', succeed: jest.fn(), fail: jest.fn() };
