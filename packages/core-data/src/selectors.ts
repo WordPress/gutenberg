@@ -46,6 +46,7 @@ export interface State {
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
+	defaultTemplates: Record< string, string >;
 }
 
 type EntityRecordKey = string | number;
@@ -80,6 +81,12 @@ interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
+
+type TemplateQuery = {
+	slug?: string;
+	is_custom?: boolean;
+	ignore_empty?: boolean;
+};
 
 export interface UserPatternCategory {
 	id: number;
@@ -1350,4 +1357,19 @@ export function getCurrentThemeGlobalStylesRevisions(
 	}
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
+}
+
+/**
+ * Returns the default template use to render a given query.
+ *
+ * @param state Data state.
+ * @param query Query.
+ *
+ * @return The default template id for the given query.
+ */
+export function getDefaultTemplateId(
+	state: State,
+	query: TemplateQuery
+): string {
+	return state.defaultTemplates[ JSON.stringify( query ) ];
 }
