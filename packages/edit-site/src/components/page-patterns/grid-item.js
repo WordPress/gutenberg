@@ -53,6 +53,7 @@ import { unlock } from '../../lock-unlock';
 
 /**
  * Downloads a file.
+ * Also used in packages/list-reusable-blocks/src/utils/file.js.
  *
  * @param {string} fileName    File Name.
  * @param {string} content     File Content.
