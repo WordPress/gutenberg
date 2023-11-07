@@ -36,11 +36,9 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-unrestricted-parent',
 		} );
 
-		await page
-			.getByRole( 'document', {
-				name: 'Block: Child Blocks Unrestricted Parent',
-			} )
-			.click();
+		await page.click(
+			'[data-type="test/child-blocks-unrestricted-parent"] .block-editor-default-block-appender'
+		);
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Toggle block inserter' } );
@@ -63,11 +61,9 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-restricted-parent',
 		} );
 
-		await page
-			.getByRole( 'document', {
-				name: 'Block: Child Blocks Restricted Parent',
-			} )
-			.click();
+		await page.click(
+			'[data-type="test/child-blocks-restricted-parent"] .block-editor-default-block-appender'
+		);
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
