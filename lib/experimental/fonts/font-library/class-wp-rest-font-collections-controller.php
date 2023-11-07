@@ -39,7 +39,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
 				'schema' => array( $this, 'get_items_schema' ),
 			)
@@ -59,7 +59,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
 				'schema' => array( $this, 'get_item_schema' ),
 			)
@@ -115,11 +115,11 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	public function update_font_library_permissions_check() {
+	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
-				'rest_cannot_update_font_library',
-				__( 'Sorry, you are not allowed to update the Font Library on this site.' ),
+				'rest_cannot_get_font_library',
+				__( 'Sorry, you are not allowed to get the Font Library on this site.' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
