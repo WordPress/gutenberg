@@ -17,9 +17,7 @@ export { metadata, name };
 
 export const settings = {
 	icon: layout,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "post-template/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

@@ -43,9 +43,7 @@ export const settings = {
 		],
 	},
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "social-links/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

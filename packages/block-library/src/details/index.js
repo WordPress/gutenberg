@@ -35,9 +35,7 @@ export const settings = {
 		],
 	},
 	save,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "details/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

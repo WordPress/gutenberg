@@ -94,9 +94,7 @@ export const settings = {
 		viewportWidth: 450,
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "table/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

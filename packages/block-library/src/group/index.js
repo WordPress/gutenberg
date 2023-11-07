@@ -83,9 +83,7 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "group/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 	variations,

@@ -18,9 +18,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "post-terms/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => {

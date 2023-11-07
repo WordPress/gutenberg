@@ -27,9 +27,7 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "separator/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

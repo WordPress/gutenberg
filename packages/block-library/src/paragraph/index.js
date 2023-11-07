@@ -52,9 +52,7 @@ export const settings = {
 				( attributesToMerge.content || '' ),
 		};
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "paragraph/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

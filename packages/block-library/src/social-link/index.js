@@ -17,9 +17,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "social-link/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	variations,
 };
 

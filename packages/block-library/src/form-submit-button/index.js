@@ -12,9 +12,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "form-submit-button/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

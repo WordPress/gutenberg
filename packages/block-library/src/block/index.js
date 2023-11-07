@@ -15,9 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "block/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	icon,
 };
 

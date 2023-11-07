@@ -26,9 +26,7 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "button/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 	merge: ( a, { text = '' } ) => ( {

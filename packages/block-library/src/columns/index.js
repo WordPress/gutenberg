@@ -81,9 +81,7 @@ export const settings = {
 		],
 	},
 	deprecated,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "columns/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	transforms,
 };

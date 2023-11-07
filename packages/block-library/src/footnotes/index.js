@@ -19,9 +19,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "footnotes/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 registerFormatType( formatName, format );

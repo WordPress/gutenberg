@@ -18,9 +18,7 @@ export const settings = {
 	__experimentalLabel: ( { label } ) => label,
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "page-list-item/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

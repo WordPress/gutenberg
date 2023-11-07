@@ -33,9 +33,7 @@ export const settings = {
 		};
 	},
 
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "navigation-link/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 
 	save,
 

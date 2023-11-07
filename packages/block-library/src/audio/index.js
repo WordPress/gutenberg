@@ -28,9 +28,7 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "audio/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

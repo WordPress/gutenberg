@@ -38,9 +38,7 @@ export const settings = {
 			content: attributes.content + '\n\n' + attributesToMerge.content,
 		};
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "verse/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

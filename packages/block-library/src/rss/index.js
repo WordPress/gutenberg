@@ -21,9 +21,7 @@ export const settings = {
 			feedURL: 'https://wordpress.org',
 		},
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "rss/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

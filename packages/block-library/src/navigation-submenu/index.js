@@ -28,9 +28,7 @@ export const settings = {
 
 	__experimentalLabel: ( { label } ) => label,
 
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "navigation-submenu/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 
 	save,
 

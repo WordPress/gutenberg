@@ -35,9 +35,7 @@ export const settings = {
 	},
 	deprecated,
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "buttons/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

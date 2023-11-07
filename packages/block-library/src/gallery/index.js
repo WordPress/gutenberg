@@ -39,9 +39,7 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "gallery/editor" */ './edit-wrapper' )
-	),
+	edit: lazyLoad( () => import( './edit-wrapper' ) ),
 	save,
 	deprecated,
 };

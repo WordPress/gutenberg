@@ -15,11 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import(
-			/* webpackChunkName: "comments-pagination-numbers/editor" */ './edit'
-		)
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

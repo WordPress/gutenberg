@@ -18,9 +18,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "tag-cloud/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	transforms,
 };
 

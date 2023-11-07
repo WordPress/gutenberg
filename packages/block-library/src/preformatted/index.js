@@ -31,9 +31,7 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "preformatted/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	merge( attributes, attributesToMerge ) {
 		return {

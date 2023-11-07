@@ -21,9 +21,7 @@ export const settings = {
 	icon,
 	example: {},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "nextpage/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

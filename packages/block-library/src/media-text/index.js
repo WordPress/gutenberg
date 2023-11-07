@@ -46,9 +46,7 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "media-text/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

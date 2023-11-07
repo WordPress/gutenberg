@@ -19,9 +19,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "calendar/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	transforms,
 };
 

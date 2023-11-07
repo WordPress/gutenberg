@@ -51,9 +51,7 @@ export const settings = {
 		};
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "image/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

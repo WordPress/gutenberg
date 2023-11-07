@@ -35,9 +35,7 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "quote/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

@@ -12,9 +12,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "site-tagline/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	deprecated,
 };
 

@@ -20,9 +20,7 @@ export const settings = {
 			return { 'data-align': width };
 		}
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "text-columns/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

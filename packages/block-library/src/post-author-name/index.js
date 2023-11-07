@@ -18,9 +18,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "post-author-name/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

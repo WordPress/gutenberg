@@ -24,9 +24,7 @@ export const settings = {
 		viewportWidth: 400,
 	},
 	variations,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "search/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

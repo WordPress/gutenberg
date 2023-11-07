@@ -47,9 +47,7 @@ export const settings = {
 			capitalCase( entity.slug )
 		);
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "template-part/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => {

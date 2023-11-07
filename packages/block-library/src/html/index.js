@@ -28,9 +28,7 @@ export const settings = {
 				'</marquee>',
 		},
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "html/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	transforms,
 };

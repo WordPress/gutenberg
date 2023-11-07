@@ -18,9 +18,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "latest-posts/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	deprecated,
 };
 

@@ -30,9 +30,7 @@ export const settings = {
 	},
 	transforms,
 	deprecated,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "video/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 };
 

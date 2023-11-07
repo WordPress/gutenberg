@@ -17,9 +17,7 @@ export { metadata, name };
 export const settings = {
 	icon: pages,
 	example: {},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "page-list/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

@@ -46,9 +46,7 @@ const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "list/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

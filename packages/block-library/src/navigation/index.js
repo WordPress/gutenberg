@@ -50,9 +50,7 @@ export const settings = {
 			},
 		],
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "cover/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

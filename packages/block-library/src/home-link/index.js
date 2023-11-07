@@ -20,9 +20,7 @@ export { metadata, name };
 export const settings = {
 	icon: home,
 
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "home-link/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 
 	save,
 

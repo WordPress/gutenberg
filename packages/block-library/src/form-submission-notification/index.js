@@ -19,11 +19,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	edit: lazyLoad( () =>
-		import(
-			/* webpackChunkName: "form-submission-notification/editor" */ './edit'
-		)
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	variations,
 };

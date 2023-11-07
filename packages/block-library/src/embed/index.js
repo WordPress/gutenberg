@@ -16,9 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	icon: embedContentIcon,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "embed/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	transforms,
 	variations,

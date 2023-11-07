@@ -32,9 +32,7 @@ export const settings = {
 		},
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "pullquote/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	save,
 	deprecated,
 };

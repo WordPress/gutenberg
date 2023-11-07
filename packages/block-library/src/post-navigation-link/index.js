@@ -11,9 +11,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "post-navigation-link/editor" */ './edit' )
-	),
+	edit: lazyLoad( () => import( './edit' ) ),
 	variations,
 };
 
