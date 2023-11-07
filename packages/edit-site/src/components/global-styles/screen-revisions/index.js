@@ -95,7 +95,7 @@ function ScreenRevisions() {
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
 				description={ __(
-					'Restore styles from an earlier version of changes that was automatically added to this timeline when new styles were saved.'
+					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply". When you are ready, save the template to commit your changes.'
 				) }
 			/>
 			{ isLoading && (
