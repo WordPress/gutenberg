@@ -61,6 +61,7 @@
 
 	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg -->
 	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
+	<exclude-pattern>./packages/env/lib/object-cache/*.php</exclude-pattern>
 
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
