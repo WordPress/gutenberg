@@ -147,7 +147,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 
 		return {
 			...( hasPageContentFocus ? context : nonPostFields ),
-			// Ideally this context should be removed. However, it is currently by the query block.
+			// Ideally this context should be removed. However, it is currently used by the Query Loop block.
 			templateSlug:
 				editedPostType === 'wp_template' ? editedPost.slug : undefined,
 			queryContext: [
