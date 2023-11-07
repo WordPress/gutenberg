@@ -351,7 +351,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 *
 	 * @return bool Whether the font directory exists.
 	 */
-	public function has_upload_directory() {
+	private function has_upload_directory() {
 		$upload_dir = WP_Font_Library::get_fonts_dir();
 		return is_dir( $upload_dir );
 	}
