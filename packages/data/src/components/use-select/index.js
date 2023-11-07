@@ -197,6 +197,9 @@ function useMappingSelect( suspense, mapSelect, deps ) {
 		() => Store( registry, suspense ),
 		[ registry, suspense ]
 	);
+
+	// These are "pass-through" dependencies from the parent hook,
+	// and the parent should catch any hook rule violations.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
 	const { subscribe, getValue } = store( selector, isAsync );
