@@ -152,7 +152,7 @@ const popoverProps = {
 	shift: true,
 };
 
-const LabeledColorIndicators = ( { indicators, label } ) => (
+const LabeledColorIndicators = ( { indicators, label, hasInheritedValue } ) => (
 	<HStack justify="flex-start">
 		<ZStack isLayered={ false } offset={ -8 }>
 			{ indicators.map( ( indicator, index ) => (
@@ -164,6 +164,18 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 		<FlexItem
 			className="block-editor-panel-color-gradient-settings__color-name"
 			title={ label }
+			// If it has an inherited value, we want to label with purple background
+			// and purple text.
+			style={
+				hasInheritedValue
+					? {
+							backgroundColor: '#FAF5FE',
+							color: '#7A00DF',
+							borderRadius: 3,
+							padding: '4px 3px',
+					  }
+					: undefined
+			}
 		>
 			{ label }
 		</FlexItem>
@@ -177,14 +189,15 @@ function ColorPanelTab( {
 	setValue,
 	colorGradientControlSettings,
 } ) {
+	const value = userValue || inheritedValue;
 	return (
 		<ColorGradientControl
 			{ ...colorGradientControlSettings }
 			showTitle={ false }
 			enableAlpha
 			__experimentalIsRenderedInSidebar
-			colorValue={ isGradient ? undefined : inheritedValue }
-			gradientValue={ isGradient ? inheritedValue : undefined }
+			colorValue={ isGradient ? undefined : value }
+			gradientValue={ isGradient ? value : undefined }
 			onColorChange={ isGradient ? undefined : setValue }
 			onGradientChange={ isGradient ? setValue : undefined }
 			clearable={ inheritedValue === userValue }
@@ -196,6 +209,7 @@ function ColorPanelTab( {
 function ColorPanelDropdown( {
 	label,
 	hasValue,
+	hasInheritedValue,
 	resetValue,
 	isShownByDefault,
 	indicators,
@@ -242,6 +256,7 @@ function ColorPanelDropdown( {
 							<LabeledColorIndicators
 								indicators={ indicators }
 								label={ label }
+								hasInheritedValue={ hasInheritedValue }
 							/>
 						</Button>
 					);
@@ -512,8 +527,9 @@ export default function ColorPanel( {
 			label: __( 'Text' ),
 			hasValue: hasTextColor,
 			resetValue: resetTextColor,
+			hasInheritedValue: !! textColor && ! userTextColor,
 			isShownByDefault: defaultControls.text,
-			indicators: [ textColor ],
+			indicators: [ userTextColor || textColor ],
 			tabs: [
 				{
 					key: 'text',
@@ -528,6 +544,10 @@ export default function ColorPanel( {
 			key: 'background',
 			label: __( 'Background' ),
 			hasValue: hasBackground,
+			hasInheritedValue:
+				( !! backgroundColor || !! gradient ) &&
+				! userBackgroundColor &&
+				! userGradient,
 			resetValue: resetBackground,
 			isShownByDefault: defaultControls.background,
 			indicators: [ gradient ?? backgroundColor ],
@@ -553,6 +573,10 @@ export default function ColorPanel( {
 			key: 'link',
 			label: __( 'Link' ),
 			hasValue: hasLink,
+			hasInheritedValue:
+				( !! linkColor || !! hoverLinkColor ) &&
+				! userLinkColor &&
+				! userHoverLinkColor,
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
 			indicators: [ linkColor, hoverLinkColor ],

@@ -295,15 +295,7 @@ export function ColorEdit( props ) {
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasColorPanel( settings );
 
-	const [ blockValue ] = useGlobalStyle( 'color.text', props.name, 'user' );
-	const [ globalStylesValue ] = useGlobalStyle(
-		'color.text',
-		undefined,
-		'user'
-	);
-
-	console.log( 'blockValue', blockValue );
-	console.log( 'globalStylesValue', globalStylesValue );
+	const [ userValue ] = useGlobalStyle( '', props.name, 'user' );
 
 	const value = useMemo( () => {
 		return attributesToStyle( {
@@ -349,6 +341,7 @@ export function ColorEdit( props ) {
 		<StylesColorPanel
 			as={ ColorInspectorControl }
 			panelId={ clientId }
+			inheritedValue={ userValue }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
