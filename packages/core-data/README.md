@@ -468,7 +468,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: The current global styles.
+-   `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 

@@ -1365,7 +1365,7 @@ export function getCurrentThemeGlobalStylesRevisions(
  * @param state Data state.
  * @param query Query.
  *
- * @return The current global styles.
+ * @return The default template id for the given query.
  */
 export function getDefaultTemplateId(
 	state: State,
