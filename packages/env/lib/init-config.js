@@ -251,7 +251,7 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 				dockerFileContent += `
 
 # Install Memcached library
-RUN apt-get -qy install libmemcached-dev`;
+RUN apt-get -qy install zlib-dev libmemcached-dev`;
 			}
 
 			break;
@@ -291,7 +291,9 @@ RUN apk add zlib-dev libmemcached-dev`;
 		dockerFileContent += `
 
 # Install Memcached PHP extension
-RUN pecl install memcached`;
+RUN pecl install memcached
+RUN docker-php-ext-enable memcached
+`;
 	}
 
 	// Add better PHP settings.
