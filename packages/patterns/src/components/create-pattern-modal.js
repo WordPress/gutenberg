@@ -179,7 +179,7 @@ export default function CreatePatternModal( {
 						categoryMap={ categoryMap }
 					/>
 					<ToggleControl
-						// translators: Toggle button label, when active makes an individual pattern "Synced".
+						// translators: Button label, when active makes an individual pattern "Synced".
 						label={ __( 'Synced' ) }
 						help={ __(
 							'Editing the pattern will update it anywhere it is used.'
