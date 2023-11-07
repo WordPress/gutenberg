@@ -146,11 +146,13 @@ module.exports = {
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
-		chunkFilename: ( { chunk } ) => {
-			if ( chunk.runtime === 'block-library' ) {
-				return './build/block-library/blocks/[name].min.js';
+		chunkFilename: ( { runtime, chunk: { id } } ) => {
+			if ( runtime === 'block-library' ) {
+				const rg = /build-module_([\w-]+)_edit/.exec( id );
+				const name = ( rg && rg[ 1 ] ) || id;
+				return `./build/block-library/blocks/${ name }/editor.js`;
 			}
-			return './build/' + chunk.runtime + '/[name].min.js';
+			return './build/' + runtime + '/[name].min.js';
 		},
 		path: join( __dirname, '..', '..' ),
 		devtoolModuleFilenameTemplate: ( info ) => {
@@ -163,6 +165,7 @@ module.exports = {
 		},
 	},
 	optimization: {
+		chunkIds: 'named',
 		splitChunks: {
 			cacheGroups: {
 				default: false,
