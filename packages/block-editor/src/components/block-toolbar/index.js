@@ -122,9 +122,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 					</div>
 				) }
 			{ isMultiToolbar && (
-				<ToolbarGroup className="block-editor-block-toolbar__block-transforms">
-					<BlockPriorityTransforms clientIds={ blockClientIds } />
-				</ToolbarGroup>
+				<BlockPriorityTransforms clientIds={ blockClientIds } />
 			) }
 			{ shouldShowVisualToolbar && isMultiToolbar && (
 				<BlockGroupToolbar />

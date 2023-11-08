@@ -331,17 +331,26 @@ export function BlockPriorityTransforms( { clientIds } ) {
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}
-	return priorityTextTransformations.map( ( item ) => (
-		<ToolbarButton
-			key={ item.name }
-			title={ item.title }
-			icon={ <BlockIcon icon={ item.icon } showColors /> }
-			onClick={ ( event ) => {
-				event.preventDefault();
-				onBlockTransform( item.name );
-			} }
-		/>
-	) );
+
+	if ( ! priorityTextTransformations.length ) {
+		return null;
+	}
+
+	return (
+		<ToolbarGroup>
+			{ priorityTextTransformations.map( ( item ) => (
+				<ToolbarButton
+					key={ item.name }
+					title={ item.title }
+					icon={ <BlockIcon icon={ item.icon } showColors /> }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						onBlockTransform( item.name );
+					} }
+				/>
+			) ) }
+		</ToolbarGroup>
+	);
 }
 
 export default BlockSwitcher;
