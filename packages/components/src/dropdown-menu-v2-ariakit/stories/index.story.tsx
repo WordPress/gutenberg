@@ -40,6 +40,8 @@ const meta: Meta< typeof DropdownMenu > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		trigger: { control: { type: null } },
+		hideOnEscape: { control: { type: 'boolean' } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
