@@ -105,7 +105,7 @@ export default function useSiteEditorSettings() {
 			__unstableGetPreference,
 			getCanvasMode,
 			getSettings,
-		} = select( editSiteStore );
+		} = unlock( select( editSiteStore ) );
 		const { getEditedEntityRecord } = select( coreStore );
 		const usedPostType = getEditedPostType();
 		const usedPostId = getEditedPostId();
