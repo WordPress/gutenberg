@@ -271,10 +271,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__block-patterns-tabs-container {
+.block-editor-inserter__block-patterns-tabs-container,
+.block-editor-block-patterns-explorer__sidebar {
 	height: 100%;
 	nav {
 		height: 100%;
+	}
+	.block-editor-block-patterns__source-filter select.components-select-control__input {
+		height: 40px;
 	}
 }
 
@@ -288,6 +292,11 @@ $block-inserter-tabs-height: 44px;
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
+
+	.block-editor-inserter__patterns-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+	}
 }
 
 .block-editor-inserter__patterns-category-dialog {
@@ -295,13 +304,10 @@ $block-inserter-tabs-height: 44px;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
 	position: absolute;
-	padding: $grid-unit-40 $grid-unit-30;
 	top: 0;
 	left: 0;
 	height: 100%;
 	width: 100%;
-	overflow-y: auto;
-	scrollbar-gutter: stable both-edges;
 
 	@include break-medium {
 		left: 100%;
@@ -310,12 +316,19 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-block-patterns-list {
-		margin-top: $grid-unit-30;
+		overflow-y: auto;
+		flex-grow: 1;
+		height: 100%;
+		padding: $grid-unit-20 $grid-unit-30;
 	}
+}
 
+.block-editor-block-patterns-list__list-item {
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-		&:hover {
+	}
+	&:hover {
+		.block-editor-block-preview__container {
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
@@ -323,9 +336,17 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-category-panel {
 	padding: 0 $grid-unit-20;
-
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 	@include break-medium {
 		padding: 0;
+	}
+	.block-editor-inserter__patterns-category-panel-header {
+		padding: 16px $grid-unit-30;
+	}
+	.block-editor-inserter__patterns-category-no-results {
+		margin-top: $grid-unit-30;
 	}
 }
 
@@ -453,12 +474,18 @@ $block-inserter-tabs-height: 44px;
 	&__list {
 		margin-left: $sidebar-width;
 		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
 	}
 
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-gap: $grid-unit-40;
 		grid-template-columns: repeat(1, 1fr);
+		margin-bottom: $grid-unit-20;
 
 		@include break-xlarge() {
 			grid-template-columns: repeat(2, 1fr);
@@ -511,7 +538,10 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	&__media-category {
+	.block-editor-inserter__media-tabs__media-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+
 		&.is-selected {
 			color: var(--wp-admin-theme-color);
 			position: relative;
@@ -738,4 +768,12 @@ $block-inserter-tabs-height: 44px;
 
 .components-menu-group .reusable-blocks-menu-items__rename-hint {
 	margin: 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
 }

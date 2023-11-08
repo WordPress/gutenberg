@@ -473,11 +473,11 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `Array`: Array of blocks to inspect.
+-   _clientIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
--   `Array`: ids of descendants.
+-   `Array`: Client IDs of descendants.
 
 ### getClientIdsWithDescendants
 
@@ -587,6 +587,18 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
+
+### getLastFocus
+
+Returns the element of the last element that had focus when focus left the editor canvas.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+
+_Returns_
+
+-   `Object`: Element.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -1650,6 +1662,18 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
+
+### setLastFocus
+
+Action that sets the element that had focus when focus leaves the editor canvas.
+
+_Parameters_
+
+-   _lastFocus_ `Object`: The last focused element.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setNavigationMode
 

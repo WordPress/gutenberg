@@ -4,18 +4,21 @@
  *
  * @package Gutenberg
  * @subpackage Interactivity API
+ *
+ * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
+
 
 class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	function process_foo_test( $tags, $context ) {
+	public function process_foo_test( $tags, $context ) {
 	}
 
-	function increment( $store ) {
+	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 
-	static function static_increment( $store ) {
+	public static function static_increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 }
@@ -25,10 +28,10 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
 }
 
 /**
- * Tests for the gutenberg_interactivity_process_directives function.
+ * Tests for the gutenberg_interactivity_process_rendered_html function.
  *
  * @group  interactivity-api
- * @covers gutenberg_interactivity_process_directives
+ * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_correctly_call_attribute_directive_processor_on_closing_tag() {
@@ -37,19 +40,19 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$test_helper = $this->createMock( Helper_Class::class );
 
 		$test_helper->expects( $this->exactly( 2 ) )
-					->method( 'process_foo_test' )
-					->with(
-						$this->callback(
-							function( $p ) {
-								return 'DIV' === $p->get_tag() && (
-									// Either this is a closing tag...
-									$p->is_tag_closer() ||
-									// ...or it is an open tag, and has the directive attribute set.
-									( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
-								);
-							}
-						)
-					);
+				->method( 'process_foo_test' )
+				->with(
+					$this->callback(
+						function ( $p ) {
+							return 'DIV' === $p->get_tag() && (
+								// Either this is a closing tag...
+								$p->is_tag_closer() ||
+								// ...or it is an open tag, and has the directive attribute set.
+								( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
+							);
+						}
+					)
+				);
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
@@ -57,13 +60,13 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
 		$test_helper = $this->createMock( Helper_Class::class );
 		$test_helper->expects( $this->atLeastOnce() )
-					->method( 'process_foo_test' );
+				->method( 'process_foo_test' );
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
@@ -71,9 +74,75 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div foo-test--value="abc"></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
+	}
+
+	public function test_interactivity_process_directives_in_root_blocks() {
+		$pattern_content =
+		'<!-- wp:paragraph -->' .
+			'<p>Pattern Content Block 1</p>' .
+		'<!-- /wp:paragraph -->' .
+		'<!-- wp:paragraph -->' .
+			'<p>Pattern Content Block 2</p>' .
+		'<!-- /wp:paragraph -->';
+		register_block_pattern(
+			'core/interactivity-pattern',
+			array(
+				'title'   => 'Interactivity Pattern',
+				'content' => $pattern_content,
+			)
+		);
+
+		$providers = $this->data_only_root_blocks_are_processed();
+		foreach ( $providers as $provider ) {
+			do_blocks( $provider['page_content'] );
+			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
+
+		}
+	}
+
+	/**
+	 * Data provider .
+	 *
+	 * @return array
+	 **/
+	public function data_only_root_blocks_are_processed() {
+
+		return array(
+			array(
+				'root_blocks'  => 2,
+				'page_content' =>
+				'<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote">
+						<!-- wp:paragraph -->' .
+						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+						'<!-- /wp:paragraph -->
+					</blockquote>' .
+				'<!-- /wp:quote -->' .
+				'<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote">
+						<!-- wp:paragraph -->' .
+						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+						'<!-- /wp:paragraph -->
+					</blockquote>' .
+				'<!-- /wp:quote -->',
+			),
+			array(
+				'root_blocks'  => 2,
+				'page_content' =>
+				'<!-- wp:paragraph -->' .
+					'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
+				'<!-- /wp:paragraph -->' .
+				'<!-- wp:pattern {"slug":"core/interactivity-pattern"} /-->',
+			),
+		);
 	}
 }
+
 
 /**
  * Tests for the gutenberg_interactivity_evaluate_reference function.
@@ -129,7 +198,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 
 	public function test_evaluate_function_should_execute_anonymous_functions() {
 		$context = new WP_Directive_Context( array( 'count' => 2 ) );
-		$helper  = new Helper_Class;
+		$helper  = new Helper_Class();
 
 		wp_store(
 			array(
@@ -137,7 +206,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 					'count' => 3,
 				),
 				'selectors' => array(
-					'anonymous_function'           => function( $store ) {
+					'anonymous_function'           => function ( $store ) {
 						return $store['state']['count'] + $store['context']['count'];
 					},
 					// Other types of callables should not be executed.

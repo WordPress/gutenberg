@@ -11,11 +11,16 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function useInitEditedEntityFromURL() {
-	const { params: { postId, postType } = {} } = useLocation();
+export function useInitEditedEntity( { postId, postType } ) {
 	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite, getUnstableBase } = select( coreDataStore );
 		const siteData = getSite();
@@ -42,16 +47,16 @@ export default function useInitEditedEntityFromURL() {
 	useEffect( () => {
 		if ( postType && postId ) {
 			switch ( postType ) {
-				case 'wp_template':
+				case TEMPLATE_POST_TYPE:
 					setTemplate( postId );
 					break;
-				case 'wp_template_part':
+				case TEMPLATE_PART_POST_TYPE:
 					setTemplatePart( postId );
 					break;
-				case 'wp_navigation':
+				case NAVIGATION_POST_TYPE:
 					setNavigationMenu( postId );
 					break;
-				case 'wp_block':
+				case PATTERN_TYPES.user:
 					setEditedEntity( postType, postId );
 					break;
 				default:
@@ -85,4 +90,9 @@ export default function useInitEditedEntityFromURL() {
 		setTemplatePart,
 		setNavigationMenu,
 	] );
+}
+
+export default function useInitEditedEntityFromURL() {
+	const { params = {} } = useLocation();
+	return useInitEditedEntity( params );
 }

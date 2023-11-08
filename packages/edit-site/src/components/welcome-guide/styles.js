@@ -77,7 +77,7 @@ export default function WelcomeGuideStyles() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
-									'You can customize your site as much as you like with different colors, typography, and layouts. Or if you prefer, just leave it up to your theme to handle! '
+									'You can customize your site as much as you like with different colors, typography, and layouts. Or if you prefer, just leave it up to your theme to handle!'
 								) }
 							</p>
 						</>
@@ -117,7 +117,7 @@ export default function WelcomeGuideStyles() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
-									'New to block themes and styling your site? '
+									'New to block themes and styling your site?'
 								) }
 								<ExternalLink
 									href={ __(

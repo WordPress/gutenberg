@@ -33,6 +33,12 @@
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
@@ -90,9 +96,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"behaviors": {
-			"lightbox": true
-		},
 		"color": {
 			"text": false,
 			"background": false
@@ -128,5 +131,5 @@
 	],
 	"editorStyle": "wp-block-image-editor",
 	"style": "wp-block-image",
-	"viewScript": "file:./view-interactivity.min.js"
+	"viewScript": "file:./view.min.js"
 }

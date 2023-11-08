@@ -12,6 +12,7 @@
 @import "./components/block-navigation/style.scss";
 @import "./components/block-parent-selector/style.scss";
 @import "./components/block-patterns-list/style.scss";
+@import "./components/block-patterns-paging/style.scss";
 @import "./components/block-popover/style.scss";
 @import "./components/block-preview/style.scss";
 @import "./components/block-settings-menu/style.scss";
@@ -46,7 +47,8 @@
 @import "./components/url-input/style.scss";
 @import "./components/url-popover/style.scss";
 @import "./hooks/anchor.scss";
-@import "./hooks/auto-inserting-blocks.scss";
+@import "./hooks/block-hooks.scss";
+@import "./hooks/background.scss";
 @import "./hooks/border.scss";
 @import "./hooks/color.scss";
 @import "./hooks/dimensions.scss";

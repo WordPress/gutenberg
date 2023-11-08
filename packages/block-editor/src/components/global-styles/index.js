@@ -1,6 +1,4 @@
 export {
-	__experimentalUseGlobalBehaviors,
-	__experimentalUseHasBehaviorsPanel,
 	useGlobalStylesReset,
 	useGlobalSetting,
 	useGlobalStyle,
@@ -25,6 +23,9 @@ export { default as BorderPanel, useHasBorderPanel } from './border-panel';
 export { default as ColorPanel, useHasColorPanel } from './color-panel';
 export { default as EffectsPanel, useHasEffectsPanel } from './effects-panel';
 export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';
-export { default as __experimentalBehaviorsPanel } from './behaviors-panel';
+export {
+	default as ImageSettingsPanel,
+	useHasImageSettingsPanel,
+} from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
 export { areGlobalStyleConfigsEqual } from './utils';

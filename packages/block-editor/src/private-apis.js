@@ -23,6 +23,8 @@ import {
 	useReusableBlocksRenameHint,
 } from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
+import { ExperimentalBlockCanvas } from './components/block-canvas';
+import { getDuotoneFilter } from './components/duotone/utils';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -30,7 +32,9 @@ import { usesContextKey } from './components/rich-text/format-edit';
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
+	ExperimentalBlockCanvas,
 	ExperimentalBlockEditorProvider,
+	getDuotoneFilter,
 	getRichTextValues,
 	kebabCase,
 	PrivateInserter,

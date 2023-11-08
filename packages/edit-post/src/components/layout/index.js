@@ -22,6 +22,7 @@ import {
 	useBlockCommands,
 	BlockBreadcrumb,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -36,6 +37,12 @@ import {
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
+
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
 
 /**
  * Internal dependencies
@@ -56,6 +63,7 @@ import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import useCommonCommands from '../../hooks/commands/use-common-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 
@@ -124,7 +132,10 @@ function useEditorStyles() {
 }
 
 function Layout() {
+	useCommands();
+	useCommonCommands();
 	useBlockCommands();
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -184,8 +195,16 @@ function Layout() {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			hasBlockSelected:
+				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
+
+	// Set the right context for the command palette
+	const commandContext = hasBlockSelected
+		? 'block-selection-edit'
+		: 'post-editor-edit';
+	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
 
@@ -210,6 +229,10 @@ function Layout() {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
+
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
+
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -220,11 +243,17 @@ function Layout() {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// We need to add the show-icon-labels class to the body element so it is applied to modals.
+	if ( showIconLabels ) {
+		document.body.classList.add( 'show-icon-labels' );
+	} else {
+		document.body.classList.remove( 'show-icon-labels' );
+	}
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
 		'is-distraction-free': isDistractionFree && isLargeViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
@@ -238,7 +267,11 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
+			return (
+				<ListViewSidebar
+					listViewToggleElement={ listViewToggleElement }
+				/>
+			);
 		}
 
 		return null;
@@ -266,7 +299,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
-			<SettingsSidebar />
+
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isLargeViewport }
 				className={ className }
@@ -279,6 +312,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
@@ -358,6 +392,7 @@ function Layout() {
 			<PostSyncStatusModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
+			<SettingsSidebar />
 		</>
 	);
 }

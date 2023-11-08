@@ -9,8 +9,8 @@ GradientPicker is a React component that renders a color gradient picker to defi
 Render a GradientPicker.
 
 ```jsx
+import { useState } from 'react';
 import { GradientPicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const myGradientPicker = () => {
 	const [ gradient, setGradient ] = useState( null );
@@ -102,3 +102,17 @@ The heading level. Only applies in cases where gradients are provided from multi
 
 -   Required: No
 -   Default: `2`
+
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`

@@ -78,7 +78,7 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 		$template_blocks    = parse_blocks( $current_template[0]->content );
 		$post_content_block = gutenberg_find_first_block( 'core/post-content', $template_blocks );
 
-		if ( ! empty( $post_content_block['attrs'] ) ) {
+		if ( isset( $post_content_block['attrs'] ) ) {
 			$settings['postContentAttributes'] = $post_content_block['attrs'];
 		}
 	}

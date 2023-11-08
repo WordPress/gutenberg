@@ -10,7 +10,6 @@
 	<php>
 		<env name="WP_MULTISITE" value="1" />
 		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
-		<const name="FONT_LIBRARY_ENABLE" value="true"/>
 	</php>
 	<testsuites>
 		<testsuite name="default">

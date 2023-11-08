@@ -4,6 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
+	edit,
 	trash,
 	rotateLeft,
 	rotateRight,
@@ -15,6 +16,7 @@ import {
 	code,
 	keyboard,
 	listView,
+	symbol,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -32,7 +34,9 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
+import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -131,7 +135,7 @@ function useManipulateDocumentCommands() {
 
 	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
 		const label =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
 				  sprintf(
 						'Reset template: %s',
@@ -155,7 +159,7 @@ function useManipulateDocumentCommands() {
 
 	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
 		const label =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
 				  sprintf(
 						'Delete template: %s',
@@ -167,7 +171,7 @@ function useManipulateDocumentCommands() {
 						decodeEntities( template.title )
 				  );
 		const path =
-			template.type === 'wp_template'
+			template.type === TEMPLATE_POST_TYPE
 				? '/wp_template'
 				: '/wp_template_part/all';
 		commands.push( {
@@ -358,6 +362,40 @@ function useEditUICommands() {
 	};
 }
 
+function usePatternCommands() {
+	const { isLoaded, record: pattern } = useEditedEntityRecord();
+	const { openModal } = useDispatch( interfaceStore );
+
+	if ( ! isLoaded ) {
+		return { isLoading: true, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( pattern?.type === 'wp_block' ) {
+		commands.push( {
+			name: 'core/rename-pattern',
+			label: __( 'Rename pattern' ),
+			icon: edit,
+			callback: ( { close } ) => {
+				openModal( PATTERN_MODALS.rename );
+				close();
+			},
+		} );
+		commands.push( {
+			name: 'core/duplicate-pattern',
+			label: __( 'Duplicate pattern' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				openModal( PATTERN_MODALS.duplicate );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/exit-code-editor',
@@ -374,6 +412,12 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/patterns',
+		hook: usePatternCommands,
+		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {

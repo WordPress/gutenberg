@@ -85,5 +85,4 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
 		$this->assertFalse( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
 	}
-
 }

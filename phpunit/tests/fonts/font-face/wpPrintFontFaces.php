@@ -4,22 +4,20 @@
  *
  * @package    WordPress
  * @subpackage Fonts
+ *
+ * @since 6.4.0
  */
 
+// @core-merge this line of code is not needed when merging into Core.
 require_once __DIR__ . '/base.php';
 
 /**
- * Test wp_print_font_faces().
- *
- * @package WordPress
- * @subpackage Fonts
- *
- * @since X.X.X
  * @group fonts
  * @group fontface
+ *
  * @covers wp_print_font_faces
  */
-class Tests_Fonts_WPPrintFontFaces extends WP_Font_Face_TestCase {
+class Tests_Fonts_WpPrintFontFaces extends WP_Font_Face_UnitTestCase {
 	const FONTS_THEME = 'fonts-block-theme';
 
 	public static function set_up_before_class() {
@@ -45,6 +43,30 @@ class Tests_Fonts_WPPrintFontFaces extends WP_Font_Face_TestCase {
 		$expected_output = $this->get_expected_styles_output( $expected );
 
 		$this->expectOutputString( $expected_output );
+		wp_print_font_faces( $fonts );
+	}
+
+	public function test_should_escape_tags() {
+		$fonts = array(
+			'Source Serif Pro' => array(
+				array(
+					'src'          => array( 'http://example.com/assets/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+					'font-family'  => 'Source Serif Pro',
+					'font-style'   => 'normal',
+					'font-weight'  => '200 900',
+					'font-stretch' => '</style><script>console.log("Hello")</script><style>',
+				),
+			),
+		);
+
+		$expected_output = <<<CSS
+<style id='wp-fonts-local' type='text/css'>
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;src:url('http://example.com/assets/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');font-stretch:;}
+</style>
+
+CSS;
+		$this->expectOutputString( $expected_output );
+
 		wp_print_font_faces( $fonts );
 	}
 

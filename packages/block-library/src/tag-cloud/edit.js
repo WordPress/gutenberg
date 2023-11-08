@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,13 +49,9 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		largestFontSize,
 	} = attributes;
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem' ],
 	} );
 
 	const getTaxonomyOptions = () => {

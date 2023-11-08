@@ -27,7 +27,6 @@ class Tests_Fonts_WpFonts_AddFontFamily extends WP_Fonts_TestCase {
 		$this->assertSame( $expected, $font_family_handle, 'Registering a font-family should return its handle' );
 		$this->assertCount( 1, $wp_fonts->registered );
 		$this->assertArrayHasKey( $font_family_handle, $wp_fonts->registered, 'Font family handle should be in the registry after registration' );
-
 	}
 
 	/**

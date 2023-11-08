@@ -36,7 +36,7 @@ abstract class WP_Font_Family_UnitTestCase extends WP_UnitTestCase {
 		parent::set_up();
 
 		$merriweather_tmp_name = wp_tempnam( 'Merriweather-' );
-		file_put_contents( $merriweather_tmp_name, 'Mocking file content' );
+		copy( __DIR__ . '/../../../data/fonts/Merriweather.ttf', $merriweather_tmp_name );
 		$this->merriweather = array(
 			'font_data'     => array(
 				'name'       => 'Merriweather',

@@ -26,7 +26,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
@@ -197,8 +197,10 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const allowFixed = useSetting( 'position.fixed' );
-	const allowSticky = useSetting( 'position.sticky' );
+	const [ allowFixed, allowSticky ] = useSettings(
+		'position.fixed',
+		'position.sticky'
+	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
 	return ! hasPositionSupport( blockName ) || isDisabled;
@@ -209,7 +211,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Position panel.
+ * @return {Element} Position panel.
  */
 export function PositionPanel( props ) {
 	const {
@@ -296,7 +298,7 @@ export function PositionPanel( props ) {
 					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision
@@ -327,15 +329,15 @@ export function PositionPanel( props ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withInspectorControls = createHigherOrderComponent(
+export const withPositionControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
 		const positionSupport = hasBlockSupport(
 			blockName,
 			POSITION_SUPPORT_KEY
 		);
-		const showPositionControls =
-			positionSupport && ! useIsPositionDisabled( props );
+		const isPositionDisabled = useIsPositionDisabled( props );
+		const showPositionControls = positionSupport && ! isPositionDisabled;
 
 		return [
 			showPositionControls && (
@@ -344,7 +346,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withInspectorControls'
+	'withPositionControls'
 );
 
 /**
@@ -361,8 +363,9 @@ export const withPositionStyles = createHigherOrderComponent(
 			name,
 			POSITION_SUPPORT_KEY
 		);
+		const isPositionDisabled = useIsPositionDisabled( props );
 		const allowPositionStyles =
-			hasPositionBlockSupport && ! useIsPositionDisabled( props );
+			hasPositionBlockSupport && ! isPositionDisabled;
 
 		const id = useInstanceId( BlockListBlock );
 		const element = useContext( BlockList.__unstableElementContext );
@@ -410,5 +413,5 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/position/with-inspector-controls',
-	withInspectorControls
+	withPositionControls
 );

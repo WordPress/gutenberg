@@ -44,7 +44,7 @@ class WP_Directive_Context {
 	 *
 	 * @param array $context A context.
 	 */
-	function __construct( $context = array() ) {
+	public function __construct( $context = array() ) {
 		$this->set_context( $context );
 	}
 
@@ -65,9 +65,10 @@ class WP_Directive_Context {
 	 * @return void
 	 */
 	public function set_context( $context ) {
-		if ( $context ) {
-			array_push( $this->stack, array_replace_recursive( $this->get_context(), $context ) );
-		}
+		array_push(
+			$this->stack,
+			array_replace_recursive( $this->get_context(), $context )
+		);
 	}
 
 	/**

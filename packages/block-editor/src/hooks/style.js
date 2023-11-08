@@ -20,6 +20,7 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
+import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -42,6 +43,7 @@ const styleSupportKeys = [
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
+	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -127,7 +129,11 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
-	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
+	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
+};
+
+const skipSerializationPathsSaveChecks = {
+	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
 
 /**
@@ -285,7 +291,9 @@ export function addSaveProps(
 
 	let { style } = attributes;
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
-		const skipSerialization = getBlockSupport( blockType, indicator );
+		const skipSerialization =
+			skipSerializationPathsSaveChecks[ indicator ] ||
+			getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -346,7 +354,7 @@ export function addEditProps( settings ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withBlockControls = createHigherOrderComponent(
+export const withBlockStyleControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( ! hasStyleSupport( props.name ) ) {
 			return <BlockEdit key="edit" { ...props } />;
@@ -360,6 +368,7 @@ export const withBlockControls = createHigherOrderComponent(
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
 						<ColorEdit { ...props } />
+						<BackgroundImagePanel { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
 						<DimensionsPanel { ...props } />
@@ -369,7 +378,7 @@ export const withBlockControls = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withBlockStyleControls'
 );
 
 // Defines which element types are supported, including their hover styles or
@@ -528,7 +537,7 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/style/with-block-controls',
-	withBlockControls
+	withBlockStyleControls
 );
 
 addFilter(

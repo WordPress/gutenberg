@@ -46,6 +46,7 @@ describe( 'useEntityRecord', () => {
 			edit: expect.any( Function ),
 			editedRecord: {},
 			hasEdits: false,
+			edits: {},
 			record: undefined,
 			save: expect.any( Function ),
 			hasResolved: false,
@@ -64,6 +65,7 @@ describe( 'useEntityRecord', () => {
 			edit: expect.any( Function ),
 			editedRecord: { hello: 'world', id: 1 },
 			hasEdits: false,
+			edits: {},
 			record: { hello: 'world', id: 1 },
 			save: expect.any( Function ),
 			hasResolved: true,
@@ -92,6 +94,7 @@ describe( 'useEntityRecord', () => {
 				edit: expect.any( Function ),
 				editedRecord: { hello: 'world', id: 1 },
 				hasEdits: false,
+				edits: {},
 				record: { hello: 'world', id: 1 },
 				save: expect.any( Function ),
 				hasResolved: true,
@@ -108,5 +111,6 @@ describe( 'useEntityRecord', () => {
 
 		expect( widget.record ).toEqual( { hello: 'world', id: 1 } );
 		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
+		expect( widget.edits ).toEqual( { hello: 'foo' } );
 	} );
 } );

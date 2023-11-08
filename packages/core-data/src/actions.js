@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -79,6 +80,7 @@ export function addEntities( entities ) {
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
+ * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -87,7 +89,8 @@ export function receiveEntityRecords(
 	records,
 	query,
 	invalidateCache = false,
-	edits
+	edits,
+	meta
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -101,9 +104,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query, edits );
+		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
-		action = receiveItems( records, edits );
+		action = receiveItems( records, edits, meta );
 	}
 
 	return {
@@ -384,27 +387,38 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			const objectId = entityConfig.getSyncObjectId( recordId );
-			getSyncProvider().update(
-				entityConfig.syncObjectType + '--edit',
-				objectId,
-				edit.edits
-			);
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				const objectId = entityConfig.getSyncObjectId( recordId );
+				getSyncProvider().update(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					edit.edits
+				);
+			}
 		} else {
+			if ( ! options.undoIgnore ) {
+				select.getUndoManager().addRecord(
+					[
+						{
+							id: { kind, name, recordId },
+							changes: Object.keys( edits ).reduce(
+								( acc, key ) => {
+									acc[ key ] = {
+										from: editedRecord[ key ],
+										to: edits[ key ],
+									};
+									return acc;
+								},
+								{}
+							),
+						},
+					],
+					options.isCached
+				);
+			}
 			dispatch( {
 				type: 'EDIT_ENTITY_RECORD',
 				...edit,
-				meta: {
-					undo: ! options.undoIgnore && {
-						...edit,
-						// Send the current values for things like the first undo stack entry.
-						edits: Object.keys( edits ).reduce( ( acc, key ) => {
-							acc[ key ] = editedRecord[ key ];
-							return acc;
-						}, {} ),
-						isCached: options.isCached,
-					},
-				},
 			} );
 		}
 	};
@@ -416,13 +430,13 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoEdits();
-		if ( ! undoEdit ) {
+		const undoRecord = select.getUndoManager().undo();
+		if ( ! undoRecord ) {
 			return;
 		}
 		dispatch( {
 			type: 'UNDO',
-			stackedEdits: undoEdit,
+			record: undoRecord,
 		} );
 	};
 
@@ -433,13 +447,13 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getRedoEdits();
-		if ( ! redoEdit ) {
+		const redoRecord = select.getUndoManager().redo();
+		if ( ! redoRecord ) {
 			return;
 		}
 		dispatch( {
 			type: 'REDO',
-			stackedEdits: redoEdit,
+			record: redoRecord,
 		} );
 	};
 
@@ -448,9 +462,11 @@ export const redo =
  *
  * @return {Object} Action object.
  */
-export function __unstableCreateUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
-}
+export const __unstableCreateUndoLevel =
+	() =>
+	( { select } ) => {
+		select.getUndoManager().addRecord();
+	};
 
 /**
  * Action triggered to save an entity record.
@@ -779,7 +795,7 @@ export const saveEditedEntityRecord =
  * @param {string} kind        Kind of the entity.
  * @param {string} name        Name of the entity.
  * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
  * @param {Object} options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
@@ -794,10 +810,9 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			recordId
 		);
 		const editsToSave = {};
-		for ( const edit in edits ) {
-			if ( itemsToSave.some( ( item ) => item === edit ) ) {
-				editsToSave[ edit ] = edits[ edit ];
-			}
+
+		for ( const item of itemsToSave ) {
+			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
@@ -814,7 +829,6 @@ export const __experimentalSaveSpecifiedEntityEdits =
 		if ( recordId ) {
 			editsToSave[ entityIdKey ] = recordId;
 		}
-
 		return await dispatch.saveEntityRecord(
 			kind,
 			name,
@@ -892,5 +906,21 @@ export function receiveNavigationFallbackId( fallbackId ) {
 	return {
 		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',
 		fallbackId,
+	};
+}
+
+/**
+ * Returns an action object used to set the template for a given query.
+ *
+ * @param {Object} query      The lookup query.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( query, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		query,
+		templateId,
 	};
 }

@@ -198,3 +198,21 @@ In some contexts, the arrow down key used to open the dropdown menu might need t
 
 -   Required: No
 -   Default: `false`
+
+### `defaultOpen`: `boolean`
+
+The open state of the dropdown menu when initially rendered. Use when you do not need to control its open state. It will be overridden by the `open` prop if it is specified on the component's first render.
+
+-   Required: No
+
+### `open`: `boolean`
+
+The controlled open state of the dropdown menu. Must be used in conjunction with `onToggle`.
+
+-   Required: No
+
+### `onToggle`: `( willOpen: boolean ) => void`
+
+A callback invoked when the state of the dropdown changes from open to closed and vice versa.
+
+-   Required: No

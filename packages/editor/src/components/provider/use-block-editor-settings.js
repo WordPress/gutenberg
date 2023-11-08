@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo } from '@wordpress/element';
+import { Platform, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -76,7 +76,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
-	'behaviors',
 ];
 
 /**
@@ -94,12 +93,15 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
+		pageForPosts,
 		postType,
+		userPatternCategories,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML, getCurrentPostType } =
 			select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord } = select( coreStore );
+		const { canUser, getEntityRecord, getUserPatternCategories } =
+			select( coreStore );
 
 		const siteSettings = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )
@@ -117,7 +119,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
+			pageForPosts: siteSettings?.page_for_posts,
 			postType: getCurrentPostType(),
+			userPatternCategories: getUserPatternCategories(),
 		};
 	}, [] );
 
@@ -180,14 +184,19 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
 	 * @return {Object} the post type object that was created.
 	 */
-	const createPageEntity = ( options ) => {
-		if ( ! userCanCreatePages ) {
-			return Promise.reject( {
-				message: __( 'You do not have permission to create Pages.' ),
-			} );
-		}
-		return saveEntityRecord( 'postType', 'page', options );
-	};
+	const createPageEntity = useCallback(
+		( options ) => {
+			if ( ! userCanCreatePages ) {
+				return Promise.reject( {
+					message: __(
+						'You do not have permission to create Pages.'
+					),
+				} );
+			}
+			return saveEntityRecord( 'postType', 'page', options );
+		},
+		[ saveEntityRecord, userCanCreatePages ]
+	);
 
 	return useMemo(
 		() => ( {
@@ -200,6 +209,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -210,19 +220,23 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			pageForPosts,
 			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
+			createPageEntity,
 			userCanCreatePages,
 			pageOnFront,
+			pageForPosts,
 		]
 	);
 }

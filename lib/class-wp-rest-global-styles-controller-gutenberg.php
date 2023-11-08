@@ -302,7 +302,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Added validation of styles.css property.
-	 * @since 6.4.0 Added validation of behaviors property.
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return stdClass|WP_Error Prepared item on success. WP_Error on when the custom CSS is not valid.
@@ -322,7 +321,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			}
 		}
 
-		if ( isset( $request['styles'] ) || isset( $request['settings'] ) || isset( $request['behaviors'] ) ) {
+		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
 			if ( isset( $request['styles'] ) ) {
 				if ( isset( $request['styles']['css'] ) ) {
@@ -339,11 +338,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 				$config['settings'] = $request['settings'];
 			} elseif ( isset( $existing_config['settings'] ) ) {
 				$config['settings'] = $existing_config['settings'];
-			}
-			if ( isset( $request['behaviors'] ) ) {
-				$config['behaviors'] = $request['behaviors'];
-			} elseif ( isset( $existing_config['behaviors'] ) ) {
-				$config['behaviors'] = $existing_config['behaviors'];
 			}
 			$config['isGlobalStylesUserThemeJSON'] = true;
 			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
@@ -367,7 +361,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Handling of style.css was added to WP_Theme_JSON.
-	 * @since 6.4.0 Added `behavior` field.
 	 *
 	 * @param WP_Post         $post    Global Styles post object.
 	 * @param WP_REST_Request $request Request object.
@@ -409,10 +402,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
-		}
-
-		if ( rest_is_field_included( 'behaviors', $fields ) ) {
-			$data['behaviors'] = ! empty( $config['behaviors'] ) && $is_global_styles_user_theme_json ? $config['behaviors'] : new stdClass();
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -521,7 +510,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * Retrieves the global styles type' schema, conforming to JSON Schema.
 	 *
 	 * @since 5.9.0
-	 * @since 6.4.0 Added `behaviors` property.
 	 *
 	 * @return array Item schema data.
 	 */
@@ -535,28 +523,23 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			'title'      => $this->post_type,
 			'type'       => 'object',
 			'properties' => array(
-				'id'        => array(
+				'id'       => array(
 					'description' => __( 'ID of global styles config.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'styles'    => array(
+				'styles'   => array(
 					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				'settings'  => array(
+				'settings' => array(
 					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
-				'behaviors' => array(
-					'description' => __( 'Global behaviors.', 'default' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-				),
-				'title'     => array(
+				'title'    => array(
 					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
 					'type'        => array( 'object', 'string' ),
 					'default'     => '',
@@ -614,7 +597,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * Returns the given theme global styles config.
 	 *
 	 * @since 5.9.0
-	 * @since 6.4.0 Added value for `behaviors` rest field.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 * @return WP_REST_Response|WP_Error
@@ -640,11 +622,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$raw_data       = $theme->get_raw_data();
 			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
-		}
-
-		if ( rest_is_field_included( 'behaviors', $fields ) ) {
-			$raw_data          = $theme->get_raw_data();
-			$data['behaviors'] = isset( $raw_data['behaviors'] ) ? $raw_data['behaviors'] : array();
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';

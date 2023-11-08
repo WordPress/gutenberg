@@ -6,6 +6,7 @@ import {
 	UIManager,
 	Pressable,
 	Platform,
+	TouchableWithoutFeedback,
 } from 'react-native';
 
 /**
@@ -304,8 +305,17 @@ class AztecView extends Component {
 			delete style.fontSize;
 		}
 
+		// We need to use `Pressable` on iOS to avoid issues with VoiceOver and assistive
+		// input like the Braille Screen Input.
+		// More information about this can be found in https://github.com/WordPress/gutenberg/pull/53895.
+		const TouchableComponent =
+			Platform.OS === 'ios' ? Pressable : TouchableWithoutFeedback;
+
 		return (
-			<Pressable accessible={ false } onPress={ this._onPress }>
+			<TouchableComponent
+				accessible={ Platform.OS !== 'ios' }
+				onPress={ this._onPress }
+			>
 				<RCTAztecView
 					{ ...otherProps }
 					style={ style }
@@ -322,7 +332,7 @@ class AztecView extends Component {
 					onBlur={ this._onBlur }
 					ref={ this.aztecViewRef }
 				/>
-			</Pressable>
+			</TouchableComponent>
 		);
 	}
 }

@@ -18,7 +18,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
-
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../utils/constants';
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
@@ -126,7 +129,7 @@ export const getSettings = createSelector(
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
-				'wp_template' === getEditedPostType( state ),
+				TEMPLATE_POST_TYPE === getEditedPostType( state ),
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -289,22 +292,21 @@ export function isSaveViewOpened( state ) {
  * @return {Array} Template parts and their blocks in an array.
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => ( state ) => {
-		const templateType = getEditedPostType( state );
-		const templateId = getEditedPostId( state );
-		const template = select( coreDataStore ).getEditedEntityRecord(
-			'postType',
-			templateType,
-			templateId
-		);
-
+	( select ) => () => {
 		const templateParts = select( coreDataStore ).getEntityRecords(
 			'postType',
-			'wp_template_part',
+			TEMPLATE_PART_POST_TYPE,
 			{ per_page: -1 }
 		);
 
-		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
+		const clientIds =
+			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
+				'core/template-part'
+			);
+		const blocks =
+			select( blockEditorStore ).getBlocksByClientId( clientIds );
+
+		return getFilteredTemplatePartBlocks( blocks, templateParts );
 	}
 );
 

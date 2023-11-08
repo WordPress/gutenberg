@@ -8,19 +8,13 @@ import classnames from 'classnames';
  */
 import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
-	WritingFlow,
 	BlockList,
 	BlockTools,
 	store as blockEditorStore,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
-	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableEditorStyles as EditorStyles,
-	useSetting,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableIframe as Iframe,
+	useSettings,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -37,43 +31,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	LayoutStyle,
+	useLayoutClasses,
+	useLayoutStyles,
+	ExperimentalBlockCanvas: BlockCanvas,
+} = unlock( blockEditorPrivateApis );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
-
-function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
-	const ref = useMouseMoveTypingReset();
-
-	if ( ! shouldIframe ) {
-		return (
-			<>
-				<EditorStyles styles={ styles } />
-				<WritingFlow
-					ref={ contentRef }
-					className="editor-styles-wrapper"
-					style={ { flex: '1', ...style } }
-					tabIndex={ -1 }
-				>
-					{ children }
-				</WritingFlow>
-			</>
-		);
-	}
-
-	return (
-		<Iframe
-			ref={ ref }
-			contentRef={ contentRef }
-			style={ { width: '100%', height: '100%', display: 'block' } }
-			name="editor-canvas"
-		>
-			<EditorStyles styles={ styles } />
-			{ children }
-		</Iframe>
-	);
-}
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -101,6 +66,15 @@ function getPostContentAttributes( blocks ) {
 	}
 }
 
+function checkForPostContentAtRootLevel( blocks ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/post-content' ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
@@ -123,9 +97,10 @@ export default function VisualEditor( { styles } ) {
 			select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const _isTemplateMode = isEditingTemplate();
+		const postTypeSlug = getCurrentPostType();
 		let _wrapperBlockName;
 
-		if ( getCurrentPostType() === 'wp_block' ) {
+		if ( postTypeSlug === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
 		} else if ( ! _isTemplateMode ) {
 			_wrapperBlockName = 'core/post-content';
@@ -133,6 +108,7 @@ export default function VisualEditor( { styles } ) {
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
+		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const canEditTemplate = select( coreStore ).canUser(
 			'create',
 			'templates'
@@ -146,7 +122,7 @@ export default function VisualEditor( { styles } ) {
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
-				supportsTemplateMode && canEditTemplate
+				postType?.viewable && supportsTemplateMode && canEditTemplate
 					? getEditedPostTemplate()
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
@@ -195,7 +171,7 @@ export default function VisualEditor( { styles } ) {
 		borderBottom: 0,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const globalLayoutSettings = useSetting( 'layout' );
+	const [ globalLayoutSettings ] = useSettings( 'layout' );
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
@@ -214,14 +190,7 @@ export default function VisualEditor( { styles } ) {
 	}
 
 	const ref = useRef();
-	const contentRef = useMergeRefs( [
-		ref,
-		useClipboardHandler(),
-		useTypewriter(),
-		useBlockSelectionClearer(),
-	] );
-
-	const blockSelectionClearerRef = useBlockSelectionClearer();
+	const contentRef = useMergeRefs( [ ref, useTypewriter() ] );
 
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
@@ -260,6 +229,26 @@ export default function VisualEditor( { styles } ) {
 		editedPostTemplate?.blocks,
 		postContentAttributes,
 	] );
+
+	const hasPostContentAtRootLevel = useMemo( () => {
+		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+			return false;
+		}
+		// When in template editing mode, we can access the blocks directly.
+		if ( editedPostTemplate?.blocks ) {
+			return checkForPostContentAtRootLevel( editedPostTemplate?.blocks );
+		}
+		// If there are no blocks, we have to parse the content string.
+		// Best double-check it's a string otherwise the parse function gets unhappy.
+		const parseableContent =
+			typeof editedPostTemplate?.content === 'string'
+				? editedPostTemplate?.content
+				: '';
+
+		return (
+			checkForPostContentAtRootLevel( parse( parseableContent ) ) || false
+		);
+	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
 	const { layout = {}, align = '' } = newestPostContentAttributes || {};
 
@@ -304,6 +293,11 @@ export default function VisualEditor( { styles } ) {
 	const blockListLayout = postContentAttributes
 		? postContentLayout
 		: fallbackLayout;
+
+	const postEditorLayout =
+		blockListLayout?.type === 'default' && ! hasPostContentAtRootLevel
+			? fallbackLayout
+			: blockListLayout;
 
 	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
@@ -355,17 +349,17 @@ export default function VisualEditor( { styles } ) {
 				animate={ {
 					padding: isTemplateMode ? '48px 48px 0' : 0,
 				} }
-				ref={ blockSelectionClearerRef }
 			>
 				<motion.div
 					animate={ animatedStyles }
 					initial={ desktopCanvasStyles }
 					className={ previewMode }
 				>
-					<MaybeIframe
+					<BlockCanvas
 						shouldIframe={ isToBeIframed }
 						contentRef={ contentRef }
 						styles={ styles }
+						height="100%"
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
@@ -377,7 +371,7 @@ export default function VisualEditor( { styles } ) {
 									/>
 									<LayoutStyle
 										selector=".block-editor-block-list__layout.is-root-container"
-										layout={ blockListLayout }
+										layout={ postEditorLayout }
 									/>
 									{ align && (
 										<LayoutStyle css={ alignCSS } />
@@ -419,7 +413,7 @@ export default function VisualEditor( { styles } ) {
 								layout={ blockListLayout }
 							/>
 						</RecursionProvider>
-					</MaybeIframe>
+					</BlockCanvas>
 				</motion.div>
 			</motion.div>
 		</BlockTools>

@@ -13,6 +13,7 @@ import { wordpress, category, media } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
+import cleanupTooltip from '../../tooltip/test/utils';
 
 const TABS = [
 	{
@@ -128,6 +129,8 @@ describe.each( [
 
 				await user.unhover( allTabs[ i ] );
 			}
+
+			await cleanupTooltip( user );
 		} );
 
 		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
@@ -189,6 +192,8 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
 			expect( await getSelectedTab() ).toHaveFocus();
+
+			await cleanupTooltip( user );
 		} );
 	} );
 

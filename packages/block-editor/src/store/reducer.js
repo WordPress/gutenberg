@@ -1913,6 +1913,76 @@ export function blockEditingModes( state = new Map(), action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the clientId of the block settings menu that is currently open.
+ *
+ * @param {string|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function openedBlockSettingsMenu( state = null, action ) {
+	if ( 'SET_OPENED_BLOCK_SETTINGS_MENU' === action.type ) {
+		return action?.clientId ?? null;
+	}
+	return state;
+}
+
+/**
+ * Reducer returning a map of style IDs to style overrides.
+ *
+ * @param {Map}    state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Map} Updated state.
+ */
+export function styleOverrides( state = new Map(), action ) {
+	switch ( action.type ) {
+		case 'SET_STYLE_OVERRIDE':
+			return new Map( state ).set( action.id, action.style );
+		case 'DELETE_STYLE_OVERRIDE': {
+			const newState = new Map( state );
+			newState.delete( action.id );
+			return newState;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer returning a map of the registered inserter media categories.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function registeredInserterMediaCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'REGISTER_INSERTER_MEDIA_CATEGORY':
+			return [ ...state, action.category ];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting last focused element
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function lastFocus( state = false, action ) {
+	switch ( action.type ) {
+		case 'LAST_FOCUS':
+			return action.lastFocus;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1929,6 +1999,7 @@ const combinedReducers = combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
 	highlightedBlock,
@@ -1936,8 +2007,11 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
+	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
+	openedBlockSettingsMenu,
+	registeredInserterMediaCategories,
 } );
 
 function withAutomaticChangeReset( reducer ) {

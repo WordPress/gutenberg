@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+
 /**
  * Internal dependencies
  */
@@ -25,6 +26,7 @@ const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -34,6 +36,9 @@ const meta: Meta< typeof DropdownMenu > = {
 			mapping: { menu, chevronDown, more },
 			control: { type: 'select' },
 		},
+		open: { control: { type: null } },
+		defaultOpen: { control: { type: null } },
+		onToggle: { control: { type: null } },
 	},
 };
 export default meta;

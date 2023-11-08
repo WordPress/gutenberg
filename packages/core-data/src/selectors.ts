@@ -14,15 +14,16 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems } from './queried-data';
+import { getQueriedItems, getQueriedTotalItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
 	setNestedValue,
+	isNumericID,
 } from './utils';
 import type * as ET from './entity-types';
-import { getUndoEdits, getRedoEdits } from './private-selectors';
+import type { UndoManager } from '@wordpress/undo-manager';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -40,10 +41,12 @@ export interface State {
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
-	undo: UndoState;
+	undoManager: UndoManager;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
+	userPatternCategories: Array< UserPatternCategory >;
+	defaultTemplates: Record< string, string >;
 }
 
 type EntityRecordKey = string | number;
@@ -74,23 +77,23 @@ interface EntityConfig {
 	kind: string;
 }
 
-export interface UndoEdit {
-	name: string;
-	kind: string;
-	recordId: string;
-	from: any;
-	to: any;
-}
-
-interface UndoState {
-	list: Array< UndoEdit[] >;
-	offset: number;
-	cache: UndoEdit[];
-}
-
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
+}
+
+type TemplateQuery = {
+	slug?: string;
+	is_custom?: boolean;
+	ignore_empty?: boolean;
+};
+
+export interface UserPatternCategory {
+	id: number;
+	name: string;
+	label: string;
+	slug: string;
+	description: string;
 }
 
 type Optional< T > = T | undefined;
@@ -99,6 +102,13 @@ type Optional< T > = T | undefined;
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 type GetRecordsHttpQuery = Record< string, any >;
+
+/**
+ * Arguments for EntityRecord selectors.
+ */
+type EntityRecordArgs =
+	| [ string, string, EntityRecordKey ]
+	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -278,7 +288,7 @@ export interface GetEntityRecord {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -290,13 +300,14 @@ export interface GetEntityRecord {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
 		key: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
+	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -317,7 +328,7 @@ export const getEntityRecord = createSelector(
 	( <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -349,7 +360,7 @@ export const getEntityRecord = createSelector(
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 				setNestedValue( filteredItem, field, value );
 			}
@@ -371,6 +382,24 @@ export const getEntityRecord = createSelector(
 ) as GetEntityRecord;
 
 /**
+ * Normalizes `recordKey`s that look like numeric IDs to numbers.
+ *
+ * @param args EntityRecordArgs the selector arguments.
+ * @return EntityRecordArgs the normalized arguments.
+ */
+getEntityRecord.__unstableNormalizeArgs = (
+	args: EntityRecordArgs
+): EntityRecordArgs => {
+	const newArgs = [ ...args ] as EntityRecordArgs;
+	const recordKey = newArgs?.[ 2 ];
+
+	// If recordKey looks to be a numeric ID then coerce to number.
+	newArgs[ 2 ] = isNumericID( recordKey ) ? Number( recordKey ) : recordKey;
+
+	return newArgs;
+};
+
+/**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
  * @param state State tree
@@ -381,7 +410,7 @@ export const getEntityRecord = createSelector(
  * @return Record.
  */
 export function __experimentalGetEntityRecordNoResolver<
-	EntityRecord extends ET.EntityRecord< any >
+	EntityRecord extends ET.EntityRecord< any >,
 >( state: State, kind: string, name: string, key: EntityRecordKey ) {
 	return getEntityRecord< EntityRecord >( state, kind, name, key );
 }
@@ -478,7 +507,7 @@ export interface GetEntityRecords {
 	<
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -489,7 +518,7 @@ export interface GetEntityRecords {
 	CurriedSignature: <
 		EntityRecord extends
 			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >
+			| Partial< ET.EntityRecord< any > >,
 	>(
 		kind: string,
 		name: string,
@@ -511,7 +540,7 @@ export interface GetEntityRecords {
 export const getEntityRecords = ( <
 	EntityRecord extends
 		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >
+		| Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -527,6 +556,63 @@ export const getEntityRecords = ( <
 	}
 	return getQueriedItems( queriedState, query );
 } ) as GetEntityRecords;
+
+/**
+ * Returns the Entity's total available records for a given query (ignoring pagination).
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
+export const getEntityRecordsTotalItems = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	return getQueriedTotalItems( queriedState, query );
+};
+
+/**
+ * Returns the number of available pages for the given query.
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @return number | null.
+ */
+export const getEntityRecordsTotalPages = (
+	state: State,
+	kind: string,
+	name: string,
+	query: GetRecordsHttpQuery
+): number | null => {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist.
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return null;
+	}
+	if ( query.per_page === -1 ) return 1;
+	const totalItems = getQueriedTotalItems( queriedState, query );
+	if ( ! totalItems ) return totalItems;
+	return Math.ceil( totalItems / query.per_page );
+};
 
 type DirtyEntityRecord = {
 	title: string;
@@ -876,21 +962,6 @@ export function getLastEntityDeleteError(
 }
 
 /**
- * Returns the current undo offset for the
- * entity records edits history. The offset
- * represents how many items from the end
- * of the history stack we are at. 0 is the
- * last edit, -1 is the second last, and so on.
- *
- * @param state State tree.
- *
- * @return The current undo offset.
- */
-function getCurrentUndoOffset( state: State ): number {
-	return state.undo.offset;
-}
-
-/**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
@@ -904,9 +975,7 @@ export function getUndoEdit( state: State ): Optional< any > {
 	deprecated( "select( 'core' ).getUndoEdit()", {
 		since: '6.3',
 	} );
-	return state.undo.list[
-		state.undo.list.length - 2 + getCurrentUndoOffset( state )
-	]?.[ 0 ];
+	return undefined;
 }
 
 /**
@@ -923,9 +992,7 @@ export function getRedoEdit( state: State ): Optional< any > {
 	deprecated( "select( 'core' ).getRedoEdit()", {
 		since: '6.3',
 	} );
-	return state.undo.list[
-		state.undo.list.length + getCurrentUndoOffset( state )
-	]?.[ 0 ];
+	return undefined;
 }
 
 /**
@@ -937,7 +1004,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return Boolean( getUndoEdits( state ) );
+	return state.undoManager.hasUndo();
 }
 
 /**
@@ -949,7 +1016,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return Boolean( getRedoEdits( state ) );
+	return state.undoManager.hasRedo();
 }
 
 /**
@@ -960,6 +1027,9 @@ export function hasRedo( state: State ): boolean {
  * @return The current theme.
  */
 export function getCurrentTheme( state: State ): any {
+	if ( ! state.currentTheme ) {
+		return null;
+	}
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
@@ -1163,11 +1233,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  *
  * @return A value whose reference will change only when an edit occurs.
  */
-export const getReferenceByDistinctEdits = createSelector(
-	// This unused state argument is listed here for the documentation generating tool (docgen).
-	( state: State ) => [],
-	( state: State ) => [ state.undo.list.length, state.undo.offset ]
-);
+export function getReferenceByDistinctEdits( state ) {
+	return state.editsReference;
+}
 
 /**
  * Retrieve the frontend template used for a given link.
@@ -1258,6 +1326,20 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 }
 
 /**
+ * Retrieve the registered user pattern categories.
+ *
+ * @param state Data state.
+ *
+ * @return User patterns category array.
+ */
+
+export function getUserPatternCategories(
+	state: State
+): Array< UserPatternCategory > {
+	return state.userPatternCategories;
+}
+
+/**
  * Returns the revisions of the current global styles theme.
  *
  * @param state Data state.
@@ -1275,4 +1357,19 @@ export function getCurrentThemeGlobalStylesRevisions(
 	}
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
+}
+
+/**
+ * Returns the default template use to render a given query.
+ *
+ * @param state Data state.
+ * @param query Query.
+ *
+ * @return The default template id for the given query.
+ */
+export function getDefaultTemplateId(
+	state: State,
+	query: TemplateQuery
+): string {
+	return state.defaultTemplates[ JSON.stringify( query ) ];
 }

@@ -534,7 +534,7 @@ async function parseEnvironmentConfig(
 async function parseCoreSource( coreSource, options ) {
 	// An empty source means we should use the latest version of WordPress.
 	if ( ! coreSource ) {
-		const wpVersion = await getLatestWordPressVersion();
+		const wpVersion = await getLatestWordPressVersion( options );
 		if ( ! wpVersion ) {
 			throw new ValidationError(
 				'Could not find the latest WordPress version. There may be a network issue.'

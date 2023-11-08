@@ -56,8 +56,8 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 Render an is author checkbox:
 
 ```jsx
+import { useState } from 'react';
 import { CheckboxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
@@ -85,7 +85,7 @@ If no prop is passed an empty label is rendered.
 
 -   Required: No
 
-#### `help`: `string|WPElement`
+#### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

@@ -13,9 +13,10 @@ import type { Icon } from '@wordpress/icons';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import type { CompositeStore } from '../composite/v2';
 
-export type CircularOptionPickerProps = {
+type CommonCircularOptionPickerProps = {
 	/**
 	 * An ID to apply to the component.
 	 */
@@ -40,22 +41,55 @@ export type CircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+};
+
+type WithBaseId = {
+	baseId: string;
+};
+
+type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 	/**
-	 * Whether the keyboard interaction should wrap around.
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 */
+	asButtons?: false;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
 	 *
 	 * @default true
 	 */
 	loop?: boolean;
 } & (
-	| {
-			'aria-label': string;
-			'aria-labelledby'?: never;
-	  }
-	| {
-			'aria-label'?: never;
-			'aria-labelledby': string;
-	  }
- );
+		| {
+				'aria-label': string;
+				'aria-labelledby'?: never;
+		  }
+		| {
+				'aria-label'?: never;
+				'aria-labelledby': string;
+		  }
+	);
+
+export type ListboxCircularOptionPickerProps = WithBaseId &
+	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;
+
+type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+	/**
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
+	 *
+	 * @default false
+	 */
+	asButtons: true;
+};
+
+export type ButtonsCircularOptionPickerProps = WithBaseId &
+	Omit< FullButtonsCircularOptionPickerProps, 'asButtons' >;
+
+export type CircularOptionPickerProps =
+	| FullListboxCircularOptionPickerProps
+	| FullButtonsCircularOptionPickerProps;
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
@@ -87,4 +121,10 @@ export type OptionProps = Omit<
 		React.ComponentProps< typeof Icon >,
 		'icon' | 'size'
 	>;
+};
+
+export type CircularOptionPickerCompositeStore = CompositeStore;
+export type CircularOptionPickerContextProps = {
+	baseId?: string;
+	compositeStore?: CircularOptionPickerCompositeStore;
 };

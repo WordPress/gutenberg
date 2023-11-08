@@ -27,6 +27,7 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
+		// Wait for the dialog element to be positioned (aligned with the button)
 		await waitFor( () =>
 			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
 		);

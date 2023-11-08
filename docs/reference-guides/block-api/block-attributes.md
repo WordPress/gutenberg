@@ -305,39 +305,6 @@ Attribute available in the block:
 { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
-
-_Example_: Extract the `content` attribute from a blockquote element found in the block's markup.
-
-Saved content:
-```html
-<div>
-	Block Content
-
-	<blockquote>
-		<p>First line</p>
-		<p>Second line</p>
-	</blockquote>
-</div>
-```
-
-Attribute definition:
-```js
-{
-	content: {
-		type: 'string',
-		source: 'html',
-		multiline: 'p',
-		selector: 'blockquote',
-	}
-}
-```
-
-Attribute available in the block:
-```js
-{ "content": "<p>First line</p><p>Second line</p>" }
-```
-
 ### `query` source
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the `selector` argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
@@ -390,7 +357,7 @@ Attribute available in the block:
 ### Meta source (deprecated)
 
 <div class="callout callout-alert">
-Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
+Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="https://developer.wordpress.org/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
 </div>
 
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key.

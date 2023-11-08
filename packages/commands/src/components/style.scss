@@ -78,11 +78,11 @@
 
 		&[aria-selected="true"],
 		&:active {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-			color: var(--wp-admin-theme-color);
+			background: var(--wp-admin-theme-color);
+			color: $white;
 
 			svg {
-				fill: var(--wp-admin-theme-color);
+				fill: $white;
 			}
 		}
 

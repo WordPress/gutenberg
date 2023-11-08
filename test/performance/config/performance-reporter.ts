@@ -32,6 +32,7 @@ export interface WPRawPerformanceResults {
 	inserterSearch: number[];
 	inserterHover: number[];
 	listViewOpen: number[];
+	navigate: number[];
 }
 
 export interface WPPerformanceResults {
@@ -65,6 +66,7 @@ export interface WPPerformanceResults {
 	listViewOpen?: number;
 	minListViewOpen?: number;
 	maxListViewOpen?: number;
+	navigate?: number;
 }
 
 /**
@@ -81,12 +83,12 @@ export function curateResults(
 		timeToFirstByte: median( results.timeToFirstByte ),
 		largestContentfulPaint: median( results.largestContentfulPaint ),
 		lcpMinusTtfb: median( results.lcpMinusTtfb ),
-		serverResponse: average( results.serverResponse ),
-		firstPaint: average( results.firstPaint ),
-		domContentLoaded: average( results.domContentLoaded ),
-		loaded: average( results.loaded ),
-		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
+		serverResponse: median( results.serverResponse ),
+		firstPaint: median( results.firstPaint ),
+		domContentLoaded: median( results.domContentLoaded ),
+		loaded: median( results.loaded ),
+		firstContentfulPaint: median( results.firstContentfulPaint ),
+		firstBlock: median( results.firstBlock ),
 		type: average( results.type ),
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
@@ -108,6 +110,7 @@ export function curateResults(
 		listViewOpen: average( results.listViewOpen ),
 		minListViewOpen: minimum( results.listViewOpen ),
 		maxListViewOpen: maximum( results.listViewOpen ),
+		navigate: median( results.navigate ),
 	};
 
 	return (

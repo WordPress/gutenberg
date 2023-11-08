@@ -118,6 +118,7 @@ export default function NavigationInnerBlocks( {
 					: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
+			__unstableDisableLayoutClassNames: true,
 		}
 	);
 

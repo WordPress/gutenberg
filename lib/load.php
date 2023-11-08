@@ -52,7 +52,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.4 compat.
 	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
+	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -63,17 +65,33 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
 	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
-		require_once __DIR__ . '/experimental/class-gutenberg-rest-block-patterns-controller.php';
-	}
 	require_once __DIR__ . '/experimental/rest-api.php';
+
+	require_once __DIR__ . '/experimental/kses-allowed-html.php';
+}
+
+// Experimental signaling server.
+if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
 }
 
 require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
+require __DIR__ . '/compat/plugin/footnotes.php';
 
+/*
+ * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
+ * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
+ * always be loaded so that Gutenberg code can run the newest version of the Tag Processor.
+ */
+require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
+
+/*
+ * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
+ * WordPress before it was introduced, these verbatim Core files will be missing.
+ */
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
@@ -86,7 +104,6 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
@@ -95,8 +112,13 @@ require_once __DIR__ . '/compat/wordpress-6.3/kses.php';
 
 // WordPress 6.4 compat.
 require __DIR__ . '/compat/wordpress-6.4/blocks.php';
+require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.4/kses.php';
+
+// WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -110,9 +132,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-auto-inserting-blocks' ) ) {
-	require __DIR__ . '/experimental/auto-inserting-blocks.php';
-}
 require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
 require __DIR__ . '/experimental/interactivity-api/store.php';
 require __DIR__ . '/experimental/interactivity-api/scripts.php';
@@ -135,8 +154,7 @@ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns o
  * keeping Fonts API available for sites that are using it.
  */
 if (
-	( defined( 'FONT_LIBRARY_ENABLE' ) && FONT_LIBRARY_ENABLE ) ||
-	( defined( 'FONTS_LIBRARY_ENABLE' ) && FONTS_LIBRARY_ENABLE )
+	! defined( 'FONT_LIBRARY_DISABLED' ) || ! FONT_LIBRARY_DISABLED
 ) {
 	// Loads the Font Library.
 	if ( ! class_exists( 'WP_Font_Library' ) ) {
@@ -152,8 +170,14 @@ if (
 	if ( ! class_exists( 'WP_Font_Face' ) ) {
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
 		require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
-		require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 	}
+
+	/*
+	 * As _gutenberg_get_iframed_editor_assets_6_4() overrides Core's _wp_get_iframed_editor_assets(),
+	 * load this file to ensure wp_print_font_faces() is invoked to load the styles into the
+	 * iframed editor.
+	 */
+	require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 
 	// Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 	// @core-merge: do not merge the BC layer files into WordPress Core.
@@ -170,6 +194,16 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
+
+	// Disables the Font Library.
+	// @core-merge: this should not go to core.
+	add_action(
+		'enqueue_block_editor_assets',
+		function () {
+			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
+		}
+	);
+
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );
@@ -198,6 +232,7 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
@@ -228,4 +263,8 @@ require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
+require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/behaviors.php';
+
+// Data views.
+require_once __DIR__ . '/experimental/data-views.php';

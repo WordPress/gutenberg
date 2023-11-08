@@ -20,7 +20,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	);
 
 	const currentThemeStylesheet = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme().stylesheet
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet
 	);
 
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
@@ -29,6 +29,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	const { getBlockRootClientId, getBlockEditingMode } =
 		useSelect( blockEditorStore );
 
+	// Duplicated in packages/edit-site/src/components/start-template-options/index.js.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
 			block.innerBlocks.find(

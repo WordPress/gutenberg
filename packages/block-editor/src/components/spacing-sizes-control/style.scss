@@ -39,15 +39,9 @@
 	}
 }
 
-.spacing-sizes-control__wrapper {
-	& + & {
-		margin-top: $grid-unit-10;
-	}
-}
-
 .spacing-sizes-control__header {
 	height: $grid-unit-20;
-	margin-bottom: $grid-unit-10;
+	margin-bottom: $grid-unit-15;
 }
 
 .spacing-sizes-control__dropdown {
@@ -62,4 +56,8 @@
 .spacing-sizes-control__icon,
 .spacing-sizes-control__custom-toggle {
 	flex: 0 0 auto;
+}
+
+.spacing-sizes-control__icon {
+	margin-left: $grid-unit-05 * -1; // Aligns the icon to the control header.
 }
