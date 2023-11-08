@@ -31,10 +31,6 @@ import {
 } from './template-actions';
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
-	list: {},
-	grid: {},
-};
 
 const DEFAULT_VIEW = {
 	type: 'list',
@@ -178,19 +174,10 @@ export default function DataviewsTemplates() {
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
-			let updatedView =
+			const updatedView =
 				typeof viewUpdater === 'function'
 					? viewUpdater( view )
 					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
-					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
-					},
-				};
-			}
-
 			setView( updatedView );
 		},
 		[ view, setView ]
