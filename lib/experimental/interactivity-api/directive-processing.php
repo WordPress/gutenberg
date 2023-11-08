@@ -7,46 +7,6 @@
  * @subpackage Interactivity API
  */
 
-global $do_block_calls;
-$do_block_calls = 0;
-
-/**
- * Process directives in each block.
- *
- * @param string $block_content The block content.
- * @param array  $block         The full block.
- *
- * @return string Filtered block content.
- */
-function gutenberg_interactivity_process_directives_in_root_blocks( $block_content, $block ) {
-	global $do_block_calls;
-
-	if ( WP_Directive_Processor::is_root_block( $block ) ) {
-
-		if ( 1 === $do_block_calls ) {
-			$directives = array(
-				'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-				'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-				'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-				'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-				'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-			);
-
-			$tags = new WP_Directive_Processor( $block_content );
-			$tags = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
-
-			$do_block_calls -= 1;
-
-			return $tags->get_updated_html();
-		} else {
-			$do_block_calls -= 1;
-		}
-	}
-
-	return $block_content;
-}
-add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_blocks', 10, 2 );
-
 /**
  * Mark the inner blocks with a temporary property so we can discard them later,
  * and process only the root blocks.
@@ -58,16 +18,55 @@ add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_
  * @return array The parsed block.
  */
 function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
-	global $do_block_calls;
+	static $render_block_data                 = 0;
+	static $process_directives_in_root_blocks = null;
+
+	if ( ! isset( $process_directives_in_root_blocks ) ) {
+		/**
+			 * Process directives in each root block.
+			 *
+			 * @param string $block_content The block content.
+			 * @param array  $block         The full block.
+			 *
+			 * @return string Filtered block content.
+			 */
+		$process_directives_in_root_blocks = static function ( $block_content, $block ) use ( &$render_block_data ) {
+
+			if ( WP_Directive_Processor::is_root_block( $block ) ) {
+
+				if ( 1 === $render_block_data ) {
+					$directives = array(
+						'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+						'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+						'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+						'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+						'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+					);
+
+					$tags = new WP_Directive_Processor( $block_content );
+
+					$tags               = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
+					$render_block_data -= 1;
+					return $tags->get_updated_html();
+				} else {
+					$render_block_data -= 1;
+				}
+			}
+
+			return $block_content;
+		};
+		add_filter( 'render_block', $process_directives_in_root_blocks, 10, 2 );
+	}
 
 	if ( ! isset( $parent_block ) ) {
 		WP_Directive_Processor::add_root_block( $parsed_block );
-		$do_block_calls += 1;
+		$render_block_data += 1;
 	}
 
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10, 3 );
+
 
 /**
  * Process directives.
