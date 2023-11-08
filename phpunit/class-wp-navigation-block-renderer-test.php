@@ -59,7 +59,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
-		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://localhost:8889" target="_self" rel="home">Test Blog</a></h1></li>';
+		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
 		$this->assertEquals( $expected, $result );
 	}
 }
