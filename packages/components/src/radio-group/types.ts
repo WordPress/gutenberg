@@ -9,7 +9,7 @@ export type RadioGroupProps = {
 	 */
 	checked?: string | number;
 	/**
-	 * The value of the radio element which is initally selected.
+	 * The value of the radio element which is initially selected.
 	 */
 	defaultChecked?: string | number;
 	/**
