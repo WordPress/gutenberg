@@ -1,6 +1,6 @@
 export type RadioGroupProps = {
 	/**
-	 * Labels the value of the selected `Radio` element.
+	 * Accessible label for the radio group
 	 */
 	label: string;
 	/**
