@@ -12,7 +12,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
@@ -33,12 +33,15 @@ import Pagination from './pagination';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SYNC_FILTERS = {
-	// translators: Button label, when clicked it shows "All patterns".
-	all: __( 'All' ),
-	// translators: Button label, when clicked it shows all "Synced patterns".
-	[ PATTERN_SYNC_TYPES.full ]: __( 'Synced' ),
-	// translators: Button label, when click it shows all "Not synced patterns".
-	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Not synced' ),
+	all: _x( 'All', 'Option that shows all patterns' ),
+	[ PATTERN_SYNC_TYPES.full ]: _x(
+		'Synced',
+		'Option that shows all synchronized patterns'
+	),
+	[ PATTERN_SYNC_TYPES.unsynced ]: _x(
+		'Not synced',
+		'Option that shows all patterns that are not synchronized'
+	),
 };
 
 const SYNC_DESCRIPTIONS = {
