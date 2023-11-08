@@ -39,8 +39,10 @@ export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
+	// This might not be needed anymore.
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
+	// This might not be needed anymore.
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();

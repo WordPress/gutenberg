@@ -41,3 +41,7 @@ export function getEditorCanvasContainerView( state ) {
 export function getPageContentFocusType( state ) {
 	return hasPageContentFocus( state ) ? state.pageContentFocusType : null;
 }
+
+export function getSettingsFromServer( state ) {
+	return state.settings;
+}
