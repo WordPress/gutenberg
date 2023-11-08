@@ -1,21 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
+import { useResizeObserver, useRefEffect } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../block-list';
-import Iframe from '../iframe';
-import EditorStyles from '../editor-styles';
-import { store } from '../../store';
-
-// This is used to avoid rendering the block list if the sizes change.
-let MemoizedBlockList;
+import EditorStyles from './editor-styles';
+import Iframe from './iframe';
 
 const MAX_HEIGHT = 2000;
 
@@ -23,6 +20,7 @@ function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
 	minHeight,
+	html,
 	additionalStyles = [],
 } ) {
 	if ( ! viewportWidth ) {
@@ -32,7 +30,7 @@ function ScaledBlockPreview( {
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const { styles } = useSelect( ( select ) => {
-		const settings = select( store ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return {
 			styles: settings.styles,
 		};
@@ -53,9 +51,6 @@ function ScaledBlockPreview( {
 
 		return styles;
 	}, [ styles, additionalStyles ] );
-
-	// Initialize on render instead of module top level, to avoid circular dependency issues.
-	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
 	const aspectRatio = contentHeight
@@ -110,15 +105,36 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
+				<div
+					dangerouslySetInnerHTML={ {
+						__html: html,
+					} }
+				></div>
 			</Iframe>
 		</Disabled>
 	);
 }
 
-export default function AutoBlockPreview( props ) {
+export default function BlockPreview( props ) {
+	const { blocks } = props;
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
+
+	const [ html, setHTML ] = useState( '' );
+
+	useEffect( () => {
+		const getHTML = async () => {
+			const dataHTML = await apiFetch( {
+				path: '/wp/v2/render_blocks',
+				method: 'POST',
+				data: blocks,
+			} );
+			setHTML( dataHTML );
+		};
+		getHTML().catch( ( error ) => {
+			return error;
+		} );
+	}, [ blocks ] );
 
 	return (
 		<>
@@ -129,6 +145,7 @@ export default function AutoBlockPreview( props ) {
 				{ !! containerWidth && (
 					<ScaledBlockPreview
 						{ ...props }
+						html={ html }
 						containerWidth={ containerWidth }
 					/>
 				) }

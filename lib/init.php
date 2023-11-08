@@ -1,4 +1,8 @@
 <?php
+// display errors
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 /**
  * Init hooks.
  *
@@ -67,14 +71,15 @@ if ( ! function_exists( 'gutenberg_render_blocks_from_request' ) ) {
 	 * @return string
 	 */
 	function gutenberg_render_blocks_from_request( $request ) {
-		$blocks        = parse_blocks( $request->get_json_params() );
-		$rendered_html = '';
+		$blocks = $request->get_json_params();
+
+		$blocks_content = '';
 		foreach ( $blocks as $block ) {
-				$rendered_block = render_block( $block );
-				$rendered_html .= $rendered_block;
+			$block['blockName'] = $block['name'];
+			$blocks_content    .= render_block( $block );
 		}
 
-		return $rendered_html;
+		return $blocks_content;
 	}
 }
 

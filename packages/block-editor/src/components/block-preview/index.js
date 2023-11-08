@@ -22,7 +22,40 @@ import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
-	html,
+	viewportWidth = 1200,
+	minHeight,
+	additionalStyles = [],
+	// Deprecated props:
+	__experimentalMinHeight,
+	__experimentalPadding,
+} ) {
+	const settings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+
+	if ( settings.blockPreview ) {
+		return settings.blockPreview( {
+			blocks,
+			viewportWidth,
+			minHeight,
+			additionalStyles,
+		} );
+	}
+	return (
+		<DefaultBlockPreview
+			blocks={ blocks }
+			viewportWidth={ viewportWidth }
+			minHeight={ minHeight }
+			additionalStyles={ additionalStyles }
+			__experimentalMinHeight={ __experimentalMinHeight }
+			__experimentalPadding={ __experimentalPadding }
+		/>
+	);
+}
+
+function DefaultBlockPreview( {
+	blocks,
 	viewportWidth = 1200,
 	minHeight,
 	additionalStyles = [],
@@ -74,7 +107,6 @@ export function BlockPreview( {
 		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
-				html={ html }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>
