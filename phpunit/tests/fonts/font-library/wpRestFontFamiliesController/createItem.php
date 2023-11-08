@@ -11,8 +11,7 @@
  *
  * @covers WP_REST_Font_Families_Controller::create_item()
  */
-class Tests_Fonts_WPRESTFontFamilesController_CreateItem extends WP_REST_Font_Families_Controller_UnitTestCase {
-
+class WP_Test_REST_Font_Families_Controller_CreateItem extends WP_Test_REST_Font_Families_Controller_UnitTestCase {
 
 	/**
 	 *

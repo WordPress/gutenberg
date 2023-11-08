@@ -10,7 +10,7 @@
  *
  * @covers WP_REST_Font_Families_Controller::register_routes
  */
-class Tests_Fonts_WPRESTFontFamiliesController_RegisterRoutes extends WP_UnitTestCase {
+class WP_Test_REST_Font_Families_Controller_RegisterRoutes extends WP_UnitTestCase {
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();

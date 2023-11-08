@@ -5,7 +5,7 @@
  * @package WordPress
  * @subpackage Fonts
  */
-abstract class WP_REST_Font_Families_Controller_UnitTestCase extends WP_UnitTestCase {
+abstract class WP_Test_REST_Font_Families_Controller_UnitTestCase extends WP_UnitTestCase {
 
 	/**
 	 * Fonts directory (in uploads).

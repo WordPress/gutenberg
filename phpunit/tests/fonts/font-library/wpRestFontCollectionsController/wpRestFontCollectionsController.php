@@ -7,7 +7,7 @@
  *
  * @group restapi
  */
-class Tests_Fonts_WpRestFontCollectionsController extends WP_Test_REST_Controller_Testcase {
+class WP_Test_REST_Font_Collections_Controller extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Fonts directory (in uploads).

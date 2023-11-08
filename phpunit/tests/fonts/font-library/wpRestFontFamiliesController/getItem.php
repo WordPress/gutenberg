@@ -11,7 +11,7 @@
  *
  * @covers WP_REST_Font_Families_Controller::get_item()
  */
-class Tests_Fonts_WPRESTFontFamilesController_GetItem extends WP_REST_Font_Families_Controller_UnitTestCase {
+class WP_Test_REST_Font_Families_Controller_GetItem extends WP_Test_REST_Font_Families_Controller_UnitTestCase {
 
 	/**
 	 * Install fonts to test get item.

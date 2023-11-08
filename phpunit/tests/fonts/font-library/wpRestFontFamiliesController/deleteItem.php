@@ -10,7 +10,7 @@
  *
  * @covers WP_REST_Font_Families_Controller::delete_item
  */
-class Tests_Fonts_WPRESTFontFamiliesController_DeleteItem extends WP_REST_Font_Families_Controller_UnitTestCase {
+class WP_Test_REST_Font_Families_Controller_DeleteItem extends WP_Test_REST_Font_Families_Controller_UnitTestCase {
 
 	/**
 	 * Install fonts to test uninstall.
