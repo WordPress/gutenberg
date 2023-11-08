@@ -8,8 +8,9 @@
  */
 
 /**
- * Mark the inner blocks with a temporary property so we can discard them later,
- * and process only the root blocks.
+ * Process the Interactivity API directives using the root blocks of the
+ * outermost rendering, ignoring the root blocks of inner blocks like Patterns,
+ * Template Parts or Content.
  *
  * @param array $parsed_block The parsed block.
  * @param array $source_block The source block.
@@ -17,7 +18,7 @@
  *
  * @return array The parsed block.
  */
-function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
+function gutenberg_interactivity_process_directives( $parsed_block, $source_block, $parent_block ) {
 	static $is_inside_root_block              = false;
 	static $process_directives_in_root_blocks = null;
 
@@ -43,7 +44,7 @@ function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block
 				);
 
 				$tags                 = new WP_Directive_Processor( $block_content );
-				$tags                 = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
+				$tags                 = gutenberg_interactivity_process_rendered_html( $tags, 'data-wp-', $directives );
 				$is_inside_root_block = false;
 				return $tags->get_updated_html();
 
@@ -61,11 +62,12 @@ function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10, 3 );
+add_filter( 'render_block_data', 'gutenberg_interactivity_process_directives', 10, 3 );
 
 
 /**
- * Process directives.
+ * Traverses the HTML searching for Interactivity API directives and processing
+ * them.
  *
  * @param WP_Directive_Processor $tags An instance of the WP_Directive_Processor.
  * @param string                 $prefix Attribute prefix.
@@ -74,7 +76,7 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10
  * @return WP_Directive_Processor The modified instance of the
  * WP_Directive_Processor.
  */
-function gutenberg_interactivity_process_directives( $tags, $prefix, $directives ) {
+function gutenberg_interactivity_process_rendered_html( $tags, $prefix, $directives ) {
 	$context   = new WP_Directive_Context();
 	$tag_stack = array();
 
