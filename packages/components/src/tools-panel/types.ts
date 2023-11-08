@@ -17,6 +17,12 @@ export type ToolsPanelProps = {
 	 */
 	children: ReactNode;
 	/**
+	 * The popover props to configure panel's DropdownMenu.
+	 *
+	 * @default {}
+	 */
+	dropdownMenuProps?: {};
+	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
 	 *
@@ -69,6 +75,12 @@ export type ToolsPanelProps = {
 };
 
 export type ToolsPanelHeaderProps = {
+	/**
+	 * The popover props to configure panel's DropdownMenu.
+	 *
+	 * @default {}
+	 */
+	dropdownMenuProps?: {};
 	/**
 	 * The heading level of the panel's header.
 	 *

@@ -157,6 +157,14 @@ wrapper element allowing the panel to lay them out accordingly.
 - Required: No
 - Default: `false`
 
+### `dropdownMenuProps`: `{}`
+
+The popover props to configure panel's `DropdownMenu`.
+
+-   Type: `Object`
+-   Required: No
+-   Default: `{}`
+
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
 The heading level of the panel's header.
