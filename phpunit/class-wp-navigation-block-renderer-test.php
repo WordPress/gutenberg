@@ -44,7 +44,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 */
 	public function test_gutenberg_get_markup_for_inner_block_site_title() {
 
-		// We are testing the site title block because we manually add list items around it
+		// We are testing the site title block because we manually add list items around it.
 		$parsed_blocks    = parse_blocks(
 			'<!-- wp:site-title /-->'
 		);
