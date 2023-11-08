@@ -64,7 +64,7 @@ function ScreenRevisions() {
 	}, [ editorCanvasContainerView ] );
 
 	const onCloseRevisions = () => {
-		goTo( '/' ); // Return global styles main panel.
+		goTo( '/' ); // Return to global styles main panel.
 	};
 
 	const restoreRevision = ( revision ) => {
