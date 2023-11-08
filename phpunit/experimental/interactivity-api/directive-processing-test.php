@@ -28,10 +28,10 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
 }
 
 /**
- * Tests for the gutenberg_interactivity_process_directives function.
+ * Tests for the gutenberg_interactivity_process_rendered_html function.
  *
  * @group  interactivity-api
- * @covers gutenberg_interactivity_process_directives
+ * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_correctly_call_attribute_directive_processor_on_closing_tag() {
@@ -60,7 +60,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
@@ -74,7 +74,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div foo-test--value="abc"></div>';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
