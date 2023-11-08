@@ -43,8 +43,7 @@ function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block
 						'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
 					);
 
-					$tags = new WP_Directive_Processor( $block_content );
-
+					$tags               = new WP_Directive_Processor( $block_content );
 					$tags               = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
 					$render_block_data -= 1;
 					return $tags->get_updated_html();
