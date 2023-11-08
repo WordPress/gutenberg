@@ -162,6 +162,7 @@ const ToolsPanelHeader = (
 		menuItems,
 		resetAll,
 		toggleItem,
+		dropdownMenuProps,
 		...headerProps
 	} = useToolsPanelHeader( props );
 
@@ -199,11 +200,7 @@ const ToolsPanelHeader = (
 						isSmall: true,
 						describedBy: dropdownMenuDescriptionText,
 					} }
-					popoverProps={ {
-						placement: 'left-start',
-						offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
-						shift: true,
-					} }
+					popoverProps={ dropdownMenuProps }
 				>
 					{ () => (
 						<>
