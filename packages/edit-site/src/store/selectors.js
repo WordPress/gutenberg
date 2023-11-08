@@ -18,20 +18,6 @@ import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
  */
 
 /**
- * Helper for getting a preference from the preferences store.
- *
- * This is only present so that `getSettings` doesn't need to be made a
- * registry selector.
- *
- * It's unstable because the selector needs to be exported and so part of the
- * public API to work.
- */
-export const __unstableGetPreference = createRegistrySelector(
-	( select ) => ( state, name ) =>
-		select( preferencesStore ).get( 'core/edit-site', name )
-);
-
-/**
  * Returns whether the given feature is enabled or not.
  *
  * @deprecated
@@ -40,14 +26,16 @@ export const __unstableGetPreference = createRegistrySelector(
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, featureName ) {
-	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
-		since: '6.0',
-		alternative: `select( 'core/preferences' ).get`,
-	} );
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( _, featureName ) => {
+		deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
+			since: '6.0',
+			alternative: `select( 'core/preferences' ).get`,
+		} );
 
-	return !! __unstableGetPreference( state, featureName );
-}
+		return select( preferencesStore ).get( 'core/edit-site', featureName );
+	}
+);
 
 /**
  * Returns the current editing canvas device type.
@@ -257,9 +245,9 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return __unstableGetPreference( state, 'editorMode' );
-}
+export const getEditorMode = createRegistrySelector( ( select ) => () => {
+	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+} );
 
 /**
  * @deprecated

@@ -13,7 +13,6 @@ import {
 	getReusableBlocks,
 	isInserterOpened,
 	isListViewOpened,
-	__unstableGetPreference,
 	isPage,
 	hasPageContentFocus,
 } from '../selectors';
@@ -21,15 +20,11 @@ import {
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
 	const getEntityRecords = jest.fn( () => [] );
-	const get = jest.fn();
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
 	};
 	getReusableBlocks.registry = {
 		select: jest.fn( () => ( { getEntityRecords } ) ),
-	};
-	__unstableGetPreference.registry = {
-		select: jest.fn( () => ( { get } ) ),
 	};
 
 	describe( 'getCanUserCreateMedia', () => {

@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -102,10 +103,10 @@ export default function useSiteEditorSettings() {
 		const {
 			getEditedPostType,
 			getEditedPostId,
-			__unstableGetPreference,
 			getCanvasMode,
 			getSettings,
 		} = unlock( select( editSiteStore ) );
+		const { get: getPreference } = select( preferencesStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const usedPostType = getEditedPostType();
 		const usedPostId = getEditedPostId();
@@ -116,10 +117,17 @@ export default function useSiteEditorSettings() {
 		);
 		return {
 			templateSlug: _record.slug,
-			focusMode: !! __unstableGetPreference( 'focusMode' ),
-			isDistractionFree: !! __unstableGetPreference( 'distractionFree' ),
-			hasFixedToolbar: !! __unstableGetPreference( 'fixedToolbar' ),
-			keepCaretInsideBlock: !! __unstableGetPreference(
+			focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
+			isDistractionFree: !! getPreference(
+				'core/edit-site',
+				'distractionFree'
+			),
+			hasFixedToolbar: !! getPreference(
+				'core/edit-site',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! getPreference(
+				'core/edit-site',
 				'keepCaretInsideBlock'
 			),
 			canvasMode: getCanvasMode(),
