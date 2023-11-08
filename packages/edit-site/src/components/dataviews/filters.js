@@ -50,7 +50,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				if ( OPERATOR_IN === filter.operator ) {
 					return (
 						<InFilter
-							key={ fieldName }
+							key={ fieldName + '.' + filter.operator }
 							filter={ visibleFiltersForField[ 0 ] }
 							view={ view }
 							onChangeView={ onChangeView }
@@ -64,7 +64,11 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 	if ( visibleFilters.length > 0 ) {
 		visibleFilters.push(
-			<ResetFilters view={ view } onChangeView={ onChangeView } />
+			<ResetFilters
+				key="reset-filters"
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
 		);
 	}
 
