@@ -36,29 +36,31 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} );
 	} );
 
-	const visibleFilters = view.visibleFilters?.map( ( fieldName ) => {
-		const visibleFiltersForField = filtersRegistered.filter(
-			( f ) => f.field === fieldName
-		);
+	const visibleFilters = view.visibleFilters
+		?.map( ( fieldName ) => {
+			const visibleFiltersForField = filtersRegistered.filter(
+				( f ) => f.field === fieldName
+			);
 
-		if ( visibleFiltersForField.length === 0 ) {
-			return null;
-		}
-
-		return visibleFiltersForField.map( ( filter ) => {
-			if ( OPERATOR_IN === filter.operator ) {
-				return (
-					<InFilter
-						key={ fieldName }
-						filter={ visibleFiltersForField[ 0 ] }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
+			if ( visibleFiltersForField.length === 0 ) {
+				return null;
 			}
-			return null;
-		} );
-	} ).filter( Boolean );
+
+			return visibleFiltersForField.map( ( filter ) => {
+				if ( OPERATOR_IN === filter.operator ) {
+					return (
+						<InFilter
+							key={ fieldName }
+							filter={ visibleFiltersForField[ 0 ] }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					);
+				}
+				return null;
+			} );
+		} )
+		.filter( Boolean );
 
 	if ( visibleFilters.length > 0 ) {
 		visibleFilters.push( <ResetFilters onChangeView={ onChangeView } /> );
