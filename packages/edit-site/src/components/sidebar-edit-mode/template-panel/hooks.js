@@ -10,7 +10,10 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
+import {
+	NON_THEME_PATTERN_SOURCES,
+	PATTERN_TYPES,
+} from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 function injectThemeAttributeInBlockTemplateContent(
@@ -40,7 +43,7 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	// Filter out core patterns.
 	const filterOutCorePatterns = ( pattern ) =>
-		! PATTERN_CORE_SOURCES.includes( pattern.source );
+		! NON_THEME_PATTERN_SOURCES.includes( pattern.source );
 
 	// Filter only the patterns that are compatible with the current template.
 	const filterCompatiblePatterns = ( pattern ) =>

@@ -5,7 +5,7 @@ export const PATTERN_TYPES = {
 
 export const PATTERN_DEFAULT_CATEGORY = 'all-patterns';
 export const PATTERN_USER_CATEGORY = 'my-patterns';
-export const PATTERN_CORE_SOURCES = [
+export const NON_THEME_PATTERN_SOURCES = [
 	'core',
 	'pattern-directory/core',
 	'pattern-directory/featured',
