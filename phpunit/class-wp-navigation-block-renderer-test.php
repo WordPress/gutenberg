@@ -28,7 +28,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
-		// Invoke the private method
+		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
 		$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
