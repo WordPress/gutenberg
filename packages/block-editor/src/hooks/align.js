@@ -138,7 +138,6 @@ function BlockEditAlignmentToolbarControls( {
 				nextAlign = '';
 			}
 		}
-
 		setAttributes( { align: nextAlign } );
 	};
 

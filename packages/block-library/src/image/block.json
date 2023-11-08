@@ -9,10 +9,6 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string",
-			"default": ""
-		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
