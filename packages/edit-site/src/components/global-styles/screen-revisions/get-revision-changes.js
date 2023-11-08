@@ -30,8 +30,8 @@ export default function getGlobalStylesChanges( {
 	if ( Object.keys( settings ).length > 0 ) {
 		changes.push( __( 'Global settings' ) );
 	}
-	Object.entries( styles ).forEach( ( [ key, value ] ) => {
-		if ( translationMap[ key ] && !! value ) {
+	Object.keys( styles ).forEach( ( key ) => {
+		if ( translationMap[ key ] ) {
 			changes.push( translationMap[ key ] );
 		}
 	} );
