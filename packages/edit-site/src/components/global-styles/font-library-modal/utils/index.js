@@ -134,7 +134,7 @@ export function makeFormDataFromFontFamily( fontFamily ) {
 
 	formData.append( 'slug', fontFamily.slug );
 	formData.append( 'name', fontFamily.name );
-	formData.append( 'fontFamily', fontFamily.fontFamily );
+	formData.append( 'font_family', fontFamily.fontFamily );
 
 	if ( fontFamily.fontFace ) {
 		fontFamily.fontFace = fontFamily.fontFace.map( ( face, faceIndex ) => {
@@ -153,7 +153,7 @@ export function makeFormDataFromFontFamily( fontFamily ) {
 			}
 			return face;
 		} );
-		formData.append( 'fontFace', JSON.stringify( fontFamily.fontFace ) );
+		formData.append( 'font_face', JSON.stringify( fontFamily.fontFace ) );
 	}
 
 	return formData;

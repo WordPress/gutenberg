@@ -53,11 +53,11 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 							'required' => true,
 							'type'     => 'string',
 						),
-						'fontFamily' => array(
+						'font_family' => array(
 							'required' => true,
 							'type'     => 'string',
 						),
-						'fontFace'   => array(
+						'font_face'   => array(
 							'required'          => false,
 							'type'              => 'string',
 							'validate_callback' => array( $this, 'validate_font_faces' ),
@@ -321,11 +321,11 @@ class WP_REST_Font_Families_Controller extends WP_REST_Controller {
 		$font_family_data = array(
 			'slug'       => $request->get_param( 'slug' ),
 			'name'       => $request->get_param( 'name' ),
-			'fontFamily' => $request->get_param( 'fontFamily' ),
+			'fontFamily' => $request->get_param( 'font_family' ),
 		);
 
-		if ( $request->get_param( 'fontFace' ) ) {
-			$font_family_data['fontFace'] = json_decode( $request->get_param( 'fontFace' ), true );
+		if ( $request->get_param( 'font-face' ) ) {
+			$font_family_data['fontFace'] = json_decode( $request->get_param( 'font_face' ), true );
 		}
 
 		if ( $this->needs_write_permission( $font_family_data ) && ! $this->has_write_permission() ) {
