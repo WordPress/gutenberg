@@ -22,7 +22,10 @@ import { ToolbarGroup } from '@wordpress/components';
  */
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
-import BlockSwitcher from '../block-switcher';
+import {
+	default as BlockSwitcher,
+	BlockPriorityTransforms,
+} from '../block-switcher';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -118,6 +121,11 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 						</ToolbarGroup>
 					</div>
 				) }
+			{ isMultiToolbar && (
+				<ToolbarGroup className="block-editor-block-toolbar__block-transforms">
+					<BlockPriorityTransforms clientIds={ blockClientIds } />
+				</ToolbarGroup>
+			) }
 			{ shouldShowVisualToolbar && isMultiToolbar && (
 				<BlockGroupToolbar />
 			) }
