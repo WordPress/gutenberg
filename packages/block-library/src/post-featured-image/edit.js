@@ -209,7 +209,17 @@ export default function PostFeaturedImageEdit( {
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ placeholder() }
+					{ !! isLink ? (
+						<a
+							href={ postPermalink }
+							target={ linkTarget }
+							{ ...disabledClickProps }
+						>
+							{ placeholder() }
+						</a>
+					) : (
+						placeholder()
+					) }
 					<Overlay
 						attributes={ attributes }
 						setAttributes={ setAttributes }
