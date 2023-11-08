@@ -15,7 +15,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 *
 	 * @covers WP_Navigation_Block_Renderer::get_markup_for_inner_block
 	 */
-	public function test_gutenberg_get_markup_for_inner_block_navigation_link() {
+	public function test_gutenberg_default_block_is_enclosed_in_li_tags() {
 
 		$parsed_blocks         = parse_blocks(
 			'<!-- wp:navigation-link {"label":"Sample Page","type":"page","kind":"post-type","url":"/hello-world"} /-->'
