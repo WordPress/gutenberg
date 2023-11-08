@@ -62,7 +62,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} )
 		.filter( Boolean );
 
-	if ( visibleFilters.length > 0 ) {
+	if ( visibleFilters?.length > 0 ) {
 		visibleFilters.push(
 			<ResetFilters
 				key="reset-filters"
