@@ -32,7 +32,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 );
 
 function ScreenRevisions() {
-	const { goBack } = useNavigator();
+	const { goTo } = useNavigator();
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { blocks, editorCanvasContainerView } = useSelect( ( select ) => {
@@ -58,13 +58,13 @@ function ScreenRevisions() {
 
 	useEffect( () => {
 		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
-			goBack();
+			goTo( '/' ); // Return to global styles main panel.
 			setEditorCanvasContainerView( editorCanvasContainerView );
 		}
 	}, [ editorCanvasContainerView ] );
 
 	const onCloseRevisions = () => {
-		goBack();
+		goTo( '/' ); // Return to global styles main panel.
 	};
 
 	const restoreRevision = ( revision ) => {
