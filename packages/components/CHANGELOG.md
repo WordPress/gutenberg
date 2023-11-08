@@ -16,6 +16,7 @@
 
 -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
 -   `TextControl`: Add opt-in prop for 40px default size ([#55471](https://github.com/WordPress/gutenberg/pull/55471)).
+-   `InputControl`: Add new `inside` label position ([#55977](https://github.com/WordPress/gutenberg/pull/55977)).
 
 ## 25.11.0 (2023-11-02)
 
