@@ -203,10 +203,12 @@ class WP_Fonts_Resolver {
 			}
 
 			// Merge the variation settings with the global settings.
-			$settings['typography']['fontFamilies']['theme'] = array_merge(
-				$settings['typography']['fontFamilies']['theme'],
-				$variation['settings']['typography']['fontFamilies']['theme']
-			);
+			if ( is_array( $settings['typography']['fontFamilies']['theme'] ) && is_array( $variation['settings']['typography']['fontFamilies']['theme'] ) ) {
+				$settings['typography']['fontFamilies']['theme'] = array_merge(
+					$settings['typography']['fontFamilies']['theme'],
+					$variation['settings']['typography']['fontFamilies']['theme']
+				);
+			}
 
 			// Make sure there are no duplicates.
 			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
