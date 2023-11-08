@@ -10,10 +10,6 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
-import {
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchUrlData as fetchUrlData,
-} from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -38,12 +34,6 @@ import App from './components/app';
 export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
 	const root = createRoot( target );
-
-	// This might not be needed anymore.
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
-	// This might not be needed anymore.
-	settings.__experimentalFetchRichUrlData = fetchUrlData;
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
