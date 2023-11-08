@@ -78,11 +78,26 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
+		$pattern_content = '<!-- wp:paragraph -->' .
+		'<p>Pattern Content Block 1</p>' .
+		'<!-- /wp:paragraph -->' .
+		'<!-- wp:paragraph -->' .
+		'<p>Pattern Content Block 2</p>' .
+		'<!-- /wp:paragraph -->';
+		register_block_pattern(
+			'core/interactivity-pattern',
+			array(
+				'title'   => 'Interactivity Pattern',
+				'content' => $pattern_content,
+			)
+		);
+
 		// Reset root blocks counter.
 		WP_Directive_Processor::$root_blocks = array();
 
 		$providers = $this->data_only_root_blocks_are_processed();
 		foreach ( $providers as $provider ) {
+
 			do_blocks( $provider['page_content'] );
 			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
 			// Reset root blocks counter.
@@ -99,85 +114,42 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		return array(
 			array(
-				'root_blocks'  => 2,
-				'page_content' => '<!-- wp:quote -->' .
-					'<blockquote class="wp-block-quote"><!-- wp:paragraph -->' .
-					'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-					'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-					'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
-					'<!-- /wp:paragraph --></blockquote>' .
-					'<!-- /wp:quote -->' .
-					'<!-- wp:quote -->' .
-					'<blockquote class="wp-block-quote"><!-- wp:paragraph -->' .
-					'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-					'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-					'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
-					'<!-- /wp:paragraph --></blockquote>' .
-					'<!-- /wp:quote -->',
+				'root_blocks'         => 2,
+				'is_root_block_calls' => 4,
+				'page_content'        =>
+				'<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote">
+						<!-- wp:paragraph -->' .
+						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+						'<!-- /wp:paragraph -->
+					</blockquote>' .
+				'<!-- /wp:quote -->' .
+				'<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote">
+						<!-- wp:paragraph -->' .
+							'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+							'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+							'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+						'<!-- /wp:paragraph -->
+					</blockquote>' .
+				'<!-- /wp:quote -->',
 			),
 			array(
-				'root_blocks'  => 1,
-				'page_content' => '' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:image {"width":"216px","height":"auto","sizeSlug":"large"} -->' .
-					'<figure class="wp-block-image size-large is-resized"><img src="#" alt="" style="width:216px;height:auto"/></figure>' .
-					'<!-- /wp:image -->' .
-					'<!-- wp:paragraph -->' .
-					'<p>As a new WordPress user, you should go to <a href="#">your dashboard</a>to delete this page and' .
-					'create new pages for your content. Have fun!</p>' .
-					'<!-- /wp:paragraph -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group --></div>' .
-					'<!-- /wp:group -->',
-			),
-			array(
-				'root_blocks'  => 6,
-				'page_content' => '<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->' .
-					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
-					'<div class="wp-block-group"><!-- wp:paragraph -->' .
-					'<p>Deeply Nested</p>' .
-					'<!-- /wp:paragraph --></div>' .
-					'<!-- /wp:group -->',
-			),
-			array(
-				'root_blocks'  => 3,
-				'page_content' => '<!-- wp:paragraph -->' .
-				'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
-				'<!-- /wp:paragraph -->' .
-				'<!-- wp:block {"ref":215} /-->' .
-				'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0","bottom":"0"}}},"layout":{"type":"constrained"}} -->' .
-				'<div class="wp-block-group alignfull"' .
-				'style="margin-top:0;margin-bottom:0;padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)">' .
+				'root_blocks'         => 3,
+				'is_root_block_calls' => 6,
+				'page_content'        =>
 				'<!-- wp:paragraph -->' .
-				'<p>Test</p>' .
-				'<!-- /wp:paragraph --></div>' .
+					'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
+				'<!-- /wp:paragraph -->' .
+				'<!-- wp:pattern {"slug":"core/interactivity-pattern"} /-->' .
+				'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0","bottom":"0"}}},"layout":{"type":"constrained"}} -->' .
+				'	<div class="wp-block-group alignfull"' .
+					'style="margin-top:0;margin-bottom:0;padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)">' .
+					'<!-- wp:paragraph -->' .
+						'<p>Test</p>' .
+					'<!-- /wp:paragraph --></div>' .
 				'<!-- /wp:group -->',
 			),
 		);
