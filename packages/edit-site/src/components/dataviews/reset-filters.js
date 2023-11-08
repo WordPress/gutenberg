@@ -13,6 +13,7 @@ export default ( { onChangeView } ) => {
 					onChangeView( ( currentView ) => ( {
 						...currentView,
 						page: 1,
+						search: '',
 						filters: [],
 					} ) );
 				} }
