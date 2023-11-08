@@ -40,19 +40,19 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$test_helper = $this->createMock( Helper_Class::class );
 
 		$test_helper->expects( $this->exactly( 2 ) )
-					->method( 'process_foo_test' )
-					->with(
-						$this->callback(
-							function ( $p ) {
-								return 'DIV' === $p->get_tag() && (
-									// Either this is a closing tag...
-									$p->is_tag_closer() ||
-									// ...or it is an open tag, and has the directive attribute set.
-									( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
-								);
-							}
-						)
-					);
+				->method( 'process_foo_test' )
+				->with(
+					$this->callback(
+						function ( $p ) {
+							return 'DIV' === $p->get_tag() && (
+								// Either this is a closing tag...
+								$p->is_tag_closer() ||
+								// ...or it is an open tag, and has the directive attribute set.
+								( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
+							);
+						}
+					)
+				);
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
@@ -66,7 +66,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_directives_with_double_hyphen_processed_correctly() {
 		$test_helper = $this->createMock( Helper_Class::class );
 		$test_helper->expects( $this->atLeastOnce() )
-					->method( 'process_foo_test' );
+				->method( 'process_foo_test' );
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
@@ -76,7 +76,102 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
 	}
+
+	public function test_interactivity_process_directives_in_root_blocks() {
+		// Reset root blocks counter.
+		WP_Directive_Processor::$root_blocks = array();
+		$provider                            = $this->data_only_root_blocks_are_processed();
+		foreach ( $provider as $provider ) {
+			$parsed_blocks = parse_blocks( $provider['page_content'] );
+			foreach ( $parsed_blocks as $parsed_block ) {
+				render_block( $parsed_block );
+			}
+			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
+			// Reset root blocks counter.
+			WP_Directive_Processor::$root_blocks = array();
+		}
+	}
+
+	/**
+	 * Data provider .
+	 *
+	 * @return array
+	 **/
+	public function data_only_root_blocks_are_processed() {
+
+		return array(
+			array(
+				'root_blocks'  => 2,
+				'page_content' => '<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote"><!-- wp:paragraph -->' .
+					'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+					'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+					'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+					'<!-- /wp:paragraph --></blockquote>' .
+					'<!-- /wp:quote -->' .
+					'<!-- wp:quote -->' .
+					'<blockquote class="wp-block-quote"><!-- wp:paragraph -->' .
+					'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+					'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+					'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+					'<!-- /wp:paragraph --></blockquote>' .
+					'<!-- /wp:quote -->',
+			),
+			array(
+				'root_blocks'  => 1,
+				'page_content' => '' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:image {"width":"216px","height":"auto","sizeSlug":"large"} -->' .
+					'<figure class="wp-block-image size-large is-resized"><img src="#" alt="" style="width:216px;height:auto"/></figure>' .
+					'<!-- /wp:image -->' .
+					'<!-- wp:paragraph -->' .
+					'<p>As a new WordPress user, you should go to <a href="#">your dashboard</a>to delete this page and' .
+					'create new pages for your content. Have fun!</p>' .
+					'<!-- /wp:paragraph -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group --></div>' .
+					'<!-- /wp:group -->',
+			),
+			array(
+				'root_blocks'  => 6,
+				'page_content' => '<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->' .
+					'<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->' .
+					'<div class="wp-block-group"><!-- wp:paragraph -->' .
+					'<p>Deeply Nested</p>' .
+					'<!-- /wp:paragraph --></div>' .
+					'<!-- /wp:group -->',
+			),
+		);
+	}
 }
+
 
 /**
  * Tests for the gutenberg_interactivity_evaluate_reference function.

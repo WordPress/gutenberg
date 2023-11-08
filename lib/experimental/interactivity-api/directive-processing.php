@@ -23,7 +23,7 @@ function gutenberg_interactivity_process_directives_in_root_blocks( $block_conte
 
 	if ( WP_Directive_Processor::is_root_block( $block ) ) {
 
-		if ( $do_block_calls === 1 ) {
+		if ( 1 === $do_block_calls ) {
 			$directives = array(
 				'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 				'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
