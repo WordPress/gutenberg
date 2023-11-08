@@ -171,3 +171,15 @@ Example:
 - `render`: function that renders the field.
 - `elements`: the set of valid values for the field's value.
 - `filters`: what filter operators are available for the user to use over this field. Only `in` available at the moment.
+
+## Actions
+
+Array of operations that can be performed upon each record. Each action is an object with the following properties:
+
+- `id`: string, required. Unique identifier of the action. For example, `move-to-trash`.
+- `label`: string, required. User facing description of the action. For example, `Move to Trash`.
+- `isPrimary`: boolean, optional. Whether the action should be listed inline (primary) or in hidden in the more actions menu (secondary).
+- `icon`: icon to show for primary actions. It's required for a primary action, otherwise the action would be considered secondary.
+- `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.
+- `isDestructive`: boolean, optional. Whether the action can delete data, in which case the UI would communicate it via red color.
+- `perform`: function, required. Function that takes the record as input and performs the required action.
