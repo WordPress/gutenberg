@@ -41,8 +41,8 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
-	// Filter out core patterns.
-	const filterOutCorePatterns = ( pattern ) =>
+	// Filter out core/directory patterns not included in theme.json.
+	const filterOutExcludedPatternSources = ( pattern ) =>
 		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
 
 	// Filter only the patterns that are compatible with the current template.
@@ -51,7 +51,7 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	return patterns
 		.filter(
-			filterOutCorePatterns &&
+			filterOutExcludedPatternSources &&
 				filterOutDuplicatesByName &&
 				filterCompatiblePatterns
 		)
