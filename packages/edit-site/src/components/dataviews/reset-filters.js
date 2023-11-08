@@ -4,10 +4,11 @@
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default ( { onChangeView } ) => {
+export default ( { view, onChangeView } ) => {
 	return (
 		<BaseControl>
 			<Button
+				disabled={ view.search === '' && view.filters?.length === 0 }
 				variant="tertiary"
 				onClick={ () => {
 					onChangeView( ( currentView ) => ( {
