@@ -11,14 +11,20 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 const postTypesWithoutParentTemplate = [
-	'wp_template',
-	'wp_template_part',
-	'wp_block',
-	'wp_navigation',
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	PATTERN_TYPES,
 ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
@@ -69,7 +75,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				if ( currentTemplateSlug ) {
 					const currentTemplate = getEntityRecords(
 						'postType',
-						'wp_template',
+						TEMPLATE_POST_TYPE,
 						{
 							per_page: -1,
 						}
@@ -127,7 +133,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 	if ( ( postType && postId ) || homepageId || ! isRequestingSite ) {
 		return {
 			isReady: resolvedTemplateId !== undefined,
-			postType: 'wp_template',
+			postType: TEMPLATE_POST_TYPE,
 			postId: resolvedTemplateId,
 			context,
 		};
