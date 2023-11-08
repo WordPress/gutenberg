@@ -241,10 +241,12 @@ function BackgroundImagePanelItem( props ) {
 		};
 	}, [] );
 
+	const hasValue = hasBackgroundImageValue( props );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
-			hasValue={ () => hasBackgroundImageValue( props ) }
+			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
 			onDeselect={ () => resetBackgroundImage( props ) }
 			isShownByDefault={ true }
@@ -267,9 +269,13 @@ function BackgroundImagePanelItem( props ) {
 					}
 					variant="secondary"
 				>
-					<MenuItem onClick={ () => resetBackgroundImage( props ) }>
-						{ __( 'Reset ' ) }
-					</MenuItem>
+					{ hasValue && (
+						<MenuItem
+							onClick={ () => resetBackgroundImage( props ) }
+						>
+							{ __( 'Reset ' ) }
+						</MenuItem>
+					) }
 				</MediaReplaceFlow>
 				<DropZone
 					onFilesDrop={ onFilesDrop }
