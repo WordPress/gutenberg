@@ -4406,7 +4406,7 @@ describe( 'selectors', () => {
 			);
 			expect( patterns1 ).toBe( patterns2 );
 		} );
-		it( 'should return proper results when there are matched block patterns', () => {
+		it( 'should return proper results when there are matched patterns', () => {
 			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
 			expect( patterns ).toHaveLength( 2 );
 			expect( patterns ).toEqual(

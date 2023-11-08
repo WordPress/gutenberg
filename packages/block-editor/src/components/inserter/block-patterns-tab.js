@@ -281,7 +281,7 @@ export function BlockPatternsCategoryPanel( {
 	);
 	const { changePage } = pagingProps;
 
-	// Hide block pattern preview on unmount.
+	// Hide pattern preview on unmount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
 
@@ -368,7 +368,7 @@ function BlockPatternsTabs( {
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<nav
-						aria-label={ __( 'Block pattern categories' ) }
+						aria-label={ __( 'Pattern categories' ) }
 						className="block-editor-inserter__block-patterns-tabs"
 					>
 						<ItemGroup role="list">

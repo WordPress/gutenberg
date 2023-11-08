@@ -92,7 +92,7 @@ _Returns_
 
 ### getBlockPatternCategories
 
-Retrieve the list of registered block pattern categories.
+Retrieve the list of registered pattern categories.
 
 _Parameters_
 
@@ -100,11 +100,11 @@ _Parameters_
 
 _Returns_
 
--   `Array< any >`: Block pattern category list.
+-   `Array< any >`: Pattern category list.
 
 ### getBlockPatterns
 
-Retrieve the list of registered block patterns.
+Retrieve the list of registered patterns.
 
 _Parameters_
 
@@ -112,7 +112,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< any >`: Block pattern list.
+-   `Array< any >`: Pattern list.
 
 ### getCurrentTheme
 

@@ -70,7 +70,7 @@ test.describe( 'Template Part', () => {
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
 		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
+			'role=listbox[name="Patterns"i] >> role=option[name="header"i]'
 		);
 
 		// There are now two header template parts.

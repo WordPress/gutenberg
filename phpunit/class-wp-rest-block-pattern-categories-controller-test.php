@@ -7,7 +7,7 @@
  */
 
 /**
- * Unit tests for REST API for Block Pattern Categories.
+ * Unit tests for REST API for Pattern Categories.
  *
  * @group restapi
  * @covers WP_REST_Block_Pattern_Categories_Controller

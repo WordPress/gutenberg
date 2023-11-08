@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the block patterns REST API routes.
+ * Registers the patterns REST API routes.
  */
 function gutenberg_register_rest_block_patterns_routes() {
 	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller();

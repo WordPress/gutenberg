@@ -710,7 +710,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
+-   `Array`: The list of matched patterns based on declared `blockTypes` and block name.
 
 ### getPreviousBlockClientId
 
