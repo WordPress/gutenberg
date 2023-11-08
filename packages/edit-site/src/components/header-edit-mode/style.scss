@@ -205,7 +205,6 @@ $header-toolbar-min-width: 335px;
 
 .has-fixed-toolbar {
 	.selected-block-tools-wrapper {
-		flex-shrink: 4;
 		overflow-x: scroll;
 
 		&.is-collapsed {
