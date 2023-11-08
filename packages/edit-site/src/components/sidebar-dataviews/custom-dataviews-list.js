@@ -3,8 +3,12 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalHeading as Heading,
+} from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -70,20 +74,25 @@ export function useCustomDataViews( type ) {
 export default function CustomDataViewsList( { type, activeView, isCustom } ) {
 	const customDataViews = useCustomDataViews( type );
 	return (
-		<ItemGroup>
-			{ customDataViews.map( ( customViewRecord ) => {
-				return (
-					<CustomDataViewItem
-						key={ customViewRecord.id }
-						dataviewId={ customViewRecord.id }
-						isActive={
-							isCustom === 'true' &&
-							Number( activeView ) === customViewRecord.id
-						}
-					/>
-				);
-			} ) }
-			<AddNewItem type={ type } />
-		</ItemGroup>
+		<>
+			<div className="edit-site-sidebar-navigation-screen-dataviews__group-header">
+				<Heading level={ 2 }>{ __( 'Custom Views' ) }</Heading>
+			</div>
+			<ItemGroup>
+				{ customDataViews.map( ( customViewRecord ) => {
+					return (
+						<CustomDataViewItem
+							key={ customViewRecord.id }
+							dataviewId={ customViewRecord.id }
+							isActive={
+								isCustom === 'true' &&
+								Number( activeView ) === customViewRecord.id
+							}
+						/>
+					);
+				} ) }
+				<AddNewItem type={ type } />
+			</ItemGroup>
+		</>
 	);
 }
