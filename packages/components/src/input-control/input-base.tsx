@@ -13,7 +13,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import Backdrop from './backdrop';
-import Label from './label';
+import { Label, InnerLabel } from './label';
 import {
 	Container,
 	Root,
@@ -98,6 +98,13 @@ export function InputBase(
 			InputControlSuffixWrapper: { paddingRight },
 		};
 	}, [ paddingLeft, paddingRight ] );
+	const labelProps = {
+		className: 'components-input-control__label',
+		htmlFor: id,
+		hideLabelFromVision,
+		labelPosition,
+	};
+	const labelInside = labelPosition === 'inside';
 
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
@@ -110,14 +117,7 @@ export function InputBase(
 			labelPosition={ labelPosition }
 			ref={ ref }
 		>
-			<Label
-				className="components-input-control__label"
-				hideLabelFromVision={ hideLabelFromVision }
-				labelPosition={ labelPosition }
-				htmlFor={ id }
-			>
-				{ label }
-			</Label>
+			{ ! labelInside && <Label { ...labelProps }>{ label }</Label> }
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
@@ -126,6 +126,9 @@ export function InputBase(
 				labelPosition={ labelPosition }
 			>
 				<ContextSystemProvider value={ prefixSuffixContextValue }>
+					{ labelInside && (
+						<InnerLabel { ...labelProps }>{ label }</InnerLabel>
+					) }
 					{ prefix && (
 						<Prefix className="components-input-control__prefix">
 							{ prefix }

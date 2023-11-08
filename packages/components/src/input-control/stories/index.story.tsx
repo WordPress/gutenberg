@@ -81,3 +81,9 @@ WithEdgeLabel.args = {
 	__unstableInputWidth: '20em',
 	labelPosition: 'edge',
 };
+
+export const WithInsideLabel = Template.bind( {} );
+WithInsideLabel.args = {
+	...Default.args,
+	labelPosition: 'inside',
+};

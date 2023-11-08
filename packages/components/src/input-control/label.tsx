@@ -1,15 +1,17 @@
 /**
  * Internal dependencies
  */
+import InputControlPrefixWrapper from './input-prefix-wrapper';
 import { VisuallyHidden } from '../visually-hidden';
 import {
 	Label as BaseLabel,
 	LabelWrapper,
+	InnerLabelWrapper,
 } from './styles/input-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { InputControlLabelProps } from './types';
 
-export default function Label( {
+export function Label( {
 	children,
 	hideLabelFromVision,
 	htmlFor,
@@ -31,5 +33,17 @@ export default function Label( {
 				{ children }
 			</BaseLabel>
 		</LabelWrapper>
+	);
+}
+
+export function InnerLabel( {
+	children,
+	htmlFor,
+	...props
+}: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
+	return (
+		<InnerLabelWrapper htmlFor={ htmlFor } { ...props }>
+			<InputControlPrefixWrapper>{ children }</InputControlPrefixWrapper>
+		</InnerLabelWrapper>
 	);
 }

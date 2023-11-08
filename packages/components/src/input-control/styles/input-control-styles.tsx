@@ -68,7 +68,7 @@ const containerWidthStyles = ( {
 };
 
 export const Container = styled.div< ContainerProps >`
-	align-items: center;
+	align-items: stretch;
 	box-sizing: border-box;
 	border-radius: inherit;
 	display: flex;
@@ -259,6 +259,14 @@ export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
 `;
 
+export const InnerLabelWrapper = styled.label`
+	${ baseLabelTypography };
+
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+`;
+
 type BackdropProps = {
 	disabled?: boolean;
 	isFocused?: boolean;
@@ -315,12 +323,14 @@ export const BackdropUI = styled.div< BackdropProps >`
 
 export const Prefix = styled.span`
 	box-sizing: border-box;
-	display: block;
+	display: flex;
+	align-items: center;
+	align-self: stretch;
 `;
 
 export const Suffix = styled.span`
-	align-items: center;
-	align-self: stretch;
 	box-sizing: border-box;
 	display: flex;
+	align-items: center;
+	align-self: stretch;
 `;

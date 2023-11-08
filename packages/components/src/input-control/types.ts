@@ -17,7 +17,7 @@ import type { WordPressComponentProps } from '../context';
 import type { FlexProps } from '../flex/types';
 import type { BaseControlProps } from '../base-control/types';
 
-export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
+export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge' | 'inside';
 
 export type DragDirection = 'n' | 's' | 'e' | 'w';
 
