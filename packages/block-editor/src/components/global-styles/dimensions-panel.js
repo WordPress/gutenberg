@@ -178,6 +178,10 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ {
+				placement: 'left-start',
+				offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+			} }
 		>
 			{ children }
 		</ToolsPanel>

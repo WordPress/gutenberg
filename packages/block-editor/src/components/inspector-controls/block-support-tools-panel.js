@@ -71,6 +71,10 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ {
+				placement: 'left-start',
+				offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+			} }
 		>
 			{ children }
 		</ToolsPanel>
