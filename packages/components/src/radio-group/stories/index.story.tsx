@@ -21,6 +21,8 @@ const meta: Meta< typeof RadioGroup > = {
 	subcomponents: { Radio },
 	argTypes: {
 		onChange: { control: { type: null } },
+		children: { control: { type: null } },
+		checked: { control: { type: 'text' } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -30,61 +32,59 @@ const meta: Meta< typeof RadioGroup > = {
 };
 export default meta;
 
-export const Default: StoryFn< typeof RadioGroup > = () => {
-	return (
-		<RadioGroup
-			// id is required for server side rendering
-			// eslint-disable-next-line no-restricted-syntax
-			id="default-radiogroup"
-			label="options"
-			defaultChecked="option2"
-		>
+const Template: StoryFn< typeof RadioGroup > = ( props ) => {
+	return <RadioGroup { ...props } />;
+};
+
+export const Default: StoryFn< typeof RadioGroup > = Template.bind( {} );
+Default.args = {
+	id: 'default-radiogroup',
+	label: 'options',
+	defaultChecked: 'option2',
+	children: (
+		<>
 			<Radio value="option1">Option 1</Radio>
 			<Radio value="option2">Option 2</Radio>
 			<Radio value="option3">Option 3</Radio>
-		</RadioGroup>
-	);
+		</>
+	),
 };
 
-export const Disabled = () => {
-	/* eslint-disable no-restricted-syntax */
-	return (
-		<RadioGroup
-			// id is required for server side rendering
-			id="disabled-radiogroup"
-			disabled
-			label="options"
-			defaultChecked="option2"
-		>
-			<Radio value="option1">Option 1</Radio>
-			<Radio value="option2">Option 2</Radio>
-			<Radio value="option3">Option 3</Radio>
-		</RadioGroup>
-	);
-	/* eslint-enable no-restricted-syntax */
+export const Disabled: StoryFn< typeof RadioGroup > = Template.bind( {} );
+Disabled.args = {
+	...Default.args,
+	id: 'disabled-radiogroup',
+	disabled: true,
 };
 
-const ControlledRadioGroupWithState = () => {
+const ControlledTemplate: StoryFn< typeof RadioGroup > = ( {
+	checked: checkedProp,
+	onChange: onChangeProp,
+	...props
+} ) => {
 	const [ checked, setChecked ] =
-		useState< React.ComponentProps< typeof RadioGroup >[ 'checked' ] >( 1 );
+		useState< React.ComponentProps< typeof RadioGroup >[ 'checked' ] >(
+			checkedProp
+		);
 
-	/* eslint-disable no-restricted-syntax */
+	const onChange: typeof onChangeProp = ( value ) => {
+		setChecked( value );
+		onChangeProp?.( value );
+	};
+
 	return (
-		<RadioGroup
-			// id is required for server side rendering
-			id="controlled-radiogroup"
-			label="options"
-			checked={ checked }
-			onChange={ setChecked }
-		>
-			<Radio value={ 0 }>Option 1</Radio>
-			<Radio value={ 1 }>Option 2</Radio>
-			<Radio value={ 2 }>Option 3</Radio>
-		</RadioGroup>
+		<RadioGroup { ...props } onChange={ onChange } checked={ checked } />
 	);
-	/* eslint-enable no-restricted-syntax */
 };
 
-export const Controlled = () => {
-	return <ControlledRadioGroupWithState />;
+export const Controlled: StoryFn< typeof RadioGroup > = ControlledTemplate.bind(
+	{}
+);
+Controlled.args = {
+	...Default.args,
+	checked: 'option2',
+	id: 'controlled-radiogroup',
+};
+Controlled.argTypes = {
+	checked: { control: { type: null } },
 };
