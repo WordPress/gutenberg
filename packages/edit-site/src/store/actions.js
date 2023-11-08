@@ -31,11 +31,14 @@ import {
  */
 export function toggleFeature( featureName ) {
 	return function ( { registry } ) {
-		deprecated( "select( 'core/edit-site' ).toggleFeature( featureName )", {
-			since: '6.0',
-			alternative:
-				"select( 'core/preferences').toggle( 'core/edit-site', featureName )",
-		} );
+		deprecated(
+			"dispatch( 'core/edit-site' ).toggleFeature( featureName )",
+			{
+				since: '6.0',
+				alternative:
+					"dispatch( 'core/preferences').toggle( 'core/edit-site', featureName )",
+			}
+		);
 
 		registry
 			.dispatch( preferencesStore )

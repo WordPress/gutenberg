@@ -33,7 +33,10 @@ export const isFeatureActive = createRegistrySelector(
 			alternative: `select( 'core/preferences' ).get`,
 		} );
 
-		return select( preferencesStore ).get( 'core/edit-site', featureName );
+		return !! select( preferencesStore ).get(
+			'core/edit-site',
+			featureName
+		);
 	}
 );
 
@@ -67,6 +70,13 @@ export const getCanUserCreateMedia = createRegistrySelector(
  * @return {Array} The available reusable blocks.
  */
 export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	deprecated(
+		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
+		{
+			since: '6.5',
+			version: '6.8',
+		}
+	);
 	const isWeb = Platform.OS === 'web';
 	return isWeb
 		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {

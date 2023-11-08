@@ -10,7 +10,6 @@ import {
 	getCanUserCreateMedia,
 	getEditedPostType,
 	getEditedPostId,
-	getReusableBlocks,
 	isInserterOpened,
 	isListViewOpened,
 	isPage,
@@ -19,12 +18,8 @@ import {
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
-	const getEntityRecords = jest.fn( () => [] );
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
-	};
-	getReusableBlocks.registry = {
-		select: jest.fn( () => ( { getEntityRecords } ) ),
 	};
 
 	describe( 'getCanUserCreateMedia', () => {
@@ -34,22 +29,6 @@ describe( 'selectors', () => {
 				getCanUserCreateMedia.registry.select
 			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
-		} );
-	} );
-
-	describe( 'getReusableBlocks', () => {
-		it( "selects `getEntityRecords( 'postType', 'wp_block' )` from the core store", () => {
-			expect( getReusableBlocks() ).toEqual( [] );
-			expect( getReusableBlocks.registry.select ).toHaveBeenCalledWith(
-				coreDataStore
-			);
-			expect( getEntityRecords ).toHaveBeenCalledWith(
-				'postType',
-				'wp_block',
-				{
-					per_page: -1,
-				}
-			);
 		} );
 	} );
 
