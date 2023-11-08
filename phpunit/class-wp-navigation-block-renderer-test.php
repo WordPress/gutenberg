@@ -56,7 +56,7 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
 		$method->setAccessible( true );
-		// Invoke the private method
+		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
 		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://localhost:8889" target="_self" rel="home">Test Blog</a></h1></li>';
