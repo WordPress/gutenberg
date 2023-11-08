@@ -201,10 +201,11 @@ export default function DataviewsTemplates() {
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
-				data={ shownTemplates || EMPTY_ARRAY }
+				data={ shownTemplates }
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
+				supportedViewTypes={ [ 'list' ] }
 			/>
 		</Page>
 	);
