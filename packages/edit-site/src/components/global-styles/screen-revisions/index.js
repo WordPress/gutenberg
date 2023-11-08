@@ -58,7 +58,7 @@ function ScreenRevisions() {
 
 	useEffect( () => {
 		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
-			goTo( '/' ); // Return global styles main panel.
+			goTo( '/' ); // Return to global styles main panel.
 			setEditorCanvasContainerView( editorCanvasContainerView );
 		}
 	}, [ editorCanvasContainerView ] );
