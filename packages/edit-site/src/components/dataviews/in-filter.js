@@ -6,11 +6,11 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 
-const OPERATOR_IN = 'in';
+export const OPERATOR_IN = 'in';
 
 export default ( { filter, view, onChangeView } ) => {
 	const valueFound = view.filters.find(
-		( f ) => f.field === filter.id && f.operator === OPERATOR_IN
+		( f ) => f.field === filter.field && f.operator === OPERATOR_IN
 	);
 
 	const activeValue =
@@ -32,11 +32,12 @@ export default ( { filter, view, onChangeView } ) => {
 			options={ filter.elements }
 			onChange={ ( value ) => {
 				const filters = view.filters.filter(
-					( f ) => f.field !== filter.id || f.operator !== OPERATOR_IN
+					( f ) =>
+						f.field !== filter.field || f.operator !== OPERATOR_IN
 				);
 				if ( value !== '' ) {
 					filters.push( {
-						field: filter.id,
+						field: filter.field,
 						operator: OPERATOR_IN,
 						value,
 					} );
