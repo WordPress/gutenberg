@@ -336,6 +336,11 @@ export function BlockPriorityTransforms( { clientIds } ) {
 		return null;
 	}
 
+	// Only show the priority transforms if all blocks are of the same type.
+	if ( new Set( blocks.map( ( { name } ) => name ) ).size !== 1 ) {
+		return;
+	}
+
 	return (
 		<ToolbarGroup>
 			{ priorityTextTransformations.map( ( item ) => (
