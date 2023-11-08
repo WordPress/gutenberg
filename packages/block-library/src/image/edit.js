@@ -110,6 +110,7 @@ export function ImageEdit( {
 		sizeSlug,
 		aspectRatio,
 		scale,
+		align,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -122,6 +123,21 @@ export function ImageEdit( {
 	useEffect( () => {
 		captionRef.current = caption;
 	}, [ caption ] );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+				aspectRatio: undefined,
+				scale: undefined,
+			} );
+		}
+	}, [ align ] );
 
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {

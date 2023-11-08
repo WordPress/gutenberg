@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter, applyFilters } from '@wordpress/hooks';
+import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	getBlockType,
@@ -138,18 +138,8 @@ function BlockEditAlignmentToolbarControls( {
 				nextAlign = '';
 			}
 		}
-		/**
-		 * This filter exists so that the image block can reset
-		 * its aspect ratio and custom size when the alignment is set
-		 * to either wide or full.
-		 */
-		const filteredAttributes = applyFilters(
-			'block-library.image.alignmentUpdate',
-			blockName,
-			{ ...attributes, align: nextAlign }
-		);
 
-		setAttributes( filteredAttributes );
+		setAttributes( { align: nextAlign } );
 	};
 
 	return (

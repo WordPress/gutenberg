@@ -13,7 +13,6 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-import { addFilter } from '@wordpress/hooks';
 
 const { name } = metadata;
 
@@ -58,26 +57,5 @@ export const settings = {
 };
 
 export const init = () => {
-	addFilter(
-		'block-library.image.alignmentUpdate',
-		'core/block-library/filters',
-		( blockName, updatedAttributes ) => {
-			if ( blockName !== 'core/image' ) {
-				return updatedAttributes;
-			}
-			if ( [ 'wide', 'full' ].includes( updatedAttributes.align ) ) {
-				return {
-					...updatedAttributes,
-					...{
-						width: undefined,
-						height: undefined,
-						aspectRatio: undefined,
-						scale: undefined,
-					},
-				};
-			}
-			return updatedAttributes;
-		}
-	);
 	initBlock( { name, metadata, settings } );
 };
