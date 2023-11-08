@@ -41,10 +41,6 @@ const defaultConfigPerViewType = {
 	},
 };
 
-// DEFAULT_STATUSES is intentionally sorted. Items do not have spaces in between them.
-// The reason for that is to match the default statuses coming from the endpoint (entity request).
-export const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All statuses but 'trash'.
-
 function useView( type ) {
 	const {
 		params: { activeView = 'all', isCustom = 'false' },
@@ -104,21 +100,22 @@ function useView( type ) {
 	return [ DEFAULT_VIEWS[ type ][ 0 ].view, setView ];
 }
 
+// See https://github.com/WordPress/gutenberg/issues/55886
+// We do not support custom statutes at the moment.
+const STATUSES = [
+	{ value: 'draft', label: __( 'Draft' ) },
+	{ value: 'future', label: __( 'Scheduled' ) },
+	{ value: 'pending', label: __( 'Pending Review' ) },
+	{ value: 'private', label: __( 'Private' ) },
+	{ value: 'publish', label: __( 'Published' ) },
+	{ value: 'trash', label: __( 'Trash' ) },
+];
+const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ selection, setSelection ] = useState( [] );
-	const { records: statuses, isResolving: isLoadingStatus } =
-		useEntityRecords( 'root', 'status' );
-	const defaultStatuses = useMemo( () => {
-		return statuses === null
-			? DEFAULT_STATUSES
-			: statuses
-					.filter( ( { slug } ) => slug !== 'trash' )
-					.map( ( { slug } ) => slug )
-					.sort()
-					.join();
-	}, [ statuses ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -133,7 +130,7 @@ export default function PagePages() {
 		// We want to provide a different default item for the status filter
 		// than the REST API provides.
 		if ( ! filters.status || filters.status === '' ) {
-			filters.status = defaultStatuses;
+			filters.status = DEFAULT_STATUSES;
 		}
 
 		return {
@@ -145,7 +142,7 @@ export default function PagePages() {
 			search: view.search,
 			...filters,
 		};
-	}, [ view, defaultStatuses ] );
+	}, [ view ] );
 	const {
 		records: pages,
 		isResolving: isLoadingPages,
@@ -242,14 +239,10 @@ export default function PagePages() {
 				header: __( 'Status' ),
 				id: 'status',
 				getValue: ( { item } ) =>
-					statuses?.find( ( { slug } ) => slug === item.status )
-						?.name ?? item.status,
+					STATUSES.find( ( { value } ) => value === item.status )
+						?.label ?? item.status,
 				filters: [ 'in' ],
-				elements:
-					statuses?.map( ( { slug, name } ) => ( {
-						value: slug,
-						label: name,
-					} ) ) || [],
+				elements: STATUSES,
 				enableSorting: false,
 			},
 			{
@@ -265,7 +258,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ statuses, authors ]
+		[ authors ]
 	);
 
 	const trashPostAction = useTrashPostAction();
@@ -317,9 +310,7 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
-					isLoading={
-						isLoadingPages || isLoadingStatus || isLoadingAuthors
-					}
+					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
 				/>
