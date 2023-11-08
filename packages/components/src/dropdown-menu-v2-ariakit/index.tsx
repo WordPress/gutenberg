@@ -180,7 +180,13 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift,
 		modal = true,
-		hideOnEscape = true,
+		hideOnEscape = ( event ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs).
+			event.preventDefault();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
 
 		// From internal components context
 		variant,

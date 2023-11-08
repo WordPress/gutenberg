@@ -118,7 +118,7 @@ The skidding of the popover along the anchor element. Can be set to negative val
 Determines whether the menu popover will be hidden when the user presses the Escape key.
 
 - Required: no
-- Default: `true`
+- Default: `( event ) => { event.preventDefault(); return true; }`
 
 ### `DropdownMenuItem`
 
