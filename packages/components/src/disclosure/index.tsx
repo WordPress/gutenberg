@@ -18,11 +18,6 @@ import type { WordPressComponentProps } from '../context';
 /**
  * Accessible Disclosure component that controls visibility of a section of
  * content. It follows the WAI-ARIA Disclosure Pattern.
- *
- * @see https://ariakit.org/reference/disclosure-content
- *
- * The plan is to build own API that accounts for future breaking changes
- * in Ariakit (https://github.com/WordPress/gutenberg/pull/28085).
  */
 const UnforwardedDisclosureContent = (
 	{
