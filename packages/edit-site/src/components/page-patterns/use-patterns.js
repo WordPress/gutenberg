@@ -17,7 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { filterOutDuplicatesByName } from './utils';
 import {
-	NON_THEME_PATTERN_SOURCES,
+	EXCLUDED_LIBRARY_SOURCES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
@@ -124,7 +124,7 @@ const selectThemePatterns = createSelector(
 		]
 			.filter(
 				( pattern ) =>
-					! NON_THEME_PATTERN_SOURCES.includes( pattern.source )
+					! EXCLUDED_LIBRARY_SOURCES.includes( pattern.source )
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )

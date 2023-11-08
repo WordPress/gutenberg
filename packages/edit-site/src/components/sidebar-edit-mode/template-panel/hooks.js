@@ -11,7 +11,7 @@ import { parse } from '@wordpress/blocks';
  */
 import { store as editSiteStore } from '../../../store';
 import {
-	NON_THEME_PATTERN_SOURCES,
+	EXCLUDED_LIBRARY_SOURCES,
 	PATTERN_TYPES,
 } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
@@ -43,7 +43,7 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	// Filter out core patterns.
 	const filterOutCorePatterns = ( pattern ) =>
-		! NON_THEME_PATTERN_SOURCES.includes( pattern.source );
+		! EXCLUDED_LIBRARY_SOURCES.includes( pattern.source );
 
 	// Filter only the patterns that are compatible with the current template.
 	const filterCompatiblePatterns = ( pattern ) =>
