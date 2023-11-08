@@ -9,7 +9,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { filterOutDuplicatesByName } from '../page-patterns/utils';
-import { PATTERN_CORE_SOURCES } from '../../utils/constants';
+import { EXCLUDED_PATTERN_SOURCES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -32,7 +32,7 @@ export default function useThemePatterns() {
 			[ ...( blockPatterns || [] ), ...( restBlockPatterns || [] ) ]
 				.filter(
 					( pattern ) =>
-						! PATTERN_CORE_SOURCES.includes( pattern.source )
+						! EXCLUDED_PATTERN_SOURCES.includes( pattern.source )
 				)
 				.filter( filterOutDuplicatesByName )
 				.filter( ( pattern ) => pattern.inserter !== false ),
