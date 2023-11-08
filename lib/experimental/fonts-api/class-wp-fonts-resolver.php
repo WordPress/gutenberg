@@ -207,7 +207,7 @@ class WP_Fonts_Resolver {
 				? $settings['typography']['fontFamilies']['theme']
 				: array();
 
-			// Initialize the font families from variation if set and is an array, otherwise default to an empty array
+			// Initialize the font families from variation if set and is an array, otherwise default to an empty array.
 			$variation_font_families = ( isset( $variation['settings']['typography']['fontFamilies']['theme'] ) && is_array( $variation['settings']['typography']['fontFamilies']['theme'] ) )
 				? $variation['settings']['typography']['fontFamilies']['theme']
 				: array();
