@@ -56,6 +56,4 @@ export const settings = {
 	deprecated,
 };
 
-export const init = () => {
-	initBlock( { name, metadata, settings } );
-};
+export const init = () => initBlock( { name, metadata, settings } );
