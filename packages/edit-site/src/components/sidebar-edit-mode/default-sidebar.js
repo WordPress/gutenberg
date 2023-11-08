@@ -24,7 +24,10 @@ export default function DefaultSidebar( {
 	panelClassName,
 } ) {
 	const showIconLabels = useSelect(
-		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		( select ) =>
+			!! select( editSiteStore ).__unstableGetPreference(
+				'showIconLabels'
+			),
 		[]
 	);
 

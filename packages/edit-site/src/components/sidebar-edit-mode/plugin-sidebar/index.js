@@ -76,7 +76,10 @@ import { store as editSiteStore } from '../../../store';
  */
 export default function PluginSidebarEditSite( { className, ...props } ) {
 	const showIconLabels = useSelect(
-		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		( select ) =>
+			!! select( editSiteStore ).__unstableGetPreference(
+				'showIconLabels'
+			),
 		[]
 	);
 

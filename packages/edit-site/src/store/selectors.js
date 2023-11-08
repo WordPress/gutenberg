@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { uploadMedia } from '@wordpress/media-utils';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -18,10 +12,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../utils/constants';
+import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
@@ -97,67 +88,16 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
 } );
 
 /**
- * Returns the settings, taking into account active features and permissions.
+ * Returns the site editor settings.
  *
- * @param {Object}   state             Global application state.
- * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
+ * @param {Object} state Global application state.
  *
  * @return {Object} Settings.
  */
-export const getSettings = createSelector(
-	( state, setIsInserterOpen ) => {
-		const settings = {
-			...state.settings,
-			outlineMode: true,
-			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
-			isDistractionFree: !! __unstableGetPreference(
-				state,
-				'distractionFree'
-			),
-			hasFixedToolbar: !! __unstableGetPreference(
-				state,
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! __unstableGetPreference(
-				state,
-				'keepCaretInsideBlock'
-			),
-			showIconLabels: !! __unstableGetPreference(
-				state,
-				'showIconLabels'
-			),
-			__experimentalSetIsInserterOpened: setIsInserterOpen,
-			__experimentalReusableBlocks: getReusableBlocks( state ),
-			__experimentalPreferPatternsOnRoot:
-				TEMPLATE_POST_TYPE === getEditedPostType( state ),
-		};
-
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
-			return settings;
-		}
-
-		settings.mediaUpload = ( { onError, ...rest } ) => {
-			uploadMedia( {
-				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-				onError: ( { message } ) => onError( message ),
-				...rest,
-			} );
-		};
-		return settings;
-	},
-	( state ) => [
-		getCanUserCreateMedia( state ),
-		state.settings,
-		__unstableGetPreference( state, 'focusMode' ),
-		__unstableGetPreference( state, 'distractionFree' ),
-		__unstableGetPreference( state, 'fixedToolbar' ),
-		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
-		__unstableGetPreference( state, 'showIconLabels' ),
-		getReusableBlocks( state ),
-		getEditedPostType( state ),
-	]
-);
+export function getSettings( state ) {
+	// It is important that we don't inject anything into these settings locally.
+	return state.settings;
+}
 
 /**
  * @deprecated

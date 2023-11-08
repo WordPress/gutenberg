@@ -8,7 +8,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
  */
 import {
 	getCanUserCreateMedia,
-	getSettings,
 	getEditedPostType,
 	getEditedPostId,
 	getReusableBlocks,
@@ -56,61 +55,6 @@ describe( 'selectors', () => {
 					per_page: -1,
 				}
 			);
-		} );
-	} );
-
-	describe( 'getSettings', () => {
-		it( "returns the settings when the user can't create media", () => {
-			canUser.mockReturnValueOnce( false );
-			canUser.mockReturnValueOnce( false );
-			get.mockImplementation( ( scope, name ) => {
-				if ( name === 'focusMode' ) return false;
-				if ( name === 'fixedToolbar' ) return false;
-			} );
-			const state = {
-				settings: {},
-				preferences: {},
-				editedPost: { postType: 'wp_template' },
-			};
-			const setInserterOpened = () => {};
-			expect( getSettings( state, setInserterOpened ) ).toEqual( {
-				outlineMode: true,
-				focusMode: false,
-				hasFixedToolbar: false,
-				isDistractionFree: false,
-				keepCaretInsideBlock: false,
-				showIconLabels: false,
-				__experimentalSetIsInserterOpened: setInserterOpened,
-				__experimentalReusableBlocks: [],
-				__experimentalPreferPatternsOnRoot: true,
-			} );
-		} );
-
-		it( 'returns the extended settings when the user can create media', () => {
-			get.mockImplementation( ( scope, name ) => {
-				if ( name === 'focusMode' ) return true;
-				if ( name === 'fixedToolbar' ) return true;
-			} );
-
-			const state = {
-				settings: { key: 'value' },
-				editedPost: { postType: 'wp_template_part' },
-			};
-			const setInserterOpened = () => {};
-
-			expect( getSettings( state, setInserterOpened ) ).toEqual( {
-				outlineMode: true,
-				key: 'value',
-				focusMode: true,
-				hasFixedToolbar: true,
-				isDistractionFree: false,
-				keepCaretInsideBlock: false,
-				showIconLabels: false,
-				__experimentalSetIsInserterOpened: setInserterOpened,
-				__experimentalReusableBlocks: [],
-				mediaUpload: expect.any( Function ),
-				__experimentalPreferPatternsOnRoot: false,
-			} );
 		} );
 	} );
 

@@ -104,8 +104,8 @@ export default function useSiteEditorSettings() {
 			getEditedPostId,
 			__unstableGetPreference,
 			getCanvasMode,
-			getSettingsFromServer,
-		} = unlock( select( editSiteStore ) );
+			getSettings,
+		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const usedPostType = getEditedPostType();
 		const usedPostId = getEditedPostId();
@@ -123,7 +123,7 @@ export default function useSiteEditorSettings() {
 				'keepCaretInsideBlock'
 			),
 			canvasMode: getCanvasMode(),
-			settings: getSettingsFromServer(),
+			settings: getSettings(),
 			postType: usedPostType,
 			postId: usedPostId,
 		};
