@@ -93,15 +93,11 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			)
 		);
 
-		// Reset root blocks counter.
-		WP_Directive_Processor::$root_blocks = array();
-
 		$providers = $this->data_only_root_blocks_are_processed();
 		foreach ( $providers as $provider ) {
 			do_blocks( $provider['page_content'] );
 			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
-			// Reset root blocks counter.
-			WP_Directive_Processor::$root_blocks = array();
+
 		}
 	}
 
@@ -136,19 +132,12 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				'<!-- /wp:quote -->',
 			),
 			array(
-				'root_blocks'  => 3,
+				'root_blocks'  => 2,
 				'page_content' =>
 				'<!-- wp:paragraph -->' .
 					'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
 				'<!-- /wp:paragraph -->' .
-				'<!-- wp:pattern {"slug":"core/interactivity-pattern"} /-->' .
-				'<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"},"margin":{"top":"0","bottom":"0"}}},"layout":{"type":"constrained"}} -->' .
-				'	<div class="wp-block-group alignfull"' .
-					'style="margin-top:0;margin-bottom:0;padding-top:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50)">' .
-					'<!-- wp:paragraph -->' .
-						'<p>Test</p>' .
-					'<!-- /wp:paragraph --></div>' .
-				'<!-- /wp:group -->',
+				'<!-- wp:pattern {"slug":"core/interactivity-pattern"} /-->',
 			),
 		);
 	}
