@@ -172,6 +172,74 @@ test.describe( 'Block Toolbar', () => {
 		/* eslint-enable playwright/expect-expect */
 		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
+
+	test( 'Tab order of the block toolbar aligns with visual order', async ( {
+		editor,
+		BlockToolbarUtils,
+		page,
+		pageUtils,
+	} ) => {
+		// On default floating toolbar
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Paragraph' );
+
+		// shift + tab
+		await pageUtils.pressKeys( 'shift+Tab' );
+		// check focus is within the block toolbar
+		const blockToolbarParagraphButton = page.getByRole( 'button', {
+			name: 'Paragraph',
+			exact: true,
+		} );
+		await expect( blockToolbarParagraphButton ).toBeFocused();
+		await pageUtils.pressKeys( 'Tab' );
+		// check focus is on the block
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+
+		// set the screen size to mobile
+		await pageUtils.setBrowserViewport( 'small' );
+
+		// TEST: Small screen toolbar without fixed toolbar setting should be the first tabstop before the editor
+		await pageUtils.pressKeys( 'shift+Tab' );
+		// check focus is within the block toolbar
+		await expect( blockToolbarParagraphButton ).toBeFocused();
+		await pageUtils.pressKeys( 'Tab' );
+		// check focus is on the block
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		// TEST: Fixed toolbar should be within the header dom
+		// Changed to Fixed top toolbar setting and large viewport to test fixed toolbar
+		await pageUtils.setBrowserViewport( 'large' );
+		await editor.setIsFixedToolbar( true );
+		// shift + tab
+		await pageUtils.pressKeys( 'shift+Tab' );
+
+		// Options button is the last one in the top toolbar, the first item outside of the editor canvas, so it should get focused.
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Options' );
+
+		await pageUtils.pressKeys( 'Tab' );
+		// check focus is on the block
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+		// Move to block, alt + f10
+		await pageUtils.pressKeys( 'alt+F10' );
+		// check focus in block toolbar
+		await expect( blockToolbarParagraphButton ).toBeFocused();
+		// escape back to block
+		await pageUtils.pressKeys( 'Escape' );
+		// check block focus
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+
+		// TEST: Small screen toolbar with fixed toolbar setting should be the first tabstop before the editor. Even though the fixed toolbar setting is on, it should not render within the header since it's visually after it.
+		await pageUtils.setBrowserViewport( 'small' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		// check focus is within the block toolbar
+		await expect( blockToolbarParagraphButton ).toBeFocused();
+		await pageUtils.pressKeys( 'Tab' );
+		// check focus is on the block
+		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
+
+		// Test cleanup
+		await editor.setIsFixedToolbar( false );
+		await pageUtils.setBrowserViewport( 'large' );
+	} );
 } );
 
 class BlockToolbarUtils {
