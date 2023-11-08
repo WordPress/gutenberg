@@ -26,7 +26,8 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
 import {
 	useResetTemplateAction,
-	useTrashTemplateAction,
+	deleteTemplateAction,
+	renameTemplateAction,
 } from './template-actions';
 
 const EMPTY_ARRAY = [];
@@ -39,7 +40,7 @@ const DEFAULT_VIEW = {
 	type: 'list',
 	search: '',
 	page: 1,
-	perPage: 5, //20,
+	perPage: 20,
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [],
@@ -52,17 +53,17 @@ function normalizeSearchInput( input = '' ) {
 
 export default function DataviewsTemplates() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
-
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
 	const { shownTemplates, paginationInfo } = useMemo( () => {
-		if ( ! allTemplates )
+		if ( ! allTemplates ) {
 			return {
 				shownTemplates: EMPTY_ARRAY,
 				paginationInfo: { totalItems: 0, totalPages: 0 },
 			};
+		}
 		let filteredTemplates = [ ...allTemplates ];
 		// Handle global search.
 		if ( view.search ) {
@@ -167,10 +168,13 @@ export default function DataviewsTemplates() {
 		[]
 	);
 	const resetTemplateAction = useResetTemplateAction();
-	const trashTemplateAction = useTrashTemplateAction();
 	const actions = useMemo(
-		() => [ resetTemplateAction, trashTemplateAction ],
-		[ resetTemplateAction, trashTemplateAction ]
+		() => [
+			resetTemplateAction,
+			deleteTemplateAction,
+			renameTemplateAction,
+		],
+		[ resetTemplateAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {

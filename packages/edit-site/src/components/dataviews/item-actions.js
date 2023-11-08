@@ -6,11 +6,66 @@ import {
 	MenuGroup,
 	MenuItem,
 	Button,
+	Modal,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+
+function PrimaryActionTrigger( { action, onClick } ) {
+	return (
+		<Button
+			label={ action.label }
+			icon={ action.icon }
+			isDestructive={ action.isDestructive }
+			size="compact"
+			onClick={ onClick }
+		/>
+	);
+}
+
+function SecondaryActionTrigger( { action, onClick } ) {
+	return (
+		<MenuItem onClick={ onClick } isDestructive={ action.isDestructive }>
+			{ action.label }
+		</MenuItem>
+	);
+}
+
+function MaybeWithModal( { action, item } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const actionTriggerProps = {
+		action,
+		onClick: action.modalProps ? setIsModalOpen : action.perform,
+	};
+	const ActionTrigger = action.isPrimary
+		? PrimaryActionTrigger
+		: SecondaryActionTrigger;
+	if ( ! action.modalProps ) {
+		return <ActionTrigger { ...actionTriggerProps } />;
+	}
+	const { ModalContent, ...modalProps } = action.modalProps;
+	return (
+		<>
+			<ActionTrigger { ...actionTriggerProps } />
+			{ isModalOpen && (
+				<Modal
+					{ ...modalProps }
+					onRequestClose={ () => {
+						setIsModalOpen( false );
+					} }
+					__experimentalHideHeader={ ! modalProps.title }
+				>
+					<ModalContent
+						item={ item }
+						setIsModalOpen={ setIsModalOpen }
+					/>
+				</Modal>
+			) }
+		</>
+	);
+}
 
 export default function ItemActions( { item, actions } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
@@ -38,13 +93,10 @@ export default function ItemActions( { item, actions } ) {
 		<HStack justify="flex-end">
 			{ !! primaryActions.length &&
 				primaryActions.map( ( action ) => (
-					<Button
-						label={ action.label }
+					<MaybeWithModal
 						key={ action.id }
-						icon={ action.icon }
-						onClick={ () => action.perform( item ) }
-						isDestructive={ action.isDestructive }
-						size="compact"
+						action={ action }
+						item={ item }
 					/>
 				) ) }
 			{ !! secondaryActions.length && (
@@ -52,13 +104,11 @@ export default function ItemActions( { item, actions } ) {
 					{ () => (
 						<MenuGroup>
 							{ secondaryActions.map( ( action ) => (
-								<MenuItem
+								<MaybeWithModal
 									key={ action.id }
-									onClick={ () => action.perform( item ) }
-									isDestructive={ action.isDestructive }
-								>
-									{ action.label }
-								</MenuItem>
+									action={ action }
+									item={ item }
+								/>
 							) ) }
 						</MenuGroup>
 					) }
