@@ -18,7 +18,7 @@
  * @return array The parsed block.
  */
 function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
-	static $render_block_data                 = 0;
+	static $is_inside_root_block              = false;
 	static $process_directives_in_root_blocks = null;
 
 	if ( ! isset( $process_directives_in_root_blocks ) ) {
@@ -30,26 +30,23 @@ function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block
 			 *
 			 * @return string Filtered block content.
 			 */
-		$process_directives_in_root_blocks = static function ( $block_content, $block ) use ( &$render_block_data ) {
+		$process_directives_in_root_blocks = static function ( $block_content, $block ) use ( &$is_inside_root_block ) {
 
 			if ( WP_Directive_Processor::is_root_block( $block ) ) {
 
-				if ( 1 === $render_block_data ) {
-					$directives = array(
-						'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-						'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-						'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-						'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-						'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-					);
+				$directives = array(
+					'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+					'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+					'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+					'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+					'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+				);
 
-					$tags               = new WP_Directive_Processor( $block_content );
-					$tags               = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
-					$render_block_data -= 1;
-					return $tags->get_updated_html();
-				} else {
-					$render_block_data -= 1;
-				}
+				$tags                 = new WP_Directive_Processor( $block_content );
+				$tags                 = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
+				$is_inside_root_block = false;
+				return $tags->get_updated_html();
+
 			}
 
 			return $block_content;
@@ -57,9 +54,9 @@ function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block
 		add_filter( 'render_block', $process_directives_in_root_blocks, 10, 2 );
 	}
 
-	if ( ! isset( $parent_block ) ) {
+	if ( ! isset( $parent_block ) && ! $is_inside_root_block ) {
 		WP_Directive_Processor::add_root_block( $parsed_block );
-		$render_block_data += 1;
+		$is_inside_root_block = true;
 	}
 
 	return $parsed_block;

@@ -78,11 +78,12 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
-		$pattern_content = '<!-- wp:paragraph -->' .
-		'<p>Pattern Content Block 1</p>' .
+		$pattern_content =
+		'<!-- wp:paragraph -->' .
+			'<p>Pattern Content Block 1</p>' .
 		'<!-- /wp:paragraph -->' .
 		'<!-- wp:paragraph -->' .
-		'<p>Pattern Content Block 2</p>' .
+			'<p>Pattern Content Block 2</p>' .
 		'<!-- /wp:paragraph -->';
 		register_block_pattern(
 			'core/interactivity-pattern',
@@ -97,7 +98,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$providers = $this->data_only_root_blocks_are_processed();
 		foreach ( $providers as $provider ) {
-
 			do_blocks( $provider['page_content'] );
 			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
 			// Reset root blocks counter.
@@ -114,9 +114,8 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		return array(
 			array(
-				'root_blocks'         => 2,
-				'is_root_block_calls' => 4,
-				'page_content'        =>
+				'root_blocks'  => 2,
+				'page_content' =>
 				'<!-- wp:quote -->' .
 					'<blockquote class="wp-block-quote">
 						<!-- wp:paragraph -->' .
@@ -129,17 +128,16 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				'<!-- wp:quote -->' .
 					'<blockquote class="wp-block-quote">
 						<!-- wp:paragraph -->' .
-							'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-							'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-							'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
 						'<!-- /wp:paragraph -->
 					</blockquote>' .
 				'<!-- /wp:quote -->',
 			),
 			array(
-				'root_blocks'         => 3,
-				'is_root_block_calls' => 6,
-				'page_content'        =>
+				'root_blocks'  => 3,
+				'page_content' =>
 				'<!-- wp:paragraph -->' .
 					'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
 				'<!-- /wp:paragraph -->' .
