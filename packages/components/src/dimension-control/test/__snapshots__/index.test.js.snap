@@ -82,10 +82,10 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 }
 
 .emotion-13 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   box-sizing: border-box;
   border-radius: inherit;
   display: -webkit-box;
@@ -135,6 +135,11 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 }
 
 .emotion-17 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -142,11 +147,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -webkit-align-self: stretch;
   -ms-flex-item-align: stretch;
   align-self: stretch;
-  box-sizing: border-box;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
 }
 
 .emotion-20 {
@@ -353,10 +353,10 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 }
 
 .emotion-13 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   box-sizing: border-box;
   border-radius: inherit;
   display: -webkit-box;
@@ -406,6 +406,11 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 }
 
 .emotion-17 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -413,11 +418,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -webkit-align-self: stretch;
   -ms-flex-item-align: stretch;
   align-self: stretch;
-  box-sizing: border-box;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
 }
 
 .emotion-20 {
@@ -634,10 +634,10 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 }
 
 .emotion-13 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   box-sizing: border-box;
   border-radius: inherit;
   display: -webkit-box;
@@ -687,6 +687,11 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 }
 
 .emotion-17 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -694,11 +699,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -webkit-align-self: stretch;
   -ms-flex-item-align: stretch;
   align-self: stretch;
-  box-sizing: border-box;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
 }
 
 .emotion-20 {
@@ -927,10 +927,10 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 }
 
 .emotion-13 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   box-sizing: border-box;
   border-radius: inherit;
   display: -webkit-box;
@@ -980,6 +980,11 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 }
 
 .emotion-17 {
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -987,11 +992,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -webkit-align-self: stretch;
   -ms-flex-item-align: stretch;
   align-self: stretch;
-  box-sizing: border-box;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
 }
 
 .emotion-20 {
