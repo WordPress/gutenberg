@@ -92,7 +92,7 @@ function TextColorEdit( {
 		[ value, colors ]
 	);
 
-	const hasColorsToChoose = colors?.length || ! allowCustomControl;
+	const hasColorsToChoose = colors.length || ! allowCustomControl;
 
 	const onPressButton = useCallback( () => {
 		if ( hasColorsToChoose ) {
