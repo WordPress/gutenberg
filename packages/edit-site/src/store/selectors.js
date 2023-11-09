@@ -94,6 +94,8 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
  */
 export function getSettings( state ) {
 	// It is important that we don't inject anything into these settings locally.
+	// The reason for this is that we have an effect in place that calls setSettings based on the previous value of getSettings.
+	// If we add computed settings here, we'll be adding these computed settings to the state which is very unexpected.
 	return state.settings;
 }
 
