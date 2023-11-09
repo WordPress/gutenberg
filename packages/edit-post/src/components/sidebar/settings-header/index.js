@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
@@ -56,34 +53,22 @@ const SettingsHeader = ( { sidebarName } ) => {
 			<Tabs.TabList>
 				<Tabs.Tab
 					id={ 'edit-post/document' }
-					render={
-						isTemplateMode ? (
-							<Button
-								onClick={ openDocumentSettings }
-								aria-label={ templateAriaLabel }
-								data-label={ __( 'Template' ) }
-							/>
-						) : (
-							<Button
-								onClick={ openDocumentSettings }
-								aria-label={ documentAriaLabel }
-								data-label={ documentLabel }
-							/>
-						)
+					onClick={ openDocumentSettings }
+					aria-label={
+						isTemplateMode ? templateAriaLabel : documentAriaLabel
+					}
+					data-label={
+						isTemplateMode ? __( 'Template' ) : documentLabel
 					}
 				>
 					{ isTemplateMode ? __( 'Template' ) : documentLabel }
 				</Tabs.Tab>
 				<Tabs.Tab
 					id={ 'edit-post/block' }
-					render={
-						<Button
-							onClick={ openBlockSettings }
-							aria-label={ blockAriaLabel }
-							// translators: Data label for the Block Settings Sidebar tab.
-							data-label={ __( 'Block' ) }
-						/>
-					}
+					onClick={ openBlockSettings }
+					aria-label={ blockAriaLabel }
+					// translators: Data label for the Block Settings Sidebar tab.
+					data-label={ __( 'Block' ) }
 				>
 					{ /* translators: Text label for the Block Settings Sidebar tab. */ }
 					{ __( 'Block' ) }
