@@ -202,9 +202,9 @@ class WP_Fonts_Resolver {
 				$settings            = static::set_tyopgraphy_settings_array_structure( $settings );
 
 				// Initialize the font families from settings if set and is an array, otherwise default to an empty array.
-				$settings['typography']['fontFamilies']['theme'] = ( isset( $settings['typography']['fontFamilies']['theme'] ) && is_array( $settings['typography']['fontFamilies']['theme'] ) )
-					? $settings['typography']['fontFamilies']['theme']
-					: array();
+				if ( ! isset( $settings['typography']['fontFamilies']['theme'] ) || ! is_array( $settings['typography']['fontFamilies']['theme'] ) ) {
+					$settings['typography']['fontFamilies']['theme'] = array();
+				}
 			}
 
 			// Initialize the font families from variation if set and is an array, otherwise default to an empty array.
