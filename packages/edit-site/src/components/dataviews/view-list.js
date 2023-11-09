@@ -68,12 +68,7 @@ function HeaderMenu( { dataView, header } ) {
 	const sortedDirection = header.column.getIsSorted();
 
 	let filter;
-	if (
-		header.column.columnDef.filters?.length > 0 &&
-		header.column.columnDef.filters.some(
-			( f ) => 'string' === typeof f && f === 'in'
-		)
-	) {
+	if ( header.column.columnDef.type === 'enumeration' ) {
 		filter = {
 			field: header.column.columnDef.id,
 			elements: [
