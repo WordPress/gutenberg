@@ -222,6 +222,8 @@ _Returns_
 
 ### addTemplate
 
+> **Deprecated**
+
 Action that adds a new template and sets it as the current template.
 
 _Parameters_
@@ -276,6 +278,7 @@ _Parameters_
 
 -   _postType_ `string`: The entity's post type.
 -   _postId_ `string`: The entity's ID.
+-   _context_ `Object`: The entity's context.
 
 _Returns_
 
@@ -365,15 +368,9 @@ _Returns_
 
 ### setPage
 
+> **Deprecated**
+
 Resolves the template for a page and displays both. If no path is given, attempts to use the postId to generate a path like `?p=${ postId }`.
-
-_Parameters_
-
--   _page_ `Object`: The page object.
--   _page.type_ `string`: The page type.
--   _page.slug_ `string`: The page slug.
--   _page.path_ `string`: The page path.
--   _page.context_ `Object`: The page context.
 
 _Returns_
 
@@ -382,11 +379,6 @@ _Returns_
 ### setTemplate
 
 Action that sets a template, optionally fetching it from REST API.
-
-_Parameters_
-
--   _templateId_ `number`: The template ID.
--   _templateSlug_ `string`: The template slug.
 
 _Returns_
 
