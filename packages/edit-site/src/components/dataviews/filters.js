@@ -10,21 +10,22 @@ import { default as InFilter, OPERATOR_IN } from './in-filter';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 
-const VALID_OPERATORS = [ OPERATOR_IN ];
+const ENUMERATION_TYPE = 'enumeration';
 
 export default function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
-		if ( ! field.filters ) {
+		if ( ! field.type ) {
 			return;
 		}
 
-		field.filters.forEach( ( filter ) => {
-			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
+		switch ( field.type ) {
+			case ENUMERATION_TYPE:
 				filters.push( {
 					field: field.id,
+					operator: OPERATOR_IN,
 					name: field.header,
-					operator: filter,
+					type: field.type,
 					elements: [
 						{
 							value: '',
@@ -36,8 +37,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 						( f ) => f.field === field.id && f.operator === filter
 					),
 				} );
-			}
-		} );
+		}
 	} );
 
 	const filterComponents = filters?.map( ( filter ) => {
