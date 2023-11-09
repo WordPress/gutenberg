@@ -33,7 +33,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 
 function ScreenRevisions() {
 	const { goTo } = useNavigator();
-	const { user: userConfig, setUserConfig } =
+	const { user: currentEditorGlobalStyles, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { blocks, editorCanvasContainerView } = useSelect( ( select ) => {
 		return {
@@ -45,9 +45,8 @@ function ScreenRevisions() {
 	}, [] );
 	const { revisions, isLoading, hasUnsavedChanges } =
 		useGlobalStylesRevisions();
-	const [ selectedRevisionId, setSelectedRevisionId ] = useState();
-	const [ globalStylesRevision, setGlobalStylesRevision ] =
-		useState( userConfig );
+	const [ currentlySelectedRevision, setCurrentlySelectedRevision ] =
+		useState( currentEditorGlobalStyles );
 	const [
 		isLoadingRevisionWithUnsavedChanges,
 		setIsLoadingRevisionWithUnsavedChanges,
@@ -55,13 +54,10 @@ function ScreenRevisions() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-
-	useEffect( () => {
-		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
-			goTo( '/' ); // Return to global styles main panel.
-			setEditorCanvasContainerView( editorCanvasContainerView );
-		}
-	}, [ editorCanvasContainerView ] );
+	const selectedRevisionMatchesEditorStyles = areGlobalStyleConfigsEqual(
+		currentlySelectedRevision,
+		currentEditorGlobalStyles
+	);
 
 	const onCloseRevisions = () => {
 		goTo( '/' ); // Return to global styles main panel.
@@ -77,17 +73,47 @@ function ScreenRevisions() {
 	};
 
 	const selectRevision = ( revision ) => {
-		setGlobalStylesRevision( {
+		setCurrentlySelectedRevision( {
 			styles: revision?.styles || {},
 			settings: revision?.settings || {},
 			id: revision?.id,
 		} );
-		setSelectedRevisionId( revision?.id );
 	};
 
+	useEffect( () => {
+		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
+			goTo( '/' ); // Return to global styles main panel.
+			setEditorCanvasContainerView( editorCanvasContainerView );
+		}
+	}, [ editorCanvasContainerView ] );
+
+	const firstRevision = revisions[ 0 ];
+	const currentlySelectedRevisionId = currentlySelectedRevision?.id;
+	const shouldSelectFirstItem =
+		!! firstRevision?.id &&
+		! selectedRevisionMatchesEditorStyles &&
+		! currentlySelectedRevisionId;
+
+	useEffect( () => {
+		/*
+		 * Ensure that the first item is selected and loaded into the preview pane
+		 * when no revision is selected and the selected styles don't match the current editor styles.
+		 * This is required in case editor styles are changed outside the revisions panel,
+		 * e.g., via the reset styles function of useGlobalStylesReset().
+		 * See: https://github.com/WordPress/gutenberg/issues/55866
+		 */
+		if ( shouldSelectFirstItem ) {
+			setCurrentlySelectedRevision( {
+				styles: firstRevision?.styles || {},
+				settings: firstRevision?.settings || {},
+				id: firstRevision?.id,
+			} );
+		}
+	}, [ shouldSelectFirstItem, firstRevision ] );
+
+	// Only display load button if there is a revision to load and it is different from the current editor styles.
 	const isLoadButtonEnabled =
-		!! globalStylesRevision?.id &&
-		! areGlobalStyleConfigsEqual( globalStylesRevision, userConfig );
+		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
 
 	return (
@@ -105,13 +131,13 @@ function ScreenRevisions() {
 				<>
 					<Revisions
 						blocks={ blocks }
-						userConfig={ globalStylesRevision }
+						userConfig={ currentlySelectedRevision }
 						onClose={ onCloseRevisions }
 					/>
 					<div className="edit-site-global-styles-screen-revisions">
 						<RevisionsButtons
 							onChange={ selectRevision }
-							selectedRevisionId={ selectedRevisionId }
+							selectedRevisionId={ currentlySelectedRevisionId }
 							userRevisions={ revisions }
 						/>
 						{ isLoadButtonEnabled && (
@@ -120,8 +146,9 @@ function ScreenRevisions() {
 									variant="primary"
 									className="edit-site-global-styles-screen-revisions__button"
 									disabled={
-										! globalStylesRevision?.id ||
-										globalStylesRevision?.id === 'unsaved'
+										! currentlySelectedRevisionId ||
+										currentlySelectedRevisionId ===
+											'unsaved'
 									}
 									onClick={ () => {
 										if ( hasUnsavedChanges ) {
@@ -130,12 +157,12 @@ function ScreenRevisions() {
 											);
 										} else {
 											restoreRevision(
-												globalStylesRevision
+												currentlySelectedRevision
 											);
 										}
 									} }
 								>
-									{ globalStylesRevision?.id === 'parent'
+									{ currentlySelectedRevisionId === 'parent'
 										? __( 'Reset to defaults' )
 										: __( 'Apply' ) }
 								</Button>
@@ -147,7 +174,7 @@ function ScreenRevisions() {
 							isOpen={ isLoadingRevisionWithUnsavedChanges }
 							confirmButtonText={ __( 'Apply' ) }
 							onConfirm={ () =>
-								restoreRevision( globalStylesRevision )
+								restoreRevision( currentlySelectedRevision )
 							}
 							onCancel={ () =>
 								setIsLoadingRevisionWithUnsavedChanges( false )
