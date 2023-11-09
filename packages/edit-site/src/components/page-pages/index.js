@@ -213,7 +213,6 @@ export default function PagePages() {
 					);
 				},
 				maxWidth: 400,
-				sortingFn: 'alphanumeric',
 				enableHiding: false,
 			},
 			{
