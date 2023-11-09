@@ -135,8 +135,6 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.text]                     Text to create value from.
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
- * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse
- *                                                white space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.
@@ -147,7 +145,6 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
-	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -171,7 +168,6 @@ export function create( {
 		element,
 		range,
 		isEditableTree,
-		preserveWhiteSpace,
 	} );
 }
 
@@ -269,16 +265,6 @@ function filterRange( node, range, filter ) {
 }
 
 /**
- * Collapse any whitespace used for HTML formatting to one space character,
- * because it will also be displayed as such by the browser.
- *
- * @param {string} string
- */
-function collapseWhiteSpace( string ) {
-	return string.replace( /[\n\r\t]+/g, ' ' );
-}
-
-/**
  * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
  *
  * @param {string} string
@@ -294,21 +280,14 @@ export function removeReservedCharacters( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}  $1                      Named argements.
- * @param {Element} [$1.element]            Element to create value from.
- * @param {Range}   [$1.range]              Range to create value from.
- * @param {boolean} [$1.preserveWhiteSpace] Whether or not to collapse white
- *                                          space characters.
+ * @param {Object}  $1                  Named argements.
+ * @param {Element} [$1.element]        Element to create value from.
+ * @param {Range}   [$1.range]          Range to create value from.
  * @param {boolean} [$1.isEditableTree]
  *
  * @return {RichTextValue} A rich text value.
  */
-function createFromElement( {
-	element,
-	range,
-	isEditableTree,
-	preserveWhiteSpace,
-} ) {
+function createFromElement( { element, range, isEditableTree } ) {
 	const accumulator = createEmptyValue();
 
 	if ( ! element ) {
@@ -328,15 +307,8 @@ function createFromElement( {
 		const tagName = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let filter = removeReservedCharacters;
-
-			if ( ! preserveWhiteSpace ) {
-				filter = ( string ) =>
-					removeReservedCharacters( collapseWhiteSpace( string ) );
-			}
-
-			const text = filter( node.nodeValue );
-			range = filterRange( node, range, filter );
+			const text = removeReservedCharacters( node.nodeValue );
+			range = filterRange( node, range, removeReservedCharacters );
 			accumulateSelection( accumulator, node, range, { text } );
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -417,7 +389,6 @@ function createFromElement( {
 			element: node,
 			range,
 			isEditableTree,
-			preserveWhiteSpace,
 		} );
 
 		accumulateSelection( accumulator, node, range, value );

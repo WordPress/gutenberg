@@ -10,8 +10,7 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-			"selector": "code",
-			"__unstablePreserveWhiteSpace": true
+			"selector": "code"
 		}
 	},
 	"supports": {

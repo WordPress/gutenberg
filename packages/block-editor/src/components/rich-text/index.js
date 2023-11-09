@@ -103,7 +103,6 @@ export function RichTextWrapper(
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
-		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
@@ -262,7 +261,6 @@ export function RichTextWrapper(
 		placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
-		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
 		__unstableAfterParse: addEditorOnlyFormats,
 		__unstableBeforeSerialize: removeEditorOnlyFormats,
@@ -348,7 +346,6 @@ export function RichTextWrapper(
 						onReplace,
 						onSplit,
 						__unstableEmbedURLOnPaste,
-						preserveWhiteSpace,
 						pastePlainText,
 					} ),
 					useDelete( {

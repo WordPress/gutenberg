@@ -25,7 +25,6 @@ export function useRichText( {
 	selectionStart,
 	selectionEnd,
 	placeholder,
-	preserveWhiteSpace,
 	onSelectionChange,
 	onChange,
 	__unstableDisableFormats: disableFormats,
@@ -51,7 +50,6 @@ export function useRichText( {
 			element: ref.current,
 			range,
 			__unstableIsEditableTree: true,
-			preserveWhiteSpace,
 		} );
 	}
 
@@ -71,10 +69,7 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( {
-			html: value,
-			preserveWhiteSpace,
-		} );
+		record.current = create( { html: value } );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
@@ -139,7 +134,6 @@ export function useRichText( {
 							formats: __unstableBeforeSerialize( newRecord ),
 					  }
 					: newRecord,
-				preserveWhiteSpace,
 			} );
 		}
 
@@ -168,7 +162,6 @@ export function useRichText( {
 						formats: __unstableBeforeSerialize( newRecord ),
 				  }
 				: newRecord,
-			preserveWhiteSpace,
 		} );
 
 		const { formats, text } = newRecord;
@@ -215,7 +208,7 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, preserveWhiteSpace } ),
+		useCopyHandler( { record } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {

@@ -24,7 +24,6 @@ export default function CodeEdit( {
 				onMerge={ mergeBlocks }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
-				preserveWhiteSpace
 				__unstablePastePlainText
 				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
