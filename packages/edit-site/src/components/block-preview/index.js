@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -127,7 +128,7 @@ export default function BlockPreview( props ) {
 			const dataHTML = await apiFetch( {
 				path: '/wp/v2/render_blocks',
 				method: 'POST',
-				data: blocks,
+				data: serialize( blocks ),
 			} );
 			setHTML( dataHTML );
 		};

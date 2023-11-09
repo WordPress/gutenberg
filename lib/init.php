@@ -71,15 +71,7 @@ if ( ! function_exists( 'gutenberg_render_blocks_from_request' ) ) {
 	 * @return string
 	 */
 	function gutenberg_render_blocks_from_request( $request ) {
-		$blocks = $request->get_json_params();
-
-		$blocks_content = '';
-		foreach ( $blocks as $block ) {
-			$block['blockName'] = $block['name'];
-			$blocks_content    .= render_block( $block );
-		}
-
-		return $blocks_content;
+		return do_blocks( $request->get_json_params() );
 	}
 }
 
