@@ -233,7 +233,7 @@ export default function PagePages() {
 						value: id,
 						label: name,
 					} ) ) || [],
-				enableFilterHiding: false,
+				// enableFilterHiding: false,
 			},
 			{
 				header: __( 'Status' ),
@@ -244,7 +244,7 @@ export default function PagePages() {
 				filters: [ 'in' ],
 				elements: STATUSES,
 				enableSorting: false,
-				enableFilterHiding: false,
+				// enableFilterHiding: false,
 			},
 			{
 				header: __( 'Date' ),
