@@ -6,7 +6,6 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-// import { type CustomSelectProps } from './types';
 import { CustomSelectButton, CustomSelectPopover } from './styles';
 import CustomSelectItem from './custom-select-item';
 import type { CustomSelectProps } from './types';
