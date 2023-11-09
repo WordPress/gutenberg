@@ -318,7 +318,7 @@ function ViewList( {
 	 * @return {Array} The transformed TanStack column filters.
 	 */
 	const toTanStackColumnFilters = ( filters ) =>
-		filters.map( ( filter ) => ( {
+		filters?.map( ( filter ) => ( {
 			[ filter.field + ':' + filter.operator ]: filter.value,
 		} ) );
 
@@ -475,6 +475,7 @@ function ViewList( {
 												header.column.columnDef
 													.maxWidth || undefined,
 										} }
+										data-field-id={ header.id }
 									>
 										<HeaderMenu
 											dataView={ dataView }
