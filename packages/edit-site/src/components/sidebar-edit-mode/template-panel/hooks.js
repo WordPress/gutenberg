@@ -51,9 +51,10 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	return patterns
 		.filter(
-			filterOutExcludedPatternSources &&
-				filterOutDuplicatesByName &&
-				filterCompatiblePatterns
+			( pattern, index, items ) =>
+				filterOutExcludedPatternSources( pattern ) &&
+				filterOutDuplicatesByName( pattern, index, items ) &&
+				filterCompatiblePatterns( pattern )
 		)
 		.map( ( pattern ) => ( {
 			...pattern,
