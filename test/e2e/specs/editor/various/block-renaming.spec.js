@@ -145,6 +145,29 @@ test.describe( 'Block Renaming', () => {
 				},
 			] );
 		} );
+
+		test( 'does not allow renaming of blocks that do not support the feature', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// Only Group supports renaming.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			} );
+
+			// Multiselect via keyboard.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			// Expect the Rename control not to exist at all.
+			await expect(
+				page.getByRole( 'menuitem', {
+					name: 'Rename',
+					includeHidden: true, // the option is hidden behind modal
+				} )
+			).toBeHidden();
+		} );
 	} );
 
 	test.describe( 'Block inspector renaming', () => {
@@ -218,6 +241,41 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'does now allow renaming of blocks that do not support the feature', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// Only Group supports renaming.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			} );
+
+			// Multiselect via keyboard.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const advancedPanelToggle = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'button', {
+					name: 'Advanced',
+					expanded: false,
+				} );
+
+			await advancedPanelToggle.click();
+
+			// Expect the Rename control not to exist at all.
+			await expect(
+				page.getByRole( 'textbox', {
+					name: 'Block name',
+				} )
+			).toBeHidden();
 		} );
 	} );
 } );
