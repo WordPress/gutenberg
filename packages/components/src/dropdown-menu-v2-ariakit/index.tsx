@@ -99,6 +99,12 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	);
 } );
 
+const radioCheck = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
+	</SVG>
+);
+
 export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
@@ -119,14 +125,7 @@ export const DropdownMenuRadioItem = forwardRef<
 				store={ dropdownMenuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
 			>
-				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<Circle
-						cx={ 12 }
-						cy={ 12 }
-						r={ 3 }
-						fill="currentColor"
-					></Circle>
-				</SVG>
+				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 			{ children }
 			{ suffix }
