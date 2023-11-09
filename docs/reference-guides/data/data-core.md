@@ -458,6 +458,18 @@ _Returns_
 
 -   `Array< UserPatternCategory >`: User patterns category array.
 
+### getUserPatterns
+
+Retrieve the list of registered user patterns.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< any >`: User pattern list.
+
 ### getUserQueryResults
 
 Returns all the users returned by a query ID.

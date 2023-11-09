@@ -103,6 +103,7 @@ export default function CreatePatternModal( {
 				typeof content === 'function' ? content() : content,
 				categories
 			);
+			invalidateResolution( 'getUserPatterns' );
 			onSuccess( {
 				pattern: newPattern,
 				categoryId: PATTERN_DEFAULT_CATEGORY,

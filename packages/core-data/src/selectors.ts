@@ -45,6 +45,7 @@ export interface State {
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
+	userPatterns: Array< unknown >;
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 }
@@ -1326,13 +1327,23 @@ export function getBlockPatternCategories( state: State ): Array< any > {
 }
 
 /**
+ * Retrieve the list of registered user patterns.
+ *
+ * @param state Data state.
+ *
+ * @return User pattern list.
+ */
+export function getUserPatterns( state: State ): Array< any > {
+	return state.userPatterns;
+}
+
+/**
  * Retrieve the registered user pattern categories.
  *
  * @param state Data state.
  *
  * @return User patterns category array.
  */
-
 export function getUserPatternCategories(
 	state: State
 ): Array< UserPatternCategory > {

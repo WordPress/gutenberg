@@ -535,6 +535,15 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function userPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PATTERNS':
+			return action.userPatterns;
+	}
+
+	return state;
+}
+
 export function userPatternCategories( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_USER_PATTERN_CATEGORIES':
@@ -610,6 +619,7 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	userPatterns,
 	userPatternCategories,
 	navigationFallbackId,
 	defaultTemplates,

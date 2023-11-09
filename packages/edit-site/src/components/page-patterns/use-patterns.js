@@ -211,31 +211,23 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
-		const { getEntityRecords, getIsResolving, getUserPatternCategories } =
+		const { getIsResolving, getUserPatternCategories, getUserPatterns } =
 			select( coreStore );
 
-		const query = { per_page: -1 };
-		const records = getEntityRecords(
-			'postType',
-			PATTERN_TYPES.user,
-			query
-		);
+		const userPatterns = getUserPatterns();
 		const userPatternCategories = getUserPatternCategories();
 		const categories = new Map();
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-		let patterns = records
-			? records.map( ( record ) =>
+
+		let patterns = userPatterns
+			? userPatterns.map( ( record ) =>
 					patternBlockToPattern( record, categories )
 			  )
 			: EMPTY_PATTERN_LIST;
 
-		const isResolving = getIsResolving( 'getEntityRecords', [
-			'postType',
-			PATTERN_TYPES.user,
-			query,
-		] );
+		const isResolving = getIsResolving( 'getUserPatterns' );
 
 		if ( syncStatus ) {
 			patterns = patterns.filter(
@@ -257,14 +249,8 @@ const selectUserPatterns = createSelector(
 		};
 	},
 	( select ) => [
-		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
-			per_page: -1,
-		} ),
-		select( coreStore ).getIsResolving( 'getEntityRecords', [
-			'postType',
-			PATTERN_TYPES.user,
-			{ per_page: -1 },
-		] ),
+		select( coreStore ).getUserPatterns(),
+		select( coreStore ).getIsResolving( 'getUserPatterns' ),
 		select( coreStore ).getUserPatternCategories(),
 	]
 );

@@ -668,6 +668,23 @@ export const getUserPatternCategories =
 		} );
 	};
 
+export const getUserPatterns =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const userPatterns = await resolveSelect.getEntityRecords(
+			'postType',
+			'wp_block',
+			{
+				per_page: -1,
+			}
+		);
+
+		dispatch( {
+			type: 'RECEIVE_USER_PATTERNS',
+			userPatterns,
+		} );
+	};
+
 export const getNavigationFallbackId =
 	() =>
 	async ( { dispatch, select } ) => {
