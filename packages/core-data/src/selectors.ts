@@ -1362,7 +1362,7 @@ export const getUserPatterns = createSelector(
 			id: patternBlock.id,
 			name: `core/block/${ patternBlock.id }`,
 			slug: patternBlock.slug,
-			syncStatus: patternBlock.wp_pattern_sync_status,
+			syncStatus: patternBlock.wp_pattern_sync_status || 'fully',
 			title: patternBlock.title.raw,
 			type: 'wp_block',
 			patternBlock,
