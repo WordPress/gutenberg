@@ -24,7 +24,7 @@ const postTypesWithoutParentTemplate = [
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
-	PATTERN_TYPES,
+	PATTERN_TYPES.user,
 ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
