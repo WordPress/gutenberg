@@ -96,8 +96,8 @@ function ScreenRevisions() {
 
 	useEffect( () => {
 		/*
-		 * Ensure that the first item is selected loaded into the preview pane
-		 * where no revision is selected and the selected styles don't match the current editor styles.
+		 * Ensure that the first item is selected and loaded into the preview pane
+		 * when no revision is selected and the selected styles don't match the current editor styles.
 		 * This is required in case editor styles are changed outside the revisions panel,
 		 * e.g., via the reset styles function of useGlobalStylesReset().
 		 * See: https://github.com/WordPress/gutenberg/issues/55866
