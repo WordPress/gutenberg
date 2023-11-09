@@ -22,12 +22,14 @@ const POPOVER_PROPS = {
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link', 'unknown' ].map( ( format ) => (
-				<Slot
-					name={ `RichText.ToolbarControls.${ format }` }
-					key={ format }
-				/>
-			) ) }
+			{ [ 'bold', 'italic', 'token', 'link', 'unknown' ].map(
+				( format ) => (
+					<Slot
+						name={ `RichText.ToolbarControls.${ format }` }
+						key={ format }
+					/>
+				)
+			) }
 			<Slot name="RichText.ToolbarControls">
 				{ ( fills ) => {
 					if ( ! fills.length ) {

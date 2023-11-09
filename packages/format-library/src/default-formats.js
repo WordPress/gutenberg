@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { token } from './token';
 import { bold } from './bold';
 import { code } from './code';
 import { image } from './image';
@@ -16,6 +17,7 @@ import { unknown } from './unknown';
 import { language } from './language';
 
 export default [
+	token,
 	bold,
 	code,
 	image,

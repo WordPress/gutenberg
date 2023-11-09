@@ -40,7 +40,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 	.components-popover.is-expanded & {
 		position: static;
-		height: calc(100% - #{ $panel-header-height });
+		height: calc(100% - #{$panel-header-height});
 		overflow-y: visible;
 		width: auto;
 		box-shadow: $shadow-popover-border-top-only;
@@ -141,4 +141,35 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	position: fixed;
 	inset: 0;
 	background-color: transparent;
+}
+
+// THESE STYLES DON'T GO HERE.
+.components-popover__content {
+	.token-metadata-list {
+		width: 300px;
+		li {
+			margin: 20px 32px;
+			cursor: pointer;
+		}
+		.selected-meta-field {
+			font-weight: bold;
+		}
+		.selected-meta-field::before {
+			content: "✔  ";
+			margin-left: -16px;
+		}
+	}
+}
+
+input.inline-token {
+	width: 250px;
+	border: none;
+	color: var(
+		--wp-components-color-accent,
+		var(--wp-admin-theme-color, #3858e9)
+	);
+	font-size: var(--wp--preset--font-size--medium);
+	background: transparent;
+	cursor: pointer;
+	outline: none;
 }
