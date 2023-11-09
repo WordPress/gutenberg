@@ -49,6 +49,7 @@ function CustomClassNameControls( { attributes, setAttributes } ) {
 		<InspectorControls group="advanced">
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
 				value={ attributes.className || '' }
