@@ -187,7 +187,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w = new WP_HTML_Tag_Processor( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
-	$w->set_attribute( 'data-wp-interactive', true );
+	$w->set_attribute( 'data-wp-interactive', '{"namespace":"core"}' );
 
 	$w->set_attribute(
 		'data-wp-context',
@@ -218,10 +218,10 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.setCurrentSrc' );
-	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
-	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
+	$w->set_attribute( 'data-wp-init', 'effects.image.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-on--load', 'actions.image.handleLoad' );
+	$w->set_attribute( 'data-wp-effect', 'effects.image.setButtonStyles' );
+	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.image.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
 	// Wrap the image in the body content with a button.
@@ -234,7 +234,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
-			data-wp-on--click="actions.core.image.showLightbox"
+			data-wp-on--click="actions.image.showLightbox"
 			data-wp-style--width="context.core.image.imageButtonWidth"
 			data-wp-style--height="context.core.image.imageButtonHeight"
 			data-wp-style--left="context.core.image.imageButtonLeft"
@@ -261,7 +261,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// we wait for the larger image to load.
 	$m->set_attribute( 'src', '' );
 	$m->set_attribute( 'data-wp-bind--src', 'context.core.image.imageCurrentSrc' );
-	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$m->set_attribute( 'data-wp-style--object-fit', 'state.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
 	$q = new WP_HTML_Tag_Processor( $block_content );
@@ -276,8 +276,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
 	// is resolved, manually setting the 'src' seems to be the best solution to load the large image on demand.
 	$q->set_attribute( 'src', '' );
-	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
-	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$q->set_attribute( 'data-wp-bind--src', 'state.image.enlargedImgSrc' );
+	$q->set_attribute( 'data-wp-style--object-fit', 'state.image.lightboxObjectFit' );
 	$enlarged_image_content = $q->get_updated_html();
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not defined,
@@ -300,20 +300,20 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	$lightbox_html = <<<HTML
         <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
-            data-wp-bind--role="selectors.core.image.roleAttribute"
-            data-wp-bind--aria-label="selectors.core.image.dialogLabel"
+            data-wp-bind--role="state.image.roleAttribute"
+            data-wp-bind--aria-label="state.image.dialogLabel"
             data-wp-class--initialized="context.core.image.initialized"
             data-wp-class--active="context.core.image.lightboxEnabled"
             data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
-            data-wp-bind--aria-modal="selectors.core.image.ariaModal"
-            data-wp-effect="effects.core.image.initLightbox"
-            data-wp-on--keydown="actions.core.image.handleKeydown"
-            data-wp-on--touchstart="actions.core.image.handleTouchStart"
-            data-wp-on--touchmove="actions.core.image.handleTouchMove"
-            data-wp-on--touchend="actions.core.image.handleTouchEnd"
-            data-wp-on--click="actions.core.image.hideLightbox"
+            data-wp-bind--aria-modal="state.image.ariaModal"
+            data-wp-effect="effects.image.initLightbox"
+            data-wp-on--keydown="actions.image.handleKeydown"
+            data-wp-on--touchstart="actions.image.handleTouchStart"
+            data-wp-on--touchmove="actions.image.handleTouchMove"
+            data-wp-on--touchend="actions.image.handleTouchEnd"
+            data-wp-on--click="actions.image.hideLightbox"
             >
-                <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
+                <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.image.hideLightbox">
                     $close_button_icon
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
