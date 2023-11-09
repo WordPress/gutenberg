@@ -14,15 +14,17 @@ module.exports = {
 	entry: {
 		index: {
 			import: `./packages/interactivity/src/index.js`,
-			library: {
-				name: [ 'wp', 'interactivity' ],
-				type: 'window',
-			},
 		},
+	},
+	experiments: {
+		outputModule: true,
 	},
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/interactivity/[name].min.js',
+		library: {
+			type: 'module',
+		},
 		path: join( __dirname, '..', '..' ),
 	},
 	module: {
