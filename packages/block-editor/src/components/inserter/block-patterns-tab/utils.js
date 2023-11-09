@@ -21,12 +21,12 @@ export const SYNC_TYPES = {
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All patterns' ),
+	label: __( 'All Patterns' ),
 };
 
 export const myPatternsCategory = {
 	name: 'myPatterns',
-	label: __( 'My patterns' ),
+	label: __( 'My Patterns' ),
 };
 
 export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
