@@ -54,6 +54,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		showIconLabels,
 		editorCanvasView,
 		hasFixedToolbar,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
 			select( editSiteStore );
@@ -89,10 +90,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 				editSiteStore.name,
 				'distractionFree'
 			),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 	const blockToolbarRef = useRef();
 
 	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
@@ -148,7 +151,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						showIconLabels={ showIconLabels }
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
-					{ hasFixedToolbar && isLargeViewport && (
+					{ isTopToolbar && (
 						<>
 							<div
 								className={ classnames(
