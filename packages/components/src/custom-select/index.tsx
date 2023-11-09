@@ -19,21 +19,14 @@ function CustomSelect( props: CustomSelectProps ) {
 		defaultValue,
 	} );
 
-	const defaultSelect = () => {
-		if ( typeof defaultValue === 'object' ) {
-			return (
-				<CustomSelectButton store={ store }>
-					{ defaultValue }
-				</CustomSelectButton>
-			);
-		}
-		return <CustomSelectButton store={ store } />;
-	};
+	const { value } = store.useState();
 
 	return (
 		<>
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
-			{ defaultSelect() }
+			<CustomSelectButton store={ store }>
+				{ typeof defaultValue === 'object' ? defaultValue : value }
+			</CustomSelectButton>
 			<CustomSelectPopover gutter={ 4 } sameWidth store={ store }>
 				{ children }
 			</CustomSelectPopover>
