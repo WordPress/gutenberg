@@ -154,11 +154,11 @@ Example:
 				<a href="...">{ item.author }</a>
 			);
 		},
+		type: 'enumeration',
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
 		]
-		filters: [ 'in' ],
 		enableSorting: false
 	}
 ]
@@ -169,7 +169,7 @@ Example:
 -   `getValue`: function that returns the value of the field.
 -   `render`: function that renders the field.
 -   `elements`: the set of valid values for the field's value.
--   `filters`: what filter operators are available for the user to use over this field. Only `in` available at the moment.
+-   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment.
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 
