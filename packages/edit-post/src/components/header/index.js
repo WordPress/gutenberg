@@ -1,14 +1,27 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-
-import { BlockContextualToolbar } from '@wordpress/block-editor';
+import {
+	BlockContextualToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { next, previous } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion, Popover } from '@wordpress/components';
+import {
+	Button,
+	__unstableMotion as motion,
+	Popover,
+} from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -43,15 +56,20 @@ function Header( {
 	const isLargeViewport = useViewportMatch( 'large' );
 	const blockToolbarRef = useRef();
 	const {
+		blockSelectionStart,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
+		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 
 		return {
+			blockSelectionStart:
+				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
@@ -59,6 +77,18 @@ function Header( {
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	const hasBlockSelected = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
 
 	return (
 		<div className="edit-post-header">
@@ -81,17 +111,47 @@ function Header( {
 				/>
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
-						<div className="selected-block-tools-wrapper">
+						<div
+							className={ classnames(
+								'selected-block-tools-wrapper',
+								{
+									'is-collapsed': isBlockToolsCollapsed,
+								}
+							) }
+						>
 							<BlockContextualToolbar isFixed />
 						</div>
 						<Popover.Slot
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
+						{ isEditingTemplate && hasBlockSelected && (
+							<Button
+								className="edit-post-header__block-tools-toggle"
+								icon={ isBlockToolsCollapsed ? next : previous }
+								onClick={ () => {
+									setIsBlockToolsCollapsed(
+										( collapsed ) => ! collapsed
+									);
+								} }
+								label={
+									isBlockToolsCollapsed
+										? __( 'Show block tools' )
+										: __( 'Hide block tools' )
+								}
+							/>
+						) }
 					</>
 				) }
-				<div className="edit-post-header__center">
-					<DocumentActions />
+				<div
+					className={ classnames( 'edit-post-header__center', {
+						'is-collapsed':
+							! isBlockToolsCollapsed &&
+							isLargeViewport &&
+							isEditingTemplate,
+					} ) }
+				>
+					{ isEditingTemplate && <DocumentActions /> }
 				</div>
 			</motion.div>
 			<motion.div

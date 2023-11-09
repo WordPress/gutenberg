@@ -42,6 +42,7 @@
 	overflow: hidden;
 	// Leave enough room for the focus ring to show.
 	padding: 2px 0;
+	align-items: center;
 
 	.table-of-contents {
 		display: none;
@@ -57,13 +58,25 @@
 
 	.selected-block-tools-wrapper {
 		overflow-x: hidden;
+
+		&.is-collapsed {
+			display: none;
+		}
 	}
+}
+
+.edit-post-header__block-tools-toggle {
+	margin-left: 2px; // Allow focus ring to be fully visible
 }
 
 .edit-post-header__center {
 	flex-grow: 1;
 	display: flex;
 	justify-content: center;
+
+	&.is-collapsed {
+		display: none;
+	}
 }
 
 /**
