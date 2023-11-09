@@ -61,6 +61,8 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					toggleProps={ {
+						size: 'small',
+						className: 'edit-site-sidebar-navigation-screen-dataviews__ellipsis-button',
 						style: {
 							color: 'inherit',
 						},
