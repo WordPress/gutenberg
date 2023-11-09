@@ -129,7 +129,6 @@ export default function AddNewItem( { type } ) {
 					onRequestClose={ () => {
 						setIsAdding( false );
 					} }
-					overlayClassName=""
 				>
 					<AddNewItemModalContent
 						type={ type }
