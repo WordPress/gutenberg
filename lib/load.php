@@ -56,6 +56,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
+	// WordPress 6.5 compat.
+	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
+	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
