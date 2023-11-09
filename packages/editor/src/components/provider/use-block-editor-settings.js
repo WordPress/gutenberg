@@ -76,17 +76,20 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
+	'__experimentalArchiveTitleTypeLabel',
+	'__experimentalArchiveTitleNameLabel',
 ];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object}  settings    EditorProvider settings prop.
- * @param {boolean} hasTemplate Whether template mode is enabled.
+ * @param {Object} settings EditorProvider settings prop.
+ * @param {string} postType Editor root level post type.
+ * @param {string} postId   Editor root level post ID.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, hasTemplate ) {
+function useBlockEditorSettings( settings, postType, postId ) {
 	const {
 		reusableBlocks,
 		hasUploadPermissions,
@@ -94,36 +97,42 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
-		postType,
 		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, getCurrentPostType } =
-			select( editorStore );
-		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord, getUserPatternCategories } =
-			select( coreStore );
+	} = useSelect(
+		( select ) => {
+			const isWeb = Platform.OS === 'web';
+			const {
+				canUser,
+				getRawEntityRecord,
+				getEntityRecord,
+				getUserPatternCategories,
+				getEntityRecords,
+			} = select( coreStore );
 
-		const siteSettings = canUser( 'read', 'settings' )
-			? getEntityRecord( 'root', 'site' )
-			: undefined;
+			const siteSettings = canUser( 'read', 'settings' )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
 
-		return {
-			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: isWeb
-				? select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_block',
-						{ per_page: -1 }
-				  )
-				: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
-			userCanCreatePages: canUser( 'create', 'pages' ),
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
-			postType: getCurrentPostType(),
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
+			return {
+				canUseUnfilteredHTML: getRawEntityRecord(
+					'postType',
+					postType,
+					postId
+				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				reusableBlocks: isWeb
+					? getEntityRecords( 'postType', 'wp_block', {
+							per_page: -1,
+					  } )
+					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
+				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
+				userCanCreatePages: canUser( 'create', 'pages' ),
+				pageOnFront: siteSettings?.page_on_front,
+				pageForPosts: siteSettings?.page_for_posts,
+				userPatternCategories: getUserPatternCategories(),
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -214,14 +223,20 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
+			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
+			// This might be better as a generic "canUser" selector.
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
+			//Todo: this is only needed for native and should probably be removed.
 			__experimentalUndo: undo,
-			outlineMode: hasTemplate,
+			// Check whether we want all site editor frames to have outlines
+			// including the navigation / pattern / parts editors.
+			outlineMode: postType === 'wp_template',
+			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
 			pageForPosts,
-			__experimentalPreferPatternsOnRoot: hasTemplate,
+			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
 		} ),
 		[
 			settings,
@@ -232,11 +247,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
-			hasTemplate,
 			createPageEntity,
 			userCanCreatePages,
 			pageOnFront,
 			pageForPosts,
+			postType,
 		]
 	);
 }

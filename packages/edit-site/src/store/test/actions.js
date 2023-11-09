@@ -34,21 +34,27 @@ describe( 'actions', () => {
 		it( 'should toggle a feature flag', () => {
 			const registry = createRegistryWithStores();
 
-			// Should default to false.
+			// Should start as undefined.
 			expect(
-				registry.select( editSiteStore ).isFeatureActive( 'name' )
-			).toBe( false );
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
+			).toBe( undefined );
 
 			// Toggle on.
 			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
 			expect(
-				registry.select( editSiteStore ).isFeatureActive( 'name' )
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
 			).toBe( true );
 
 			// Toggle off again.
 			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
 			expect(
-				registry.select( editSiteStore ).isFeatureActive( 'name' )
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
 			).toBe( false );
 
 			// Expect a deprecation warning.
