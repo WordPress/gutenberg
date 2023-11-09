@@ -11,6 +11,9 @@ module.exports = {
 			"Display your site's copyright date. (Quick Start Example)",
 		npmDependencies: [ '@wordpress/icons' ],
 		attributes: {
+			fallbackCurrentYear: {
+				type: 'string',
+			},
 			showStartingYear: {
 				type: 'boolean',
 			},
