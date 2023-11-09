@@ -260,6 +260,17 @@ const UnconnectedDropdownMenu = (
 		[]
 	);
 
+	const wrapperProps = useMemo(
+		() => ( {
+			dir: computedDirection,
+			style: {
+				direction:
+					computedDirection as React.CSSProperties[ 'direction' ],
+			},
+		} ),
+		[ computedDirection ]
+	);
+
 	return (
 		<>
 			{ /* Menu trigger */ }
@@ -292,12 +303,7 @@ const UnconnectedDropdownMenu = (
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
-				wrapperProps={ {
-					dir: computedDirection,
-					style: {
-						direction: computedDirection,
-					},
-				} }
+				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
 			>
