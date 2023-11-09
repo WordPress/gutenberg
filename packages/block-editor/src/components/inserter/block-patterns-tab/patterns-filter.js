@@ -16,22 +16,7 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { myPatternsCategory } from './block-patterns-tab';
-
-export const PATTERN_TYPES = {
-	all: 'all',
-	synced: 'synced',
-	unsynced: 'unsynced',
-	user: 'user',
-	theme: 'theme',
-	directory: 'directory',
-};
-
-export const SYNC_TYPES = {
-	all: 'all',
-	full: 'fully',
-	unsynced: 'unsynced',
-};
+import { myPatternsCategory, SYNC_TYPES, PATTERN_TYPES } from './utils';
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== PATTERN_TYPES.all && sourceFilter !== PATTERN_TYPES.user;
@@ -40,7 +25,7 @@ const getShouldDisableNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
 
-export function BlockPatternsSyncFilter( {
+export function PatternsFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
 	patternSyncFilter,
