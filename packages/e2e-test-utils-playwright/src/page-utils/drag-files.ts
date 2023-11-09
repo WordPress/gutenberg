@@ -122,7 +122,15 @@ async function dragFiles(
 		drop: async () => {
 			const topMostElement = await this.page.evaluateHandle(
 				( { x, y } ) => {
-					return document.elementFromPoint( x, y );
+					const element = document.elementFromPoint( x, y );
+					if ( element instanceof HTMLIFrameElement ) {
+						const offsetBox = element.getBoundingClientRect();
+						return element.contentDocument!.elementFromPoint(
+							x - offsetBox.x,
+							y - offsetBox.y
+						);
+					}
+					return element;
 				},
 				position
 			);
