@@ -33,33 +33,28 @@ function SecondaryActionTrigger( { action, onClick } ) {
 	);
 }
 
-function MaybeWithModal( { action, item } ) {
+function ActionWithModal( { action, item, ActionTrigger } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
-		onClick: action.modalProps ? setIsModalOpen : action.perform,
+		onClick: () => setIsModalOpen( true ),
 	};
-	const ActionTrigger = action.isPrimary
-		? PrimaryActionTrigger
-		: SecondaryActionTrigger;
-	if ( ! action.modalProps ) {
-		return <ActionTrigger { ...actionTriggerProps } />;
-	}
-	const { ModalContent, ...modalProps } = action.modalProps;
+	const { RenderModal, hideModalHeader } = action;
 	return (
 		<>
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
 				<Modal
-					{ ...modalProps }
+					title={ ! hideModalHeader && action.label }
+					__experimentalHideHeader={ !! hideModalHeader }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
-					__experimentalHideHeader={ ! modalProps.title }
+					overlayClassName="dataviews-action-modal"
 				>
-					<ModalContent
+					<RenderModal
 						item={ item }
-						setIsModalOpen={ setIsModalOpen }
+						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				</Modal>
 			) }
@@ -92,24 +87,52 @@ export default function ItemActions( { item, actions } ) {
 	return (
 		<HStack justify="flex-end">
 			{ !! primaryActions.length &&
-				primaryActions.map( ( action ) => (
-					<MaybeWithModal
-						key={ action.id }
-						action={ action }
-						item={ item }
-					/>
-				) ) }
+				primaryActions.map( ( action ) => {
+					if ( !! action.RenderModal ) {
+						return (
+							<ActionWithModal
+								key={ action.id }
+								action={ action }
+								item={ item }
+								ActionTrigger={ PrimaryActionTrigger }
+							/>
+						);
+					}
+					return (
+						<PrimaryActionTrigger
+							key={ action.id }
+							action={ action }
+							item={ item }
+							onClick={ action.perform }
+						/>
+					);
+				} ) }
 			{ !! secondaryActions.length && (
 				<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
 					{ () => (
 						<MenuGroup>
-							{ secondaryActions.map( ( action ) => (
-								<MaybeWithModal
-									key={ action.id }
-									action={ action }
-									item={ item }
-								/>
-							) ) }
+							{ secondaryActions.map( ( action ) => {
+								if ( !! action.RenderModal ) {
+									return (
+										<ActionWithModal
+											key={ action.id }
+											action={ action }
+											item={ item }
+											ActionTrigger={
+												SecondaryActionTrigger
+											}
+										/>
+									);
+								}
+								return (
+									<SecondaryActionTrigger
+										key={ action.id }
+										action={ action }
+										item={ item }
+										onClick={ action.perform }
+									/>
+								);
+							} ) }
 						</MenuGroup>
 					) }
 				</DropdownMenu>

@@ -44,11 +44,11 @@ const availableViews = [
 	},
 ];
 
-function ViewTypeMenu( { view, onChangeView, supportedViewTypes } ) {
+function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	let _availableViews = availableViews;
-	if ( supportedViewTypes ) {
+	if ( supportedLayouts ) {
 		_availableViews = _availableViews.filter( ( _view ) =>
-			supportedViewTypes.includes( _view.id )
+			supportedLayouts.includes( _view.id )
 		);
 	}
 	if ( _availableViews.length === 1 ) {
@@ -278,7 +278,7 @@ export default function ViewActions( {
 	fields,
 	view,
 	onChangeView,
-	supportedViewTypes,
+	supportedLayouts,
 } ) {
 	return (
 		<DropdownMenuV2
@@ -294,7 +294,7 @@ export default function ViewActions( {
 				<ViewTypeMenu
 					view={ view }
 					onChangeView={ onChangeView }
-					supportedViewTypes={ supportedViewTypes }
+					supportedLayouts={ supportedLayouts }
 				/>
 				<SortMenu
 					fields={ fields }

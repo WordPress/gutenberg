@@ -43,7 +43,7 @@ export default function DataViews( {
 	data,
 	isLoading = false,
 	paginationInfo,
-	supportedViewTypes,
+	supportedLayouts,
 } ) {
 	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
@@ -75,7 +75,7 @@ export default function DataViews( {
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
-							supportedViewTypes={ supportedViewTypes }
+							supportedLayouts={ supportedLayouts }
 						/>
 					</HStack>
 				</HStack>

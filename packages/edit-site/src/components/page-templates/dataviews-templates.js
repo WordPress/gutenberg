@@ -130,7 +130,6 @@ export default function DataviewsTemplates() {
 					);
 				},
 				maxWidth: 400,
-				sortingFn: 'alphanumeric',
 				enableHiding: false,
 			},
 			{
@@ -192,7 +191,7 @@ export default function DataviewsTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedViewTypes={ [ 'list' ] }
+				supportedLayouts={ [ 'list' ] }
 			/>
 		</Page>
 	);
