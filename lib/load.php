@@ -123,6 +123,7 @@ require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
