@@ -187,13 +187,7 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 
 function FiltersVisibilityMenu( { view, onChangeView, fields } ) {
 	const filtersHidable = fields
-		.filter(
-			( f ) =>
-				f.filters &&
-				f.filters.length > 0 &&
-				( ! f.hasOwnProperty( 'enableFilterHiding' ) ||
-					f.enableFilterHiding )
-		)
+		.filter( ( f ) => f.filters && f.filters.length > 0 )
 		.map( ( f ) => ( { id: f.id, name: f.header } ) );
 
 	if ( filtersHidable.length === 0 ) {
