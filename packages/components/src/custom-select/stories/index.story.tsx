@@ -35,6 +35,7 @@ const Template: StoryFn< typeof CustomSelect > = () => {
 			label="Label"
 			defaultValue="Select a size..."
 			onChange={ ( selectedItem ) => setFontSize( selectedItem ) }
+			size="large"
 		>
 			<CustomSelect.Item>
 				<span style={ { fontSize: '75%' } }>Small</span>
@@ -97,6 +98,7 @@ const AsChildrenTemplate = () => {
 				label="Default Gravatars:"
 				defaultValue={ renderValue( value ) }
 				onChange={ ( nextValue: any ) => setValue( nextValue ) }
+				size="large"
 			>
 				{ options.map( ( option ) => (
 					<CustomSelect.Item key={ option } value={ option }>

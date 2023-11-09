@@ -19,6 +19,10 @@ export type CustomSelectProps = {
 	 * A function that receives the new value of the input.
 	 */
 	onChange?: Function;
+	/**
+	 * The size of the select.
+	 */
+	size?: 'default' | 'large';
 };
 
 export type CustomSelectItemProps = {

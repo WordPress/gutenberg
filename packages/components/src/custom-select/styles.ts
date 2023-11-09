@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
@@ -19,7 +20,6 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 	border-style: none;
 	border-radius: ${ space( 1 ) };
 	min-width: 250px;
-	height: auto;
 	margin-top: 1rem;
 	padding: ${ space( 4 ) };
 	background: ${ COLORS.white };
@@ -29,6 +29,15 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 		background-color: ${ COLORS.gray[ 100 ] };
 	}
 `;
+
+export const inputSize = {
+	default: css`
+		height: 40px;
+	`,
+	large: css`
+		height: auto;
+	`,
+};
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	z-index: 50;
