@@ -186,11 +186,17 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 }
 
 function FiltersVisibilityMenu( { view, onChangeView, fields } ) {
-	const filtersRegistered = fields
-		.filter( ( f ) => f?.filters && f.filters.length > 0 )
+	const filtersHidable = fields
+		.filter(
+			( f ) =>
+				f.filters &&
+				f.filters.length > 0 &&
+				( ! f.hasOwnProperty( 'enableFilterHiding' ) ||
+					f.enableFilterHiding )
+		)
 		.map( ( f ) => ( { id: f.id, name: f.header } ) );
 
-	if ( filtersRegistered.length === 0 ) {
+	if ( filtersHidable.length === 0 ) {
 		return null;
 	}
 
@@ -204,7 +210,7 @@ function FiltersVisibilityMenu( { view, onChangeView, fields } ) {
 				</DropdownSubMenuTriggerV2>
 			}
 		>
-			{ filtersRegistered?.map( ( { id, name } ) => {
+			{ filtersHidable?.map( ( { id, name } ) => {
 				return (
 					<DropdownMenuItemV2
 						key={ id }
