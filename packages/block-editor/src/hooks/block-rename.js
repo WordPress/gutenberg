@@ -16,7 +16,11 @@ export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name, attributes, setAttributes, isSelected } = props;
 
-		const supportsBlockNaming = hasBlockSupport( name, 'renaming', true );
+		const supportsBlockNaming = hasBlockSupport(
+			name,
+			'__experimentalMetadata',
+			false
+		);
 
 		return (
 			<>
