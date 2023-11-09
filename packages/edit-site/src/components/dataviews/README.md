@@ -145,7 +145,8 @@ Example:
 			return (
 				<time>{ getFormattedDate( item.date ) }</time>
 			);
-		}
+		},
+		enableHiding: false
 	},
 	{
 		id: 'author',
