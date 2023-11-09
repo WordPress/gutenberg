@@ -145,6 +145,42 @@ test.describe( 'Block Renaming', () => {
 				},
 			] );
 		} );
+
+		test( 'does not allow renaming of blocks that do not support the feature', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			// Only Group supports renaming.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			} );
+
+			// Multiselect via keyboard.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			const listViewParagraphNode = listView.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+				selected: true,
+			} );
+
+			await expect( listViewParagraphNode ).toBeVisible();
+
+			// Expect the Rename control not to exist at all.
+			await expect(
+				listViewParagraphNode.getByRole( 'menuitem', {
+					name: 'Rename',
+				} )
+			).toBeHidden();
+		} );
 	} );
 
 	test.describe( 'Block inspector renaming', () => {
@@ -218,6 +254,41 @@ test.describe( 'Block Renaming', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'does now allow renaming of blocks that do not support the feature', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// Only Group supports renaming.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First Paragraph' },
+			} );
+
+			// Multiselect via keyboard.
+			await pageUtils.pressKeys( 'primary+a' );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const advancedPanelToggle = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'button', {
+					name: 'Advanced',
+					expanded: false,
+				} );
+
+			await advancedPanelToggle.click();
+
+			// Expect the Rename control not to exist at all.
+			await expect(
+				page.getByRole( 'textbox', {
+					name: 'Block name',
+				} )
+			).toBeHidden();
 		} );
 	} );
 } );
