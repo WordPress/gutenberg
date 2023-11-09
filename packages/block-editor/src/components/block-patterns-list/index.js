@@ -51,7 +51,6 @@ function BlockPattern( {
 	showTooltip,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
-
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
