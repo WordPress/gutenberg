@@ -189,7 +189,7 @@ export default function ReusableBlockConvertButton( {
 									'Option that makes an individual pattern synchronized'
 								) }
 								help={ __(
-									'Sync this pattern across multiple locations..'
+									'Sync this pattern across multiple locations.'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {
