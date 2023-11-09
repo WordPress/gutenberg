@@ -12,34 +12,54 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelect from '..';
+import { CustomSelect, CustomSelectItem } from '..';
 
 const meta: Meta< typeof CustomSelect > = {
-	title: 'Components/CustomSelect',
+	title: 'Components (Experimental)/CustomSelectControlV2',
 	component: CustomSelect,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CustomSelectItem,
+	},
 	argTypes: {
 		children: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { canvas: { sourceState: 'shown' } },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { excludeDecorators: true },
+		},
 	},
+	decorators: [
+		// Layout wrapper
+		( Story ) => (
+			<div
+				style={ {
+					minHeight: '300px',
+				} }
+			>
+				<Story />
+			</div>
+		),
+	],
 };
 export default meta;
 
 const Template: StoryFn< typeof CustomSelect > = () => {
 	return (
 		<CustomSelect label="Label">
-			<CustomSelect.Item value="Small">
+			<CustomSelectItem value="Small">
 				<span style={ { fontSize: '75%' } }>Small</span>
-			</CustomSelect.Item>
-			<CustomSelect.Item value="Default" />
-			<CustomSelect.Item value="Large">
+			</CustomSelectItem>
+			<CustomSelectItem value="Default" />
+			<CustomSelectItem value="Large">
 				<span style={ { fontSize: '150%' } }>Large</span>
-			</CustomSelect.Item>
-			<CustomSelect.Item value="Huge">
+			</CustomSelectItem>
+			<CustomSelectItem value="Huge">
 				<span style={ { fontSize: '200%' } }>Huge</span>
-			</CustomSelect.Item>
+			</CustomSelectItem>
 		</CustomSelect>
 	);
 };
@@ -74,14 +94,12 @@ const ControlledTemplate = () => {
 				onChange={ ( nextValue ) => setValue( nextValue ) }
 				size="large"
 				value={ value }
-				renderSelectedValue={ ( currentValue ) =>
-					renderValue( currentValue )
-				}
+				styledValue={ ( currentValue ) => renderValue( currentValue ) }
 			>
 				{ options.map( ( option ) => (
-					<CustomSelect.Item key={ option } value={ option }>
+					<CustomSelectItem key={ option } value={ option }>
 						{ renderValue( option ) }
-					</CustomSelect.Item>
+					</CustomSelectItem>
 				) ) }
 			</CustomSelect>
 		</>

@@ -4,8 +4,8 @@
 import { CustomSelectItem as SelectItem } from './styles';
 import { type CustomSelectItemProps } from './types';
 
-function CustomSelectItem( { ...rest }: CustomSelectItemProps ) {
-	return <SelectItem { ...rest } className="select-item" />;
+function CustomSelectItem( { ...props }: CustomSelectItemProps ) {
+	return <SelectItem { ...props } />;
 }
 
 export default CustomSelectItem;

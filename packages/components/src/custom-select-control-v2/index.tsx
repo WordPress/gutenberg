@@ -10,12 +10,11 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelectButton, CustomSelectPopover, inputSize } from './styles';
-import CustomSelectItem from './custom-select-item';
-import type { CustomSelectProps } from './types';
 import { useCx } from '../utils/hooks/use-cx';
+import * as Styled from './styles';
+import type { CustomSelectProps, CustomSelectItemProps } from './types';
 
-function CustomSelect( props: CustomSelectProps ) {
+export function CustomSelect( props: CustomSelectProps ) {
 	const {
 		children,
 		defaultValue,
@@ -23,7 +22,7 @@ function CustomSelect( props: CustomSelectProps ) {
 		onChange,
 		size = 'default',
 		value,
-		styledValues,
+		styledValue,
 	} = props;
 
 	const store = Ariakit.useSelectStore( {
@@ -36,21 +35,24 @@ function CustomSelect( props: CustomSelectProps ) {
 
 	const cx = useCx();
 
-	const classes = useMemo( () => cx( inputSize[ size ] ), [ cx, size ] );
+	const classes = useMemo(
+		() => cx( Styled.inputSize[ size ] ),
+		[ cx, size ]
+	);
 
 	return (
 		<>
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
-			<CustomSelectButton className={ classes } store={ store }>
-				{ styledValues ? styledValues( currentValue ) : currentValue }
-			</CustomSelectButton>
-			<CustomSelectPopover gutter={ 4 } sameWidth store={ store }>
+			<Styled.CustomSelectButton className={ classes } store={ store }>
+				{ styledValue ? styledValue( currentValue ) : currentValue }
+			</Styled.CustomSelectButton>
+			<Styled.CustomSelectPopover gutter={ 4 } sameWidth store={ store }>
 				{ children }
-			</CustomSelectPopover>
+			</Styled.CustomSelectPopover>
 		</>
 	);
 }
 
-CustomSelect.Item = CustomSelectItem;
-
-export default CustomSelect;
+export function CustomSelectItem( { ...props }: CustomSelectItemProps ) {
+	return <Styled.CustomSelectItem { ...props } />;
+}
