@@ -191,9 +191,9 @@ export function pasteHandler( {
 			}
 
 			const filters = [
-				nestedListedConverter,
 				googleDocsUIDRemover,
 				msListConverter,
+				nestedListedConverter,
 				headRemover,
 				listReducer,
 				imageCorrector,
