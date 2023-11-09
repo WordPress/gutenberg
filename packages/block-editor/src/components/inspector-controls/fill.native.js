@@ -9,7 +9,6 @@ import { View } from 'react-native';
 import { Children } from '@wordpress/element';
 import { BottomSheetConsumer } from '@wordpress/components';
 import warning from '@wordpress/warning';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -21,20 +20,8 @@ import { BlockSettingsButton } from '../block-settings';
 export default function InspectorControlsFill( {
 	children,
 	group = 'default',
-	__experimentalGroup,
 	...props
 } ) {
-	if ( __experimentalGroup ) {
-		deprecated(
-			'`__experimentalGroup` property in `InspectorControlsFill`',
-			{
-				since: '6.2',
-				version: '6.4',
-				alternative: '`group`',
-			}
-		);
-		group = __experimentalGroup;
-	}
 	const isDisplayed = useDisplayBlockControls();
 
 	const Fill = groups[ group ]?.Fill;
