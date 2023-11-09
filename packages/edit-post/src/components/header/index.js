@@ -1,11 +1,14 @@
 /**
  * WordPress dependencies
  */
+
+import { BlockContextualToolbar } from '@wordpress/block-editor';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion, Slot } from '@wordpress/components';
+import { __unstableMotion as motion, Popover } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -38,6 +41,7 @@ function Header( {
 	setListViewToggleElement,
 } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
+	const blockToolbarRef = useRef();
 	const {
 		hasActiveMetaboxes,
 		hasFixedToolbar,
@@ -76,11 +80,15 @@ function Header( {
 					setListViewToggleElement={ setListViewToggleElement }
 				/>
 				{ hasFixedToolbar && isLargeViewport && (
-					<Slot
-						className="selected-block-tools-wrapper"
-						name="__experimentalSelectedBlockTools"
-						bubblesVirtually
-					/>
+					<>
+						<div className="selected-block-tools-wrapper">
+							<BlockContextualToolbar isFixed />
+						</div>
+						<Popover.Slot
+							ref={ blockToolbarRef }
+							name="block-toolbar"
+						/>
+					</>
 				) }
 				<div className="edit-post-header__center">
 					<DocumentActions />

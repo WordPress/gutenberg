@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { forwardRef } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
@@ -19,10 +18,11 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-function UnforwardedBlockContextualToolbar(
-	{ focusOnMount, isFixed, ...props },
-	ref
-) {
+export default function BlockContextualToolbar( {
+	focusOnMount,
+	isFixed,
+	...props
+} ) {
 	const { blockType, blockEditingMode, hasParents, showParentSelector } =
 		useSelect( ( select ) => {
 			const {
@@ -78,7 +78,6 @@ function UnforwardedBlockContextualToolbar(
 
 	return (
 		<NavigableToolbar
-			ref={ ref }
 			focusOnMount={ focusOnMount }
 			focusEditorOnEscape
 			className={ classes }
@@ -91,9 +90,3 @@ function UnforwardedBlockContextualToolbar(
 		</NavigableToolbar>
 	);
 }
-
-export const BlockContextualToolbar = forwardRef(
-	UnforwardedBlockContextualToolbar
-);
-
-export default BlockContextualToolbar;

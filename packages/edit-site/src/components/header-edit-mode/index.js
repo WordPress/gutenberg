@@ -9,11 +9,12 @@ import classnames from 'classnames';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	BlockContextualToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { external, next, previous } from '@wordpress/icons';
@@ -22,7 +23,7 @@ import {
 	__unstableMotion as motion,
 	MenuGroup,
 	MenuItem,
-	Slot,
+	Popover,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -91,7 +92,8 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		};
 	}, [] );
 
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch( 'large' );
+	const blockToolbarRef = useRef();
 
 	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
 		useDispatch( editSiteStore );
@@ -148,15 +150,19 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					/>
 					{ hasFixedToolbar && isLargeViewport && (
 						<>
-							<Slot
+							<div
 								className={ classnames(
 									'selected-block-tools-wrapper',
 									{
 										'is-collapsed': isBlockToolsCollapsed,
 									}
 								) }
-								name="__experimentalSelectedBlockTools"
-								bubblesVirtually
+							>
+								<BlockContextualToolbar isFixed />
+							</div>
+							<Popover.Slot
+								ref={ blockToolbarRef }
+								name="block-toolbar"
 							/>
 							{ hasBlockSelected && (
 								<Button

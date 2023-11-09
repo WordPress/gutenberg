@@ -3,11 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	Fill,
-	__experimentalUseSlot as useSlot,
-	Popover,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
@@ -69,7 +65,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const {
 		clientId,
 		hasFixedToolbar,
@@ -91,10 +87,6 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
-
-	const selectedBlockToolsRef = useRef( null );
-
-	const blockToolsSlot = useSlot( '__experimentalSelectedBlockTools' );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
@@ -138,7 +130,9 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if ( selectedBlockToolsRef?.current?.contains( event.target ) ) {
+			if (
+				event.target.closest( '.block-editor-block-contextual-toolbar' )
+			) {
 				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
 				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
 				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
@@ -175,7 +169,6 @@ export default function BlockTools( {
 	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
 	// 3. Fixed toolbar is enabled
 	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
-	const isTopToolbarFill = isTopToolbar && blockToolsSlot?.ref?.current;
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -187,22 +180,10 @@ export default function BlockTools( {
 					/>
 				) }
 				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-				{ isTopToolbarFill && (
-					<Fill name="__experimentalSelectedBlockTools">
-						<BlockContextualToolbar
-							ref={ selectedBlockToolsRef }
-							isFixed
-						/>
-					</Fill>
-				) }
 
-				{ ! isTopToolbarFill &&
-					( isTopToolbar || ! isLargeViewport ) && ( // Small viewports always get a fixed toolbar
-						<BlockContextualToolbar
-							ref={ selectedBlockToolsRef }
-							isFixed
-						/>
-					) }
+				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
+					<BlockContextualToolbar isFixed />
+				) }
 
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
@@ -214,22 +195,13 @@ export default function BlockTools( {
 					needed for navigation and zoom-out mode. */ }
 				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
 					<SelectedBlockTools
-						ref={ selectedBlockToolsRef }
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
 				) }
 
 				{ /* Used for the inline rich text toolbar. */ }
-				{ /* Only render in the fill if we're also using the top toolbar fill */ }
-				{ isTopToolbarFill ? (
-					<Fill name="__experimentalSelectedBlockTools">
-						<Popover.Slot
-							name="block-toolbar"
-							ref={ blockToolbarRef }
-						/>
-					</Fill>
-				) : (
+				{ ! isTopToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }

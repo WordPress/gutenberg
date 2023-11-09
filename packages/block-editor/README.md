@@ -164,6 +164,10 @@ _Parameters_
 
 -   _props_ `BlockContextProviderProps`:
 
+### BlockContextualToolbar
+
+Undocumented declaration.
+
 ### BlockControls
 
 Undocumented declaration.

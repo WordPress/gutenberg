@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
@@ -21,10 +21,11 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-function UnforwardedSelectedBlockTools(
-	{ clientId, showEmptyBlockSideInserter, __unstableContentRef },
-	ref
-) {
+export default function SelectedBlockTools( {
+	clientId,
+	showEmptyBlockSideInserter,
+	__unstableContentRef,
+} ) {
 	const {
 		capturingClientId,
 		isInsertionPointVisible,
@@ -101,7 +102,6 @@ function UnforwardedSelectedBlockTools(
 			>
 				{ shouldShowContextualToolbar && (
 					<BlockContextualToolbar
-						ref={ ref }
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
 						focusOnMount={ isToolbarForced.current }
@@ -128,7 +128,3 @@ function UnforwardedSelectedBlockTools(
 
 	return null;
 }
-
-export const SelectedBlockTools = forwardRef( UnforwardedSelectedBlockTools );
-
-export default SelectedBlockTools;

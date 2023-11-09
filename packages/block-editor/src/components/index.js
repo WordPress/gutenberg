@@ -126,6 +126,7 @@ export { default as BlockSettingsMenuControls } from './block-settings-menu-cont
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
+export { default as BlockContextualToolbar } from './block-tools/block-contextual-toolbar';
 export {
 	default as CopyHandler,
 	__unstableUseClipboardHandler,

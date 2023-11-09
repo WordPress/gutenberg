@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { BlockContextualToolbar } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Slot, VisuallyHidden } from '@wordpress/components';
+import { Popover, VisuallyHidden } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -18,6 +20,7 @@ import MoreMenu from '../more-menu';
 function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
 	const isLargeViewport = useViewportMatch( 'large' );
+	const blockToolbarRef = useRef();
 	const { hasFixedToolbar } = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: !! select( preferencesStore ).get(
@@ -49,11 +52,15 @@ function Header( { setListViewToggleElement } ) {
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
 					{ hasFixedToolbar && isLargeViewport && (
-						<Slot
-							className="selected-block-tools-wrapper"
-							name="__experimentalSelectedBlockTools"
-							bubblesVirtually
-						/>
+						<>
+							<div className="selected-block-tools-wrapper">
+								<BlockContextualToolbar isFixed />
+							</div>
+							<Popover.Slot
+								ref={ blockToolbarRef }
+								name="block-toolbar"
+							/>
+						</>
 					) }
 				</div>
 				<div className="edit-widgets-header__actions">
