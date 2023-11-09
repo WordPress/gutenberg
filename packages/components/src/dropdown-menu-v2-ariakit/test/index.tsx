@@ -197,32 +197,6 @@ describe( 'DropdownMenu', () => {
 			);
 		} );
 
-		it( 'should not close when pressing the escape key if the `hideOnEscape` prop is set to `false`', async () => {
-			render(
-				<DropdownMenu
-					trigger={ <button>Open dropdown</button> }
-					hideOnEscape={ false }
-				>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			await click( trigger );
-
-			// Focuses menu on mouse click, focuses first item on keyboard press
-			// Can be changed with a custom useEffect
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
-
-			// Pressing esc will close the menu and move focus to the toggle
-			await press.Escape();
-
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
-		} );
-
 		it( 'should close when clicking outside of the content', async () => {
 			render(
 				<DropdownMenu

@@ -14,6 +14,7 @@ import {
 	useMemo,
 	cloneElement,
 	isValidElement,
+	useCallback,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -180,7 +181,6 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift,
 		modal = true,
-		hideOnEscape = true,
 
 		// From internal components context
 		variant,
@@ -248,6 +248,28 @@ const UnconnectedDropdownMenu = (
 		);
 	}
 
+	const hideOnEscape = useCallback(
+		( event: React.KeyboardEvent< Element > ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs, close parent modals...).
+			event.preventDefault();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
+		[]
+	);
+
+	const wrapperProps = useMemo(
+		() => ( {
+			dir: computedDirection,
+			style: {
+				direction:
+					computedDirection as React.CSSProperties[ 'direction' ],
+			},
+		} ),
+		[ computedDirection ]
+	);
+
 	return (
 		<>
 			{ /* Menu trigger */ }
@@ -280,12 +302,7 @@ const UnconnectedDropdownMenu = (
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
-				wrapperProps={ {
-					dir: computedDirection,
-					style: {
-						direction: computedDirection,
-					},
-				} }
+				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
 			>
