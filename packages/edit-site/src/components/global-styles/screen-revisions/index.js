@@ -45,7 +45,6 @@ function ScreenRevisions() {
 	}, [] );
 	const { revisions, isLoading, hasUnsavedChanges } =
 		useGlobalStylesRevisions();
-	const [ selectedRevisionId, setSelectedRevisionId ] = useState();
 	const [ globalStylesRevision, setGlobalStylesRevision ] =
 		useState( userConfig );
 	const [
@@ -79,7 +78,6 @@ function ScreenRevisions() {
 			settings: revision?.settings || {},
 			id: revision?.id,
 		} );
-		setSelectedRevisionId( revision?.id );
 	};
 
 	useEffect( () => {
@@ -91,8 +89,10 @@ function ScreenRevisions() {
 
 	const firstRevision = revisions[ 0 ];
 	const shouldSelectFirstItem =
+		!! firstRevision?.id &&
 		! selectedRevisionMatchesEditorStyles &&
-		( ! selectedRevisionId || 'unsaved' === selectedRevisionId );
+		( ! globalStylesRevision?.id ||
+			'unsaved' === globalStylesRevision?.id );
 
 	useEffect( () => {
 		/*
@@ -133,7 +133,7 @@ function ScreenRevisions() {
 					<div className="edit-site-global-styles-screen-revisions">
 						<RevisionsButtons
 							onChange={ selectRevision }
-							selectedRevisionId={ selectedRevisionId }
+							selectedRevisionId={ globalStylesRevision?.id }
 							userRevisions={ revisions }
 						/>
 						{ isLoadButtonEnabled && (
