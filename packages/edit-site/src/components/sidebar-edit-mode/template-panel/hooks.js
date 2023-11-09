@@ -37,6 +37,10 @@ function injectThemeAttributeInBlockTemplateContent(
 }
 
 function preparePatterns( patterns, template, currentThemeStylesheet ) {
+	// Filter out duplicates.
+	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
+		index === items.findIndex( ( item ) => currentItem.name === item.name );
+
 	// Filter out core/directory patterns not included in theme.json.
 	const filterOutExcludedPatternSources = ( pattern ) =>
 		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
@@ -47,8 +51,9 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 
 	return patterns
 		.filter(
-			( pattern ) =>
+			( pattern, index, items ) =>
 				filterOutExcludedPatternSources( pattern ) &&
+				filterOutDuplicatesByName( pattern, index, items ) &&
 				filterCompatiblePatterns( pattern )
 		)
 		.map( ( pattern ) => ( {
