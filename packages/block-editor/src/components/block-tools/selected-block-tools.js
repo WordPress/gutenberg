@@ -111,9 +111,6 @@ function UnforwardedSelectedBlockTools(
 						__experimentalOnIndexChange={ ( index ) => {
 							initialToolbarItemIndexRef.current = index;
 						} }
-						// Resets the index whenever the active block changes so
-						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-						key={ clientId }
 					/>
 				) }
 				{ shouldShowBreadcrumb && (
