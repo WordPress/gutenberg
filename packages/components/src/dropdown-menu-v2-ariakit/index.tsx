@@ -14,6 +14,7 @@ import {
 	useMemo,
 	cloneElement,
 	isValidElement,
+	useCallback,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -180,13 +181,6 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift,
 		modal = true,
-		hideOnEscape = ( event ) => {
-			// Pressing Escape can cause unexpected consequences (ie. exiting
-			// full screen mode on MacOs).
-			event.preventDefault();
-			// Returning `true` causes the menu to hide.
-			return true;
-		},
 
 		// From internal components context
 		variant,
@@ -253,6 +247,18 @@ const UnconnectedDropdownMenu = (
 			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
 		);
 	}
+
+	const hideOnEscape = useCallback(
+		( event: React.KeyboardEvent< Element > ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs, close parent modals...).
+			event.preventDefault();
+			event.stopPropagation();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
+		[]
+	);
 
 	return (
 		<>
