@@ -24,7 +24,7 @@ class Helper_Class {
 }
 
 function gutenberg_test_process_directives_helper_increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
+	return $store['state']['count'] + $store['context']['count'];
 }
 
 /**
@@ -59,8 +59,8 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
@@ -73,8 +73,8 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		$markup = '<div foo-test--value="abc"></div>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_rendered_html( $tags, 'foo-', $directives );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
@@ -95,8 +95,36 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$providers = $this->data_only_root_blocks_are_processed();
 		foreach ( $providers as $provider ) {
+
+			// PHPUnit cannot stub functions, only classes.
+			$test_helper = $this->createMock( WP_Directive_Processor::class );
+
+			$test_helper->expects( $this->exactly( 3 ) )
+				->method( 'process_rendered_html' )
+				->with(
+					$this->callback(
+						function ( $block_content, $block ) {
+							if ( WP_Directive_Processor::is_root_block( $block ) ) {
+
+								$directives = array(
+									'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+									'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+									'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+									'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+									'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+								);
+
+								$tags = new WP_Directive_Processor( $block_content );
+								$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
+								return $tags->get_updated_html();
+
+							}
+
+							return $block_content;
+						}
+					)
+				);
 			do_blocks( $provider['page_content'] );
-			$this->assertSame( $provider['root_blocks'], count( WP_Directive_Processor::$root_blocks ) );
 
 		}
 	}
@@ -121,15 +149,17 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 						'<!-- /wp:paragraph -->
 					</blockquote>' .
 				'<!-- /wp:quote -->' .
-				'<!-- wp:quote -->' .
-					'<blockquote class="wp-block-quote">
-						<!-- wp:paragraph -->' .
-						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
-						'<!-- /wp:paragraph -->
-					</blockquote>' .
-				'<!-- /wp:quote -->',
+				'<!-- wp:group -->' .
+					'<!-- wp:quote -->' .
+						'<blockquote class="wp-block-quote">
+							<!-- wp:paragraph -->' .
+							'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
+							'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
+							'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
+							'<!-- /wp:paragraph -->
+						</blockquote>' .
+					'<!-- /wp:quote -->' .
+				'<!-- /wp:group -->',
 			),
 			array(
 				'root_blocks'  => 2,
