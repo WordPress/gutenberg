@@ -28,25 +28,16 @@ const meta: Meta< typeof CustomSelect > = {
 export default meta;
 
 const Template: StoryFn< typeof CustomSelect > = () => {
-	const [ , setFontSize ] = useState();
-
 	return (
-		<CustomSelect
-			label="Label"
-			defaultValue="Select a size..."
-			onChange={ ( selectedItem ) => setFontSize( selectedItem ) }
-			size="large"
-		>
-			<CustomSelect.Item>
+		<CustomSelect label="Label">
+			<CustomSelect.Item value="Small">
 				<span style={ { fontSize: '75%' } }>Small</span>
 			</CustomSelect.Item>
-			<CustomSelect.Item>
-				<span style={ { fontSize: '100%' } }>Default</span>
-			</CustomSelect.Item>
-			<CustomSelect.Item>
+			<CustomSelect.Item value="Default" />
+			<CustomSelect.Item value="Large">
 				<span style={ { fontSize: '150%' } }>Large</span>
 			</CustomSelect.Item>
-			<CustomSelect.Item>
+			<CustomSelect.Item value="Huge">
 				<span style={ { fontSize: '200%' } }>Huge</span>
 			</CustomSelect.Item>
 		</CustomSelect>
@@ -55,23 +46,7 @@ const Template: StoryFn< typeof CustomSelect > = () => {
 
 export const Default = Template.bind( {} );
 
-const AsValueTemplate: StoryFn< typeof CustomSelect > = () => {
-	return (
-		<CustomSelect label="Label" defaultValue="In my defense, I have none">
-			<CustomSelect.Item value="If the story's over, why am I still writing pages?" />
-			<CustomSelect.Item value="In my defense, I have none" />
-			<CustomSelect.Item value="I was so ahead of the curve, the curve became a sphere" />
-			<CustomSelect.Item value="Sometimes you just don't know the answer" />
-			<CustomSelect.Item value="Are you really gonna talk about timing in times like these?" />
-			<CustomSelect.Item value="This scene feels like what I once saw on a screen" />
-			<CustomSelect.Item value="Everything you lose is a step you take" />
-		</CustomSelect>
-	);
-};
-
-export const AsValue = AsValueTemplate.bind( {} );
-
-const AsChildrenTemplate = () => {
+const ControlledTemplate = () => {
 	function renderValue( gravatar: string ) {
 		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 		return (
@@ -90,15 +65,18 @@ const AsChildrenTemplate = () => {
 
 	const options = [ 'mystery-person', 'identicon', 'wavatar', 'retro' ];
 
-	const [ value, setValue ] = useState( 'mystery-person' );
+	const [ value, setValue ] = useState();
 
 	return (
 		<>
 			<CustomSelect
 				label="Default Gravatars:"
-				defaultValue={ renderValue( value ) }
-				onChange={ ( nextValue: any ) => setValue( nextValue ) }
+				onChange={ ( nextValue ) => setValue( nextValue ) }
 				size="large"
+				value={ value }
+				renderSelectedValue={ ( currentValue ) =>
+					renderValue( currentValue )
+				}
 			>
 				{ options.map( ( option ) => (
 					<CustomSelect.Item key={ option } value={ option }>
@@ -110,4 +88,4 @@ const AsChildrenTemplate = () => {
 	);
 };
 
-export const AsChildren = AsChildrenTemplate.bind( {} );
+export const Controlled = ControlledTemplate.bind( {} );

@@ -1,16 +1,14 @@
-// TO DO
 export type CustomSelectProps = {
 	/**
-	 * The children elements. This should be composed
+	 * The child elements. This should be composed
 	 * of CustomSelect.Item components.
 	 */
 	children: React.ReactNode;
 	/**
-	 * An optional default value for the control.
-	 * If left undefined, the first non-disabled
-	 * item will be used
+	 * An optional default value for the control. If left `undefined`,
+	 * the first non-disabled item will be used.
 	 */
-	defaultValue?: any;
+	defaultValue?: string | string[];
 	/**
 	 * Label for the control.
 	 */
@@ -18,21 +16,29 @@ export type CustomSelectProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onChange?: Function;
+	onChange?: ( newValue: string | string[] ) => void;
 	/**
-	 * The size of the select.
+	 * Can be used to render select UI with custom styled values.
+	 */
+	styledValues?: ( selectValue: string | string[] ) => React.ReactNode;
+	/**
+	 * The size of the control.
 	 */
 	size?: 'default' | 'large';
+	/**
+	 * Can be used to externally control the value of the control.
+	 */
+	value?: string | string[];
 };
 
 export type CustomSelectItemProps = {
 	/**
-	 * The children elements to be displayed for the select options.
+	 * The children to display for each select item.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	/**
-	 * The current value of the select. Can be used in lieu of
-	 * children if only a string is needed.
+	 * The value of the select item. This will be used as the children
+	 * if children are left `undefined`.
 	 */
-	value?: any;
+	value: string;
 };

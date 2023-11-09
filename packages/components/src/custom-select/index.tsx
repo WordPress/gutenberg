@@ -16,14 +16,23 @@ import type { CustomSelectProps } from './types';
 import { useCx } from '../utils/hooks/use-cx';
 
 function CustomSelect( props: CustomSelectProps ) {
-	const { children, defaultValue, label, onChange, size = 'default' } = props;
+	const {
+		children,
+		defaultValue,
+		label,
+		onChange,
+		size = 'default',
+		value,
+		styledValues,
+	} = props;
 
 	const store = Ariakit.useSelectStore( {
 		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
+		value,
 	} );
 
-	const { value } = store.useState();
+	const { value: currentValue } = store.useState();
 
 	const cx = useCx();
 
@@ -33,7 +42,7 @@ function CustomSelect( props: CustomSelectProps ) {
 		<>
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
 			<CustomSelectButton className={ classes } store={ store }>
-				{ typeof defaultValue === 'object' ? defaultValue : value }
+				{ styledValues ? styledValues( currentValue ) : currentValue }
 			</CustomSelectButton>
 			<CustomSelectPopover gutter={ 4 } sameWidth store={ store }>
 				{ children }
