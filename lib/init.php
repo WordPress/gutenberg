@@ -1,8 +1,8 @@
 <?php
 // display errors
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 /**
  * Init hooks.
  *
@@ -71,7 +71,24 @@ if ( ! function_exists( 'gutenberg_render_blocks_from_request' ) ) {
 	 * @return string
 	 */
 	function gutenberg_render_blocks_from_request( $request ) {
-		return do_blocks( $request->get_json_params() );
+		// We need to fake a global $wp_query and $post.
+		// This is because some blocks (e.g. Query block) rely on them,
+		// and we don't have them in the REST API context.
+		// Without them, the preview will be empty.
+		global $wp_query;
+		global $post;
+		$data       = $request->get_json_params();
+		$fake_query = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'posts_per_page' => get_option( 'posts_per_page' ),
+				'post_status'    => 'publish',
+			)
+		);
+		// Not sure if there is a better way to achieve this.
+		$wp_query = $fake_query;
+		$post     = $wp_query->posts[0];
+		return do_blocks( $data['blocks'] );
 	}
 }
 

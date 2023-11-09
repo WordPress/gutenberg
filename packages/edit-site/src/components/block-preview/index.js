@@ -14,6 +14,7 @@ import { serialize } from '@wordpress/blocks';
  */
 import EditorStyles from './editor-styles';
 import Iframe from './iframe';
+import { store as editSiteStore } from '../../store';
 
 const MAX_HEIGHT = 2000;
 
@@ -123,12 +124,22 @@ export default function BlockPreview( props ) {
 
 	const [ html, setHTML ] = useState( '' );
 
+	const { editedPostId } = useSelect( ( select ) => {
+		const { getEditedPostId } = select( editSiteStore );
+		return {
+			editedPostId: getEditedPostId(),
+		};
+	}, [] );
+
 	useEffect( () => {
 		const getHTML = async () => {
 			const dataHTML = await apiFetch( {
 				path: '/wp/v2/render_blocks',
 				method: 'POST',
-				data: serialize( blocks ),
+				data: {
+					blocks: serialize( blocks ),
+					post_id: editedPostId,
+				},
 			} );
 			setHTML( dataHTML );
 		};
