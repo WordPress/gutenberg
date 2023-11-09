@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
+import { focus } from '@wordpress/dom';
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	DropZone,
@@ -19,7 +20,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Platform, useCallback } from '@wordpress/element';
+import { Platform, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -150,6 +151,8 @@ function BackgroundImagePanelItem( props ) {
 	const { id, title, url } =
 		attributes.style?.background?.backgroundImage || {};
 
+	const replaceContainerRef = useRef();
+
 	const { mediaUpload } = useSelect( ( select ) => {
 		return {
 			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
@@ -253,7 +256,10 @@ function BackgroundImagePanelItem( props ) {
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
-			<div className="block-editor-hooks__background__inspector-media-replace-container">
+			<div
+				className="block-editor-hooks__background__inspector-media-replace-container"
+				ref={ replaceContainerRef }
+			>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
@@ -271,7 +277,17 @@ function BackgroundImagePanelItem( props ) {
 				>
 					{ hasValue && (
 						<MenuItem
-							onClick={ () => resetBackgroundImage( props ) }
+							onClick={ () => {
+								const [ toggleButton ] = focus.tabbable.find(
+									replaceContainerRef.current
+								);
+								// Focus the toggle button and close the dropdown menu.
+								// This ensures similar behaviour as to selecting an image, where the dropdown is
+								// closed and focus is redirected to the dropdown toggle button.
+								toggleButton?.focus();
+								toggleButton?.click();
+								resetBackgroundImage( props );
+							} }
 						>
 							{ __( 'Reset ' ) }
 						</MenuItem>
