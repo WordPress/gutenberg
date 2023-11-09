@@ -722,10 +722,15 @@ When the block declares support for a specific spacing property, its attributes 
 ```js
 attributes: {
     style: {
-        margin: 'value',
-        padding: {
-            top: 'value',
-        }
+	type: 'object',
+	default: {
+	    spacing: {
+		margin: '2rem',
+		padding: {
+		    top: '2rem'
+		}
+	    }
+	}
     }
 }
 ```
