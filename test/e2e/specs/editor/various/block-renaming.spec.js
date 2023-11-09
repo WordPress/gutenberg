@@ -151,6 +151,12 @@ test.describe( 'Block Renaming', () => {
 			page,
 			pageUtils,
 		} ) => {
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
 			// Only Group supports renaming.
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -160,11 +166,18 @@ test.describe( 'Block Renaming', () => {
 			// Multiselect via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
+			const listViewParagraphNode = listView.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+				selected: true,
+			} );
+
+			await expect( listViewParagraphNode ).toBeVisible();
+
 			// Expect the Rename control not to exist at all.
 			await expect(
-				page.getByRole( 'menuitem', {
+				listViewParagraphNode.getByRole( 'menuitem', {
 					name: 'Rename',
-					includeHidden: true, // the option is hidden behind modal
 				} )
 			).toBeHidden();
 		} );
