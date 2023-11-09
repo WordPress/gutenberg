@@ -59,8 +59,6 @@ function createBullet( doc, child, isNested ) {
  * @param {Document} doc  the parent document.
  */
 export default function nestedListedConverter( node, doc ) {
-	//console.log(1, doc.body.innerHTML)
-
 	function transformList( list, result = [] ) {
 		const isNested = isList( node.parentElement );
 
