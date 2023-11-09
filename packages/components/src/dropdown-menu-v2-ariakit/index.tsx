@@ -253,7 +253,6 @@ const UnconnectedDropdownMenu = (
 			// Pressing Escape can cause unexpected consequences (ie. exiting
 			// full screen mode on MacOs, close parent modals...).
 			event.preventDefault();
-			event.stopPropagation();
 			// Returning `true` causes the menu to hide.
 			return true;
 		},
