@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
  * Internal dependencies
  */
 import type { HeadingSize } from '../heading/types';
+import type { DropdownMenu } from '../dropdown-menu';
 
 export type ResetAllFilter = ( attributes?: any ) => any;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
@@ -18,10 +19,8 @@ export type ToolsPanelProps = {
 	children: ReactNode;
 	/**
 	 * The popover props to configure panel's DropdownMenu.
-	 *
-	 * @default {}
 	 */
-	dropdownMenuProps?: {};
+	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
 	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
@@ -77,8 +76,6 @@ export type ToolsPanelProps = {
 export type ToolsPanelHeaderProps = {
 	/**
 	 * The popover props to configure panel's DropdownMenu.
-	 *
-	 * @default {}
 	 */
 	dropdownMenuProps?: {};
 	/**
