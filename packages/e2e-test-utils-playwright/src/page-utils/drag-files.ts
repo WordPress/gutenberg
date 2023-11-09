@@ -9,7 +9,7 @@ import { getType } from 'mime';
  * Internal dependencies
  */
 import type { PageUtils } from './index';
-import type { ElementHandle, Locator } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 
 type FileObject = {
 	name: string;
@@ -118,25 +118,21 @@ async function dragFiles(
 
 		/**
 		 * Drop the files at the current position.
-		 *
-		 * @param locator
 		 */
-		drop: async ( locator: Locator | ElementHandle | null ) => {
-			if ( ! locator ) {
-				const topMostElement = await this.page.evaluateHandle(
-					( { x, y } ) => {
-						return document.elementFromPoint( x, y );
-					},
-					position
-				);
-				locator = topMostElement.asElement();
-			}
+		drop: async () => {
+			const topMostElement = await this.page.evaluateHandle(
+				( { x, y } ) => {
+					return document.elementFromPoint( x, y );
+				},
+				position
+			);
+			const elementHandle = topMostElement.asElement();
 
-			if ( ! locator ) {
+			if ( ! elementHandle ) {
 				throw new Error( 'Element not found.' );
 			}
 
-			const dataTransfer = await locator.evaluateHandle(
+			const dataTransfer = await elementHandle.evaluateHandle(
 				async ( _node, _fileObjects ) => {
 					const dt = new DataTransfer();
 					const fileInstances = await Promise.all(
@@ -159,7 +155,7 @@ async function dragFiles(
 				fileObjects
 			);
 
-			await locator.dispatchEvent( 'drop', { dataTransfer } );
+			await elementHandle.dispatchEvent( 'drop', { dataTransfer } );
 
 			await cdpSession.detach();
 		},
