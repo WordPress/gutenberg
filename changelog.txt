@@ -1,29 +1,25 @@
 == Changelog ==
 
-= 17.0.0-rc.1 =
+= 17.0.0 =
 
 
 
 ## Changelog
 
-### Features
-
-#### Data Views
-- Add: Ability to persist dataviews on the database. ([55465](https://github.com/WordPress/gutenberg/pull/55465))
-- DataViews: Extract `search` from filters. ([55722](https://github.com/WordPress/gutenberg/pull/55722))
-- DataViews: Limit users to those who have published pages. ([55455](https://github.com/WordPress/gutenberg/pull/55455))
-- Dataviews: List all pages, not only those with publish and draft statuses. ([55476](https://github.com/WordPress/gutenberg/pull/55476))
-
-#### Patterns
-- Revert "Patterns: Fix capabilities settings for pattern categories. ([55532](https://github.com/WordPress/gutenberg/pull/55532))
-
 
 ### Enhancements
 
--  Add blog icon to the blog home page in LinkControl search results. ([55610](https://github.com/WordPress/gutenberg/pull/55610))
-- Add: Default readonly views to dataviews. ([55740](https://github.com/WordPress/gutenberg/pull/55740))
-- Add: Possibility to tree shake DataViewsProvider. ([55641](https://github.com/WordPress/gutenberg/pull/55641))
+#### Link Control
+- Add blog icon to the blog home page in LinkControl search results. ([55610](https://github.com/WordPress/gutenberg/pull/55610))
+- Add home icon to the front page in LinkControl results. ([55606](https://github.com/WordPress/gutenberg/pull/55606))
+
+#### Block Theme Preview
 - Block Theme Preview: Display loading state when activating. ([55658](https://github.com/WordPress/gutenberg/pull/55658))
+
+#### Block Library
+- Template Part block: Use `_build_block_template_result_from_post`. ([55811](https://github.com/WordPress/gutenberg/pull/55811))
+
+#### Block Toolbar
 - Improve toolbar button focus visual. ([55523](https://github.com/WordPress/gutenberg/pull/55523))
 
 #### Components
@@ -31,37 +27,35 @@
 - Update InputControl and SelectControl default heights. ([55490](https://github.com/WordPress/gutenberg/pull/55490))
 - Update ariakit to version 0.3.5. ([55365](https://github.com/WordPress/gutenberg/pull/55365))
 
-#### Block Library
-- Allow using groups and columns inside the experimental form block. ([55758](https://github.com/WordPress/gutenberg/pull/55758))
-
 #### Block Editor
 - Adjust the padding of the category item to make it visually balanced. ([55598](https://github.com/WordPress/gutenberg/pull/55598))
-
-#### Data Views
-- [Data views]: Update icons and design tweaks. ([55391](https://github.com/WordPress/gutenberg/pull/55391))
 
 #### Patterns
 - Suggest commands when editing pattern in site editor. ([55332](https://github.com/WordPress/gutenberg/pull/55332))
 
-
 ### Bug Fixes
+
+- Fix autocomplete trigger character detection. ([55301](https://github.com/WordPress/gutenberg/pull/55301))
+- Fix typo in `FontCollection`. ([55439](https://github.com/WordPress/gutenberg/pull/55439))
+
+#### Block Editor
 
 - Block Editor: Avoid rendering empty Slot for block alignments. ([55689](https://github.com/WordPress/gutenberg/pull/55689))
 - Block Example: Avoid a crash when block is not registered. ([55686](https://github.com/WordPress/gutenberg/pull/55686))
+
+#### Command Palette
 - Command Palette: Fix a crash when transform to a block without icon. ([55676](https://github.com/WordPress/gutenberg/pull/55676))
-- Ensure Term Description block is registered in core. ([55669](https://github.com/WordPress/gutenberg/pull/55669))
-- Fix autocomplete trigger character detection. ([55301](https://github.com/WordPress/gutenberg/pull/55301))
-- Fix typo in `FontCollection`. ([55439](https://github.com/WordPress/gutenberg/pull/55439))
-- Fix: Add __next40pxDefaultSize to author select in PostAuthor. ([55597](https://github.com/WordPress/gutenberg/pull/55597))
-- Fix: Add home icon to the front page in LinkControl results. ([55606](https://github.com/WordPress/gutenberg/pull/55606))
-- Fix: Don't register dataviews postype and taxonomy if experiment is disabled. ([55743](https://github.com/WordPress/gutenberg/pull/55743))
+
+#### Link Control
 - Fix: LinkControl on site editor does not show font page and post page indication. ([55694](https://github.com/WordPress/gutenberg/pull/55694))
 - Fix: LinkControl on widgets editor does not show font page and post page indication. ([55732](https://github.com/WordPress/gutenberg/pull/55732))
-- Fix: Post terms block: Missing options for prefix and suffix when the…. ([55726](https://github.com/WordPress/gutenberg/pull/55726))
+
+#### Interactivity API
 - Fix: Update page title when using enhanced pagination in query loop. ([55446](https://github.com/WordPress/gutenberg/pull/55446))
-- Use PostCSS + PostCSS plugins for style transformation. ([49521](https://github.com/WordPress/gutenberg/pull/49521))
 
 #### Block Library
+- Fix: Post terms block: Missing options for prefix and suffix when the…. ([55726](https://github.com/WordPress/gutenberg/pull/55726))
+- Ensure Term Description block is registered in core. ([55669](https://github.com/WordPress/gutenberg/pull/55669))
 - Fix #55679 missing space in the string. ([55682](https://github.com/WordPress/gutenberg/pull/55682))
 - Image block: Wrap images with hrefs in an A tag. ([55470](https://github.com/WordPress/gutenberg/pull/55470))
 - Image: Improve focus management in lightbox. ([55428](https://github.com/WordPress/gutenberg/pull/55428))
@@ -75,33 +69,28 @@
 
 #### Patterns
 - Fix bug with authors and contributors not seeing user pattern categories. ([55553](https://github.com/WordPress/gutenberg/pull/55553))
-- Fix capabilities settings for pattern categories. ([55379](https://github.com/WordPress/gutenberg/pull/55379))
 - Fix pattern category renaming causing potential duplicate categories. ([55607](https://github.com/WordPress/gutenberg/pull/55607))
 
 #### Post Editor
 - Edit Post: Fix revision button misalignment. ([55659](https://github.com/WordPress/gutenberg/pull/55659))
 - Preferences modal: Fix the position of sticky heading when blocks are hidden. ([55456](https://github.com/WordPress/gutenberg/pull/55456))
+- Fix: Add __next40pxDefaultSize to author select in PostAuthor. ([55597](https://github.com/WordPress/gutenberg/pull/55597))
 
 #### Site Editor
 - Fix the 'Slug' display for draft pages. ([55774](https://github.com/WordPress/gutenberg/pull/55774))
 
 #### Data Views
-- DataViews: List all users in author filter. ([55723](https://github.com/WordPress/gutenberg/pull/55723))
+- List all users in author filter. ([55723](https://github.com/WordPress/gutenberg/pull/55723))
+- Don't register dataviews postype and taxonomy if experiment is disabled. ([55743](https://github.com/WordPress/gutenberg/pull/55743))
 
 #### Design Tools
-- Fix: Remove default dimensions controls from core/avatar. ([55596](https://github.com/WordPress/gutenberg/pull/55596))
+- Remove default dimensions controls from core/avatar. ([55596](https://github.com/WordPress/gutenberg/pull/55596))
 
-#### Collaborative Editing
-- Remove dangling comma causing PHPUnit failures. ([55494](https://github.com/WordPress/gutenberg/pull/55494))
 
 #### Interactivity API
 - Fix server processing of an empty `data-wp-context` directive. ([55482](https://github.com/WordPress/gutenberg/pull/55482))
-
-#### Layout
-- Make layout support compatible with enhanced pagination. ([55416](https://github.com/WordPress/gutenberg/pull/55416))
-
-#### Colors
 - Make duotone support compatible with enhanced pagination. ([55415](https://github.com/WordPress/gutenberg/pull/55415))
+- Make layout support compatible with enhanced pagination. ([55416](https://github.com/WordPress/gutenberg/pull/55416))
 
 #### Global Styles
 - Fix duotone not showing in site editor style block level styles. ([55361](https://github.com/WordPress/gutenberg/pull/55361))
@@ -134,11 +123,23 @@
 
 #### Data Views
 - Trash Data View: Use trash icon. ([55771](https://github.com/WordPress/gutenberg/pull/55771))
-- [Data views]: Add quick actions. ([55488](https://github.com/WordPress/gutenberg/pull/55488))
+- Add quick actions. ([55488](https://github.com/WordPress/gutenberg/pull/55488))
+- Update icons and design tweaks. ([55391](https://github.com/WordPress/gutenberg/pull/55391))
+- Add ability to persist dataviews on the database. ([55465](https://github.com/WordPress/gutenberg/pull/55465))
+- Extract `search` from filters. ([55722](https://github.com/WordPress/gutenberg/pull/55722))
+- Limit users to those who have published pages. ([55455](https://github.com/WordPress/gutenberg/pull/55455))
+- List all pages, not only those with publish and draft statuses. ([55476](https://github.com/WordPress/gutenberg/pull/55476))
+- Add: Default readonly views to dataviews. ([55740](https://github.com/WordPress/gutenberg/pull/55740))
+- Add: Possibility to tree shake DataViewsProvider. ([55641](https://github.com/WordPress/gutenberg/pull/55641))
 
-#### Block Library
-- Form Blocks: Capitalize title and end the description with a period. ([55728](https://github.com/WordPress/gutenberg/pull/55728))
+#### Form block
+- Blocks: Capitalize title and end the description with a period. ([55728](https://github.com/WordPress/gutenberg/pull/55728))
+- Update copy. ([55468](https://github.com/WordPress/gutenberg/pull/55468))
+- Allow using groups and columns inside the experimental form block. ([55758](https://github.com/WordPress/gutenberg/pull/55758))
 
+#### Collaborative Editing
+- Remove dangling comma causing PHPUnit failures. ([55494](https://github.com/WordPress/gutenberg/pull/55494))
+- [Try] HTTP based PHP signaling server for colaborative editing. ([53922](https://github.com/WordPress/gutenberg/pull/53922))
 
 ### Documentation
 
@@ -154,7 +155,7 @@
 
 
 ### Code Quality
-
+- Use PostCSS + PostCSS plugins for style transformation. ([49521](https://github.com/WordPress/gutenberg/pull/49521))
 - CS: Remove redundant ignore annotations. ([55615](https://github.com/WordPress/gutenberg/pull/55615))
 - Chore: Fix: Potential access to properties of undefined object. ([55697](https://github.com/WordPress/gutenberg/pull/55697))
 - Fix: Add missing defaultStatuses on PagePages. ([55761](https://github.com/WordPress/gutenberg/pull/55761))
@@ -162,13 +163,14 @@
 - Update: Code quality: Use for each instead of map. ([55798](https://github.com/WordPress/gutenberg/pull/55798))
 - Update: Remove path awareness from data-views specific code. ([55695](https://github.com/WordPress/gutenberg/pull/55695))
 - Update: Remove useless self assignment. ([55696](https://github.com/WordPress/gutenberg/pull/55696))
-- chore: Fix: Remove unused file dataview context. ([55775](https://github.com/WordPress/gutenberg/pull/55775))
+- Backport updates from Core during the 6.4 release cycle. ([55703](https://github.com/WordPress/gutenberg/pull/55703))
 
 #### Data Views
 - DataViews: Iterate on filter's API. ([55440](https://github.com/WordPress/gutenberg/pull/55440))
 - DataViews: Pass `search` filter as global, unattached from fields. ([55475](https://github.com/WordPress/gutenberg/pull/55475))
 - DataViews: Remove string from pages sidebar. ([55510](https://github.com/WordPress/gutenberg/pull/55510))
 - Rename `TextFilter` to `Search`. ([55731](https://github.com/WordPress/gutenberg/pull/55731))
+- Remove unused file dataview context. ([55775](https://github.com/WordPress/gutenberg/pull/55775))
 
 #### Block Library
 - Pattern: Unlock the private hook outside the component. ([55792](https://github.com/WordPress/gutenberg/pull/55792))
@@ -181,6 +183,7 @@
 
 - Replace 'npx' with 'node' on test-playwright.js file'. ([55616](https://github.com/WordPress/gutenberg/pull/55616))
 - wp-env: Fix errors which prevent it from working without internet. ([53547](https://github.com/WordPress/gutenberg/pull/53547))
+- [create-block] Add ABSPATH check. ([55533](https://github.com/WordPress/gutenberg/pull/55533))
 
 #### Testing
 - E2E: Revert typing delay on the autocomplete mentions test. ([55132](https://github.com/WordPress/gutenberg/pull/55132))
@@ -189,18 +192,6 @@
 - Migrate 'block context' end-to-end tests to Playwright. ([55793](https://github.com/WordPress/gutenberg/pull/55793))
 - Performance tests: Fix canvas locator timeout. ([55441](https://github.com/WordPress/gutenberg/pull/55441))
 - Scripts: Fix default Playwright configuration. ([55453](https://github.com/WordPress/gutenberg/pull/55453))
-
-
-### Various
-
-- Form: Update copy. ([55468](https://github.com/WordPress/gutenberg/pull/55468))
-- [create-block] Add ABSPATH check. ([55533](https://github.com/WordPress/gutenberg/pull/55533))
-
-#### HTML API
-- Backport updates from Core during the 6.4 release cycle. ([55703](https://github.com/WordPress/gutenberg/pull/55703))
-
-#### Collaborative Editing
-- [Try] HTTP based PHP signaling server for colaborative editing. ([53922](https://github.com/WordPress/gutenberg/pull/53922))
 
 
 ## First time contributors
