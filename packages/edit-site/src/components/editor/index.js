@@ -144,8 +144,14 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		: __( 'Block Library' );
 	const blockContext = useMemo( () => {
 		const { postType, postId, ...nonPostFields } = context ?? {};
+
 		return {
 			...( hasPageContentFocus ? context : nonPostFields ),
+			// Ideally this context should be removed. However, it is currently used by the Query Loop block.
+			templateSlug:
+				editedPostType === TEMPLATE_POST_TYPE
+					? editedPost.slug
+					: undefined,
 			queryContext: [
 				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -158,7 +164,13 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 					} ),
 			],
 		};
-	}, [ hasPageContentFocus, context, setEditedPostContext ] );
+	}, [
+		editedPost.slug,
+		editedPostType,
+		hasPageContentFocus,
+		context,
+		setEditedPostContext,
+	] );
 
 	let title;
 	if ( hasLoadedPost ) {
