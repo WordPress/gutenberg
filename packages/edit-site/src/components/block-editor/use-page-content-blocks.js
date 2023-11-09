@@ -7,7 +7,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { PAGE_CONTENT_BLOCK_TYPES } from '../../../utils/constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from '../../utils/constants';
 
 /**
  * Helper method to iterate through all blocks, recursing into allowed inner blocks.

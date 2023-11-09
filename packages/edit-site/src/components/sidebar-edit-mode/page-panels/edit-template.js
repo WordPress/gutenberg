@@ -21,7 +21,7 @@ import { store as editSiteStore } from '../../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../../lock-unlock';
-import usePageContentBlocks from '../../block-editor/block-editor-provider/use-page-content-blocks';
+import usePageContentBlocks from '../../block-editor/use-page-content-blocks';
 
 const POPOVER_PROPS = {
 	className: 'edit-site-page-panels-edit-template__dropdown',

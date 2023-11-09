@@ -87,7 +87,7 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
+export function useSpecificEditorSettings() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const {
 		templateSlug,
@@ -97,8 +97,6 @@ export default function useSiteEditorSettings() {
 		keepCaretInsideBlock,
 		canvasMode,
 		settings,
-		postType,
-		postId,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostType,
@@ -164,5 +162,21 @@ export default function useSiteEditorSettings() {
 		archiveLabels.archiveNameLabel,
 	] );
 
+	return defaultEditorSettings;
+}
+
+export default function useSiteEditorSettings() {
+	const defaultEditorSettings = useSpecificEditorSettings();
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		return {
+			postType: usedPostType,
+			postId: usedPostId,
+		};
+	}, [] );
 	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

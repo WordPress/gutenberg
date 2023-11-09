@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
@@ -9,9 +14,11 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,9 +31,86 @@ import { unlock } from '../../lock-unlock';
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
+const noop = () => {};
+
+/**
+ * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
+ *
+ * Set block editing mode to contentOnly when entering Navigation focus mode.
+ * this ensures that non-content controls on the block will be hidden and thus
+ * the user can focus on editing the Navigation Menu content only.
+ *
+ * @param {string} navigationBlockClientId ClientId.
+ */
+function useForceFocusModeForNavigation( navigationBlockClientId ) {
+	const { setBlockEditingMode, unsetBlockEditingMode } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( ! navigationBlockClientId ) {
+			return;
+		}
+
+		setBlockEditingMode( navigationBlockClientId, 'contentOnly' );
+
+		return () => {
+			unsetBlockEditingMode( navigationBlockClientId );
+		};
+	}, [
+		navigationBlockClientId,
+		unsetBlockEditingMode,
+		setBlockEditingMode,
+	] );
+}
+
+/**
+ * Depending on the post, template and template mode,
+ * returns the appropriate blocks and change handlers for the block editor provider.
+ *
+ * @param {Array}   post         Block list.
+ * @param {boolean} template     Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
+ * @param {boolean} templateMode Whether to wrap the page content blocks in a group block to mimic the post editor. Default `false`.
+ * @return {Array} Block editor props.
+ */
+function useBlockEditorProps( post, template, templateMode ) {
+	const rootLevelPost =
+		!! template && templateMode !== 'hidden' ? template : post;
+	const { type, id } = rootLevelPost;
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		type,
+		{ id }
+	);
+	const actualBlocks = useMemo( () => {
+		if ( type === 'wp_navigation' ) {
+			return [
+				createBlock( 'core/navigation', {
+					ref: id,
+					// As the parent editor is locked with `templateLock`, the template locking
+					// must be explicitly "unset" on the block itself to allow the user to modify
+					// the block's content.
+					templateLock: false,
+				} ),
+			];
+		}
+	}, [ type, id ] );
+	const allowRootLevelChanges =
+		!! template && templateMode !== 'disabled' && type === 'wp_navigation';
+	const navigationBlockClientId =
+		type === 'wp_navigation' && actualBlocks && actualBlocks[ 0 ]?.clientId;
+	useForceFocusModeForNavigation( navigationBlockClientId );
+
+	return [
+		actualBlocks ?? blocks,
+		allowRootLevelChanges ? onInput : noop,
+		allowRootLevelChanges ? onChange : noop,
+	];
+}
+
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
 		__unstableTemplate,
+		templateMode = 'all',
 		post,
 		settings,
 		recovery,
@@ -34,12 +118,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 	} ) => {
+		const rootLevelPost =
+			!! __unstableTemplate && templateMode !== 'hidden'
+				? __unstableTemplate
+				: post;
 		const defaultBlockContext = useMemo( () => {
-			if ( post.type === 'wp_template' ) {
-				return {};
-			}
-			return { postId: post.id, postType: post.type };
-		}, [ post.id, post.type ] );
+			const postContext =
+				post.type !== 'wp_template'
+					? { postId: post.id, postType: post.type }
+					: {};
+
+			return {
+				...postContext,
+				templateSlug:
+					rootLevelPost.type === 'wp_template'
+						? rootLevelPost.slug
+						: undefined,
+			};
+		}, [ post.id, post.type, rootLevelPost.type, rootLevelPost?.slug ] );
 		const { editorSettings, selection, isReady } = useSelect(
 			( select ) => {
 				const {
@@ -55,17 +151,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[]
 		);
-		const { id, type } = __unstableTemplate ?? post;
-		const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-			'postType',
-			type,
-			{ id }
-		);
+		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
 			type,
 			id
 		);
+		const [ blocks, onInput, onChange ] = useBlockEditorProps(
+			post,
+			__unstableTemplate,
+			templateMode
+		);
+
 		const {
 			updatePostLock,
 			setupEditor,
@@ -109,7 +206,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
 			updateEditorSettings( settings );
-		}, [ settings ] );
+		}, [ settings, updateEditorSettings ] );
 
 		if ( ! isReady ) {
 			return null;
