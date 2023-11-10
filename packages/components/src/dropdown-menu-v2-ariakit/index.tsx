@@ -61,7 +61,11 @@ export const DropdownMenuItem = forwardRef<
 			{ prefix && (
 				<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 			) }
-			{ children }
+
+			<Styled.DropdownMenuItemContentWrapper>
+				{ children }
+			</Styled.DropdownMenuItemContentWrapper>
+
 			{ suffix && (
 				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
 			) }
@@ -92,7 +96,10 @@ export const DropdownMenuCheckboxItem = forwardRef<
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			{ children }
+			<Styled.DropdownMenuItemContentWrapper>
+				{ children }
+			</Styled.DropdownMenuItemContentWrapper>
+
 			{ suffix && (
 				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
 			) }
@@ -128,7 +135,11 @@ export const DropdownMenuRadioItem = forwardRef<
 			>
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
-			{ children }
+
+			<Styled.DropdownMenuItemContentWrapper>
+				{ children }
+			</Styled.DropdownMenuItemContentWrapper>
+
 			{ suffix }
 		</Styled.DropdownMenuRadioItem>
 	);
@@ -329,6 +340,19 @@ export const DropdownMenuSeparator = forwardRef<
 			{ ...props }
 			store={ dropdownMenuContext?.store }
 			variant={ dropdownMenuContext?.variant }
+		/>
+	);
+} );
+
+export const DropdownMenuItemHelpText = forwardRef<
+	HTMLHRElement,
+	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+>( function DropdownMenuItemHelpText( props, ref ) {
+	return (
+		<Styled.DropdownMenuItemHelpText
+			numberOfLines={ 2 }
+			ref={ ref }
+			{ ...props }
 		/>
 	);
 } );

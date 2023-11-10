@@ -24,6 +24,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuContext,
 	DropdownMenuRadioItem,
+	DropdownMenuItemHelpText,
 } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -65,35 +66,25 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const ItemHelpText = styled.span`
-	font-size: 12px;
-	color: ${ COLORS.gray[ '700' ] };
-
-	/* when the immediate parent item is hovered / focused */
-	[data-active-item] > * > &,
-	/* when the parent item is a submenu trigger and the submenu is open */
-	[aria-expanded='true'] > &,
-	/* when the parent item is disabled */
-	[aria-disabled='true'] > & {
-		color: inherit;
-	}
-`;
-
 export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
-		<DropdownMenuItem>Default item</DropdownMenuItem>
+		<DropdownMenuItem>Label</DropdownMenuItem>
+		<DropdownMenuItem>
+			<span>Label</span>
+			<DropdownMenuItemHelpText>Help text</DropdownMenuItemHelpText>
+		</DropdownMenuItem>
+		<DropdownMenuItem>
+			Label
+			<DropdownMenuItemHelpText>
+				Help text is automatically truncated when there are more than
+				two lines of text.
+			</DropdownMenuItemHelpText>
+		</DropdownMenuItem>
 		<DropdownMenuItem hideOnClick={ false }>
-			<div
-				style={ {
-					display: 'inline-flex',
-					flexDirection: 'column',
-				} }
-			>
-				Other item
-				<ItemHelpText>
-					Won&apos;t close the menu when clicked
-				</ItemHelpText>
-			</div>
+			Label
+			<DropdownMenuItemHelpText>
+				This item doesn&apos;t close the menu on click
+			</DropdownMenuItemHelpText>
 		</DropdownMenuItem>
 		<DropdownMenuItem disabled>Disabled item</DropdownMenuItem>
 		<DropdownMenuSeparator />
@@ -174,14 +165,20 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					name="checkbox-individual-uncontrolled-a"
 					value="a"
 				>
-					Checkbox item A (initially unchecked)
+					Checkbox item A
+					<DropdownMenuItemHelpText>
+						Uncontrolled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-uncontrolled-b"
 					value="b"
 					defaultChecked
 				>
-					Checkbox item B (initially checked)
+					Checkbox item B
+					<DropdownMenuItemHelpText>
+						Uncontrolled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
@@ -196,6 +193,9 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					onChange={ ( e ) => setAChecked( e.target.checked ) }
 				>
 					Checkbox item A
+					<DropdownMenuItemHelpText>
+						Controlled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-controlled-b"
@@ -203,7 +203,10 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ isBChecked }
 					onChange={ ( e ) => setBChecked( e.target.checked ) }
 				>
-					Checkbox item B (initially checked)
+					Checkbox item B
+					<DropdownMenuItemHelpText>
+						Controlled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
@@ -215,14 +218,20 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					name="checkbox-multiple-uncontrolled"
 					value="a"
 				>
-					Checkbox item A (initially unchecked)
+					Checkbox item A
+					<DropdownMenuItemHelpText>
+						Uncontrolled, multiple selection
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="b"
 					defaultChecked
 				>
-					Checkbox item B (initially checked)
+					Checkbox item B
+					<DropdownMenuItemHelpText>
+						Uncontrolled, multiple selection, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
@@ -236,7 +245,10 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ multipleCheckboxesValue.includes( 'a' ) }
 					onChange={ onMultipleCheckboxesCheckedChange }
 				>
-					Checkbox item A (initially unchecked)
+					Checkbox item A
+					<DropdownMenuItemHelpText>
+						Controlled, multiple selection
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-controlled"
@@ -244,7 +256,10 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ multipleCheckboxesValue.includes( 'b' ) }
 					onChange={ onMultipleCheckboxesCheckedChange }
 				>
-					Checkbox item B (initially checked)
+					Checkbox item B
+					<DropdownMenuItemHelpText>
+						Controlled, multiple selection, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 		</DropdownMenu>
@@ -268,13 +283,19 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 				</DropdownMenuGroupLabel>
 				<DropdownMenuRadioItem name="radio-uncontrolled" value="one">
 					Radio item 1
+					<DropdownMenuItemHelpText>
+						Uncontrolled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 				<DropdownMenuRadioItem
 					name="radio-uncontrolled"
 					value="two"
 					defaultChecked
 				>
-					Radio item 2 (initially checked)
+					Radio item 2
+					<DropdownMenuItemHelpText>
+						Uncontrolled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
@@ -289,6 +310,9 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 					onChange={ onRadioChange }
 				>
 					Radio item 1
+					<DropdownMenuItemHelpText>
+						Controlled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 				<DropdownMenuRadioItem
 					name="radio-controlled"
@@ -296,7 +320,10 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ radioValue === 'two' }
 					onChange={ onRadioChange }
 				>
-					Radio item 2 (initially checked)
+					Radio item 2
+					<DropdownMenuItemHelpText>
+						Controlled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 			</DropdownMenuGroup>
 		</DropdownMenu>

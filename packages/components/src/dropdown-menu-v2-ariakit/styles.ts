@@ -12,6 +12,7 @@ import styled from '@emotion/styled';
 import { COLORS, font, rtl, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
+import { Truncate } from '../truncate';
 import type { DropdownMenuContext } from './types';
 
 const ANIMATION_PARAMS = {
@@ -248,6 +249,12 @@ export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
 	${ baseItem }
 `;
 
+export const DropdownMenuItemContentWrapper = styled.div`
+	display: inline-flex;
+	flex-direction: column;
+	pointer-events: none;
+`;
+
 export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
 
 export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
@@ -295,3 +302,19 @@ export const SubmenuChevronIcon = styled( Icon )`
 		}
 	) }
 `;
+
+export const DropdownMenuItemHelpText = styled( Truncate )`
+	font-size: 12px;
+	color: ${ COLORS.gray[ '700' ] };
+`;
+
+// /* when the immediate parent item is hovered / focused */
+// [data-active-item] > ${ DropdownMenuItem }[data-active-item] > &,
+// [data-active-item] > ${ DropdownMenuRadioItem }[data-active-item] > &,
+// [data-active-item] > ${ DropdownMenuCheckboxItem }[data-active-item] > &,
+// /* when the parent item is a submenu trigger and the submenu is open */
+// [aria-expanded='true'] > &,
+// /* when the parent item is disabled */
+// [aria-disabled='true'] > & {
+// 	color: inherit;
+// }
