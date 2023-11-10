@@ -20,7 +20,7 @@ This component is generated automatically by its parent
 
 ### `dropdownMenuProps`: `{}`
 
-The popover props to configure panel's `DropdownMenu`.
+The dropdown menu props to configure the panel's `DropdownMenu`.
 
 -   Type: `Object`
 -   Required: No

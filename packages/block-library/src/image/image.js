@@ -463,8 +463,10 @@ export default function Image( {
 					label={ __( 'Settings' ) }
 					resetAll={ resetAll }
 					dropdownMenuProps={ {
-						placement: 'left-start',
-						offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+						popoverProps: {
+							placement: 'left-start',
+							offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+						},
 					} }
 				>
 					{ ! multiImageSelection && (

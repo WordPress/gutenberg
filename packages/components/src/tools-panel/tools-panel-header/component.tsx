@@ -193,6 +193,7 @@ const ToolsPanelHeader = (
 			</Heading>
 			{ hasMenuItems && (
 				<DropdownMenu
+					{ ...dropdownMenuProps }
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
@@ -200,7 +201,6 @@ const ToolsPanelHeader = (
 						isSmall: true,
 						describedBy: dropdownMenuDescriptionText,
 					} }
-					popoverProps={ dropdownMenuProps }
 				>
 					{ () => (
 						<>

@@ -18,7 +18,7 @@ export type ToolsPanelProps = {
 	 */
 	children: ReactNode;
 	/**
-	 * The popover props to configure panel's DropdownMenu.
+	 * The dropdown menu props to configure the panel's `DropdownMenu`.
 	 */
 	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
 	/**
@@ -75,9 +75,9 @@ export type ToolsPanelProps = {
 
 export type ToolsPanelHeaderProps = {
 	/**
-	 * The popover props to configure panel's DropdownMenu.
+	 * The dropdown menu props to configure the panel's `DropdownMenu`.
 	 */
-	dropdownMenuProps?: {};
+	dropdownMenuProps?: React.ComponentProps< typeof DropdownMenu >;
 	/**
 	 * The heading level of the panel's header.
 	 *
