@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 16.9.1 =
+
+Fixes a PHP fatal error in `WP_Fonts_Resolver::get_settings()`: https://github.com/WordPress/gutenberg/pull/55981
+
+
 = 17.0.0 =
 
 
