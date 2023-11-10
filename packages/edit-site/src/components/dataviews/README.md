@@ -187,5 +187,5 @@ Array of operations that can be performed upon each record. Each action is an ob
 -   `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.
 -   `isDestructive`: boolean, optional. Whether the action can delete data, in which case the UI would communicate it via red color.
 -   `callback`: function, required. Callback function that takes the record as input and performs the required action.
--   `RenderModal`: ReactElement, optional. If an action requires to render contents in a modal, can provide a component which takes as input the record and a `closeModal` function. If this prop is provided, there is no need to provide the `callback` property.
+-   `RenderModal`: ReactElement, optional. If an action requires to render contents in a modal, can provide a component which takes as input the record and a `closeModal` function. If this prop is provided, the `callback` property would be ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
