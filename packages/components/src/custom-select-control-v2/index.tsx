@@ -29,11 +29,11 @@ export function CustomSelect( props: CustomSelectProps ) {
 		onChange,
 		size = 'default',
 		value,
-		styledValue,
+		renderSelectedValue,
 	} = props;
 
 	const store = Ariakit.useSelectStore( {
-		setValue: ( nextValue ) => onChange?.( nextValue ),
+		setValue: ( nextValue: string ) => onChange?.( nextValue ),
 		defaultValue,
 		value,
 	} );
@@ -48,16 +48,20 @@ export function CustomSelect( props: CustomSelectProps ) {
 	);
 
 	return (
-		<CustomSelectContext.Provider value={ { store } }>
+		<>
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
 			<Styled.CustomSelectButton className={ classes } store={ store }>
-				{ styledValue ? styledValue( currentValue ) : currentValue }
+				{ renderSelectedValue
+					? renderSelectedValue( currentValue as string )
+					: currentValue ?? 'Select an item' }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover store={ store } sameWidth>
-				{ children }
+				<CustomSelectContext.Provider value={ { store } }>
+					{ children }
+				</CustomSelectContext.Provider>
 			</Styled.CustomSelectPopover>
-		</CustomSelectContext.Provider>
+		</>
 	);
 }
 

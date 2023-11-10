@@ -16,7 +16,7 @@ The child elements. This should be composed of CustomSelect.Item components.
 
 -   Required: yes
 
-##### `defaultValue`: `string | string[]`
+##### `defaultValue`: `string`
 
 An optional default value for the control. If left `undefined`, the first non-disabled item will be used.
 
@@ -28,13 +28,13 @@ Label for the control.
 
 -   Required: no
 
-##### `onChange`: `( newValue: string | string[] ) => void`
+##### `onChange`: `( newValue: string ) => void`
 
 A function that receives the new value of the input.
 
 -   Required: no
 
-##### `styledValue`: `( selectValue: string | string[] ) => React.ReactNode`
+##### `renderSelectedValue`: `( selectValue: string ) => React.ReactNode`
 
 Can be used to render select UI with custom styled values.
 
@@ -46,7 +46,7 @@ The size of the control.
 
 -   Required: no
 
-##### `value`: `string | string[]`
+##### `value`: `string`
 
 Can be used to externally control the value of the control.
 
@@ -66,7 +66,7 @@ The children to display for each select item.
 
 -   Required: no
 
-##### `value`: `string | string[]`
+##### `value`: `string`
 
 The value of the select item. This will be used as the children if children are left `undefined`.
 

@@ -22,7 +22,7 @@ export type CustomSelectProps = {
 	 * An optional default value for the control. If left `undefined`, the first
 	 * non-disabled item will be used.
 	 */
-	defaultValue?: string | string[];
+	defaultValue?: string;
 	/**
 	 * Label for the control.
 	 */
@@ -30,11 +30,11 @@ export type CustomSelectProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onChange?: ( newValue: string | string[] ) => void;
+	onChange?: ( newValue: string ) => void;
 	/**
 	 * Can be used to render select UI with custom styled values.
 	 */
-	styledValue?: ( selectValue: string | string[] ) => React.ReactNode;
+	renderSelectedValue?: ( selectValue: string ) => React.ReactNode;
 	/**
 	 * The size of the control.
 	 */
@@ -42,7 +42,7 @@ export type CustomSelectProps = {
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: string | string[];
+	value?: string;
 };
 
 export type CustomSelectItemProps = {
@@ -54,5 +54,5 @@ export type CustomSelectItemProps = {
 	 * The value of the select item. This will be used as the children if
 	 * children are left `undefined`.
 	 */
-	value: string;
+	value?: string;
 };

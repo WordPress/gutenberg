@@ -1,4 +1,3 @@
-//@ts-nocheck
 /**
  * External dependencies
  */
@@ -15,7 +14,7 @@ import { useState } from '@wordpress/element';
 import { CustomSelect, CustomSelectItem } from '..';
 
 const meta: Meta< typeof CustomSelect > = {
-	title: 'Components (Experimental)/CustomSelectControlV2',
+	title: 'Components (Experimental)/CustomSelectControl v2',
 	component: CustomSelect,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -84,7 +83,7 @@ const ControlledTemplate = () => {
 
 	const options = [ 'mystery-person', 'identicon', 'wavatar', 'retro' ];
 
-	const [ value, setValue ] = useState();
+	const [ value, setValue ] = useState< string >();
 
 	return (
 		<>
@@ -93,7 +92,9 @@ const ControlledTemplate = () => {
 				onChange={ ( nextValue ) => setValue( nextValue ) }
 				size="large"
 				value={ value }
-				styledValue={ ( currentValue ) => renderValue( currentValue ) }
+				renderSelectedValue={ ( currentValue ) =>
+					renderValue( currentValue )
+				}
 			>
 				{ options.map( ( option ) => (
 					<CustomSelectItem key={ option } value={ option }>

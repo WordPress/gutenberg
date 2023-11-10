@@ -48,7 +48,6 @@ export const inputSize = {
 };
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
-	z-index: 50;
 	border-radius: ${ space( 0.5 ) };
 	background: ${ COLORS.white };
 	border: 1px solid ${ COLORS.gray[ 900 ] };
