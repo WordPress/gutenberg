@@ -207,11 +207,11 @@ When you save the post and view it published, you will see the `Hola mundo (from
 
 ## Conclusion
 
-This shows the most basic static block. The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository has complete examples for both.
+This shows the most basic static block. The [block-development-examples](https://github.com/WordPress/block-development-examples) repository has complete examples for both.
 
--   [Basic Example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/01-basic-esnext)
+-   [Basic Example with JSX build](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/basic-esnext-a2ab62)
 
--   [Basic Example Plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/01-basic),
+-   [Basic Example Plain JavaScript](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6),
 
 **NOTE:** The examples include a more complete block setup with translation features included, it is recommended to follow those examples for a production block. The internationalization features were left out of this guide for simplicity and focusing on the very basics of a block.
 
