@@ -48,6 +48,7 @@ export default function ResponsiveWrapper( {
 				overlayBackgroundColor?.slug
 			) ]: !! overlayBackgroundColor?.slug,
 			'is-menu-open': isOpen,
+			'is-overlay-open': isOpen, // alias for new overlay specific style
 			'hidden-by-default': isHiddenByDefault,
 		}
 	);

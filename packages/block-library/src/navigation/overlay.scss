@@ -28,7 +28,7 @@
 	bottom: 0;
 
 	@include break-small() {
-		&:not(.hidden-by-default):not(.is-menu-open) {
+		&:not(.hidden-by-default):not(.is-overlay-open) {
 			display: block;
 			width: 100%;
 			position: relative;
@@ -39,7 +39,7 @@
 
 	// STATE: overlay is open.
 	// ********************************************************
-	&.is-menu-open {
+	&.is-overlay-open {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 		background-color: inherit;
@@ -73,7 +73,7 @@
 
 	// STATE: overlay is open.
 	// ********************************************************
-	.is-menu-open & {
+	.is-overlay-open & {
 		// Quesiton: why is this conditionally applied?
 		box-sizing: border-box;
 	}
@@ -104,7 +104,7 @@
 
 	// STATE: overlay is open.
 	// ********************************************************
-	.is-menu-open & {
+	.is-overlay-open & {
 		// Quesiton: why is this conditionally applied?
 		box-sizing: border-box;
 	}
@@ -168,7 +168,7 @@
 
 	// STATE: overlay is open.
 	// ********************************************************
-	.is-menu-open & {
+	.is-overlay-open & {
 		box-sizing: border-box;
 	}
 }
