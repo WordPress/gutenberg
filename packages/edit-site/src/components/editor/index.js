@@ -183,108 +183,106 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const contentProps = isLoading
-		? {
-				'aria-busy': 'true',
-				'aria-describedby': loadingProgressId,
-		  }
-		: undefined;
 	const settings = useSpecificEditorSettings();
+	const isReady =
+		! isLoading &&
+		( ( hasTemplate && !! contextPost && !! editedPost ) ||
+			( ! hasTemplate && !! editedPost ) );
 
 	return (
 		<>
-			{ isLoading ? <CanvasLoader id={ loadingProgressId } /> : null }
+			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
-			<EditorProvider
-				post={ hasTemplate ? contextPost : editedPost }
-				__unstableTemplate={ hasTemplate ? editedPost : undefined }
-				settings={ settings }
-				useSubRegistry={ false }
-			>
-				<SidebarComplementaryAreaFills />
-				{ isEditMode && <StartTemplateOptions /> }
-				<InterfaceSkeleton
-					isDistractionFree={ true }
-					enableRegionNavigation={ false }
-					className={ classnames(
-						'edit-site-editor__interface-skeleton',
-						{
-							'show-icon-labels': showIconLabels,
-							'is-loading': isLoading,
+			{ isReady && (
+				<EditorProvider
+					post={ hasTemplate ? contextPost : editedPost }
+					__unstableTemplate={ hasTemplate ? editedPost : undefined }
+					settings={ settings }
+					useSubRegistry={ false }
+				>
+					<SidebarComplementaryAreaFills />
+					{ isEditMode && <StartTemplateOptions /> }
+					<InterfaceSkeleton
+						isDistractionFree={ true }
+						enableRegionNavigation={ false }
+						className={ classnames(
+							'edit-site-editor__interface-skeleton',
+							{
+								'show-icon-labels': showIconLabels,
+							}
+						) }
+						notices={ <EditorSnackbars /> }
+						content={
+							<>
+								<GlobalStylesRenderer />
+								{ isEditMode && <EditorNotices /> }
+								{ showVisualEditor && editedPost && (
+									<>
+										<TemplatePartConverter />
+										<SidebarInspectorFill>
+											<BlockInspector />
+										</SidebarInspectorFill>
+										<SiteEditorCanvas />
+										<BlockRemovalWarningModal
+											rules={ blockRemovalRules }
+										/>
+										<PatternModal />
+									</>
+								) }
+								{ editorMode === 'text' &&
+									editedPost &&
+									isEditMode && <CodeEditor /> }
+								{ hasLoadedPost && ! editedPost && (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+									>
+										{ __(
+											"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+										) }
+									</Notice>
+								) }
+								{ isEditMode && <KeyboardShortcutsEditMode /> }
+							</>
 						}
-					) }
-					notices={ <EditorSnackbars /> }
-					content={
-						<>
-							<GlobalStylesRenderer />
-							{ isEditMode && <EditorNotices /> }
-							{ showVisualEditor && editedPost && (
-								<>
-									<TemplatePartConverter />
-									<SidebarInspectorFill>
-										<BlockInspector />
-									</SidebarInspectorFill>
-									<SiteEditorCanvas />
-									<BlockRemovalWarningModal
-										rules={ blockRemovalRules }
+						secondarySidebar={
+							isEditMode &&
+							( ( shouldShowInserter && <InserterSidebar /> ) ||
+								( shouldShowListView && (
+									<ListViewSidebar
+										listViewToggleElement={
+											listViewToggleElement
+										}
 									/>
-									<PatternModal />
+								) ) )
+						}
+						sidebar={
+							isEditMode &&
+							isRightSidebarOpen && (
+								<>
+									<ComplementaryArea.Slot scope="core/edit-site" />
+									<SidebarFixedBottomSlot />
 								</>
-							) }
-							{ editorMode === 'text' &&
-								editedPost &&
-								isEditMode && <CodeEditor /> }
-							{ hasLoadedPost && ! editedPost && (
-								<Notice
-									status="warning"
-									isDismissible={ false }
-								>
-									{ __(
-										"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-									) }
-								</Notice>
-							) }
-							{ isEditMode && <KeyboardShortcutsEditMode /> }
-						</>
-					}
-					contentProps={ contentProps }
-					secondarySidebar={
-						isEditMode &&
-						( ( shouldShowInserter && <InserterSidebar /> ) ||
-							( shouldShowListView && (
-								<ListViewSidebar
-									listViewToggleElement={
-										listViewToggleElement
+							)
+						}
+						footer={
+							shouldShowBlockBreadcrumbs && (
+								<BlockBreadcrumb
+									rootLabelText={
+										hasPageContentFocus
+											? __( 'Page' )
+											: __( 'Template' )
 									}
 								/>
-							) ) )
-					}
-					sidebar={
-						isEditMode &&
-						isRightSidebarOpen && (
-							<>
-								<ComplementaryArea.Slot scope="core/edit-site" />
-								<SidebarFixedBottomSlot />
-							</>
-						)
-					}
-					footer={
-						shouldShowBlockBreadcrumbs && (
-							<BlockBreadcrumb
-								rootLabelText={
-									hasPageContentFocus
-										? __( 'Page' )
-										: __( 'Template' )
-								}
-							/>
-						)
-					}
-					labels={ {
-						...interfaceLabels,
-						secondarySidebar: secondarySidebarLabel,
-					} }
-				/>
-			</EditorProvider>
+							)
+						}
+						labels={ {
+							...interfaceLabels,
+							secondarySidebar: secondarySidebarLabel,
+						} }
+					/>
+				</EditorProvider>
+			) }
 		</>
 	);
 }
