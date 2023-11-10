@@ -185,57 +185,6 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	);
 }
 
-function FiltersVisibilityMenu( { view, onChangeView, fields } ) {
-	const filtersHidable = fields
-		.filter( ( f ) => f.filters && f.filters.length > 0 )
-		.map( ( f ) => ( { id: f.id, name: f.header } ) );
-
-	if ( filtersHidable.length === 0 ) {
-		return null;
-	}
-
-	return (
-		<DropdownSubMenuV2
-			trigger={
-				<DropdownSubMenuTriggerV2
-					suffix={ <Icon icon={ chevronRightSmall } /> }
-				>
-					{ __( 'Filters' ) }
-				</DropdownSubMenuTriggerV2>
-			}
-		>
-			{ filtersHidable?.map( ( { id, name } ) => {
-				return (
-					<DropdownMenuItemV2
-						key={ id }
-						prefix={
-							view.visibleFilters.includes( id ) && (
-								<Icon icon={ check } />
-							)
-						}
-						onSelect={ ( event ) => {
-							event.preventDefault();
-							onChangeView( {
-								...view,
-								visibleFilters: view.visibleFilters?.includes(
-									id
-								)
-									? view.visibleFilters.filter(
-											( filter ) => filter !== id
-									  )
-									: [ ...view.visibleFilters, id ],
-							} );
-						} }
-						role="menuitemcheckbox"
-					>
-						{ name }
-					</DropdownMenuItemV2>
-				);
-			} ) }
-		</DropdownSubMenuV2>
-	);
-}
-
 // This object is used to construct the sorting options per sortable field.
 const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
@@ -353,11 +302,6 @@ export default function ViewActions( {
 					onChangeView={ onChangeView }
 				/>
 				<FieldsVisibilityMenu
-					fields={ fields }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-				<FiltersVisibilityMenu
 					fields={ fields }
 					view={ view }
 					onChangeView={ onChangeView }
