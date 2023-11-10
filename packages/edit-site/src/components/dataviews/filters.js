@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as InFilter, OPERATOR_IN } from './in-filter';
 import ResetFilters from './reset-filters';
+import AddFilter from './add-filter';
 
 const VALID_OPERATORS = [ OPERATOR_IN ];
 
@@ -61,6 +62,16 @@ export default function Filters( { fields, view, onChangeView } ) {
 			} );
 		} )
 		.filter( Boolean );
+
+	// TODO: disable when no more filters to add.
+	visibleFilters.push(
+		<AddFilter
+			key="add-filter"
+			filters={ filtersRegistered }
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	);
 
 	if ( visibleFilters?.length > 0 ) {
 		visibleFilters.push(
