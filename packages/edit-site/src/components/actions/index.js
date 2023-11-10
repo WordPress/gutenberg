@@ -31,7 +31,7 @@ export function useTrashPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				try {
 					await deleteEntityRecord(
 						'postType',
@@ -81,7 +81,7 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				try {
 					await deleteEntityRecord(
 						'postType',
@@ -132,7 +132,7 @@ export function useRestorePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				await editEntityRecord( 'postType', post.type, post.id, {
 					status: 'draft',
 				} );
@@ -183,7 +183,7 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	perform( post ) {
+	callback( post ) {
 		document.location.href = post.link;
 	},
 };
@@ -197,7 +197,7 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			perform( post ) {
+			callback( post ) {
 				history.push( {
 					postId: post.id,
 					postType: post.type,
@@ -222,7 +222,7 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	perform( post ) {
+	callback( post ) {
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
