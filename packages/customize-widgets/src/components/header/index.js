@@ -33,7 +33,7 @@ function Header( {
 	setIsInserterOpened,
 	isFixedToolbarActive,
 } ) {
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const [ [ hasUndo, hasRedo ], setUndoRedo ] = useState( [
 		sidebar.hasUndo(),

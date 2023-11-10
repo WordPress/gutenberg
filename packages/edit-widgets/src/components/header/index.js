@@ -21,8 +21,7 @@ import { unlock } from '../../lock-unlock';
 const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 function Header( { setListViewToggleElement } ) {
-	const isMediumViewport = useViewportMatch( 'medium' );
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const { hasFixedToolbar } = useSelect(
 		( select ) => ( {
@@ -38,12 +37,12 @@ function Header( { setListViewToggleElement } ) {
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					{ isMediumViewport && (
+					{ isLargeViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }
 						</h1>
 					) }
-					{ ! isMediumViewport && (
+					{ ! isLargeViewport && (
 						<VisuallyHidden
 							as="h1"
 							className="edit-widgets-header__title"

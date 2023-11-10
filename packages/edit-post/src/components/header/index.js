@@ -56,7 +56,8 @@ function Header( {
 	setEntitiesSavedStatesCallback,
 	setListViewToggleElement,
 } ) {
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isWideViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const {
 		blockSelectionStart,
@@ -182,13 +183,13 @@ function Header( {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				{ ( isLargeViewport || ! showIconLabels ) && (
+				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						<PinnedItems.Slot scope="core/edit-post" />
 						<MoreMenu showIconLabels={ showIconLabels } />
 					</>
 				) }
-				{ showIconLabels && ! isLargeViewport && (
+				{ showIconLabels && ! isWideViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
 			</motion.div>

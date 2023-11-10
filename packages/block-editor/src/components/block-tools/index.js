@@ -65,7 +65,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		clientId,
 		hasFixedToolbar,

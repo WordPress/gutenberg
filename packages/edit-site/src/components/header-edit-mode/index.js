@@ -96,7 +96,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		};
 	}, [] );
 
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 	const blockToolbarRef = useRef();
 
