@@ -16,6 +16,7 @@ export default ( { view, onChangeView } ) => {
 						page: 1,
 						search: '',
 						filters: [],
+						visibleFilters: [],
 					} ) );
 				} }
 			>
