@@ -105,7 +105,12 @@ export default function ResponsiveWrapper( {
 				>
 					<div { ...dialogProps }>
 						<Button
-							className="wp-block-navigation__responsive-container-close wp-overlay-component__close wp-overlay-component__toggle"
+							className={ classnames(
+								'wp-block-navigation__responsive-container-close',
+								'wp-overlay-component__close',
+								'wp-overlay-component__toggle',
+								{ 'always-shown': isHiddenByDefault }
+							) }
 							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
 						>

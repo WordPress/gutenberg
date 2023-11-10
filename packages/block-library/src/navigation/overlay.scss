@@ -1,3 +1,14 @@
+// ********************************************************
+// VARIABLES & MIXINS
+// ********************************************************
+
+// Abstraction for Navigation breakpoint.
+@mixin nav-breakpoint() {
+	@include break-small {
+		@content;
+	}
+}
+
 
 // ********************************************************
 // ANIMATION
@@ -27,7 +38,7 @@
 	right: 0;
 	bottom: 0;
 
-	@include break-small() {
+	@include nav-breakpoint {
 		&:not(.hidden-by-default):not(.is-overlay-open) {
 			display: block;
 			width: 100%;
@@ -147,8 +158,9 @@
 .wp-overlay-component__open {
 	display: flex;
 
-	// When the overlay is always "on" then do not
-	// hide the open button on smaller viewports.
+	// Hide the button on smaller viewports except
+	// when the overlay is set to always show.
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
@@ -166,11 +178,21 @@
 	top: 0;
 	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
+	display: none; // hide by default for all users.
 
 	// STATE: overlay is open.
 	// ********************************************************
 	.is-overlay-open & {
 		box-sizing: border-box;
+
+		// Reveal when overlay is open.
+		display: inline-flex; // as per <Button> component.
+	}
+
+	// STATE: overlay is set to always show.
+	// ********************************************************
+	&.always-shown {
+		display: inline-flex; // as per <Button> component.
 	}
 }
 

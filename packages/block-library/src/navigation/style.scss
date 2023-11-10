@@ -460,14 +460,6 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container {
 
 
-	@include break-small() {
-		&:not(.hidden-by-default):not(.is-menu-open) {
-			.wp-block-navigation__responsive-container-close {
-				display: none;
-			}
-		}
-	}
-
 	// Low specificity so that themes can override.
 	& :where(.wp-block-navigation-item a) {
 		color: inherit;
