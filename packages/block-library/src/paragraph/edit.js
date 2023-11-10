@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
+	Button,
+	Popover,
+	SearchControl,
 	ToolbarButton,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -21,7 +25,7 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { formatLtr } from '@wordpress/icons';
+import { plugins as pluginsIcon, formatLtr } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -77,6 +81,85 @@ function ParagraphBlock( {
 		helpText = __( 'Toggle to show a large initial letter.' );
 	}
 
+	// Simulate fetching the REST API.
+	const metadata = [
+		{
+			name: 'Site title',
+			key: 'site_title',
+			value: 'This is the title of my site',
+		},
+		{
+			name: 'My custom field 1',
+			key: 'custom_field_1',
+			value: 'Value of my custom field 1',
+		},
+		{
+			name: 'My custom field 2',
+			key: 'custom_field_2',
+			value: 'Value of my custom field 2',
+		},
+		{
+			name: 'Post title',
+			key: 'post_title',
+			value: 'This is the post title',
+		},
+		{
+			name: 'Post summary',
+			key: 'post_summary',
+			value: 'This is the post summary',
+		},
+	];
+
+	// Adding the elements for the Bindings UI.
+	const [ addingBinding, setAddingBinding ] = useState( false );
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ searchInput, setSearchInput ] = useState( '' );
+	const [ selectedField, setSelectedField ] = useState( null );
+
+	function selectItem( item ) {
+		setSelectedField( item );
+		setAttributes( {
+			content: item.value,
+		} );
+		setAddingBinding( false );
+	}
+	function BindingsUI() {
+		return (
+			<Popover
+				popoverAnchor={ popoverAnchor }
+				onClose={ () => {
+					setAddingBinding( false );
+				} }
+				onFocusOutside={ () => {
+					setAddingBinding( false );
+				} }
+				placement="bottom"
+				shift
+			>
+				<SearchControl
+					label={ __( 'Search metadata' ) }
+					value={ searchInput }
+					onChange={ setSearchInput }
+					size="compact"
+				/>
+				<ul className="token-metadata-list">
+					{ metadata.map( ( item ) => (
+						<li
+							key={ item.key }
+							onClick={ () => selectItem( item ) }
+							className={
+								selectedField?.key === item.key
+									? 'selected-meta-field'
+									: ''
+							}
+						>
+							{ item.name }
+						</li>
+					) ) }
+				</ul>
+			</Popover>
+		);
+	}
 	return (
 		<>
 			<BlockControls group="block">
@@ -166,6 +249,17 @@ function ParagraphBlock( {
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>
+			<BlockControls group="other">
+				<Button
+					onClick={ () => {
+						setAddingBinding( ! addingBinding );
+					} }
+					aria-expanded={ true }
+					icon={ pluginsIcon }
+					ref={ setPopoverAnchor }
+				></Button>
+				{ addingBinding && <BindingsUI /> }
+			</BlockControls>
 		</>
 	);
 }
