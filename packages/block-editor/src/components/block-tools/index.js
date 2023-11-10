@@ -130,9 +130,7 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if (
-				event.target.closest( '.block-editor-block-contextual-toolbar' )
-			) {
+			if ( event.target.closest( '[role=toolbar]' ) ) {
 				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
 				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
 				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
