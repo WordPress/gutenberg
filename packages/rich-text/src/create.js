@@ -135,6 +135,8 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.text]                     Text to create value from.
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
+ * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse
+ *                                                white space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.
@@ -145,6 +147,7 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
+	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -155,6 +158,7 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
+		html = preserveWhiteSpace ? html : collapseWhiteSpace( html );
 		// It does not matter which document this is, we're just using it to
 		// parse.
 		element = createElement( document, html );
@@ -262,6 +266,24 @@ function filterRange( node, range, filter ) {
 	}
 
 	return { startContainer, startOffset, endContainer, endOffset };
+}
+
+/**
+ * Collapse any whitespace used for HTML formatting to one space character,
+ * because it will also be displayed as such by the browser.
+ *
+ * We need to strip it from the content because we use white-space: pre-wrap for
+ * displaying editable rich text. Without using white-space: pre-wrap, the
+ * browser will litter the content with non breaking spaces, among other issues.
+ * See packages/rich-text/src/component/use-default-style.js.
+ *
+ * @see
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
+ *
+ * @param {string} string
+ */
+function collapseWhiteSpace( string ) {
+	return string.replace( /[ \n\r\t]+/g, ' ' ).replace( /^ | $/g, '' );
 }
 
 /**

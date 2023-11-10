@@ -26,6 +26,7 @@ export function useRichText( {
 	selectionEnd,
 	placeholder,
 	onSelectionChange,
+	preserveWhiteSpace,
 	onChange,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
@@ -69,7 +70,7 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( { html: value } );
+		record.current = create( { html: value, preserveWhiteSpace } );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );

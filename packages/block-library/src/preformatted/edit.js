@@ -20,6 +20,7 @@ export default function PreformattedEdit( {
 		<RichText
 			tagName="pre"
 			identifier="content"
+			preserveWhiteSpace
 			value={ content }
 			onChange={ ( nextContent ) => {
 				setAttributes( {
