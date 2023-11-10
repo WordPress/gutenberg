@@ -23,14 +23,22 @@ const {
 } = unlock( componentsPrivateApis );
 
 export default function AddFilter( { filters, onChangeView } ) {
+	if ( ! filters.length ) {
+		return (
+			<BaseControl>
+				<Button disabled={ ! filters?.length } variant="tertiary">
+					{ __( '+ Add filter' ) }
+				</Button>
+			</BaseControl>
+		);
+	}
+
 	return (
 		<BaseControl>
 			<DropdownMenuV2
 				label={ __( 'Add filter' ) }
 				trigger={
-					<Button disabled={ ! filters?.length } variant="tertiary">
-						{ __( '+ Add filter' ) }
-					</Button>
+					<Button variant="tertiary">{ __( '+ Add filter' ) }</Button>
 				}
 			>
 				{ filters.map( ( filter ) => (
