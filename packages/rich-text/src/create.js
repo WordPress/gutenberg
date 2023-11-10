@@ -135,8 +135,6 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.text]                     Text to create value from.
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
- * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse
- *                                                white space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.
@@ -147,7 +145,6 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
-	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -158,7 +155,6 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
-		html = preserveWhiteSpace ? html : collapseWhiteSpace( html );
 		// It does not matter which document this is, we're just using it to
 		// parse.
 		element = createElement( document, html );
@@ -282,7 +278,7 @@ function filterRange( node, range, filter ) {
  *
  * @param {string} string
  */
-function collapseWhiteSpace( string ) {
+export function collapseWhiteSpace( string ) {
 	return string.replace( /[ \n\r\t]+/g, ' ' ).replace( /^ | $/g, '' );
 }
 

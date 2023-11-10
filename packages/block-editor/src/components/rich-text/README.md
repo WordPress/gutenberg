@@ -71,8 +71,7 @@ _Optional._ A list of autocompleters to use instead of the default.
 
 ### `preserveWhiteSpace: Boolean`
 
-_Optional._ Whether or not to preserve white space characters in the `value`.
-Normally tab, newline and space characters are collapsed to a single space or
+_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
 trimmed.
 
 ## RichText.Content

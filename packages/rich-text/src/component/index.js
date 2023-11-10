@@ -8,7 +8,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { create } from '../create';
+import { collapseWhiteSpace, create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
@@ -70,7 +70,9 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( { html: value, preserveWhiteSpace } );
+		record.current = create( {
+			html: preserveWhiteSpace ? value : collapseWhiteSpace( value ),
+		} );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
