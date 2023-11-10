@@ -494,7 +494,7 @@ test.describe( 'List View', () => {
 				'All column blocks should be selected, with the first one focused.'
 			)
 			.toMatchObject( [
-				{ name: 'core/group' },
+				{ name: 'core/group', selected: false, focused: false },
 				{
 					name: 'core/columns',
 					innerBlocks: [
@@ -514,7 +514,7 @@ test.describe( 'List View', () => {
 				'The columns block should be selected and focused.'
 			)
 			.toMatchObject( [
-				{ name: 'core/group' },
+				{ name: 'core/group', selected: false, focused: false },
 				{
 					name: 'core/columns',
 					innerBlocks: [
