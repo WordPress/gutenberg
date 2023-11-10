@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug fix
-
--   `Dropdown`: remove extra white space around toggle ([#56005](https://github.com/WordPress/gutenberg/pull/56005))
-
 ### Internal
 
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
