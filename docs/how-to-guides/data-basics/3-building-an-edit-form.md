@@ -1,22 +1,18 @@
 # Building an edit form
 
-This part is about adding an *Edit* feature to our app. Here's a glimpse of what we're going to build:
+This part is about adding an _Edit_ feature to our app. Here's a glimpse of what we're going to build:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-finished.png)
 
 ### Step 1: Add an _Edit_ button
 
-We can't have an *Edit* form without an *Edit* button, so let's start by adding one to our `PagesList` component:
+We can't have an _Edit_ form without an _Edit_ button, so let's start by adding one to our `PagesList` component:
 
 ```js
 import { Button } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 
-const PageEditButton = () => (
-	<Button variant="primary">
-		Edit
-	</Button>
-)
+const PageEditButton = () => <Button variant="primary">Edit</Button>;
 
 function PagesList( { hasResolved, pages } ) {
 	if ( ! hasResolved ) {
@@ -31,12 +27,12 @@ function PagesList( { hasResolved, pages } ) {
 			<thead>
 				<tr>
 					<td>Title</td>
-					<td style={{width: 120}}>Actions</td>
+					<td style={ { width: 120 } }>Actions</td>
 				</tr>
 			</thead>
 			<tbody>
 				{ pages?.map( ( page ) => (
-					<tr key={page.id}>
+					<tr key={ page.id }>
 						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
 							<PageEditButton pageId={ page.id } />
@@ -62,10 +58,7 @@ import { Button, TextControl } from '@wordpress/components';
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	return (
 		<div className="my-gutenberg-form">
-			<TextControl
-				value=''
-				label='Page title:'
-			/>
+			<TextControl value="" label="Page title:" />
 			<div className="form-buttons">
 				<Button onClick={ onSaveFinished } variant="primary">
 					Save
@@ -84,33 +77,30 @@ Now let's make the button display the form we just created. As this tutorial is 
 ```js
 import { Button, Modal, TextControl } from '@wordpress/components';
 
-function PageEditButton({ pageId }) {
+function PageEditButton( { pageId } ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 	return (
 		<>
-			<Button
-				onClick={ openModal }
-				variant="primary"
-			>
+			<Button onClick={ openModal } variant="primary">
 				Edit
 			</Button>
 			{ isOpen && (
 				<Modal onRequestClose={ closeModal } title="Edit page">
 					<EditPageForm
-						pageId={pageId}
-						onCancel={closeModal}
-						onSaveFinished={closeModal}
+						pageId={ pageId }
+						onCancel={ closeModal }
+						onSaveFinished={ closeModal }
 					/>
 				</Modal>
 			) }
 		</>
-	)
+	);
 }
 ```
 
-When you click the *Edit* button now, you should see the following modal:
+When you click the _Edit_ button now, you should see the following modal:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-scaffold.png)
 
@@ -125,7 +115,7 @@ In this case, we need to use the [`getEntityRecord`](/docs/reference-guides/data
 Here's how you can try it in your browser's dev tools:
 
 ```js
-wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 );  // Replace 9 with an actual page ID
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ); // Replace 9 with an actual page ID
 ```
 
 Let's update `EditPageForm` accordingly:
@@ -133,15 +123,17 @@ Let's update `EditPageForm` accordingly:
 ```js
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
-		select => select( coreDataStore ).getEntityRecord( 'postType', 'page', pageId ),
-		[pageId]
+		( select ) =>
+			select( coreDataStore ).getEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+		[ pageId ]
 	);
 	return (
 		<div className="my-gutenberg-form">
-			<TextControl
-				label='Page title:'
-				value={ page.title.rendered }
-			/>
+			<TextControl label="Page title:" value={ page.title.rendered } />
 			{ /* ... */ }
 		</div>
 	);
@@ -156,18 +148,12 @@ Now it should look like this:
 
 There's one problem with our _Page title_ field: you can't edit it. It receives a fixed `value` but doesn't update it when typing. We need an `onChange` handler.
 
-
 You may have seen a pattern similar to this one in other React apps. It's known as a ["controlled component"](https://reactjs.org/docs/forms.html#controlled-components):
 
 ```js
-function VanillaReactForm({ initialTitle }) {
-	const [title, setTitle] = useState( initialTitle );
-	return (
-		<TextControl
-			value={ title }
-			onChange={ setTitle }
-		/>
-	);
+function VanillaReactForm( { initialTitle } ) {
+	const [ title, setTitle ] = useState( initialTitle );
+	return <TextControl value={ title } onChange={ setTitle } />;
 }
 ```
 
@@ -175,10 +161,14 @@ Updating entity records in Gutenberg Data is similar but instead of using `setTi
 
 ```js
 // We need a valid page ID to call editEntityRecord, so let's get the first available one using getEntityRecords.
-const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
+const pageId = wp.data
+	.select( 'core' )
+	.getEntityRecords( 'postType', 'page' )[ 0 ].id;
 
 // Update the title
-wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
+wp.data
+	.dispatch( 'core' )
+	.editEntityRecord( 'postType', 'page', pageId, { title: 'updated title' } );
 ```
 
 At this point, you may ask _how_ is `editEntityRecord` better than `useState`? The answer is that it offers a few features you wouldn't otherwise get.
@@ -192,22 +182,23 @@ Lastly, because the changes live in the _Redux_ state, they are "global" and can
 To that last point, let's see what happens when we use `getEntityRecord` to access the entity record we just updated:
 
 ```js
-wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title;
 ```
 
 It doesn't reflect the edits. What's going on?
 
 Well, `<PagesList />` renders the data returned by `getEntityRecord()`. If `getEntityRecord()` reflected the updated title, then anything the user types in the `TextControl` would be immediately displayed inside `<PagesList />`, too. This is not what we want. The edits shouldn't leak outside the form until the user decides to save them.
 
-Gutenberg Data solves this problem by making a distinction between *Entity Records* and *Edited Entity Records*. *Entity Records* reflect the data from the API and ignore any local edits, while *Edited Entity Records* also have all the local edits applied on top. Both co-exist in the Redux state at the same time.
+Gutenberg Data solves this problem by making a distinction between _Entity Records_ and _Edited Entity Records_. _Entity Records_ reflect the data from the API and ignore any local edits, while _Edited Entity Records_ also have all the local edits applied on top. Both co-exist in the Redux state at the same time.
 
 Let's see what happens if we call `getEditedEntityRecord`:
 
 ```js
-wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', pageId ).title
+wp.data.select( 'core' ).getEditedEntityRecord( 'postType', 'page', pageId )
+	.title;
 // "updated title"
 
-wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', pageId ).title;
 // { "rendered": "<original, unchanged title>", "raw": "..." }
 ```
 
@@ -224,11 +215,17 @@ import { useDispatch } from '@wordpress/data';
 
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const page = useSelect(
-		select => select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
+		( select ) =>
+			select( coreDataStore ).getEditedEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
 		[ pageId ]
 	);
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', pageId, { title } );
+	const handleChange = ( title ) =>
+		editEntityRecord( 'postType', 'page', pageId, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
@@ -264,7 +261,9 @@ Here's an example you may try in your browser's dev tools:
 
 ```js
 // Replace 9 with an actual page ID
-wp.data.dispatch( 'core' ).editEntityRecord( 'postType', 'page', 9, { title: 'updated title' } );
+wp.data
+	.dispatch( 'core' )
+	.editEntityRecord( 'postType', 'page', 9, { title: 'updated title' } );
 wp.data.dispatch( 'core' ).saveEditedEntityRecord( 'postType', 'page', 9 );
 ```
 
@@ -272,28 +271,30 @@ The above snippet saved a new title. Unlike before, `getEntityRecord` now reflec
 
 ```js
 // Replace 9 with an actual page ID
-wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ).title.rendered
+wp.data.select( 'core' ).getEntityRecord( 'postType', 'page', 9 ).title
+	.rendered;
 // "updated title"
 ```
 
 Entity records are updated to reflect any saved changes right after the REST API request is finished.
 
-This is how the `EditPageForm` looks like with a working *Save* button:
+This is how the `EditPageForm` looks like with a working _Save_ button:
 
 ```js
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
 	const { saveEditedEntityRecord } = useDispatch( coreDataStore );
-	const handleSave = () => saveEditedEntityRecord( 'postType', 'page', pageId );
+	const handleSave = () =>
+		saveEditedEntityRecord( 'postType', 'page', pageId );
 
 	return (
 		<div className="my-gutenberg-form">
-			{/* ... */}
+			{ /* ... */ }
 			<div className="form-buttons">
 				<Button onClick={ handleSave } variant="primary">
 					Save
 				</Button>
-				{/* ... */}
+				{ /* ... */ }
 			</div>
 		</div>
 	);
@@ -315,11 +316,11 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 ### Step 6: Handle errors
 
-We optimistically assumed that a *save* operation would always succeed. Unfortunately, it may fail in many ways:
+We optimistically assumed that a _save_ operation would always succeed. Unfortunately, it may fail in many ways:
 
-* The website can be down
-* The update may be invalid
-* The page could have been deleted by someone else in the meantime
+-   The website can be down
+-   The update may be invalid
+-   The page could have been deleted by someone else in the meantime
 
 To tell the user when any of these happens, we have to make two adjustments. We don't want to close the form modal when the update fails. The promise returned by `saveEditedEntityRecord` is resolved with an updated record only if the update actually worked. When something goes wrong, it resolves with an empty value. Let's use it to keep the modal open:
 
@@ -327,7 +328,11 @@ To tell the user when any of these happens, we have to make two adjustments. We 
 function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
 	const handleSave = async () => {
-		const updatedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
+		const updatedRecord = await saveEditedEntityRecord(
+			'postType',
+			'page',
+			pageId
+		);
 		if ( updatedRecord ) {
 			onSaveFinished();
 		}
@@ -340,7 +345,7 @@ Great! Now, let's display an error message. The failure details can be grabbed u
 
 ```js
 // Replace 9 with an actual page ID
-wp.data.select( 'core' ).getLastEntitySaveError( 'postType', 'page', 9 )
+wp.data.select( 'core' ).getLastEntitySaveError( 'postType', 'page', 9 );
 ```
 
 Here's how we can use it in `EditPageForm`:
@@ -348,23 +353,31 @@ Here's how we can use it in `EditPageForm`:
 ```js
 function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
-    const { lastError, page } = useSelect(
-        select => ({
-			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
-			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId )
-		}),
-        [ pageId ]
-	)
+	const { lastError, page } = useSelect(
+		( select ) => ( {
+			page: select( coreDataStore ).getEditedEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+			lastError: select( coreDataStore ).getLastEntitySaveError(
+				'postType',
+				'page',
+				pageId
+			),
+		} ),
+		[ pageId ]
+	);
 	// ...
 	return (
 		<div className="my-gutenberg-form">
-			{/* ... */}
+			{ /* ... */ }
 			{ lastError ? (
-				<div className="form-error">
-					Error: { lastError.message }
-				</div>
-			) : false }
-			{/* ... */}
+				<div className="form-error">Error: { lastError.message }</div>
+			) : (
+				false
+			) }
+			{ /* ... */ }
 		</div>
 	);
 }
@@ -377,7 +390,8 @@ Let's see that error message in action. We'll trigger an invalid update and let 
 ```js
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	// ...
-	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', pageId, { title, date: -1 } );
+	const handleChange = ( title ) =>
+		editEntityRecord( 'postType', 'page', pageId, { title, date: -1 } );
 	// ...
 }
 ```
@@ -390,7 +404,7 @@ Fantastic! We can now **restore the previous version of `handleChange`** and mov
 
 ### Step 7: Status indicator
 
-There is one last problem with our form: no visual feedback. We can’t be quite sure whether the *Save* button worked until either the form disappears or an error message shows.
+There is one last problem with our form: no visual feedback. We can’t be quite sure whether the _Save_ button worked until either the form disappears or an error message shows.
 
 We're going to clear it up and communicate two states to the user: _Saving_ and _No changes detected_. The relevant selectors are `isSavingEntityRecord` and `hasEditsForEntityRecord`. Unlike `getEntityRecord`, they never issue any HTTP requests but only return the current entity record state.
 
@@ -399,14 +413,22 @@ Let's use them in `EditPageForm`:
 ```js
 function EditPageForm( { pageId, onSaveFinished } ) {
 	// ...
-	const { isSaving, hasEdits, /* ... */ } = useSelect(
-		select => ({
-			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page', pageId ),
-			hasEdits: select( coreDataStore ).hasEditsForEntityRecord( 'postType', 'page', pageId ),
+	const { isSaving, hasEdits /* ... */ } = useSelect(
+		( select ) => ( {
+			isSaving: select( coreDataStore ).isSavingEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+			hasEdits: select( coreDataStore ).hasEditsForEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
 			// ...
-		}),
+		} ),
 		[ pageId ]
-	)
+	);
 }
 ```
 
@@ -418,13 +440,19 @@ function EditPageForm( { pageId, onSaveFinished } ) {
 	return (
 		// ...
 		<div className="form-buttons">
-			<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
+			<Button
+				onClick={ handleSave }
+				variant="primary"
+				disabled={ ! hasEdits || isSaving }
+			>
 				{ isSaving ? (
 					<>
-						<Spinner/>
+						<Spinner />
 						Saving
 					</>
-				) : 'Save' }
+				) : (
+					'Save'
+				) }
 			</Button>
 			<Button
 				onClick={ onCancel }
@@ -441,7 +469,7 @@ function EditPageForm( { pageId, onSaveFinished } ) {
 
 Note that we disable the _save_ button when there are no edits and when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice.
 
-Also, interrupting a *save* in progress is not supported by `@wordpress/data` so we also conditionally disabled the _cancel_ button.
+Also, interrupting a _save_ in progress is not supported by `@wordpress/data` so we also conditionally disabled the _cancel_ button.
 
 Here's what it looks like in action:
 
@@ -481,22 +509,44 @@ function PageEditButton( { pageId } ) {
 function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 	const { page, lastError, isSaving, hasEdits } = useSelect(
 		( select ) => ( {
-			page: select( coreDataStore ).getEditedEntityRecord( 'postType', 'page', pageId ),
-			lastError: select( coreDataStore ).getLastEntitySaveError( 'postType', 'page', pageId ),
-			isSaving: select( coreDataStore ).isSavingEntityRecord( 'postType', 'page', pageId ),
-			hasEdits: select( coreDataStore ).hasEditsForEntityRecord( 'postType', 'page', pageId ),
+			page: select( coreDataStore ).getEditedEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+			lastError: select( coreDataStore ).getLastEntitySaveError(
+				'postType',
+				'page',
+				pageId
+			),
+			isSaving: select( coreDataStore ).isSavingEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+			hasEdits: select( coreDataStore ).hasEditsForEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
 		} ),
 		[ pageId ]
 	);
 
-	const { saveEditedEntityRecord, editEntityRecord } = useDispatch( coreDataStore );
+	const { saveEditedEntityRecord, editEntityRecord } =
+		useDispatch( coreDataStore );
 	const handleSave = async () => {
-		const savedRecord = await saveEditedEntityRecord( 'postType', 'page', pageId );
+		const savedRecord = await saveEditedEntityRecord(
+			'postType',
+			'page',
+			pageId
+		);
 		if ( savedRecord ) {
 			onSaveFinished();
 		}
 	};
-	const handleChange = ( title ) =>  editEntityRecord( 'postType', 'page', page.id, { title } );
+	const handleChange = ( title ) =>
+		editEntityRecord( 'postType', 'page', page.id, { title } );
 
 	return (
 		<div className="my-gutenberg-form">
@@ -518,10 +568,12 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 				>
 					{ isSaving ? (
 						<>
-							<Spinner/>
+							<Spinner />
 							Saving
 						</>
-					) : 'Save' }
+					) : (
+						'Save'
+					) }
 				</Button>
 				<Button
 					onClick={ onCancel }
@@ -538,6 +590,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 
 ## What's next?
 
-* **Previous part:** [Building a list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
-* **Next part:** Building a *New Page* form (coming soon)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
+-   **Previous part:** [Building a list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
+-   **Next part:** Building a _New Page_ form (coming soon)
+-   (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/non-block-react-wp-data-56d6f3) in the block-development-examples repository
