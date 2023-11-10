@@ -33,11 +33,10 @@ const meta: Meta< typeof CustomSelect > = {
 		},
 	},
 	decorators: [
-		// Layout wrapper
 		( Story ) => (
 			<div
 				style={ {
-					minHeight: '300px',
+					minHeight: '250px',
 				} }
 			>
 				<Story />

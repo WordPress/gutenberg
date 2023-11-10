@@ -45,8 +45,9 @@ export function CustomSelect( props: CustomSelectProps ) {
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
 			<Styled.CustomSelectButton className={ classes } store={ store }>
 				{ styledValue ? styledValue( currentValue ) : currentValue }
+				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
-			<Styled.CustomSelectPopover gutter={ 4 } sameWidth store={ store }>
+			<Styled.CustomSelectPopover store={ store } sameWidth>
 				{ children }
 			</Styled.CustomSelectPopover>
 		</>

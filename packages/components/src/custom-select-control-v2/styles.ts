@@ -12,21 +12,29 @@ import * as Ariakit from '@ariakit/react';
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
 
+export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-transform: uppercase;
+	margin-bottom: ${ space( 2 ) };
+`;
+
 export const CustomSelectButton = styled( Ariakit.Select )`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	font-size: 1rem;
-	border-style: none;
-	border-radius: ${ space( 1 ) };
-	min-width: 250px;
-	margin-top: 1rem;
-	padding: ${ space( 4 ) };
 	background: ${ COLORS.white };
-	box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-		${ COLORS.gray[ 400 ] };
-	&:hover {
-		background-color: ${ COLORS.gray[ 100 ] };
+	border: 1px solid ${ COLORS.gray[ 600 ] };
+	border-radius: ${ space( 0.5 ) };
+	cursor: pointer;
+	padding: ${ space( 2 ) };
+	width: 100%;
+	&[data-focus-visible] {
+		outline-style: solid;
+	}
+	&[aria-expanded='true'] {
+		border: 1.5px solid ${ COLORS.theme.accent };
 	}
 `;
 
@@ -41,16 +49,14 @@ export const inputSize = {
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	z-index: 50;
-	border-radius: ${ space( 1 ) };
+	border-radius: ${ space( 0.5 ) };
 	background: ${ COLORS.white };
-	box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-		${ COLORS.gray[ 400 ] };
+	border: 1px solid ${ COLORS.gray[ 900 ] };
+	margin: ${ space( 3 ) } 0;
 `;
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
-	cursor: pointer;
 	padding: ${ space( 2 ) };
 	&:hover {
-		background-color: ${ COLORS.theme.accent };
-		color: ${ COLORS.white };
+		background-color: ${ COLORS.gray[ 300 ] };
 	}
 `;
