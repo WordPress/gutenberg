@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -128,6 +128,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -182,6 +183,19 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
+
+	useEffect(
+		function openGlobalStylesOnLoad() {
+			const searchParams = new URLSearchParams( window.location.search );
+			if ( searchParams.get( 'styles' ) === 'open' ) {
+				enableComplementaryArea(
+					'core/edit-site',
+					'edit-site/global-styles'
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URLQueryController> from double-announcing.
