@@ -95,6 +95,7 @@ export { default as formatStrikethrough } from './library/format-strikethrough';
 export { default as formatUnderline } from './library/format-underline';
 export { default as formatUppercase } from './library/format-uppercase';
 export { default as fullscreen } from './library/fullscreen';
+export { default as funnel } from './library/funnel';
 export { default as gallery } from './library/gallery';
 export { default as globe } from './library/globe';
 export { default as grid } from './library/grid';

@@ -53,7 +53,7 @@ if ( ! process.env.WP_ARTIFACTS_PATH ) {
 }
 
 const testResult = spawn(
-	'npx',
+	'node',
 	[
 		require.resolve( '@playwright/test/cli' ),
 		'test',

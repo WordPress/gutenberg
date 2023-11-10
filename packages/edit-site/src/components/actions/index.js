@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash } from '@wordpress/icons';
+import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -31,7 +31,7 @@ export function useTrashPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				try {
 					await deleteEntityRecord(
 						'postType',
@@ -67,6 +67,114 @@ export function useTrashPostAction() {
 	);
 }
 
+export function usePermanentlyDeletePostAction() {
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const { deleteEntityRecord } = useDispatch( coreStore );
+
+	return useMemo(
+		() => ( {
+			id: 'permanently-delete',
+			label: __( 'Permanently delete' ),
+			isPrimary: true,
+			icon: trash,
+			isEligible( { status } ) {
+				return status === 'trash';
+			},
+			async callback( post ) {
+				try {
+					await deleteEntityRecord(
+						'postType',
+						post.type,
+						post.id,
+						{ force: true },
+						{ throwOnError: true }
+					);
+					createSuccessNotice(
+						sprintf(
+							/* translators: The posts's title. */
+							__( '"%s" permanently deleted.' ),
+							decodeEntities( post.title.rendered )
+						),
+						{
+							type: 'snackbar',
+							id: 'edit-site-post-permanently-deleted',
+						}
+					);
+				} catch ( error ) {
+					const errorMessage =
+						error.message && error.code !== 'unknown_error'
+							? error.message
+							: __(
+									'An error occurred while permanently deleting the post.'
+							  );
+
+					createErrorNotice( errorMessage, { type: 'snackbar' } );
+				}
+			},
+		} ),
+		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
+	);
+}
+
+export function useRestorePostAction() {
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+
+	return useMemo(
+		() => ( {
+			id: 'restore',
+			label: __( 'Restore' ),
+			isPrimary: true,
+			icon: backup,
+			isEligible( { status } ) {
+				return status === 'trash';
+			},
+			async callback( post ) {
+				await editEntityRecord( 'postType', post.type, post.id, {
+					status: 'draft',
+				} );
+				try {
+					await saveEditedEntityRecord(
+						'postType',
+						post.type,
+						post.id,
+						{ throwOnError: true }
+					);
+					createSuccessNotice(
+						sprintf(
+							/* translators: The posts's title. */
+							__( '"%s" has been restored.' ),
+							decodeEntities( post.title.rendered )
+						),
+						{
+							type: 'snackbar',
+							id: 'edit-site-post-restored',
+						}
+					);
+				} catch ( error ) {
+					const errorMessage =
+						error.message && error.code !== 'unknown_error'
+							? error.message
+							: __(
+									'An error occurred while restoring the post.'
+							  );
+
+					createErrorNotice( errorMessage, { type: 'snackbar' } );
+				}
+			},
+		} ),
+		[
+			createSuccessNotice,
+			createErrorNotice,
+			editEntityRecord,
+			saveEditedEntityRecord,
+		]
+	);
+}
+
 export const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
@@ -75,7 +183,7 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	perform( post ) {
+	callback( post ) {
 		document.location.href = post.link;
 	},
 };
@@ -89,7 +197,7 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			perform( post ) {
+			callback( post ) {
 				history.push( {
 					postId: post.id,
 					postType: post.type,
@@ -114,7 +222,7 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	perform( post ) {
+	callback( post ) {
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );

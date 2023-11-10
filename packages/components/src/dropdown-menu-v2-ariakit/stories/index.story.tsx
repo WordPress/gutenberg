@@ -40,6 +40,7 @@ const meta: Meta< typeof DropdownMenu > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		trigger: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -494,10 +495,6 @@ export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
 };
 InsideModal.args = {
 	...Default.args,
-	hideOnEscape: ( e ) => {
-		e.stopPropagation();
-		return true;
-	},
 };
 InsideModal.parameters = {
 	docs: {

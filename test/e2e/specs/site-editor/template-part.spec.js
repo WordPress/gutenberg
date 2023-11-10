@@ -211,9 +211,7 @@ test.describe( 'Template Part', () => {
 
 		// Detach the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
-		await editor.clickBlockOptionsMenuItem(
-			'Detach blocks from template part'
-		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();

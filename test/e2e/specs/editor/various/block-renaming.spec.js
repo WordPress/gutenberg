@@ -15,10 +15,8 @@ test.describe( 'Block Renaming', () => {
 			pageUtils,
 		} ) => {
 			// Turn on block list view by default.
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-site', 'showListViewByDefault', true );
+			await editor.setPreferences( 'core/edit-site', {
+				showListViewByDefault: true,
 			} );
 
 			const listView = page.getByRole( 'treegrid', {

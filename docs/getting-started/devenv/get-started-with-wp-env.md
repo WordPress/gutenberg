@@ -140,4 +140,5 @@ Your environment should now be set up at <code>http://localhost:8888</code>.
 - [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
 - [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
 - [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
+- [wp-env: Simple Local Environments for WordPress](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/) (Make WordPress Core Blog)
 - [`wp-env` Basics diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA) (Excalidraw)
