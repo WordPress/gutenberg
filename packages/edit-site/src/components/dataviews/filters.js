@@ -37,44 +37,39 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} );
 	} );
 
-	const visibleFilters = view.visibleFilters
-		?.map( ( fieldName ) => {
-			const visibleFiltersForField = filtersRegistered.filter(
-				( f ) => f.field === fieldName
-			);
+	const visibleFiltersList = filtersRegistered.filter( ( filter ) =>
+		view.visibleFilters.includes( filter.field )
+	);
+	const hiddenFiltersList = filtersRegistered.filter(
+		( filter ) => ! view.visibleFilters.includes( filter.field )
+	);
 
-			if ( visibleFiltersForField.length === 0 ) {
-				return null;
+	const visibleFilters = visibleFiltersList
+		?.map( ( filter ) => {
+			if ( OPERATOR_IN === filter.operator ) {
+				return (
+					<InFilter
+						key={ filter.field + '.' + filter.operator }
+						filter={ filter }
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
+				);
 			}
-
-			return visibleFiltersForField.map( ( filter ) => {
-				if ( OPERATOR_IN === filter.operator ) {
-					return (
-						<InFilter
-							key={ fieldName + '.' + filter.operator }
-							filter={ visibleFiltersForField[ 0 ] }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					);
-				}
-				return null;
-			} );
+			return null;
 		} )
 		.filter( Boolean );
 
-	// TODO: disable when no more filters to add.
 	visibleFilters.push(
 		<AddFilter
 			key="add-filter"
-			filters={ filtersRegistered }
+			filters={ hiddenFiltersList }
 			view={ view }
 			onChangeView={ onChangeView }
 		/>
 	);
 
-	if ( visibleFilters?.length > 0 ) {
-		// TODO: fix visibility.
+	if ( visibleFilters?.length > 1 ) {
 		visibleFilters.push(
 			<ResetFilters
 				key="reset-filters"

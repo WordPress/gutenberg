@@ -28,7 +28,9 @@ export default function AddFilter( { filters, onChangeView } ) {
 			<DropdownMenuV2
 				label={ __( 'Add filter' ) }
 				trigger={
-					<Button variant="tertiary">{ __( '+ Add filter' ) }</Button>
+					<Button disabled={ ! filters?.length } variant="tertiary">
+						{ __( '+ Add filter' ) }
+					</Button>
 				}
 			>
 				{ filters.map( ( filter ) => (
