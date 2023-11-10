@@ -103,7 +103,7 @@ export default function ItemActions( { item, actions } ) {
 							key={ action.id }
 							action={ action }
 							item={ item }
-							onClick={ () => action.perform( item ) }
+							onClick={ () => action.callback( item ) }
 						/>
 					);
 				} ) }
@@ -129,7 +129,9 @@ export default function ItemActions( { item, actions } ) {
 										key={ action.id }
 										action={ action }
 										item={ item }
-										onClick={ () => action.perform( item ) }
+										onClick={ () =>
+											action.callback( item )
+										}
 									/>
 								);
 							} ) }

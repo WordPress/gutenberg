@@ -36,7 +36,7 @@ export function useResetTemplateAction() {
 			isPrimary: true,
 			icon: backup,
 			isEligible: isTemplateRevertable,
-			async perform( template ) {
+			async callback( template ) {
 				try {
 					await revertTemplate( template, { allowUndo: false } );
 					await saveEditedEntityRecord(
