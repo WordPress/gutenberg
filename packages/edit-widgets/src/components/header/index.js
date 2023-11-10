@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { BlockContextualToolbar } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +16,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';
+import { unlock } from '../../lock-unlock';
+
+const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 function Header( { setListViewToggleElement } ) {
 	const isMediumViewport = useViewportMatch( 'medium' );
