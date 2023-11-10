@@ -29,7 +29,7 @@ export default function SiteExport() {
 				contentDisposition.match( /=(.+)\.zip/ );
 			const fileName = contentDispositionMatches[ 1 ]
 				? contentDispositionMatches[ 1 ]
-				: 'edit-emptysite-export';
+				: 'edit-site-export';
 
 			downloadBlob( fileName + '.zip', blob, 'application/zip' );
 		} catch ( errorResponse ) {

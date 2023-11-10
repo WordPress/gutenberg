@@ -30,14 +30,25 @@ _Returns_
 
 Downloads a file, e.g., a text or readable stream, in the browser. Appropriate for downloading smaller file sizes, e.g., \< 5 MB.
 
-Example usage: const fileContent = JSON.stringify( { "title": "My Post", }, null, 2 ); const fileName = 'file.json';
+Example usage:
 
-    downloadBlob( 'file.json', fileContent, 'application/json' );
+```js
+const fileContent = JSON.stringify(
+	{
+		title: 'My Post',
+	},
+	null,
+	2
+);
+const fileName = 'file.json';
+
+downloadBlob( 'file.json', fileContent, 'application/json' );
+```
 
 _Parameters_
 
 -   _fileName_ `string`: File Name.
--   _content_ `string`: File Content.
+-   _content_ `BlobPart`: File Content (BufferSource | Blob | string).
 -   _contentType_ `string`: File mime type.
 
 _Returns_

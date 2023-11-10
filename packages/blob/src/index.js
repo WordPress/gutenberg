@@ -76,6 +76,8 @@ export function isBlobURL( url ) {
  * Appropriate for downloading smaller file sizes, e.g., < 5 MB.
  *
  * Example usage:
+ *
+ * ```js
  * 	const fileContent = JSON.stringify(
  * 		{
  * 			"title": "My Post",
@@ -86,11 +88,12 @@ export function isBlobURL( url ) {
  * 	const fileName = 'file.json';
  *
  * 	downloadBlob( 'file.json', fileContent, 'application/json' );
+ * ```
  *
- * @param {string} fileName    File Name.
- * @param {string} content     File Content.
- * @param {string} contentType File mime type.
- * @return {HTMLElement}       The created anchor element.
+ * @param {string}   fileName    File Name.
+ * @param {BlobPart} content     File Content (BufferSource | Blob | string).
+ * @param {string}   contentType File mime type.
+ * @return {HTMLElement}        The created anchor element.
  */
 export function downloadBlob( fileName = 'wp-download', content, contentType ) {
 	const file = new window.Blob( [ content ], { type: contentType } );
