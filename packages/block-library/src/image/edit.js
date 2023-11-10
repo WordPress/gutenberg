@@ -7,7 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { Placeholder } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	SearchControl,
+	Placeholder,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
@@ -21,7 +26,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { image as icon } from '@wordpress/icons';
+import { plugins as pluginsIcon, image as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -358,6 +363,77 @@ export function ImageEdit( {
 		);
 	};
 
+	// CONNECTING WITH CUSTOM FIELDS.
+	// Simulate fetching the REST API.
+	const metadata = [
+		{
+			name: 'Image 1',
+			key: 'image_1',
+			value: 'http://custom-fields.local/wp-content/uploads/2023/11/1.jpg',
+		},
+		{
+			name: 'Image 2',
+			key: 'image_2',
+			value: 'http://custom-fields.local/wp-content/uploads/2023/11/2.jpg',
+		},
+		{
+			name: 'Image 3',
+			key: 'image_3',
+			value: 'http://custom-fields.local/wp-content/uploads/2023/11/3.jpg',
+		},
+	];
+
+	// Adding the elements for the Bindings UI.
+	const [ addingBinding, setAddingBinding ] = useState( false );
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ searchInput, setSearchInput ] = useState( '' );
+	const [ selectedField, setSelectedField ] = useState( null );
+
+	function selectItem( item ) {
+		setSelectedField( item );
+		setAttributes( {
+			url: item.value,
+		} );
+		setAddingBinding( false );
+	}
+	function BindingsUI() {
+		return (
+			<Popover
+				popoverAnchor={ popoverAnchor }
+				onClose={ () => {
+					setAddingBinding( false );
+				} }
+				onFocusOutside={ () => {
+					setAddingBinding( false );
+				} }
+				placement="bottom"
+				shift
+			>
+				<SearchControl
+					label={ __( 'Search metadata' ) }
+					value={ searchInput }
+					onChange={ setSearchInput }
+					size="compact"
+				/>
+				<ul className="token-metadata-list">
+					{ metadata.map( ( item ) => (
+						<li
+							key={ item.key }
+							onClick={ () => selectItem( item ) }
+							className={
+								selectedField?.key === item.key
+									? 'selected-meta-field'
+									: ''
+							}
+						>
+							{ item.name }
+						</li>
+					) ) }
+				</ul>
+			</Popover>
+		);
+	}
+
 	return (
 		<figure { ...blockProps }>
 			<Image
@@ -395,6 +471,17 @@ export function ImageEdit( {
 				mediaPreview={ mediaPreview }
 				disableMediaButtons={ temporaryURL || url }
 			/>
+			<BlockControls group="other">
+				<Button
+					onClick={ () => {
+						setAddingBinding( ! addingBinding );
+					} }
+					aria-expanded={ true }
+					icon={ pluginsIcon }
+					ref={ setPopoverAnchor }
+				></Button>
+				{ addingBinding && <BindingsUI /> }
+			</BlockControls>
 		</figure>
 	);
 }
