@@ -37,6 +37,8 @@
 		}
 	}
 
+	// STATE: overlay is open.
+	// ********************************************************
 	&.is-menu-open {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
@@ -69,6 +71,8 @@
 .wp-overlay-component__dialog {
 	position: relative;
 
+	// STATE: overlay is open.
+	// ********************************************************
 	.is-menu-open & {
 		// Quesiton: why is this conditionally applied?
 		box-sizing: border-box;
@@ -98,6 +102,8 @@
 	flex-direction: column;
 	flex-wrap: nowrap;
 
+	// STATE: overlay is open.
+	// ********************************************************
 	.is-menu-open & {
 		// Quesiton: why is this conditionally applied?
 		box-sizing: border-box;
@@ -140,6 +146,8 @@
 .wp-overlay-component__open {
 	display: flex;
 
+	// When the overlay is always "on" then do not
+	// hide the open button on smaller viewports.
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
@@ -158,6 +166,8 @@
 	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
 
+	// STATE: overlay is open.
+	// ********************************************************
 	.is-menu-open & {
 		box-sizing: border-box;
 	}
@@ -171,6 +181,8 @@
 .wp-overlay-component__maybe-redundant {
 	width: 100%;
 
+	// STATE: overlay is open.
+	// ********************************************************
 	.has-modal-open & {
 		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
 		max-width: var(--wp--style--global--wide-size, 100%);
