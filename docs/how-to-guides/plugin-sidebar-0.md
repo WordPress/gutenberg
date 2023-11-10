@@ -249,9 +249,9 @@ The `useSelect` function is used to fetch data when the component loads and will
 
 	var MetaBlockField = function () {
 		var metaFieldValue = useSelect( function ( select ) {
-			return select( 'core/editor' ).getEditedPostAttribute(
-				'meta'
-			)[ 'sidebar_plugin_meta_block_field' ];
+			return select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
+				'sidebar_plugin_meta_block_field'
+			];
 		}, [] );
 
 		return el( Text, {
@@ -313,9 +313,9 @@ The `useDispatch` function takes a store name as its only argument and returns m
 
 	var MetaBlockField = function ( props ) {
 		var metaFieldValue = useSelect( function ( select ) {
-			return select( 'core/editor' ).getEditedPostAttribute(
-				'meta'
-			)[ 'sidebar_plugin_meta_block_field' ];
+			return select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
+				'sidebar_plugin_meta_block_field'
+			];
 		}, [] );
 
 		var editPost = useDispatch( 'core/editor' ).editPost;
@@ -379,7 +379,7 @@ Functions used in this guide:
 
 You now have a custom sidebar that you can use to update `post_meta` content.
 
-A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/plugin-sidebar) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/plugin-sidebar-9ee4a6) from the [block-development-examples](https://github.com/WordPress/block-development-examples) repository.
 
 ### Note
 
@@ -393,7 +393,7 @@ This problem does not exist if Custom Fields is not enabled.
 
 If you need to have Custom Fields enabled and also have post meta in the sidebar there are two possible solutions:
 
-1. Precede the name of the meta field with an underscore, so the name in the above example would be `_sidebar_plugin_meta_block_field`. This indicates that the post meta should be treated as private so it will not be visible in the Custom Fields section of a post. With this solution an error will be generated when you save the post unless you add an `auth_callback` property to the `args` array passed to `register_post_meta` with a function that ultimately returns `true`.  See the `args` documentation in the [post_meta](https://developer.wordpress.org/reference/functions/register_meta/#parameters) page for more info.
+1. Precede the name of the meta field with an underscore, so the name in the above example would be `_sidebar_plugin_meta_block_field`. This indicates that the post meta should be treated as private so it will not be visible in the Custom Fields section of a post. With this solution an error will be generated when you save the post unless you add an `auth_callback` property to the `args` array passed to `register_post_meta` with a function that ultimately returns `true`. See the `args` documentation in the [post_meta](https://developer.wordpress.org/reference/functions/register_meta/#parameters) page for more info.
 2. In the TextControl's `onChange` function, target the Value field textarea and set the value there to be the same as the value in the TextControl meta field. The value will then be identical in both places and so you can be assured that if the value is changed in the TextControl then it will still be saved to the database.
 
 ```js
