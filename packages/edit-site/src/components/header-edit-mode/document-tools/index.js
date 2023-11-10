@@ -14,7 +14,6 @@ import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, chevronUpDown } from '@wordpress/icons';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,42 +31,34 @@ const preventDefault = ( event ) => {
 
 export default function DocumentTools( {
 	blockEditorMode,
+	hasFixedToolbar,
 	isDistractionFree,
 	showIconLabels,
 	setListViewToggleElement,
 } ) {
 	const inserterButton = useRef();
-	const {
-		isInserterOpen,
-		isListViewOpen,
-		listViewShortcut,
-		isVisualMode,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetPreviewDeviceType,
-			isInserterOpened,
-			isListViewOpened,
-			getEditorMode,
-		} = select( editSiteStore );
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+	const { isInserterOpen, isListViewOpen, listViewShortcut, isVisualMode } =
+		useSelect( ( select ) => {
+			const {
+				__experimentalGetPreviewDeviceType,
+				isInserterOpened,
+				isListViewOpened,
+				getEditorMode,
+			} = select( editSiteStore );
+			const { getShortcutRepresentation } = select(
+				keyboardShortcutsStore
+			);
 
-		const { get: getPreference } = select( preferencesStore );
-
-		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			isInserterOpen: isInserterOpened(),
-			isListViewOpen: isListViewOpened(),
-			listViewShortcut: getShortcutRepresentation(
-				'core/edit-site/toggle-list-view'
-			),
-			isVisualMode: getEditorMode() === 'visual',
-			hasFixedToolbar: getPreference(
-				editSiteStore.name,
-				'fixedToolbar'
-			),
-		};
-	}, [] );
+			return {
+				deviceType: __experimentalGetPreviewDeviceType(),
+				isInserterOpen: isInserterOpened(),
+				isListViewOpen: isListViewOpened(),
+				listViewShortcut: getShortcutRepresentation(
+					'core/edit-site/toggle-list-view'
+				),
+				isVisualMode: getEditorMode() === 'visual',
+			};
+		}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
@@ -120,7 +111,7 @@ export default function DocumentTools( {
 
 	return (
 		<NavigableToolbar
-			className="edit-site-header-edit-mode__start"
+			className="edit-site-header-edit-mode__document-tools"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 		>
