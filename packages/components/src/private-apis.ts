@@ -32,7 +32,6 @@ import {
 import {
 	DropdownMenu as DropdownMenuV2Ariakit,
 	DropdownMenuGroup as DropdownMenuGroupV2Ariakit,
-	DropdownMenuGroupLabel as DropdownMenuGroupLabelV2Ariakit,
 	DropdownMenuItem as DropdownMenuItemV2Ariakit,
 	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
@@ -74,7 +73,6 @@ lock( privateApis, {
 	Theme,
 	DropdownMenuV2Ariakit,
 	DropdownMenuGroupV2Ariakit,
-	DropdownMenuGroupLabelV2Ariakit,
 	DropdownMenuItemV2Ariakit,
 	DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItemV2Ariakit,

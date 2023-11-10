@@ -16,7 +16,6 @@ import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuItem,
-	DropdownMenuGroupLabel,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuGroup,
@@ -452,9 +451,6 @@ describe( 'DropdownMenu', () => {
 				return (
 					<DropdownMenu trigger={ <button>Open dropdown</button> }>
 						<DropdownMenuGroup>
-							<DropdownMenuGroupLabel>
-								Radio group label
-							</DropdownMenuGroupLabel>
 							<DropdownMenuRadioItem
 								name="radio-test"
 								value="radio-one"
@@ -532,9 +528,6 @@ describe( 'DropdownMenu', () => {
 			render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuGroup>
-						<DropdownMenuGroupLabel>
-							Radio group label
-						</DropdownMenuGroupLabel>
 						<DropdownMenuRadioItem
 							name="radio-test"
 							value="radio-one"

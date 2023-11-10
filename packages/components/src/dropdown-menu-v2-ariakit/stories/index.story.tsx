@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
 /**
@@ -14,13 +13,12 @@ import { useState, useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { COLORS, useCx } from '../../utils';
+import { useCx } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuCheckboxItem,
 	DropdownMenuGroup,
-	DropdownMenuGroupLabel,
 	DropdownMenuSeparator,
 	DropdownMenuContext,
 	DropdownMenuRadioItem,
@@ -89,7 +87,6 @@ export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 		<DropdownMenuItem disabled>Disabled item</DropdownMenuItem>
 		<DropdownMenuSeparator />
 		<DropdownMenuGroup>
-			<DropdownMenuGroupLabel>Prefix and suffix</DropdownMenuGroupLabel>
 			<DropdownMenuItem
 				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
 			>
@@ -158,9 +155,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<DropdownMenu { ...props }>
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Individual, uncontrolled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-uncontrolled-a"
 					value="a"
@@ -183,9 +177,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Individual, controlled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-controlled-a"
 					value="a"
@@ -211,9 +202,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Multiple, uncontrolled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="a"
@@ -236,9 +224,6 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Multiple, controlled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-controlled"
 					value="a"
@@ -278,9 +263,6 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<DropdownMenu { ...props }>
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Uncontrolled radios
-				</DropdownMenuGroupLabel>
 				<DropdownMenuRadioItem name="radio-uncontrolled" value="one">
 					Radio item 1
 					<DropdownMenuItemHelpText>
@@ -300,9 +282,6 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Controlled radios
-				</DropdownMenuGroupLabel>
 				<DropdownMenuRadioItem
 					name="radio-controlled"
 					value="one"

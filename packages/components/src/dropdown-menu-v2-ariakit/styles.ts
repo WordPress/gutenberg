@@ -257,24 +257,6 @@ export const DropdownMenuItemContentWrapper = styled.div`
 
 export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
 
-export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
-	box-sizing: border-box;
-	display: flex;
-	align-items: center;
-	min-height: ${ space( 8 ) };
-
-	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
-		${ ITEM_PREFIX_WIDTH };
-	/* TODO: color doesn't match available UI variables */
-	color: ${ COLORS.gray[ 700 ] };
-
-	/* TODO: font size doesn't match available ones via "font" utils */
-	font-size: 11px;
-	line-height: 1.4;
-	font-weight: 500;
-	text-transform: uppercase;
-`;
-
 export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 	Pick< DropdownMenuContext, 'variant' >
 >`

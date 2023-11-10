@@ -30,7 +30,6 @@ import type {
 	DropdownMenuContext as DropdownMenuContextType,
 	DropdownMenuProps,
 	DropdownMenuGroupProps,
-	DropdownMenuGroupLabelProps,
 	DropdownMenuItemProps,
 	DropdownMenuCheckboxItemProps,
 	DropdownMenuRadioItemProps,
@@ -152,20 +151,6 @@ export const DropdownMenuGroup = forwardRef<
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
 		<Styled.DropdownMenuGroup
-			ref={ ref }
-			{ ...props }
-			store={ dropdownMenuContext?.store }
-		/>
-	);
-} );
-
-export const DropdownMenuGroupLabel = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
->( function DropdownMenuGroupLabel( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-	return (
-		<Styled.DropdownMenuGroupLabel
 			ref={ ref }
 			{ ...props }
 			store={ dropdownMenuContext?.store }

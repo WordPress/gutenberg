@@ -298,20 +298,6 @@ The contents of the group.
 
 - Required: yes
 
-### `DropdownMenuGroupLabel`
-
-Used to render a group label.
-
-#### Props
-
-The component accepts the following props:
-
-##### `children`: `React.ReactNode`
-
-The contents of the group.
-
-- Required: yes
-
 ### `DropdownMenuSeparatorProps`
 
 Used to render a visual separator.
