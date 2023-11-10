@@ -162,7 +162,7 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
 	popoverProps: {
 		placement: 'left-start',
-		offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 	},
 };
 
