@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import downloadjs from 'downloadjs';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -11,6 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { download } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
+import { downloadBlob } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function SiteExport() {
@@ -33,9 +29,9 @@ export default function SiteExport() {
 				contentDisposition.match( /=(.+)\.zip/ );
 			const fileName = contentDispositionMatches[ 1 ]
 				? contentDispositionMatches[ 1 ]
-				: 'edit-site-export';
+				: 'edit-emptysite-export';
 
-			downloadjs( blob, fileName + '.zip', 'application/zip' );
+			downloadBlob( fileName + '.zip', blob, 'application/zip' );
 		} catch ( errorResponse ) {
 			let error = {};
 			try {

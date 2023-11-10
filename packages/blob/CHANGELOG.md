@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New feature
+
+-   Add `downloadBlob` function and remove `downloadjs` dependency.
+
 ## 3.45.0 (2023-11-02)
 
 ## 3.44.0 (2023-10-18)
