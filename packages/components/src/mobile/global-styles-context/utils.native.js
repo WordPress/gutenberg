@@ -13,7 +13,7 @@ import {
 	useSettings,
 	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { usePreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -459,7 +459,10 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 export const useEditorColorScheme = ( baseStyle, darkStyle ) => {
 	const globalStyles = useGlobalStyles();
 
-	const deviceColorScheme = usePreferredColorScheme( baseStyle, darkStyle );
+	const deviceColorScheme = usePreferredColorSchemeStyle(
+		baseStyle,
+		darkStyle
+	);
 
 	const editorColors = globalStyles?.baseColors?.color;
 	const editorBackgroundColor = editorColors?.background;
