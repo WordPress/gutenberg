@@ -1,5 +1,18 @@
 == Changelog ==
 
+= 17.0.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix a fatal error in `WP_Fonts_Resolver::get_settings()`. ([55981](https://github.com/WordPress/gutenberg/pull/55981))
+
+## Contributors
+
+@anton-vlasenko
+
+
 = 17.0.0 =
 
 
