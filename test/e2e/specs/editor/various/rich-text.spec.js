@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'RichText', () => {
+test.describe( 'RichText (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
