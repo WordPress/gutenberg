@@ -63,10 +63,11 @@ figure.wp-block-image:not(.wp-block) {
 		transform: translate(-50%, -50%);
 	}
 
-	// When the Image block is linked,
-	// it's wrapped with a disabled <a /> tag.
-	// Restore cursor style so it doesn't appear 'clickable'.
 	> a {
+		pointer-events: none;
+		// When the Image block is linked,
+		// it's wrapped with a disabled <a /> tag.
+		// Restore cursor style so it doesn't appear 'clickable'.
 		cursor: default;
 	}
 }
