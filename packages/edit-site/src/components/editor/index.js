@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { EntityProvider } from '@wordpress/core-data';
@@ -127,7 +127,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			hasPageContentFocus: _hasPageContentFocus(),
 		};
 	}, [] );
-	const { setEditedPostContext } = useDispatch( editSiteStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -152,25 +151,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				editedPostType === TEMPLATE_POST_TYPE
 					? editedPost.slug
 					: undefined,
-			queryContext: [
-				context?.queryContext || { page: 1 },
-				( newQueryContext ) =>
-					setEditedPostContext( {
-						...context,
-						queryContext: {
-							...context?.queryContext,
-							...newQueryContext,
-						},
-					} ),
-			],
 		};
-	}, [
-		editedPost.slug,
-		editedPostType,
-		hasPageContentFocus,
-		context,
-		setEditedPostContext,
-	] );
+	}, [ editedPost.slug, editedPostType, hasPageContentFocus, context ] );
 
 	let title;
 	if ( hasLoadedPost ) {
