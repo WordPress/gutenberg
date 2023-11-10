@@ -7,7 +7,7 @@ import {
 	BaseControl,
 	Icon,
 } from '@wordpress/components';
-import { check } from '@wordpress/icons';
+import { chevronRightSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,9 +15,14 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from '../../lock-unlock';
 
-const { DropdownMenuV2, DropdownMenuItemV2 } = unlock( componentsPrivateApis );
+const {
+	DropdownMenuV2,
+	DropdownSubMenuV2,
+	DropdownSubMenuTriggerV2,
+	DropdownMenuItemV2,
+} = unlock( componentsPrivateApis );
 
-export default function AddFilter( { filters, view, onChangeView } ) {
+export default function AddFilter( { filters, onChangeView } ) {
 	return (
 		<BaseControl>
 			<DropdownMenuV2
@@ -27,35 +32,48 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 				}
 			>
 				{ filters.map( ( filter ) => (
-					<DropdownMenuItemV2
+					<DropdownSubMenuV2
 						key={ filter.field }
-						prefix={
-							view.visibleFilters.includes( filter.field ) && (
-								<Icon icon={ check } />
-							)
+						trigger={
+							<DropdownSubMenuTriggerV2
+								suffix={ <Icon icon={ chevronRightSmall } /> }
+							>
+								{ filter.name }
+							</DropdownSubMenuTriggerV2>
 						}
-						onSelect={ ( event ) => {
-							event.preventDefault();
-							onChangeView( ( currentView ) => ( {
-								...currentView,
-								visibleFilters:
-									currentView.visibleFilters.includes(
-										filter.field
-									)
-										? currentView.visibleFilters.filter(
-												( field ) =>
-													field !== filter.field
-										  )
-										: [
-												...currentView.visibleFilters,
-												filter.field,
-										  ],
-							} ) );
-						} }
-						role="menuitemcheckbox"
 					>
-						{ filter.name }
-					</DropdownMenuItemV2>
+						{ filter.elements.map( ( element ) => (
+							<DropdownMenuItemV2
+								key={ element.value }
+								onSelect={ () => {
+									onChangeView( ( currentView ) => ( {
+										...currentView,
+										// TODO: set filter as well
+										visibleFilters:
+											currentView.visibleFilters.includes(
+												filter.field
+											)
+												? currentView.visibleFilters
+												: [
+														...currentView.visibleFilters,
+														filter.field,
+												  ],
+										filters: [
+											...currentView.filters,
+											{
+												field: filter.field,
+												operator: 'in',
+												value: element.value,
+											},
+										],
+									} ) );
+								} }
+								role="menuitemcheckbox"
+							>
+								{ element.label }
+							</DropdownMenuItemV2>
+						) ) }
+					</DropdownSubMenuV2>
 				) ) }
 			</DropdownMenuV2>
 		</BaseControl>

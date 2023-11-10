@@ -74,6 +74,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 	);
 
 	if ( visibleFilters?.length > 0 ) {
+		// TODO: fix visibility.
 		visibleFilters.push(
 			<ResetFilters
 				key="reset-filters"
