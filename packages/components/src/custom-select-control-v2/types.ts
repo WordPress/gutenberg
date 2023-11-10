@@ -1,3 +1,18 @@
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type * as Ariakit from '@ariakit/react';
+
+export type CustomSelectContext =
+	| {
+			/**
+			 * The store object returned by Ariakit's `useSelectStore` hook.
+			 */
+			store: Ariakit.SelectStore;
+	  }
+	| undefined;
+
 export type CustomSelectProps = {
 	/**
 	 * The child elements. This should be composed of CustomSelect.Item components.

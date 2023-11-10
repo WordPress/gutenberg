@@ -6,13 +6,20 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { createContext, useContext, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import { useCx } from '../utils/hooks/use-cx';
 import * as Styled from './styles';
-import type { CustomSelectProps, CustomSelectItemProps } from './types';
+import type {
+	CustomSelectProps,
+	CustomSelectItemProps,
+	CustomSelectContext as CustomSelectContextType,
+} from './types';
+
+export const CustomSelectContext =
+	createContext< CustomSelectContextType >( undefined );
 
 export function CustomSelect( props: CustomSelectProps ) {
 	const {
@@ -41,7 +48,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 	);
 
 	return (
-		<>
+		<CustomSelectContext.Provider value={ { store } }>
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
 			<Styled.CustomSelectButton className={ classes } store={ store }>
 				{ styledValue ? styledValue( currentValue ) : currentValue }
@@ -50,10 +57,16 @@ export function CustomSelect( props: CustomSelectProps ) {
 			<Styled.CustomSelectPopover store={ store } sameWidth>
 				{ children }
 			</Styled.CustomSelectPopover>
-		</>
+		</CustomSelectContext.Provider>
 	);
 }
 
 export function CustomSelectItem( { ...props }: CustomSelectItemProps ) {
-	return <Styled.CustomSelectItem { ...props } />;
+	const customSelectContext = useContext( CustomSelectContext );
+	return (
+		<Styled.CustomSelectItem
+			store={ customSelectContext?.store }
+			{ ...props }
+		/>
+	);
 }
