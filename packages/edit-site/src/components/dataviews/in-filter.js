@@ -5,11 +5,10 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	SelectControl,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 
 export const OPERATOR_IN = 'in';
 
-export default function InFilter( { filter, view, onChangeView } ) {
+export default ( { filter, view, onChangeView } ) => {
 	const valueFound = view.filters.find(
 		( f ) => f.field === filter.field && f.operator === OPERATOR_IN
 	);
@@ -19,7 +18,7 @@ export default function InFilter( { filter, view, onChangeView } ) {
 			? ''
 			: valueFound.value;
 
-	const id = useInstanceId( InFilter, 'dataviews__filters-in' );
+	const id = `dataviews__filters-in-${ filter.field }`;
 
 	return (
 		<SelectControl
@@ -56,4 +55,4 @@ export default function InFilter( { filter, view, onChangeView } ) {
 			} }
 		/>
 	);
-}
+};
