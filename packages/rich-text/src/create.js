@@ -279,7 +279,7 @@ function filterRange( node, range, filter ) {
  * @param {string} string
  */
 export function collapseWhiteSpace( string ) {
-	return string.replace( /[ \n\r\t]+/g, ' ' ).replace( /^ | $/g, '' );
+	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
 /**
