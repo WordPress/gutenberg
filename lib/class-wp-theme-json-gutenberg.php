@@ -440,6 +440,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const VALID_STYLES = array(
+		'sections'   => null,
 		'border'     => array(
 			'color'  => null,
 			'radius' => null,
@@ -2174,14 +2175,106 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		// Blocks.
-		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
+		if (
+			! isset( $theme_json['styles']['blocks'] ) &&
+			! isset( $theme_json['styles']['sections'] )
+		) {
 			return $nodes;
 		}
 
-		$block_nodes = static::get_block_nodes( $theme_json, $selectors );
-		foreach ( $block_nodes as $block_node ) {
-			$nodes[] = $block_node;
+		// Blocks.
+		if ( isset( $theme_json['styles']['blocks'] ) ) {
+			$block_nodes = static::get_block_nodes( $theme_json, $selectors );
+			foreach ( $block_nodes as $block_node ) {
+				$nodes[] = $block_node;
+			}
+		}
+
+		// Sections
+		if ( isset( $theme_json['styles']['sections'] ) ) {
+			foreach ( $theme_json['styles']['sections'] as $section_index => $section ) {
+				$index = intval( $section_index );
+				$section_class = ".wp-section-$index";
+
+				// General section styles.
+				$nodes[] = array(
+					'path'     => array( 'styles', 'sections', $index ),
+					'selector' => $section_class,
+				);
+
+				// Section block styles.
+				if ( isset( $theme_json['styles']['sections'][ $index ]['blocks'] ) ) {
+					$section_block_styles = array(
+						'styles' => array(
+							'blocks' => $theme_json['styles']['sections'][ $index ]['blocks']
+						)
+					);
+					$section_block_nodes = static::get_block_nodes( $section_block_styles, $selectors );
+					foreach( $section_block_nodes as &$section_block_node ) {
+						// Update the path to the section's block styles.
+						array_splice( $section_block_node['path'], 1, 0, array( 'sections', $index ) );
+
+						// Scope the block's root selector by the section's class.
+						$section_block_node['selector'] = static::scope_selector( $section_class, $section_block_node['selector'] );
+						foreach ($section_block_node['selectors'] as $feature => $selector ) {
+							if ( is_string( $selector ) ) {
+								$section_block_node['selectors'][ $feature ] = static::scope_selector( $section_class, $selector );
+							}
+
+							if ( is_array( $selector ) ){
+								foreach ( $selector as $subfeature => $subfeature_selector ) {
+									$section_block_node['selectors'][ $feature ][ $subfeature ] = static::scope_selector( $section_class, $subfeature_selector );
+								}
+							}
+						}
+
+						// Scope duotone selectors.
+						if ( ! empty( $section_block_node['duotone'] ) ) {
+							$section_block_node['duotone'] = static::scope_selector( $section_class, $section_block_node['duotone'] );
+						}
+
+						// TODO: What about variations??????
+					}
+				}
+
+				// Section element styles.
+				if ( isset( $theme_json['styles']['sections'][ $index ]['elements'] ) ) {
+					foreach ( self::ELEMENTS as $element => $selector ) {
+						if ( ! isset( $theme_json['styles']['sections'][ $index ]['elements'][ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
+							continue;
+						}
+
+						// Handle element defaults.
+						$nodes[] = array(
+							'path'     => array( 'styles', 'sections', $index, 'elements', $element ),
+							'selector' => static::scope_selector( $section_class, static::ELEMENTS[ $element ] ),
+						);
+
+						// Handle any pseudo selectors for the element.
+						if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
+							foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+
+								if ( isset( $theme_json['styles']['sections'][ $index ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+									$combined_pseudo_selector = static::append_to_selector( static::ELEMENTS[ $element ], $pseudo_selector );
+									$nodes[] = array(
+										// There's some weirdness with the path actually being to the element not the pseudo_selector's path.
+										'path'     => array( 'styles', 'sections', $index, 'elements', $element ),
+										'selector' => static::scope_selector( $section_class, $combined_pseudo_selector ),
+									);
+								}
+							}
+						}
+					}
+				}
+
+
+				// TODO: Implement generation of section block element nodes.
+			}
+
+			foreach ( $section_block_nodes as $section_block_node ) {
+				$nodes[] = $section_block_node;
+			}
+
 		}
 
 		/**
