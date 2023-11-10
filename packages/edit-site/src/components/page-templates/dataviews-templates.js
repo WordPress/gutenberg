@@ -9,9 +9,10 @@ import removeAccents from 'remove-accents';
 import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -21,7 +22,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import AddedBy from '../list/added-by';
+import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
 import {
@@ -45,6 +46,47 @@ const DEFAULT_VIEW = {
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
+}
+
+// TODO: these are going to be reused in the template part list.
+// That's the reason for leaving the template parts code for now.
+function TemplateTitle( { item } ) {
+	const { isCustomized } = useAddedBy( item.type, item.id );
+	return (
+		<VStack spacing={ 1 }>
+			<Heading as="h3" level={ 5 }>
+				<Link
+					params={ {
+						postId: item.id,
+						postType: item.type,
+						canvas: 'edit',
+					} }
+				>
+					{ decodeEntities( item.title?.rendered || item.slug ) ||
+						__( '(no title)' ) }
+				</Link>
+			</Heading>
+			{ isCustomized && (
+				<span className="edit-site-list-added-by__customized-info">
+					{ item.type === TEMPLATE_POST_TYPE
+						? _x( 'Customized', 'template' )
+						: _x( 'Customized', 'template part' ) }
+				</span>
+			) }
+		</VStack>
+	);
+}
+
+function AuthorField( { item } ) {
+	const { text, type, imageUrl } = useAddedBy( item.type, item.id );
+	return (
+		<HStack alignment="left">
+			{ type === 'user' && imageUrl && (
+				<AvatarImage imageUrl={ imageUrl } />
+			) }
+			<span>{ text }</span>
+		</HStack>
+	);
 }
 
 export default function DataviewsTemplates() {
@@ -110,25 +152,7 @@ export default function DataviewsTemplates() {
 				header: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' ) }
-								</Link>
-							</Heading>
-						</VStack>
-					);
-				},
+				render: ( { item } ) => <TemplateTitle item={ item } />,
 				maxWidth: 400,
 				enableHiding: false,
 			},
@@ -145,17 +169,14 @@ export default function DataviewsTemplates() {
 						)
 					);
 				},
+				maxWidth: 200,
 				enableSorting: false,
 			},
 			{
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: () => {},
-				render: ( { item } ) => {
-					return (
-						<AddedBy postType={ item.type } postId={ item.id } />
-					);
-				},
+				render: ( { item } ) => <AuthorField item={ item } />,
 				enableHiding: false,
 				enableSorting: false,
 			},
