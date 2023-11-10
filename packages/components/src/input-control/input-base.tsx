@@ -117,7 +117,9 @@ export function InputBase(
 			labelPosition={ labelPosition }
 			ref={ ref }
 		>
-			{ ! labelInside && <Label { ...labelProps }>{ label }</Label> }
+			{ label && ! labelInside && (
+				<Label { ...labelProps }>{ label }</Label>
+			) }
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
@@ -126,7 +128,7 @@ export function InputBase(
 				labelPosition={ labelPosition }
 			>
 				<ContextSystemProvider value={ prefixSuffixContextValue }>
-					{ labelInside && (
+					{ label && labelInside && (
 						<InnerLabel { ...labelProps }>{ label }</InnerLabel>
 					) }
 					{ prefix && (
