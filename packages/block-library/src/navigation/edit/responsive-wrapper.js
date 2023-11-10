@@ -34,6 +34,7 @@ export default function ResponsiveWrapper( {
 
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
+		'wp-overlay-component',
 		{
 			'has-text-color':
 				!! overlayTextColor.color || !! overlayTextColor?.class,
@@ -61,13 +62,16 @@ export default function ResponsiveWrapper( {
 
 	const openButtonClasses = classnames(
 		'wp-block-navigation__responsive-container-open',
+		'wp-overlay-component__open',
+		'wp-overlay-component__toggle',
 		{ 'always-shown': isHiddenByDefault }
 	);
 
 	const modalId = `${ id }-modal`;
 
 	const dialogProps = {
-		className: 'wp-block-navigation__responsive-dialog',
+		className:
+			'wp-block-navigation__responsive-dialog wp-overlay-component__dialog',
 		...( isOpen && {
 			role: 'dialog',
 			'aria-modal': true,
@@ -95,12 +99,12 @@ export default function ResponsiveWrapper( {
 				id={ modalId }
 			>
 				<div
-					className="wp-block-navigation__responsive-close"
+					className="wp-block-navigation__responsive-close wp-overlay-component__maybe-redundant"
 					tabIndex="-1"
 				>
 					<div { ...dialogProps }>
 						<Button
-							className="wp-block-navigation__responsive-container-close"
+							className="wp-block-navigation__responsive-container-close wp-overlay-component__close wp-overlay-component__toggle"
 							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
 						>
@@ -108,7 +112,7 @@ export default function ResponsiveWrapper( {
 							{ ! hasIcon && __( 'Close' ) }
 						</Button>
 						<div
-							className="wp-block-navigation__responsive-container-content"
+							className="wp-block-navigation__responsive-container-content wp-overlay-component__content"
 							id={ `${ modalId }-content` }
 						>
 							{ children }

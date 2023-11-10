@@ -1,0 +1,188 @@
+
+// ********************************************************
+// ANIMATION
+// ********************************************************
+@keyframes overlay-menu__fade-in-animation {
+	from {
+		opacity: 0;
+		transform: translateY(0.5em);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+
+// ********************************************************
+// ROOT
+// Alias: wp-block-navigation__responsive-container
+// ********************************************************
+.wp-overlay-component {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	@include break-small() {
+		&:not(.hidden-by-default):not(.is-menu-open) {
+			display: block;
+			width: 100%;
+			position: relative;
+			z-index: auto;
+			background-color: inherit;
+		}
+	}
+
+	&.is-menu-open {
+		display: flex; // Needs to be set to override "none".
+		flex-direction: column;
+		background-color: inherit;
+
+		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
+		padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
+		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
+		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
+		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20em);
+
+		// Animation.
+		animation: overlay-menu__fade-in-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		// Allow modal to scroll.
+		overflow: auto;
+
+		// Give it a z-index just higher than the adminbar.
+		z-index: 100000;
+	}
+}
+
+
+// ********************************************************
+// DIALOG
+// Alias: wp-block-navigation__responsive-dialog
+// ********************************************************
+.wp-overlay-component__dialog {
+	position: relative;
+
+	.is-menu-open & {
+		// Quesiton: why is this conditionally applied?
+		box-sizing: border-box;
+	}
+}
+
+
+// ********************************************************
+// CONTENT
+// Alias: wp-block-navigation__responsive-container-content
+// ********************************************************
+.wp-overlay-component__content {
+	// Always align the contents of the menu to the top.
+
+	justify-content: flex-start;
+
+	// Add padding above to accommodate close button.
+	padding-top: calc(2rem + #{ $navigation-icon-size });
+
+	// Don't crop the focus style.
+	overflow: visible;
+
+	// Override the container flex layout settings
+	// because we want overlay menu to always display
+	// as a column.
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+
+	.is-menu-open & {
+		// Quesiton: why is this conditionally applied?
+		box-sizing: border-box;
+	}
+}
+
+
+// ********************************************************
+// TOGGLE BUTTONS
+// Alias:
+// - .wp-block-navigation__responsive-container-open,
+// - .wp-block-navigation__responsive-container-close
+// ********************************************************
+
+.wp-overlay-component__toggle {
+	vertical-align: middle;
+	cursor: pointer;
+	color: currentColor;
+	background: transparent;
+	border: none;
+	margin: 0;
+	padding: 0;
+	text-transform: inherit;
+
+	svg {
+		fill: currentColor;
+		pointer-events: none;
+		display: block;
+		width: $navigation-icon-size;
+		height: $navigation-icon-size;
+	}
+}
+
+
+// ********************************************************
+// OPEN BUTTON
+// Alias: wp-block-navigation__responsive-container-open
+// ********************************************************
+
+.wp-overlay-component__open {
+	display: flex;
+
+	&:not(.always-shown) {
+		@include break-small {
+			display: none;
+		}
+	}
+}
+
+// ********************************************************
+// CLOSE BUTTON
+// Alias: wp-block-navigation__responsive-container-close
+// ********************************************************
+
+.wp-overlay-component__close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 2; // Needs to be above the modal z index itself.
+
+	.is-menu-open & {
+		box-sizing: border-box;
+	}
+}
+
+
+// ********************************************************
+// MAYBE REDUNDANT
+// Alias: wp-block-navigation__responsive-close
+// ********************************************************
+.wp-overlay-component__maybe-redundant {
+	width: 100%;
+
+	.has-modal-open & {
+		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+		max-width: var(--wp--style--global--wide-size, 100%);
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	// This element is not keyboard accessible, and is focusable only using the mouse.
+	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,
+	// where clicking that scrim closes the overlay just like the close button.
+	// It should not have a visible focus rectangle.
+	&:focus {
+		outline: none;
+	}
+}
