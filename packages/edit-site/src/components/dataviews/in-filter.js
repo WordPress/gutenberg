@@ -18,12 +18,16 @@ export default ( { filter, view, onChangeView } ) => {
 			? ''
 			: valueFound.value;
 
+	const id = `dataviews__filters-in-${ filter.field }`;
+
 	return (
 		<SelectControl
+			id={ id }
 			value={ activeValue }
 			prefix={
 				<InputControlPrefixWrapper
-					as="span"
+					as="label"
+					htmlFor={ id }
 					className="dataviews__select-control-prefix"
 				>
 					{ filter.name + ':' }
