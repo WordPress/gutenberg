@@ -168,6 +168,7 @@ In order to include the blockEditor as a dependency, make sure to run the build 
 {% JSX %}
 
 Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
+
 ```bash
 npm run build
 ```
@@ -199,7 +200,7 @@ Use the `editorStyle` property to a CSS file you want to load in the editor view
 
 It is worth noting that, if the editor content is iframed, both of these will
 load in the iframe. `editorStyle` will also load outside the iframe, so it can
-be used for editor content as well as UI. 
+be used for editor content as well as UI.
 
 For example:
 
@@ -249,4 +250,4 @@ The files will automatically be enqueued when specified in the block.json.
 
 This guide showed a couple of different ways to apply styles to your block, by either inline or in its own style sheet. Both of these methods use the `useBlockProps` hook, see the [block wrapper reference documentation](/docs/reference-guides/block-api/block-edit-save.md#block-wrapper-props) for additional details.
 
-See the complete [example-02-stylesheets](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/02-stylesheets) code in the [gutenberg-examples repository](https://github.com/WordPress/gutenberg-examples).
+See the complete [stylesheets-79a4c3](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/stylesheets-79a4c3) code in the [block-development-examples](https://github.com/WordPress/block-development-examples)
