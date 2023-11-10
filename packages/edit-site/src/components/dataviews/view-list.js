@@ -28,7 +28,6 @@ import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useMemo, Children, Fragment } from '@wordpress/element';
 
@@ -267,7 +266,7 @@ function ViewList( {
 		} );
 		if ( actions?.length ) {
 			_columns.push( {
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+				header: __( 'Actions' ),
 				id: 'actions',
 				cell: ( props ) => {
 					return (
