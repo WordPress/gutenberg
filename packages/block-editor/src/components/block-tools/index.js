@@ -6,28 +6,48 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import EmptyBlockInserter from './empty-block-inserter';
 import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockPopover from './selected-block-popover';
+import SelectedBlockTools from './selected-block-tools';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
 function selector( select ) {
-	const { __unstableGetEditorMode, getSettings, isTyping } =
-		select( blockEditorStore );
+	const {
+		getSelectedBlockClientId,
+		getFirstMultiSelectedBlockClientId,
+		getBlock,
+		getSettings,
+		__unstableGetEditorMode,
+		isTyping,
+	} = select( blockEditorStore );
+
+	const clientId =
+		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+
+	const { name = '', attributes = {} } = getBlock( clientId ) || {};
 
 	return {
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
+		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
+		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		showEmptyBlockSideInserter:
+			clientId &&
+			! isTyping() &&
+			__unstableGetEditorMode() === 'edit' &&
+			isUnmodifiedDefaultBlock( { name, attributes } ),
 	};
 }
 
@@ -46,10 +66,14 @@ export default function BlockTools( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { hasFixedToolbar, isZoomOutMode, isTyping } = useSelect(
-		selector,
-		[]
-	);
+	const {
+		clientId,
+		hasFixedToolbar,
+		hasSelectedBlock,
+		isTyping,
+		isZoomOutMode,
+		showEmptyBlockSideInserter,
+	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -63,6 +87,8 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
+
+	const selectedBlockToolsRef = useRef( null );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
@@ -106,6 +132,15 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			if ( selectedBlockToolsRef?.current?.contains( event.target ) ) {
+				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
+				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
+				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
+				// - This bubbles via the React tree, which hits this `unselect` escape keypress before the block toolbar DOM event listener has access to it.
+				// An alternative would be to remove the addEventListener on the navigableToolbar and use this event to handle it directly right here. That feels hacky too though.
+				return;
+			}
+
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
@@ -140,13 +175,28 @@ export default function BlockTools( {
 				) }
 				{ ! isZoomOutMode &&
 					( hasFixedToolbar || ! isLargeViewport ) && (
-						<BlockContextualToolbar isFixed />
+						<BlockContextualToolbar
+							ref={ selectedBlockToolsRef }
+							isFixed
+						/>
 					) }
+
+				{ showEmptyBlockSideInserter && (
+					<EmptyBlockInserter
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }
-				<SelectedBlockPopover
-					__unstableContentRef={ __unstableContentRef }
-				/>
+				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
+					<SelectedBlockTools
+						ref={ selectedBlockToolsRef }
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
+
 				{ /* Used for the inline rich text toolbar. */ }
 				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
 				{ children }

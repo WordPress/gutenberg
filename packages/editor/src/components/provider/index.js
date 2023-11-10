@@ -63,7 +63,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		);
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
-			!! __unstableTemplate
+			type,
+			id
 		);
 		const {
 			updatePostLock,

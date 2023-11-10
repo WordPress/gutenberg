@@ -346,22 +346,43 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that returns whether the Query Loop with the given `clientId` contains
- * any third-party block.
+ * The object returned by useUnsupportedBlocks with info about the type of
+ * unsupported blocks present inside the Query block.
+ *
+ * @typedef  {Object}  UnsupportedBlocksInfo
+ * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
+ * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
+ */
+
+/**
+ * Hook that returns an object with information about the unsupported blocks
+ * present inside a Query Loop with the given `clientId`. The returned object
+ * contains props that are true when a certain type of unsupported block is
+ * present.
  *
  * @param {string} clientId The block's client ID.
- * @return {boolean} True if it contains third-party blocks.
+ * @return {UnsupportedBlocksInfo} The object containing the information.
  */
-export const useContainsThirdPartyBlocks = ( clientId ) => {
+export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-
-			return getClientIdsOfDescendants( clientId ).some(
-				( descendantClientId ) =>
-					! getBlockName( descendantClientId ).startsWith( 'core/' )
+			const blocks = {};
+			getClientIdsOfDescendants( clientId ).forEach(
+				( descendantClientId ) => {
+					const blockName = getBlockName( descendantClientId );
+					if ( ! blockName.startsWith( 'core/' ) ) {
+						blocks.hasBlocksFromPlugins = true;
+					} else if ( blockName === 'core/post-content' ) {
+						blocks.hasPostContentBlock = true;
+					}
+				}
 			);
+			blocks.hasUnsupportedBlocks =
+				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
+			return blocks;
 		},
 		[ clientId ]
 	);

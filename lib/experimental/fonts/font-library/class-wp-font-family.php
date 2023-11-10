@@ -376,7 +376,7 @@ class WP_Font_Family {
 
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
-			// If the fonts are not meant to be dowloaded or uploaded
+			// If the fonts are not meant to be downloaded or uploaded
 			// (for example to install fonts that use a remote url).
 			$new_font_face = $font_face;
 

@@ -28,6 +28,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
+	blockEditorPrivateApis
+);
+
 /**
  * Menu control to convert block(s) to reusable block.
  *
@@ -42,9 +46,6 @@ export default function ReusableBlockConvertButton( {
 	rootClientId,
 	onClose,
 } ) {
-	const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
-		blockEditorPrivateApis
-	);
 	const showRenameHint = useReusableBlocksRenameHint();
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );

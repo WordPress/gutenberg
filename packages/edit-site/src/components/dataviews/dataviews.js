@@ -14,19 +14,38 @@ import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
+import Search from './search';
 import { ViewGrid } from './view-grid';
+import { ViewSideBySide } from './view-side-by-side';
+
+// To do: convert to view type registry.
+export const viewTypeSupportsMap = {
+	list: {},
+	grid: {},
+	'side-by-side': {
+		preview: true,
+	},
+};
+
+const viewTypeMap = {
+	list: ViewList,
+	grid: ViewGrid,
+	'side-by-side': ViewSideBySide,
+};
 
 export default function DataViews( {
 	view,
 	onChangeView,
 	fields,
-	filters,
+	search = true,
+	searchLabel = undefined,
 	actions,
 	data,
 	isLoading = false,
 	paginationInfo,
+	supportedLayouts,
 } ) {
-	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
+	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
@@ -35,11 +54,17 @@ export default function DataViews( {
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 4 } justify="flex-start">
 				<HStack>
 					<HStack justify="start">
+						{ search && (
+							<Search
+								label={ searchLabel }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
+						) }
 						<Filters
-							filters={ filters }
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
@@ -50,6 +75,7 @@ export default function DataViews( {
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							supportedLayouts={ supportedLayouts }
 						/>
 					</HStack>
 				</HStack>

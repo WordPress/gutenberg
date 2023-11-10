@@ -35,25 +35,11 @@
 	margin: 0;
 }
 
-.patterns-menu-items__convert-modal__terms-label {
-	font-size: 11px;
-	font-weight: 500;
-	line-height: 1.4;
-	text-transform: uppercase;
-	display: inline-block;
-	padding: 0;
-}
+.patterns-rename-pattern-category-modal__validation-message {
+	color: $alert-red;
 
-.patterns-category-selector__terms-list {
-	max-height: 6rem;
-	overflow: auto;
-	border: 1px solid $gray-600;
-	padding: 8px;
-
-	.patterns-category-selector__terms-choice {
-		margin-bottom: $grid-unit-10;
-		&:last-child {
-			margin-bottom: 2px;
-		}
+	// Match the input size.
+	@include break-medium() {
+		width: $grid-unit * 40;
 	}
 }

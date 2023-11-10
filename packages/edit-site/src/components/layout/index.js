@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -72,7 +72,6 @@ export default function Layout() {
 	useCommonCommands();
 	useBlockCommands();
 
-	const hubRef = useRef();
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
@@ -117,7 +116,7 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const showSidebar =
-		( isMobileViewport && ! isListPage ) ||
+		( isMobileViewport && canvasMode === 'view' && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
@@ -226,13 +225,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						variants={ {
-							isDistractionFree: { x: '-100%' },
-							isDistractionFreeHovering: { x: 0 },
-							view: { x: 0 },
-							edit: { x: 0 },
-						} }
-						ref={ hubRef }
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
@@ -290,7 +282,7 @@ export default function Layout() {
 							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
 							// so we can't remove the element entirely. Using `inert` will make
 							// it inaccessible to screen readers and keyboard navigation.
-							inert={ showSidebar ? undefined : 'inert' }
+							inert={ showSidebar ? undefined : 'true' }
 							animate={ { opacity: showSidebar ? 1 : 0 } }
 							transition={ {
 								type: 'tween',

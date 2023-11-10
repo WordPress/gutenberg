@@ -4,6 +4,7 @@
 	height: $grid-unit-60;
 }
 
-.editor-post-last-revision__title.components-button {
+// Needs specificity to override button styles.
+.editor-post-last-revision__title.components-button.components-button {
 	padding: $grid-unit-20;
 }
