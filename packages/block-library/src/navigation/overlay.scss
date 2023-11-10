@@ -85,26 +85,27 @@
 // Alias: wp-block-navigation__responsive-container-content
 // ********************************************************
 .wp-overlay-component__content {
-	// Always align the contents of the menu to the top.
-
-	justify-content: flex-start;
-
-	// Add padding above to accommodate close button.
-	padding-top: calc(2rem + #{ $navigation-icon-size });
-
-	// Don't crop the focus style.
-	overflow: visible;
-
-	// Override the container flex layout settings
-	// because we want overlay menu to always display
-	// as a column.
-	display: flex;
-	flex-direction: column;
-	flex-wrap: nowrap;
 
 	// STATE: overlay is open.
 	// ********************************************************
 	.is-overlay-open & {
+
+		// Always align the contents of the menu to the top.
+		justify-content: flex-start;
+
+		// Add padding above to accommodate close button.
+		padding-top: calc(2rem + #{ $navigation-icon-size });
+
+		// Don't crop the focus style.
+		overflow: visible;
+
+		// Override the container flex layout settings
+		// because we want overlay menu to always display
+		// as a column.
+		display: flex;
+		flex-direction: column;
+		flex-wrap: nowrap;
+
 		// Quesiton: why is this conditionally applied?
 		box-sizing: border-box;
 	}
