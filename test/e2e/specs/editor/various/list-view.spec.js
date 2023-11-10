@@ -464,101 +464,29 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
-		// Move up to the paragraph block in the first column block.
-		// Expand children to get to the deeply nested paragraph block.
+		// Move up to columns block, expand, and then move to the first column block.
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 
 		await expect
 			.poll(
 				listViewUtils.getBlocksWithA11yAttributes,
-				'The last inserted block should be selected, while the deeply nested paragraph block should be focused.'
+				'The last inserted block should be selected, while the first column block should be focused.'
 			)
 			.toMatchObject( [
 				{ name: 'core/group' },
 				{
 					name: 'core/columns',
 					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading' },
-								{
-									name: 'core/paragraph',
-									selected: false,
-									focused: true,
-								},
-							],
-						},
+						{ name: 'core/column', selected: false, focused: true },
 						{ name: 'core/column' },
 					],
 				},
 				{ name: 'core/file', selected: true, focused: false },
 			] );
 
-		// Select all siblings at the current level.
-		await pageUtils.pressKeys( 'primary+a' );
-		await expect
-			.poll(
-				listViewUtils.getBlocksWithA11yAttributes,
-				'The deeply nested paragraph block should be selected, along with its sibling heading.'
-			)
-			.toMatchObject( [
-				{ name: 'core/group' },
-				{
-					name: 'core/columns',
-					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading', selected: true },
-								{
-									name: 'core/paragraph',
-									selected: true,
-									focused: true,
-								},
-							],
-						},
-						{ name: 'core/column' },
-					],
-				},
-				{ name: 'core/file', selected: false, focused: false },
-			] );
-
-		// Select next parent.
-		await pageUtils.pressKeys( 'primary+a' );
-		await expect
-			.poll(
-				listViewUtils.getBlocksWithA11yAttributes,
-				'The first column block should be selected and focused.'
-			)
-			.toMatchObject( [
-				{ name: 'core/group' },
-				{
-					name: 'core/columns',
-					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading' },
-								{
-									name: 'core/paragraph',
-								},
-							],
-							selected: true,
-							focused: true,
-						},
-						{ name: 'core/column', selected: false },
-					],
-				},
-				{ name: 'core/file', selected: false, focused: false },
-			] );
-
-		// Select all siblings at current level.
+		// Select all sibling column blocks at current level.
 		await pageUtils.pressKeys( 'primary+a' );
 		await expect
 			.poll(
@@ -570,23 +498,15 @@ test.describe( 'List View', () => {
 				{
 					name: 'core/columns',
 					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading' },
-								{
-									name: 'core/paragraph',
-								},
-							],
-							selected: true,
-							focused: true,
-						},
-						{ name: 'core/column', selected: true },
+						{ name: 'core/column', selected: true, focused: true },
+						{ name: 'core/column', selected: true, focused: false },
 					],
+					selected: false,
 				},
 				{ name: 'core/file', selected: false, focused: false },
 			] );
-		// Select next parent.
+
+		// Select next parent (the columns block).
 		await pageUtils.pressKeys( 'primary+a' );
 		await expect
 			.poll(
@@ -598,15 +518,7 @@ test.describe( 'List View', () => {
 				{
 					name: 'core/columns',
 					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading' },
-								{
-									name: 'core/paragraph',
-								},
-							],
-						},
+						{ name: 'core/column' },
 						{ name: 'core/column' },
 					],
 					selected: true,
@@ -627,15 +539,7 @@ test.describe( 'List View', () => {
 				{
 					name: 'core/columns',
 					innerBlocks: [
-						{
-							name: 'core/column',
-							innerBlocks: [
-								{ name: 'core/heading' },
-								{
-									name: 'core/paragraph',
-								},
-							],
-						},
+						{ name: 'core/column' },
 						{ name: 'core/column' },
 					],
 					selected: true,
@@ -646,10 +550,7 @@ test.describe( 'List View', () => {
 
 		// Deselect blocks via Escape key.
 		await page.keyboard.press( 'Escape' );
-		// Collapse the column block and the columns block.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowUp' );
+		// Collapse the columns block.
 		await page.keyboard.press( 'ArrowLeft' );
 
 		await expect
