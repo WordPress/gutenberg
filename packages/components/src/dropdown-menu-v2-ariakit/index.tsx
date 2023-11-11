@@ -296,7 +296,9 @@ const UnconnectedDropdownMenu = (
 				{ ...otherProps }
 				modal={ modal }
 				store={ dropdownMenuStore }
-				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 8 ) }
+				// Nested menus overlap by 8px
+				gutter={ gutter ?? ( dropdownMenuStore.parent ? 0 : 8 ) }
+				// Nested menus have their items aligned horizontally
 				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
