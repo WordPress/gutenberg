@@ -276,12 +276,15 @@ const UnconnectedDropdownMenu = (
 					dropdownMenuStore.parent
 						? cloneElement( trigger, {
 								// Add submenu arrow, unless a `suffix` is explicitly specified
-								suffix: trigger.props.suffix ?? (
-									<Styled.SubmenuChevronIcon
-										aria-hidden="true"
-										icon={ chevronRightSmall }
-										size={ 24 }
-									/>
+								suffix: (
+									<>
+										{ trigger.props.suffix }
+										<Styled.SubmenuChevronIcon
+											aria-hidden="true"
+											icon={ chevronRightSmall }
+											size={ 24 }
+										/>
+									</>
 								),
 						  } )
 						: trigger

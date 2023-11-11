@@ -117,7 +117,11 @@ export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
 		<DropdownMenuItem>Level 1 item</DropdownMenuItem>
 		<DropdownMenu
-			trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+			trigger={
+				<DropdownMenuItem suffix="Suffix">
+					Submenu trigger
+				</DropdownMenuItem>
+			}
 		>
 			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
 			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
