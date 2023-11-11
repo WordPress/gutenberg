@@ -31,7 +31,7 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		[data-field-id="actions"] {
+		&[data-field-id="actions"] {
 			text-align: right;
 		}
 	}

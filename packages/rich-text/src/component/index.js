@@ -8,7 +8,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { create } from '../create';
+import { collapseWhiteSpace, create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
@@ -25,8 +25,8 @@ export function useRichText( {
 	selectionStart,
 	selectionEnd,
 	placeholder,
-	preserveWhiteSpace,
 	onSelectionChange,
+	preserveWhiteSpace,
 	onChange,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
@@ -51,7 +51,6 @@ export function useRichText( {
 			element: ref.current,
 			range,
 			__unstableIsEditableTree: true,
-			preserveWhiteSpace,
 		} );
 	}
 
@@ -72,8 +71,7 @@ export function useRichText( {
 	function setRecordFromProps() {
 		_value.current = value;
 		record.current = create( {
-			html: value,
-			preserveWhiteSpace,
+			html: preserveWhiteSpace ? value : collapseWhiteSpace( value ),
 		} );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
@@ -139,7 +137,6 @@ export function useRichText( {
 							formats: __unstableBeforeSerialize( newRecord ),
 					  }
 					: newRecord,
-				preserveWhiteSpace,
 			} );
 		}
 
@@ -168,7 +165,6 @@ export function useRichText( {
 						formats: __unstableBeforeSerialize( newRecord ),
 				  }
 				: newRecord,
-			preserveWhiteSpace,
 		} );
 
 		const { formats, text } = newRecord;
@@ -215,7 +211,7 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, preserveWhiteSpace } ),
+		useCopyHandler( { record } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {

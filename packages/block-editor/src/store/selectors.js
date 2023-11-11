@@ -26,7 +26,6 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { mapRichTextSettings } from './utils';
 import { orderBy } from '../utils/sorting';
 
 /**
@@ -1114,27 +1113,13 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
 			: [ selectionAnchor, selectionFocus ];
 
 	const blockA = getBlock( state, selectionStart.clientId );
-	const blockAType = getBlockType( blockA.name );
-
 	const blockB = getBlock( state, selectionEnd.clientId );
-	const blockBType = getBlockType( blockB.name );
 
 	const htmlA = blockA.attributes[ selectionStart.attributeKey ];
 	const htmlB = blockB.attributes[ selectionEnd.attributeKey ];
 
-	const attributeDefinitionA =
-		blockAType.attributes[ selectionStart.attributeKey ];
-	const attributeDefinitionB =
-		blockBType.attributes[ selectionEnd.attributeKey ];
-
-	let valueA = create( {
-		html: htmlA,
-		...mapRichTextSettings( attributeDefinitionA ),
-	} );
-	let valueB = create( {
-		html: htmlB,
-		...mapRichTextSettings( attributeDefinitionB ),
-	} );
+	let valueA = create( { html: htmlA } );
+	let valueB = create( { html: htmlB } );
 
 	valueA = remove( valueA, 0, selectionStart.offset );
 	valueB = remove( valueB, selectionEnd.offset, valueB.text.length );
@@ -1146,7 +1131,6 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
 				...blockA.attributes,
 				[ selectionStart.attributeKey ]: toHTMLString( {
 					value: valueA,
-					...mapRichTextSettings( attributeDefinitionA ),
 				} ),
 			},
 		},
@@ -1156,7 +1140,6 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
 				...blockB.attributes,
 				[ selectionEnd.attributeKey ]: toHTMLString( {
 					value: valueB,
-					...mapRichTextSettings( attributeDefinitionB ),
 				} ),
 			},
 		},
