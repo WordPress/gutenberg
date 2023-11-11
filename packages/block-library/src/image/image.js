@@ -83,9 +83,10 @@ const scaleOptions = [
 	},
 ];
 
-const disabledClickProps = {
+const disabledProps = {
 	onClick: ( event ) => event.preventDefault(),
 	'aria-disabled': true,
+	tabIndex: -1,
 };
 
 export default function Image( {
@@ -790,7 +791,7 @@ export default function Image( {
 			{ ! temporaryURL && controls }
 			{ /* If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles */ }
 			{ !! href ? (
-				<a href={ href } { ...disabledClickProps }>
+				<a href={ href } { ...disabledProps }>
 					{ img }
 				</a>
 			) : (
