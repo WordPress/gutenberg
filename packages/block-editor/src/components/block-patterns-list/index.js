@@ -105,16 +105,16 @@ function BlockPattern( {
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
 							/>
-
 							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.id && ! pattern.syncStatus && (
-									<div className="block-editor-patterns__pattern-icon-wrapper">
-										<Icon
-											className="block-editor-patterns__pattern-icon"
-											icon={ symbol }
-										/>
-									</div>
-								) }
+								{ pattern.id &&
+									pattern.syncStatus === 'fully' && (
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
+										</div>
+									) }
 								{ ( ! showTooltip || pattern.id ) && (
 									<div className="block-editor-block-patterns-list__item-title">
 										{ pattern.title }
