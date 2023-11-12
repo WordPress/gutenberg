@@ -775,7 +775,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< any >`: User pattern list.
+-   `Array< UserPattern >`: User pattern list.
 
 ### getUserQueryResults
 

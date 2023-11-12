@@ -46,7 +46,7 @@ export interface State {
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
-	userPatterns: Array< unknown >;
+	userPatterns: Array< UserPattern >;
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 }
@@ -96,6 +96,17 @@ export interface UserPatternCategory {
 	label: string;
 	slug: string;
 	description: string;
+}
+
+export interface UserPattern {
+	blocks: Array< unknown >;
+	categories?: Array< string >;
+	id: string;
+	name: string;
+	slug: string;
+	syncStatus: string;
+	title: string;
+	type: string;
 }
 
 type Optional< T > = T | undefined;
@@ -1335,7 +1346,7 @@ export function getBlockPatternCategories( state: State ): Array< any > {
  * @return User pattern list.
  */
 export const getUserPatterns = createSelector(
-	( state: State ): Array< unknown > => {
+	( state: State ): Array< UserPattern > => {
 		const categories = new Map();
 		state.userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
@@ -1347,25 +1358,18 @@ export const getUserPatterns = createSelector(
 			} ),
 			...( patternBlock.wp_pattern_category.length > 0 && {
 				categories: patternBlock.wp_pattern_category.map(
-					( patternCategoryId ) =>
+					( patternCategoryId: number ) =>
 						categories && categories.get( patternCategoryId )
 							? categories.get( patternCategoryId ).slug
 							: patternCategoryId
 				),
 			} ),
-			termLabels: patternBlock.wp_pattern_category.map(
-				( patternCategoryId ) =>
-					categories?.get( patternCategoryId )
-						? categories.get( patternCategoryId ).label
-						: patternCategoryId
-			),
 			id: patternBlock.id,
 			name: `core/block/${ patternBlock.id }`,
 			slug: patternBlock.slug,
 			syncStatus: patternBlock.wp_pattern_sync_status || 'fully',
 			title: patternBlock.title.raw,
 			type: 'wp_block',
-			patternBlock,
 		} ) );
 	},
 	( state ) => [ state.userPatternCategories, state.userPatterns ]
