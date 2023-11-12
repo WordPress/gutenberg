@@ -123,7 +123,11 @@ export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
 				</DropdownMenuItem>
 			}
 		>
-			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+			<DropdownMenuItem
+				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
+			>
+				Level 2 item
+			</DropdownMenuItem>
 			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
 			<DropdownMenu
 				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
