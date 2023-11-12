@@ -184,48 +184,18 @@ const selectPatterns = createSelector(
 	]
 );
 
-const patternBlockToPattern = ( patternBlock, categories ) => ( {
-	blocks: parse( patternBlock.content.raw, {
-		__unstableSkipMigrationLogs: true,
-	} ),
-	...( patternBlock.wp_pattern_category.length > 0 && {
-		categories: patternBlock.wp_pattern_category.map(
-			( patternCategoryId ) =>
-				categories && categories.get( patternCategoryId )
-					? categories.get( patternCategoryId ).slug
-					: patternCategoryId
-		),
-	} ),
-	termLabels: patternBlock.wp_pattern_category.map( ( patternCategoryId ) =>
-		categories?.get( patternCategoryId )
-			? categories.get( patternCategoryId ).label
-			: patternCategoryId
-	),
-	id: patternBlock.id,
-	name: patternBlock.slug,
-	syncStatus: patternBlock.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
-	title: patternBlock.title.raw,
-	type: PATTERN_TYPES.user,
-	patternBlock,
-} );
-
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
 		const { getIsResolving, getUserPatternCategories, getUserPatterns } =
 			select( coreStore );
 
-		const userPatterns = getUserPatterns();
+		let patterns = getUserPatterns();
+		console.log( 'hmm', patterns );
 		const userPatternCategories = getUserPatternCategories();
 		const categories = new Map();
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-
-		let patterns = userPatterns
-			? userPatterns.map( ( record ) =>
-					patternBlockToPattern( record, categories )
-			  )
-			: EMPTY_PATTERN_LIST;
 
 		const isResolving = getIsResolving( 'getUserPatterns' );
 

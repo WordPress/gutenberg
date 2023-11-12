@@ -98,6 +98,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
+		userPatterns,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -107,6 +108,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
+				getUserPatterns,
 			} = select( coreStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
@@ -129,6 +131,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
+				userPatterns: getUserPatterns(),
 			};
 		},
 		[ postType, postId ]
@@ -219,6 +222,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
+			__experimentalUserPatterns: userPatterns,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -252,6 +256,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageOnFront,
 			pageForPosts,
 			postType,
+			userPatterns,
 		]
 	);
 }

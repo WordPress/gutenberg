@@ -2274,31 +2274,6 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
-function getUserPatterns( state ) {
-	const userPatterns =
-		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const userPatternCategories =
-		state?.settings?.__experimentalUserPatternCategories ?? [];
-	const categories = new Map();
-	userPatternCategories.forEach( ( userCategory ) =>
-		categories.set( userCategory.id, userCategory )
-	);
-	return userPatterns.map( ( userPattern ) => {
-		return {
-			name: `core/block/${ userPattern.id }`,
-			id: userPattern.id,
-			title: userPattern.title.raw,
-			categories: userPattern.wp_pattern_category.map( ( catId ) =>
-				categories && categories.get( catId )
-					? categories.get( catId ).slug
-					: catId
-			),
-			content: userPattern.content.raw,
-			syncStatus: userPattern.wp_pattern_sync_status,
-		};
-	} );
-}
-
 export const __experimentalUserPatternCategories = createSelector(
 	( state ) => {
 		return state?.settings?.__experimentalUserPatternCategories;
@@ -2309,7 +2284,7 @@ export const __experimentalUserPatternCategories = createSelector(
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
+		const userPatterns = state.settings.__experimentalUserPatterns;
 
 		const pattern = [ ...patterns, ...userPatterns ].find(
 			( { name } ) => name === patternName
@@ -2317,24 +2292,28 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
+
 		return {
 			...pattern,
-			blocks: parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} ),
+			blocks: pattern.blocks
+				? pattern.blocks
+				: parse( pattern.content, {
+						__unstableSkipMigrationLogs: true,
+				  } ),
 		};
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
 		state?.settings?.__experimentalUserPatternCategories,
+		state?.settings?.__experimentalUserPatterns,
 	]
 );
 
 const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
+		const userPatterns = state.settings.__experimentalUserPatterns;
 
 		const { allowedBlockTypes } = getSettings( state );
 
@@ -2350,7 +2329,7 @@ const getAllAllowedPatterns = createSelector(
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalReusableBlocks,
+		state.settings.__experimentalUserPatterns,
 		state.settings.allowedBlockTypes,
 		state?.settings?.__experimentalUserPatternCategories,
 	]

@@ -9,6 +9,7 @@ import createSelector from 'rememo';
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -1333,9 +1334,42 @@ export function getBlockPatternCategories( state: State ): Array< any > {
  *
  * @return User pattern list.
  */
-export function getUserPatterns( state: State ): Array< any > {
-	return state.userPatterns;
-}
+export const getUserPatterns = createSelector(
+	( state: State ): Array< unknown > => {
+		const categories = new Map();
+		state.userPatternCategories.forEach( ( userCategory ) =>
+			categories.set( userCategory.id, userCategory )
+		);
+
+		return state.userPatterns.map( ( patternBlock: any ) => ( {
+			blocks: parse( patternBlock.content.raw, {
+				__unstableSkipMigrationLogs: true,
+			} ),
+			...( patternBlock.wp_pattern_category.length > 0 && {
+				categories: patternBlock.wp_pattern_category.map(
+					( patternCategoryId ) =>
+						categories && categories.get( patternCategoryId )
+							? categories.get( patternCategoryId ).slug
+							: patternCategoryId
+				),
+			} ),
+			termLabels: patternBlock.wp_pattern_category.map(
+				( patternCategoryId ) =>
+					categories?.get( patternCategoryId )
+						? categories.get( patternCategoryId ).label
+						: patternCategoryId
+			),
+			id: patternBlock.id,
+			name: `core/block/${ patternBlock.id }`,
+			slug: patternBlock.slug,
+			syncStatus: patternBlock.wp_pattern_sync_status,
+			title: patternBlock.title.raw,
+			type: 'wp_block',
+			patternBlock,
+		} ) );
+	},
+	( state ) => [ state.userPatternCategories, state.userPatterns ]
+);
 
 /**
  * Retrieve the registered user pattern categories.
