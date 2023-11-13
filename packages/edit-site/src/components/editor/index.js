@@ -28,6 +28,7 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -103,6 +104,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 		hasPageContentFocus,
+		pageContentFocusType,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -111,6 +113,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			isInserterOpened,
 			isListViewOpened,
 			hasPageContentFocus: _hasPageContentFocus,
+			getPageContentFocusType,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -145,6 +148,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				'showBlockBreadcrumbs'
 			),
 			hasPageContentFocus: _hasPageContentFocus(),
+			pageContentFocusType: getPageContentFocusType(),
 		};
 	}, [] );
 
@@ -188,6 +192,21 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		! isLoading &&
 		( ( hasTemplate && !! contextPost && !! editedPost ) ||
 			( ! hasTemplate && !! editedPost ) );
+	const templateMode = useMemo( () => {
+		if ( isViewMode ) {
+			return 'disabled';
+		}
+
+		if ( isEditMode && pageContentFocusType === 'hideTemplate' ) {
+			return 'hidden';
+		}
+
+		if ( hasTemplate ) {
+			return 'disabled';
+		}
+
+		return 'all';
+	}, [ isViewMode, isEditMode, hasTemplate, pageContentFocusType ] );
 
 	return (
 		<>
@@ -206,6 +225,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 					__unstableTemplate={ hasTemplate ? editedPost : undefined }
 					settings={ settings }
 					useSubRegistry={ false }
+					templateMode={ templateMode }
 				>
 					<SidebarComplementaryAreaFills />
 					{ isEditMode && <StartTemplateOptions /> }
