@@ -67,20 +67,11 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
-	$view_asset = 'wp-block-query-view';
-	if ( ! wp_script_is( $view_asset ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if (
-			( ! $attributes['enhancedPagination'] || ! isset( $attributes['queryId'] ) )
-			&& in_array( $view_asset, $script_handles, true )
-		) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) && ! in_array( $view_asset, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
-		}
+	if ( $attributes['enhancedPagination'] ) {
+		gutenberg_enqueue_module(
+			'@wordpress/block-library/query',
+			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js'
+		);
 	}
 
 	$style_asset = 'wp-block-query';

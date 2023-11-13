@@ -14,6 +14,8 @@ module.exports = {
 	entry: {
 		index: `./packages/interactivity/src/index.js`,
 		navigation: './packages/block-library/src/navigation/view.js',
+		query: './packages/block-library/src/query/view.js',
+		image: './packages/block-library/src/image/view.js',
 	},
 	experiments: {
 		outputModule: true,
