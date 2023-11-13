@@ -165,7 +165,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const hasTemplate = hasPageContentFocus && context?.postId;
+	const hasTemplate = context?.postId;
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -192,21 +192,27 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		! isLoading &&
 		( ( hasTemplate && !! contextPost && !! editedPost ) ||
 			( ! hasTemplate && !! editedPost ) );
-	const templateMode = useMemo( () => {
+	const mode = useMemo( () => {
 		if ( isViewMode ) {
-			return 'disabled';
+			return 'locked';
 		}
 
 		if ( isEditMode && pageContentFocusType === 'hideTemplate' ) {
-			return 'hidden';
+			return 'post-only';
 		}
 
-		if ( hasTemplate ) {
-			return 'disabled';
+		if ( hasTemplate && hasPageContentFocus ) {
+			return 'locked';
 		}
 
-		return 'all';
-	}, [ isViewMode, isEditMode, hasTemplate, pageContentFocusType ] );
+		return 'template-only';
+	}, [
+		isViewMode,
+		isEditMode,
+		hasTemplate,
+		pageContentFocusType,
+		hasPageContentFocus,
+	] );
 
 	return (
 		<>
@@ -225,7 +231,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 					__unstableTemplate={ hasTemplate ? editedPost : undefined }
 					settings={ settings }
 					useSubRegistry={ false }
-					templateMode={ templateMode }
+					mode={ mode }
 				>
 					<SidebarComplementaryAreaFills />
 					{ isEditMode && <StartTemplateOptions /> }

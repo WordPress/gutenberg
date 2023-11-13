@@ -62,14 +62,13 @@ function useForceFocusModeForNavigation( navigationBlockClientId ) {
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
- * @param {Array}   post         Block list.
- * @param {boolean} template     Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
- * @param {boolean} templateMode Whether to wrap the page content blocks in a group block to mimic the post editor. Default `false`.
+ * @param {Array}   post     Block list.
+ * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
+ * @param {boolean} mode     Rendering mode.
  * @return {Array} Block editor props.
  */
-function useBlockEditorProps( post, template, templateMode ) {
-	const rootLevelPost =
-		!! template && templateMode !== 'hidden' ? template : post;
+function useBlockEditorProps( post, template, mode ) {
+	const rootLevelPost = mode === 'post-only' || ! template ? post : template;
 	const { type, id } = rootLevelPost;
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -89,7 +88,7 @@ function useBlockEditorProps( post, template, templateMode ) {
 			];
 		}
 
-		if ( !! template && templateMode === 'hidden' ) {
+		if ( mode === 'post-only' ) {
 			return [
 				createBlock(
 					'core/group',
@@ -110,10 +109,9 @@ function useBlockEditorProps( post, template, templateMode ) {
 				),
 			];
 		}
-	}, [ type, id, templateMode, template ] );
+	}, [ type, id, mode ] );
 	const disableRootLevelChanges =
-		( !! template && templateMode === 'disabled' ) ||
-		type === 'wp_navigation';
+		( !! template && mode === 'locked' ) || type === 'wp_navigation';
 	const navigationBlockClientId =
 		type === 'wp_navigation' && actualBlocks && actualBlocks[ 0 ]?.clientId;
 	useForceFocusModeForNavigation( navigationBlockClientId );
@@ -127,22 +125,21 @@ function useBlockEditorProps( post, template, templateMode ) {
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
-		__unstableTemplate,
-		templateMode = 'all',
+		mode = 'all',
 		post,
 		settings,
 		recovery,
 		initialEdits,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
+		__unstableTemplate: template,
 	} ) => {
-		const rootLevelPost =
-			!! __unstableTemplate && templateMode !== 'hidden'
-				? __unstableTemplate
-				: post;
+		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				post.type !== 'wp_template'
+				rootLevelPost.type !== 'wp_template' ||
+				( shouldRenderTemplate && mode !== 'template-only' )
 					? { postId: post.id, postType: post.type }
 					: {};
 
@@ -153,7 +150,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						? rootLevelPost.slug
 						: undefined,
 			};
-		}, [ post.id, post.type, rootLevelPost.type, rootLevelPost?.slug ] );
+		}, [
+			mode,
+			post.id,
+			post.type,
+			rootLevelPost.type,
+			rootLevelPost?.slug,
+			shouldRenderTemplate,
+		] );
 		const { editorSettings, selection, isReady } = useSelect(
 			( select ) => {
 				const {
@@ -177,8 +181,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
-			__unstableTemplate,
-			templateMode
+			template,
+			mode
 		);
 
 		const {
