@@ -169,8 +169,11 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
-		options;
+	const {
+		__unstableDisableLayoutClassNames,
+		__unstableDisableDropZone,
+		__unstableContentRef,
+	} = options;
 	const {
 		clientId,
 		layout = null,
@@ -211,6 +214,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {
+		dropZoneElement: __unstableContentRef?.current,
 		rootClientId: clientId,
 	} );
 
