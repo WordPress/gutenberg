@@ -14,6 +14,7 @@ import {
 	useMemo,
 	cloneElement,
 	isValidElement,
+	useCallback,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -99,6 +100,12 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	);
 } );
 
+const radioCheck = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
+	</SVG>
+);
+
 export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
@@ -119,14 +126,7 @@ export const DropdownMenuRadioItem = forwardRef<
 				store={ dropdownMenuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
 			>
-				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<Circle
-						cx={ 12 }
-						cy={ 12 }
-						r={ 3 }
-						fill="currentColor"
-					></Circle>
-				</SVG>
+				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 			{ children }
 			{ suffix }
@@ -181,7 +181,6 @@ const UnconnectedDropdownMenu = (
 		children,
 		shift,
 		modal = true,
-		hideOnEscape = true,
 
 		// From internal components context
 		variant,
@@ -249,6 +248,28 @@ const UnconnectedDropdownMenu = (
 		);
 	}
 
+	const hideOnEscape = useCallback(
+		( event: React.KeyboardEvent< Element > ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs, close parent modals...).
+			event.preventDefault();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
+		[]
+	);
+
+	const wrapperProps = useMemo(
+		() => ( {
+			dir: computedDirection,
+			style: {
+				direction:
+					computedDirection as React.CSSProperties[ 'direction' ],
+			},
+		} ),
+		[ computedDirection ]
+	);
+
 	return (
 		<>
 			{ /* Menu trigger */ }
@@ -281,12 +302,7 @@ const UnconnectedDropdownMenu = (
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
-				wrapperProps={ {
-					dir: computedDirection,
-					style: {
-						direction: computedDirection,
-					},
-				} }
+				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
 			>

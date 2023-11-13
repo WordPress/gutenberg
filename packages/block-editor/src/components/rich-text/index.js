@@ -141,7 +141,7 @@ export function RichTextWrapper(
 		};
 	};
 	// This selector must run on every render so the right selection state is
-	// retreived from the store on merge.
+	// retrieved from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
@@ -348,7 +348,6 @@ export function RichTextWrapper(
 						onReplace,
 						onSplit,
 						__unstableEmbedURLOnPaste,
-						preserveWhiteSpace,
 						pastePlainText,
 					} ),
 					useDelete( {

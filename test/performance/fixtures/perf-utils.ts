@@ -59,7 +59,9 @@ export class PerfUtils {
 			this.page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
-		return this.page.url();
+		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
+
+		return postId;
 	}
 
 	/**
