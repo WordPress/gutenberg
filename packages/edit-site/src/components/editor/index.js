@@ -193,6 +193,13 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		<>
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
+			{ hasLoadedPost && ! editedPost && (
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+					) }
+				</Notice>
+			) }
 			{ isReady && (
 				<EditorProvider
 					post={ hasTemplate ? contextPost : editedPost }
@@ -216,7 +223,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 							<>
 								<GlobalStylesRenderer />
 								{ isEditMode && <EditorNotices /> }
-								{ showVisualEditor && editedPost && (
+								{ showVisualEditor && (
 									<>
 										<TemplatePartConverter />
 										<SidebarInspectorFill>
@@ -229,18 +236,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 										<PatternModal />
 									</>
 								) }
-								{ editorMode === 'text' &&
-									editedPost &&
-									isEditMode && <CodeEditor /> }
-								{ hasLoadedPost && ! editedPost && (
-									<Notice
-										status="warning"
-										isDismissible={ false }
-									>
-										{ __(
-											"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-										) }
-									</Notice>
+								{ editorMode === 'text' && isEditMode && (
+									<CodeEditor />
 								) }
 								{ isEditMode && <KeyboardShortcutsEditMode /> }
 							</>
