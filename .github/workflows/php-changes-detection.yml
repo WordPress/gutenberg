@@ -1,7 +1,7 @@
 name: OPTIONAL - Confirm if PHP changes require backporting to WordPress Core
 
 on:
-    pull_request:
+    pull_request_target:
         types: [opened, synchronize]
 jobs:
     detect_php_changes:
