@@ -348,7 +348,6 @@ export function RichTextWrapper(
 						onReplace,
 						onSplit,
 						__unstableEmbedURLOnPaste,
-						preserveWhiteSpace,
 						pastePlainText,
 					} ),
 					useDelete( {

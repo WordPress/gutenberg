@@ -56,6 +56,14 @@
 	}
 }
 
+.block-editor-block-contextual-toolbar.is-fixed {
+	position: sticky;
+	top: 0;
+	z-index: z-index(".block-editor-block-popover");
+	display: block;
+	width: 100%;
+}
+
 // on desktop browsers the fixed toolbar has tweaked borders
 @include break-medium() {
 	.block-editor-block-contextual-toolbar.is-fixed {

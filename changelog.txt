@@ -1,5 +1,44 @@
 == Changelog ==
 
+= 17.0.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Typography
+- Fix another fatal error in WP_Fonts_Resolver::Get_settings(). ([56067](https://github.com/WordPress/gutenberg/pull/56067))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@arthur791004
+
+
+= 17.0.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix a fatal error in `WP_Fonts_Resolver::get_settings()`. ([55981](https://github.com/WordPress/gutenberg/pull/55981))
+
+## Contributors
+
+@anton-vlasenko
+
+
+= 16.9.1 =
+
+Fixes a PHP fatal error in `WP_Fonts_Resolver::get_settings()`: https://github.com/WordPress/gutenberg/pull/55981
+
+
 = 17.0.0 =
 
 

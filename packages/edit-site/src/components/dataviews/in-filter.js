@@ -5,6 +5,7 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	SelectControl,
 } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
 export const OPERATOR_IN = 'in';
 
@@ -30,7 +31,11 @@ export default ( { filter, view, onChangeView } ) => {
 					htmlFor={ id }
 					className="dataviews__select-control-prefix"
 				>
-					{ filter.name + ':' }
+					{ sprintf(
+						/* translators: filter name. */
+						__( '%s:' ),
+						filter.name
+					) }
 				</InputControlPrefixWrapper>
 			}
 			options={ filter.elements }

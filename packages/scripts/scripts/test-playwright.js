@@ -12,6 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -27,7 +28,10 @@ const {
 
 const result = spawn(
 	'node',
-	[ require.resolve( 'playwright-core/cli' ), 'install' ],
+	[
+		path.resolve( require.resolve( 'playwright-core' ), '..', 'cli.js' ),
+		'install',
+	],
 	{
 		stdio: 'inherit',
 	}

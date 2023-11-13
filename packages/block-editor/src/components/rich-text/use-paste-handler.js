@@ -35,7 +35,6 @@ export function usePasteHandler( props ) {
 				onReplace,
 				onSplit,
 				__unstableEmbedURLOnPaste,
-				preserveWhiteSpace,
 				pastePlainText,
 			} = propsRef.current;
 
@@ -63,10 +62,7 @@ export function usePasteHandler( props ) {
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
 			if ( isInternal ) {
-				const pastedValue = create( {
-					html,
-					preserveWhiteSpace,
-				} );
+				const pastedValue = create( { html } );
 				addActiveFormats( pastedValue, value.activeFormats );
 				onChange( insert( value, pastedValue ) );
 				return;
@@ -136,7 +132,6 @@ export function usePasteHandler( props ) {
 				plainText,
 				mode,
 				tagName,
-				preserveWhiteSpace,
 			} );
 
 			if ( typeof content === 'string' ) {

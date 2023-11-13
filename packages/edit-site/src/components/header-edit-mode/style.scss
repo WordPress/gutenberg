@@ -15,6 +15,17 @@ $header-toolbar-min-width: 335px;
 	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
+		align-items: center;
+		flex-shrink: 2;
+		// We need this to be overflow hidden so the block toolbar can
+		// overflow scroll. If the overflow is visible, flexbox allows
+		// the toolbar to grow outside of the allowed container space.
+		overflow: hidden;
+		// Take up the full height of the header so the border focus
+		// is visible on toolbar buttons.
+		height: 100%;
+		// Allow focus ring to be fully visible on furthest right button.
+		padding-right: 2px;
 	}
 
 	.edit-site-header-edit-mode__end {
@@ -34,6 +45,10 @@ $header-toolbar-min-width: 335px;
 		// subsequently truncate child text, we set an explicit min-width.
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed {
+		border: none;
 	}
 }
 
@@ -99,7 +114,7 @@ $header-toolbar-min-width: 335px;
 	}
 }
 
-.edit-site-header-edit-mode__start {
+.edit-site-header-edit-mode__document-tools {
 	display: flex;
 	border: none;
 
@@ -183,7 +198,25 @@ $header-toolbar-min-width: 335px;
 		padding: 0 $grid-unit-10;
 	}
 
-	.edit-site-header-edit-mode__start .edit-site-header-edit-mode__toolbar > * + * {
+	.edit-site-header-edit-mode__document-tools .edit-site-header-edit-mode__toolbar > * + * {
 		margin-left: $grid-unit-10;
 	}
+}
+
+.has-fixed-toolbar {
+	.selected-block-tools-wrapper {
+		overflow-x: scroll;
+
+		&.is-collapsed {
+			display: none;
+		}
+	}
+
+	.edit-site-header-edit-mode__center.is-collapsed {
+		display: none;
+	}
+}
+
+.edit-site-header-edit-mode__block-tools-toggle {
+	margin-left: 2px; // Allow focus ring to be fully visible
 }
