@@ -57,6 +57,9 @@
 		},
 		"layout": {
 			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true
 		}
 	},
 	"styles": [
