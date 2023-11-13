@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const translationMap = {
 	blocks: __( 'Block styles' ),
 	border: __( 'Border' ),
-	colors: __( 'Colors' ),
+	color: __( 'Colors' ),
 	elements: __( 'Elements' ),
 	link: __( 'Links' ),
 	layout: __( 'Layout' ),
