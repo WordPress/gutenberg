@@ -209,7 +209,7 @@ class WP_Fonts_Resolver {
 
 			// Merge the variation settings with the global settings.
 			$settings['typography']['fontFamilies']['theme'] = array_merge(
-				$settings['typography']['fontFamilies']['theme'] ?? array(),
+				$settings['typography']['fontFamilies']['theme'],
 				$variation_font_families
 			);
 
