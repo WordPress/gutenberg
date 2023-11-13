@@ -42,7 +42,7 @@
 		"parent": "devenv"
 	},
 	{
-		"title": "QuickStartGuide",
+		"title": "Quick Start Guide",
 		"slug": "quick-start-guide",
 		"markdown_source": "../docs/getting-started/quick-start-guide.md",
 		"parent": "getting-started"
