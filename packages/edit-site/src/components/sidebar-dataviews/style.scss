@@ -6,3 +6,17 @@
 		text-transform: uppercase;
 	}
 }
+
+.edit-site-sidebar-dataviews-dataview-item {
+	&:hover,
+	&:focus,
+	&[aria-current] {
+		color: $gray-200;
+		background: $gray-800;
+	}
+
+	&.is-selected {
+		background: var(--wp-admin-theme-color);
+		color: $white;
+	}
+}
