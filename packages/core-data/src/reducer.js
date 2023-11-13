@@ -543,6 +543,14 @@ export function userPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function patternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+	return state;
+}
+
 export function navigationFallbackId( state = null, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
@@ -611,6 +619,7 @@ export default combineReducers( {
 	blockPatterns,
 	blockPatternCategories,
 	userPatternCategories,
+	patternCategories,
 	navigationFallbackId,
 	defaultTemplates,
 } );

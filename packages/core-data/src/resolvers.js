@@ -668,6 +668,21 @@ export const getUserPatternCategories =
 		} );
 	};
 
+export const getPatternCategories =
+	() =>
+	async ( { dispatch } ) => {
+		const patternCategories = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/block-patterns/categories', {
+				_fields: 'name,label,description, id',
+				source: [ 'core', 'user' ],
+			} ),
+		} );
+		dispatch( {
+			type: 'RECEIVE_PATTERN_CATEGORIES',
+			patternCategories,
+		} );
+	};
+
 export const getNavigationFallbackId =
 	() =>
 	async ( { dispatch, select } ) => {

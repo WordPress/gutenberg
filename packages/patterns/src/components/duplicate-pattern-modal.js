@@ -15,14 +15,14 @@ import { PATTERN_SYNC_TYPES } from '../constants';
 function getTermLabels( pattern, categories ) {
 	// Theme patterns don't have an id and rely on core pattern categories.
 	if ( ! pattern.id ) {
-		return categories.core
+		return categories
 			?.filter( ( category ) =>
 				pattern.categories.includes( category.name )
 			)
 			.map( ( category ) => category.label );
 	}
 
-	return categories.user
+	return categories
 		?.filter( ( category ) =>
 			pattern.wp_pattern_category.includes( category.id )
 		)
@@ -36,13 +36,9 @@ export default function DuplicatePatternModal( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const categories = useSelect( ( select ) => {
-		const { getUserPatternCategories, getBlockPatternCategories } =
-			select( coreStore );
+		const { getPatternCategories } = select( coreStore );
 
-		return {
-			core: getBlockPatternCategories(),
-			user: getUserPatternCategories(),
-		};
+		return getPatternCategories();
 	} );
 
 	if ( ! pattern ) {

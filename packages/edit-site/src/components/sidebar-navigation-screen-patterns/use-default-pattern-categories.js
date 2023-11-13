@@ -22,7 +22,7 @@ export default function useDefaultPatternCategories() {
 	} );
 
 	const restBlockPatternCategories = useSelect( ( select ) =>
-		select( coreStore ).getBlockPatternCategories()
+		select( coreStore ).getPatternCategories()
 	);
 
 	return [

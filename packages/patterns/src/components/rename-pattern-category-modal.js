@@ -101,7 +101,7 @@ export default function RenamePatternCategoryModal( {
 				}
 			);
 
-			invalidateResolution( 'getBlockPatternCategories' );
+			invalidateResolution( 'getPatternCategories' );
 			onSuccess?.( savedRecord );
 			onClose();
 

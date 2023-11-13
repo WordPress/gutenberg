@@ -97,7 +97,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
-		userPatternCategories,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -105,7 +104,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
-				getUserPatternCategories,
 				getEntityRecords,
 			} = select( coreStore );
 
@@ -128,7 +126,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				userCanCreatePages: canUser( 'create', 'pages' ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
-				userPatternCategories: getUserPatternCategories(),
 			};
 		},
 		[ postType, postId ]
@@ -145,7 +142,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
 			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
+				select( coreStore ).getPatternCategories(),
 		} ),
 		[]
 	);
@@ -218,7 +215,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -242,7 +238,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
-			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,

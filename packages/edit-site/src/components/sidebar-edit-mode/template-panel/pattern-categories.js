@@ -163,7 +163,7 @@ export default function PatternCategories( { post } ) {
 			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
 				throwOnError: true,
 			} );
-			invalidateResolution( 'getBlockPatternCategories' );
+			invalidateResolution( 'getPatternCategories' );
 			return unescapeTerm( newTerm );
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {

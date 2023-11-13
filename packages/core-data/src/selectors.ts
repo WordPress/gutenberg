@@ -47,6 +47,7 @@ export interface State {
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
+	patternCategories: Array< unknown >;
 }
 
 type EntityRecordKey = string | number;
@@ -1337,6 +1338,18 @@ export function getUserPatternCategories(
 	state: State
 ): Array< UserPatternCategory > {
 	return state.userPatternCategories;
+}
+
+/**
+ * Retrieve the core and user pattern categories.
+ *
+ * @param state Data state.
+ *
+ * @return User patterns category array.
+ */
+
+export function getPatternCategories( state: State ): Array< unknown > {
+	return state.patternCategories;
 }
 
 /**

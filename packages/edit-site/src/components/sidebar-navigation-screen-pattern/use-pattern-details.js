@@ -41,13 +41,12 @@ export default function usePatternDetails( postType, postId ) {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-	const { currentTheme, userPatternCategories } = useSelect( ( select ) => {
-		const { getCurrentTheme, getUserPatternCategories } =
-			select( coreStore );
+	const { currentTheme, patternCategories } = useSelect( ( select ) => {
+		const { getCurrentTheme, getPatternCategories } = select( coreStore );
 
 		return {
 			currentTheme: getCurrentTheme(),
-			userPatternCategories: getUserPatternCategories(),
+			patternCategories: getPatternCategories(),
 		};
 	}, [] );
 
@@ -105,14 +104,16 @@ export default function usePatternDetails( postType, postId ) {
 			} );
 		}
 		if ( record.wp_pattern_category?.length > 0 ) {
-			const patternCategories = new Map();
-			userPatternCategories.forEach( ( userCategory ) =>
+			const patternCategoriesMap = new Map();
+			patternCategories.forEach( ( userCategory ) =>
 				patternCategories.set( userCategory.id, userCategory )
 			);
 
 			const categories = record.wp_pattern_category
-				.filter( ( category ) => patternCategories.get( category ) )
-				.map( ( category ) => patternCategories.get( category ).label );
+				.filter( ( category ) => patternCategoriesMap.get( category ) )
+				.map(
+					( category ) => patternCategoriesMap.get( category ).label
+				);
 
 			details.push( {
 				label: __( 'Categories' ),

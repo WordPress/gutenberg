@@ -49,9 +49,9 @@ export default function CreatePatternModal( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const patternCategories = useSelect( ( select ) => {
-		const { getBlockPatternCategories } = select( coreStore );
+		const { getPatternCategories } = select( coreStore );
 
-		return getBlockPatternCategories();
+		return getPatternCategories();
 	} );
 
 	async function onCreate( patternTitle, sync ) {
@@ -110,7 +110,7 @@ export default function CreatePatternModal( {
 				termData,
 				{ throwOnError: true }
 			);
-			invalidateResolution( 'getBlockPatternCategories' );
+			invalidateResolution( 'getPatternCategories' );
 			return newTerm.id;
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {

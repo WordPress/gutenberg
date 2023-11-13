@@ -679,6 +679,18 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
+### getPatternCategories
+
+Retrieve the core and user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< unknown >`: User patterns category array.
+
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
