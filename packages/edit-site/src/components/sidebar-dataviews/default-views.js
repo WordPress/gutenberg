@@ -36,6 +36,7 @@ const DEFAULT_VIEWS = {
 				filters: [
 					{ field: 'status', operator: 'in', value: 'draft' },
 				],
+				visibleFilters: [ 'status' ],
 			},
 		},
 		{
@@ -47,6 +48,7 @@ const DEFAULT_VIEWS = {
 				filters: [
 					{ field: 'status', operator: 'in', value: 'trash' },
 				],
+				visibleFilters: [ 'status' ],
 			},
 		},
 	],
