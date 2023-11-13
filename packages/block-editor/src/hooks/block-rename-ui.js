@@ -92,6 +92,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
@@ -130,6 +131,7 @@ function BlockRenameControl( props ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Block name' ) }
 					value={ customName || '' }
 					onChange={ onChange }
