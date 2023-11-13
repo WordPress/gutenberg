@@ -12,9 +12,8 @@ module.exports = {
 	...baseConfig,
 	name: 'interactivity',
 	entry: {
-		index: {
-			import: `./packages/interactivity/src/index.js`,
-		},
+		index: `./packages/interactivity/src/index.js`,
+		navigation: './packages/block-library/src/navigation/view.js',
 	},
 	experiments: {
 		outputModule: true,
@@ -26,6 +25,11 @@ module.exports = {
 			type: 'module',
 		},
 		path: join( __dirname, '..', '..' ),
+		environment: { module: true },
+	},
+	externalsType: 'module',
+	externals: {
+		'@wordpress/interactivity': '@wordpress/interactivity',
 	},
 	module: {
 		rules: [

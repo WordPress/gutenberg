@@ -637,20 +637,18 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
-	$view_js_file            = 'wp-block-navigation-view';
 
-	// If the script already exists, there is no point in removing it from viewScript.
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	// Load the modules.
+	if ( $should_load_view_script ) {
+		gutenberg_register_module(
+			'@wordpress/interactivity',
+			'/wp-content/plugins/gutenberg/build/interactivity/index.min.js'
+		);
 
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-		}
+		gutenberg_enqueue_module(
+			'@wordpress/block-library/navigation-block',
+			'/wp-content/plugins/gutenberg/build/interactivity/navigation.min.js'
+		);
 	}
 
 	// Add directives to the submenu if needed.

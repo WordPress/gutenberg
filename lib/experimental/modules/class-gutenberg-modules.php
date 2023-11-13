@@ -21,7 +21,7 @@ class Gutenberg_Modules {
 	 *
 	 * @var string[]
 	 */
-	public $queue = array();
+	private static $enqueued = array();
 
 	/**
 	 * Registers the module if no module with that module identifier already
@@ -69,8 +69,43 @@ class Gutenberg_Modules {
 		}
 
 		// Add the module to the queue if it's not already there.
-		if ( ! in_array( $module_identifier, self::$queue, true ) ) {
-			self::$queue[] = $module_identifier;
+		if ( ! in_array( $module_identifier, self::$enqueued, true ) ) {
+			self::$enqueued[] = $module_identifier;
+		}
+	}
+
+	/**
+	 * Returns the import map array.
+	 *
+	 * @return string The import map.
+	 */
+	public static function get_import_map() {
+		$import_map = array(
+			'imports' => array(),
+		);
+
+		foreach ( self::$registered as $module_identifier => $module_data ) {
+			$import_map['imports'][ $module_identifier ] = $module_data['src'];
+		}
+
+		return $import_map;
+	}
+
+	/**
+	 * Prints the import map
+	 */
+	public static function print_import_map() {
+		echo '<script type="importmap">' . wp_json_encode( self::get_import_map(), JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>';
+	}
+
+	/**
+	 * Prints all enqueued modules using script tags with type "module".
+	 */
+	public static function print_enqueued_modules() {
+		foreach ( self::$enqueued as $module_identifier ) {
+			if ( isset( self::$registered[ $module_identifier ] ) ) {
+				echo '<script type="module" src="' . self::$registered[ $module_identifier ]['src'] . '"></script>';
+			}
 		}
 	}
 }
@@ -114,3 +149,9 @@ function gutenberg_register_module( $module_identifier, $src, $args = array() ) 
 function gutenberg_enqueue_module( $module_identifier, $src = '', $args = array() ) {
 	Gutenberg_Modules::enqueue( $module_identifier, $src, $args );
 }
+
+// Attach the above function to 'wp_head' action hook.
+add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map' ) );
+
+// Attach the new function to 'wp_head' action hook.
+add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
