@@ -149,7 +149,7 @@ add_action( 'registered_taxonomy', 'register_block_core_post_terms_taxonomy_vari
  * @return void
  */
 function register_block_core_post_terms_taxonomy_variation( $taxonomy, $object_type, $args ) {
-	if ( isset( $args['show_in_nav_menus'] ) && $args['show_in_nav_menus'] ) {
+	if ( isset( $args['publicly_queryable'] ) && $args['publicly_queryable'] ) {
 		$variation = block_core_post_terms_build_variation_for_post_terms( (object) $args );
 		// Directly set the variations on the registered block type
 		// because there's no server side registration for variations (see #47170).
