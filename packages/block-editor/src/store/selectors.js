@@ -2330,7 +2330,7 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
-		state?.settings?.__experimentalUserPatternCategories,
+		state.settings.__experimentalBlockPatternCategories,
 	]
 );
 
@@ -2355,7 +2355,7 @@ const getAllAllowedPatterns = createSelector(
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
 		state.settings.allowedBlockTypes,
-		state?.settings?.__experimentalUserPatternCategories,
+		state.settings.__experimentalBlockPatternCategories,
 	]
 );
 
@@ -2382,6 +2382,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.__experimentalReusableBlocks,
+		state.settings.__experimentalBlockPatternCategories,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
