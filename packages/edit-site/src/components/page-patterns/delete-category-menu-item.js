@@ -42,7 +42,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 
 			// Prevent the need to refresh the page to get up-to-date categories
 			// and pattern categorization.
-			invalidateResolution( 'getPatternCategories' );
+			invalidateResolution( 'getAllPatternCategories' );
 			invalidateResolution( 'getEntityRecords', [
 				'postType',
 				PATTERN_TYPES.user,

@@ -211,7 +211,7 @@ const patternBlockToPattern = ( patternBlock, categories ) => ( {
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
-		const { getEntityRecords, getIsResolving, getPatternCategories } =
+		const { getEntityRecords, getIsResolving, getAllPatternCategories } =
 			select( coreStore );
 
 		const query = { per_page: -1 };
@@ -220,7 +220,7 @@ const selectUserPatterns = createSelector(
 			PATTERN_TYPES.user,
 			query
 		);
-		const patternCategories = getPatternCategories();
+		const patternCategories = getAllPatternCategories();
 		const categories = new Map();
 		patternCategories.forEach( ( category ) => {
 			if ( category.id ) {

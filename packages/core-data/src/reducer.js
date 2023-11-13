@@ -543,10 +543,10 @@ export function userPatternCategories( state = [], action ) {
 	return state;
 }
 
-export function patternCategories( state = [], action ) {
+export function allPatternCategories( state = [], action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_PATTERN_CATEGORIES':
-			return action.patternCategories;
+		case 'RECEIVE_ALL_PATTERN_CATEGORIES':
+			return action.allPatternCategories;
 	}
 	return state;
 }
@@ -619,7 +619,7 @@ export default combineReducers( {
 	blockPatterns,
 	blockPatternCategories,
 	userPatternCategories,
-	patternCategories,
+	allPatternCategories,
 	navigationFallbackId,
 	defaultTemplates,
 } );

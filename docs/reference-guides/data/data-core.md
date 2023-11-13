@@ -44,6 +44,18 @@ _Returns_
 
 -   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
+### getAllPatternCategories
+
+Retrieve the core and user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< unknown >`: User patterns category array.
+
 ### getAuthors
 
 > **Deprecated** since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
@@ -371,18 +383,6 @@ _Parameters_
 _Returns_
 
 -   `any`: The entity record's save error.
-
-### getPatternCategories
-
-Retrieve the core and user pattern categories.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `Array< unknown >`: User patterns category array.
 
 ### getRawEntityRecord
 

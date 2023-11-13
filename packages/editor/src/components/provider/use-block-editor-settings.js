@@ -142,7 +142,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
 			restBlockPatternCategories:
-				select( coreStore ).getPatternCategories(),
+				select( coreStore ).getAllPatternCategories(),
 		} ),
 		[]
 	);

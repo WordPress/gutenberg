@@ -36,9 +36,9 @@ export default function DuplicatePatternModal( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const categories = useSelect( ( select ) => {
-		const { getPatternCategories } = select( coreStore );
+		const { getAllPatternCategories } = select( coreStore );
 
-		return getPatternCategories();
+		return getAllPatternCategories();
 	} );
 
 	if ( ! pattern ) {

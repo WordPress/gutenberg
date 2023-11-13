@@ -42,11 +42,12 @@ export default function usePatternDetails( postType, postId ) {
 		[]
 	);
 	const { currentTheme, patternCategories } = useSelect( ( select ) => {
-		const { getCurrentTheme, getPatternCategories } = select( coreStore );
+		const { getCurrentTheme, getAllPatternCategories } =
+			select( coreStore );
 
 		return {
 			currentTheme: getCurrentTheme(),
-			patternCategories: getPatternCategories(),
+			patternCategories: getAllPatternCategories(),
 		};
 	}, [] );
 
