@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancement
+### Breaking Change
 
 -   Update the block example scaffolded by the template.
 
