@@ -51,7 +51,7 @@ describe( 'downloadBlob', () => {
 	afterAll( () => {
 		window.URL = originalURL;
 	} );
-	it( 'returns expected HTML element without filename', () => {
+	it( 'constructs an anchor element with attributes and removes it', () => {
 		downloadBlob( 'filename.json', '{}', 'application/json' );
 
 		expect( createObjectURL ).toHaveBeenCalledWith( new window.Blob() );
