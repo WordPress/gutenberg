@@ -414,7 +414,7 @@ test.describe( 'Draggable block', () => {
 				'Dragging over the empty group block but outside the appender should still show the blue background'
 			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
 
-			await drop( rowBlock );
+			await drop();
 			await expect( rowAppender ).toBeHidden();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -446,7 +446,7 @@ test.describe( 'Draggable block', () => {
 				'rgb(0, 124, 186)'
 			);
 
-			await drop( columnAppender );
+			await drop();
 			await expect( columnAppender ).toBeHidden();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{ name: 'core/group' },
