@@ -40,7 +40,7 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 			)
 		);
 
-		if ( is_array( $query_args['source'] ) && in_array( 'user', $query_args['source'], true ) ) {
+		if ( isset( $query_args['source'] ) && is_array( $query_args['source'] ) && in_array( 'user', $query_args['source'], true ) ) {
 			foreach ( $user_categories as $user_category ) {
 				$prepared_category   = $this->prepare_item_for_response(
 					array(
