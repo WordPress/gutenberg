@@ -108,7 +108,7 @@ class Gutenberg_Modules {
 			if ( isset( self::$registered[ $module_identifier ] ) ) {
 				$module  = self::$registered[ $module_identifier ];
 				$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module['args']['version'] || '';
-				echo '<script type="module" src="' . $module['src'] . $version . '"></script>';
+				echo '<script type="module" src="' . $module['src'] . $version . '" id="' . $module_identifier . '"></script>';
 			}
 		}
 	}
