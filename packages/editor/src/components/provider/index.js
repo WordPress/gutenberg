@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
