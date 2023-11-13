@@ -427,10 +427,9 @@ function ViewList( {
 			onChangeView( { ...view, search: value, page: 1 } );
 		},
 		onColumnFiltersChange: ( columnFiltersUpdater ) => {
-			const filters = fromTanStackColumnFilters( columnFiltersUpdater() );
 			onChangeView( {
 				...view,
-				filters,
+				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
 				page: 1,
 			} );
 		},
