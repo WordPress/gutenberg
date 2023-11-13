@@ -190,7 +190,6 @@ const selectUserPatterns = createSelector(
 			select( coreStore );
 
 		let patterns = getUserPatterns();
-		console.log( 'hmm', patterns );
 		const userPatternCategories = getUserPatternCategories();
 		const categories = new Map();
 		userPatternCategories.forEach( ( userCategory ) =>
