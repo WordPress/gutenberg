@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -21,37 +21,18 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
-	const { patternCategories, patterns, userPatternCategories } = useSelect(
+	const { patternCategories, patterns } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } =
 				select( blockEditorStore );
-			const {
-				__experimentalUserPatternCategories,
-				__experimentalBlockPatternCategories,
-			} = getSettings();
+			const { __experimentalBlockPatternCategories } = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
-				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId ]
 	);
-
-	const allCategories = useMemo( () => {
-		const categories = [ ...patternCategories ];
-		userPatternCategories?.forEach( ( userCategory ) => {
-			if (
-				! categories.find(
-					( existingCategory ) =>
-						existingCategory.name === userCategory.name
-				)
-			) {
-				categories.push( userCategory );
-			}
-		} );
-		return categories;
-	}, [ patternCategories, userPatternCategories ] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
@@ -79,7 +60,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 		[ createSuccessNotice, onInsert ]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ patterns, patternCategories, onClickPattern ];
 };
 
 export default usePatternsState;

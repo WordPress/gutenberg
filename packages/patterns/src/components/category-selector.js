@@ -16,13 +16,13 @@ export const CATEGORY_SLUG = 'wp_pattern_category';
 export default function CategorySelector( {
 	categoryTerms,
 	onChange,
-	categoryMap,
+	categories,
 } ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
 	const suggestions = useMemo( () => {
-		return Array.from( categoryMap.values() )
+		return categories
 			.map( ( category ) => unescapeString( category.label ) )
 			.filter( ( category ) => {
 				if ( search !== '' ) {
@@ -33,7 +33,7 @@ export default function CategorySelector( {
 				return true;
 			} )
 			.sort( ( a, b ) => a.localeCompare( b ) );
-	}, [ search, categoryMap ] );
+	}, [ search, categories ] );
 
 	function handleChange( termNames ) {
 		const uniqueTerms = termNames.reduce( ( terms, newTerm ) => {
