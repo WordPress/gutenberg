@@ -428,15 +428,8 @@ function ViewList( {
 		},
 		onColumnFiltersChange: ( columnFiltersUpdater ) => {
 			const filters = fromTanStackColumnFilters( columnFiltersUpdater() );
-			const visibleFilters = [ ...view.visibleFilters ];
-			filters.forEach( ( filter ) => {
-				if ( ! view.visibleFilters?.includes( filter.field ) ) {
-					visibleFilters.push( filter.field );
-				}
-			} );
 			onChangeView( {
 				...view,
-				visibleFilters,
 				filters,
 				page: 1,
 			} );

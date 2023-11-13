@@ -14,7 +14,6 @@ const DEFAULT_PAGE_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	visibleFilters: [],
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
@@ -36,7 +35,6 @@ const DEFAULT_VIEWS = {
 				filters: [
 					{ field: 'status', operator: 'in', value: 'draft' },
 				],
-				visibleFilters: [ 'status' ],
 			},
 		},
 		{
@@ -48,7 +46,6 @@ const DEFAULT_VIEWS = {
 				filters: [
 					{ field: 'status', operator: 'in', value: 'trash' },
 				],
-				visibleFilters: [ 'status' ],
 			},
 		},
 	],

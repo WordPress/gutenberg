@@ -58,16 +58,6 @@ export default function AddFilter( { filters, onChangeView } ) {
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
 										...currentView,
-										// TODO: set filter as well
-										visibleFilters:
-											currentView.visibleFilters.includes(
-												filter.field
-											)
-												? currentView.visibleFilters
-												: [
-														...currentView.visibleFilters,
-														filter.field,
-												  ],
 										filters: [
 											...currentView.filters,
 											{

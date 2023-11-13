@@ -38,10 +38,15 @@ export default function Filters( { fields, view, onChangeView } ) {
 	} );
 
 	const visibleFiltersList = filtersRegistered.filter( ( filter ) =>
-		view.visibleFilters.includes( filter.field )
+		view.filters.some(
+			( filterInView ) => filterInView.field === filter.field
+		)
 	);
 	const hiddenFiltersList = filtersRegistered.filter(
-		( filter ) => ! view.visibleFilters.includes( filter.field )
+		( filter ) =>
+			! view.filters.some(
+				( filterInView ) => filterInView.field === filter.field
+			)
 	);
 
 	const visibleFilters = visibleFiltersList
