@@ -4,6 +4,28 @@
 import transformStyles from '../transform-styles';
 
 describe( 'transformStyles', () => {
+	it( 'should not throw error in case of invalid css', () => {
+		const run = () =>
+			transformStyles(
+				[
+					{
+						css: 'h1 { color: red; }', // valid CSS
+					},
+					{
+						css: 'h1 { color: red;', // invalid CSS
+					},
+				],
+				'.my-namespace'
+			);
+
+		expect( run ).not.toThrow();
+
+		const [ validCSS, invalidCSS ] = run();
+
+		expect( validCSS ).toBe( '.my-namespace h1 { color: red; }' );
+		expect( invalidCSS ).toBe( null );
+	} );
+
 	describe( 'selector wrap', () => {
 		it( 'should wrap regular selectors', () => {
 			const input = `h1 { color: red; }`;
