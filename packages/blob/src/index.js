@@ -93,7 +93,6 @@ export function isBlobURL( url ) {
  * @param {string}   filename    File name.
  * @param {BlobPart} content     File content (BufferSource | Blob | string).
  * @param {string}   contentType File mime type.
- * @return {HTMLElement}        The created anchor element.
  */
 export function downloadBlob( filename, content, contentType ) {
 	const file = new window.Blob( [ content ], { type: contentType } );
@@ -106,5 +105,4 @@ export function downloadBlob( filename, content, contentType ) {
 	anchorElement.click();
 	document.body.removeChild( anchorElement );
 	window.URL.revokeObjectURL( url );
-	return anchorElement;
 }

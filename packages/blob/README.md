@@ -51,10 +51,6 @@ _Parameters_
 -   _content_ `BlobPart`: File content (BufferSource | Blob | string).
 -   _contentType_ `string`: File mime type.
 
-_Returns_
-
--   `HTMLElement`: The created anchor element.
-
 ### getBlobByURL
 
 Retrieve a file based on a blob URL. The file must have been created by `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return `undefined`.
