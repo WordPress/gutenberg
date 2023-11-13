@@ -8,7 +8,6 @@ module.exports = {
 		slug: 'copyright-date-block',
 		title: 'Copyright Date',
 		description: "Display your site's copyright date.",
-		npmDependencies: [ '@wordpress/icons' ],
 		attributes: {
 			fallbackCurrentYear: {
 				type: 'string',
