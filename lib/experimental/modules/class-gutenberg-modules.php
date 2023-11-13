@@ -85,7 +85,9 @@ class Gutenberg_Modules {
 		);
 
 		foreach ( self::$registered as $module_identifier => $module_data ) {
-			$import_map['imports'][ $module_identifier ] = $module_data['src'];
+			$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module_data['args']['version'] || '';
+
+			$import_map['imports'][ $module_identifier ] = $module_data['src'] . $version;
 		}
 
 		return $import_map;
@@ -104,7 +106,9 @@ class Gutenberg_Modules {
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
 			if ( isset( self::$registered[ $module_identifier ] ) ) {
-				echo '<script type="module" src="' . self::$registered[ $module_identifier ]['src'] . '"></script>';
+				$module  = self::$registered[ $module_identifier ];
+				$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module['args']['version'] || '';
+				echo '<script type="module" src="' . $module['src'] . $version . '"></script>';
 			}
 		}
 	}
