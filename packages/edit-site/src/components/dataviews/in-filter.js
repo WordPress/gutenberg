@@ -2,65 +2,99 @@
  * WordPress dependencies
  */
 import {
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	SelectControl,
+	Button,
+	privateApis as componentsPrivateApis,
+	Icon,
 } from '@wordpress/components';
+import { check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { OPERATOR_IN } from './constants';
+import { unlock } from '../../lock-unlock';
+
+const { DropdownMenuV2, DropdownMenuItemV2, DropdownMenuSeparatorV2 } = unlock(
+	componentsPrivateApis
+);
 
 export default ( { filter, view, onChangeView } ) => {
-	const valueFound = view.filters.find(
-		( f ) => f.field === filter.field && f.operator === OPERATOR_IN
+	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
+	const activeElement = filter.elements.find(
+		( element ) => element.value === filterInView?.value
 	);
 
-	const activeValue =
-		! valueFound || ! valueFound.hasOwnProperty( 'value' )
-			? ''
-			: valueFound.value;
-
-	const id = `dataviews__filters-in-${ filter.field }`;
-
 	return (
-		<SelectControl
-			id={ id }
-			__nextHasNoMarginBottom
-			value={ activeValue }
-			prefix={
-				<InputControlPrefixWrapper
-					as="label"
-					htmlFor={ id }
-					className="dataviews__select-control-prefix"
-				>
-					{ sprintf(
-						/* translators: filter name. */
-						__( '%s:' ),
-						filter.name
-					) }
-				</InputControlPrefixWrapper>
+		<DropdownMenuV2
+			key={ filter.field }
+			label={ filter.name }
+			trigger={
+				<Button variant="tertiary" size="compact">
+					{ activeElement !== undefined
+						? sprintf(
+								/* translators: 1: Filter name. 2: filter value. e.g.: "Author is Admin". */
+								__( '%1$s is %2$s' ),
+								filter.name,
+								activeElement.label
+						  )
+						: filter.name }
+					<Icon icon={ chevronDown } />
+				</Button>
 			}
-			options={ filter.elements }
-			onChange={ ( value ) => {
-				const filters = view.filters.filter(
-					( f ) =>
-						f.field !== filter.field || f.operator !== OPERATOR_IN
+		>
+			{ filter.elements.map( ( element ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ element.value }
+						suffix={
+							activeElement?.value === element.value && (
+								<Icon icon={ check } />
+							)
+						}
+						onSelect={ () =>
+							onChangeView( ( currentView ) => ( {
+								...currentView,
+								page: 1,
+								filters: [
+									...view.filters.filter(
+										( f ) => f.field !== filter.field
+									),
+									{
+										field: filter.field,
+										operator: OPERATOR_IN,
+										value:
+											activeElement?.value ===
+											element.value
+												? undefined
+												: element.value,
+									},
+								],
+							} ) )
+						}
+						role="menuitemcheckbox"
+					>
+						{ element.label }
+					</DropdownMenuItemV2>
 				);
-
-				filters.push( {
-					field: filter.field,
-					operator: OPERATOR_IN,
-					value,
-				} );
-
-				onChangeView( ( currentView ) => ( {
-					...currentView,
-					page: 1,
-					filters,
-				} ) );
-			} }
-		/>
+			} ) }
+			<DropdownMenuSeparatorV2 />
+			<DropdownMenuItemV2
+				key="remove-filter"
+				onSelect={ () =>
+					onChangeView( ( currentView ) => ( {
+						...currentView,
+						page: 1,
+						filters: [
+							...view.filters.filter(
+								( f ) => f.field !== filter.field
+							),
+						],
+					} ) )
+				}
+			>
+				{ __( 'Remove' ) }
+			</DropdownMenuItemV2>
+		</DropdownMenuV2>
 	);
 };
