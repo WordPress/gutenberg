@@ -266,7 +266,7 @@ const selectUserPatterns = createSelector(
 			PATTERN_TYPES.user,
 			{ per_page: -1 },
 		] ),
-		select( coreStore ).getUserPatternCategories(),
+		select( coreStore ).getAllPatternCategories(),
 	]
 );
 
