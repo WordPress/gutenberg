@@ -89,16 +89,17 @@ function useBlockEditorProps( post, template, templateMode ) {
 			];
 		}
 	}, [ type, id ] );
-	const allowRootLevelChanges =
-		!! template && templateMode !== 'disabled' && type === 'wp_navigation';
+	const disableRootLevelChanges =
+		( !! template && templateMode === 'disabled' ) ||
+		type === 'wp_navigation';
 	const navigationBlockClientId =
 		type === 'wp_navigation' && actualBlocks && actualBlocks[ 0 ]?.clientId;
 	useForceFocusModeForNavigation( navigationBlockClientId );
 
 	return [
 		actualBlocks ?? blocks,
-		allowRootLevelChanges ? onInput : noop,
-		allowRootLevelChanges ? onChange : noop,
+		disableRootLevelChanges ? noop : onInput,
+		disableRootLevelChanges ? noop : onChange,
 	];
 }
 
