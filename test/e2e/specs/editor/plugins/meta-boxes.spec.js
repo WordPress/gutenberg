@@ -61,9 +61,17 @@ test.describe( 'Meta boxes', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		await expect(
-			page.locator( '.wp-block-latest-posts > li' )
-		).toContainText( [ 'A published post', 'Dynamic block test' ] );
+		await expect
+			.poll( async () => {
+				const posts = await page
+					.locator(
+						'.entry-content .wp-block-latest-posts__post-title'
+					)
+					.allTextContents();
+
+				return posts.sort();
+			} )
+			.toEqual( [ 'A published post', 'Dynamic block test' ] );
 	} );
 
 	test( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async ( {
