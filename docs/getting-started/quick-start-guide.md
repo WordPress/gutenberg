@@ -1,4 +1,4 @@
-## Quick Start Guide
+# Quick Start Guide
 
 This guide is designed to demonstrate the basic principles of block development in WordPress using a hands-on approach. Following the steps below, you will create a custom block plugin that uses modern JavaScript (ESNext and JSX) in a matter of minutes. The example block displays the copyright symbol (©) and the current year, the perfect addition to any website's footer.
 
