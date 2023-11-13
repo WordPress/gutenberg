@@ -640,11 +640,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load the modules.
 	if ( $should_load_view_script ) {
-		gutenberg_register_module(
-			'@wordpress/interactivity',
-			'/wp-content/plugins/gutenberg/build/interactivity/index.min.js'
-		);
-
 		gutenberg_enqueue_module(
 			'@wordpress/block-library/navigation-block',
 			'/wp-content/plugins/gutenberg/build/interactivity/navigation.min.js'
