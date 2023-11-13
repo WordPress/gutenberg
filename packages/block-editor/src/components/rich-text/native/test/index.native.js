@@ -8,7 +8,7 @@ import { getEditorHtml, render, initializeEditor } from 'test/helpers';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as richTextStore } from '@wordpress/rich-text';
 import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
@@ -19,8 +19,8 @@ import {
 /**
  * Internal dependencies
  */
-import { store as richTextStore } from '../store';
-import RichText from '../component/index.native';
+import { store as blockEditorStore } from '../../../../store';
+import RichText from '../index.native';
 
 /**
  * Mock `useSelect` with various global application settings, e.g., styles.
