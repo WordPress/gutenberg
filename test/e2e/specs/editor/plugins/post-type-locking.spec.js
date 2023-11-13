@@ -131,7 +131,7 @@ test.describe( 'Post-type locking', () => {
 			await pageUtils.pressKeys( 'secondary+M' );
 
 			// Modify template.
-			await page.getByPlaceholder( 'Start writing with text or HTML' )
+			await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 				.fill( `<!-- wp:paragraph {"placeholder":"Add a description"} -->
 <p></p>
 <!-- /wp:paragraph -->` );
@@ -273,9 +273,15 @@ test.describe( 'Post-type locking', () => {
 				.fill( 'p1' );
 
 			await editor.clickBlockOptionsMenuItem( 'Delete' );
-			await expect.poll( editor.getBlocks ).not.toMatchObject( [
+			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
-					name: 'core/paragraph',
+					name: 'core/image',
+				},
+				{
+					name: 'core/quote',
+				},
+				{
+					name: 'core/columns',
 				},
 			] );
 		} );
