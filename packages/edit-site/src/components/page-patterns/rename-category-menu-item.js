@@ -39,12 +39,10 @@ export default function RenameCategoryMenuItem( { category, onClose } ) {
 }
 
 function RenameModal( { category, onClose } ) {
-	// User created pattern categories have their properties updated when
-	// retrieved via `getUserPatternCategories`. The rename modal expects an
-	// object that will match the pattern category entity.
+	// The rename modal expects an object that will match the pattern category entity.
 	const normalizedCategory = {
 		id: category.id,
-		slug: category.slug,
+		slug: category.name,
 		name: category.label,
 	};
 

@@ -30,7 +30,7 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
             $unique_categories[] = $user_category->name;
 		}
 		foreach ( $categories as $category ) {
-            if ( in_array( $category['label'], $unique_categories ) ) {
+            if ( in_array( $category['label'], $unique_categories ) || 'query' === $category['name'] ) {
                 continue;
             }
 			$prepared_category = $this->prepare_item_for_response( $category, $request );

@@ -24,8 +24,7 @@ export default function usePatternCategories() {
 		label: __( 'Uncategorized' ),
 	} );
 	const themePatterns = useThemePatterns();
-	const { patterns: userPatterns, categories: userPatternCategories } =
-		usePatterns( PATTERN_TYPES.user );
+	const { patterns: userPatterns } = usePatterns( PATTERN_TYPES.user );
 
 	const patternCategories = useMemo( () => {
 		const categoryMap = {};
@@ -33,11 +32,6 @@ export default function usePatternCategories() {
 
 		// Create a map for easier counting of patterns in categories.
 		defaultCategories.forEach( ( category ) => {
-			if ( ! categoryMap[ category.name ] ) {
-				categoryMap[ category.name ] = { ...category, count: 0 };
-			}
-		} );
-		userPatternCategories.forEach( ( category ) => {
 			if ( ! categoryMap[ category.name ] ) {
 				categoryMap[ category.name ] = { ...category, count: 0 };
 			}
@@ -70,18 +64,16 @@ export default function usePatternCategories() {
 		} );
 
 		// Filter categories so we only have those containing patterns.
-		[ ...defaultCategories, ...userPatternCategories ].forEach(
-			( category ) => {
-				if (
-					categoryMap[ category.name ].count &&
-					! categoriesWithCounts.find(
-						( cat ) => cat.name === category.name
-					)
-				) {
-					categoriesWithCounts.push( categoryMap[ category.name ] );
-				}
+		[ ...defaultCategories ].forEach( ( category ) => {
+			if (
+				categoryMap[ category.name ].count &&
+				! categoriesWithCounts.find(
+					( cat ) => cat.name === category.name
+				)
+			) {
+				categoriesWithCounts.push( categoryMap[ category.name ] );
 			}
-		);
+		} );
 		const sortedCategories = categoriesWithCounts.sort( ( a, b ) =>
 			a.label.localeCompare( b.label )
 		);
@@ -100,12 +92,7 @@ export default function usePatternCategories() {
 		} );
 
 		return sortedCategories;
-	}, [
-		defaultCategories,
-		themePatterns,
-		userPatternCategories,
-		userPatterns,
-	] );
+	}, [ defaultCategories, themePatterns, userPatterns ] );
 
 	return { patternCategories, hasPatterns: !! patternCategories.length };
 }
