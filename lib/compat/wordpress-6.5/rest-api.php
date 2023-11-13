@@ -19,7 +19,7 @@ function gutenberg_register_global_styles_revisions_endpoints() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
 
-/** 
+/**
  * Registers the block pattern categories REST API routes.
  */
 function gutenberg_register_rest_block_pattern_categories_routes() {
