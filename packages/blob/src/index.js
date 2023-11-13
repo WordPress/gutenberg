@@ -90,21 +90,21 @@ export function isBlobURL( url ) {
  * 	downloadBlob( 'file.json', fileContent, 'application/json' );
  * ```
  *
- * @param {string}   fileName    File Name.
- * @param {BlobPart} content     File Content (BufferSource | Blob | string).
+ * @param {string}   filename    File name.
+ * @param {BlobPart} content     File content (BufferSource | Blob | string).
  * @param {string}   contentType File mime type.
  * @return {HTMLElement}        The created anchor element.
  */
-export function downloadBlob( fileName = 'wp-download', content, contentType ) {
+export function downloadBlob( filename, content, contentType ) {
 	const file = new window.Blob( [ content ], { type: contentType } );
 	const url = window.URL.createObjectURL( file );
-	const a = document.createElement( 'a' );
-	a.href = url;
-	a.download = fileName;
-	a.style.display = 'none';
-	document.body.appendChild( a );
-	a.click();
-	document.body.removeChild( a );
+	const anchorElement = document.createElement( 'a' );
+	anchorElement.href = url;
+	anchorElement.download = filename;
+	anchorElement.style.display = 'none';
+	document.body.appendChild( anchorElement );
+	anchorElement.click();
+	document.body.removeChild( anchorElement );
 	window.URL.revokeObjectURL( url );
-	return a;
+	return anchorElement;
 }

@@ -47,8 +47,8 @@ downloadBlob( 'file.json', fileContent, 'application/json' );
 
 _Parameters_
 
--   _fileName_ `string`: File Name.
--   _content_ `BlobPart`: File Content (BufferSource | Blob | string).
+-   _filename_ `string`: File name.
+-   _content_ `BlobPart`: File content (BufferSource | Blob | string).
 -   _contentType_ `string`: File mime type.
 
 _Returns_
