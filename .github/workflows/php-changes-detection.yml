@@ -7,7 +7,7 @@ jobs:
     detect_php_changes:
         name: Detect PHP changes
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'WordPress/gutenberg'}}
         steps:
             - name: Check out code
               uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
