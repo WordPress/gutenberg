@@ -78,98 +78,38 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
-		$pattern_content =
+
+		$block_content =
 		'<!-- wp:paragraph -->' .
-			'<p>Pattern Content Block 1</p>' .
+			'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
 		'<!-- /wp:paragraph -->' .
 		'<!-- wp:paragraph -->' .
-			'<p>Pattern Content Block 2</p>' .
+			'<p>Welcome to WordPress.</p>' .
 		'<!-- /wp:paragraph -->';
-		register_block_pattern(
-			'core/interactivity-pattern',
-			array(
-				'title'   => 'Interactivity Pattern',
-				'content' => $pattern_content,
-			)
-		);
 
-		$providers = $this->data_only_root_blocks_are_processed();
-		foreach ( $providers as $provider ) {
+		$parsed_block     = parse_blocks( $block_content )[0];
+		$rendered_content = render_block( $parsed_block );
 
-			// PHPUnit cannot stub functions, only classes.
-			$test_helper = $this->createMock( WP_Directive_Processor::class );
+		$parsed_block_second = parse_blocks( $block_content )[1];
 
-			$test_helper->expects( $this->exactly( 3 ) )
-				->method( 'process_rendered_html' )
-				->with(
-					$this->callback(
-						function ( $block_content, $block ) {
-							if ( WP_Directive_Processor::is_root_block( $block ) ) {
+		// Test that root block is intially emtpy.
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
-								$directives = array(
-									'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-									'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-									'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-									'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-									'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-								);
+		// Test that root block is not added if there is a parent block.
+		gutenberg_interactivity_process_directives( $parsed_block, $parsed_block, $parsed_block );
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
-								$tags = new WP_Directive_Processor( $block_content );
-								$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
-								return $tags->get_updated_html();
+		// Test that root block is added if there is no parent block.
+		gutenberg_interactivity_process_directives( $parsed_block, $parsed_block, null );
+		$current_root_block = WP_Directive_Processor::$root_block;
+		$this->assertNotEmpty( $current_root_block );
 
-							}
-
-							return $block_content;
-						}
-					)
-				);
-			do_blocks( $provider['page_content'] );
-
-		}
-	}
-
-	/**
-	 * Data provider .
-	 *
-	 * @return array
-	 **/
-	public function data_only_root_blocks_are_processed() {
-
-		return array(
-			array(
-				'root_blocks'  => 2,
-				'page_content' =>
-				'<!-- wp:quote -->' .
-					'<blockquote class="wp-block-quote">
-						<!-- wp:paragraph -->' .
-						'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-						'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-						'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
-						'<!-- /wp:paragraph -->
-					</blockquote>' .
-				'<!-- /wp:quote -->' .
-				'<!-- wp:group -->' .
-					'<!-- wp:quote -->' .
-						'<blockquote class="wp-block-quote">
-							<!-- wp:paragraph -->' .
-							'<p>The XYZ Doohickey Company was founded in 1971, and has been providing' .
-							'quality doohickeys to the public ever since. Located in Gotham City, XYZ employs' .
-							'over 2,000 people and does all kinds of awesome things for the Gotham community.</p>' .
-							'<!-- /wp:paragraph -->
-						</blockquote>' .
-					'<!-- /wp:quote -->' .
-				'<!-- /wp:group -->',
-			),
-			array(
-				'root_blocks'  => 2,
-				'page_content' =>
-				'<!-- wp:paragraph -->' .
-					'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
-				'<!-- /wp:paragraph -->' .
-				'<!-- wp:pattern {"slug":"core/interactivity-pattern"} /-->',
-			),
-		);
+		// Test that a root block is not added if there is already a root block defined.
+		gutenberg_interactivity_process_directives( $parsed_block_second, $parsed_block_second, $parsed_block_second );
+		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
+		// Test that root block is removed after processing.
+		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
 	}
 }
 
