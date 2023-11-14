@@ -73,7 +73,7 @@ export function toVdom( root ) {
 				} else {
 					let [ ns, value ] = nsPathRegExp
 						.exec( attributes[ i ].value )
-						?.slice( 1 ) ?? [ namespace, attributes[ i ].value ];
+						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
 					try {
 						value = JSON.parse( value );
 					} catch ( e ) {}
