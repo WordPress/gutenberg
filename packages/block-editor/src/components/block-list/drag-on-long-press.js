@@ -29,7 +29,7 @@ function useOnLongPress( ref, timeout, callback, deps ) {
 	}, deps );
 }
 
-export function DragOnLongPress( { target, clientId, rootClientId } ) {
+export function DragOnLongPress( { target, index, clientId, rootClientId } ) {
 	const [ isDraggging, setIsDragging ] = useState( false );
 	const container = useRef( document.createElement( 'div' ) );
 
@@ -114,6 +114,7 @@ export function DragOnLongPress( { target, clientId, rootClientId } ) {
 				const dataTransfer = new window.DataTransfer();
 				const data = {
 					type: 'block',
+					srcIndex: index,
 					srcClientId: clientId,
 					srcRootClientId: rootClientId || '',
 				};

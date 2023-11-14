@@ -98,6 +98,7 @@ function BlockListBlock( {
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
 		rootClientId,
+		blockIndex,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -105,6 +106,7 @@ function BlockListBlock( {
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
 				getBlockRootClientId,
+				getBlockIndex,
 			} = select( blockEditorStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
@@ -112,6 +114,7 @@ function BlockListBlock( {
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode: getBlockEditingMode( clientId ),
 				rootClientId: getBlockRootClientId( clientId ),
+				blockIndex: getBlockIndex( clientId ),
 			};
 		},
 		[ clientId ]
@@ -248,6 +251,7 @@ function BlockListBlock( {
 				{ block }
 				<DragOnLongPress
 					target={ blockWrapperRef }
+					index={ blockIndex }
 					clientId={ clientId }
 					rootClientId={ rootClientId }
 				/>
