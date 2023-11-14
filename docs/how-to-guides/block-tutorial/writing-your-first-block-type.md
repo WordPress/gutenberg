@@ -64,8 +64,6 @@ The `block.json` file should be added to your plugin. To start a new plugin, cre
 
 Create a basic `block.json` file there:
 
-{% codetabs %}
-{% JSX %}
 
 ```json
 {
@@ -77,22 +75,6 @@ Create a basic `block.json` file there:
 	"editorScript": "file:./build/index.js"
 }
 ```
-
-{% Plain %}
-
-```json
-{
-	"apiVersion": 3,
-	"title": "Example: Basic",
-	"name": "gutenberg-examples/example-01-basic",
-	"category": "layout",
-	"icon": "universal-access-alt",
-	"editorScript": "file:./block.js"
-}
-```
-
-{% end %}
-
 ### Step 2: Register block in plugin
 
 With the `block.json` in place, the registration for the block is a single function call in PHP, this will setup the block and JavaScript file specified in the `editorScript` property to load in the editor.
@@ -118,8 +100,6 @@ The `edit` function is a component that is shown in the editor when the block is
 
 The `save` function is a component that defines the final markup returned by the block and saved in `post_content`.
 
-{% codetabs %}
-{% JSX %}
 
 Add the following in `src/index.js`
 
@@ -140,33 +120,12 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 } );
 ```
 
-{% Plain %}
-
-Add the following to `block.js`
-
-```js
-( function ( blocks, React ) {
-	var el = React.createElement;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
-		edit: function () {
-			return el( 'p', {}, 'Hello World (from the editor).' );
-		},
-		save: function () {
-			return el( 'p', {}, 'Hola mundo (from the frontend).' );
-		},
-	} );
-} )( window.wp.blocks, window.React );
-```
-
-{% end %}
 
 ### Step 4: Build or add dependency
 
 In order to register the block, an asset php file is required in the same directory as the directory used in `register_block_type()` and must begin with the script's filename.
 
-{% codetabs %}
-{% JSX %}
+
 
 Build the scripts and asset file which is used to keep track of dependencies and the build version.
 
@@ -174,23 +133,6 @@ Build the scripts and asset file which is used to keep track of dependencies and
 npm run build
 ```
 
-{% Plain %}
-
-Create the asset file to load the dependencies for the scripts. The name of this file should be the name of the js file then .asset.php. For this example, create `block.asset.php` with the following:
-
-```php
-<?php return
-	array( 'dependencies' =>
-		array(
-			'react',
-			'wp-blocks',
-			'wp-polyfill'
-		),
-		'version' => '0.1'
-	);
-```
-
-{% end %}
 
 ### Step 5: Confirm
 
