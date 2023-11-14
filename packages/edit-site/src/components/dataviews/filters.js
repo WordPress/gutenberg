@@ -42,12 +42,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 			( filterInView ) => filterInView.field === filter.field
 		)
 	);
-	const hiddenFiltersList = filtersRegistered.filter(
-		( filter ) =>
-			! view.filters.some(
-				( filterInView ) => filterInView.field === filter.field
-			)
-	);
 
 	const visibleFilters = visibleFiltersList
 		?.map( ( filter ) => {
@@ -68,7 +62,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 	visibleFilters.push(
 		<AddFilter
 			key="add-filter"
-			filters={ hiddenFiltersList }
+			fields={ fields }
 			view={ view }
 			onChangeView={ onChangeView }
 		/>
