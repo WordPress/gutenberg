@@ -34,7 +34,11 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const { slug, theme, tagName, layout = {} } = attributes;
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
 	const hasAlreadyRendered = useHasRecursion( templatePartId );
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
