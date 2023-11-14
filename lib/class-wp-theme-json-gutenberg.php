@@ -2182,7 +2182,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		// Blocks.
+		// Blocks (including section block styles).
 		if ( isset( $theme_json['styles']['blocks'] ) ) {
 			$block_nodes = static::get_block_nodes( $theme_json, $selectors );
 			foreach ( $block_nodes as $block_node ) {
@@ -2201,41 +2201,6 @@ class WP_Theme_JSON_Gutenberg {
 					'path'     => array( 'styles', 'sections', $index ),
 					'selector' => $section_class,
 				);
-
-				// Section block styles.
-				if ( isset( $theme_json['styles']['sections'][ $index ]['blocks'] ) ) {
-					$section_block_styles = array(
-						'styles' => array(
-							'blocks' => $theme_json['styles']['sections'][ $index ]['blocks']
-						)
-					);
-					$section_block_nodes = static::get_block_nodes( $section_block_styles, $selectors );
-					foreach( $section_block_nodes as &$section_block_node ) {
-						// Update the path to the section's block styles.
-						array_splice( $section_block_node['path'], 1, 0, array( 'sections', $index ) );
-
-						// Scope the block's root selector by the section's class.
-						$section_block_node['selector'] = static::scope_selector( $section_class, $section_block_node['selector'] );
-						foreach ($section_block_node['selectors'] as $feature => $selector ) {
-							if ( is_string( $selector ) ) {
-								$section_block_node['selectors'][ $feature ] = static::scope_selector( $section_class, $selector );
-							}
-
-							if ( is_array( $selector ) ){
-								foreach ( $selector as $subfeature => $subfeature_selector ) {
-									$section_block_node['selectors'][ $feature ][ $subfeature ] = static::scope_selector( $section_class, $subfeature_selector );
-								}
-							}
-						}
-
-						// Scope duotone selectors.
-						if ( ! empty( $section_block_node['duotone'] ) ) {
-							$section_block_node['duotone'] = static::scope_selector( $section_class, $section_block_node['duotone'] );
-						}
-
-						// TODO: What about variations??????
-					}
-				}
 
 				// Section element styles.
 				if ( isset( $theme_json['styles']['sections'][ $index ]['elements'] ) ) {
@@ -2266,15 +2231,7 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 				}
-
-
-				// TODO: Implement generation of section block element nodes.
 			}
-
-			foreach ( $section_block_nodes as $section_block_node ) {
-				$nodes[] = $section_block_node;
-			}
-
 		}
 
 		/**
@@ -2344,6 +2301,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
 	 * @since 6.1.0
+	 * @since 6.5.0 Add support for section specific block styles.
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
 	 * @param array $selectors  Optional list of selectors per block.
@@ -2352,65 +2310,141 @@ class WP_Theme_JSON_Gutenberg {
 	private static function get_block_nodes( $theme_json, $selectors = array() ) {
 		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$nodes     = array();
-		if ( ! isset( $theme_json['styles'] ) ) {
-			return $nodes;
-		}
 
 		// Blocks.
-		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
-			return $nodes;
-		}
+		if ( isset( $theme_json['styles']['blocks'] ) ) {
+			foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
+				$selector = null;
+				if ( isset( $selectors[ $name ]['selector'] ) ) {
+					$selector = $selectors[ $name ]['selector'];
+				}
 
-		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
+				$duotone_selector = null;
+				if ( isset( $selectors[ $name ]['duotone'] ) ) {
+					$duotone_selector = $selectors[ $name ]['duotone'];
+				}
 
-			$duotone_selector = null;
-			if ( isset( $selectors[ $name ]['duotone'] ) ) {
-				$duotone_selector = $selectors[ $name ]['duotone'];
-			}
+				$feature_selectors = null;
+				if ( isset( $selectors[ $name ]['selectors'] ) ) {
+					$feature_selectors = $selectors[ $name ]['selectors'];
+				}
 
-			$feature_selectors = null;
-			if ( isset( $selectors[ $name ]['selectors'] ) ) {
-				$feature_selectors = $selectors[ $name ]['selectors'];
-			}
+				$variation_selectors = array();
+				if ( isset( $node['variations'] ) ) {
+					foreach ( $node['variations'] as $variation => $node ) {
+						$variation_selectors[] = array(
+							'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
+							'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
+						);
+					}
+				}
 
-			$variation_selectors = array();
-			if ( isset( $node['variations'] ) ) {
-				foreach ( $node['variations'] as $variation => $node ) {
-					$variation_selectors[] = array(
-						'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
-						'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
-					);
+				$nodes[] = array(
+					'name'       => $name,
+					'path'       => array( 'styles', 'blocks', $name ),
+					'selector'   => $selector,
+					'selectors'  => $feature_selectors,
+					'duotone'    => $duotone_selector,
+					'variations' => $variation_selectors,
+				);
+
+				if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
+					foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+						$nodes[] = array(
+							'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
+							'selector' => $selectors[ $name ]['elements'][ $element ],
+						);
+
+						// Handle any pseudo selectors for the element.
+						if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
+							foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+									$nodes[] = array(
+										'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
+										'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
+									);
+								}
+							}
+						}
+					}
 				}
 			}
+		}
 
-			$nodes[] = array(
-				'name'       => $name,
-				'path'       => array( 'styles', 'blocks', $name ),
-				'selector'   => $selector,
-				'selectors'  => $feature_selectors,
-				'duotone'    => $duotone_selector,
-				'variations' => $variation_selectors,
-			);
+		if ( isset( $theme_json['styles']['sections'] ) ) {
+			foreach ( $theme_json['styles']['sections'] as $section_index => $section ) {
+				$index = intval( $section_index );
+				$section_class = ".wp-section-$index";
 
-			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
-				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+				if ( empty( $section['blocks'] ) ) {
+					continue;
+				}
+
+				foreach ( $section['blocks'] as $name => $node ) {
+					$selector = null;
+					if ( isset( $selectors[ $name ]['selector'] ) ) {
+						$selector = static::scope_selector( $section_class, $selectors[ $name ]['selector'] );
+					}
+
+					$duotone_selector = null;
+					if ( isset( $selectors[ $name ]['duotone'] ) ) {
+						$duotone_selector = static::scope_selector( $section_class, $selectors[ $name ]['duotone'] );
+					}
+
+					$feature_selectors = null;
+					if ( isset( $selectors[ $name ]['selectors'] ) ) {
+						$feature_selectors = array();
+
+						foreach( $selectors[ $name ]['selectors'] as $feature => $feature_selector ) {
+							if ( is_string( $feature_selector ) ) {
+								$feature_selectors[ $feature ] = static::scope_selector( $section_class, $feature_selector );
+							}
+
+							if ( is_array( $selector ) ){
+								foreach ( $selector as $subfeature => $subfeature_selector ) {
+									$feature_selectors[ $feature ][ $subfeature ] = static::scope_selector( $section_class, $subfeature_selector );
+								}
+							}
+						}
+					}
+
+					$variation_selectors = array();
+					if ( isset( $node['variations'] ) ) {
+						foreach ( $node['variations'] as $variation => $variation_node ) {
+							$variation_selectors[] = array(
+								'path'     => array( 'styles', 'sections', $index, 'blocks', $name, 'variations', $variation ),
+								'selector' => static::scope_selector( $section_class, $selectors[ $name ]['styleVariations'][ $variation ] ),
+							);
+						}
+					}
+
 					$nodes[] = array(
-						'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-						'selector' => $selectors[ $name ]['elements'][ $element ],
+						'name'       => $name,
+						'path'       => array( 'styles', 'sections', $index, 'blocks', $name ),
+						'selector'   => $selector,
+						'selectors'  => $feature_selectors,
+						'duotone'    => $duotone_selector,
+						'variations' => $variation_selectors,
 					);
 
-					// Handle any pseudo selectors for the element.
-					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
-						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-								$nodes[] = array(
-									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-									'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
-								);
+					if ( isset( $node['elements'] ) ) {
+						foreach ( $node['elements'] as $element => $element_node ) {
+							$nodes[] = array(
+								'path'     => array( 'styles', 'sections', $index, 'blocks', $name, 'elements', $element ),
+								'selector' => static::scope_selector( $section_class, $selectors[ $name ]['elements'][ $element ] ),
+							);
+
+							// Handle any pseudo selectors for the element.
+							if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
+								foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+									if ( isset( $node['elements'][ $element ][ $pseudo_selector ] ) ) {
+										$pseudo_class = static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector );
+										$nodes[] = array(
+											'path'     => array( 'styles', 'sections', $index, 'blocks', $name, 'elements', $element ),
+											'selector' => static::scope_selector( $section_class, $pseudo_class ),
+										);
+									}
+								}
 							}
 						}
 					}
@@ -2422,17 +2456,17 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Gets the CSS rules for a particular block from theme.json.
+	 * gets the css rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param array $block_metadata Metadata about the block to get styles for.
+	 * @param array $block_metadata metadata about the block to get styles for.
 	 *
-	 * @return string Styles for the block.
+	 * @return string styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
 		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
+		$use_root_padding = isset( $this->theme_json['settings']['userootpaddingawarealignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
 
