@@ -137,7 +137,8 @@ function register_block_core_post_terms() {
 add_action( 'init', 'register_block_core_post_terms' );
 // Register actions for all taxonomies, to add variations when they are registered.
 // All taxonomies registered before register_block_core_post_terms, will be handled by that function.
-add_action( 'registered_taxonomy', 'register_block_core_post_terms_taxonomy_variation', 10, 3 );
+add_action( 'registered_taxonomy', 'block_core_post_terms_register_taxonomy_variation', 10, 3 );
+add_action( 'unregistered_taxonomy', 'block_core_post_terms_unregister_taxonomy_variation', 10, 3 );
 
 /**
  * Register a custom taxonomy variation for post terms on taxonomy registration
@@ -148,7 +149,7 @@ add_action( 'registered_taxonomy', 'register_block_core_post_terms_taxonomy_vari
  * @param array        $args Array of taxonomy registration arguments.
  * @return void
  */
-function register_block_core_post_terms_taxonomy_variation( $taxonomy, $object_type, $args ) {
+function block_core_post_terms_register_taxonomy_variation( $taxonomy, $object_type, $args ) {
 	if ( isset( $args['publicly_queryable'] ) && $args['publicly_queryable'] ) {
 		$variation = block_core_post_terms_build_variation_for_post_terms( (object) $args );
 		// Directly set the variations on the registered block type
@@ -162,4 +163,29 @@ function register_block_core_post_terms_taxonomy_variation( $taxonomy, $object_t
 
 		$post_terms_block_type->variations[] = $variation;
 	}
+}
+
+/**
+ * Unregisters a custom taxonomy variation for post terms block on taxonomy unregistration.
+ *
+ * @param string $taxonomy The taxonomy name passed from unregistered_taxonomy action hook.
+ * @return void
+ */
+function block_core_post_terms_unregister_taxonomy_variation( $taxonomy ) {
+	// Directly get the variations from the registered block type
+	// because there's no server side (un)registration for variations (see #47170).
+	$post_terms_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/post-terms' );
+	// If the block is not registered (yet), there's no need to remove a variation.
+	if ( ! $post_terms_block_type || empty( $post_terms_block_type->variations ) ) {
+		return;
+	}
+	// Search for the variation and remove it from the array.
+	foreach ( $post_terms_block_type->variations as $i => $variation ) {
+		if ( $variation['name'] === $taxonomy ) {
+			unset( $post_terms_block_type->variations[ $i ] );
+			break;
+		}
+	}
+	// Reindex array after removing one variation.
+	$post_terms_block_type->variations = array_values( $post_terms_block_type->variations );
 }
