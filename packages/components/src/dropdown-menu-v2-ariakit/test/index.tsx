@@ -984,7 +984,7 @@ describe( 'DropdownMenu', () => {
 			// The contents of the suffix are rendered after the item's children
 			expect(
 				screen.getByRole( 'menuitemradio', {
-					name: 'Radio item oneRadio suffix',
+					name: 'Radio item one Radio suffix',
 				} )
 			).toBeInTheDocument();
 		} );
