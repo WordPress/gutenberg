@@ -57,9 +57,7 @@ export const DropdownMenuItem = forwardRef<
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
 		>
-			{ prefix && (
-				<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
-			) }
+			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 
 			<Styled.DropdownMenuItemContentWrapper>
 				<Styled.DropdownMenuItemChildrenWrapper>
@@ -297,6 +295,7 @@ const UnconnectedDropdownMenu = (
 											aria-hidden="true"
 											icon={ chevronRightSmall }
 											size={ 24 }
+											preserveAspectRatio="xMidYMid slice"
 										/>
 									</>
 								),

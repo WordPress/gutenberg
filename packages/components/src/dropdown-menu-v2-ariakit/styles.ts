@@ -22,12 +22,15 @@ const ANIMATION_PARAMS = {
 };
 
 const CONTENT_WRAPPER_PADDING = space( 2 );
-const ITEM_PREFIX_WIDTH = space( 7 );
-const ITEM_PADDING_INLINE_START = space( 2 );
-const ITEM_PADDING_INLINE_END = space( 2.5 );
+const ITEM_PADDING_BLOCK = space( 2 );
+const ITEM_PADDING_INLINE = space( 3 );
 
-// TODO: should bring this into the config, and make themeable
-const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
+// TODO:
+// - those values are different from saved variables?
+// - should bring this into the config, and make themeable
+// - border color and divider color are different?
+const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
+const DIVIDER_COLOR = COLORS.gray[ 200 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
@@ -76,7 +79,9 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	grid-template-columns: minmax( 0, max-content ) 1fr;
 	grid-template-rows: auto;
 
-	min-width: 220px;
+	box-sizing: border-box;
+	min-width: 160px;
+	max-width: 320px;
 	max-height: var( --popover-available-height );
 	padding: ${ CONTENT_WRAPPER_PADDING };
 
@@ -115,80 +120,12 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	}
 `;
 
-const itemPrefix = css`
-	/* Always occupy the first column, even when auto-collapsing /*
-	grid-column: 1;
-
-	/* !important is to override some inline styles set by Ariakit */
-	width: ${ ITEM_PREFIX_WIDTH } !important;
-	/* !important is to override some inline styles set by Ariakit */
-	height: auto !important;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	/* Prefixes don't get affected by the item's inline start padding */
-	margin-inline-start: calc( -1 * ${ ITEM_PADDING_INLINE_START } );
-	/*
-		Negative margin allows the suffix to be as tall as the whole item
-		(incl. padding) before increasing the items' height. This can be useful,
-		e.g., when using icons that are bigger than 20x20 px
-	*/
-	margin-top: ${ space( -2 ) };
-	margin-bottom: ${ space( -2 ) };
-`;
-
-const itemSuffix = css`
-	flex: 0;
-	width: max-content;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	/* Push prefix to the inline-end of the item */
-	margin-inline-start: auto;
-	/* Minimum space between the item's content and suffix */
-	padding-inline-start: ${ space( 6 ) };
-	/*
-		Negative margin allows the suffix to be as tall as the whole item
-		(incl. padding) before increasing the items' height. This can be useful,
-		e.g., when using icons that are bigger than 20x20 px
-	*/
-	margin-top: ${ space( -2 ) };
-	margin-bottom: ${ space( -2 ) };
-
-	/*
-		Override color in normal conditions, but inherit the item's color
-	  for altered conditions.
-
-		TODO:
-		  - For now, used opacity like for disabled item, which makes it work
-			  regardless of the theme
-		  - how do we translate this for themes? Should we have a new variable
-		for "secondary" text?
-	*/
-	opacity: 0.6;
-
-	/* when the parent item is hovered / focused */
-	[data-active-item] > &,
-	/* when the parent item is a submenu trigger and the submenu is open */
-	[aria-expanded='true'] > &,
-	/* when the parent item is disabled */
-	[aria-disabled='true'] > & {
-		opacity: 1;
-	}
-`;
-
-export const ItemPrefixWrapper = styled.span`
-	${ itemPrefix }
-`;
-
-export const ItemSuffixWrapper = styled.span`
-	${ itemSuffix }
-`;
-
 const baseItem = css`
 	all: unset;
 
 	position: relative;
+	min-height: ${ space( 10 ) };
+	box-sizing: border-box;
 
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
@@ -209,26 +146,21 @@ const baseItem = css`
 	color: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.radiusBlockUi };
 
-	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
-		${ ITEM_PADDING_INLINE_START };
+	padding-block: ${ ITEM_PADDING_BLOCK };
+	padding-inline: ${ ITEM_PADDING_INLINE };
 
 	user-select: none;
 	outline: none;
 
 	&[aria-disabled='true'] {
-		/*
-		TODO:
-			- we need a disabled color in the Theme variables
-			- design specs use opacity instead of setting a new text color
-	*/
-		opacity: 0.5;
+		color: ${ COLORS.ui.textDisabled };
 		pointer-events: none;
 	}
 
 	/* Hover */
-	&[data-active-item] {
-		/* TODO: reconcile with global focus styles */
-		background-color: ${ COLORS.gray[ '100' ] };
+	&[data-active-item]:not( [data-focus-visible] ) {
+		background-color: ${ COLORS.theme.accent };
+		color: ${ COLORS.white };
 	}
 
 	/* Keyboard focus (focus-visible) */
@@ -247,7 +179,8 @@ const baseItem = css`
 
 	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		/* TODO: should we style submenu triggers any different? */
+		background-color: ${ COLORS.gray[ 100 ] };
+		color: ${ COLORS.gray[ 900 ] };
 	}
 
 	svg {
@@ -256,15 +189,44 @@ const baseItem = css`
 `;
 
 export const DropdownMenuItem = styled( Ariakit.MenuItem )`
-	${ baseItem }
+	${ baseItem };
 `;
 
 export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
-	${ baseItem }
+	${ baseItem };
 `;
 
 export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
-	${ baseItem }
+	${ baseItem };
+`;
+
+export const ItemPrefixWrapper = styled.span`
+	/* Always occupy the first column, even when auto-collapsing */
+	grid-column: 1;
+
+	&:not( :empty ) {
+		margin-inline-end: ${ space( 2 ) };
+	}
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	/* Override inline styles applied by ariakit */
+	width: auto !important;
+	height: auto !important;
+
+	color: ${ COLORS.gray[ '700' ] };
+
+	/*
+	* When the parent menu item is active, except when it's a non-focused/hovered
+	* submenu trigger (in that case, color should not be inherited)
+	*/
+	[data-active-item]:not( [data-focus-visible] ) > &,
+	/* When the parent menu item is disabled */
+	[aria-disabled='true'] > & {
+		color: inherit;
+	}
 `;
 
 export const DropdownMenuItemContentWrapper = styled.div`
@@ -275,13 +237,41 @@ export const DropdownMenuItemContentWrapper = styled.div`
 	grid-column: 2;
 
 	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: ${ space( 3 ) };
+
+	pointer-events: none;
 `;
 
 export const DropdownMenuItemChildrenWrapper = styled.div`
 	flex: 1;
+
 	display: inline-flex;
 	flex-direction: column;
-	pointer-events: none;
+	gap: ${ space( 1 ) };
+`;
+
+export const ItemSuffixWrapper = styled.span`
+	flex: 0;
+	width: max-content;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: ${ space( 3 ) };
+
+	color: ${ COLORS.gray[ '700' ] };
+
+	/*
+	 * When the parent menu item is active, except when it's a non-focused/hovered
+	 * submenu trigger (in that case, color should not be inherited)
+	 */
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ DropdownMenu }) &,
+	/* When the parent menu item is disabled */
+	[aria-disabled='true'] *:not(${ DropdownMenu }) & {
+		color: inherit;
+	}
 `;
 
 export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
@@ -297,41 +287,37 @@ export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 
 	border: none;
 	height: ${ CONFIG.borderWidth };
-	/* TODO: doesn't match border color from variables */
 	background-color: ${ ( props ) =>
 		props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BORDER_COLOR
-			: DEFAULT_BORDER_COLOR };
-	/* Negative horizontal margin to make separator go from side to side */
-	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
+			: DIVIDER_COLOR };
+	/* Align with menu items' content */
+	margin-block: ${ space( 2 ) };
+	margin-inline: ${ ITEM_PADDING_INLINE };
 
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent;
 `;
 
 export const SubmenuChevronIcon = styled( Icon )`
+	width: ${ space( 1.5 ) };
 	${ rtl(
 		{
-			transform: `scaleX(1) translateX(${ space( 2 ) })`,
+			transform: `scaleX(1)`,
 		},
 		{
-			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
+			transform: `scaleX(-1)`,
 		}
-	) }
+	) };
 `;
 
 export const DropdownMenuItemHelpText = styled( Truncate )`
-	font-size: 12px;
+	font-size: ${ font( 'helpText.fontSize' ) };
+	line-height: 16px;
 	color: ${ COLORS.gray[ '700' ] };
-`;
 
-// /* when the immediate parent item is hovered / focused */
-// [data-active-item] > ${ DropdownMenuItem }[data-active-item] > &,
-// [data-active-item] > ${ DropdownMenuRadioItem }[data-active-item] > &,
-// [data-active-item] > ${ DropdownMenuCheckboxItem }[data-active-item] > &,
-// /* when the parent item is a submenu trigger and the submenu is open */
-// [aria-expanded='true'] > &,
-// /* when the parent item is disabled */
-// [aria-disabled='true'] > & {
-// 	color: inherit;
-// }
+	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
+	[aria-disabled='true'] *:not( ${ DropdownMenu } ) & {
+		color: inherit;
+	}
+`;
