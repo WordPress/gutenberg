@@ -64,11 +64,13 @@ figure.wp-block-image:not(.wp-block) {
 	}
 
 	> a {
-		pointer-events: none;
 		// When the Image block is linked,
 		// it's wrapped with a disabled <a /> tag.
-		// Restore cursor style so it doesn't appear 'clickable'.
+		// Restore cursor style so it doesn't appear 'clickable'
+		// and remove pointer events. Safari needs the display property.
+		pointer-events: none;
 		cursor: default;
+		display: inline-block;
 	}
 }
 
