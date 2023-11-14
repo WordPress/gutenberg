@@ -26,6 +26,7 @@ export interface WPRawPerformanceResults {
 	firstContentfulPaint: number[];
 	firstBlock: number[];
 	type: number[];
+	typeWithFixedToolbar: number[];
 	typeContainer: number[];
 	focus: number[];
 	inserterOpen: number[];
@@ -48,6 +49,9 @@ export interface WPPerformanceResults {
 	type?: number;
 	minType?: number;
 	maxType?: number;
+	typeWithFixedToolbar?: number;
+	minTypeWithFixedToolbar?: number;
+	maxTypeWithFixedToolbar?: number;
 	typeContainer?: number;
 	minTypeContainer?: number;
 	maxTypeContainer?: number;
@@ -92,6 +96,9 @@ export function curateResults(
 		type: average( results.type ),
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
+		typeWithFixedToolbar: average( results.typeWithFixedToolbar ),
+		minTypeWithFixedToolbar: minimum( results.typeWithFixedToolbar ),
+		maxTypeWithFixedToolbar: maximum( results.typeWithFixedToolbar ),
 		typeContainer: average( results.typeContainer ),
 		minTypeContainer: minimum( results.typeContainer ),
 		maxTypeContainer: maximum( results.typeContainer ),
