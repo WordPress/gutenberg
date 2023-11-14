@@ -27,10 +27,10 @@ class Gutenberg_Modules {
 	 * Registers the module if no module with that module identifier already
 	 * exists.
 	 *
-	 * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
-	 * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
-	 * @param string $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or 'both'.
-	 * @param array  $args     {
+	 * @param string       $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
+	 * @param string       $src               Full URL of the module, or path of the script relative to the WordPress root directory.
+	 * @param string|array $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or an array of such strings.
+	 * @param array        $args     {
 	 *      Optional array of arguments.
 	 *
 	 *      @type string|bool $ver Optional. String specifying script version number, if it has one, it is added to the URL
@@ -40,13 +40,18 @@ class Gutenberg_Modules {
 	 * }
 	 */
 	public static function register( $module_identifier, $src, $usage, $args = array() ) {
+		// Normalize $usage to an array.
+		if ( ! is_array( $usage ) ) {
+			$usage = array( $usage );
+		}
+
 		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
-				self::$registered[ $module_identifier ] = array(
-					'src'     => $src,
-					'usage'   => $usage,
-					'version' => isset( $args['version'] ) ? $args['version'] : '',
-				);
+			self::$registered[ $module_identifier ] = array(
+				'src'     => $src,
+				'usage'   => $usage,
+				'version' => isset( $args['version'] ) ? $args['version'] : '',
+			);
 		}
 	}
 
@@ -104,17 +109,14 @@ class Gutenberg_Modules {
 	/**
 	 * Determines if the usage is appropriate for the current context.
 	 *
-	 * @param string $usage Specifies the usage of the module. Can be 'admin', 'frontend', or 'both'.
+	 * @param array $usage Specifies the usage of the module. Can contain 'admin' or 'frontend'.
 	 * @return bool Returns true if it's appropriate to load the module in the current WP context.
 	 */
 	private static function get_appropriate_usage( $usage ) {
-		if ( 'both' === $usage ) {
+		if ( in_array( 'admin', $usage, true ) && is_admin() ) {
 			return true;
 		}
-		if ( 'admin' === $usage && is_admin() ) {
-			return true;
-		}
-		if ( 'frontend' === $usage && ! is_admin() ) {
+		if ( in_array( 'frontend', $usage, true ) && ! is_admin() ) {
 			return true;
 		}
 		return false;
