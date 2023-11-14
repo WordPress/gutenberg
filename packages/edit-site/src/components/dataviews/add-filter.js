@@ -4,7 +4,6 @@
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	BaseControl,
 	Icon,
 } from '@wordpress/components';
 import { chevronRightSmall, plus } from '@wordpress/icons';
@@ -59,81 +58,81 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 	}
 
 	return (
-		<BaseControl>
-			<DropdownMenuV2
-				label={ __( 'Add filter' ) }
-				trigger={
-					<Button icon={ plus } variant="tertiary">
-						{ __( 'Add filter' ) }
-					</Button>
+		<DropdownMenuV2
+			label={ __( 'Add filter' ) }
+			trigger={
+				<Button
+					__next40pxDefaultSize={ true }
+					icon={ plus }
+					variant="tertiary"
+				>
+					{ __( 'Add filter' ) }
+				</Button>
+			}
+		>
+			{ filters.map( ( filter ) => {
+				if ( filter.isVisible ) {
+					return (
+						<DropdownMenuItemV2
+							key={ filter.field }
+							disabled={ true }
+						>
+							{ filter.name }
+						</DropdownMenuItemV2>
+					);
 				}
-			>
-				{ filters.map( ( filter ) => {
-					if ( filter.isVisible ) {
-						return (
-							<DropdownMenuItemV2
-								key={ filter.field }
-								disabled={ true }
+
+				return (
+					<DropdownSubMenuV2
+						key={ filter.field }
+						trigger={
+							<DropdownSubMenuTriggerV2
+								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
 								{ filter.name }
+							</DropdownSubMenuTriggerV2>
+						}
+					>
+						{ filter.elements.map( ( element ) => (
+							<DropdownMenuItemV2
+								key={ element.value }
+								onSelect={ () => {
+									onChangeView( ( currentView ) => ( {
+										...currentView,
+										page: 1,
+										filters: [
+											...currentView.filters,
+											{
+												field: filter.field,
+												operator: 'in',
+												value: element.value,
+											},
+										],
+									} ) );
+								} }
+								role="menuitemcheckbox"
+							>
+								{ element.label }
 							</DropdownMenuItemV2>
-						);
-					}
-
-					return (
-						<DropdownSubMenuV2
-							key={ filter.field }
-							trigger={
-								<DropdownSubMenuTriggerV2
-									suffix={
-										<Icon icon={ chevronRightSmall } />
-									}
-								>
-									{ filter.name }
-								</DropdownSubMenuTriggerV2>
-							}
-						>
-							{ filter.elements.map( ( element ) => (
-								<DropdownMenuItemV2
-									key={ element.value }
-									onSelect={ () => {
-										onChangeView( ( currentView ) => ( {
-											...currentView,
-											page: 1,
-											filters: [
-												...currentView.filters,
-												{
-													field: filter.field,
-													operator: 'in',
-													value: element.value,
-												},
-											],
-										} ) );
-									} }
-									role="menuitemcheckbox"
-								>
-									{ element.label }
-								</DropdownMenuItemV2>
-							) ) }
-						</DropdownSubMenuV2>
-					);
-				} ) }
-				<DropdownMenuSeparatorV2 />
-				<DropdownMenuItemV2
-					key={ 'reset-filters' }
-					disabled={ view.filters?.length === 0 }
-					onSelect={ () => {
-						onChangeView( ( currentView ) => ( {
-							...currentView,
-							page: 1,
-							filters: [],
-						} ) );
-					} }
-					role="menuitemcheckbox"
-				>
-					{ __( 'Reset filters' ) }
-				</DropdownMenuItemV2>
-			</DropdownMenuV2>
-		</BaseControl>
+						) ) }
+					</DropdownSubMenuV2>
+				);
+			} ) }
+			<DropdownMenuSeparatorV2 />
+			<DropdownMenuItemV2
+				key={ 'reset-filters' }
+				disabled={ view.filters?.length === 0 }
+				onSelect={ () => {
+					onChangeView( ( currentView ) => ( {
+						...currentView,
+						page: 1,
+						filters: [],
+					} ) );
+				} }
+				role="menuitemcheckbox"
+			>
+				{ __( 'Reset filters' ) }
+			</DropdownMenuItemV2>
+		</DropdownMenuV2>
 	);
 }
