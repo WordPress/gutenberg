@@ -54,6 +54,10 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 		} );
 	} );
 
+	if ( filters.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<BaseControl>
 			<DropdownMenuV2
