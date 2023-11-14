@@ -51,6 +51,7 @@ const parseInitialState = () => {
 };
 
 export const stores = new Map();
+const rawStores = new Map();
 const storeLocks = new Map();
 
 const objToProxy = new WeakMap();
@@ -246,11 +247,11 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		stores.set(
-			namespace,
-			new Proxy( { state: deepSignal( state ), ...block }, handlers )
-		);
-		proxyToNs.set( stores.get( namespace ), namespace );
+		const rawStore = { state: deepSignal( state ), ...block };
+		const proxiedStore = new Proxy( rawStore, handlers );
+		rawStores.set( namespace, rawStore );
+		stores.set( namespace, proxiedStore );
+		proxyToNs.set( proxiedStore, namespace );
 	} else {
 		// Lock the store if it wasn't locked yet and the passed lock is
 		// different from the universal unlock. If no lock is given, the store
@@ -274,7 +275,7 @@ export function store(
 			}
 		}
 
-		const target = stores.get( namespace );
+		const target = rawStores.get( namespace );
 		deepMerge( target, block );
 		deepMerge( target.state, state );
 	}

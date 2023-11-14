@@ -58,8 +58,7 @@ export function toVdom( root ) {
 
 		const props = {};
 		const children = [];
-		const directives = {};
-		let hasDirectives = false;
+		const directives = [];
 		let ignore = false;
 		let island = false;
 
@@ -82,15 +81,7 @@ export function toVdom( root ) {
 						island = true;
 						namespace = value?.namespace ?? null;
 					} else {
-						hasDirectives = true;
-						const [ , prefix, suffix = 'default' ] =
-							directiveParser.exec( n );
-						directives[ prefix ] = directives[ prefix ] || [];
-						directives[ prefix ].push( {
-							namespace: ns,
-							value,
-							suffix,
-						} );
+						directives.push( [ n, ns, value ] );
 					}
 				}
 			} else if ( n === 'ref' ) {
@@ -109,7 +100,22 @@ export function toVdom( root ) {
 			];
 		if ( island ) hydratedIslands.add( node );
 
-		if ( hasDirectives ) props.__directives = directives;
+		if ( directives.length ) {
+			props.__directives = directives.reduce(
+				( obj, [ name, ns, value ] ) => {
+					const [ , prefix, suffix = 'default' ] =
+						directiveParser.exec( name );
+					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
+					obj[ prefix ].push( {
+						namespace: ns ?? namespace,
+						value,
+						suffix,
+					} );
+					return obj;
+				},
+				{}
+			);
+		}
 
 		let child = treeWalker.firstChild();
 		if ( child ) {
