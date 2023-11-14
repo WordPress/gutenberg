@@ -36,6 +36,8 @@ import {
 	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
 	DropdownMenuSeparator as DropdownMenuSeparatorV2Ariakit,
+	DropdownMenuItemLabel as DropdownMenuItemLabelV2Ariakit,
+	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2Ariakit,
 } from './dropdown-menu-v2-ariakit';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
@@ -77,4 +79,6 @@ lock( privateApis, {
 	DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItemV2Ariakit,
 	DropdownMenuSeparatorV2Ariakit,
+	DropdownMenuItemLabelV2Ariakit,
+	DropdownMenuItemHelpTextV2Ariakit,
 } );
