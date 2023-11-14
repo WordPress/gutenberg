@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect, useDispatch } from '@wordpress/data';
-import { create, getTextContent } from '@wordpress/rich-text';
+import { create } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -128,11 +128,9 @@ export const DocumentOutline = ( {
 						>
 							{ item.isEmpty
 								? emptyHeadingContent
-								: getTextContent(
-										create( {
-											html: item.attributes.content,
-										} )
-								  ) }
+								: create( {
+										html: item.attributes.content,
+								  } ).text }
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 &&
 								hasMultipleH1 &&

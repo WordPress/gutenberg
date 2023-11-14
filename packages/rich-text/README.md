@@ -220,6 +220,8 @@ _Returns_
 
 ### getTextContent
 
+> **Deprecated** Use the text property instead.
+
 Get the textual content of a Rich Text value. This is similar to `Element.textContent`.
 
 _Parameters_

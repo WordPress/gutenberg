@@ -15,7 +15,6 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
 import { external, textColor } from '@wordpress/icons';
@@ -38,7 +37,7 @@ const LinkSettingsScreen = ( {
 	activeAttributes,
 	isVisible,
 } ) => {
-	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
+	const [ text, setText ] = useState( slice( value ).text );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
 		activeAttributes.target === '_blank'
 	);
@@ -111,7 +110,7 @@ const LinkSettingsScreen = ( {
 				linkText.length
 			);
 			newAttributes = insert( value, toInsert );
-		} else if ( text !== getTextContent( slice( value ) ) ) {
+		} else if ( text !== slice( value ).text ) {
 			// Edit text in selected link.
 			const toInsert = applyFormat(
 				create( { text } ),

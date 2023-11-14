@@ -13,7 +13,6 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	applyFormat,
 	getActiveFormat,
-	getTextContent,
 	isCollapsed,
 	removeFormat,
 	slice,
@@ -56,7 +55,7 @@ export const link = {
 
 			addLink() {
 				const { value, onChange } = this.props;
-				const text = getTextContent( slice( value ) );
+				const { text } = slice( value );
 
 				if ( text && isURL( text ) && isValidHref( text ) ) {
 					const newValue = applyFormat( value, {

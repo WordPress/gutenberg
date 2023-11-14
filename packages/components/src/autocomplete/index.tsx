@@ -15,13 +15,7 @@ import {
 } from '@wordpress/element';
 import { __, _n } from '@wordpress/i18n';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
-import {
-	create,
-	slice,
-	insert,
-	isCollapsed,
-	getTextContent,
-} from '@wordpress/rich-text';
+import { create, slice, insert, isCollapsed } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS } from '@wordpress/keycodes';
 
@@ -253,7 +247,7 @@ export function useAutocomplete( {
 	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
 		if ( isCollapsed( record ) ) {
-			return getTextContent( slice( record, 0 ) );
+			return slice( record, 0 ).text;
 		}
 		return '';
 	}, [ record ] );
@@ -329,9 +323,11 @@ export function useAutocomplete( {
 			return;
 		}
 
-		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
-		);
+		const textAfterSelection = slice(
+			record,
+			undefined,
+			record.text.length
+		).text;
 
 		if (
 			allowContext &&

@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
-	getTextContent,
 	applyFormat,
 	removeFormat,
 	slice,
@@ -41,7 +40,7 @@ function Edit( {
 	const [ addingLink, setAddingLink ] = useState( false );
 
 	function addLink() {
-		const text = getTextContent( slice( value ) );
+		const { text } = slice( value );
 
 		if ( text && isURL( text ) && isValidHref( text ) ) {
 			onChange(

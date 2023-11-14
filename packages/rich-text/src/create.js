@@ -9,7 +9,7 @@ import { select } from '@wordpress/data';
 import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { ZWNBSP } from './special-characters';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -283,16 +283,13 @@ export function collapseWhiteSpace( string ) {
 }
 
 /**
- * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
+ * Removes reserved characters used by rich-text (zero width non breaking spaces
+ * added by `toTree`).
  *
  * @param {string} string
  */
 export function removeReservedCharacters( string ) {
-	// with the global flag, note that we should create a new regex each time OR reset lastIndex state.
-	return string.replace(
-		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
-		''
-	);
+	return string.replaceAll( ZWNBSP, '' );
 }
 
 /**
@@ -365,7 +362,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 						},
 					},
 				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				text: ' ',
 			};
 			accumulateSelection( accumulator, node, range, value );
 			mergePair( accumulator, value );
@@ -396,7 +393,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 						innerHTML: node.innerHTML,
 					},
 				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				text: ' ',
 			} );
 			continue;
 		}
@@ -418,7 +415,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 				mergePair( accumulator, {
 					formats: [ , ],
 					replacements: [ format ],
-					text: OBJECT_REPLACEMENT_CHARACTER,
+					text: ' ',
 				} );
 			}
 		} else {
