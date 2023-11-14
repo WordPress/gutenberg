@@ -63,10 +63,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 			<DropdownMenuV2
 				label={ __( 'Add filter' ) }
 				trigger={
-					<Button
-						prefix={ <Icon icon={ plus } /> }
-						variant="tertiary"
-					>
+					<Button icon={ plus } variant="tertiary">
 						{ __( 'Add filter' ) }
 					</Button>
 				}
