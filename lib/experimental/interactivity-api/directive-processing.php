@@ -35,10 +35,9 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_process_directives', 1
  *
  * @return string Filtered block content.
  */
-$process_directives_in_root_blocks = static function ( $block_content, $block ) {
-
+function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 	if ( WP_Directive_Processor::is_root_block( $block ) ) {
-
+		WP_Directive_Processor::remove_root_block();
 		$directives = array(
 			'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 			'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
@@ -49,14 +48,13 @@ $process_directives_in_root_blocks = static function ( $block_content, $block ) 
 
 		$tags = new WP_Directive_Processor( $block_content );
 		$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
-		WP_Directive_Processor::remove_root_block();
 		return $tags->get_updated_html();
 
 	}
 
 	return $block_content;
-};
-add_filter( 'render_block', $process_directives_in_root_blocks, 10, 2 );
+}
+add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2 );
 
 
 /**
