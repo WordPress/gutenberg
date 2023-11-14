@@ -186,9 +186,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data $theme_json Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data( $config, 'default' ) );
+		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
 		$config       = $theme_json->get_data();
-		static::$core = new WP_Theme_JSON( $config, 'default' );
+		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return static::$core;
 	}
@@ -272,7 +272,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				// Read parent theme.json, and only merge it if successful and different from main theme.json data.
 				$raw_parent_theme_json_data = static::read_theme_json_data_for_theme( $wp_theme->parent() );
 				if ( $raw_parent_theme_json_data && $raw_theme_json_data !== $raw_parent_theme_json_data ) {
-					$parent_theme = new WP_Theme_JSON( $raw_parent_theme_json_data );
+					$parent_theme = new WP_Theme_JSON_Gutenberg( $raw_parent_theme_json_data );
 
 					/*
 					 * Merge the child theme.json into the parent theme.json.
