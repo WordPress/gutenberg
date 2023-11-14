@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/navigation-link` block.
+ * Server-side registering and rendering of the `core/navigation-link` block.
  *
  * @package WordPress
  */
@@ -323,12 +323,12 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 }
 
 /**
- * Register a variation for a post type / taxonomy for the navigation link block
+ * Register a variation for a post type / taxonomy for the navigation link block.
  *
  * @param array $variation Variation array from build_variation_for_navigation_link.
  * @return void
  */
-function register_block_core_navigation_link_variation( $variation ) {
+function block_core_navigation_link_register_variation( $variation ) {
 	// Directly set the variations on the registered block type
 	// because there's no server side registration for variations (see #47170).
 	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
@@ -393,6 +393,8 @@ function register_block_core_navigation_link() {
 add_action( 'init', 'register_block_core_navigation_link' );
 // Register actions for all post types and taxonomies, to add variations when they are registered.
 // All post types/taxonomies registered before register_block_core_navigation_link, will be handled by that function.
+add_action( 'registered_post_type', 'block_core_navigation_link_register_post_type_variation', 10, 2 );
+add_action( 'registered_taxonomy', 'block_core_navigation_link_register_taxonomy_variation', 10, 3 );
 add_action( 'registered_post_type', 'register_block_core_navigation_link_post_type_variation', 10, 2 );
 add_action( 'registered_taxonomy', 'register_block_core_navigation_link_taxonomy_variation', 10, 3 );
 
@@ -400,14 +402,14 @@ add_action( 'registered_taxonomy', 'register_block_core_navigation_link_taxonomy
  * Register custom post type variations for navigation link on post type registration
  * Handles all post types registered after the block is registered in register_navigation_link_post_type_variations
  *
- * @param string       $post_type The post type name passed from registered_post_type filter.
+ * @param string       $post_type The post type name passed from registered_post_type action hook.
  * @param WP_Post_Type $post_type_object The post type object passed from registered_post_type.
  * @return void
  */
-function register_block_core_navigation_link_post_type_variation( $post_type, $post_type_object ) {
+function block_core_navigation_link_register_post_type_variation( $post_type, $post_type_object ) {
 	if ( $post_type_object->show_in_nav_menus ) {
 		$variation = build_variation_for_navigation_link( $post_type_object, 'post-type' );
-		register_block_core_navigation_link_variation( $variation );
+		block_core_navigation_link_register_variation( $variation );
 	}
 }
 
@@ -420,9 +422,9 @@ function register_block_core_navigation_link_post_type_variation( $post_type, $p
  * @param array        $args Array of taxonomy registration arguments.
  * @return void
  */
-function register_block_core_navigation_link_taxonomy_variation( $taxonomy, $object_type, $args ) {
+function block_core_navigation_link_register_taxonomy_variation( $taxonomy, $object_type, $args ) {
 	if ( isset( $args['show_in_nav_menus'] ) && $args['show_in_nav_menus'] ) {
 		$variation = build_variation_for_navigation_link( (object) $args, 'post-type' );
-		register_block_core_navigation_link_variation( $variation );
+		block_core_navigation_link_register_variation( $variation );
 	}
 }
