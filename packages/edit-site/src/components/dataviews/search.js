@@ -35,7 +35,6 @@ export default function Search( { label, view, onChangeView } ) {
 			value={ search }
 			label={ searchLabel }
 			placeholder={ searchLabel }
-			className="dataviews-control"
 			size="compact"
 		/>
 	);
