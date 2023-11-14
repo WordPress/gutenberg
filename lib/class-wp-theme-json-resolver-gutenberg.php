@@ -83,7 +83,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 6.1.0 Added caching.
-	 * @since 6.5.0 Added persistent caching using object cache.
+	 * @since 6.5.0 Added persistent caching using object cache, and the `$cache_key` parameter.
 	 *
 	 * @param string $file_path Path to file. Empty if no file.
 	 * @param string $cache_key Optional. Key to cache the result under. Omitting the parameter results in no caching
