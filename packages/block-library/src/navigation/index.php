@@ -638,7 +638,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$should_load_view_script = ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 
-	// Load the modules.
+	// Load the module.
 	if ( $should_load_view_script ) {
 		gutenberg_enqueue_module( '@wordpress/block-library/navigation-block' );
 	}

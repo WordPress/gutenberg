@@ -85,21 +85,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
-		}
 
-		// If the script already exists, there is no point in removing it from viewScript.
-		$view_js_file = 'wp-block-search-view';
-		if ( ! wp_script_is( $view_js_file ) ) {
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $is_expandable_searchfield && in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
-			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $is_expandable_searchfield && ! in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
-			}
+			// Load the module.
+			gutenberg_enqueue_module( '@wordpress/block-library/search-block' );
 		}
 	}
 
@@ -203,27 +191,17 @@ function register_block_core_search() {
 			'render_callback' => 'render_block_core_search',
 		)
 	);
+
+	gutenberg_register_module(
+		'@wordpress/block-library/search-block',
+		'/wp-content/plugins/gutenberg/build/interactivity/search.min.js',
+		array( '@wordpress/interactivity' ),
+		array(
+			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
+		)
+	);
 }
 add_action( 'init', 'register_block_core_search' );
-
-/**
- * Ensure that the view script has the `wp-interactivity` dependency.
- *
- * @since 6.4.0
- *
- * @global WP_Scripts $wp_scripts
- */
-function block_core_search_ensure_interactivity_dependency() {
-	global $wp_scripts;
-	if (
-		isset( $wp_scripts->registered['wp-block-search-view'] ) &&
-		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-search-view']->deps, true )
-	) {
-		$wp_scripts->registered['wp-block-search-view']->deps[] = 'wp-interactivity';
-	}
-}
-
-add_action( 'wp_print_scripts', 'block_core_search_ensure_interactivity_dependency' );
 
 /**
  * Builds the correct top level classnames for the 'core/search' block.
