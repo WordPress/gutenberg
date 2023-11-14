@@ -85,7 +85,7 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  *
  * @param integer $value Excerpt length.
  *
- * @return integer .
+ * @return integer Filtered excerpt length.
  */
 function register_block_core_post_excerpt_length_filter( $value ) {
 	// This check needs to be inside the callback since the REST_REQUEST constant
