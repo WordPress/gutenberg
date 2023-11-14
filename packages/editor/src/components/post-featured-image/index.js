@@ -8,20 +8,19 @@ import {
 	Button,
 	Spinner,
 	ResponsiveWrapper,
-	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import { useSelect, withDispatch, withSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	MediaUpload,
 	MediaUploadCheck,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -86,25 +85,44 @@ function getMediaDetails( media, postId ) {
 	};
 }
 
-function PostFeaturedImage( {
-	currentPostId,
-	featuredImageId,
-	onUpdateImage,
-	onRemoveImage,
-	media,
-	postType,
-	noticeUI,
-	noticeOperations,
-} ) {
+function PostFeaturedImage() {
 	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
-	const mediaUpload = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().mediaUpload;
-	}, [] );
+	const { mediaUpload, media, currentPostId, postType, featuredImageId } =
+		useSelect( ( select ) => {
+			const { mediaUpload: _mediaUpload } =
+				select( blockEditorStore ).getSettings();
+			const { getMedia, getPostType } = select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
+			const _featuredImageId = getEditedPostAttribute( 'featured_media' );
+
+			return {
+				mediaUpload: _mediaUpload,
+				media: _featuredImageId
+					? getMedia( featuredImageId, { context: 'view' } )
+					: null,
+				currentPostId: getCurrentPostId(),
+				postType: getPostType( getEditedPostAttribute( 'type' ) ),
+				featuredImageId: _featuredImageId,
+			};
+		}, [] );
+	const { editPost } = useDispatch( editorStore );
+	const { removeAllNotices, createErrorNotice } = useDispatch( noticesStore );
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
 	);
+
+	function onUpdateImage( image ) {
+		if ( image?.id ) {
+			editPost( { featured_media: image.id } );
+		}
+	}
+
+	function onRemoveImage() {
+		editPost( { featured_media: 0 } );
+	}
 
 	function onDropFiles( filesList ) {
 		mediaUpload( {
@@ -119,15 +137,14 @@ function PostFeaturedImage( {
 				setIsLoading( false );
 			},
 			onError( message ) {
-				noticeOperations.removeAllNotices();
-				noticeOperations.createErrorNotice( message );
+				removeAllNotices();
+				createErrorNotice( message, { type: 'snackbar' } );
 			},
 		} );
 	}
 
 	return (
 		<PostFeaturedImageCheck>
-			{ noticeUI }
 			<div className="editor-post-featured-image">
 				{ media && (
 					<div
@@ -233,53 +250,4 @@ function PostFeaturedImage( {
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( coreStore );
-	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
-	const featuredImageId = getEditedPostAttribute( 'featured_media' );
-
-	return {
-		media: featuredImageId
-			? getMedia( featuredImageId, { context: 'view' } )
-			: null,
-		currentPostId: getCurrentPostId(),
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-		featuredImageId,
-	};
-} );
-
-const applyWithDispatch = withDispatch(
-	( dispatch, { noticeOperations }, { select } ) => {
-		const { editPost } = dispatch( editorStore );
-		return {
-			onUpdateImage( image ) {
-				editPost( { featured_media: image.id } );
-			},
-			onDropImage( filesList ) {
-				select( blockEditorStore )
-					.getSettings()
-					.mediaUpload( {
-						allowedTypes: [ 'image' ],
-						filesList,
-						onFileChange( [ image ] ) {
-							editPost( { featured_media: image.id } );
-						},
-						onError( message ) {
-							noticeOperations.removeAllNotices();
-							noticeOperations.createErrorNotice( message );
-						},
-					} );
-			},
-			onRemoveImage() {
-				editPost( { featured_media: 0 } );
-			},
-		};
-	}
-);
-
-export default compose(
-	withNotices,
-	applyWithSelect,
-	applyWithDispatch,
-	withFilters( 'editor.PostFeaturedImage' )
-)( PostFeaturedImage );
+export default withFilters( 'editor.PostFeaturedImage' )( PostFeaturedImage );
