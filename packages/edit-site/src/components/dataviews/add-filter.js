@@ -99,6 +99,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 									onSelect={ () => {
 										onChangeView( ( currentView ) => ( {
 											...currentView,
+											page: 1,
 											filters: [
 												...currentView.filters,
 												{
