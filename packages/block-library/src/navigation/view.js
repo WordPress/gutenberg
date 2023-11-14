@@ -46,25 +46,23 @@ const { state, actions } = store( 'core/navigation', {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen ? 'dialog' : null;
 		},
-		get ariaModalroleAttribute() {
+		get ariaModal() {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen ? 'true' : null;
 		},
-		get ariaLabelroleAttribute() {
+		get ariaLabel() {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen
 				? ctx.ariaLabel
 				: null;
 		},
-		get isMenuOpenroleAttribute() {
+		get isMenuOpen() {
 			// The menu is opened if either `click`, `hover` or `focus` is true.
 			return (
-				Object.values( state.menuOpenedByroleAttribute ).filter(
-					Boolean
-				).length > 0
+				Object.values( state.menuOpenedBy ).filter( Boolean ).length > 0
 			);
 		},
-		get menuOpenedByroleAttribute() {
+		get menuOpenedBy() {
 			const ctx = getContext();
 			return ctx.type === 'overlay'
 				? ctx.overlayOpenedBy
