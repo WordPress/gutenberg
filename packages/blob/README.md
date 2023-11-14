@@ -49,7 +49,7 @@ _Parameters_
 
 -   _filename_ `string`: File name.
 -   _content_ `BlobPart`: File content (BufferSource | Blob | string).
--   _contentType_ `string`: File mime type.
+-   _contentType_ `string`: (Optional) File mime type. Default is `''`.
 
 ### getBlobByURL
 

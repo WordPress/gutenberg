@@ -92,9 +92,13 @@ export function isBlobURL( url ) {
  *
  * @param {string}   filename    File name.
  * @param {BlobPart} content     File content (BufferSource | Blob | string).
- * @param {string}   contentType File mime type.
+ * @param {string}   contentType (Optional) File mime type. Default is `''`.
  */
-export function downloadBlob( filename, content, contentType ) {
+export function downloadBlob( filename, content, contentType = '' ) {
+	if ( ! filename || ! content ) {
+		return;
+	}
+
 	const file = new window.Blob( [ content ], { type: contentType } );
 	const url = window.URL.createObjectURL( file );
 	const anchorElement = document.createElement( 'a' );
