@@ -19,7 +19,7 @@
  * @return array The parsed block.
  */
 function gutenberg_interactivity_process_directives( $parsed_block, $source_block, $parent_block ) {
-	if ( ! isset( $parent_block ) ) {
+	if ( ! isset( $parent_block ) && ! isset( WP_Directive_Processor::$root_block ) ) {
 		WP_Directive_Processor::add_root_block( $parsed_block );
 	}
 
