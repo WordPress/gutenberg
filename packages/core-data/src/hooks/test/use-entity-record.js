@@ -113,4 +113,38 @@ describe( 'useEntityRecord', () => {
 		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
 		expect( widget.edits ).toEqual( { hello: 'foo' } );
 	} );
+
+	it( 'does not resolve entity record when disabled via options', async () => {
+		// Provide response
+		triggerFetch.mockImplementation( () => TEST_RECORD );
+
+		let data;
+		const TestComponent = () => {
+			data = useEntityRecord( 'root', 'widget', 2, {
+				options: { enabled: false },
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( data ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
+			edits: {},
+			record: null,
+			save: expect.any( Function ),
+		} );
+
+		// Fetch request should have been issued
+		await waitFor( () =>
+			expect( triggerFetch ).not.toHaveBeenCalledWith( {
+				path: '/wp/v2/widgets/2?context=edit',
+			} )
+		);
+	} );
 } );
