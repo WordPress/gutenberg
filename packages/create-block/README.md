@@ -141,7 +141,7 @@ For example, running the `start` script from inside the generated folder (`npm s
 
 ## External Project Templates
 
-[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block-tutorial-template/) for information on External Project Templates
+[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/packages-create-block-external-template/) for information on External Project Templates
 
 ## Contributing to this package
 
