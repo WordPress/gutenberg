@@ -62,8 +62,8 @@ test.describe( 'Meta boxes', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		await expect(
-			page.locator( '.wp-block-latest-posts > li' )
-		).toContainText( [ 'A published post', 'Dynamic block test' ] );
+			page.locator( '.entry-content .wp-block-latest-posts__post-title' )
+		).toContainText( [ 'Dynamic block test', 'A published post' ] );
 	} );
 
 	test( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async ( {
