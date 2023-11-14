@@ -214,7 +214,7 @@ module.exports = {
 				'import/default': 'off',
 				'import/no-extraneous-dependencies': [
 					'error',
-					{ devDependencies: false },
+					{ devDependencies: true },
 				],
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
