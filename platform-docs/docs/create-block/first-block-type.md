@@ -9,6 +9,7 @@ In addition to the built-in block types, Gutenberg offers a flexible API to buil
 The `registerBlockType` function registers the block we are going to create and specifies the block type settings.
 
 ```js
+import { createElement } from "react";
 import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'create-block/gutenpride', {
