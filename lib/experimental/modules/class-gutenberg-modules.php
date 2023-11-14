@@ -54,22 +54,8 @@ class Gutenberg_Modules {
 	 * Enqueues a module for output in the page.
 	 *
 	 * @param string $module_identifier The identifier of the module.
-	 * @param string $src               Optional. Full URL of the module, or path of the script relative to the WordPress root directory.
-	 * @param array  $args     {
-	 *      Optional array of arguments.
-	 *
-	 *      @type string|bool $ver Optional. String specifying script version number, if it has one, it is added to the URL
-	 *                             as a query string for cache busting purposes. If version is set to false, a version
-	 *                             number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
-	 *                             is set to true, it uses the timestamp instead.
-	 * }
 	 */
-	public static function enqueue( $module_identifier, $src = null, $args = array() ) {
-		// Register the module if a source is provided and it's not already registered.
-		if ( $src && ! isset( self::$registered[ $module_identifier ] ) ) {
-			self::register( $module_identifier, $src, $args );
-		}
-
+	public static function enqueue( $module_identifier ) {
 		// Add the module to the queue if it's not already there.
 		if ( ! in_array( $module_identifier, self::$enqueued, true ) ) {
 			self::$enqueued[] = $module_identifier;
@@ -141,6 +127,7 @@ class Gutenberg_Modules {
  *
  * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
+ * @param string $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or 'both'.
  * @param array  $args     {
  *      Optional array of arguments.
  *
@@ -172,8 +159,8 @@ function gutenberg_register_module( $module_identifier, $src, $usage, $args = ar
  *                             is set to true, it uses the timestamp instead.
  * }
  */
-function gutenberg_enqueue_module( $module_identifier, $src = '', $args = array() ) {
-	Gutenberg_Modules::enqueue( $module_identifier, $src, $args );
+function gutenberg_enqueue_module( $module_identifier ) {
+	Gutenberg_Modules::enqueue( $module_identifier );
 }
 
 // Attach the above function to 'wp_head' action hook.
