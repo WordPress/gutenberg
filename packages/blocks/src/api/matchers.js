@@ -48,8 +48,7 @@ export function html( selector, multilineTag ) {
 }
 
 export const richText = ( selector ) => ( el ) => {
-	return new RichTextData( {
-		element: selector ? el.querySelector( selector ) : el,
+	return new RichTextData( selector ? el.querySelector( selector ) : el, {
 		preserveWhiteSpace: false,
 	} );
 };

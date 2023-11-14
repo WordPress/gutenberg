@@ -97,26 +97,117 @@ function toFormat( { tagName, attributes } ) {
 	};
 }
 
+function collapseWhiteSpaceElement( el, isRoot = true ) {
+	Array.from( el.childNodes ).forEach( ( node ) => {
+		if ( node.nodeType === node.TEXT_NODE ) {
+			node.nodeValue = node.nodeValue
+				.replace( /[\n\t\r\f]+/g, ' ' )
+				.replace( / {2,}/g, ' ' );
+		} else if ( node.nodeType === node.ELEMENT_NODE ) {
+			collapseWhiteSpaceElement( node, false );
+		}
+	} );
+
+	if (
+		el.firstChild &&
+		el.firstChild.nodeType === el.TEXT_NODE &&
+		el.firstChild.nodeValue.startsWith( ' ' )
+	) {
+		el.firstChild.nodeValue = el.firstChild.nodeValue.slice( 1 );
+	}
+
+	if (
+		isRoot &&
+		el.lastChild &&
+		el.lastChild.nodeType === el.TEXT_NODE &&
+		el.lastChild.nodeValue.endsWith( ' ' )
+	) {
+		el.lastChild.nodeValue = el.lastChild.nodeValue.slice( 0, -1 );
+	}
+}
+
+// Ideally we use a private property.
 const RichTextInternalData = Symbol( 'RichTextInternalData' );
 
+/**
+ * The RichTextData class is used to instantiate a wrapper around rich text
+ * values, with methods that can be used to transform or manipulate the data.
+ *
+ * Create an emtpy instance: `new RichTextData()`.
+ * Create one from an html string: `new RichTextData( '<em>hello</em>' )`.
+ * Create one from a DOM wrapper element:
+ * `new RichTextData( document.createElement( 'p' ) )`.
+ * Create
+ * Create one from a rich text value:
+ * `new RichTextData( { text: '...', formats: [ ... ] } )`.
+ *
+ * @todo Add methods to manipulate the data, such as slice etc.
+ */
 export class RichTextData {
-	constructor( init ) {
-		this[ RichTextInternalData ] = init?.formats ? init : create( init );
-	}
-	get html() {
-		return toHTMLString( { value: this[ RichTextInternalData ] } );
+	constructor( init, options = {} ) {
+		if ( ! init ) {
+			init = createEmptyValue();
+		} else if ( typeof init === 'string' ) {
+			init = create( { html: init } );
+		} else if ( init.nodeType && init.nodeType === init.ELEMENT_NODE ) {
+			init.normalize();
+			const { preserveWhiteSpace = false } = options;
+			if ( preserveWhiteSpace === false ) {
+				collapseWhiteSpaceElement( init );
+			}
+			init = create( { element: init } );
+		} else if ( init.text ) {
+			init = {
+				text: init.text,
+				formats: init.formats,
+				replacements: init.replacements,
+			};
+
+			if ( ! init.formats ) {
+				init.formats = Array( init.text.length );
+			} else if ( init.formats.length !== init.text.length ) {
+				throw new Error(
+					'RichTextData: `formats` and `text` must be of the same length.'
+				);
+			}
+
+			if ( ! init.replacements ) {
+				init.replacements = Array( init.text.length );
+			} else if ( init.replacements.length !== init.text.length ) {
+				throw new Error(
+					'RichTextData: `replacements` and `text` must be of the same length.'
+				);
+			}
+		} else {
+			init = createEmptyValue();
+		}
+
+		// Setting text, formats, and replacements as enumerable properties
+		// unfortunately visualises these in the e2e tests. As long as the class
+		// instance doesn't have any enumerable properties, it will be
+		// visualised as a string.
+		Object.defineProperty( this, RichTextInternalData, { value: init } );
 	}
 	valueOf() {
-		return this.html;
+		return toHTMLString( { value: this[ RichTextInternalData ] } );
 	}
 	toString() {
-		return this.html;
+		return this.valueOf();
 	}
 	toJSON() {
-		return this.html;
+		return this.valueOf();
 	}
 	get length() {
-		return this[ RichTextInternalData ].text.length;
+		return this.text.length;
+	}
+	get formats() {
+		return this[ RichTextInternalData ].formats;
+	}
+	get replacements() {
+		return this[ RichTextInternalData ].replacements;
+	}
+	get text() {
+		return this[ RichTextInternalData ].text;
 	}
 }
 
@@ -152,7 +243,6 @@ export class RichTextData {
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
  * @param {boolean} [$1.__unstableIsEditableTree]
- * @param {boolean} [$1.preserveWhiteSpace]
  * @return {RichTextValue} A rich text value.
  */
 export function create( {
@@ -161,11 +251,13 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
-	preserveWhiteSpace,
 } = {} ) {
-	// Ideally we use the instance internally as well.
 	if ( html instanceof RichTextData ) {
-		return { ...html[ RichTextInternalData ] };
+		return {
+			text: html.text,
+			formats: html.formats,
+			replacements: html.replacements,
+		};
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -184,40 +276,6 @@ export function create( {
 
 	if ( typeof element !== 'object' ) {
 		return createEmptyValue();
-	}
-
-	function collapseWhiteSpaceElement( el, isRoot = true ) {
-		Array.from( el.childNodes ).forEach( ( node ) => {
-			if ( node.nodeType === node.TEXT_NODE ) {
-				node.nodeValue = node.nodeValue
-					.replace( /[\n\t\r]+/g, ' ' )
-					.replace( / {2,}/g, ' ' );
-			} else if ( node.nodeType === node.ELEMENT_NODE ) {
-				collapseWhiteSpaceElement( node, false );
-			}
-		} );
-
-		if (
-			el.firstChild &&
-			el.firstChild.nodeType === el.TEXT_NODE &&
-			el.firstChild.nodeValue.startsWith( ' ' )
-		) {
-			el.firstChild.nodeValue = el.firstChild.nodeValue.slice( 1 );
-		}
-
-		if (
-			isRoot &&
-			el.lastChild &&
-			el.lastChild.nodeType === el.TEXT_NODE &&
-			el.lastChild.nodeValue.endsWith( ' ' )
-		) {
-			el.lastChild.nodeValue = el.lastChild.nodeValue.slice( 0, -1 );
-		}
-	}
-
-	if ( element && preserveWhiteSpace === false ) {
-		element.normalize();
-		collapseWhiteSpaceElement( element );
 	}
 
 	return createFromElement( {

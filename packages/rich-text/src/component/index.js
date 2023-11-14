@@ -70,12 +70,18 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( {
-			html:
-				typeof value !== 'string' || preserveWhiteSpace
-					? value
-					: collapseWhiteSpace( value ),
-		} );
+		record.current =
+			value instanceof RichTextData
+				? {
+						text: value.text,
+						formats: value.formats,
+						replacements: value.replacements,
+				  }
+				: create( {
+						html: preserveWhiteSpace
+							? value
+							: collapseWhiteSpace( value ),
+				  } );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );

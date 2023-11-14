@@ -61,7 +61,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			const richTextValue = create( { html: value } );
+			const richTextValue = new RichTextData( value );
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
@@ -79,9 +79,9 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			} );
 
 			if ( typeof value === 'string' ) {
-				attributes[ key ] = toHTMLString( { value: richTextValue } );
+				attributes[ key ] = richTextValue.toString();
 			} else {
-				attributes[ key ] = new RichTextData( richTextValue );
+				attributes[ key ] = richTextValue;
 			}
 		}
 

@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { create } from '@wordpress/rich-text';
-
-/**
  * Internal dependencies
  */
 import getRichTextValuesCached from './get-rich-text-values-cached';
@@ -19,13 +14,11 @@ function getBlockFootnotesOrder( block ) {
 			}
 
 			// replacements is a sparse array, use forEach to skip empty slots.
-			create( { html: value } ).replacements.forEach(
-				( { type, attributes } ) => {
-					if ( type === 'core/footnote' ) {
-						order.push( attributes[ 'data-fn' ] );
-					}
+			value.replacements.forEach( ( { type, attributes } ) => {
+				if ( type === 'core/footnote' ) {
+					order.push( attributes[ 'data-fn' ] );
 				}
-			);
+			} );
 		}
 		cache.set( block, order );
 	}

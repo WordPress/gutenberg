@@ -175,7 +175,6 @@ _Parameters_
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
--   _$1.preserveWhiteSpace_ `[boolean]`:
 
 _Returns_
 
@@ -358,7 +357,9 @@ _Returns_
 
 ### RichTextData
 
-Undocumented declaration.
+The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
+
+Create an emtpy instance: `new RichTextData()`. Create one from an html string: `new RichTextData( '<em>hello</em>' )`. Create one from a DOM wrapper element: `new RichTextData( document.createElement( 'p' ) )`. Create Create one from a rich text value: `new RichTextData( { text: '...', formats: [ ... ] } )`.
 
 ### RichTextValue
 

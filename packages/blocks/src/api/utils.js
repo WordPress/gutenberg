@@ -283,9 +283,7 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 					if ( value instanceof RichTextData ) {
 						accumulator[ key ] = value;
 					} else if ( typeof value === 'string' ) {
-						accumulator[ key ] = new RichTextData( {
-							html: value,
-						} );
+						accumulator[ key ] = new RichTextData( value );
 					}
 				} else if (
 					schema.type === 'string' &&
