@@ -51,7 +51,6 @@ export function useBackToPageNotification() {
 			alreadySeen.current = true;
 		}
 	}, [
-		alreadySeen,
 		isPage,
 		hasPageContentFocus,
 		createInfoNotice,
