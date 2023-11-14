@@ -7,7 +7,7 @@ import {
 	BaseControl,
 	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall } from '@wordpress/icons';
+import { chevronRightSmall, plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,8 +26,12 @@ export default function AddFilter( { filters, onChangeView } ) {
 	if ( ! filters.length ) {
 		return (
 			<BaseControl>
-				<Button disabled={ ! filters?.length } variant="tertiary">
-					{ __( '+ Add filter' ) }
+				<Button
+					prefix={ <Icon icon={ plus } /> }
+					disabled={ ! filters?.length }
+					variant="tertiary"
+				>
+					{ __( 'Add filter' ) }
 				</Button>
 			</BaseControl>
 		);
