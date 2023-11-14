@@ -1,11 +1,15 @@
 <?php
 /**
- * Gutenberg_Modules class.
+ * Modules API: Gutenberg_Modules class.
  *
  * Native support for ES Modules and Import Maps.
  *
  * @package Gutenberg
  * @subpackage Modules
+ */
+
+/**
+ * Gutenberg_Modules class
  */
 class Gutenberg_Modules {
 	/**
@@ -14,7 +18,6 @@ class Gutenberg_Modules {
 	 * @var array
 	 */
 	private static $registered = array();
-
 
 	/**
 	 * An array of queued modules.
@@ -56,7 +59,7 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Enqueues a module for output in the page.
+	 * Enqueues a module in the page.
 	 *
 	 * @param string $module_identifier The identifier of the module.
 	 */
@@ -87,14 +90,14 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Prints the import map
+	 * Prints the import map.
 	 */
 	public static function print_import_map() {
 		echo '<script type="importmap">' . wp_json_encode( self::get_import_map(), JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>';
 	}
 
 	/**
-	 * Prints all enqueued modules using script tags with type "module".
+	 * Prints all the enqueued modules using script tags with type "module".
 	 */
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
@@ -163,17 +166,14 @@ function gutenberg_register_module( $module_identifier, $src, $usage, $args = ar
  * Enqueues a JavaScript module. It will be added to both the import map and a
  * script tag with the "module" type.
  *
- * It registers the module if a source is provided but it won't overwrites the
- * value if there is an existing one.
- *
  * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  */
 function gutenberg_enqueue_module( $module_identifier ) {
 	Gutenberg_Modules::enqueue( $module_identifier );
 }
 
-// Attach the above function to 'wp_head' action hook.
+// Prints the import map in the head tag.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map' ) );
 
-// Attach the new function to 'wp_head' action hook.
+// Prints the enqueued modules in the head tag.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
