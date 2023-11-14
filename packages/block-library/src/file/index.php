@@ -57,7 +57,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 	if ( $should_load_view_script ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();
-		$processor->set_attribute( 'data-wp-interactive', '{"namespace":"core"}' );
+		$processor->set_attribute( 'data-wp-interactive', '{"namespace":"core/file"}' );
 		$processor->next_tag( 'object' );
 		$processor->set_attribute( 'data-wp-style--display', 'state.file.hasPdfPreview' );
 		return $processor->get_updated_html();
