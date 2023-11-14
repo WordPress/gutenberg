@@ -393,7 +393,13 @@ const Slot = () => {
 		[ dropdownMenuContext ]
 	);
 
-	return <ExampleSlotFill.Slot fillProps={ fillProps } bubblesVirtually />;
+	return (
+		<ExampleSlotFill.Slot
+			fillProps={ fillProps }
+			bubblesVirtually
+			style={ { display: 'contents' } }
+		/>
+	);
 };
 
 type ForwardedContextTuple< P = {} > = [
