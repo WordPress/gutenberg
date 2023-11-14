@@ -724,7 +724,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		unset( $context['appearanceTools'] );
 	}
-
+	
 	/**
 	 * Sanitizes the input according to the schemas.
 	 *
@@ -831,6 +831,19 @@ class WP_Theme_JSON_Gutenberg {
 							$schema['settings']['typography']['fontFamilies'][ $font_family_key ]['fontFace'][ $font_face_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0]['fontFace'][0];
 						}
 					}
+				}
+			} else {
+				foreach ( $input['settings']['typography']['fontFamilies']['theme'] as $font_family_key => $value ) {
+					$schema['settings']['typography']['fontFamilies']['theme'][ $font_family_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0];
+					// Do the same for fontFace.
+					if ( isset( $input['settings']['typography']['fontFamilies']['theme'][ $font_family_key ]['fontFace'] ) ) {
+						foreach ( $input['settings']['typography']['fontFamilies']['theme'][ $font_family_key ]['fontFace'] as $font_face_key => $value2 ) {
+							$schema['settings']['typography']['fontFamilies']['theme'][ $font_family_key ]['fontFace'][ $font_face_key ] = static::VALID_SETTINGS['typography']['fontFamilies'][0]['fontFace'][0];
+						}
+					}
+				}
+				if ( array_key_exists( 0, $schema['settings']['typography']['fontFamilies'] ) ) {
+					unset( $schema['settings']['typography']['fontFamilies'][0] );
 				}
 			}
 		}
