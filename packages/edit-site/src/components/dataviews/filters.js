@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { default as InFilter, OPERATOR_IN } from './in-filter';
-import ResetFilters from './reset-filters';
 import AddFilter from './add-filter';
 
 const VALID_OPERATORS = [ OPERATOR_IN ];
@@ -67,16 +66,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 			onChangeView={ onChangeView }
 		/>
 	);
-
-	if ( visibleFilters?.length > 1 ) {
-		visibleFilters.push(
-			<ResetFilters
-				key="reset-filters"
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
-		);
-	}
 
 	return visibleFilters;
 }

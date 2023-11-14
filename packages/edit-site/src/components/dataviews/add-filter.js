@@ -21,6 +21,7 @@ const {
 	DropdownSubMenuV2,
 	DropdownSubMenuTriggerV2,
 	DropdownMenuItemV2,
+	DropdownMenuSeparatorV2,
 } = unlock( componentsPrivateApis );
 
 const VALID_OPERATORS = [ OPERATOR_IN ];
@@ -115,6 +116,21 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 						</DropdownSubMenuV2>
 					);
 				} ) }
+				<DropdownMenuSeparatorV2 />
+				<DropdownMenuItemV2
+					key={ 'reset-filters' }
+					disabled={ view.filters?.length === 0 }
+					onSelect={ () => {
+						onChangeView( ( currentView ) => ( {
+							...currentView,
+							page: 1,
+							filters: [],
+						} ) );
+					} }
+					role="menuitemcheckbox"
+				>
+					{ __( 'Reset filters' ) }
+				</DropdownMenuItemV2>
 			</DropdownMenuV2>
 		</BaseControl>
 	);
