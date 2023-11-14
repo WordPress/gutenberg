@@ -18,6 +18,8 @@
  */
 function render_block_core_query( $attributes, $content, $block ) {
 	if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) ) {
+		gutenberg_enqueue_module( '@wordpress/block-library/query' );
+
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
@@ -67,13 +69,6 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
-	if ( $attributes['enhancedPagination'] ) {
-		gutenberg_enqueue_module(
-			'@wordpress/block-library/query',
-			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js'
-		);
-	}
-
 	$style_asset = 'wp-block-query';
 	if ( ! wp_style_is( $style_asset ) ) {
 		$style_handles = $block->block_type->style_handles;
@@ -121,6 +116,12 @@ function register_block_core_query() {
 		array(
 			'render_callback' => 'render_block_core_query',
 		)
+	);
+
+	gutenberg_register_module(
+		'@wordpress/block-library/query',
+		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
+		'frontend'
 	);
 }
 add_action( 'init', 'register_block_core_query' );

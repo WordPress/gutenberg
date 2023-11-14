@@ -29,6 +29,7 @@ class Gutenberg_Modules {
 	 *
 	 * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
 	 * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
+	 * @param string $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or 'both'.
 	 * @param array  $args     {
 	 *      Optional array of arguments.
 	 *
@@ -38,13 +39,14 @@ class Gutenberg_Modules {
 	 *                             is set to true, it uses the timestamp instead.
 	 * }
 	 */
-	public static function register( $module_identifier, $src, $args = array() ) {
+	public static function register( $module_identifier, $src, $usage, $args = array() ) {
 		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
-			self::$registered[ $module_identifier ] = array(
-				'src'  => $src,
-				'args' => $args,
-			);
+				self::$registered[ $module_identifier ] = array(
+					'src'   => $src,
+					'usage' => $usage,
+					'args'  => $args,
+				);
 		}
 	}
 
@@ -85,9 +87,10 @@ class Gutenberg_Modules {
 		);
 
 		foreach ( self::$registered as $module_identifier => $module_data ) {
-			$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module_data['args']['version'] || '';
-
-			$import_map['imports'][ $module_identifier ] = $module_data['src'] . $version;
+			if ( self::appropriate_usage( $module_data['usage'] ) ) {
+				$version                                     = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module_data['args']['version'] || '';
+				$import_map['imports'][ $module_identifier ] = $module_data['src'] . $version;
+			}
 		}
 
 		return $import_map;
@@ -105,12 +108,31 @@ class Gutenberg_Modules {
 	 */
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
-			if ( isset( self::$registered[ $module_identifier ] ) ) {
-				$module  = self::$registered[ $module_identifier ];
-				$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module['args']['version'] || '';
-				echo '<script type="module" src="' . $module['src'] . $version . '" id="' . $module_identifier . '"></script>';
+			if ( isset( self::$registered[ $module_identifier ] ) && self::appropriate_usage( self::$registered[ $module_identifier ]['usage'] ) ) {
+					$module  = self::$registered[ $module_identifier ];
+					$version = SCRIPT_DEBUG ? '?ver=' . time() : '?ver=' . $module['args']['version'] || '';
+					echo '<script type="module" src="' . $module['src'] . $version . '" id="' . $module_identifier . '"></script>';
 			}
 		}
+	}
+
+	/**
+	 * Determines if the usage is appropriate for the current context.
+	 *
+	 * @param string $usage Specifies the usage of the module. Can be 'admin', 'frontend', or 'both'.
+	 * @return bool Returns true if it's appropriate to load the module in the current WP context.
+	 */
+	public static function appropriate_usage( $usage ) {
+		if ( 'both' === $usage ) {
+			return true;
+		}
+		if ( 'admin' === $usage && is_admin() ) {
+			return true;
+		}
+		if ( 'frontend' === $usage && ! is_admin() ) {
+			return true;
+		}
+		return false;
 	}
 }
 
@@ -128,8 +150,8 @@ class Gutenberg_Modules {
  *                             is set to true, it uses the timestamp instead.
  * }
  */
-function gutenberg_register_module( $module_identifier, $src, $args = array() ) {
-	Gutenberg_Modules::register( $module_identifier, $src, $args );
+function gutenberg_register_module( $module_identifier, $src, $usage, $args = array() ) {
+	Gutenberg_Modules::register( $module_identifier, $src, $usage, $args );
 }
 
 /**

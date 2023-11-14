@@ -47,10 +47,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		gutenberg_enqueue_module(
-			'@wordpress/block-library/image',
-			'/wp-content/plugins/gutenberg/build/interactivity/image.min.js'
-		);
+		gutenberg_enqueue_module( '@wordpress/block-library/image' );
 
 		/*
 		 * This render needs to happen in a filter with priority 15 to ensure
@@ -353,6 +350,12 @@ function register_block_core_image() {
 		array(
 			'render_callback' => 'render_block_core_image',
 		)
+	);
+
+	gutenberg_register_module(
+		'@wordpress/block-library/image',
+		'/wp-content/plugins/gutenberg/build/interactivity/image.min.js',
+		'frontend'
 	);
 }
 add_action( 'init', 'register_block_core_image' );
