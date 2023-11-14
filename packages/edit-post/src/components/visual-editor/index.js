@@ -411,7 +411,7 @@ export default function VisualEditor( { styles } ) {
 										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								layout={ blockListLayout }
-								__unstableContentRef={ ref }
+								dropZoneElement={ ref?.current }
 							/>
 						</RecursionProvider>
 					</BlockCanvas>
