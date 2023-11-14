@@ -212,7 +212,10 @@ module.exports = {
 			],
 			rules: {
 				'import/default': 'off',
-				'import/no-extraneous-dependencies': 'off',
+				'import/no-extraneous-dependencies': [
+					'error',
+					{ devDependencies: false },
+				],
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
