@@ -4,6 +4,8 @@
 
 ### Internal
 
+-   `Autocomplete`: use the `text` property instead of `getTextContent` on rich
+    text value.
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
 -   Migrate `DisclosureContent` from `reakit` to `ariakit` and TypeScript ([#55639](https://github.com/WordPress/gutenberg/pull/55639))
 -   Migrate `RadioGroup` from `reakit` to `ariakit` and TypeScript ([#55580](https://github.com/WordPress/gutenberg/pull/55580))

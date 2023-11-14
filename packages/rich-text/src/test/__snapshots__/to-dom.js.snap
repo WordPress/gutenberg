@@ -215,23 +215,6 @@ exports[`recordToDom should handle selection before br 1`] = `
 </body>
 `;
 
-exports[`recordToDom should ignore manually added object replacement character 1`] = `
-<body>
-  test
-</body>
-`;
-
-exports[`recordToDom should ignore manually added object replacement character with formatting 1`] = `
-<body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
-    hi
-  </em>
-  
-</body>
-`;
-
 exports[`recordToDom should not error with overlapping formats (1) 1`] = `
 <body>
   <a
