@@ -130,8 +130,6 @@ export function useSpecificEditorSettings() {
 			),
 			canvasMode: getCanvasMode(),
 			settings: getSettings(),
-			postType: usedPostType,
-			postId: usedPostId,
 		};
 	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
