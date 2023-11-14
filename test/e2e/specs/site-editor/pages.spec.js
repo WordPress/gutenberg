@@ -141,17 +141,36 @@ test.describe( 'Pages', () => {
 		await draftNewPage( page );
 		await editor.openDocumentSettingsSidebar();
 
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+			.getByRole( 'document', {
+				name: 'Empty block; start writing or type forward slash to choose a block',
+			} )
+			.click();
+
+		// Add some content to the page.
+		await page.keyboard.type( 'Sweet paragraph 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Sweet paragraph 2' );
+		await editor.saveSiteEditorEntities();
+
 		// Header template area and page content are visible.
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: header',
 			} )
 		).toBeVisible();
-		await expect(
-			editor.canvas.getByRole( 'document', {
+
+		const paragraphs = editor.canvas
+			.getByRole( 'document', {
 				name: 'Block: Content',
 			} )
-		).toBeVisible();
+			.getByText( 'Sweet paragraph ' );
+
+		await expect( paragraphs.nth( 0 ) ).toBeVisible();
+		await expect( paragraphs.nth( 1 ) ).toBeVisible();
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Title',
@@ -185,15 +204,25 @@ test.describe( 'Pages', () => {
 		).toBeHidden();
 
 		// Content block is still visible and wrapped in a container.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Group',
-				} )
-				.getByRole( 'document', {
-					name: 'Block: Content',
-				} )
-		).toBeVisible();
+		const paragraphsInGroup = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Group',
+			} )
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+			.getByText( 'Sweet paragraph ' );
+
+		await expect( paragraphsInGroup.nth( 0 ) ).toBeVisible();
+		await expect( paragraphsInGroup.nth( 1 ) ).toBeVisible();
+		// Check order of paragraphs.
+		// Important to ensure the blocks are rendered as they are in the template.
+		await expect( paragraphsInGroup.nth( 0 ) ).toHaveText(
+			'Sweet paragraph 1'
+		);
+		await expect( paragraphsInGroup.nth( 1 ) ).toHaveText(
+			'Sweet paragraph 2'
+		);
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -221,11 +250,8 @@ test.describe( 'Pages', () => {
 				name: 'Block: header',
 			} )
 		).toBeVisible();
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
-		).toBeVisible();
+		await expect( paragraphs.nth( 0 ) ).toBeVisible();
+		await expect( paragraphs.nth( 1 ) ).toBeVisible();
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Title',
