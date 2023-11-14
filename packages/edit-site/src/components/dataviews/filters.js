@@ -12,7 +12,7 @@ import AddFilter from './add-filter';
 const VALID_OPERATORS = [ OPERATOR_IN ];
 
 export default function Filters( { fields, view, onChangeView } ) {
-	const filtersRegistered = [];
+	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
@@ -20,7 +20,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 		field.filters.forEach( ( filter ) => {
 			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
-				filtersRegistered.push( {
+				filters.push( {
 					field: field.id,
 					name: field.header,
 					operator: filter,
@@ -31,34 +31,34 @@ export default function Filters( { fields, view, onChangeView } ) {
 						},
 						...( field.elements || [] ),
 					],
+					isVisible: view.filters.some(
+						( f ) => f.field === field.id && f.operator === filter
+					),
 				} );
 			}
 		} );
 	} );
 
-	const visibleFiltersList = filtersRegistered.filter( ( filter ) =>
-		view.filters.some(
-			( filterInView ) => filterInView.field === filter.field
-		)
-	);
-
-	const visibleFilters = visibleFiltersList
-		?.map( ( filter ) => {
-			if ( OPERATOR_IN === filter.operator ) {
-				return (
-					<InFilter
-						key={ filter.field + '.' + filter.operator }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
+	const filterComponents = filters?.map( ( filter ) => {
+		if ( ! filter.isVisible ) {
 			return null;
-		} )
-		.filter( Boolean );
+		}
 
-	visibleFilters.push(
+		if ( OPERATOR_IN === filter.operator ) {
+			return (
+				<InFilter
+					key={ filter.field + '.' + filter.operator }
+					filter={ filter }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+			);
+		}
+
+		return null;
+	} );
+
+	filterComponents.push(
 		<AddFilter
 			key="add-filter"
 			fields={ fields }
@@ -67,5 +67,5 @@ export default function Filters( { fields, view, onChangeView } ) {
 		/>
 	);
 
-	return visibleFilters;
+	return filterComponents.filter( Boolean );
 }
