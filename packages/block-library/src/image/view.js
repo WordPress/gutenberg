@@ -17,7 +17,7 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
-/*
+/**
  * Stores a context-bound scroll handler.
  *
  * This callback could be defined inline inside of the store
@@ -32,7 +32,7 @@ const focusableSelectors = [
  */
 let scrollCallback;
 
-/*
+/**
  * Tracks whether user is touching screen; used to
  * differentiate behavior for touch and mouse input.
  *
@@ -40,7 +40,7 @@ let scrollCallback;
  */
 let isTouching = false;
 
-/*
+/**
  * Tracks the last time the screen was touched; used to
  * differentiate behavior for touch and mouse input.
  *
@@ -48,7 +48,7 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
-/*
+/**
  * Lightbox page-scroll handler: prevents scrolling.
  *
  * This handler is added to prevent scrolling behaviors that
@@ -64,7 +64,7 @@ let lastTouchTime = 0;
  * instead to not rely on JavaScript, but this seems to be the best approach
  * for now that provides the best visual experience.
  *
- * @param {Object} context Interactivity page context?
+ * @param {Object} image Context for the `core/image` namespace.
  */
 function handleScroll( image ) {
 	// We can't override the scroll behavior on mobile devices
@@ -77,244 +77,232 @@ function handleScroll( image ) {
 	}
 }
 
-const { state, actions, effects } = store( {
+const { state, actions, effects } = store( 'core/image', {
 	state: {
-		image: {
-			windowWidth: window.innerWidth,
-			windowHeight: window.innerHeight,
-			get roleAttribute() {
-				const { image } = getContext();
-				return image.lightboxEnabled ? 'dialog' : null;
-			},
-			get ariaModal() {
-				const { image } = getContext();
-				return image.lightboxEnabled ? 'true' : null;
-			},
-			get dialogLabel() {
-				const { image } = getContext();
-				return image.lightboxEnabled ? image.dialogLabel : null;
-			},
-			get lightboxObjectFit() {
-				const { image } = getContext();
-				if ( image.initialized ) {
-					return 'cover';
-				}
-			},
-			get enlargedImgSrc() {
-				const { image } = getContext();
-				return image.initialized
-					? image.imageUploadedSrc
-					: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-			},
+		windowWidth: window.innerWidth,
+		windowHeight: window.innerHeight,
+		get roleAttribute() {
+			const image = getContext();
+			return image.lightboxEnabled ? 'dialog' : null;
+		},
+		get ariaModal() {
+			const image = getContext();
+			return image.lightboxEnabled ? 'true' : null;
+		},
+		get dialogLabel() {
+			const image = getContext();
+			return image.lightboxEnabled ? image.dialogLabel : null;
+		},
+		get lightboxObjectFit() {
+			const image = getContext();
+			if ( image.initialized ) {
+				return 'cover';
+			}
+		},
+		get enlargedImgSrc() {
+			const image = getContext();
+			return image.initialized
+				? image.imageUploadedSrc
+				: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 		},
 	},
 	actions: {
-		image: {
-			showLightbox( event ) {
-				// We can't initialize the lightbox until the reference
-				// image is loaded, otherwise the UX is broken.
-				const { image } = getContext();
-				if ( ! image.imageLoaded ) {
-					return;
-				}
-				image.initialized = true;
-				image.lastFocusedElement = window.document.activeElement;
-				image.scrollDelta = 0;
+		showLightbox( event ) {
+			// We can't initialize the lightbox until the reference
+			// image is loaded, otherwise the UX is broken.
+			const image = getContext();
+			if ( ! image.imageLoaded ) {
+				return;
+			}
+			image.initialized = true;
+			image.lastFocusedElement = window.document.activeElement;
+			image.scrollDelta = 0;
 
-				image.lightboxEnabled = true;
-				setStyles( image, event.target.previousElementSibling );
+			image.lightboxEnabled = true;
+			setStyles( image, event.target.previousElementSibling );
 
-				image.scrollTopReset =
-					window.pageYOffset || document.documentElement.scrollTop;
+			image.scrollTopReset =
+				window.pageYOffset || document.documentElement.scrollTop;
 
-				// In most cases, this value will be 0, but this is included
-				// in case a user has created a page with horizontal scrolling.
-				image.scrollLeftReset =
-					window.pageXOffset || document.documentElement.scrollLeft;
+			// In most cases, this value will be 0, but this is included
+			// in case a user has created a page with horizontal scrolling.
+			image.scrollLeftReset =
+				window.pageXOffset || document.documentElement.scrollLeft;
 
-				// We define and bind the scroll callback here so
-				// that we can pass the context and as an argument.
-				// We may be able to change this in the future if we
-				// define the scroll callback in the store instead, but
-				// this approach seems to tbe clearest for now.
-				scrollCallback = handleScroll.bind( null, image );
+			// We define and bind the scroll callback here so
+			// that we can pass the context and as an argument.
+			// We may be able to change this in the future if we
+			// define the scroll callback in the store instead, but
+			// this approach seems to tbe clearest for now.
+			scrollCallback = handleScroll.bind( null, image );
 
-				// We need to add a scroll event listener to the window
-				// here because we are unable to otherwise access it via
-				// the Interactivity API directives. If we add a native way
-				// to access the window, we can remove this.
-				window.addEventListener( 'scroll', scrollCallback, false );
-			},
-			hideLightbox() {
-				const { image } = getContext();
-				image.hideAnimationEnabled = true;
-				if ( image.lightboxEnabled ) {
-					// We want to wait until the close animation is completed
-					// before allowing a user to scroll again. The duration of this
-					// animation is defined in the styles.scss and depends on if the
-					// animation is 'zoom' or 'fade', but in any case we should wait
-					// a few milliseconds longer than the duration, otherwise a user
-					// may scroll too soon and cause the animation to look sloppy.
-					setTimeout( function () {
-						window.removeEventListener( 'scroll', scrollCallback );
-					}, 450 );
+			// We need to add a scroll event listener to the window
+			// here because we are unable to otherwise access it via
+			// the Interactivity API directives. If we add a native way
+			// to access the window, we can remove this.
+			window.addEventListener( 'scroll', scrollCallback, false );
+		},
+		hideLightbox() {
+			const image = getContext();
+			image.hideAnimationEnabled = true;
+			if ( image.lightboxEnabled ) {
+				// We want to wait until the close animation is completed
+				// before allowing a user to scroll again. The duration of this
+				// animation is defined in the styles.scss and depends on if the
+				// animation is 'zoom' or 'fade', but in any case we should wait
+				// a few milliseconds longer than the duration, otherwise a user
+				// may scroll too soon and cause the animation to look sloppy.
+				setTimeout( function () {
+					window.removeEventListener( 'scroll', scrollCallback );
+				}, 450 );
 
-					image.lightboxEnabled = false;
-					image.lastFocusedElement.focus( {
-						preventScroll: true,
-					} );
-				}
-			},
-			handleKeydown( event ) {
-				const { image } = getContext();
-				if ( image.lightboxEnabled ) {
-					if ( event.key === 'Tab' || event.keyCode === 9 ) {
-						// If shift + tab it change the direction
-						if (
-							event.shiftKey &&
-							window.document.activeElement ===
-								image.firstFocusableElement
-						) {
-							event.preventDefault();
-							image.lastFocusableElement.focus();
-						} else if (
-							! event.shiftKey &&
-							window.document.activeElement ===
-								image.lastFocusableElement
-						) {
-							event.preventDefault();
-							image.firstFocusableElement.focus();
-						}
-					}
-
-					if ( event.key === 'Escape' || event.keyCode === 27 ) {
-						actions.image.hideLightbox();
+				image.lightboxEnabled = false;
+				image.lastFocusedElement.focus( {
+					preventScroll: true,
+				} );
+			}
+		},
+		handleKeydown( event ) {
+			const image = getContext();
+			if ( image.lightboxEnabled ) {
+				if ( event.key === 'Tab' || event.keyCode === 9 ) {
+					// If shift + tab it change the direction
+					if (
+						event.shiftKey &&
+						window.document.activeElement ===
+							image.firstFocusableElement
+					) {
+						event.preventDefault();
+						image.lastFocusableElement.focus();
+					} else if (
+						! event.shiftKey &&
+						window.document.activeElement ===
+							image.lastFocusableElement
+					) {
+						event.preventDefault();
+						image.firstFocusableElement.focus();
 					}
 				}
-			},
-			handleLoad() {
-				const { image } = getContext();
-				const { ref } = getElement();
-				image.imageLoaded = true;
-				image.imageCurrentSrc = ref.currentSrc;
-				effects.image.setButtonStyles();
-			},
-			handleTouchStart() {
-				isTouching = true;
-			},
-			handleTouchMove( event ) {
-				const { image } = getContext();
-				// On mobile devices, we want to prevent triggering the
-				// scroll event because otherwise the page jumps around as
-				// we reset the scroll position. This also means that closing
-				// the lightbox requires that a user perform a simple tap. This
-				// may be changed in the future if we find a better alternative
-				// to override or reset the scroll position during swipe actions.
-				if ( image.lightboxEnabled ) {
-					event.preventDefault();
+
+				if ( event.key === 'Escape' || event.keyCode === 27 ) {
+					actions.hideLightbox();
 				}
-			},
-			handleTouchEnd: () => {
-				// We need to wait a few milliseconds before resetting
-				// to ensure that pinch to zoom works consistently
-				// on mobile devices when the lightbox is open.
-				lastTouchTime = Date.now();
-				isTouching = false;
-			},
+			}
+		},
+		handleLoad() {
+			const image = getContext();
+			const { ref } = getElement();
+			image.imageLoaded = true;
+			image.imageCurrentSrc = ref.currentSrc;
+			effects.image.setButtonStyles();
+		},
+		handleTouchStart() {
+			isTouching = true;
+		},
+		handleTouchMove( event ) {
+			const image = getContext();
+			// On mobile devices, we want to prevent triggering the
+			// scroll event because otherwise the page jumps around as
+			// we reset the scroll position. This also means that closing
+			// the lightbox requires that a user perform a simple tap. This
+			// may be changed in the future if we find a better alternative
+			// to override or reset the scroll position during swipe actions.
+			if ( image.lightboxEnabled ) {
+				event.preventDefault();
+			}
+		},
+		handleTouchEnd: () => {
+			// We need to wait a few milliseconds before resetting
+			// to ensure that pinch to zoom works consistently
+			// on mobile devices when the lightbox is open.
+			lastTouchTime = Date.now();
+			isTouching = false;
 		},
 	},
 	effects: {
-		image: {
-			setCurrentSrc() {
-				const { image } = getContext();
-				const { ref } = getElement();
-				if ( ref.complete ) {
-					image.imageLoaded = true;
-					image.imageCurrentSrc = ref.currentSrc;
-				}
-			},
-			initLightbox() {
-				const { image } = getContext();
-				const { ref } = getElement();
-				image.figureRef = ref.querySelector( 'figure' );
-				image.imageRef = ref.querySelector( 'img' );
-				if ( image.lightboxEnabled ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
-					image.firstFocusableElement = focusableElements[ 0 ];
-					image.lastFocusableElement =
-						focusableElements[ focusableElements.length - 1 ];
+		setCurrentSrc() {
+			const image = getContext();
+			const { ref } = getElement();
+			if ( ref.complete ) {
+				image.imageLoaded = true;
+				image.imageCurrentSrc = ref.currentSrc;
+			}
+		},
+		initLightbox() {
+			const image = getContext();
+			const { ref } = getElement();
+			image.figureRef = ref.querySelector( 'figure' );
+			image.imageRef = ref.querySelector( 'img' );
+			if ( image.lightboxEnabled ) {
+				const focusableElements =
+					ref.querySelectorAll( focusableSelectors );
+				image.firstFocusableElement = focusableElements[ 0 ];
+				image.lastFocusableElement =
+					focusableElements[ focusableElements.length - 1 ];
 
-					ref.querySelector( '.close-button' ).focus();
-				}
-			},
-			setButtonStyles() {
-				const { ref } = getElement();
-				const {
-					naturalWidth,
-					naturalHeight,
-					offsetWidth,
-					offsetHeight,
-				} = ref;
+				ref.querySelector( '.close-button' ).focus();
+			}
+		},
+		setButtonStyles() {
+			const { ref } = getElement();
+			const { naturalWidth, naturalHeight, offsetWidth, offsetHeight } =
+				ref;
 
-				// If the image isn't loaded yet, we can't
-				// calculate how big the button should be.
-				if ( naturalWidth === 0 || naturalHeight === 0 ) {
-					return;
-				}
+			// If the image isn't loaded yet, we can't
+			// calculate how big the button should be.
+			if ( naturalWidth === 0 || naturalHeight === 0 ) {
+				return;
+			}
 
-				const { image } = getContext();
+			const image = getContext();
 
-				// Subscribe to the window dimensions so we can
-				// recalculate the styles if the window is resized.
-				if (
-					( state.image.windowWidth || state.image.windowHeight ) &&
-					image.scaleAttr === 'contain'
-				) {
-					// In the case of an image with object-fit: contain, the
-					// size of the img element can be larger than the image itself,
-					// so we need to calculate the size of the button to match.
+			// Subscribe to the window dimensions so we can
+			// recalculate the styles if the window is resized.
+			if (
+				( state.windowWidth || state.windowHeight ) &&
+				image.scaleAttr === 'contain'
+			) {
+				// In the case of an image with object-fit: contain, the
+				// size of the img element can be larger than the image itself,
+				// so we need to calculate the size of the button to match.
 
-					// Natural ratio of the image.
-					const naturalRatio = naturalWidth / naturalHeight;
-					// Offset ratio of the image.
-					const offsetRatio = offsetWidth / offsetHeight;
+				// Natural ratio of the image.
+				const naturalRatio = naturalWidth / naturalHeight;
+				// Offset ratio of the image.
+				const offsetRatio = offsetWidth / offsetHeight;
 
-					if ( naturalRatio > offsetRatio ) {
-						// If it reaches the width first, keep
-						// the width and recalculate the height.
-						image.imageButtonWidth = offsetWidth;
-						const buttonHeight = offsetWidth / naturalRatio;
-						image.imageButtonHeight = buttonHeight;
-						image.imageButtonTop =
-							( offsetHeight - buttonHeight ) / 2;
-					} else {
-						// If it reaches the height first, keep
-						// the height and recalculate the width.
-						image.imageButtonHeight = offsetHeight;
-						const buttonWidth = offsetHeight * naturalRatio;
-						image.imageButtonWidth = buttonWidth;
-						image.imageButtonLeft =
-							( offsetWidth - buttonWidth ) / 2;
-					}
-				} else {
-					// In all other cases, we can trust that the size of
-					// the image is the right size for the button as well.
-
+				if ( naturalRatio > offsetRatio ) {
+					// If it reaches the width first, keep
+					// the width and recalculate the height.
 					image.imageButtonWidth = offsetWidth;
+					const buttonHeight = offsetWidth / naturalRatio;
+					image.imageButtonHeight = buttonHeight;
+					image.imageButtonTop = ( offsetHeight - buttonHeight ) / 2;
+				} else {
+					// If it reaches the height first, keep
+					// the height and recalculate the width.
 					image.imageButtonHeight = offsetHeight;
+					const buttonWidth = offsetHeight * naturalRatio;
+					image.imageButtonWidth = buttonWidth;
+					image.imageButtonLeft = ( offsetWidth - buttonWidth ) / 2;
 				}
-			},
-			setStylesOnResize() {
-				const { image } = getContext();
-				const { ref } = getElement();
-				if (
-					image.lightboxEnabled &&
-					( state.image.windowWidth || state.image.windowHeight )
-				) {
-					setStyles( image, ref );
-				}
-			},
+			} else {
+				// In all other cases, we can trust that the size of
+				// the image is the right size for the button as well.
+
+				image.imageButtonWidth = offsetWidth;
+				image.imageButtonHeight = offsetHeight;
+			}
+		},
+		setStylesOnResize() {
+			const image = getContext();
+			const { ref } = getElement();
+			if (
+				image.lightboxEnabled &&
+				( state.windowWidth || state.windowHeight )
+			) {
+				setStyles( image, ref );
+			}
 		},
 	},
 } );
@@ -322,8 +310,8 @@ const { state, actions, effects } = store( {
 window.addEventListener(
 	'resize',
 	debounce( () => {
-		state.image.windowWidth = window.innerWidth;
-		state.image.windowHeight = window.innerHeight;
+		state.windowWidth = window.innerWidth;
+		state.windowHeight = window.innerHeight;
 	} )
 );
 
@@ -497,12 +485,12 @@ function setStyles( image, ref ) {
 	`;
 }
 
-/*
+/**
  * Debounces a function call.
  *
  * @function
  * @param {Function} func - A function to be called
- * @param {number} wait - The time to wait before calling the function
+ * @param {number}   wait - The time to wait before calling the function
  */
 function debounce( func, wait = 50 ) {
 	let timeout;
