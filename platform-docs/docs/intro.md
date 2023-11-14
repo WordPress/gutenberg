@@ -36,7 +36,7 @@ It's time to render our first block editor.
 
  - Update your `index.jsx` file with the following code:
 ```jsx
-import { createElement, useState } from "react";
+import { useState } from "react";
 import { createRoot } from 'react-dom/client';
 import {
   BlockEditorProvider,
