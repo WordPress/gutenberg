@@ -154,7 +154,6 @@ test.describe( 'Pages', () => {
 		await page.keyboard.type( 'Sweet paragraph 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Sweet paragraph 2' );
-		await editor.saveSiteEditorEntities();
 
 		// Header template area and page content are visible.
 		await expect(
