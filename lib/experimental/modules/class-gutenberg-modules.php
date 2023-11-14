@@ -30,32 +30,31 @@ class Gutenberg_Modules {
 	 * Registers the module if no module with that module identifier already
 	 * exists.
 	 *
-	 * @param string       $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
-	 * @param string       $src               Full URL of the module, or path of the script relative to the WordPress root directory.
-	 * @param string|array $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or an array of such strings.
-	 * @param array        $args     {
+	 * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
+	 * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
+	 * @param array  $dependencies      An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
+	 * @param array  $args     {
 	 *      Optional array of arguments.
 	 *
 	 *      @type string|bool $ver          Optional. String specifying script version number, if it has one, it is added to the URL
 	 *                                      as a query string for cache busting purposes. If version is set to false, a version
 	 *                                      number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
 	 *                                      is set to true, it uses the timestamp instead.
-	 *      @type array       $dependencies Optional. An array of module identifiers of the static dependencies of this module.
+	 *      @type array       $dependencies Optional. An array of module identifiers of the dependencies of this module.
 	 * }
 	 */
-	public static function register( $module_identifier, $src, $usage, $args = array() ) {
-		// Normalize $usage to an array.
-		if ( ! is_array( $usage ) ) {
-			$usage = array( $usage );
-		}
-
+	public static function register( $module_identifier, $src, $dependencies = array(), $args = array() ) {
 		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
+			$deps = array(
+				'static'  => isset( $dependencies['static'] ) || isset( $dependencies['dynamic'] ) ? $dependencies['static'] ?? array() : $dependencies,
+				'dynamic' => isset( $dependencies['dynamic'] ) ? $dependencies['dynamic'] : array(),
+			);
+
 			self::$registered[ $module_identifier ] = array(
 				'src'          => $src,
-				'usage'        => $usage,
 				'version'      => isset( $args['version'] ) ? $args['version'] : '',
-				'dependencies' => isset( $args['dependencies'] ) ? $args['dependencies'] : array(),
+				'dependencies' => $deps,
 			);
 		}
 	}
@@ -78,17 +77,11 @@ class Gutenberg_Modules {
 	 * @return string The import map.
 	 */
 	public static function get_import_map() {
-		$import_map = array(
-			'imports' => array(),
-		);
-
-		foreach ( self::$registered as $module_identifier => $module ) {
-			if ( self::get_appropriate_usage( $module['usage'] ) ) {
-				$import_map['imports'][ $module_identifier ] = $module['src'] . self::get_module_version( $module );
-			}
+		$imports = array();
+		foreach ( self::get_dependencies( self::$enqueued, array( 'static', 'dynamic' ) ) as $module_identifier => $module ) {
+			$imports[ $module_identifier ] = $module['src'] . self::get_module_version( $module['version'] );
 		}
-
-		return $import_map;
+		return array( 'imports' => $imports );
 	}
 
 	/**
@@ -103,10 +96,9 @@ class Gutenberg_Modules {
 	 */
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
-			if ( isset( self::$registered[ $module_identifier ] ) && self::get_appropriate_usage( self::$registered[ $module_identifier ]['usage'] ) ) {
-					$module  = self::$registered[ $module_identifier ];
-					$version = self::get_module_version( $module );
-					echo '<script type="module" src="' . $module['src'] . $version . '" id="' . $module_identifier . '"></script>';
+			if ( isset( self::$registered[ $module_identifier ] ) ) {
+					$module = self::$registered[ $module_identifier ];
+					echo '<script type="module" src="' . $module['src'] . self::get_module_version( $module['version'] ) . '" id="' . $module_identifier . '"></script>';
 			}
 		}
 	}
@@ -116,26 +108,9 @@ class Gutenberg_Modules {
 	 * dependencies of the enqueued modules.
 	 */
 	public static function print_module_preloads() {
-		foreach ( self::get_dependencies( self::$enqueued ) as $dependency_identifier => $module ) {
-				$version = self::get_module_version( $module );
-				echo '<link rel="modulepreload" href="' . $module['src'] . $version . '" id="' . $dependency_identifier . '">';
+		foreach ( self::get_dependencies( self::$enqueued, array( 'static' ) ) as $dependency_identifier => $module ) {
+				echo '<link rel="modulepreload" href="' . $module['src'] . self::get_module_version( $module['version'] ) . '" id="' . $dependency_identifier . '">';
 		}
-	}
-
-	/**
-	 * Determines if the usage is appropriate for the current context.
-	 *
-	 * @param array $usage Specifies the usage of the module. Can contain 'admin' or 'frontend'.
-	 * @return bool Returns true if it's appropriate to load the module in the current WP context.
-	 */
-	private static function get_appropriate_usage( $usage ) {
-		if ( in_array( 'admin', $usage, true ) && is_admin() ) {
-			return true;
-		}
-		if ( in_array( 'frontend', $usage, true ) && ! is_admin() ) {
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -143,46 +118,42 @@ class Gutenberg_Modules {
 	 * is true), the explicit version of the module if it is set and not false, or
 	 * an empty string if none of the above conditions are met.
 	 *
-	 * @param array $module The data of the module.
+	 * @param array $version The version of the module.
 	 * @return string A string presenting the version.
 	 */
-	private static function get_module_version( $module ) {
+	private static function get_module_version( $version ) {
 		if ( SCRIPT_DEBUG ) {
 			return '?ver=' . time();
-		} elseif ( $module['version'] ) {
-			return '?ver=' . $module['version'];
+		} elseif ( $version ) {
+			return '?ver=' . $version;
 		}
 		return '';
 	}
 
 	/**
-	 * Returns all unique static dependencies for the received modules. It's
-	 * recursive, so it will also get the static dependencies of the dependencies.
+	 * Returns all unique static and/or dynamic dependencies for the received modules. It's
+	 * recursive, so it will also get the static or dynamic dependencies of the dependencies.
 	 *
 	 * @param array $module_identifiers The identifiers of the modules to get dependencies for.
+	 * @param array $types              The type of dependencies to retrieve. It can be `static`, `dynamic` or both.
 	 * @return array The array containing the unique dependencies of the modules.
 	 */
-	public static function get_dependencies( $module_identifiers ) {
+	private static function get_dependencies( $module_identifiers, $types = array( 'static', 'dynamic' ) ) {
 		return array_reduce(
 			$module_identifiers,
-			function ( $dependency_modules, $module_identifier ) {
-				if (
-					! isset( self::$registered[ $module_identifier ] ) ||
-					! self::get_appropriate_usage( self::$registered[ $module_identifier ]['usage'] ) ||
-					empty( self::$registered[ $module_identifier ]['dependencies'] )
-				) {
+			function ( $dependency_modules, $module_identifier ) use ( $types ) {
+				if ( ! isset( self::$registered[ $module_identifier ] ) ) {
 					return $dependency_modules;
 				}
 
-				$filtered_dependencies = array_filter(
-					self::$registered[ $module_identifier ]['dependencies'],
-					function ( $dependency_identifier ) {
-						return isset( self::$registered[ $dependency_identifier ] ) && self::get_appropriate_usage( self::$registered[ $dependency_identifier ]['usage'] );
-					}
-				);
+				$dependencies = array();
+				foreach ( $types as $type ) {
+					$dependencies = array_merge( $dependencies, self::$registered[ $module_identifier ]['dependencies'][ $type ] );
+				}
+				$dependencies       = array_unique( $dependencies );
+				$dependency_modules = array_intersect_key( self::$registered, array_flip( $dependencies ) );
 
-				$dependency_data = array_intersect_key( self::$registered, array_flip( $filtered_dependencies ) );
-				return array_merge( $dependency_modules, $dependency_data, self::get_dependencies( $filtered_dependencies ) );
+				return array_merge( $dependency_modules, $dependency_modules, self::get_dependencies( $dependencies, $types ) );
 			},
 			array()
 		);
@@ -194,7 +165,7 @@ class Gutenberg_Modules {
  *
  * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
- * @param string $usage             Specifies where the module would be used. Can be 'admin', 'frontend', or 'both'.
+ * @param array  $dependencies      An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
  * @param array  $args     {
  *      Optional array of arguments.
  *
@@ -205,8 +176,8 @@ class Gutenberg_Modules {
  *      @type array       $dependencies Optional. An array of module identifiers of the static dependencies of this module.
  * }
  */
-function gutenberg_register_module( $module_identifier, $src, $usage, $args = array() ) {
-	Gutenberg_Modules::register( $module_identifier, $src, $usage, $args );
+function gutenberg_register_module( $module_identifier, $src, $dependencies, $args = array() ) {
+	Gutenberg_Modules::register( $module_identifier, $src, $dependencies, $args );
 }
 
 /**

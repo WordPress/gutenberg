@@ -785,10 +785,9 @@ function register_block_core_navigation() {
 	gutenberg_register_module(
 		'@wordpress/block-library/navigation-block',
 		'/wp-content/plugins/gutenberg/build/interactivity/navigation.min.js',
-		'frontend',
+		array( '@wordpress/interactivity' ),
 		array(
-			'version'      => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
-			'dependencies' => array( '@wordpress/interactivity' ),
+			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
 		)
 	);
 }

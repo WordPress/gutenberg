@@ -13,7 +13,7 @@ function gutenberg_register_interactivity_module() {
 	gutenberg_register_module(
 		'@wordpress/interactivity',
 		'/wp-content/plugins/gutenberg/build/interactivity/index.min.js',
-		'frontend',
+		array(),
 		array(
 			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
 		)
