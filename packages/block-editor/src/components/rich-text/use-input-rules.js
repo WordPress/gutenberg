@@ -28,7 +28,9 @@ function findSelection( blocks ) {
 		if ( attributeKey ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
-			].replace( START_OF_SELECTED_AREA, '' );
+			]
+				.toString()
+				.replace( START_OF_SELECTED_AREA, '' );
 			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
 		}
 

@@ -11,6 +11,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -47,8 +48,12 @@ export function isUnmodifiedBlock( block ) {
 	const newBlock = isUnmodifiedBlock[ block.name ];
 	const blockType = getBlockType( block.name );
 
-	return Object.keys( blockType?.attributes ?? {} ).every(
-		( key ) => newBlock.attributes[ key ] === block.attributes[ key ]
+	function isEqual( a, b ) {
+		return ( a?.valueOf() ?? a ) === ( b?.valueOf() ?? b );
+	}
+
+	return Object.keys( blockType?.attributes ?? {} ).every( ( key ) =>
+		isEqual( newBlock.attributes[ key ], block.attributes[ key ] )
 	);
 }
 
@@ -243,6 +248,16 @@ export function getAccessibleBlockLabel(
 	);
 }
 
+export function getDefault( attributeSchema ) {
+	if ( attributeSchema.default !== undefined ) {
+		return attributeSchema.default;
+	}
+
+	if ( attributeSchema.type === 'rich-text' ) {
+		return new RichTextData();
+	}
+}
+
 /**
  * Ensure attributes contains only values defined by block type, and merge
  * default values for missing attributes.
@@ -264,9 +279,27 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {
-				accumulator[ key ] = value;
-			} else if ( schema.hasOwnProperty( 'default' ) ) {
-				accumulator[ key ] = schema.default;
+				if ( schema.type === 'rich-text' ) {
+					if ( value instanceof RichTextData ) {
+						accumulator[ key ] = value;
+					} else if ( typeof value === 'string' ) {
+						accumulator[ key ] = new RichTextData( {
+							html: value,
+						} );
+					}
+				} else if (
+					schema.type === 'string' &&
+					value instanceof RichTextData
+				) {
+					accumulator[ key ] = value.toString();
+				} else {
+					accumulator[ key ] = value;
+				}
+			} else {
+				const _default = getDefault( schema );
+				if ( undefined !== _default ) {
+					accumulator[ key ] = _default;
+				}
 			}
 
 			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {

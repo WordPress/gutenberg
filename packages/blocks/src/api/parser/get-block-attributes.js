@@ -9,12 +9,22 @@ import memoize from 'memize';
  */
 import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { attr, html, text, query, node, children, prop } from '../matchers';
-import { normalizeBlockType } from '../utils';
+import {
+	attr,
+	html,
+	text,
+	query,
+	node,
+	children,
+	prop,
+	richText,
+} from '../matchers';
+import { normalizeBlockType, getDefault } from '../utils';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -58,6 +68,9 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
  */
 export function isOfType( value, type ) {
 	switch ( type ) {
+		case 'rich-text':
+			return value instanceof RichTextData;
+
 		case 'string':
 			return typeof value === 'string';
 
@@ -134,6 +147,7 @@ export function getBlockAttribute(
 		case 'property':
 		case 'html':
 		case 'text':
+		case 'rich-text':
 		case 'children':
 		case 'node':
 		case 'query':
@@ -152,7 +166,7 @@ export function getBlockAttribute(
 	}
 
 	if ( value === undefined ) {
-		value = attributeSchema.default;
+		value = getDefault( attributeSchema );
 	}
 
 	return value;
@@ -211,6 +225,8 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
+		case 'rich-text':
+			return richText( sourceConfig.selector );
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':

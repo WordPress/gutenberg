@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { create, toHTMLString } from '@wordpress/rich-text';
+import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -53,11 +53,11 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			if ( typeof value !== 'string' ) {
-				continue;
-			}
-
-			if ( value.indexOf( 'data-fn' ) === -1 ) {
+			// To do, remove support for string values.
+			if (
+				typeof value !== 'string' &&
+				! ( value instanceof RichTextData )
+			) {
 				continue;
 			}
 
@@ -78,7 +78,11 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				}
 			} );
 
-			attributes[ key ] = toHTMLString( { value: richTextValue } );
+			if ( typeof value === 'string' ) {
+				attributes[ key ] = toHTMLString( { value: richTextValue } );
+			} else {
+				attributes[ key ] = new RichTextData( richTextValue );
+			}
 		}
 
 		return attributes;

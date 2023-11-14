@@ -20,7 +20,7 @@
 				"isValid": true,
 				"attributes": {
 					"align": "center",
-					"content": " Cover! ",
+					"content": "Cover!",
 					"dropCap": false,
 					"placeholder": "Write title…",
 					"fontSize": "large"

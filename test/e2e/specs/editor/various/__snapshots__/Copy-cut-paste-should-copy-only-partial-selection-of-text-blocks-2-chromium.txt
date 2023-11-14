@@ -3,7 +3,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>B </p>
+<p>B</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->

@@ -14,7 +14,7 @@ function getBlockFootnotesOrder( block ) {
 	if ( ! cache.has( block ) ) {
 		const order = [];
 		for ( const value of getRichTextValuesCached( block ) ) {
-			if ( ! value || ! value.includes( 'data-fn' ) ) {
+			if ( ! value ) {
 				continue;
 			}
 

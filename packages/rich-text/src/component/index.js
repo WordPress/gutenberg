@@ -8,7 +8,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { collapseWhiteSpace, create } from '../create';
+import { collapseWhiteSpace, create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
@@ -71,9 +71,10 @@ export function useRichText( {
 	function setRecordFromProps() {
 		_value.current = value;
 		record.current = create( {
-			html: preserveWhiteSpace
-				? value
-				: collapseWhiteSpace( typeof value === 'string' ? value : '' ),
+			html:
+				typeof value !== 'string' || preserveWhiteSpace
+					? value
+					: collapseWhiteSpace( value ),
 		} );
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
@@ -116,7 +117,7 @@ export function useRichText( {
 
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
-		} else {
+		} else if ( typeof value === 'string' ) {
 			_value.current = toHTMLString( {
 				value: __unstableBeforeSerialize
 					? {
@@ -125,6 +126,15 @@ export function useRichText( {
 					  }
 					: newRecord,
 			} );
+		} else {
+			_value.current = new RichTextData(
+				__unstableBeforeSerialize
+					? {
+							...newRecord,
+							formats: __unstableBeforeSerialize( newRecord ),
+					  }
+					: newRecord
+			);
 		}
 
 		const { start, end, formats, text } = newRecord;

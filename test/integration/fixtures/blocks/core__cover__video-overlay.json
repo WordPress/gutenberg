@@ -21,7 +21,7 @@
 				"isValid": true,
 				"attributes": {
 					"align": "center",
-					"content": "\n\t\t\tGuten Berg!\n\t\t",
+					"content": "Guten Berg!",
 					"dropCap": false,
 					"placeholder": "Write title…",
 					"fontSize": "large"

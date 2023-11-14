@@ -175,6 +175,7 @@ _Parameters_
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
+-   _$1.preserveWhiteSpace_ `[boolean]`:
 
 _Returns_
 
@@ -354,6 +355,10 @@ _Parameters_
 _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
+
+### RichTextData
+
+Undocumented declaration.
 
 ### RichTextValue
 

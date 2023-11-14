@@ -114,6 +114,7 @@
 										"object",
 										"array",
 										"string",
+										"rich-text",
 										"integer",
 										"number"
 									]
@@ -159,6 +160,7 @@
 							"enum": [
 								"attribute",
 								"text",
+								"rich-text",
 								"html",
 								"raw",
 								"query",

@@ -10,6 +10,7 @@ import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { toHTMLString } from './to-html-string';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -96,6 +97,29 @@ function toFormat( { tagName, attributes } ) {
 	};
 }
 
+const RichTextInternalData = Symbol( 'RichTextInternalData' );
+
+export class RichTextData {
+	constructor( init ) {
+		this[ RichTextInternalData ] = init?.formats ? init : create( init );
+	}
+	get html() {
+		return toHTMLString( { value: this[ RichTextInternalData ] } );
+	}
+	valueOf() {
+		return this.html;
+	}
+	toString() {
+		return this.html;
+	}
+	toJSON() {
+		return this.html;
+	}
+	get length() {
+		return this[ RichTextInternalData ].text.length;
+	}
+}
+
 /**
  * Create a RichText value from an `Element` tree (DOM), an HTML string or a
  * plain text string, with optionally a `Range` object to set the selection. If
@@ -128,7 +152,7 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
  * @param {boolean} [$1.__unstableIsEditableTree]
- *
+ * @param {boolean} [$1.preserveWhiteSpace]
  * @return {RichTextValue} A rich text value.
  */
 export function create( {
@@ -137,7 +161,13 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
+	preserveWhiteSpace,
 } = {} ) {
+	// Ideally we use the instance internally as well.
+	if ( html instanceof RichTextData ) {
+		return { ...html[ RichTextInternalData ] };
+	}
+
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
@@ -154,6 +184,40 @@ export function create( {
 
 	if ( typeof element !== 'object' ) {
 		return createEmptyValue();
+	}
+
+	function collapseWhiteSpaceElement( el, isRoot = true ) {
+		Array.from( el.childNodes ).forEach( ( node ) => {
+			if ( node.nodeType === node.TEXT_NODE ) {
+				node.nodeValue = node.nodeValue
+					.replace( /[\n\t\r]+/g, ' ' )
+					.replace( / {2,}/g, ' ' );
+			} else if ( node.nodeType === node.ELEMENT_NODE ) {
+				collapseWhiteSpaceElement( node, false );
+			}
+		} );
+
+		if (
+			el.firstChild &&
+			el.firstChild.nodeType === el.TEXT_NODE &&
+			el.firstChild.nodeValue.startsWith( ' ' )
+		) {
+			el.firstChild.nodeValue = el.firstChild.nodeValue.slice( 1 );
+		}
+
+		if (
+			isRoot &&
+			el.lastChild &&
+			el.lastChild.nodeType === el.TEXT_NODE &&
+			el.lastChild.nodeValue.endsWith( ' ' )
+		) {
+			el.lastChild.nodeValue = el.lastChild.nodeValue.slice( 0, -1 );
+		}
+	}
+
+	if ( element && preserveWhiteSpace === false ) {
+		element.normalize();
+		collapseWhiteSpaceElement( element );
 	}
 
 	return createFromElement( {

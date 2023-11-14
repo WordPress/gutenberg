@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * A robust way to retain selection position through various
  * transforms is to insert a special character at the position and
  * then recover it.
@@ -19,8 +24,8 @@ export function retrieveSelectedAttribute( blockAttributes ) {
 	return Object.keys( blockAttributes ).find( ( name ) => {
 		const value = blockAttributes[ name ];
 		return (
-			typeof value === 'string' &&
-			value.indexOf( START_OF_SELECTED_AREA ) !== -1
+			( typeof value === 'string' || value instanceof RichTextData ) &&
+			value.toString().indexOf( START_OF_SELECTED_AREA ) !== -1
 		);
 	} );
 }
