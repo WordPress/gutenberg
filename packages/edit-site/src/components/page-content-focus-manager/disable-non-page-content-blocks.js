@@ -30,12 +30,10 @@ function DisableBlock( { clientId } ) {
 	useEffect( () => {
 		if ( mode ) {
 			setBlockEditingMode( clientId, mode );
-		}
-		return () => {
-			if ( mode ) {
+			return () => {
 				unsetBlockEditingMode( clientId );
-			}
-		};
+			};
+		}
 	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
 }
 
