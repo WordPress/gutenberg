@@ -24,7 +24,7 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
-store( {
+store( 'core/query', {
 	state: {
 		get startAnimation() {
 			return getContext().animation === 'start';
