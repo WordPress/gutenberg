@@ -85,21 +85,21 @@ const { state, actions, effects } = store( 'core/image', {
 			const ctx = getContext();
 			return ctx.lightboxEnabled ? 'dialog' : null;
 		},
-		get ariaModalroleAttribute() {
+		get ariaModal() {
 			const ctx = getContext();
 			return ctx.lightboxEnabled ? 'true' : null;
 		},
-		get dialogLabelroleAttribute() {
+		get dialogLabel() {
 			const ctx = getContext();
 			return ctx.lightboxEnabled ? ctx.dialogLabel : null;
 		},
-		get lightboxObjectFitroleAttribute() {
+		get lightboxObjectFit() {
 			const ctx = getContext();
 			if ( ctx.initialized ) {
 				return 'cover';
 			}
 		},
-		get enlargedImgSrcroleAttribute() {
+		get enlargedImgSrc() {
 			const ctx = getContext();
 			return ctx.initialized
 				? ctx.imageUploadedSrc
