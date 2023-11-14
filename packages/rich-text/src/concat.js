@@ -22,7 +22,7 @@ export function mergePair( a, b ) {
 		...a._formats,
 		...Array.from( b._formats ).map( ( [ format, selection ] ) => [
 			format,
-			[ selection[ 0 ] + a.text.length, selection[ 1 ] + a.text.length ],
+			selection.map( ( index ) => index + a.text.length ),
 		] ),
 	] );
 	a.replacements = a.replacements.concat( b.replacements );

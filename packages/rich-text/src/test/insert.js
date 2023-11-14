@@ -17,6 +17,7 @@ describe( 'insert', () => {
 	it( 'should delete and insert', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [],
 			text: 'one two three',
 			start: 6,
@@ -24,11 +25,16 @@ describe( 'insert', () => {
 		};
 		const toInsert = {
 			formats: [ [ strong ] ],
+			_formats: new Map( [ [ strong, [ 0, 1 ] ] ] ),
 			replacements: [],
 			text: 'a',
 		};
 		const expected = {
 			formats: [ , , [ strong ], [ em ], , , , , , , ],
+			_formats: new Map( [
+				[ em, [ 3, 4 ] ],
+				[ strong, [ 2, 3 ] ],
+			] ),
 			replacements: [],
 			text: 'onao three',
 			start: 3,
@@ -44,6 +50,7 @@ describe( 'insert', () => {
 	it( 'should insert line break with selection', () => {
 		const record = {
 			formats: [ , , ],
+			_formats: new Map(),
 			replacements: [],
 			text: 'tt',
 			start: 1,
@@ -51,11 +58,13 @@ describe( 'insert', () => {
 		};
 		const toInsert = {
 			formats: [ , ],
+			_formats: new Map(),
 			replacements: [],
 			text: '\n',
 		};
 		const expected = {
 			formats: [ , , , ],
+			_formats: new Map(),
 			replacements: [],
 			text: 't\nt',
 			start: 2,

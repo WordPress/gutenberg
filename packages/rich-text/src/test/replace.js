@@ -16,6 +16,7 @@ describe( 'replace', () => {
 	it( 'should replace string to string', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -23,6 +24,7 @@ describe( 'replace', () => {
 		};
 		const expected = {
 			formats: [ , , , , [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 5 ] ] ] ),
 			replacements: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
@@ -38,6 +40,7 @@ describe( 'replace', () => {
 	it( 'should replace string to record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
@@ -45,11 +48,13 @@ describe( 'replace', () => {
 		};
 		const replacement = {
 			formats: [ , ],
+			_formats: new Map(),
 			replacements: [ , ],
 			text: '2',
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , ],
+			_formats: new Map(),
 			replacements: [ , , , , , , , , , , , ],
 			text: 'one 2 three',
 			start: 5,
@@ -65,6 +70,7 @@ describe( 'replace', () => {
 	it( 'should replace string to function', () => {
 		const record = {
 			formats: [ , , , , , , , , , , , , ],
+			_formats: new Map(),
 			replacements: [ , , , , , , , , , , , , ],
 			text: 'abc12345#$*%',
 			start: 6,
@@ -72,6 +78,7 @@ describe( 'replace', () => {
 		};
 		const expected = {
 			formats: [ , , , , , , , , , , , , , , , , , , ],
+			_formats: new Map(),
 			replacements: [ , , , , , , , , , , , , , , , , , , ],
 			text: 'abc - 12345 - #$*%',
 			start: 18,

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { sliceFormats } from './slice';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -14,7 +15,10 @@
  *
  * @return {Array<RichTextValue>|undefined} An array of new values.
  */
-export function split( { formats, replacements, text, start, end }, string ) {
+export function split(
+	{ formats, _formats, replacements, text, start, end },
+	string
+) {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( ...arguments );
 	}
@@ -25,6 +29,11 @@ export function split( { formats, replacements, text, start, end }, string ) {
 		const startIndex = nextStart;
 		const value = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
+			_formats: sliceFormats(
+				_formats,
+				startIndex,
+				startIndex + substring.length
+			),
 			replacements: replacements.slice(
 				startIndex,
 				startIndex + substring.length
@@ -53,7 +62,7 @@ export function split( { formats, replacements, text, start, end }, string ) {
 }
 
 function splitAtSelection(
-	{ formats, replacements, text, start, end },
+	{ formats, _formats, replacements, text, start, end },
 	startIndex = start,
 	endIndex = end
 ) {
@@ -63,11 +72,13 @@ function splitAtSelection(
 
 	const before = {
 		formats: formats.slice( 0, startIndex ),
+		_formats: sliceFormats( _formats, 0, startIndex ),
 		replacements: replacements.slice( 0, startIndex ),
 		text: text.slice( 0, startIndex ),
 	};
 	const after = {
 		formats: formats.slice( endIndex ),
+		_formats: sliceFormats( _formats, endIndex ),
 		replacements: replacements.slice( endIndex ),
 		text: text.slice( endIndex ),
 		start: 0,
