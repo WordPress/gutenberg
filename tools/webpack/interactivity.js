@@ -16,6 +16,8 @@ module.exports = {
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',
 		image: './packages/block-library/src/image/view.js',
+		file: './packages/block-library/src/file/view.js',
+		search: './packages/block-library/src/search/view.js',
 	},
 	experiments: {
 		outputModule: true,
