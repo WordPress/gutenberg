@@ -355,7 +355,10 @@ function register_block_core_image() {
 	gutenberg_register_module(
 		'@wordpress/block-library/image',
 		'/wp-content/plugins/gutenberg/build/interactivity/image.min.js',
-		'frontend'
+		'frontend',
+		array(
+			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
+		)
 	);
 }
 add_action( 'init', 'register_block_core_image' );
