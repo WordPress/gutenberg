@@ -38,6 +38,8 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { BlockListBlockContext } from './block-list-block-context';
+import { DragOnLongPress } from './drag-on-long-press';
+import { __unstableUseBlockRef as useBlockRef } from './use-block-props/use-block-refs';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -95,18 +97,21 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
+		rootClientId,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
+				getBlockRootClientId,
 			} = select( blockEditorStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode: getBlockEditingMode( clientId ),
+				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
@@ -229,6 +234,8 @@ function BlockListBlock( {
 
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
+	const blockWrapperRef = useBlockRef( clientId );
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary
@@ -239,6 +246,11 @@ function BlockListBlock( {
 				}
 			>
 				{ block }
+				<DragOnLongPress
+					target={ blockWrapperRef }
+					clientId={ clientId }
+					rootClientId={ rootClientId }
+				/>
 			</BlockCrashBoundary>
 		</BlockListBlockContext.Provider>
 	);
