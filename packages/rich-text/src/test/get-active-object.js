@@ -26,15 +26,4 @@ describe( 'getActiveObject', () => {
 
 		expect( getActiveObject( record ) ).toBe( undefined );
 	} );
-
-	it( 'should return nothing if te selection is not an object', () => {
-		const record = {
-			replacements: [ { type: 'em' } ],
-			text: 'a',
-			start: 0,
-			end: 1,
-		};
-
-		expect( getActiveObject( record ) ).toBe( undefined );
-	} );
 } );

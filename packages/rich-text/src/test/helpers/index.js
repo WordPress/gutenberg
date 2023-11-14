@@ -224,7 +224,7 @@ export const spec = [
 			end: 0,
 			formats: [ , ],
 			replacements: [ img ],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -243,7 +243,7 @@ export const spec = [
 			end: 1,
 			formats: [ [ em ] ],
 			replacements: [ img ],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -262,7 +262,7 @@ export const spec = [
 			end: 5,
 			formats: [ , , [ em ], [ em ], [ em ] ],
 			replacements: [ , , , , img ],
-			text: 'test\ufffc',
+			text: 'test ',
 		},
 	},
 	{
@@ -281,7 +281,7 @@ export const spec = [
 			end: 5,
 			formats: [ [ em ], [ em ], [ em ], , , ],
 			replacements: [ img, , , , , ],
-			text: '\ufffctest',
+			text: ' test',
 		},
 	},
 	{
@@ -482,7 +482,7 @@ export const spec = [
 					type: 'script',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -508,7 +508,7 @@ export const spec = [
 					type: 'img',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 ];
