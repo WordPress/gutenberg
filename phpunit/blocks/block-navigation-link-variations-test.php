@@ -25,6 +25,17 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 				'show_in_nav_menus' => true,
 			)
 		);
+		register_post_type(
+			'private_custom_book',
+			array(
+				'labels'            => array(
+					'item_link' => 'Custom Book',
+				),
+				'public'            => false,
+				'show_in_rest'      => true,
+				'show_in_nav_menus' => false,
+			)
+		);
 		register_taxonomy(
 			'book_type',
 			'custom_book',
@@ -35,11 +46,23 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 				'show_in_nav_menus' => true,
 			)
 		);
+		register_taxonomy(
+			'private_book_type',
+			'private_custom_book',
+			array(
+				'labels'            => array(
+					'item_link' => 'Book Type',
+				),
+				'show_in_nav_menus' => false,
+			)
+		);
 	}
 
 	public function tear_down() {
 		unregister_post_type( 'custom_book' );
+		unregister_post_type( 'private_custom_book' );
 		unregister_taxonomy( 'book_type' );
+		unregister_taxonomy( 'private_book_type' );
 		parent::tear_down();
 	}
 
@@ -59,6 +82,17 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::block_core_navigation_link_register_post_type_variation
 	 */
+	public function test_navigation_link_variations_private_custom_post_type() {
+		$registry       = WP_Block_Type_Registry::get_instance();
+		$nav_link_block = $registry->get_registered( 'core/navigation-link' );
+		$this->assertNotEmpty( $nav_link_block->variations, 'Block has no variations' );
+		$variation = $this->get_variation_by_name( 'private_custom_book', $nav_link_block->variations );
+		$this->assertEmpty( $variation, 'Block variation for private post type exists.' );
+	}
+
+	/**
+	 * @covers ::block_core_navigation_link_register_taxonomy_variation
+	 */
 	public function test_navigation_link_variations_custom_taxonomy() {
 		$registry       = WP_Block_Type_Registry::get_instance();
 		$nav_link_block = $registry->get_registered( 'core/navigation-link' );
@@ -67,6 +101,17 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 		$this->assertIsArray( $variation, 'Block variation does not exist' );
 		$this->assertArrayHasKey( 'title', $variation, 'Block variation has no title' );
 		$this->assertEquals( 'Book Type', $variation['title'], 'Variation title is different than the post type label' );
+	}
+
+	/**
+	 * @covers ::block_core_navigation_link_register_taxonomy_variation
+	 */
+	public function test_navigation_link_variations_private_custom_taxonomy() {
+		$registry       = WP_Block_Type_Registry::get_instance();
+		$nav_link_block = $registry->get_registered( 'core/navigation-link' );
+		$this->assertNotEmpty( $nav_link_block->variations, 'Block has no variations' );
+		$variation = $this->get_variation_by_name( 'private_book_type', $nav_link_block->variations );
+		$this->assertEmpty( $variation, 'Block variation for private taxonomy exists.' );
 	}
 
 	/**
