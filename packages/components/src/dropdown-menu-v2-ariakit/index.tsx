@@ -15,10 +15,6 @@ import {
 	cloneElement,
 	isValidElement,
 	useCallback,
-	useState,
-	useEffect,
-	useRef,
-	useId,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -52,16 +48,7 @@ export const DropdownMenuItem = forwardRef<
 	{ prefix, suffix, children, hideOnClick = true, ...props },
 	ref
 ) {
-	const id = useId();
 	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	const { registerHasPrefix, unregisterHasPrefix } =
-		dropdownMenuContext ?? {};
-	const hasPrefix = !! prefix;
-	useEffect( () => {
-		registerHasPrefix?.( id, hasPrefix );
-		return () => unregisterHasPrefix?.( id );
-	}, [ id, registerHasPrefix, unregisterHasPrefix, hasPrefix ] );
 
 	return (
 		<Styled.DropdownMenuItem
@@ -69,9 +56,6 @@ export const DropdownMenuItem = forwardRef<
 			{ ...props }
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
-			shouldIndent={
-				! hasPrefix && ( dropdownMenuContext?.shouldIndent ?? false )
-			}
 		>
 			{ prefix && (
 				<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
@@ -95,16 +79,7 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	{ suffix, children, hideOnClick = false, ...props },
 	ref
 ) {
-	const id = useId();
 	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	const { registerHasPrefix, unregisterHasPrefix } =
-		dropdownMenuContext ?? {};
-	useEffect( () => {
-		// Check items always have a prefix (the check icon).
-		registerHasPrefix?.( id, true );
-		return () => unregisterHasPrefix?.( id );
-	}, [ id, registerHasPrefix, unregisterHasPrefix ] );
 
 	return (
 		<Styled.DropdownMenuCheckboxItem
@@ -144,16 +119,7 @@ export const DropdownMenuRadioItem = forwardRef<
 	{ suffix, children, hideOnClick = false, ...props },
 	ref
 ) {
-	const id = useId();
 	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	const { registerHasPrefix, unregisterHasPrefix } =
-		dropdownMenuContext ?? {};
-	useEffect( () => {
-		// Radio items always have a prefix (the check icon).
-		registerHasPrefix?.( id, true );
-		return () => unregisterHasPrefix?.( id );
-	}, [ id, registerHasPrefix, unregisterHasPrefix ] );
 
 	return (
 		<Styled.DropdownMenuRadioItem
@@ -258,50 +224,9 @@ const UnconnectedDropdownMenu = (
 		rtl: computedDirection === 'rtl',
 	} );
 
-	const [ shouldIndent, setShouldIndent ] = useState( false );
-
-	const updateShouldIndent = useCallback( () => {
-		let atLeastOnePrefix = false;
-		for ( const value of hasPrefixMap.current.values() ) {
-			atLeastOnePrefix ||= value;
-		}
-
-		setShouldIndent( atLeastOnePrefix );
-	}, [] );
-
-	const hasPrefixMap = useRef( new Map< string, boolean >() );
-
-	const registerHasPrefix = useCallback(
-		( id: string, hasPrefix: boolean ) => {
-			hasPrefixMap.current.set( id, hasPrefix );
-			updateShouldIndent();
-		},
-		[ updateShouldIndent ]
-	);
-
-	const unregisterHasPrefix = useCallback(
-		( id: string ) => {
-			hasPrefixMap.current.delete( id );
-			updateShouldIndent();
-		},
-		[ updateShouldIndent ]
-	);
-
 	const contextValue = useMemo(
-		() => ( {
-			store: dropdownMenuStore,
-			variant,
-			shouldIndent,
-			registerHasPrefix,
-			unregisterHasPrefix,
-		} ),
-		[
-			dropdownMenuStore,
-			variant,
-			shouldIndent,
-			registerHasPrefix,
-			unregisterHasPrefix,
-		]
+		() => ( { store: dropdownMenuStore, variant } ),
+		[ dropdownMenuStore, variant ]
 	);
 
 	// Extract the side from the applied placement — useful for animations.

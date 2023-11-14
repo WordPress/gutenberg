@@ -231,18 +231,14 @@ const baseItem = css`
 	svg {
 		fill: currentColor;
 	}
+
+	&:not( :has( ${ ItemPrefixWrapper } ) ) {
+		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
+	}
 `;
 
-export const DropdownMenuItem = styled( Ariakit.MenuItem )< {
-	shouldIndent?: boolean;
-} >`
+export const DropdownMenuItem = styled( Ariakit.MenuItem )`
 	${ baseItem }
-
-	${ ( props ) =>
-		props.shouldIndent &&
-		`
-		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
-		` }
 `;
 
 export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`

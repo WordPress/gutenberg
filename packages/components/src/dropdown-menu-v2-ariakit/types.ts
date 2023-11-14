@@ -14,20 +14,6 @@ export interface DropdownMenuContext {
 	 * The variant used by the underlying menu popover.
 	 */
 	variant?: 'toolbar';
-	/**
-	 * Whether items in this menu should be indented, ie. they should show
-	 * extra white space even when they don't have a prefix.
-	 */
-	shouldIndent: boolean;
-	/**
-	 * Function used by menu items to let the parent dropdown menu know
-	 * whether they are rendering a prefix or not.
-	 */
-	registerHasPrefix: ( itemId: string, hasPrefix: boolean ) => void;
-	/**
-	 * Function used by menu items to unregister a previously set entry.
-	 */
-	unregisterHasPrefix: ( itemId: string ) => void;
 }
 
 export interface DropdownMenuProps {
