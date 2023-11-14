@@ -70,14 +70,6 @@ function toFormat( { tagName, attributes } ) {
 
 		registeredAttributes[ key ] = _attributes[ name ];
 
-		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[ key ] =
-				formatType.__unstableFilterAttributeValue(
-					key,
-					registeredAttributes[ key ]
-				);
-		}
-
 		// delete the attribute and what's left is considered
 		// to be unregistered.
 		delete _attributes[ name ];

@@ -9,7 +9,7 @@ import {
 	MenuItemsChoice,
 	ExternalLink,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 
@@ -55,15 +55,24 @@ export function PatternsFilter( {
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
-			{ value: SYNC_TYPES.all, label: __( 'All' ) },
+			{
+				value: SYNC_TYPES.all,
+				label: _x( 'All', 'Option that shows all patterns' ),
+			},
 			{
 				value: SYNC_TYPES.full,
-				label: __( 'Synced' ),
+				label: _x(
+					'Synced',
+					'Option that shows all synchronized patterns'
+				),
 				disabled: shouldDisableSyncFilter,
 			},
 			{
 				value: SYNC_TYPES.unsynced,
-				label: __( 'Not synced' ),
+				label: _x(
+					'Not synced',
+					'Option that shows all patterns that are not synchronized'
+				),
 				disabled: shouldDisableSyncFilter,
 			},
 		],

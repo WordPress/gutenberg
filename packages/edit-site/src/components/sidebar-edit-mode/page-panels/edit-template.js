@@ -114,6 +114,7 @@ export default function EditTemplate() {
 									icon={
 										! isTemplateHidden ? check : undefined
 									}
+									isPressed={ ! isTemplateHidden }
 									onClick={ () => {
 										setPageContentFocusType(
 											isTemplateHidden

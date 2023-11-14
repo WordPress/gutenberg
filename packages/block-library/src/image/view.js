@@ -313,11 +313,21 @@ store(
 						if ( caption ) {
 							const captionComputedStyle =
 								window.getComputedStyle( caption );
-							figureHeight =
-								figureHeight -
-								caption.offsetHeight -
-								parseFloat( captionComputedStyle.marginTop ) -
-								parseFloat( captionComputedStyle.marginBottom );
+							if (
+								! [ 'absolute', 'fixed' ].includes(
+									captionComputedStyle.position
+								)
+							) {
+								figureHeight =
+									figureHeight -
+									caption.offsetHeight -
+									parseFloat(
+										captionComputedStyle.marginTop
+									) -
+									parseFloat(
+										captionComputedStyle.marginBottom
+									);
+							}
 						}
 
 						const buttonOffsetTop = figureHeight - offsetHeight;

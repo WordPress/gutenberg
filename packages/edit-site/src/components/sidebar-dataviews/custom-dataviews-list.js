@@ -9,8 +9,13 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	TextControl,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	Button,
+	Modal,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -25,6 +30,55 @@ import { unlock } from '../../lock-unlock';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
+
+function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
+	const { editEntityRecord } = useDispatch( coreStore );
+	const [ title, setTitle ] = useState( currentTitle );
+	return (
+		<form
+			onSubmit={ async ( event ) => {
+				event.preventDefault();
+				await editEntityRecord(
+					'postType',
+					'wp_dataviews',
+					dataviewId,
+					{
+						title,
+					}
+				);
+				setIsRenaming( false );
+			} }
+		>
+			<VStack spacing="5">
+				<TextControl
+					__nextHasNoMarginBottom
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					placeholder={ __( 'My view' ) }
+					className="patterns-create-modal__name-input"
+				/>
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ () => {
+							setIsRenaming( false );
+						} }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						type="submit"
+						aria-disabled={ ! title }
+					>
+						{ __( 'Rename' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
+	);
+}
 
 function CustomDataViewItem( { dataviewId, isActive } ) {
 	const {
@@ -49,51 +103,76 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 		const viewContent = JSON.parse( dataview.content );
 		return viewContent.type;
 	}, [ dataview.content ] );
+	const [ isRenaming, setIsRenaming ] = useState( false );
 	return (
-		<DataViewItem
-			title={ dataview.title }
-			type={ type }
-			isActive={ isActive }
-			isCustom="true"
-			customViewId={ dataviewId }
-			suffix={
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Actions' ) }
-					toggleProps={ {
-						style: {
-							color: 'inherit',
-						},
+		<>
+			<DataViewItem
+				title={ dataview.title }
+				type={ type }
+				isActive={ isActive }
+				isCustom="true"
+				customViewId={ dataviewId }
+				suffix={
+					<DropdownMenu
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						toggleProps={ {
+							style: {
+								color: 'inherit',
+							},
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								<MenuItem
+									onClick={ () => {
+										setIsRenaming( true );
+										onClose();
+									} }
+								>
+									{ __( 'Rename' ) }
+								</MenuItem>
+								<MenuItem
+									onClick={ async () => {
+										await deleteEntityRecord(
+											'postType',
+											'wp_dataviews',
+											dataview.id,
+											{
+												force: true,
+											}
+										);
+										if ( isActive ) {
+											history.replace( {
+												path,
+											} );
+										}
+										onClose();
+									} }
+									isDestructive
+								>
+									{ __( 'Delete' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				}
+			/>
+			{ isRenaming && (
+				<Modal
+					title={ __( 'Rename view' ) }
+					onRequestClose={ () => {
+						setIsRenaming( false );
 					} }
 				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							<MenuItem
-								onClick={ async () => {
-									await deleteEntityRecord(
-										'postType',
-										'wp_dataviews',
-										dataview.id,
-										{
-											force: true,
-										}
-									);
-									if ( isActive ) {
-										history.replace( {
-											path,
-										} );
-									}
-									onClose();
-								} }
-								isDestructive
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
-			}
-		/>
+					<RenameItemModalContent
+						dataviewId={ dataviewId }
+						setIsRenaming={ setIsRenaming }
+						currentTitle={ dataview.title }
+					/>
+				</Modal>
+			) }
+		</>
 	);
 }
 

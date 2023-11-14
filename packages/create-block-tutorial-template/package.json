@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/create-block-tutorial-template",
 	"version": "2.33.0",
-	"description": "Template for @wordpress/create-block used in the official WordPress tutorial.",
+	"description": "This is a template for @wordpress/create-block that creates an example 'Copyright Date' block. This block is used in the official WordPress block development Quick Start Guide.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"create block",
-		"block template"
+		"block template",
+		"quick start"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/docs/getting-started/create-block",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/docs/getting-started/quick-start-guide",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

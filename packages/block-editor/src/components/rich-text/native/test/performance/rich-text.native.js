@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import RichText from '../../component/index.native';
+import RichText from '../../index.native';
 
 describe( 'RichText Performance', () => {
 	const onCreateUndoLevel = jest.fn();

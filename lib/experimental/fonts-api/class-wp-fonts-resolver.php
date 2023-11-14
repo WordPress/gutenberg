@@ -200,11 +200,6 @@ class WP_Fonts_Resolver {
 			if ( $set_theme_structure ) {
 				$set_theme_structure = false;
 				$settings            = static::set_tyopgraphy_settings_array_structure( $settings );
-
-				// Initialize the font families from settings if set and is an array, otherwise default to an empty array.
-				if ( ! isset( $settings['typography']['fontFamilies']['theme'] ) || ! is_array( $settings['typography']['fontFamilies']['theme'] ) ) {
-					$settings['typography']['fontFamilies']['theme'] = array();
-				}
 			}
 
 			// Initialize the font families from variation if set and is an array, otherwise default to an empty array.
@@ -219,7 +214,12 @@ class WP_Fonts_Resolver {
 			);
 
 			// Make sure there are no duplicates.
-			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'], SORT_REGULAR );
+
+			// The font families from settings might become null after running the `array_unique`.
+			if ( ! isset( $settings['typography']['fontFamilies']['theme'] ) || ! is_array( $settings['typography']['fontFamilies']['theme'] ) ) {
+				$settings['typography']['fontFamilies']['theme'] = array();
+			}
 		}
 
 		return $settings;

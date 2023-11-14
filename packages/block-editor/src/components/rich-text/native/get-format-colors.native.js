@@ -1,7 +1,7 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { getColorObjectByAttributeValues } from '@wordpress/block-editor';
+import { getColorObjectByAttributeValues } from '../../../components/colors';
 
 const FORMAT_TYPE = 'core/text-color';
 const REGEX_TO_MATCH = /^has-(.*)-color$/;

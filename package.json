@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.0.1",
+	"version": "17.0.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -107,7 +107,7 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
-		"@playwright/test": "1.32.0",
+		"@playwright/test": "1.39.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
 		"@storybook/addon-a11y": "7.2.2",
 		"@storybook/addon-actions": "7.2.2",

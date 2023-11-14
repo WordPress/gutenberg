@@ -96,12 +96,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-actions {
-	display: flex;
-	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
-	justify-content: flex-start;
-	gap: $grid-unit-10;
 	padding: $grid-unit-10 $grid-unit-20 $grid-unit-20;
-	order: 20;
 }
 
 .block-editor-link-control__search-results-wrapper {
