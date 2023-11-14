@@ -83,16 +83,15 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * the excerpt length block setting has no effect.
  * Returns 100 because 100 is the max length in the setting.
  */
-add_filter(
-	'excerpt_length',
-	static function ( $value ) {
-		// This check needs to be inside the callback since the REST_REQUEST constant
-		// is not defined at the time add_filter() is called.
-		if ( ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-			return $value;
-		}
+function register_block_core_post_excerpt_length_filter( $value ) {
+	// This check needs to be inside the callback since the REST_REQUEST constant
+	// is not defined at the time add_filter() is called.
+	if ( ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return $value;
+	}
 
-		return 100;
-	},
-	PHP_INT_MAX
-);
+	return 100;
+}
+add_filter( 'excerpt_length', 'register_block_core_post_excerpt_length_filter', PHP_INT_MAX );
+
+
