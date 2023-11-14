@@ -72,6 +72,10 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
+	display: grid;
+	grid-template-columns: minmax( 0, max-content ) 1fr;
+	grid-template-rows: auto;
+
 	min-width: 220px;
 	max-height: var( --popover-available-height );
 	padding: ${ CONTENT_WRAPPER_PADDING };
@@ -112,6 +116,9 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 `;
 
 const itemPrefix = css`
+	/* Always occupy the first column, even when auto-collapsing /*
+	grid-column: 1;
+
 	/* !important is to override some inline styles set by Ariakit */
 	width: ${ ITEM_PREFIX_WIDTH } !important;
 	/* !important is to override some inline styles set by Ariakit */
@@ -131,6 +138,7 @@ const itemPrefix = css`
 `;
 
 const itemSuffix = css`
+	flex: 0;
 	width: max-content;
 	display: inline-flex;
 	align-items: center;
@@ -179,17 +187,31 @@ export const ItemSuffixWrapper = styled.span`
 
 const baseItem = css`
 	all: unset;
+
+	position: relative;
+
+	/* Occupy the width of all grid columns (ie. full width) */
+	grid-column: 1 / -1;
+
+	/*
+	 * Define a grid layout which inherits the same columns configuration
+	 * from the parent layout (ie. subgrid).
+	 */
+	display: grid;
+	grid-template-columns: subgrid;
+	align-items: center;
+
 	font-size: ${ font( 'default.fontSize' ) };
 	font-family: inherit;
 	font-weight: normal;
 	line-height: 20px;
+
 	color: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.radiusBlockUi };
-	display: flex;
-	align-items: center;
+
 	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
 		${ ITEM_PADDING_INLINE_START };
-	position: relative;
+
 	user-select: none;
 	outline: none;
 
@@ -231,10 +253,6 @@ const baseItem = css`
 	svg {
 		fill: currentColor;
 	}
-
-	&:not( :has( ${ ItemPrefixWrapper } ) ) {
-		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
-	}
 `;
 
 export const DropdownMenuItem = styled( Ariakit.MenuItem )`
@@ -250,16 +268,33 @@ export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
 `;
 
 export const DropdownMenuItemContentWrapper = styled.div`
+	/*
+	 * Always occupy the second column, since the first column
+	 * is taken by the prefix wrapper (when displayed).
+	 */
+	grid-column: 2;
+
+	display: flex;
+`;
+
+export const DropdownMenuItemChildrenWrapper = styled.div`
+	flex: 1;
 	display: inline-flex;
 	flex-direction: column;
 	pointer-events: none;
 `;
 
-export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
+export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
+	/* Ignore this element when calculating the layout. Useful for subgrid */
+	display: contents;
+`;
 
 export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 	Pick< DropdownMenuContext, 'variant' >
 >`
+	/* Occupy the width of all grid columns (ie. full width) */
+	grid-column: 1 / -1;
+
 	border: none;
 	height: ${ CONFIG.borderWidth };
 	/* TODO: doesn't match border color from variables */

@@ -62,12 +62,16 @@ export const DropdownMenuItem = forwardRef<
 			) }
 
 			<Styled.DropdownMenuItemContentWrapper>
-				{ children }
-			</Styled.DropdownMenuItemContentWrapper>
+				<Styled.DropdownMenuItemChildrenWrapper>
+					{ children }
+				</Styled.DropdownMenuItemChildrenWrapper>
 
-			{ suffix && (
-				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
-			) }
+				{ suffix && (
+					<Styled.ItemSuffixWrapper>
+						{ suffix }
+					</Styled.ItemSuffixWrapper>
+				) }
+			</Styled.DropdownMenuItemContentWrapper>
 		</Styled.DropdownMenuItem>
 	);
 } );
@@ -96,12 +100,16 @@ export const DropdownMenuCheckboxItem = forwardRef<
 			</Ariakit.MenuItemCheck>
 
 			<Styled.DropdownMenuItemContentWrapper>
-				{ children }
-			</Styled.DropdownMenuItemContentWrapper>
+				<Styled.DropdownMenuItemChildrenWrapper>
+					{ children }
+				</Styled.DropdownMenuItemChildrenWrapper>
 
-			{ suffix && (
-				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
-			) }
+				{ suffix && (
+					<Styled.ItemSuffixWrapper>
+						{ suffix }
+					</Styled.ItemSuffixWrapper>
+				) }
+			</Styled.DropdownMenuItemContentWrapper>
 		</Styled.DropdownMenuCheckboxItem>
 	);
 } );
@@ -136,10 +144,16 @@ export const DropdownMenuRadioItem = forwardRef<
 			</Ariakit.MenuItemCheck>
 
 			<Styled.DropdownMenuItemContentWrapper>
-				{ children }
-			</Styled.DropdownMenuItemContentWrapper>
+				<Styled.DropdownMenuItemChildrenWrapper>
+					{ children }
+				</Styled.DropdownMenuItemChildrenWrapper>
 
-			{ suffix }
+				{ suffix && (
+					<Styled.ItemSuffixWrapper>
+						{ suffix }
+					</Styled.ItemSuffixWrapper>
+				) }
+			</Styled.DropdownMenuItemContentWrapper>
 		</Styled.DropdownMenuRadioItem>
 	);
 } );
