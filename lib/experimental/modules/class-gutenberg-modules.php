@@ -36,10 +36,11 @@ class Gutenberg_Modules {
 	 * @param array        $args     {
 	 *      Optional array of arguments.
 	 *
-	 *      @type string|bool $ver Optional. String specifying script version number, if it has one, it is added to the URL
-	 *                             as a query string for cache busting purposes. If version is set to false, a version
-	 *                             number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
-	 *                             is set to true, it uses the timestamp instead.
+	 *      @type string|bool $ver          Optional. String specifying script version number, if it has one, it is added to the URL
+	 *                                      as a query string for cache busting purposes. If version is set to false, a version
+	 *                                      number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
+	 *                                      is set to true, it uses the timestamp instead.
+	 *      @type array       $dependencies Optional. An array of module identifiers of the static dependencies of this module.
 	 * }
 	 */
 	public static function register( $module_identifier, $src, $usage, $args = array() ) {
@@ -51,9 +52,10 @@ class Gutenberg_Modules {
 		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
 			self::$registered[ $module_identifier ] = array(
-				'src'     => $src,
-				'usage'   => $usage,
-				'version' => isset( $args['version'] ) ? $args['version'] : '',
+				'src'          => $src,
+				'usage'        => $usage,
+				'version'      => isset( $args['version'] ) ? $args['version'] : '',
+				'dependencies' => isset( $args['dependencies'] ) ? $args['dependencies'] : array(),
 			);
 		}
 	}
@@ -97,7 +99,7 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Prints all the enqueued modules using script tags with type "module".
+	 * Prints all the enqueued modules using <script type="module">.
 	 */
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
@@ -106,6 +108,17 @@ class Gutenberg_Modules {
 					$version = self::get_module_version( $module );
 					echo '<script type="module" src="' . $module['src'] . $version . '" id="' . $module_identifier . '"></script>';
 			}
+		}
+	}
+
+	/**
+	 * Prints the link tag with rel="modulepreload" for all the static
+	 * dependencies of the enqueued modules.
+	 */
+	public static function print_module_preloads() {
+		foreach ( self::get_dependencies( self::$enqueued ) as $dependency_identifier => $module ) {
+				$version = self::get_module_version( $module );
+				echo '<link rel="modulepreload" href="' . $module['src'] . $version . '" id="' . $dependency_identifier . '">';
 		}
 	}
 
@@ -141,6 +154,39 @@ class Gutenberg_Modules {
 		}
 		return '';
 	}
+
+	/**
+	 * Returns all unique static dependencies for the received modules. It's
+	 * recursive, so it will also get the static dependencies of the dependencies.
+	 *
+	 * @param array $module_identifiers The identifiers of the modules to get dependencies for.
+	 * @return array The array containing the unique dependencies of the modules.
+	 */
+	public static function get_dependencies( $module_identifiers ) {
+		return array_reduce(
+			$module_identifiers,
+			function ( $dependency_modules, $module_identifier ) {
+				if (
+					! isset( self::$registered[ $module_identifier ] ) ||
+					! self::get_appropriate_usage( self::$registered[ $module_identifier ]['usage'] ) ||
+					empty( self::$registered[ $module_identifier ]['dependencies'] )
+				) {
+					return $dependency_modules;
+				}
+
+				$filtered_dependencies = array_filter(
+					self::$registered[ $module_identifier ]['dependencies'],
+					function ( $dependency_identifier ) {
+						return isset( self::$registered[ $dependency_identifier ] ) && self::get_appropriate_usage( self::$registered[ $dependency_identifier ]['usage'] );
+					}
+				);
+
+				$dependency_data = array_intersect_key( self::$registered, array_flip( $filtered_dependencies ) );
+				return array_merge( $dependency_modules, $dependency_data, self::get_dependencies( $filtered_dependencies ) );
+			},
+			array()
+		);
+	}
 }
 
 /**
@@ -152,10 +198,11 @@ class Gutenberg_Modules {
  * @param array  $args     {
  *      Optional array of arguments.
  *
- *      @type string|bool $ver Optional. String specifying script version number, if it has one, it is added to the URL
- *                             as a query string for cache busting purposes. If version is set to false, a version
- *                             number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
- *                             is set to true, it uses the timestamp instead.
+ *      @type string|bool $ver          Optional. String specifying script version number, if it has one, it is added to the URL
+ *                                      as a query string for cache busting purposes. If version is set to false, a version
+ *                                      number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
+ *                                      is set to true, it uses the timestamp instead.
+ *      @type array       $dependencies Optional. An array of module identifiers of the static dependencies of this module.
  * }
  */
 function gutenberg_register_module( $module_identifier, $src, $usage, $args = array() ) {
@@ -177,3 +224,6 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map' ) );
 
 // Prints the enqueued modules in the head tag.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
+
+// Prints the preloaded modules in the head tag.
+add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_module_preloads' ) );

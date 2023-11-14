@@ -123,7 +123,8 @@ function register_block_core_query() {
 		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
 		'frontend',
 		array(
-			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
+			'version'      => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
+			'dependencies' => array( '@wordpress/interactivity' ),
 		)
 	);
 }
