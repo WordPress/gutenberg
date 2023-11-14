@@ -347,8 +347,21 @@ export const DropdownMenuSeparator = forwardRef<
 	);
 } );
 
+export const DropdownMenuItemLabel = forwardRef<
+	HTMLSpanElement,
+	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+>( function DropdownMenuItemLabel( props, ref ) {
+	return (
+		<Styled.DropdownMenuItemLabel
+			numberOfLines={ 1 }
+			ref={ ref }
+			{ ...props }
+		/>
+	);
+} );
+
 export const DropdownMenuItemHelpText = forwardRef<
-	HTMLHRElement,
+	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
 >( function DropdownMenuItemHelpText( props, ref ) {
 	return (

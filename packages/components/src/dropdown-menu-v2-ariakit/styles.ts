@@ -311,6 +311,12 @@ export const SubmenuChevronIcon = styled( Icon )`
 	) };
 `;
 
+export const DropdownMenuItemLabel = styled( Truncate )`
+	font-size: ${ font( 'default.fontSize' ) };
+	line-height: 20px;
+	color: inherit;
+`;
+
 export const DropdownMenuItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
