@@ -161,6 +161,7 @@ test.describe( 'Preview', () => {
 		await editor.canvas
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Lorem' );
+		await editor.openDocumentSettingsSidebar();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
@@ -294,7 +295,10 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
+		await admin.createNewPost( {
+			postType: 'not_public',
+			title: 'aaaaa',
+		} );
 
 		// Open the view menu.
 		await page.click( 'role=button[name="Preview"i]' );

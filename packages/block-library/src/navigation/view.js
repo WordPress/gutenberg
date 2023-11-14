@@ -13,6 +13,11 @@ const focusableSelectors = [
 	'[tabindex]:not([tabindex^="-"])',
 ];
 
+// This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
+// when the user taps in the body. It can be removed once we add an overlay to
+// capture the clicks, instead of relying on the focusout event.
+document.addEventListener( 'click', () => {} );
+
 const { state, actions } = store( 'core/navigation', {
 	effects: {
 		initMenu() {
@@ -27,7 +32,7 @@ const { state, actions } = store( 'core/navigation', {
 					focusableElements[ focusableElements.length - 1 ];
 			}
 		},
-		focusFirstElement() {
+		focusFirstElementinitMenu() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
 				ref.querySelector(
@@ -41,23 +46,25 @@ const { state, actions } = store( 'core/navigation', {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen ? 'dialog' : null;
 		},
-		get ariaModal() {
+		get ariaModalroleAttribute() {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen ? 'true' : null;
 		},
-		get ariaLabel() {
+		get ariaLabelroleAttribute() {
 			const ctx = getContext();
 			return ctx.type === 'overlay' && state.isMenuOpen
 				? ctx.ariaLabel
 				: null;
 		},
-		get isMenuOpen() {
+		get isMenuOpenroleAttribute() {
 			// The menu is opened if either `click`, `hover` or `focus` is true.
 			return (
-				Object.values( state.menuOpenedBy ).filter( Boolean ).length > 0
+				Object.values( state.menuOpenedByroleAttribute ).filter(
+					Boolean
+				).length > 0
 			);
 		},
-		get menuOpenedBy() {
+		get menuOpenedByroleAttribute() {
 			const ctx = getContext();
 			return ctx.type === 'overlay'
 				? ctx.overlayOpenedBy
@@ -66,11 +73,11 @@ const { state, actions } = store( 'core/navigation', {
 	},
 	actions: {
 		openMenuOnHover() {
-			const ctx = getContext();
+			const { type, overlayOpenedBy } = getContext();
 			if (
-				ctx.type === 'submenu' &&
+				type === 'submenu' &&
 				// Only open on hover if the overlay is closed.
-				Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
+				Object.values( overlayOpenedBy || {} ).filter( Boolean )
 					.length === 0
 			)
 				actions.openMenu( 'hover' );
@@ -79,6 +86,9 @@ const { state, actions } = store( 'core/navigation', {
 			actions.closeMenu( 'hover' );
 		},
 		openMenuOnClick() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.previousFocus = ref;
 			actions.openMenu( 'click' );
 		},
 		closeMenuOnClick() {
@@ -89,15 +99,22 @@ const { state, actions } = store( 'core/navigation', {
 			actions.openMenu( 'focus' );
 		},
 		toggleMenuOnClick() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
+			if ( window.document.activeElement !== ref ) ref.focus();
 			const { menuOpenedBy } = state;
 			if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
 			} else {
+				ctx.previousFocus = ref;
 				actions.openMenu( 'click' );
 			}
 		},
 		handleMenuKeydown( event ) {
+			const { type, firstFocusableElement, lastFocusableElement } =
+				getContext();
 			if ( state.menuOpenedBy.click ) {
 				// If Escape close the menu.
 				if ( event?.key === 'Escape' ) {
@@ -106,38 +123,38 @@ const { state, actions } = store( 'core/navigation', {
 					return;
 				}
 
-				const ctx = getContext();
 				// Trap focus if it is an overlay (main menu).
-				if ( ctx.type === 'overlay' && event.key === 'Tab' ) {
+				if ( type === 'overlay' && event.key === 'Tab' ) {
 					// If shift + tab it change the direction.
 					if (
 						event.shiftKey &&
-						window.document.activeElement ===
-							ctx.firstFocusableElement
+						window.document.activeElement === firstFocusableElement
 					) {
 						event.preventDefault();
-						ctx.lastFocusableElement.focus();
+						lastFocusableElement.focus();
 					} else if (
 						! event.shiftKey &&
-						window.document.activeElement ===
-							ctx.lastFocusableElement
+						window.document.activeElement === lastFocusableElement
 					) {
 						event.preventDefault();
-						ctx.firstFocusableElement.focus();
+						firstFocusableElement.focus();
 					}
 				}
 			}
 		},
 		handleMenuFocusout( event ) {
-			const ctx = getContext();
+			const { modal } = getContext();
 			// If focus is outside modal, and in the document, close menu
 			// event.target === The element losing focus
 			// event.relatedTarget === The element receiving focus (if any)
 			// When focusout is outsite the document,
 			// `window.document.activeElement` doesn't change.
+
+			// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.
 			if (
-				! ctx.modal?.contains( event.relatedTarget ) &&
-				event.target !== window.document.activeElement
+				event.relatedTarget === null ||
+				( ! modal?.contains( event.relatedTarget ) &&
+					event.target !== window.document.activeElement )
 			) {
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
@@ -145,11 +162,9 @@ const { state, actions } = store( 'core/navigation', {
 		},
 
 		openMenu( menuOpenedOn ) {
-			const ctx = getContext();
-			const { ref } = getElement();
+			const { type } = getContext();
 			state.menuOpenedBy[ menuOpenedOn ] = true;
-			ctx.previousFocus = ref;
-			if ( ctx.type === 'overlay' ) {
+			if ( type === 'overlay' ) {
 				// Add a `has-modal-open` class to the <html> root.
 				document.documentElement.classList.add( 'has-modal-open' );
 			}
@@ -161,7 +176,7 @@ const { state, actions } = store( 'core/navigation', {
 			// Check if the menu is still open or not.
 			if ( ! state.isMenuOpen ) {
 				if ( ctx.modal?.contains( window.document.activeElement ) ) {
-					ctx.previousFocus.focus();
+					ctx.previousFocus?.focus();
 				}
 				ctx.modal = null;
 				ctx.previousFocus = null;

@@ -10,7 +10,7 @@ import { browserSupportsPdfs } from './utils';
 store( 'core/file', {
 	state: {
 		get hasPdfPreview() {
-			return browserSupportsPdfs() ? 'inherit' : 'none';
+			return browserSupportsPdfs();
 		},
 	},
 } );

@@ -56,6 +56,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
+	// WordPress 6.5 compat.
+	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
+	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
@@ -70,14 +74,29 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
+// Experimental signaling server.
+if ( ! class_exists( 'Gutenberg_HTTP_Singling_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-signaling-server.php';
+}
+
 require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/footnotes.php';
 
+/*
+ * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
+ * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
+ * always be loaded so that Gutenberg code can run the newest version of the Tag Processor.
+ */
+require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
+
+/*
+ * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
+ * WordPress before it was introduced, these verbatim Core files will be missing.
+ */
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
 	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
@@ -89,7 +108,6 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.3/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
 require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 require __DIR__ . '/compat/wordpress-6.3/navigation-fallback.php';
@@ -102,6 +120,10 @@ require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
+
+// WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -248,3 +270,6 @@ require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/behaviors.php';
+
+// Data views.
+require_once __DIR__ . '/experimental/data-views.php';

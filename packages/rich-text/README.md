@@ -174,7 +174,6 @@ _Parameters_
 -   _$1.text_ `[string]`: Text to create value from.
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
--   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to collapse white space characters.
 -   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
@@ -420,7 +419,6 @@ _Parameters_
 
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
--   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 

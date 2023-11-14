@@ -28,7 +28,7 @@ Node.js and its accompanying development tools allow you to:
 -   Lint, format, and test JavaScript code
 -   Scaffold custom blocks with the `create-block` package
 
-The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) and [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/), that streamline the process and are made possible by Node.js development tools.
+The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](/docs/getting-started/devenv/get-started-with-wp-scripts.md) and [`create-block`](/docs/getting-started/devenv/get-started-with-create-block.md), that streamline the process and are made possible by Node.js development tools.
 
 **The recommended Node.js version for block development is [Active LTS](https://nodejs.dev/en/about/releases/) (Long Term Support)**. However, there are times when you  need to to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 

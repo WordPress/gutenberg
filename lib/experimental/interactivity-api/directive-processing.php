@@ -8,37 +8,9 @@
  */
 
 /**
- * Process directives in each block.
- *
- * @param string $block_content The block content.
- * @param array  $block         The full block.
- *
- * @return string Filtered block content.
- */
-function gutenberg_interactivity_process_directives_in_root_blocks( $block_content, $block ) {
-	// Don't process inner blocks or root blocks that don't contain directives.
-	if ( ! WP_Directive_Processor::is_root_block( $block ) || strpos( $block_content, 'data-wp-' ) === false ) {
-		return $block_content;
-	}
-
-	// TODO: Add some directive/components registration mechanism.
-	$directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-	);
-
-	$tags = new WP_Directive_Processor( $block_content );
-	$tags = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
-	return $tags->get_updated_html();
-}
-add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_blocks', 10, 2 );
-
-/**
- * Mark the inner blocks with a temporary property so we can discard them later,
- * and process only the root blocks.
+ * Process the Interactivity API directives using the root blocks of the
+ * outermost rendering, ignoring the root blocks of inner blocks like Patterns,
+ * Template Parts or Content.
  *
  * @param array $parsed_block The parsed block.
  * @param array $source_block The source block.
@@ -46,16 +18,56 @@ add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_
  *
  * @return array The parsed block.
  */
-function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
-	if ( ! isset( $parent_block ) ) {
-		WP_Directive_Processor::add_root_block( $parsed_block );
+function gutenberg_interactivity_process_directives( $parsed_block, $source_block, $parent_block ) {
+	static $is_inside_root_block              = false;
+	static $process_directives_in_root_blocks = null;
+
+	if ( ! isset( $process_directives_in_root_blocks ) ) {
+		/**
+			 * Process directives in each root block.
+			 *
+			 * @param string $block_content The block content.
+			 * @param array  $block         The full block.
+			 *
+			 * @return string Filtered block content.
+			 */
+		$process_directives_in_root_blocks = static function ( $block_content, $block ) use ( &$is_inside_root_block ) {
+
+			if ( WP_Directive_Processor::is_root_block( $block ) ) {
+
+				$directives = array(
+					'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+					'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+					'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+					'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+					'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+				);
+
+				$tags                 = new WP_Directive_Processor( $block_content );
+				$tags                 = gutenberg_interactivity_process_rendered_html( $tags, 'data-wp-', $directives );
+				$is_inside_root_block = false;
+				return $tags->get_updated_html();
+
+			}
+
+			return $block_content;
+		};
+		add_filter( 'render_block', $process_directives_in_root_blocks, 10, 2 );
 	}
+
+	if ( ! isset( $parent_block ) && ! $is_inside_root_block ) {
+		WP_Directive_Processor::add_root_block( $parsed_block );
+		$is_inside_root_block = true;
+	}
+
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10, 3 );
+add_filter( 'render_block_data', 'gutenberg_interactivity_process_directives', 10, 3 );
+
 
 /**
- * Process directives.
+ * Traverses the HTML searching for Interactivity API directives and processing
+ * them.
  *
  * @param WP_Directive_Processor $tags An instance of the WP_Directive_Processor.
  * @param string                 $prefix Attribute prefix.
@@ -64,7 +76,7 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10
  * @return WP_Directive_Processor The modified instance of the
  * WP_Directive_Processor.
  */
-function gutenberg_interactivity_process_directives( $tags, $prefix, $directives ) {
+function gutenberg_interactivity_process_rendered_html( $tags, $prefix, $directives ) {
 	$context   = new WP_Directive_Context();
 	$tag_stack = array();
 

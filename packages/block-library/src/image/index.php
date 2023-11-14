@@ -214,28 +214,35 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.setCurrentSrc' );
+	$w->set_attribute( 'data-wp-init', 'effects.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.handleLoad' );
 	$w->set_attribute( 'data-wp-watch', 'effects.setButtonStyles' );
+	// We need to set an event callback on the `img` specifically
+	// because the `figure` element can also contain a caption, and
+	// we don't want to trigger the lightbox when the caption is clicked.
+	$w->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
 	$w->set_attribute( 'data-wp-watch--setStylesOnResize', 'effects.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
-	// Wrap the image in the body content with a button.
+	// Add a button alongside image in the body content.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
 
 	$button =
 		$img[0]
 		. '<button
+			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-on--click="actions.showLightbox"
-			data-wp-style--width="context.imageButtonWidth"
-			data-wp-style--height="context.imageButtonHeight"
-			data-wp-style--left="context.imageButtonLeft"
+			data-wp-style--right="context.imageButtonRight"
 			data-wp-style--top="context.imageButtonTop"
-		></button>';
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
+				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
+			</svg>
+		</button>';
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
@@ -291,7 +298,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		}
 	}
 
-	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
@@ -308,12 +315,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-on--touchmove="actions.handleTouchMove"
             data-wp-on--touchend="actions.handleTouchEnd"
             data-wp-on--click="actions.hideLightbox"
+            tabindex="-1"
             >
                 <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.hideLightbox">
                     $close_button_icon
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
-				<div class="lightbox-image-container">$enlarged_image_content</div>
+                <div class="lightbox-image-container">$enlarged_image_content</div>
                 <div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
         </div>
 HTML;
