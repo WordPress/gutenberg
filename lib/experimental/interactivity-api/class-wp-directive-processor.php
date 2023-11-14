@@ -57,7 +57,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 * @return bool True if block is a root block, false otherwise.
 	 */
 	public static function is_root_block( $block ) {
-			return md5( serialize( $block ) === self::$root_block );
+			return md5( serialize( $block ) ) === self::$root_block;
 	}
 
 
