@@ -224,7 +224,7 @@ export const spec = [
 			endContainer: element.querySelector( 'em' ),
 		} ),
 		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 2 ],
+		endPath: [ 1, 0, 0 ],
 		record: {
 			start: 0,
 			end: 2,
@@ -477,8 +477,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.firstChild,
 		} ),
-		startPath: [ 0, 0, 0, 1 ],
-		endPath: [ 0, 0, 0, 1 ],
+		startPath: [ 0, 1, 0, 0 ],
+		endPath: [ 0, 1, 0, 0 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -503,8 +503,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.firstChild,
 		} ),
-		startPath: [ 0, 0, 0, 1 ],
-		endPath: [ 0, 0, 0, 1 ],
+		startPath: [ 1, 0, 0, 0 ],
+		endPath: [ 1, 0, 0, 0 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -779,6 +779,7 @@ export const specWithRegistration = [
 		html: '<a class="non-editable">a</a>',
 		value: {
 			formats: [ , ],
+			_formats: new Map(),
 			replacements: [
 				{
 					type: 'my-plugin/non-editable',

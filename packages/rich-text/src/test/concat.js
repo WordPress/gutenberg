@@ -16,16 +16,22 @@ describe( 'concat', () => {
 	it( 'should merge records', () => {
 		const one = {
 			formats: [ , , [ em ] ],
+			_formats: new Map( [ [ em, [ 2, 3 ] ] ] ),
 			replacements: [ , , , ],
 			text: 'one',
 		};
 		const two = {
 			formats: [ [ em ], , , ],
+			_formats: new Map( [ [ { ...em }, [ 0, 1 ] ] ] ),
 			replacements: [ , , , ],
 			text: 'two',
 		};
 		const three = {
 			formats: [ , , [ em ], [ em ], , , ],
+			_formats: new Map( [
+				[ em, [ 2, 3 ] ],
+				[ { ...em }, [ 3, 4 ] ],
+			] ),
 			replacements: [ , , , , , , ],
 			text: 'onetwo',
 		};

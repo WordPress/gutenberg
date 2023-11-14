@@ -4,7 +4,7 @@
 
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { ZWNBSP } from './special-characters';
 
 function restoreOnAttributes( attributes, isEditableTree ) {
 	if ( isEditableTree ) {
@@ -110,23 +110,6 @@ function fromFormat( {
 	};
 }
 
-/**
- * Checks if both arrays of formats up until a certain index are equal.
- *
- * @param {Array}  a     Array of formats to compare.
- * @param {Array}  b     Array of formats to compare.
- * @param {number} index Index to check until.
- */
-function isEqualUntil( a, b, index ) {
-	do {
-		if ( a[ index ] !== b[ index ] ) {
-			return false;
-		}
-	} while ( index-- );
-
-	return true;
-}
-
 export function toTree( {
 	value,
 	createEmpty,
@@ -134,15 +117,13 @@ export function toTree( {
 	getLastChild,
 	getParent,
 	isText,
-	getText,
-	remove,
 	appendText,
-	onStartIndex,
-	onEndIndex,
+	onStartIndex = () => {},
+	onEndIndex = () => {},
 	isEditableTree,
 	placeholder,
 } ) {
-	const { formats, _formats, replacements, text, start, end } = value;
+	const { _formats, replacements, text, start, end } = value;
 
 	const tags = [];
 
@@ -187,20 +168,51 @@ export function toTree( {
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
+	if ( text.length === 0 ) {
+		const _text = append( tree, ZWNBSP );
+		if ( start === 0 ) {
+			onStartIndex( tree, _text, 0 );
+		}
+		if ( end === 0 ) {
+			onEndIndex( tree, _text, 0 );
+		}
+		if ( placeholder ) {
+			append( tree, {
+				type: 'span',
+				attributes: {
+					'data-rich-text-placeholder': placeholder,
+					// Necessary to prevent the placeholder from catching
+					// selection and being editable.
+					style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+				},
+			} );
+		}
+		return tree;
+	}
+
 	let currentNode = tree;
 	let lastPos = 0;
 
 	for ( const tag of tags ) {
 		if ( lastPos !== tag.pos ) {
-			const _text = append(
-				currentNode,
-				text.substring( lastPos, tag.pos )
-			);
+			let _text = getLastChild( currentNode );
+			if ( ! _text || ! isText( _text ) ) {
+				_text = append( currentNode, '' );
+			}
+
+			if ( lastPos === start ) {
+				onStartIndex( tree, _text, 0 );
+			}
+			if ( lastPos === end ) {
+				onEndIndex( tree, _text, 0 );
+			}
+
+			appendText( _text, text.substring( lastPos, tag.pos ) );
 			// check if text contains selection start or end
-			if ( lastPos < start && tag.pos > start ) {
+			if ( lastPos < start && tag.pos >= start ) {
 				onStartIndex( tree, _text, start - lastPos );
 			}
-			if ( lastPos < end && tag.pos > end ) {
+			if ( lastPos < end && tag.pos >= end ) {
 				onEndIndex( tree, _text, end - lastPos );
 			}
 		}
@@ -209,7 +221,7 @@ export function toTree( {
 			const { type, tagName, attributes, unregisteredAttributes } =
 				tag.format;
 			const boundaryClass =
-				-isEditableTree && tag.format === deepestActiveFormat;
+				isEditableTree && tag.format === deepestActiveFormat;
 			currentNode = append(
 				currentNode,
 				fromFormat( {
@@ -227,20 +239,74 @@ export function toTree( {
 			currentNode = getParent( currentNode );
 			lastPos = tag.pos;
 		} else if ( tag.type === 'replacement' ) {
-			append(
-				currentNode,
-				fromFormat( {
-					...tag.format,
-					isEditableTree,
-				} )
-			);
+			let _text = getLastChild( currentNode );
+			if ( ! _text || ! isText( _text ) ) {
+				_text = append( currentNode, '' );
+			}
 
+			if ( lastPos === start ) {
+				onStartIndex( tree, _text, 0 );
+			}
+			if ( lastPos === end ) {
+				onEndIndex( tree, _text, 0 );
+			}
+			const formatType = getFormatType( tag.format.type );
+			if ( formatType?.contentEditable === false ) {
+				// For non editable formats, render the stored inner HTML.
+				const replacementNode = append(
+					currentNode,
+					fromFormat( {
+						...tag.format,
+						isEditableTree,
+					} )
+				);
+
+				if ( tag.format.innerHTML ) {
+					append( replacementNode, {
+						html: tag.format.innerHTML,
+					} );
+				}
+			} else {
+				append(
+					currentNode,
+					fromFormat( {
+						...tag.format,
+						isEditableTree,
+						object: true,
+					} )
+				);
+			}
+
+			_text = append( currentNode, '' );
 			lastPos = tag.pos + 1;
+
+			if ( lastPos === start ) {
+				onStartIndex( tree, _text, 0 );
+			}
+			if ( lastPos === end ) {
+				onEndIndex( tree, _text, 0 );
+			}
+
+			if ( tag.format.type === 'br' && text.length === lastPos ) {
+				append( currentNode, ZWNBSP );
+			}
 		}
 	}
 
 	if ( lastPos !== text.length ) {
-		const _text = append( currentNode, text.substring( lastPos ) );
+		let _text = getLastChild( currentNode );
+		if ( ! _text || ! isText( _text ) ) {
+			_text = append( currentNode, '' );
+		}
+
+		if ( lastPos === start ) {
+			onStartIndex( tree, _text, 0 );
+		}
+		if ( lastPos === end ) {
+			onEndIndex( tree, _text, 0 );
+		}
+
+		appendText( _text, text.substring( lastPos ) );
 		// check if text contains selection start or end
 		if ( lastPos < start ) {
 			onStartIndex( tree, _text, start - lastPos );
