@@ -21,7 +21,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
-			$p->set_attribute( 'data-wp-interactive', true );
+			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
 			// Use context to send translated strings.
 			$p->set_attribute(
@@ -54,12 +54,12 @@ function render_block_core_query( $attributes, $content, $block ) {
 				'<div
 					class="screen-reader-text"
 					aria-live="polite"
-					data-wp-text="context.core.query.message"
+					data-wp-text="context.message"
 				></div>
 				<div
 					class="wp-block-query__enhanced-pagination-animation"
-					data-wp-class--start-animation="selectors.core.query.startAnimation"
-					data-wp-class--finish-animation="selectors.core.query.finishAnimation"
+					data-wp-class--start-animation="state.startAnimation"
+					data-wp-class--finish-animation="state.finishAnimation"
 				></div>',
 				$last_tag_position,
 				0
