@@ -28,6 +28,10 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 				</div>
 			) }
 			<InspectorControls.Slot
+				group="section"
+				label={ __( 'Sections' ) }
+			/>
+			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
 				className="color-block-support-panel__inner-wrapper"
