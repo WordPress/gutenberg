@@ -27,6 +27,11 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
+export const PAGE_CONTENT_BLOCK_TYPES = [
+	'core/post-title',
+	'core/post-featured-image',
+	'core/post-content',
+];
 
 /**
  * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
@@ -59,6 +64,34 @@ function useForceFocusModeForNavigation( navigationBlockClientId ) {
 }
 
 /**
+ * Helper method to extract the post content block types from a template.
+ *
+ * @param {Array} blocks Template blocks.
+ *
+ * @return {Array} Flattened object.
+ */
+function extractedPageContentBlockTypesFromTemplateBlocks( blocks ) {
+	const result = [];
+	for ( let i = 0; i < blocks.length; i++ ) {
+		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
+		// we skip it because we only want to render stand-alone page content blocks in the block list.
+		if ( [ 'core/query' ].includes( blocks[ i ].name ) ) {
+			continue;
+		}
+		if ( PAGE_CONTENT_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
+			result.push( createBlock( blocks[ i ].name ) );
+		}
+		result.push(
+			...extractedPageContentBlockTypesFromTemplateBlocks(
+				blocks[ i ].innerBlocks
+			)
+		);
+	}
+
+	return result;
+}
+
+/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -68,18 +101,22 @@ function useForceFocusModeForNavigation( navigationBlockClientId ) {
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
-	const rootLevelPost = mode === 'post-only' || ! template ? post : template;
-	const { type, id } = rootLevelPost;
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const rootLevelPost =
+		mode === 'post-only' || ! template ? 'post' : 'template';
+	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		type,
-		{ id }
+		post.type,
+		{ id: post.id }
 	);
-	const actualBlocks = useMemo( () => {
-		if ( type === 'wp_navigation' ) {
+	const [ templateBlocks, onInputTemplate, onChangeTemplate ] =
+		useEntityBlockEditor( 'postType', template?.type, {
+			id: template?.id,
+		} );
+	const blocks = useMemo( () => {
+		if ( post.type === 'wp_navigation' ) {
 			return [
 				createBlock( 'core/navigation', {
-					ref: id,
+					ref: post.id,
 					// As the parent editor is locked with `templateLock`, the template locking
 					// must be explicitly "unset" on the block itself to allow the user to modify
 					// the block's content.
@@ -102,24 +139,41 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					[
-						createBlock( 'core/post-title' ),
-						createBlock( 'core/post-content' ),
-					]
+					extractedPageContentBlockTypesFromTemplateBlocks(
+						templateBlocks
+					)
 				),
 			];
 		}
-	}, [ type, id, mode ] );
+
+		if ( rootLevelPost === 'template' ) {
+			return templateBlocks;
+		}
+
+		return postBlocks;
+	}, [
+		templateBlocks,
+		postBlocks,
+		rootLevelPost,
+		post.type,
+		post.id,
+		mode,
+	] );
 	const disableRootLevelChanges =
-		( !! template && mode === 'locked' ) || type === 'wp_navigation';
+		( !! template && mode === 'locked' ) ||
+		post.type === 'wp_navigation' ||
+		mode === 'post-only';
 	const navigationBlockClientId =
-		type === 'wp_navigation' && actualBlocks && actualBlocks[ 0 ]?.clientId;
+		post.type === 'wp_navigation' && blocks && blocks[ 0 ]?.clientId;
 	useForceFocusModeForNavigation( navigationBlockClientId );
+	if ( disableRootLevelChanges ) {
+		return [ blocks, noop, noop ];
+	}
 
 	return [
-		actualBlocks ?? blocks,
-		disableRootLevelChanges ? noop : onInput,
-		disableRootLevelChanges ? noop : onChange,
+		blocks,
+		rootLevelPost === 'post' ? onInput : onInputTemplate,
+		rootLevelPost === 'post' ? onChange : onChangeTemplate,
 	];
 }
 
