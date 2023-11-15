@@ -866,7 +866,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	}
 
 	$layout_classes = array();
-	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
 		foreach ( $processor->class_list() as $class_name ) {
