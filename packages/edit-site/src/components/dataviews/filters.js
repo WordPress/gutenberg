@@ -68,9 +68,11 @@ export default function Filters( { fields, view, onChangeView } ) {
 		/>
 	);
 
-	filterComponents.push(
-		<ResetFilters view={ view } onChangeView={ onChangeView } />
-	);
+	if ( filterComponents.length > 1 ) {
+		filterComponents.push(
+			<ResetFilters view={ view } onChangeView={ onChangeView } />
+		);
+	}
 
-	return filterComponents.filter( Boolean );
+	return filterComponents;
 }
