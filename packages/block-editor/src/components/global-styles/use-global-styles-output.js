@@ -690,6 +690,180 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		}
 	);
 
+	// Iterate over sections, they can have general, block type, and
+	// element styles.
+	Object.entries( tree.styles?.sections ?? {} ).forEach(
+		( [ sectionIndex, node ] ) => {
+			const index = parseInt( sectionIndex, 10 );
+			const sectionClass = `.wp-section-${ index }`;
+
+			// Top level section styles.
+			const sectionStyles = pickStyleKeys( node );
+			if ( sectionStyles ) {
+				nodes.push( {
+					styles: sectionStyles,
+					selector: sectionClass,
+				} );
+			}
+
+			// Section element styles.
+			Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
+				if ( node?.elements?.[ name ] ) {
+					nodes.push( {
+						styles: node?.elements?.[ name ],
+						selector: scopeSelector( sectionClass, selector ),
+					} );
+				}
+			} );
+
+			// Section block styles.
+			Object.entries( node?.blocks ?? {} ).forEach(
+				( [ blockName, blockNode ] ) => {
+					const blockStyles = pickStyleKeys( blockNode );
+
+					// Block variations.
+					if ( blockNode?.variations ) {
+						const variations = {};
+
+						Object.keys( blockNode.variations ).forEach(
+							( variation ) => {
+								variations[ variation ] = pickStyleKeys(
+									blockNode.variations[ variation ]
+								);
+							}
+						);
+
+						blockStyles.variations = variations;
+					}
+
+					// Create block node.
+					if (
+						blockStyles &&
+						blockSelectors?.[ blockName ]?.selector
+					) {
+						const scopeFeatureSelectors = (
+							featureSelectors,
+							scope
+						) => {
+							if ( ! featureSelectors ) {
+								return featureSelectors;
+							}
+
+							const scopedFeatureSelectors = {};
+
+							Object.entries( featureSelectors ).forEach(
+								( [ feature, featureSelector ] ) => {
+									if ( typeof featureSelector === 'string' ) {
+										scopedFeatureSelectors[ feature ] =
+											scopeSelector(
+												sectionClass,
+												featureSelector
+											);
+									}
+
+									if ( typeof featureSelector === 'object' ) {
+										scopedFeatureSelectors[ feature ] = {};
+
+										Object.entries(
+											featureSelector
+										).forEach(
+											( [
+												subfeature,
+												subfeatureSelector,
+											] ) => {
+												scopedFeatureSelectors[
+													feature
+												][ subfeature ] = scopeSelector(
+													scope,
+													subfeatureSelector
+												);
+											}
+										);
+									}
+								}
+							);
+
+							return scopedFeatureSelectors;
+						};
+
+						const scopeStyleVariationSelectors = (
+							variationSelectors,
+							scope
+						) => {
+							if ( ! variationSelectors ) {
+								return variationSelectors;
+							}
+
+							const scopedVariationSelectors = {};
+
+							Object.entries( variationSelectors ).forEach(
+								( [ variation, variationSelector ] ) => {
+									scopedVariationSelectors[ variation ] =
+										scopeSelector(
+											scope,
+											variationSelector
+										);
+								}
+							);
+
+							return scopedVariationSelectors;
+						};
+
+						nodes.push( {
+							duotoneSelector: scopeSelector(
+								sectionClass,
+								blockSelectors[ blockName ].doutoneSelector
+							),
+							fallbackGapValue:
+								blockSelectors[ blockName ].fallbackGapValue,
+							hasLayoutSupport:
+								blockSelectors[ blockName ].hasLayoutSupport,
+							selector: scopeSelector(
+								sectionClass,
+								blockSelectors[ blockName ].selector
+							),
+							styles: blockStyles,
+							featureSelectors: scopeFeatureSelectors(
+								blockSelectors[ blockName ].featureSelectors,
+								sectionClass
+							),
+							styleVariationSelectors:
+								scopeStyleVariationSelectors(
+									blockSelectors[ blockName ]
+										.styleVariationSelectors,
+									sectionClass
+								),
+						} );
+					}
+
+					// Block element styles.
+					Object.entries( blockNode?.elements ?? {} ).forEach(
+						( [ elementName, value ] ) => {
+							if (
+								value &&
+								blockSelectors?.[ blockName ] &&
+								ELEMENTS[ elementName ]
+							) {
+								const scopedBlockSelector =
+									sectionClass +
+									' ' +
+									blockSelectors[ blockName ].selector;
+
+								nodes.push( {
+									styles: value,
+									selector: scopeSelector(
+										scopedBlockSelector,
+										ELEMENTS[ elementName ]
+									),
+								} );
+							}
+						}
+					);
+				}
+			);
+		}
+	);
+
 	return nodes;
 };
 
