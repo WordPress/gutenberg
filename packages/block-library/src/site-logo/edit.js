@@ -351,7 +351,7 @@ const SiteLogo = ( {
 					{ imgEdit }
 				</a>
 			) : (
-				{ imgEdit }
+				imgEdit
 			) }
 		</>
 	);
