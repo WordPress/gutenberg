@@ -288,34 +288,6 @@ class WP_Font_Family {
 	}
 
 	/**
-	 * Sanitizes the font family data using WP_Theme_JSON.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array A sanitized font family definition.
-	 */
-	private function sanitize() {
-		// Creates the structure of theme.json array with the new fonts.
-		$fonts_json = array(
-			'version'  => '2',
-			'settings' => array(
-				'typography' => array(
-					'fontFamilies' => array( $this->data ),
-				),
-			),
-		);
-		// Creates a new WP_Theme_JSON object with the new fonts to
-		// leverage sanitization and validation.
-		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
-		$theme_data     = $theme_json->get_data();
-		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
-			? $theme_data['settings']['typography']['fontFamilies'][0]
-			: array();
-		$this->data     = $sanitized_font;
-		return $this->data;
-	}
-
-	/**
 	 * Downloads font face assets.
 	 *
 	 * Downloads the font face asset(s) associated with a font face. It works with
@@ -581,8 +553,6 @@ class WP_Font_Family {
 	 *                      WP_Error otherwise.
 	 */
 	private function create_or_update_font_post() {
-		$this->sanitize();
-
 		$post = $this->get_font_post();
 		if ( $post ) {
 			return $this->update_font_post( $post );

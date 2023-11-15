@@ -90,4 +90,34 @@ class WP_Font_Family_Utils {
 
 		return in_array( $filetype['type'], $allowed_mime_types, true );
 	}
+
+	/**
+	 * Sanitizes the font family data using WP_Theme_JSON.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $data The font family JSON data as a string.
+	 * @return string The sanitized font family JSON data as a string.
+	 */
+	public static function sanitize( $data ) {
+		$data = json_decode( $data, true );
+
+		// Creates the structure of theme.json array with the new fonts.
+		$fonts_json = array(
+			'version'  => '2',
+			'settings' => array(
+				'typography' => array(
+					'fontFamilies' => array( $data ),
+				),
+			),
+		);
+		// Creates a new WP_Theme_JSON object with the new fonts to
+		// leverage sanitization and validation.
+		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
+		$theme_data     = $theme_json->get_data();
+		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
+			? $theme_data['settings']['typography']['fontFamilies'][0]
+			: array();
+		return wp_json_encode( $sanitized_font );
+	}
 }
