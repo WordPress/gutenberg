@@ -74,7 +74,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 		// Set the specified alignment.
 		await editor.insertBlock( { name: blockName } );
 		await editor.clickBlockToolbarButton( 'Align' );
-		await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
+		await page.locator( BUTTON_XPATH ).click();
 
 		// Verify the button of the specified alignment is pressed.
 		await editor.clickBlockToolbarButton( 'Align' );
@@ -92,12 +92,12 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 		expect( htmlMarkup ).toMatchSnapshot();
 
 		// Verify the markup can be correctly parsed.
-		let parsedBlocks = window.wp.blocks.parse( htmlMarkup );
-		await page.evaluate( () => {
+		await page.evaluate( ( _htmlMarkup ) => {
+			const parsedBlocks = window.wp.blocks.parse( _htmlMarkup );
 			window.wp.data
 				.dispatch( 'core/block-editor' )
 				.resetBlocks( parsedBlocks );
-		} );
+		}, htmlMarkup );
 		let blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].isValid ).toBeTruthy();
@@ -110,7 +110,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 
 		// Remove the alignment.
 		await editor.clickBlockToolbarButton( 'Align' );
-		await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
+		await page.locator( BUTTON_XPATH ).click();
 
 		// Verify 'none' alignment button is in pressed state.
 		await editor.clickBlockToolbarButton( 'Align' );
@@ -125,12 +125,12 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 		expect( htmlMarkup ).toMatchSnapshot();
 
 		// verify the markup when no alignment is set is valid
-		parsedBlocks = window.wp.blocks.parse( htmlMarkup );
-		await page.evaluate( () => {
+		await page.evaluate( ( _htmlMarkup ) => {
+			const parsedBlocks = window.wp.blocks.parse( _htmlMarkup );
 			window.wp.data
 				.dispatch( 'core/block-editor' )
 				.resetBlocks( parsedBlocks );
-		} );
+		}, htmlMarkup );
 
 		blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 1 );
@@ -174,10 +174,10 @@ test.describe( 'Align Hook Works As Expected', () => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			const CHANGE_ALIGNMENT_BUTTON_SELECTOR =
 				'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Align"]';
-			const changeAlignmentButton = page.locator(
-				CHANGE_ALIGNMENT_BUTTON_SELECTOR
-			);
-			expect( changeAlignmentButton ).toBe( null );
+			const changeAlignmentButton = await page
+				.locator( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+				.all();
+			expect( changeAlignmentButton ).toHaveLength( 0 );
 		} );
 
 		test( 'Does not save any alignment related attribute or class', async ( {
@@ -277,9 +277,9 @@ test.describe( 'Align Hook Works As Expected', () => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			// Verify the correct alignment button is pressed.
 			await editor.clickBlockToolbarButton( 'Align' );
-			const selectedAlignmentControls = await page.$x(
-				SELECTED_ALIGNMENT_CONTROL_SELECTOR
-			);
+			const selectedAlignmentControls = await page
+				.locator( SELECTED_ALIGNMENT_CONTROL_SELECTOR )
+				.all();
 			expect( selectedAlignmentControls ).toHaveLength( 1 );
 		} );
 
@@ -299,7 +299,7 @@ test.describe( 'Align Hook Works As Expected', () => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			// Remove the alignment.
 			await editor.clickBlockToolbarButton( 'Align' );
-			const [ selectedAlignmentControl ] = await page.$x(
+			const selectedAlignmentControl = page.locator(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);
 			await selectedAlignmentControl.click();
