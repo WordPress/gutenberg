@@ -32,18 +32,10 @@ class Gutenberg_Modules {
 	 *
 	 * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
 	 * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
-	 * @param array  $dependencies      An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
-	 * @param array  $args     {
-	 *      Optional array of arguments.
-	 *
-	 *      @type string|bool $ver          Optional. String specifying script version number, if it has one, it is added to the URL
-	 *                                      as a query string for cache busting purposes. If version is set to false, a version
-	 *                                      number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
-	 *                                      is set to true, it uses the timestamp instead.
-	 *      @type array       $dependencies Optional. An array of module identifiers of the dependencies of this module.
-	 * }
+	 * @param array  $dependencies      Optional. An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
+	 * @param string $version           Optional. String specifying script version number. If version is set to false, a version number is automatically added equal to currently installed WordPress version. If SCRIPT_DEBUG is set to true, then uses the current time as version instead.
 	 */
-	public static function register( $module_identifier, $src, $dependencies = array(), $args = array() ) {
+	public static function register( $module_identifier, $src, $dependencies = array(), $version = '' ) {
 		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
 			$deps = array(
@@ -53,7 +45,7 @@ class Gutenberg_Modules {
 
 			self::$registered[ $module_identifier ] = array(
 				'src'          => $src,
-				'version'      => isset( $args['version'] ) ? $args['version'] : '',
+				'version'      => $version,
 				'dependencies' => $deps,
 			);
 		}
@@ -165,19 +157,11 @@ class Gutenberg_Modules {
  *
  * @param string $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  * @param string $src               Full URL of the module, or path of the script relative to the WordPress root directory.
- * @param array  $dependencies      An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
- * @param array  $args     {
- *      Optional array of arguments.
- *
- *      @type string|bool $ver          Optional. String specifying script version number, if it has one, it is added to the URL
- *                                      as a query string for cache busting purposes. If version is set to false, a version
- *                                      number is automatically added equal to current installed WordPress version. If SCRIPT_DEBUG
- *                                      is set to true, it uses the timestamp instead.
- *      @type array       $dependencies Optional. An array of module identifiers of the static dependencies of this module.
- * }
+ * @param array  $dependencies      Optional. An array of module identifiers of the static and dynamic dependencies of this module. It can be an indexed array, in which case all the dependencies are static, or it can be an associative array, in which case it has to contain the keys `static` and `dynamic`.
+ * @param string $version           Optional. String specifying script version number. If version is set to false, a version number is automatically added equal to currently installed WordPress version. If SCRIPT_DEBUG is set to true, then uses the current time as version instead.
  */
-function gutenberg_register_module( $module_identifier, $src, $dependencies, $args = array() ) {
-	Gutenberg_Modules::register( $module_identifier, $src, $dependencies, $args );
+function gutenberg_register_module( $module_identifier, $src, $dependencies = array(), $version = '' ) {
+	Gutenberg_Modules::register( $module_identifier, $src, $dependencies, $version );
 }
 
 /**
