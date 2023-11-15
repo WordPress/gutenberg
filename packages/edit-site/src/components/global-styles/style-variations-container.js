@@ -217,8 +217,10 @@ export default function StyleVariationsContainer() {
 		];
 	}, [ variations ] );
 
-	const colorVariations = withEmptyVariation.filter( ( variation ) =>
-		variation.title.includes( 'Color/' )
+	const colorVariations = withEmptyVariation.filter(
+		( variation ) =>
+			variation.title.includes( 'Color/' ) ||
+			variation.title === 'Default'
 	);
 	const fontVariations = withEmptyVariation.filter( ( variation ) =>
 		variation.title.includes( 'Font/' )
