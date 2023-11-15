@@ -209,29 +209,6 @@ function HeaderMenu( { dataView, header } ) {
 									</DropdownMenuItemV2>
 								);
 							} ) }
-							<DropdownMenuSeparatorV2 />
-							<DropdownMenuItemV2
-								key="remove-filter"
-								onSelect={ () => {
-									const otherFilters = dataView
-										.getState()
-										.columnFilters?.filter( ( f ) => {
-											const [ field, operator ] =
-												Object.keys( f )[ 0 ].split(
-													':'
-												);
-											return (
-												field !== filter.field ||
-												operator !== 'in'
-											);
-										} );
-									dataView.setColumnFilters( [
-										...otherFilters,
-									] );
-								} }
-							>
-								{ __( 'Remove' ) }
-							</DropdownMenuItemV2>
 						</DropdownSubMenuV2>
 					</DropdownMenuGroupV2>
 				) }
