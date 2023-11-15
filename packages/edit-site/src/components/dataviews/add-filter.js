@@ -60,6 +60,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					__next40pxDefaultSize
 					icon={ plus }
 					variant="tertiary"
+					size="compact"
 				>
 					{ __( 'Add filter' ) }
 				</Button>

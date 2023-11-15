@@ -10,6 +10,7 @@ export default ( { view, onChangeView } ) => {
 			disabled={ view.search === '' && view.filters?.length === 0 }
 			__experimentalIsFocusable
 			__next40pxDefaultSize
+			size="compact"
 			variant="tertiary"
 			onClick={ () => {
 				onChangeView( ( currentView ) => ( {
