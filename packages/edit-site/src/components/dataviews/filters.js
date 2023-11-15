@@ -7,12 +7,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { default as InFilter, OPERATOR_IN } from './in-filter';
+import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 
 const VALID_OPERATORS = [ OPERATOR_IN ];
 
 export default function Filters( { fields, view, onChangeView } ) {
-	const filtersRegistered = [];
+	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
@@ -20,7 +21,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 		field.filters.forEach( ( filter ) => {
 			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
-				filtersRegistered.push( {
+				filters.push( {
 					field: field.id,
 					name: field.header,
 					operator: filter,
@@ -31,46 +32,47 @@ export default function Filters( { fields, view, onChangeView } ) {
 						},
 						...( field.elements || [] ),
 					],
+					isVisible: view.filters.some(
+						( f ) => f.field === field.id && f.operator === filter
+					),
 				} );
 			}
 		} );
 	} );
 
-	const visibleFilters = view.visibleFilters
-		?.map( ( fieldName ) => {
-			const visibleFiltersForField = filtersRegistered.filter(
-				( f ) => f.field === fieldName
+	const filterComponents = filters?.map( ( filter ) => {
+		if ( ! filter.isVisible ) {
+			return null;
+		}
+
+		if ( OPERATOR_IN === filter.operator ) {
+			return (
+				<InFilter
+					key={ filter.field + '.' + filter.operator }
+					filter={ filter }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
 			);
+		}
 
-			if ( visibleFiltersForField.length === 0 ) {
-				return null;
-			}
+		return null;
+	} );
 
-			return visibleFiltersForField.map( ( filter ) => {
-				if ( OPERATOR_IN === filter.operator ) {
-					return (
-						<InFilter
-							key={ fieldName + '.' + filter.operator }
-							filter={ visibleFiltersForField[ 0 ] }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					);
-				}
-				return null;
-			} );
-		} )
-		.filter( Boolean );
+	filterComponents.push(
+		<AddFilter
+			key="add-filter"
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	);
 
-	if ( visibleFilters?.length > 0 ) {
-		visibleFilters.push(
-			<ResetFilters
-				key="reset-filters"
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
+	if ( filterComponents.length > 1 ) {
+		filterComponents.push(
+			<ResetFilters view={ view } onChangeView={ onChangeView } />
 		);
 	}
 
-	return visibleFilters;
+	return filterComponents;
 }

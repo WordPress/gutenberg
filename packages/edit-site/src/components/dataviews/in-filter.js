@@ -24,6 +24,7 @@ export default ( { filter, view, onChangeView } ) => {
 	return (
 		<SelectControl
 			id={ id }
+			__nextHasNoMarginBottom
 			value={ activeValue }
 			prefix={
 				<InputControlPrefixWrapper
@@ -44,13 +45,12 @@ export default ( { filter, view, onChangeView } ) => {
 					( f ) =>
 						f.field !== filter.field || f.operator !== OPERATOR_IN
 				);
-				if ( value !== '' ) {
-					filters.push( {
-						field: filter.field,
-						operator: OPERATOR_IN,
-						value,
-					} );
-				}
+
+				filters.push( {
+					field: filter.field,
+					operator: OPERATOR_IN,
+					value,
+				} );
 
 				onChangeView( ( currentView ) => ( {
 					...currentView,

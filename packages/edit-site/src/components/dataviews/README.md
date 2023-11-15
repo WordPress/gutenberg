@@ -47,7 +47,6 @@ Example:
 		{ field: 'author', operator: 'in', value: 2 },
 		{ field: 'status', operator: 'in', value: 'publish,draft' }
 	],
-	visibleFilters: [ 'author', 'status' ],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
 }
@@ -62,8 +61,7 @@ Example:
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
     -   `operator`: which type of filter it is. Only `in` available at the moment.
-    -   `vaule`: the actual value selected by the user.
--   `visibleFilters`: the `id` of the filters that are visible in the UI.
+    -   `value`: the actual value selected by the user.
 -   `hiddenFields`: the `id` of the fields that are hidden in the UI.
 -   `layout`: ...
 
@@ -88,7 +86,6 @@ function MyCustomPageList() {
 			{ field: 'author', operator: 'in', value: 2 },
 			{ field: 'status', operator: 'in', value: 'publish,draft' }
 		],
-		visibleFilters: [ 'author', 'status' ],
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
 	} );
