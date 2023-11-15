@@ -261,7 +261,7 @@ export default function StyleVariationsContainer() {
 			styles: {
 				color: {
 					background: 'var(--wp--preset--color--theme-1-lighter)',
-					text: 'var(--wp--preset--color--accent-dark)',
+					text: 'var(--wp--preset--color--theme-1-dark)',
 				},
 				elements: {
 					button: {
@@ -273,7 +273,7 @@ export default function StyleVariationsContainer() {
 					},
 					heading: {
 						color: {
-							text: 'var(--wp--preset--color--darker)',
+							text: 'var(--wp--preset--color--theme-1-darker)',
 						},
 					},
 				},
