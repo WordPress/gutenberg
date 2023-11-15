@@ -57,9 +57,12 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 		// Check if the current block is a paragraph or image block.
 		// Currently, only these two blocks are supported.
 		if (
-			! [ 'core/paragraph', 'core/image', 'core/heading' ].includes(
-				props.name
-			)
+			! [
+				'core/paragraph',
+				'core/image',
+				'core/heading',
+				'core/list',
+			].includes( props.name )
 		) {
 			return <BlockEdit { ...props } />;
 		}
@@ -71,6 +74,7 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 		if ( props.name === 'core/paragraph' ) attributeName = 'content';
 		if ( props.name === 'core/image' ) attributeName = 'url';
 		if ( props.name === 'core/heading' ) attributeName = 'content';
+		if ( props.name === 'core/list' ) attributeName = 'innerBlocks';
 
 		const connectionSource =
 			props.attributes?.connections?.attributes?.[ attributeName ]

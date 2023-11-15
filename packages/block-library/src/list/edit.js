@@ -125,6 +125,43 @@ function IndentUI( { clientId } ) {
 
 export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	const { ordered, type, reversed, start } = attributes;
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { patternParentAttributes } = useSelect( ( select ) => {
+		const { getBlockParentsByBlockName, getBlockAttributes } =
+			select( blockEditorStore );
+		const parent = getBlockParentsByBlockName(
+			clientId,
+			'core/block'
+		)?.[ 0 ];
+		return {
+			patternParent: parent,
+			patternParentAttributes: getBlockAttributes( parent ),
+		};
+	} );
+
+	useEffect( () => {
+		if (
+			Array.isArray( patternParentAttributes?.dynamicContent?.myList )
+		) {
+			const patternInstanceInnerBlocks =
+				patternParentAttributes?.dynamicContent?.myList.map(
+					( block ) => {
+						return createBlock(
+							block.name,
+							block.attributes,
+							block.innerBlocks
+						);
+					}
+				);
+			replaceInnerBlocks( clientId, patternInstanceInnerBlocks );
+		}
+	}, [
+		clientId,
+		patternParentAttributes?.dynamicContent?.myList,
+		replaceInnerBlocks,
+	] );
+
 	const blockProps = useBlockProps( {
 		style: {
 			...( Platform.isNative && style ),

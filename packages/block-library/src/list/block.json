@@ -36,6 +36,7 @@
 		}
 	},
 	"supports": {
+		"__experimentalConnections": true,
 		"anchor": true,
 		"className": false,
 		"typography": {
