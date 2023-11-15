@@ -66,6 +66,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 ) => {
 	test( 'Correctly applies the selected alignment and correctly removes the alignment', async ( {
 		editor,
+		page,
 		alignHookUtils,
 	} ) => {
 		const BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), '${ alignLabels[ alignment ] }')]`;
@@ -73,7 +74,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 		// Set the specified alignment.
 		await editor.insertBlock( { name: blockName } );
 		await editor.clickBlockToolbarButton( 'Align' );
-		await ( await this.page.$x( BUTTON_XPATH ) )[ 0 ].click();
+		await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 		// Verify the button of the specified alignment is pressed.
 		await editor.clickBlockToolbarButton( 'Align' );
@@ -92,7 +93,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 
 		// Verify the markup can be correctly parsed.
 		let parsedBlocks = window.wp.blocks.parse( htmlMarkup );
-		await this.page.evaluate( () => {
+		await page.evaluate( () => {
 			window.wp.data
 				.dispatch( 'core/block-editor' )
 				.resetBlocks( parsedBlocks );
@@ -103,13 +104,13 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 
 		let clientId = ( await editor.getBlocks() )[ 0 ].clientId;
 
-		await this.page.evaluate( ( id ) => {
+		await page.evaluate( ( id ) => {
 			window.wp.data.dispatch( 'core/block-editor' ).selectBlock( id );
 		}, clientId );
 
 		// Remove the alignment.
 		await editor.clickBlockToolbarButton( 'Align' );
-		await ( await this.page.$x( BUTTON_XPATH ) )[ 0 ].click();
+		await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 		// Verify 'none' alignment button is in pressed state.
 		await editor.clickBlockToolbarButton( 'Align' );
@@ -125,7 +126,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 
 		// verify the markup when no alignment is set is valid
 		parsedBlocks = window.wp.blocks.parse( htmlMarkup );
-		await this.page.evaluate( () => {
+		await page.evaluate( () => {
 			window.wp.data
 				.dispatch( 'core/block-editor' )
 				.resetBlocks( parsedBlocks );
@@ -137,7 +138,7 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 
 		clientId = ( await editor.getBlocks() )[ 0 ].clientId;
 
-		await this.page.evaluate( ( id ) => {
+		await page.evaluate( ( id ) => {
 			window.wp.data.dispatch( 'core/block-editor' ).selectBlock( id );
 		}, clientId );
 
@@ -165,14 +166,15 @@ test.describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	test.describe( 'Block with no alignment set', () => {
-		const BLOCK_NAME = 'Test No Alignment Set';
+		const BLOCK_NAME = 'test/test-no-alignment-set';
 		test( 'Shows no alignment buttons on the alignment toolbar', async ( {
 			editor,
+			page,
 		} ) => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			const CHANGE_ALIGNMENT_BUTTON_SELECTOR =
 				'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Align"]';
-			const changeAlignmentButton = this.page.locator(
+			const changeAlignmentButton = page.locator(
 				CHANGE_ALIGNMENT_BUTTON_SELECTOR
 			);
 			expect( changeAlignmentButton ).toBe( null );
@@ -187,7 +189,7 @@ test.describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	test.describe( 'Block with align true', () => {
-		const BLOCK_NAME = 'Test Align True';
+		const BLOCK_NAME = 'test/test-align-true';
 
 		test( 'Shows the expected buttons on the alignment toolbar', async ( {
 			editor,
@@ -218,7 +220,7 @@ test.describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	test.describe( 'Block with align array', () => {
-		const BLOCK_NAME = 'Test Align Array';
+		const BLOCK_NAME = 'test/test-align-array';
 
 		test( 'Shows the expected buttons on the alignment toolbar', async ( {
 			editor,
@@ -253,7 +255,7 @@ test.describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	test.describe( 'Block with default align', () => {
-		const BLOCK_NAME = 'Test Default Align';
+		const BLOCK_NAME = 'test/test-default-align';
 		const SELECTED_ALIGNMENT_CONTROL_SELECTOR =
 			'//div[contains(@class, "components-dropdown-menu__menu")]//button[contains(@class, "is-active")]/span[text()="Align right"]';
 
@@ -270,11 +272,12 @@ test.describe( 'Align Hook Works As Expected', () => {
 
 		test( 'Applies the selected alignment by default', async ( {
 			editor,
+			page,
 		} ) => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			// Verify the correct alignment button is pressed.
 			await editor.clickBlockToolbarButton( 'Align' );
-			const selectedAlignmentControls = await this.page.$x(
+			const selectedAlignmentControls = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);
 			expect( selectedAlignmentControls ).toHaveLength( 1 );
@@ -291,11 +294,12 @@ test.describe( 'Align Hook Works As Expected', () => {
 
 		test( 'Can remove the default alignment and the align attribute equals none but alignnone class is not applied', async ( {
 			editor,
+			page,
 		} ) => {
 			await editor.insertBlock( { name: BLOCK_NAME } );
 			// Remove the alignment.
 			await editor.clickBlockToolbarButton( 'Align' );
-			const [ selectedAlignmentControl ] = await this.page.$x(
+			const [ selectedAlignmentControl ] = await page.$x(
 				SELECTED_ALIGNMENT_CONTROL_SELECTOR
 			);
 			await selectedAlignmentControl.click();
