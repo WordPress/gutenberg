@@ -607,6 +607,127 @@ function pickStyleKeys( treeToPickFrom ) {
 	return Object.fromEntries( clonedEntries );
 }
 
+function getElementNodes( node, scope ) {
+	if ( ! node ) {
+		return [];
+	}
+
+	const elementNodes = [];
+
+	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
+		if ( node.elements?.[ name ] ) {
+			elementNodes.push( {
+				styles: node.elements[ name ],
+				selector: scopeSelector( scope, selector ),
+			} );
+		}
+	} );
+
+	return elementNodes;
+}
+
+function getBlockElementNodes( node, selector, scope ) {
+	if ( ! node?.elements || ! selector ) {
+		return [];
+	}
+	const blockElementNodes = [];
+
+	Object.entries( node.elements ).forEach( ( [ elementName, styles ] ) => {
+		if ( styles && ELEMENTS[ elementName ] ) {
+			blockElementNodes.push( {
+				styles,
+				selector: scopeSelector(
+					scopeSelector( scope, selector ),
+					ELEMENTS[ elementName ]
+				),
+			} );
+		}
+	} );
+
+	return blockElementNodes;
+}
+
+function getBlockStyleVariations( node ) {
+	const variations = {};
+	Object.keys( node?.variations ?? {} ).forEach( ( variation ) => {
+		variations[ variation ] = pickStyleKeys( node.variations[ variation ] );
+	} );
+
+	return variations;
+}
+
+function scopeFeatureSelectors( featureSelectors, scope ) {
+	if ( ! featureSelectors || ! scope ) {
+		return featureSelectors;
+	}
+
+	const scopedFeatureSelectors = {};
+
+	Object.entries( featureSelectors ).forEach(
+		( [ feature, featureSelector ] ) => {
+			if ( typeof featureSelector === 'string' ) {
+				scopedFeatureSelectors[ feature ] = scopeSelector(
+					scope,
+					featureSelector
+				);
+			}
+
+			if ( typeof featureSelector === 'object' ) {
+				scopedFeatureSelectors[ feature ] = {};
+
+				Object.entries( featureSelector ).forEach(
+					( [ subfeature, subfeatureSelector ] ) => {
+						scopedFeatureSelectors[ feature ][ subfeature ] =
+							scopeSelector( scope, subfeatureSelector );
+					}
+				);
+			}
+		}
+	);
+
+	return scopedFeatureSelectors;
+}
+
+function scopeStyleVariationSelectors( variationSelectors, scope ) {
+	if ( ! variationSelectors || ! scope ) {
+		return variationSelectors;
+	}
+
+	const scopedVariationSelectors = {};
+
+	Object.entries( variationSelectors ).forEach(
+		( [ variation, variationSelector ] ) => {
+			scopedVariationSelectors[ variation ] = scopeSelector(
+				scope,
+				variationSelector
+			);
+		}
+	);
+
+	return scopedVariationSelectors;
+}
+
+function createStyleNode( styles, name, selectors, scope ) {
+	return {
+		styles,
+		fallbackGapValue: selectors[ name ].fallbackGapValue,
+		hasLayoutSupport: selectors[ name ].hasLayoutSupport,
+		selector: scopeSelector( scope, selectors[ name ].selector ),
+		duotoneSelector: scopeSelector(
+			scope,
+			selectors[ name ].duotoneSelector
+		),
+		featureSelectors: scopeFeatureSelectors(
+			selectors[ name ].featureSelectors,
+			scope
+		),
+		styleVariationSelectors: scopeStyleVariationSelectors(
+			selectors[ name ].styleVariationSelectors,
+			scope
+		),
+	};
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
@@ -614,7 +735,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		return nodes;
 	}
 
-	// Top-level.
+	// Top-level styles.
 	const styles = pickStyleKeys( tree.styles );
 	if ( styles ) {
 		nodes.push( {
@@ -623,14 +744,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		} );
 	}
 
-	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( tree.styles?.elements?.[ name ] ) {
-			nodes.push( {
-				styles: tree.styles?.elements?.[ name ],
-				selector,
-			} );
-		}
-	} );
+	getElementNodes( tree.styles ).forEach( ( node ) => nodes.push( node ) );
 
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
@@ -638,55 +752,19 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			const blockStyles = pickStyleKeys( node );
 
 			if ( node?.variations ) {
-				const variations = {};
-				Object.keys( node.variations ).forEach( ( variation ) => {
-					variations[ variation ] = pickStyleKeys(
-						node.variations[ variation ]
-					);
-				} );
-				blockStyles.variations = variations;
-			}
-			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
-				nodes.push( {
-					duotoneSelector:
-						blockSelectors[ blockName ].duotoneSelector,
-					fallbackGapValue:
-						blockSelectors[ blockName ].fallbackGapValue,
-					hasLayoutSupport:
-						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ].selector,
-					styles: blockStyles,
-					featureSelectors:
-						blockSelectors[ blockName ].featureSelectors,
-					styleVariationSelectors:
-						blockSelectors[ blockName ].styleVariationSelectors,
-				} );
+				blockStyles.variations = getBlockStyleVariations( node );
 			}
 
-			Object.entries( node?.elements ?? {} ).forEach(
-				( [ elementName, value ] ) => {
-					if (
-						value &&
-						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName ]
-					) {
-						nodes.push( {
-							styles: value,
-							selector: blockSelectors[ blockName ]?.selector
-								.split( ',' )
-								.map( ( sel ) => {
-									const elementSelectors =
-										ELEMENTS[ elementName ].split( ',' );
-									return elementSelectors.map(
-										( elementSelector ) =>
-											sel + ' ' + elementSelector
-									);
-								} )
-								.join( ',' ),
-						} );
-					}
-				}
-			);
+			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
+				nodes.push(
+					createStyleNode( blockStyles, blockName, blockSelectors )
+				);
+			}
+
+			getBlockElementNodes(
+				node,
+				blockSelectors[ blockName ]?.selector
+			).forEach( ( elementNode ) => nodes.push( elementNode ) );
 		}
 	);
 
@@ -707,14 +785,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			}
 
 			// Section element styles.
-			Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-				if ( node?.elements?.[ name ] ) {
-					nodes.push( {
-						styles: node?.elements?.[ name ],
-						selector: scopeSelector( sectionClass, selector ),
-					} );
-				}
-			} );
+			getElementNodes( node, sectionClass ).forEach( ( elementNode ) =>
+				nodes.push( elementNode )
+			);
 
 			// Section block styles.
 			Object.entries( node?.blocks ?? {} ).forEach(
@@ -723,17 +796,8 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 					// Block variations.
 					if ( blockNode?.variations ) {
-						const variations = {};
-
-						Object.keys( blockNode.variations ).forEach(
-							( variation ) => {
-								variations[ variation ] = pickStyleKeys(
-									blockNode.variations[ variation ]
-								);
-							}
-						);
-
-						blockStyles.variations = variations;
+						blockStyles.variations =
+							getBlockStyleVariations( blockNode );
 					}
 
 					// Create block node.
@@ -741,122 +805,22 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockStyles &&
 						blockSelectors?.[ blockName ]?.selector
 					) {
-						const scopeFeatureSelectors = (
-							featureSelectors,
-							scope
-						) => {
-							if ( ! featureSelectors ) {
-								return featureSelectors;
-							}
-
-							const scopedFeatureSelectors = {};
-
-							Object.entries( featureSelectors ).forEach(
-								( [ feature, featureSelector ] ) => {
-									if ( typeof featureSelector === 'string' ) {
-										scopedFeatureSelectors[ feature ] =
-											scopeSelector(
-												sectionClass,
-												featureSelector
-											);
-									}
-
-									if ( typeof featureSelector === 'object' ) {
-										scopedFeatureSelectors[ feature ] = {};
-
-										Object.entries(
-											featureSelector
-										).forEach(
-											( [
-												subfeature,
-												subfeatureSelector,
-											] ) => {
-												scopedFeatureSelectors[
-													feature
-												][ subfeature ] = scopeSelector(
-													scope,
-													subfeatureSelector
-												);
-											}
-										);
-									}
-								}
-							);
-
-							return scopedFeatureSelectors;
-						};
-
-						const scopeStyleVariationSelectors = (
-							variationSelectors,
-							scope
-						) => {
-							if ( ! variationSelectors ) {
-								return variationSelectors;
-							}
-
-							const scopedVariationSelectors = {};
-
-							Object.entries( variationSelectors ).forEach(
-								( [ variation, variationSelector ] ) => {
-									scopedVariationSelectors[ variation ] =
-										scopeSelector(
-											scope,
-											variationSelector
-										);
-								}
-							);
-
-							return scopedVariationSelectors;
-						};
-
-						nodes.push( {
-							duotoneSelector: scopeSelector(
-								sectionClass,
-								blockSelectors[ blockName ].doutoneSelector
-							),
-							fallbackGapValue:
-								blockSelectors[ blockName ].fallbackGapValue,
-							hasLayoutSupport:
-								blockSelectors[ blockName ].hasLayoutSupport,
-							selector: scopeSelector(
-								sectionClass,
-								blockSelectors[ blockName ].selector
-							),
-							styles: blockStyles,
-							featureSelectors: scopeFeatureSelectors(
-								blockSelectors[ blockName ].featureSelectors,
+						nodes.push(
+							createStyleNode(
+								blockStyles,
+								blockName,
+								blockSelectors,
 								sectionClass
-							),
-							styleVariationSelectors:
-								scopeStyleVariationSelectors(
-									blockSelectors[ blockName ]
-										.styleVariationSelectors,
-									sectionClass
-								),
-						} );
+							)
+						);
 					}
 
 					// Block element styles.
-					Object.entries( blockNode?.elements ?? {} ).forEach(
-						( [ elementName, value ] ) => {
-							if (
-								value &&
-								blockSelectors?.[ blockName ] &&
-								ELEMENTS[ elementName ]
-							) {
-								nodes.push( {
-									styles: value,
-									selector: scopeSelector(
-										scopeSelector(
-											sectionClass,
-											blockSelectors[ blockName ].selector
-										),
-										ELEMENTS[ elementName ]
-									),
-								} );
-							}
-						}
-					);
+					getBlockElementNodes(
+						blockNode,
+						blockSelectors[ blockName ]?.selector,
+						sectionClass
+					).forEach( ( elementNode ) => nodes.push( elementNode ) );
 				}
 			);
 		}
