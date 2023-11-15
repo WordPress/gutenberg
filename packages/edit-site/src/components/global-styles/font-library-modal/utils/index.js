@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { paramCase as kebabCase } from 'change-case';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
@@ -129,9 +134,20 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
+// This function replicates one behavior of _wp_to_kebab_case().
+// Additional context: https://github.com/WordPress/gutenberg/issues/53695
+export function wpKebabCase( str ) {
+	// If a string contains a digit followed by a number, insert a dash between them.
+	return kebabCase( str ).replace(
+		/([a-zA-Z])(\d)|(\d)([a-zA-Z])/g,
+		'$1$3-$2$4'
+	);
+}
+
 export function makeFormDataFromFontFamilies( fontFamilies ) {
 	const formData = new FormData();
 	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
+		family.slug = wpKebabCase( family.slug );
 		if ( family?.fontFace ) {
 			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
 				if ( face.file ) {
