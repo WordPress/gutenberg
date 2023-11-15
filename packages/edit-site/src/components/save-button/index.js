@@ -42,7 +42,11 @@ export default function SaveButton( {
 				isDirty: dirtyEntityRecords.length > 0,
 				isSaving:
 					dirtyEntityRecords.some( ( record ) =>
-						isSavingEntityRecord( record.kind, record.name, record.key )
+						isSavingEntityRecord(
+							record.kind,
+							record.name,
+							record.key
+						)
 					) || isActivatingTheme,
 				isSaveViewOpen: isSaveViewOpened(),
 				previewingThemeName: previewingTheme?.name?.rendered,
