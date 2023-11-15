@@ -37,13 +37,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					field: field.id,
 					name: field.header,
 					operator: filter,
-					elements: [
-						{
-							value: '',
-							label: __( 'All' ),
-						},
-						...( field.elements || [] ),
-					],
+					elements: field.elements || [],
 					isVisible: view.filters.some(
 						( f ) => f.field === field.id && f.operator === filter
 					),
