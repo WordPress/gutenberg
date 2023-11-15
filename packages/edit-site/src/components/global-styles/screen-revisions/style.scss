@@ -99,6 +99,7 @@
 	.edit-site-global-styles-screen-revisions__date {
 		text-transform: uppercase;
 		font-weight: 600;
+		font-size: 12px;
 	}
 }
 
@@ -107,6 +108,8 @@
 	display: flex;
 	justify-content: start;
 	width: 100%;
+	align-items: center;
+	font-size: 11px;
 
 	img {
 		width: $grid-unit-20;
