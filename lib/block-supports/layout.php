@@ -870,20 +870,19 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
 		foreach ( $processor->class_list() as $class_name ) {
-			if (str_contains( $class_name, 'layout' ) ) {
+			if ( str_contains( $class_name, 'layout' ) ) {
 				array_push( $layout_classes, $class_name );
-				$what = $processor->remove_class( $class_name );
-			}			
+				$processor->remove_class( $class_name );
+			}
 		}
 	}
 
 	$content_without_layout_classes = $processor->get_updated_html();
-
-	$replace_regex   = sprintf(
+	$replace_regex                  = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
 	);
-	$updated_content = preg_replace_callback(
+	$updated_content                = preg_replace_callback(
 		$replace_regex,
 		static function ( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
@@ -897,7 +896,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 			foreach ( $layout_classes as $class_name ) {
 				$processor->add_class( $class_name );
 			}
-		}		
+		}
 		$updated_content = $processor->get_updated_html();
 	}
 
