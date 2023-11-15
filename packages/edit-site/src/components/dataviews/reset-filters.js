@@ -7,7 +7,8 @@ import { __ } from '@wordpress/i18n';
 export default ( { view, onChangeView } ) => {
 	return (
 		<Button
-			aria-disabled={ view.search === '' && view.filters?.length === 0 }
+			disabled={ view.search === '' && view.filters?.length === 0 }
+			__experimentalIsFocusable={ true }
 			__next40pxDefaultSize={ true }
 			variant="tertiary"
 			onClick={ () => {

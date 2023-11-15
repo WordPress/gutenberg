@@ -61,7 +61,8 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 			label={ __( 'Add filter' ) }
 			trigger={
 				<Button
-					aria-disabled={ filters.length === view.filters?.length }
+					disabled={ filters.length === view.filters?.length }
+					__experimentalIsFocusable={ true }
 					__next40pxDefaultSize={ true }
 					icon={ plus }
 					variant="tertiary"
