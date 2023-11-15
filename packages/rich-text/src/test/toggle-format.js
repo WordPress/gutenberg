@@ -34,12 +34,17 @@ describe( 'toggleFormat', () => {
 				,
 				,
 			],
+			_formats: new Map( [
+				[ em, [ 4, 7 ] ],
+				[ strong, [ 3, 6 ] ],
+			] ),
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [ [ em, [ 4, 7 ] ] ] ),
 			activeFormats: [],
 			text: 'one two three',
 			start: 3,
@@ -55,6 +60,10 @@ describe( 'toggleFormat', () => {
 	it( "should apply format if it doesn't exist at start of selection", () => {
 		const record = {
 			formats: [ , , , , [ em, strong ], [ em ], [ em ], , , , , , , ],
+			_formats: new Map( [
+				[ em, [ 4, 7 ] ],
+				[ strong, [ 4, 5 ] ],
+			] ),
 			text: 'one two three',
 			start: 3,
 			end: 6,
@@ -75,6 +84,10 @@ describe( 'toggleFormat', () => {
 				,
 				,
 			],
+			_formats: new Map( [
+				[ em, [ 4, 7 ] ],
+				[ strong, [ 3, 6 ] ],
+			] ),
 			activeFormats: [ strong ],
 			text: 'one two three',
 			start: 3,

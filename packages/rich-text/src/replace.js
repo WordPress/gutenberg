@@ -6,6 +6,19 @@ import { insert } from './insert';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
+function getFormatsAtIndex( value, index ) {
+	const { _formats } = value;
+	const formatsAtIndex = new Set();
+
+	for ( const [ format, [ start, end ] ] of _formats ) {
+		if ( start <= index && end > index ) {
+			formatsAtIndex.add( format );
+		}
+	}
+
+	return formatsAtIndex;
+}
+
 /**
  * Search a Rich Text value and replace the match(es) with `replacement`. This
  * is similar to `String.prototype.replace`.
@@ -36,9 +49,11 @@ export function replace( value, pattern, replacement ) {
 				formats: Array( replacement.length ).fill(
 					value.formats[ offset ]
 				),
-				_formats: new Map( [
-					[ value.formats[ offset ], [ 0, replacement.length ] ],
-				] ),
+				_formats: new Map(
+					Array.from( getFormatsAtIndex( value, offset ) ).map(
+						( format ) => [ format, [ 0, replacement.length ] ]
+					)
+				),
 				replacements: Array( replacement.length ),
 			};
 		}

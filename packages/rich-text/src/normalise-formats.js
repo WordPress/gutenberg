@@ -7,36 +7,25 @@ import { isFormatEqual } from './is-format-equal';
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
- * Normalises formats: ensures subsequent adjacent equal formats have the same
- * reference.
+ * Normalises formats: merge adjacent and overlapping formats.
  *
  * @param {RichTextValue} value Value to normalise formats of.
  *
  * @return {RichTextValue} New value with normalised formats.
  */
 export function normaliseFormats( value ) {
-	const newFormats = value.formats.slice();
+	const _newFormats = new Map();
 
-	newFormats.forEach( ( formatsAtIndex, index ) => {
-		const formatsAtPreviousIndex = newFormats[ index - 1 ];
+	const existing = Array.from( _newFormats.keys() ).filter( ( _format ) =>
+		isFormatEqual( _format, format )
+	);
 
-		if ( formatsAtPreviousIndex ) {
-			const newFormatsAtIndex = formatsAtIndex.slice();
-
-			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
-				const previousFormat = formatsAtPreviousIndex[ formatIndex ];
-
-				if ( isFormatEqual( format, previousFormat ) ) {
-					newFormatsAtIndex[ formatIndex ] = previousFormat;
-				}
-			} );
-
-			newFormats[ index ] = newFormatsAtIndex;
-		}
-	} );
+	for ( const [ format, [ start, end ] ] of existing ) {
+		
+	}
 
 	return {
 		...value,
-		formats: newFormats,
+		_formats: _newFormats,
 	};
 }

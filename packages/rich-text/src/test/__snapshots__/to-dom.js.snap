@@ -245,7 +245,6 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
 <body>
   <em>
     <a
-      data-rich-text-format-boundary="true"
       href="#"
     >
       1
@@ -253,6 +252,7 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
   </em>
   <strong>
     <a
+      data-rich-text-format-boundary="true"
       href="#"
     >
       2
