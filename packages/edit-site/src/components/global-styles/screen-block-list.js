@@ -11,7 +11,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
-	useMemo,
 	useEffect,
 	useRef,
 	useDeferredValue,
@@ -111,14 +110,11 @@ function BlockList( { filterValue } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
 
-	const filteredBlockTypes = useMemo( () => {
-		if ( ! filterValue ) {
-			return sortedBlockTypes;
-		}
-		return sortedBlockTypes.filter( ( blockType ) =>
-			isMatchingSearchTerm( blockType, filterValue )
-		);
-	}, [ filterValue, sortedBlockTypes, isMatchingSearchTerm ] );
+	const filteredBlockTypes = ! filterValue
+		? sortedBlockTypes
+		: sortedBlockTypes.filter( ( blockType ) =>
+				isMatchingSearchTerm( blockType, filterValue )
+		  );
 
 	const blockTypesListRef = useRef();
 
