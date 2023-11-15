@@ -38,6 +38,36 @@ const DEFAULT_VIEWS = {
 			},
 		},
 		{
+			title: __( 'Pending' ),
+			slug: 'pending',
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{ field: 'status', operator: 'in', value: 'pending' },
+				],
+			},
+		},
+		{
+			title: __( 'Scheduled' ),
+			slug: 'scheduled',
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{ field: 'status', operator: 'in', value: 'future' },
+				],
+			},
+		},
+		{
+			title: __( 'Private' ),
+			slug: 'private',
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{ field: 'status', operator: 'in', value: 'private' },
+				],
+			},
+		},
+		{
 			title: __( 'Trash' ),
 			slug: 'trash',
 			icon: trash,
