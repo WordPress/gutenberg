@@ -15,6 +15,8 @@ import { pencil } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
 import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
+import { useEffect } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -26,40 +28,62 @@ import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+const { useHistory } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreenPage() {
-	const navigator = useNavigator();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const history = useHistory();
 	const {
 		params: { postId },
+		goTo,
 	} = useNavigator();
-	const { record } = useEntityRecord( 'postType', 'page', postId );
-
-	const { featuredMediaAltText, featuredMediaSourceUrl } = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			// Featured image.
-			const attachedMedia = record?.featured_media
-				? getEntityRecord(
-						'postType',
-						'attachment',
-						record?.featured_media
-				  )
-				: null;
-
-			return {
-				featuredMediaSourceUrl:
-					attachedMedia?.media_details.sizes?.medium?.source_url ||
-					attachedMedia?.source_url,
-				featuredMediaAltText: escapeAttribute(
-					attachedMedia?.alt_text ||
-						attachedMedia?.description?.raw ||
-						''
-				),
-			};
-		},
-		[ record ]
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'page',
+		postId
 	);
+
+	const { isCanvasModeView, featuredMediaAltText, featuredMediaSourceUrl } =
+		useSelect(
+			( select ) => {
+				const { getEntityRecord } = select( coreStore );
+				// Featured image.
+				const attachedMedia = record?.featured_media
+					? getEntityRecord(
+							'postType',
+							'attachment',
+							record?.featured_media
+					  )
+					: null;
+
+				return {
+					isCanvasModeView:
+						unlock( select( editSiteStore ) ).getCanvasMode() ===
+						'view',
+					featuredMediaSourceUrl:
+						attachedMedia?.media_details.sizes?.medium
+							?.source_url || attachedMedia?.source_url,
+					featuredMediaAltText: escapeAttribute(
+						attachedMedia?.alt_text ||
+							attachedMedia?.description?.raw ||
+							''
+					),
+				};
+			},
+			[ record ]
+		);
+
+	// Redirect to the main pages navigation screen if the page is not found or has been deleted.
+	useEffect( () => {
+		if ( hasResolved && ! record ) {
+			history.push( {
+				path: '/page',
+				postId: undefined,
+				postType: undefined,
+				canvas: 'view',
+			} );
+		}
+	}, [ hasResolved, isCanvasModeView, history ] );
 
 	const featureImageAltText = featuredMediaAltText
 		? decodeEntities( featuredMediaAltText )
@@ -76,7 +100,7 @@ export default function SidebarNavigationScreenPage() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( '/page' );
+							goTo( '/page' );
 						} }
 					/>
 					<SidebarButton
