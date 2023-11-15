@@ -55,7 +55,7 @@ export default function DataViews( {
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 } justify="flex-start">
-				<HStack>
+				<HStack className="dataviews-filters-options">
 					<HStack justify="start">
 						{ search && (
 							<Search
