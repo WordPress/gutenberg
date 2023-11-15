@@ -15,6 +15,7 @@ import './duotone';
 import './font-family';
 import './font-size';
 import './border';
+import './section';
 import './position';
 import './layout';
 import './content-lock-ui';

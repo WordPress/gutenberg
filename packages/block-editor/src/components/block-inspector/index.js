@@ -122,6 +122,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 					<>
 						<InspectorControls.Slot />
 						<InspectorControls.Slot
+							group="section"
+							label={ __( 'Sections' ) }
+						/>
+						<InspectorControls.Slot
 							group="color"
 							label={ __( 'Color' ) }
 							className="color-block-support-panel__inner-wrapper"
@@ -282,6 +286,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot group="list" />
+					<InspectorControls.Slot
+						group="section"
+						label={ __( 'Sections' ) }
+					/>
 					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
