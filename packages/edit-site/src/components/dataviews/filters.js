@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as InFilter, OPERATOR_IN } from './in-filter';
 import AddFilter from './add-filter';
+import ResetFilters from './reset-filters';
 
 const VALID_OPERATORS = [ OPERATOR_IN ];
 
@@ -65,6 +66,10 @@ export default function Filters( { fields, view, onChangeView } ) {
 			view={ view }
 			onChangeView={ onChangeView }
 		/>
+	);
+
+	filterComponents.push(
+		<ResetFilters view={ view } onChangeView={ onChangeView } />
 	);
 
 	return filterComponents.filter( Boolean );
