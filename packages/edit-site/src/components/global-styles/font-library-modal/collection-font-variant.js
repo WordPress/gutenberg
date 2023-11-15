@@ -25,7 +25,9 @@ function CollectionFontVariant( {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const checkboxId = kebabCase( displayName );
+	const checkboxId = kebabCase(
+		`${ font.slug }-${ getFontFaceVariantName( face ) }`
+	);
 
 	return (
 		<label
