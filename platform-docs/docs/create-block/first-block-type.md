@@ -9,7 +9,7 @@ In addition to the built-in block types, Gutenberg offers a flexible API to buil
 The `registerBlockType` function registers the block we are going to create and specifies the block type settings.
 
 ```js
-import { createElement } from "react";
+import { createElement } from 'react';
 import { registerBlockType } from '@wordpress/blocks';
 
 registerBlockType( 'create-block/gutenpride', {
@@ -45,12 +45,12 @@ registerBlockType( 'create-block/gutenpride', {
 } );
 ```
 
-The first parameter in the **registerBlockType** function is the block name. It's composed of two segments a namespace and a specific name. The namespace is used to avoid collisions with other block types from different sources The specific name is the name of the block type. The namespace and the specific name are separated by a slash.
+The first parameter in the **registerBlockType** function is the block name. It's composed of two segments: a namespace and a specific name. The namespace is used to avoid collisions with other block types from different sources. The specific name is the name of the block type. The namespace and the specific name are separated by a slash.
 
-The second parameter to the function is the block type object. Two common object properties are **edit** and **save**, these are the key parts of a block.
+The second parameter to the function is the block type object. Two common object properties are **edit** and **save** — these are the key parts of a block.
 
-The results of the edit function is what the editor will render to the editor page when the block is inserted.
+The result of the edit function is what the editor will render to the editor page when the block is inserted.
 
-The results of the save function is what the editor will produce as HTML when calling the `serialize` function.
+The result of the save function is what the editor will produce as HTML when calling the `serialize` function.
 
-At the moment, the `create-block/gutenpride` block type produces a static block at the moment, in the next sections of the tutorial, we will see how to make it editable.
+The `create-block/gutenpride` block type produces a static block at the moment, in the following sections of the tutorial, we will see how to make it editable.
