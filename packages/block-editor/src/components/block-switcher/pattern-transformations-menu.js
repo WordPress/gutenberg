@@ -108,13 +108,16 @@ function BlockPattern( { pattern, onSelect } ) {
 	return (
 		<div className={ `${ baseClassName }-list__list-item` }>
 			<CompositeItem
-				role="option"
-				as="div"
-				aria-label={ pattern.title }
-				aria-describedby={
-					pattern.description ? descriptionId : undefined
+				render={
+					<div
+						role="option"
+						aria-label={ pattern.title }
+						aria-describedby={
+							pattern.description ? descriptionId : undefined
+						}
+						className={ `${ baseClassName }-list__item` }
+					/>
 				}
-				className={ `${ baseClassName }-list__item` }
 				onClick={ () => onSelect( pattern.transformedBlocks ) }
 			>
 				<BlockPreview
