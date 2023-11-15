@@ -305,40 +305,40 @@ class WP_Font_Family {
 			),
 		);
 
-		foreach ( $fonts_json['settings']['typography']['fontFamilies'] as $key => $font ) {
-			if ( isset( $font['slug'] ) ) {
-				$fonts_json['settings']['typography']['fontFamilies'][ $key ]['slug'] = _wp_to_kebab_case( $font['slug'] );
-			}
-
-			if ( isset( $font['fontFamily'] ) ) {
-				$font_families         = explode( ',', $font['fontFamily'] );
-				$wrapped_font_families = array_map(
-					function ( $font_family ) {
-						$trimmed = trim( $font_family );
-						if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
-								return "'" . $trimmed . "'";
-						}
-						return $trimmed;
-					},
-					$font_families
-				);
-
-				if ( count( $wrapped_font_families ) === 1 ) {
-					$fonts_json['settings']['typography']['fontFamilies'][ $key ]['fontFamily'] = $wrapped_font_families[0];
-				} else {
-					$fonts_json['settings']['typography']['fontFamilies'][ $key ]['fontFamily'] = implode( ', ', $wrapped_font_families );
-				}
-			}
-		}
-
 		// Creates a new WP_Theme_JSON object with the new fonts to
 		// leverage sanitization and validation.
-		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
-		$theme_data     = $theme_json->get_data();
+		$theme_json = new WP_Theme_JSON_Gutenberg( $fonts_json );
+		$theme_data = $theme_json->get_data();
+
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
-		$this->data     = $sanitized_font;
+
+		// Ensure slugs are kebab-cased and font families are wrapped in quotes.
+		if ( isset( $sanitized_font['slug'] ) ) {
+			$sanitized_font['slug'] = _wp_to_kebab_case( $sanitized_font['slug'] );
+		}
+
+		if ( isset( $sanitized_font['fontFamily'] ) ) {
+			$font_families         = explode( ',', $sanitized_font['fontFamily'] );
+			$wrapped_font_families = array_map(
+				function ( $font_family ) {
+					$trimmed = trim( $font_family );
+					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
+							return "'" . $trimmed . "'";
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$sanitized_font['fontFamily'] = $wrapped_font_families[0];
+			} else {
+				$sanitized_font['fontFamily'] = implode( ', ', $wrapped_font_families );
+			}
+		}
+		$this->data = $sanitized_font;
 		return $this->data;
 	}
 
