@@ -5,7 +5,6 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -45,16 +44,6 @@ export default function useTitle( title ) {
 			);
 
 			document.title = formattedTitle;
-
-			// Announce title on route change for screen readers.
-			speak(
-				sprintf(
-					/* translators: The page title that is currently displaying. */
-					__( 'Now displaying: %s' ),
-					document.title
-				),
-				'assertive'
-			);
 		}
 	}, [ title, siteTitle, location ] );
 }
