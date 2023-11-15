@@ -69,7 +69,6 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingColspan,
 			tagName: 'p',
-			preserveWhiteSpace: false,
 		} );
 
 		expect( console ).toHaveLogged();
@@ -110,7 +109,6 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingRowspan,
 			tagName: 'p',
-			preserveWhiteSpace: false,
 		} );
 
 		expect( console ).toHaveLogged();

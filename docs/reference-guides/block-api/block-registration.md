@@ -197,7 +197,7 @@ example: {
 },
 ```
 
-If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
+If `example` is not defined, the preview will not be shown. So even if no attributes are defined, setting an empty example object `example: {}` will trigger the preview to show.
 
 It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
 
@@ -242,13 +242,13 @@ Similarly to how the block's styles can be declared, a block type can define blo
 
 -   **_Type:_** `Object`
 
-Supports contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
+Supports contains a set of options to control features used in the editor. See [the `supports` documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 #### transforms (optional)
 
 -   **Type:** `Object`
 
-Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file or a raw DOM node. Take a look at the [Block Transforms API](/docs/reference-guides/block-api/block-transforms.md) for more info about each available transformation.
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression, a file, or a raw DOM node. Take a look at the [Block Transforms API](/docs/reference-guides/block-api/block-transforms.md) for more info about each available transformation.
 
 #### parent (optional)
 
@@ -268,7 +268,7 @@ parent: [ 'core/columns' ],
 -   **Type:** `Array`
 -   **Since**: `WordPress 6.0.0`
 
-The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block. In comparison to the `parent` property, blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
 ```js
 // Only allow this block when it is nested at any level in a Columns block.

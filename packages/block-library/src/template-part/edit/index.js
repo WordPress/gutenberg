@@ -4,7 +4,6 @@
 import { useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
-	BlockTitle,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
@@ -14,7 +13,7 @@ import {
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +34,11 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const { slug, theme, tagName, layout = {} } = attributes;
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
 	const hasAlreadyRendered = useHasRecursion( templatePartId );
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
@@ -174,17 +177,7 @@ export default function TemplatePartEdit( {
 									}
 									aria-haspopup="dialog"
 								>
-									{ createInterpolateElement(
-										__( 'Replace <BlockTitle />' ),
-										{
-											BlockTitle: (
-												<BlockTitle
-													clientId={ clientId }
-													maximumLength={ 25 }
-												/>
-											),
-										}
-									) }
+									{ __( 'Replace' ) }
 								</MenuItem>
 							);
 						} }

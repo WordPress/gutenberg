@@ -1,6 +1,16 @@
 .dataviews-wrapper {
 	width: 100%;
+	height: 100%;
+	overflow: auto;
 	padding: $grid-unit-40;
+
+	> div {
+		min-height: 100%;
+	}
+}
+
+.dataviews-pagination {
+	margin-top: auto;
 }
 
 .dataviews-list-view {
@@ -21,18 +31,13 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		&:last-child {
+		&[data-field-id="actions"] {
 			text-align: right;
 		}
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;
 	}
-}
-
-.dataviews__select-control-prefix {
-	color: $gray-700;
-	text-wrap: nowrap;
 }
 
 .dataviews-view-grid__media {
@@ -43,4 +48,8 @@
 		max-width: 100%;
 		object-fit: cover;
 	}
+}
+
+.dataviews-action-modal {
+	z-index: z-index(".dataviews-action-modal");
 }

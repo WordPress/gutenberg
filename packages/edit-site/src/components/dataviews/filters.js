@@ -6,89 +6,71 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TextFilter from './text-filter';
-import InFilter from './in-filter';
+import { default as InFilter, OPERATOR_IN } from './in-filter';
+import ResetFilters from './reset-filters';
 
-export default function Filters( { filters, fields, view, onChangeView } ) {
-	const filterIndex = {};
-	filters.forEach( ( filter ) => {
-		if ( 'object' !== typeof filter || ! filter?.id || ! filter?.type ) {
-			return;
-		}
+const VALID_OPERATORS = [ OPERATOR_IN ];
 
-		filterIndex[ filter.id ] = filter;
-	} );
-
+export default function Filters( { fields, view, onChangeView } ) {
+	const filtersRegistered = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.filters ) {
 			return;
 		}
 
 		field.filters.forEach( ( filter ) => {
-			let id = field.id;
-			if ( 'string' === typeof filter ) {
-				filterIndex[ id ] = {
-					id,
+			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
+				filtersRegistered.push( {
+					field: field.id,
 					name: field.header,
-					type: filter,
-				};
-			}
-
-			if ( 'object' === typeof filter ) {
-				id = filter.id || field.id;
-				filterIndex[ id ] = {
-					id,
-					name: filter.name || field.header,
-					type: filter.type,
-				};
-			}
-
-			if ( 'enumeration' === filterIndex[ id ]?.type ) {
-				const elements = [
-					{
-						value: filter.resetValue || '',
-						label: filter.resetLabel || __( 'All' ),
-					},
-					...( field.elements || [] ),
-				];
-				filterIndex[ id ] = {
-					...filterIndex[ id ],
-					elements,
-				};
+					operator: filter,
+					elements: [
+						{
+							value: '',
+							label: __( 'All' ),
+						},
+						...( field.elements || [] ),
+					],
+				} );
 			}
 		} );
 	} );
 
-	return (
-		view.visibleFilters?.map( ( filterName ) => {
-			const filter = filterIndex[ filterName ];
+	const visibleFilters = view.visibleFilters
+		?.map( ( fieldName ) => {
+			const visibleFiltersForField = filtersRegistered.filter(
+				( f ) => f.field === fieldName
+			);
 
-			if ( ! filter ) {
+			if ( visibleFiltersForField.length === 0 ) {
 				return null;
 			}
 
-			if ( filter.type === 'search' ) {
-				return (
-					<TextFilter
-						key={ filterName }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
-			if ( filter.type === 'enumeration' ) {
-				return (
-					<InFilter
-						key={ filterName }
-						filter={ filter }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-				);
-			}
+			return visibleFiltersForField.map( ( filter ) => {
+				if ( OPERATOR_IN === filter.operator ) {
+					return (
+						<InFilter
+							key={ fieldName + '.' + filter.operator }
+							filter={ visibleFiltersForField[ 0 ] }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					);
+				}
+				return null;
+			} );
+		} )
+		.filter( Boolean );
 
-			return null;
-		} ) || __( 'No filters available' )
-	);
+	if ( visibleFilters?.length > 0 ) {
+		visibleFilters.push(
+			<ResetFilters
+				key="reset-filters"
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
+		);
+	}
+
+	return visibleFilters;
 }

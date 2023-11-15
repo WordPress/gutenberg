@@ -64,9 +64,6 @@ function PatternsManageButton( { clientId } ) {
 
 	return (
 		<>
-			<MenuItem href={ managePatternsUrl }>
-				{ __( 'Manage patterns' ) }
-			</MenuItem>
 			{ canRemove && (
 				<MenuItem
 					onClick={ () => convertSyncedPatternToStatic( clientId ) }
@@ -76,6 +73,9 @@ function PatternsManageButton( { clientId } ) {
 						: __( 'Detach pattern' ) }
 				</MenuItem>
 			) }
+			<MenuItem href={ managePatternsUrl }>
+				{ __( 'Manage patterns' ) }
+			</MenuItem>
 		</>
 	);
 }

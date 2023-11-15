@@ -3,7 +3,7 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -62,19 +62,11 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 	);
 }
 
-function StartPageOptionsModal() {
-	const [ modalState, setModalState ] = useState( 'initial' );
+function StartPageOptionsModal( { onClose } ) {
 	const startPatterns = useStartPatterns();
 	const hasStartPattern = startPatterns.length > 0;
-	const shouldOpenModal = hasStartPattern && modalState === 'initial';
 
-	useEffect( () => {
-		if ( shouldOpenModal ) {
-			setModalState( 'open' );
-		}
-	}, [ shouldOpenModal ] );
-
-	if ( modalState !== 'open' ) {
+	if ( ! hasStartPattern ) {
 		return null;
 	}
 
@@ -83,12 +75,12 @@ function StartPageOptionsModal() {
 			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
 			isFullScreen
-			onRequestClose={ () => setModalState( 'closed' ) }
+			onRequestClose={ onClose }
 		>
 			<div className="edit-post-start-page-options__modal-content">
 				<PatternSelection
 					blockPatterns={ startPatterns }
-					onChoosePattern={ () => setModalState( 'closed' ) }
+					onChoosePattern={ onClose }
 				/>
 			</div>
 		</Modal>
@@ -96,6 +88,7 @@ function StartPageOptionsModal() {
 }
 
 export default function StartPageOptions() {
+	const [ isClosed, setIsClosed ] = useState( false );
 	const shouldEnableModal = useSelect( ( select ) => {
 		const { isCleanNewPost } = select( editorStore );
 		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
@@ -107,9 +100,9 @@ export default function StartPageOptions() {
 		);
 	}, [] );
 
-	if ( ! shouldEnableModal ) {
+	if ( ! shouldEnableModal || isClosed ) {
 		return null;
 	}
 
-	return <StartPageOptionsModal />;
+	return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
 }

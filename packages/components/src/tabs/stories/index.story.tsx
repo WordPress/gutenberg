@@ -42,8 +42,16 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 			<Tabs.TabPanel id={ 'tab2' }>
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' }>
+			<Tabs.TabPanel id={ 'tab3' } focusable={ false }>
 				<p>Selected tab: Tab 3</p>
+				<p>
+					This tabpanel has its <code>focusable</code> prop set to
+					<code> false</code>, so it won&apos;t get a tab stop.
+					<br />
+					Instead, the [Tab] key will move focus to the first
+					focusable element within the panel.
+				</p>
+				<Button variant="primary">I&apos;m a button!</Button>
 			</Tabs.TabPanel>
 		</Tabs>
 	);

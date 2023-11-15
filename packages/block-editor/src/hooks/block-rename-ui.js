@@ -92,6 +92,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
@@ -130,6 +131,7 @@ function BlockRenameControl( props ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Block name' ) }
 					value={ customName || '' }
 					onChange={ onChange }
@@ -187,7 +189,7 @@ function BlockRenameControl( props ) {
 	);
 }
 
-export const withBlockRenameControl = createHigherOrderComponent(
+export const withBlockRenameControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { clientId, name, attributes, setAttributes, isSelected } = props;
 
@@ -216,11 +218,11 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withBlockRenameControls'
 );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/block-rename-ui/with-block-rename-control',
-	withBlockRenameControl
+	'core/block-rename-ui/with-block-rename-controls',
+	withBlockRenameControls
 );

@@ -313,11 +313,21 @@ store(
 						if ( caption ) {
 							const captionComputedStyle =
 								window.getComputedStyle( caption );
-							figureHeight =
-								figureHeight -
-								caption.offsetHeight -
-								parseFloat( captionComputedStyle.marginTop ) -
-								parseFloat( captionComputedStyle.marginBottom );
+							if (
+								! [ 'absolute', 'fixed' ].includes(
+									captionComputedStyle.position
+								)
+							) {
+								figureHeight =
+									figureHeight -
+									caption.offsetHeight -
+									parseFloat(
+										captionComputedStyle.marginTop
+									) -
+									parseFloat(
+										captionComputedStyle.marginBottom
+									);
+							}
 						}
 
 						const buttonOffsetTop = figureHeight - offsetHeight;
@@ -340,26 +350,26 @@ store(
 								context.core.image.imageButtonTop =
 									( offsetHeight - referenceHeight ) / 2 +
 									buttonOffsetTop +
-									10;
+									16;
 								context.core.image.imageButtonRight =
-									buttonOffsetRight + 10;
+									buttonOffsetRight + 16;
 							} else {
 								// If it reaches the height first, keep
 								// the height and compute the width.
 								const referenceWidth =
 									offsetHeight * naturalRatio;
 								context.core.image.imageButtonTop =
-									buttonOffsetTop + 10;
+									buttonOffsetTop + 16;
 								context.core.image.imageButtonRight =
 									( offsetWidth - referenceWidth ) / 2 +
 									buttonOffsetRight +
-									10;
+									16;
 							}
 						} else {
 							context.core.image.imageButtonTop =
-								buttonOffsetTop + 10;
+								buttonOffsetTop + 16;
 							context.core.image.imageButtonRight =
-								buttonOffsetRight + 10;
+								buttonOffsetRight + 16;
 						}
 					},
 					setStylesOnResize: ( { state, context, ref } ) => {

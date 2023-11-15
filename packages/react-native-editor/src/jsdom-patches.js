@@ -29,23 +29,25 @@ const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
 	core;
 
 /**
- * Simple recursive implementation of Node.contains method
+ * Copy of Node.contains polyfill from polyfill-library package (https://t.ly/mehjW).
+ * This polyfill was originally used in WordPress Core (https://t.ly/4o7wQ).
  *
- * @param {number} otherNode Another node (may be the same node).
- * @return {boolean} true if otherNode is a descendant of this node, or is this
- * node, false otherwise.
+ * @param {number} node Node to check.
+ * @return {boolean} true if passed node is a descendant of this node, or the
+ * same node, false otherwise.
  *
  * This function is necessary in the mobile environment, because there are code
  * paths that make use of functions in the Gutenberg (web) project, which has
  * expectation that this is implemented (as it is in the browser environment).
  */
-Node.prototype.contains = function ( otherNode ) {
-	return (
-		this === otherNode ||
-		Array.prototype.some.call( this._childNodes, ( childNode ) => {
-			return childNode.contains( otherNode );
-		} )
-	);
+Node.prototype.contains = function ( node ) {
+	do {
+		if ( this === node ) {
+			return true;
+		}
+	} while ( ( node = node && node.parentNode ) );
+
+	return false;
 };
 
 /**
