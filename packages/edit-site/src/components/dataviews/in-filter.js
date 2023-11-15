@@ -93,7 +93,7 @@ export default ( { filter, view, onChangeView } ) => {
 					} ) )
 				}
 			>
-				{ __( 'Remove' ) }
+				{ __( 'Reset' ) }
 			</DropdownMenuItemV2>
 		</DropdownMenuV2>
 	);
