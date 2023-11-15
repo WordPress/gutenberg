@@ -380,6 +380,14 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( selector === undefined ) {
+		return undefined;
+	}
+
+	if ( ! scope ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
