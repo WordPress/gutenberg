@@ -532,6 +532,10 @@ _Returns_
 
 -   `string`: Gradient value.
 
+### getLinkValueTransforms
+
+Undocumented declaration.
+
 ### getPxFromCssUnit
 
 Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
