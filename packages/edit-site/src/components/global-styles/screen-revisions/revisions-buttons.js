@@ -140,12 +140,18 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 								</span>
 							) : (
 								<span className="edit-site-global-styles-screen-revisions__description">
-									<time
-										className="edit-site-global-styles-screen-revisions__date"
-										dateTime={ modified }
-									>
-										{ displayDate }
-									</time>
+									{ isUnsaved ? (
+										<span className="edit-site-global-styles-screen-revisions__date">
+											{ __( '(Unsaved)' ) }
+										</span>
+									) : (
+										<time
+											className="edit-site-global-styles-screen-revisions__date"
+											dateTime={ modified }
+										>
+											{ displayDate }
+										</time>
+									) }
 									<span className="edit-site-global-styles-screen-revisions__changes">
 										{ getGlobalStylesChanges(
 											revision
