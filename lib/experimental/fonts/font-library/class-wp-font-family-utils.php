@@ -122,4 +122,41 @@ class WP_Font_Family_Utils {
 
 		return $font_family;
 	}
+
+	/**
+	 * Sanitizes the font family data using WP_Theme_JSON.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array A sanitized font family definition.
+	 */
+	public static function sanitize() {
+		// Creates the structure of theme.json array with the new fonts.
+		$fonts_json = array(
+			'version'  => '2',
+			'settings' => array(
+				'typography' => array(
+					'fontFamilies' => array(
+						'custom' => array(
+							$this->data,
+						),
+					),
+				),
+			),
+		);
+
+		// Creates a new WP_Theme_JSON object with the new fonts to
+		// leverage sanitization and validation.
+		$fonts_json     = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $fonts_json );
+		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
+		$theme_data     = $theme_json->get_data();
+		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
+			? $theme_data['settings']['typography']['fontFamilies'][0]
+			: array();
+
+		$sanitized_font['slug']       = _wp_to_kebab_case( $sanitized_font['slug'] );
+		$sanitized_font['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized_font['fontFamily'] );
+		$this->data                   = $sanitized_font;
+		return $this->data;
+	}
 }
