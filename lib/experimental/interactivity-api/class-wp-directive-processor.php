@@ -36,7 +36,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * @return void
 	 */
-	public static function add_root_block( $block ) {
+	public static function mark_root_block( $block ) {
 		self::$root_block = md5( serialize( $block ) );
 	}
 
@@ -45,7 +45,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * @return void
 	 */
-	public static function remove_root_block() {
+	public static function unmark_root_block() {
 		self::$root_block = null;
 	}
 
@@ -56,8 +56,17 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 *
 	 * @return bool True if block is a root block, false otherwise.
 	 */
-	public static function is_root_block( $block ) {
+	public static function is_marked_as_root_block( $block ) {
 		return md5( serialize( $block ) ) === self::$root_block;
+	}
+
+	/**
+	 * Check if a root block has already been defined.
+	 *
+	 * @return bool True if block is a root block, false otherwise.
+	 */
+	public static function has_root_block() {
+		return isset( self::$root_block );
 	}
 
 

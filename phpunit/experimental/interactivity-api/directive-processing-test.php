@@ -87,25 +87,30 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			'<p>Welcome to WordPress.</p>' .
 		'<!-- /wp:paragraph -->';
 
-		$parsed_block     = parse_blocks( $block_content )[0];
+		$parsed_block = parse_blocks( $block_content )[0];
+
+		$source_block = $parsed_block;
+
 		$rendered_content = render_block( $parsed_block );
 
 		$parsed_block_second = parse_blocks( $block_content )[1];
+
+		$fake_parent_block = array();
 
 		// Test that root block is intially emtpy.
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
 		// Test that root block is not added if there is a parent block.
-		gutenberg_interactivity_process_directives( $parsed_block, $parsed_block, $parsed_block );
+		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, $fake_parent_block );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
 		// Test that root block is added if there is no parent block.
-		gutenberg_interactivity_process_directives( $parsed_block, $parsed_block, null );
+		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, null );
 		$current_root_block = WP_Directive_Processor::$root_block;
 		$this->assertNotEmpty( $current_root_block );
 
 		// Test that a root block is not added if there is already a root block defined.
-		gutenberg_interactivity_process_directives( $parsed_block_second, $parsed_block_second, $parsed_block_second );
+		gutenberg_interactivity_mark_root_blocks( $parsed_block_second, $source_block, null );
 		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
 		// Test that root block is removed after processing.
 		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );

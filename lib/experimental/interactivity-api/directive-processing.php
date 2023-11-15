@@ -8,9 +8,9 @@
  */
 
 /**
- * Process the Interactivity API directives using the root blocks of the
- * outermost rendering, ignoring the root blocks of inner blocks like Patterns,
- * Template Parts or Content.
+ * Mark if the block is a root block. Checks that there is already a root block
+ * in order not to mark template-parts or synced patterns as root blocks, where
+ * the parent is not null.
  *
  * @param array $parsed_block The parsed block.
  * @param array $source_block The source block.
@@ -18,14 +18,14 @@
  *
  * @return array The parsed block.
  */
-function gutenberg_interactivity_process_directives( $parsed_block, $source_block, $parent_block ) {
-	if ( ! isset( $parent_block ) && ! isset( WP_Directive_Processor::$root_block ) ) {
-		WP_Directive_Processor::add_root_block( $parsed_block );
+function gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, $parent_block ) {
+	if ( ! isset( $parent_block ) && ! WP_Directive_Processor::has_root_block() ) {
+		WP_Directive_Processor::mark_root_block( $parsed_block );
 	}
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'gutenberg_interactivity_process_directives', 10, 3 );
+add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_blocks', 10, 3 );
 
 /**
  * Process directives in each root block.
@@ -36,8 +36,8 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_process_directives', 1
  * @return string Filtered block content.
  */
 function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
-	if ( WP_Directive_Processor::is_root_block( $block ) ) {
-		WP_Directive_Processor::remove_root_block();
+	if ( WP_Directive_Processor::is_marked_as_root_block( $block ) ) {
+		WP_Directive_Processor::unmark_root_block();
 		$directives = array(
 			'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 			'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
