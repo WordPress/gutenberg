@@ -38,10 +38,23 @@ const availableViews = [
 		id: 'grid',
 		label: __( 'Grid' ),
 	},
+	{
+		id: 'side-by-side',
+		label: __( 'Side by side' ),
+	},
 ];
 
-function ViewTypeMenu( { view, onChangeView } ) {
-	const activeView = availableViews.find( ( v ) => view.type === v.id );
+function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
+	let _availableViews = availableViews;
+	if ( supportedLayouts ) {
+		_availableViews = _availableViews.filter( ( _view ) =>
+			supportedLayouts.includes( _view.id )
+		);
+	}
+	if ( _availableViews.length === 1 ) {
+		return null;
+	}
+	const activeView = _availableViews.find( ( v ) => view.type === v.id );
 	return (
 		<DropdownSubMenuV2
 			trigger={
@@ -57,7 +70,7 @@ function ViewTypeMenu( { view, onChangeView } ) {
 				</DropdownSubMenuTriggerV2>
 			}
 		>
-			{ availableViews.map( ( availableView ) => {
+			{ _availableViews.map( ( availableView ) => {
 				return (
 					<DropdownMenuItemV2
 						key={ availableView.id }
@@ -82,7 +95,7 @@ function ViewTypeMenu( { view, onChangeView } ) {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2
@@ -261,7 +274,12 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-export default function ViewActions( { fields, view, onChangeView } ) {
+export default function ViewActions( {
+	fields,
+	view,
+	onChangeView,
+	supportedLayouts,
+} ) {
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
@@ -273,7 +291,11 @@ export default function ViewActions( { fields, view, onChangeView } ) {
 			}
 		>
 			<DropdownMenuGroupV2>
-				<ViewTypeMenu view={ view } onChangeView={ onChangeView } />
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

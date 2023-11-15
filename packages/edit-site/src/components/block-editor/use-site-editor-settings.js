@@ -4,12 +4,16 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+
+const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -85,40 +89,25 @@ function useArchiveLabel( templateSlug ) {
 
 export default function useSiteEditorSettings() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType, siteSettings } =
-		useSelect(
-			( select ) => {
-				const { canUser, getEntityRecord } = select( coreStore );
-				const { getSettings, getCanvasMode, getEditedPostType } =
-					unlock( select( editSiteStore ) );
-				return {
-					storedSettings: getSettings( setIsInserterOpened ),
-					canvasMode: getCanvasMode(),
-					templateType: getEditedPostType(),
-					siteSettings: canUser( 'read', 'settings' )
-						? getEntityRecord( 'root', 'site' )
-						: undefined,
-				};
-			},
-			[ setIsInserterOpened ]
-		);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
 	const {
-		restBlockPatterns,
-		restBlockPatternCategories,
 		templateSlug,
-		userPatternCategories,
+		focusMode,
+		isDistractionFree,
+		hasFixedToolbar,
+		keepCaretInsideBlock,
+		canvasMode,
+		settings,
+		postType,
+		postId,
 	} = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord, getUserPatternCategories } =
-			select( coreStore );
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getCanvasMode,
+			getSettings,
+		} = unlock( select( editSiteStore ) );
+		const { get: getPreference } = select( preferencesStore );
+		const { getEditedEntityRecord } = select( coreStore );
 		const usedPostType = getEditedPostType();
 		const usedPostId = getEditedPostId();
 		const _record = getEditedEntityRecord(
@@ -127,75 +116,53 @@ export default function useSiteEditorSettings() {
 			usedPostId
 		);
 		return {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
 			templateSlug: _record.slug,
-			userPatternCategories: getUserPatternCategories(),
+			focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
+			isDistractionFree: !! getPreference(
+				'core/edit-site',
+				'distractionFree'
+			),
+			hasFixedToolbar: !! getPreference(
+				'core/edit-site',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! getPreference(
+				'core/edit-site',
+				'keepCaretInsideBlock'
+			),
+			canvasMode: getCanvasMode(),
+			settings: getSettings(),
+			postType: usedPostType,
+			postId: usedPostId,
 		};
 	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
 
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
-
+	const defaultEditorSettings = useMemo( () => {
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
+			...settings,
+
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			isDistractionFree,
+			hasFixedToolbar,
+			keepCaretInsideBlock,
+
+			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
-		userPatternCategories,
+		settings,
+		setIsInserterOpened,
+		focusMode,
+		isDistractionFree,
+		hasFixedToolbar,
+		keepCaretInsideBlock,
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		siteSettings?.page_on_front,
-		siteSettings?.page_for_posts,
 	] );
+
+	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

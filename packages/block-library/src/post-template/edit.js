@@ -96,7 +96,6 @@ export default function PostTemplateEdit( {
 			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
 			...restQueryArgs
 		} = {},
-		queryContext = [ { page: 1 } ],
 		templateSlug,
 		previewPostType,
 	},
@@ -104,8 +103,6 @@ export default function PostTemplateEdit( {
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
-
-	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -126,7 +123,7 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
+				offset: perPage ? perPage + offset : 0,
 				order,
 				orderby: orderBy,
 			};
@@ -194,7 +191,6 @@ export default function PostTemplateEdit( {
 		},
 		[
 			perPage,
-			page,
 			offset,
 			order,
 			orderBy,

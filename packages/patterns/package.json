@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,6 +31,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",

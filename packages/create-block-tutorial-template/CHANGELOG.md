@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Update the block example scaffolded by the template.
+
+## 2.33.0 (2023-11-02)
+
 ## 2.32.0 (2023-10-18)
 
 ## 2.31.0 (2023-10-05)

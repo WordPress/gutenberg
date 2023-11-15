@@ -9,7 +9,7 @@ import {
 	__experimentalVStack as VStack,
 	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -179,7 +179,10 @@ export default function CreatePatternModal( {
 						categoryMap={ categoryMap }
 					/>
 					<ToggleControl
-						label={ __( 'Synced' ) }
+						label={ _x(
+							'Synced',
+							'Option that makes an individual pattern synchronized'
+						) }
 						help={ __(
 							'Editing the pattern will update it anywhere it is used.'
 						) }

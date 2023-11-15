@@ -136,6 +136,128 @@ test.describe( 'Pages', () => {
 			)
 		).toBeVisible();
 	} );
+
+	test( 'toggle template preview', async ( { page, editor } ) => {
+		await draftNewPage( page );
+		await editor.openDocumentSettingsSidebar();
+
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+			.getByRole( 'document', {
+				name: 'Empty block; start writing or type forward slash to choose a block',
+			} )
+			.click();
+
+		// Add some content to the page.
+		await page.keyboard.type( 'Sweet paragraph 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Sweet paragraph 2' );
+
+		// Header template area and page content are visible.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: header',
+			} )
+		).toBeVisible();
+
+		const paragraphs = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+			.getByText( 'Sweet paragraph ' );
+
+		await expect( paragraphs.nth( 0 ) ).toBeVisible();
+		await expect( paragraphs.nth( 1 ) ).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Title',
+			} )
+		).toBeVisible();
+
+		// Toggle template preview to "off".
+		const templateOptionsButton = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } );
+		await templateOptionsButton.click();
+		const templatePreviewButton = page
+			.getByRole( 'menu', { name: 'Template options' } )
+			.getByRole( 'menuitem', { name: 'Template preview' } );
+
+		await expect( templatePreviewButton ).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		await templatePreviewButton.click();
+		await expect( templatePreviewButton ).toHaveAttribute(
+			'aria-pressed',
+			'false'
+		);
+
+		// Header template area should be hidden.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: header',
+			} )
+		).toBeHidden();
+
+		// Content block is still visible and wrapped in a container.
+		const paragraphsInGroup = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Group',
+			} )
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+			.getByText( 'Sweet paragraph ' );
+
+		await expect( paragraphsInGroup.nth( 0 ) ).toBeVisible();
+		await expect( paragraphsInGroup.nth( 1 ) ).toBeVisible();
+		// Check order of paragraphs.
+		// Important to ensure the blocks are rendered as they are in the template.
+		await expect( paragraphsInGroup.nth( 0 ) ).toHaveText(
+			'Sweet paragraph 1'
+		);
+		await expect( paragraphsInGroup.nth( 1 ) ).toHaveText(
+			'Sweet paragraph 2'
+		);
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Group',
+				} )
+				.getByRole( 'document', {
+					name: 'Block: Title',
+				} )
+		).toBeVisible();
+
+		// Remove focus from templateOptionsButton button.
+		await editor.canvas.locator( 'body' ).click();
+
+		// Toggle template preview to "on".
+		await templateOptionsButton.click();
+		await templatePreviewButton.click();
+		await expect( templatePreviewButton ).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+
+		// Header template area and page content are once again visible.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: header',
+			} )
+		).toBeVisible();
+		await expect( paragraphs.nth( 0 ) ).toBeVisible();
+		await expect( paragraphs.nth( 1 ) ).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Title',
+			} )
+		).toBeVisible();
+	} );
+
 	test( 'swap template and reset to default', async ( {
 		admin,
 		page,
@@ -195,6 +317,7 @@ test.describe( 'Pages', () => {
 		await resetButton.click();
 		await expect( templateOptionsButton ).toHaveText( 'Single Entries' );
 	} );
+
 	test( 'swap template options should respect the declared `postTypes`', async ( {
 		page,
 		editor,
