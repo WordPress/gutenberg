@@ -33,7 +33,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 	} = props;
 
 	const store = Ariakit.useSelectStore( {
-		setValue: ( nextValue: string ) => onChange?.( nextValue ),
+		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
 		value,
 	} );
@@ -52,7 +52,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
 			<Styled.CustomSelectButton className={ classes } store={ store }>
 				{ renderSelectedValue
-					? renderSelectedValue( currentValue as string )
+					? renderSelectedValue( currentValue )
 					: currentValue ?? 'Select an item' }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>

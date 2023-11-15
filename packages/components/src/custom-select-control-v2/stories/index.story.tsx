@@ -65,7 +65,7 @@ const Template: StoryFn< typeof CustomSelect > = () => {
 export const Default = Template.bind( {} );
 
 const ControlledTemplate = () => {
-	function renderValue( gravatar: string ) {
+	function renderValue( gravatar: string | string[] ) {
 		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 		return (
 			<>
@@ -83,7 +83,7 @@ const ControlledTemplate = () => {
 
 	const options = [ 'mystery-person', 'identicon', 'wavatar', 'retro' ];
 
-	const [ value, setValue ] = useState< string >();
+	const [ value, setValue ] = useState< string | string[] >();
 
 	return (
 		<>
