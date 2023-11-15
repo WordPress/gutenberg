@@ -109,10 +109,8 @@ function BlockMenuItem( { block } ) {
 function BlockList( { filterValue } ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const isMatchingSearchTerm = useSelect(
-		( select ) => select( blocksStore ).isMatchingSearchTerm,
-		[]
-	);
+	const { isMatchingSearchTerm } = useSelect( blocksStore );
+
 	const filteredBlockTypes = useMemo( () => {
 		if ( ! filterValue ) {
 			return sortedBlockTypes;
