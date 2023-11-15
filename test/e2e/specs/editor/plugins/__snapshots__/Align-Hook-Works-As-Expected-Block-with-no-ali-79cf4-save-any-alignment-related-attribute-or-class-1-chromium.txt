@@ -1,0 +1,3 @@
+<!-- wp:test/test-no-alignment-set -->
+<div style="outline:1px solid gray;padding:5px" class="wp-block-test-test-no-alignment-set">Test Align Hook</div>
+<!-- /wp:test/test-no-alignment-set -->

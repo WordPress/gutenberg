@@ -1,0 +1,3 @@
+<!-- wp:test/test-align-array {"align":"center"} -->
+<div style="outline:1px solid gray;padding:5px" class="wp-block-test-test-align-array aligncenter">Test Align Hook</div>
+<!-- /wp:test/test-align-array -->

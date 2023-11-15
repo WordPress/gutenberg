@@ -98,11 +98,15 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 				.dispatch( 'core/block-editor' )
 				.resetBlocks( parsedBlocks );
 		}, htmlMarkup );
-		let blocks = await editor.getBlocks();
+
+		let blocks = await page.evaluate( () => {
+			return window.wp.data.select( 'core/block-editor' ).getBlocks();
+		} );
+
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].isValid ).toBeTruthy();
 
-		let clientId = ( await editor.getBlocks() )[ 0 ].clientId;
+		let clientId = blocks[ 0 ].clientId;
 
 		await page.evaluate( ( id ) => {
 			window.wp.data.dispatch( 'core/block-editor' ).selectBlock( id );
@@ -132,11 +136,13 @@ const createCorrectlyAppliesAndRemovesAlignmentTest = (
 				.resetBlocks( parsedBlocks );
 		}, htmlMarkup );
 
-		blocks = await editor.getBlocks();
+		blocks = await page.evaluate( () => {
+			return window.wp.data.select( 'core/block-editor' ).getBlocks();
+		} );
+
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].isValid ).toBeTruthy();
-
-		clientId = ( await editor.getBlocks() )[ 0 ].clientId;
+		clientId = blocks[ 0 ].clientId;
 
 		await page.evaluate( ( id ) => {
 			window.wp.data.dispatch( 'core/block-editor' ).selectBlock( id );

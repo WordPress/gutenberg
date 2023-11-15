@@ -1,0 +1,3 @@
+<!-- wp:test/test-align-true {"align":"right"} -->
+<div style="outline:1px solid gray;padding:5px" class="wp-block-test-test-align-true alignright">Test Align Hook</div>
+<!-- /wp:test/test-align-true -->
