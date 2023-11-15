@@ -10,9 +10,10 @@ import {
 	chevronRightSmall,
 	check,
 	blockTable,
-	chevronDown,
 	arrowUp,
 	arrowDown,
+	grid,
+	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -274,19 +275,26 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
+function getDataViewIcon( type ) {
+	const icons = { list: blockTable, grid: grid, 'side-by-side': columns };
+	return icons[ type ];
+}
+
 export default function ViewActions( {
 	fields,
 	view,
 	onChangeView,
 	supportedLayouts,
 } ) {
+
+	const iconToUse = getDataViewIcon( view.type );
+
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
 			trigger={
-				<Button variant="tertiary" icon={ blockTable }>
+				<Button variant="tertiary" size="compact" icon={ iconToUse }>
 					{ __( 'View' ) }
-					<Icon icon={ chevronDown } />
 				</Button>
 			}
 		>
