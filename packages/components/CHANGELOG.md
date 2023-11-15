@@ -22,6 +22,7 @@
 
 ### Bug Fix
 
+-   `DropdownMenu`: remove extra vertical space around the toggle button ([#56136](https://github.com/WordPress/gutenberg/pull/56136)).
 -   Package should not depend on `@ariakit/test`, that package is only needed for testing ([#56091](https://github.com/WordPress/gutenberg/pull/56091)).
 
 ## 25.11.0 (2023-11-02)
