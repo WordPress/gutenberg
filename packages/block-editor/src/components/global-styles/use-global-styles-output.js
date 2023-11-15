@@ -844,15 +844,13 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								blockSelectors?.[ blockName ] &&
 								ELEMENTS[ elementName ]
 							) {
-								const scopedBlockSelector =
-									sectionClass +
-									' ' +
-									blockSelectors[ blockName ].selector;
-
 								nodes.push( {
 									styles: value,
 									selector: scopeSelector(
-										scopedBlockSelector,
+										scopeSelector(
+											sectionClass,
+											blockSelectors[ blockName ].selector
+										),
 										ELEMENTS[ elementName ]
 									),
 								} );
