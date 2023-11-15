@@ -73,14 +73,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 		>
 			{ filters.map( ( filter ) => {
 				if ( filter.isVisible ) {
-					return (
-						<DropdownMenuItemV2
-							key={ filter.field }
-							disabled={ true }
-						>
-							{ filter.name }
-						</DropdownMenuItemV2>
-					);
+					return null;
 				}
 
 				return (
