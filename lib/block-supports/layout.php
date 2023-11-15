@@ -865,6 +865,20 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
+	$layout_classes = array();
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+
+	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
+		foreach ( $processor->class_list() as $class_name ) {
+			if (str_contains( $class_name, 'layout' ) ) {
+				array_push( $layout_classes, $class_name );
+				$what = $processor->remove_class( $class_name );
+			}			
+		}
+	}
+
+	$content_without_layout_classes = $processor->get_updated_html();
+
 	$replace_regex   = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
@@ -874,8 +888,19 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		static function ( $matches ) {
 			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
-		$block_content
+		$content_without_layout_classes
 	);
+
+	if ( ! empty( $layout_classes ) ) {
+		$processor = new WP_HTML_Tag_Processor( $updated_content );
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-group__inner-container' ) ) ) {
+			foreach ( $layout_classes as $class_name ) {
+				$processor->add_class( $class_name );
+			}
+		}		
+		$updated_content = $processor->get_updated_html();
+	}
+
 	return $updated_content;
 }
 
