@@ -165,7 +165,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const hasTemplate = context?.postId;
+	const postWithTemplate = context?.postId;
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -190,26 +190,30 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const settings = useSpecificEditorSettings();
 	const isReady =
 		! isLoading &&
-		( ( hasTemplate && !! contextPost && !! editedPost ) ||
-			( ! hasTemplate && !! editedPost ) );
+		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
+			( ! postWithTemplate && !! editedPost ) );
 	const mode = useMemo( () => {
 		if ( isViewMode ) {
-			return 'locked';
+			return postWithTemplate ? 'template-locked' : 'all';
 		}
 
 		if ( isEditMode && pageContentFocusType === 'hideTemplate' ) {
 			return 'post-only';
 		}
 
-		if ( hasTemplate && hasPageContentFocus ) {
-			return 'locked';
+		if ( postWithTemplate && hasPageContentFocus ) {
+			return 'template-locked';
 		}
 
-		return 'template-only';
+		if ( postWithTemplate && ! hasPageContentFocus ) {
+			return 'template-only';
+		}
+
+		return 'all';
 	}, [
 		isViewMode,
 		isEditMode,
-		hasTemplate,
+		postWithTemplate,
 		pageContentFocusType,
 		hasPageContentFocus,
 	] );
@@ -227,8 +231,10 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			) }
 			{ isReady && (
 				<EditorProvider
-					post={ hasTemplate ? contextPost : editedPost }
-					__unstableTemplate={ hasTemplate ? editedPost : undefined }
+					post={ postWithTemplate ? contextPost : editedPost }
+					__unstableTemplate={
+						postWithTemplate ? editedPost : undefined
+					}
 					settings={ settings }
 					useSubRegistry={ false }
 					mode={ mode }

@@ -160,7 +160,7 @@ function useBlockEditorProps( post, template, mode ) {
 		mode,
 	] );
 	const disableRootLevelChanges =
-		( !! template && mode === 'locked' ) ||
+		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation' ||
 		mode === 'post-only';
 	const navigationBlockClientId =
