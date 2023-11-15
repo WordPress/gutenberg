@@ -150,6 +150,19 @@ _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
 
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
+
 ### getEditedEntityRecord
 
 Returns the specified entity record, merged with its edits.
@@ -298,6 +311,36 @@ _Parameters_
 _Returns_
 
 -   `EntityRecord[] | null`: Records.
+
+### getEntityRecordsTotalItems
+
+Returns the Entity's total available records for a given query (ignoring pagination).
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
+### getEntityRecordsTotalPages
+
+Returns the number of available pages for the given query.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
 
 ### getLastEntityDeleteError
 
@@ -618,6 +661,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -630,6 +686,7 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 

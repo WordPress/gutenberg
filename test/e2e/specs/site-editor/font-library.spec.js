@@ -14,7 +14,7 @@ test.describe( 'Font Library', () => {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
@@ -39,7 +39,7 @@ test.describe( 'Font Library', () => {
 				postId: 'twentytwentythree//index',
 				postType: 'wp_template',
 			} );
-			await editor.canvas.click( 'body' );
+			await editor.canvas.locator( 'body' ).click();
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {

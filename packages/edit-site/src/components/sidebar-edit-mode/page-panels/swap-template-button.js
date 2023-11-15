@@ -1,20 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
 import { useMemo, useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
 import { useAvailableTemplates, useEditedPostContext } from './hooks';
 
 export default function SwapTemplateButton( { onClick } ) {
@@ -24,16 +23,18 @@ export default function SwapTemplateButton( { onClick } ) {
 		setShowModal( false );
 	}, [] );
 	const { postType, postId } = useEditedPostContext();
-	const entitiy = useEntityRecord( 'postType', postType, postId );
-	const { setPage } = useDispatch( editSiteStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 	if ( ! availableTemplates?.length ) {
 		return null;
 	}
 	const onTemplateSelect = async ( template ) => {
-		entitiy.edit( { template: template.name }, { undoIgnore: true } );
-		await setPage( {
-			context: { postType, postId },
-		} );
+		editEntityRecord(
+			'postType',
+			postType,
+			postId,
+			{ template: template.name },
+			{ undoIgnore: true }
+		);
 		onClose(); // Close the template suggestions modal first.
 		onClick();
 	};

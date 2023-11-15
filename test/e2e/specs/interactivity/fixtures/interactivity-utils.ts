@@ -47,6 +47,7 @@ export default class InteractivityUtils {
 			content: `<!-- wp:${ block } /-->`,
 			status: 'publish' as 'publish',
 			date_gmt: '2023-01-01T00:00:00',
+			title: alias,
 		};
 
 		const { link } = await this.requestUtils.createPost( payload );

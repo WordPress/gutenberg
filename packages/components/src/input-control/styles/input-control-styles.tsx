@@ -14,7 +14,7 @@ import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -149,9 +149,9 @@ export const getSizeConfig = ( {
 
 	if ( ! __next40pxDefaultSize ) {
 		sizes.default = {
-			height: 30,
+			height: 32,
 			lineHeight: 1,
-			minHeight: 30,
+			minHeight: 32,
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		};

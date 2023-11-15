@@ -12,11 +12,17 @@ const {
  * @typedef {import('@playwright/test').FrameLocator} FrameLocator
  * @typedef {import('@wordpress/e2e-test-utils-playwright').PageUtils} PageUtils
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
+ * @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor
  */
 
 test.use( {
-	widgetsCustomizerPage: async ( { admin, page, pageUtils }, use ) => {
-		await use( new WidgetsCustomizerPage( { admin, page, pageUtils } ) );
+	widgetsCustomizerPage: async (
+		{ admin, page, pageUtils, editor },
+		use
+	) => {
+		await use(
+			new WidgetsCustomizerPage( { admin, page, pageUtils, editor } )
+		);
 	},
 } );
 
@@ -36,11 +42,7 @@ test.describe( 'Widgets Customizer', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'should add blocks', async ( {
-		page,
-		widgetsCustomizerPage,
-		editor,
-	} ) => {
+	test( 'should add blocks', async ( { page, widgetsCustomizerPage } ) => {
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 
 		await widgetsCustomizerPage.visitCustomizerPage();
@@ -86,9 +88,11 @@ test.describe( 'Widgets Customizer', () => {
 
 		await page.click( 'role=option[name="Search"i]' );
 
-		await editor.canvas.focus(
-			'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
-		);
+		await page
+			.locator(
+				'role=document[name="Block: Search"i] >> role=textbox[name="Label text"i]'
+			)
+			.focus();
 
 		await page.keyboard.type( 'My ' );
 
@@ -233,7 +237,6 @@ test.describe( 'Widgets Customizer', () => {
 		page,
 		requestUtils,
 		widgetsCustomizerPage,
-		editor,
 	} ) => {
 		await requestUtils.addWidgetBlock(
 			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
@@ -282,7 +285,7 @@ test.describe( 'Widgets Customizer', () => {
 		await headingWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editHeadingWidget.click();
 
-		const headingBlock = editor.canvas.locator(
+		const headingBlock = page.locator(
 			'role=document[name="Block: Heading"i] >> text="First Heading"'
 		);
 		await expect( headingBlock ).toBeFocused();
@@ -586,13 +589,12 @@ test.describe( 'Widgets Customizer', () => {
 	test( 'preserves content in the Custom HTML block', async ( {
 		page,
 		widgetsCustomizerPage,
-		editor,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
 
 		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
-		const HTMLBlockTextarea = editor.canvas.locator(
+		const HTMLBlockTextarea = page.locator(
 			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
 		);
 		await HTMLBlockTextarea.type( 'hello' );
@@ -617,11 +619,13 @@ class WidgetsCustomizerPage {
 	 * @param {Admin}     config.admin
 	 * @param {Page}      config.page
 	 * @param {PageUtils} config.pageUtils
+	 * @param {Editor}    config.editor
 	 */
-	constructor( { admin, page, pageUtils } ) {
+	constructor( { admin, page, pageUtils, editor } ) {
 		this.admin = admin;
 		this.page = page;
 		this.pageUtils = pageUtils;
+		this.editor = editor;
 
 		/** @type {FrameLocator} */
 		this.previewFrame = this.page
@@ -635,10 +639,8 @@ class WidgetsCustomizerPage {
 		await this.admin.visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/customize-widgets', 'welcomeGuide', false );
+		await this.editor.setPreferences( 'core/customize-widgets', {
+			welcomeGuide: false,
 		} );
 	}
 

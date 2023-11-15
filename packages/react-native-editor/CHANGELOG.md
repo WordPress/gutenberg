@@ -11,10 +11,24 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.108.0
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+-   [*] Fix crash related to accessing undefined value in `TextColorEdit` [#55664]
+
+## 1.107.0
+-   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
+-   [*] Classic block: Add option to convert to blocks [#55461]
+
+## 1.106.0
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+-   [*] Fix quote block border visibility when used with block based themes in dark mode [#54964]
+
 ## 1.105.0
 -   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
 -   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
 -   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
 
 ## 1.104.0
 -   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]

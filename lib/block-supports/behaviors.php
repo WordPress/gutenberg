@@ -84,17 +84,19 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$aria_label = __( 'Enlarge image', 'gutenberg' );
 
+	$processor->next_tag( 'img' );
 	$alt_attribute = $processor->get_attribute( 'alt' );
 
-	if ( null !== $alt_attribute ) {
+	// An empty alt attribute `alt=""` is valid for decorative images.
+	if ( is_string( $alt_attribute ) ) {
 		$alt_attribute = trim( $alt_attribute );
 	}
 
+	// It only makes sense to append the alt text to the button aria-label when the alt text is non-empty.
 	if ( $alt_attribute ) {
 		/* translators: %s: Image alt text. */
 		$aria_label = sprintf( __( 'Enlarge image: %s', 'gutenberg' ), $alt_attribute );
 	}
-	$content = $processor->get_updated_html();
 
 	// If we don't set a default, it won't work if Lightbox is set to enabled by default.
 	$lightbox_animation = 'zoom';
@@ -102,17 +104,15 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$lightbox_animation = $lightbox_settings['animation'];
 	}
 
-	// We want to store the src in the context so we can set it dynamically when the lightbox is opened.
-	$z = new WP_HTML_Tag_Processor( $content );
-	$z->next_tag( 'img' );
-
+	// Note: We want to store the `src` in the context so we
+	// can set it dynamically when the lightbox is opened.
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
-		$img_width        = $img_metadata['width'];
-		$img_height       = $img_metadata['height'];
+		$img_width        = $img_metadata['width'] ?? 'none';
+		$img_height       = $img_metadata['height'] ?? 'none';
 	} else {
-		$img_uploaded_src = $z->get_attribute( 'src' );
+		$img_uploaded_src = $processor->get_attribute( 'src' );
 		$img_width        = 'none';
 		$img_height       = 'none';
 	}
@@ -123,7 +123,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$scale_attr = false;
 	}
 
-	$w = new WP_HTML_Tag_Processor( $content );
+	$w = new WP_HTML_Tag_Processor( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
@@ -163,19 +163,20 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// Wrap the image in the body content with a button.
 	$img = null;
 	preg_match( '/<img[^>]+>/', $body_content, $img );
-	$button       =
-				'<button
-					type="button"
-					aria-haspopup="dialog"
-					aria-label="' . esc_attr( $aria_label ) . '"
-					data-wp-on--click="actions.core.image.showLightbox"
-					data-wp-style--width="context.core.image.imageButtonWidth"
-					data-wp-style--height="context.core.image.imageButtonHeight"
-					data-wp-style--left="context.core.image.imageButtonLeft"
-					data-wp-style--top="context.core.image.imageButtonTop"
-				>
-				</button>'
-				. $img[0];
+
+	$button =
+		$img[0]
+		. '<button
+			type="button"
+			aria-haspopup="dialog"
+			aria-label="' . esc_attr( $aria_label ) . '"
+			data-wp-on--click="actions.core.image.showLightbox"
+			data-wp-style--width="context.core.image.imageButtonWidth"
+			data-wp-style--height="context.core.image.imageButtonHeight"
+			data-wp-style--left="context.core.image.imageButtonLeft"
+			data-wp-style--top="context.core.image.imageButtonTop"
+		></button>';
+
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
 	// We need both a responsive image and an enlarged image to animate
@@ -183,7 +184,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// image is a copy of the one in the body, which animates immediately
 	// as the lightbox is opened, while the enlarged one is a full-sized
 	// version that will likely still be loading as the animation begins.
-	$m = new WP_HTML_Tag_Processor( $content );
+	$m = new WP_HTML_Tag_Processor( $block_content );
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
@@ -199,7 +200,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
-	$q = new WP_HTML_Tag_Processor( $content );
+	$q = new WP_HTML_Tag_Processor( $block_content );
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );
@@ -219,7 +220,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 
 	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$close_button_color = esc_attr( wp_get_global_styles( array( 'color', 'text' ) ) );
-	$dialog_label       = $alt_attribute ? esc_attr( $alt_attribute ) : esc_attr__( 'Image', 'gutenberg' );
+	$dialog_label       = esc_attr__( 'Enlarged image', 'gutenberg' );
 	$close_button_label = esc_attr__( 'Close', 'gutenberg' );
 
 	$lightbox_html = <<<HTML
