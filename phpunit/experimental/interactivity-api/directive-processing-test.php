@@ -112,6 +112,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		// Test that a root block is not added if there is already a root block defined.
 		gutenberg_interactivity_mark_root_blocks( $parsed_block_second, $source_block, null );
 		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
+
 		// Test that root block is removed after processing.
 		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
