@@ -56,8 +56,8 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 			trigger={
 				<Button
 					disabled={ filters.length === view.filters?.length }
-					__experimentalIsFocusable={ true }
-					__next40pxDefaultSize={ true }
+					__experimentalIsFocusable
+					__next40pxDefaultSize
 					icon={ plus }
 					variant="tertiary"
 				>

@@ -8,8 +8,8 @@ export default ( { view, onChangeView } ) => {
 	return (
 		<Button
 			disabled={ view.search === '' && view.filters?.length === 0 }
-			__experimentalIsFocusable={ true }
-			__next40pxDefaultSize={ true }
+			__experimentalIsFocusable
+			__next40pxDefaultSize
 			variant="tertiary"
 			onClick={ () => {
 				onChangeView( ( currentView ) => ( {

@@ -24,7 +24,7 @@ export default ( { filter, view, onChangeView } ) => {
 	return (
 		<SelectControl
 			id={ id }
-			__nextHasNoMarginBottom={ true }
+			__nextHasNoMarginBottom
 			value={ activeValue }
 			prefix={
 				<InputControlPrefixWrapper
