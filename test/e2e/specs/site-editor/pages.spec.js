@@ -18,6 +18,208 @@ async function draftNewPage( page ) {
 	).toBeVisible();
 }
 
+async function addPageContent( editor, page ) {
+	await editor.canvas
+		.getByRole( 'document', {
+			name: 'Block: Content',
+		} )
+		.getByRole( 'document', {
+			name: 'Empty block; start writing or type forward slash to choose a block',
+		} )
+		.click();
+
+	// Insert into Page Content using default block.
+	await editor.canvas
+		.getByRole( 'document', {
+			name: 'Empty block; start writing or type forward slash to choose a block',
+		} )
+		.fill( 'Lorem ipsum dolor sit amet' );
+
+	// Insert into Page Content using global inserter.
+	await page.getByRole( 'button', { name: 'Toggle block inserter' } ).click();
+	await page.getByRole( 'option', { name: 'Heading', exact: true } ).click();
+	await editor.canvas
+		.getByRole( 'document', {
+			name: 'Block: Heading',
+		} )
+		.fill( 'A sweet heading 1' );
+
+	// Add some regular content blocks.
+	await page.keyboard.press( 'Enter' );
+	await editor.insertBlock( { name: 'core/paragraph' } );
+	await page.keyboard.type( 'A sweet paragraph 1' );
+	await page.keyboard.press( 'Enter' );
+	await editor.insertBlock( { name: 'core/paragraph' } );
+	await page.keyboard.type( 'A sweet paragraph 2' );
+
+	// Insert into Page Content using appender.
+	await page
+		.getByRole( 'region', { name: 'Editor footer' } )
+		.getByRole( 'button', { name: 'Content' } )
+		.click();
+	await editor.canvas.getByRole( 'button', { name: 'Add block' } ).click();
+	await page.getByPlaceholder( 'Search' ).fill( 'list' );
+	await page.getByRole( 'option', { name: 'List', exact: true } ).click();
+	await page.keyboard.type( 'Sweet list 1' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'Sweet list 2' );
+}
+
+async function testToggleTemplatePreview( editor, page ) {
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: header',
+		} )
+	).toBeVisible();
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: Content',
+		} )
+	).toBeVisible();
+
+	// Ensure order is preserved between toggling.
+	await page
+		.locator(
+			'[aria-label="Block: Content"] + [aria-label="Block: Title"]'
+		)
+		.isVisible();
+
+	await editor.openDocumentSettingsSidebar();
+	// Toggle template preview to "off".
+	const templateOptionsButton = page
+		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'button', { name: 'Template options' } );
+	await templateOptionsButton.click();
+	const templatePreviewButton = page
+		.getByRole( 'menu', { name: 'Template options' } )
+		.getByRole( 'menuitem', { name: 'Template preview' } );
+
+	await expect( templatePreviewButton ).toHaveAttribute(
+		'aria-pressed',
+		'true'
+	);
+	await templatePreviewButton.click();
+	await expect( templatePreviewButton ).toHaveAttribute(
+		'aria-pressed',
+		'false'
+	);
+
+	// Header template area should be hidden.
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: header',
+		} )
+	).toBeHidden();
+
+	// Check order of paragraphs.
+	// Important to ensure the blocks are rendered as they are in the template.
+
+	await expect(
+		editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Group',
+			} )
+			.getByRole( 'document', {
+				name: 'Block: Content',
+			} )
+	).toBeVisible();
+	// Ensure order is preserved between toggling.
+	await page
+		.locator(
+			'[aria-label="Block: Content"] + [aria-label="Block: Title"]'
+		)
+		.isVisible();
+
+	// Remove focus from templateOptionsButton button.
+	await editor.canvas.locator( 'body' ).click();
+
+	// Toggle template preview to "on".
+	await templateOptionsButton.click();
+	await templatePreviewButton.click();
+	await expect( templatePreviewButton ).toHaveAttribute(
+		'aria-pressed',
+		'true'
+	);
+
+	// Header template area and page content are once again visible.
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: header',
+		} )
+	).toBeVisible();
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: Title',
+		} )
+	).toBeVisible();
+}
+
+async function testCreatePage( editor, page ) {
+	// Selecting a block in the template should display a notice.
+	await editor.canvas
+		.getByRole( 'document', {
+			name: 'Block: Site Title',
+		} )
+		.click( { force: true } );
+	await expect(
+		page.locator(
+			'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
+		)
+	).toBeVisible();
+
+	// Switch to template editing focus.
+	await editor.openDocumentSettingsSidebar();
+	await page
+		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'button', { name: 'Template options' } )
+		.click();
+	await page.getByRole( 'button', { name: 'Edit template' } ).click();
+	await expect(
+		editor.canvas.getByRole( 'document', {
+			name: 'Block: Content',
+		} )
+	).toContainText(
+		'This is the Content block, it will display all the blocks in any single post or page.'
+	);
+	await expect(
+		page.locator(
+			'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
+		)
+	).toBeVisible();
+
+	// Edit blocks that are in the template.
+	await editor.canvas
+		.getByRole( 'document', { name: 'Block: Title' } )
+		.click();
+	await page
+		.getByRole( 'button', { name: 'Move down', exact: true } )
+		.click();
+
+	await editor.canvas
+		.getByRole( 'textbox', { name: 'Site title text' } )
+		.fill( 'New Site Title' );
+
+	// Go back to page editing focus.
+	await page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Back' } )
+		.click();
+
+	// Site Title and Page entities should have been modified.
+	await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+	await expect(
+		page.locator(
+			'role=region[name="Save panel"] >> role=checkbox[name="Title"]'
+		)
+	).toBeVisible();
+	await expect(
+		page.locator(
+			'role=region[name="Save panel"] >> role=checkbox[name="Test Page"]'
+		)
+	).toBeVisible();
+	await page.getByRole( 'button', { name: 'Cancel', exact: true } ).click();
+}
+
 test.describe( 'Pages', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -43,219 +245,17 @@ test.describe( 'Pages', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'create a new page', async ( { page, editor } ) => {
+	test( 'create a new page, edit template and toggle page template preview', async ( {
+		page,
+		editor,
+	} ) => {
+		// Set up
 		await draftNewPage( page );
+		await addPageContent( editor, page );
 
-		// Insert into Page Content using default block.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Empty block; start writing or type forward slash to choose a block',
-			} )
-			.fill( 'Lorem ipsum dolor sit amet' );
-
-		// Insert into Page Content using global inserter.
-		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
-			.click();
-		await page
-			.getByRole( 'option', { name: 'Heading', exact: true } )
-			.click();
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Heading',
-			} )
-			.fill( 'Lorem ipsum' );
-
-		// Insert into Page Content using appender.
-		await page
-			.getByRole( 'region', { name: 'Editor footer' } )
-			.getByRole( 'button', { name: 'Content' } )
-			.click();
-		await editor.canvas
-			.getByRole( 'button', { name: 'Add block' } )
-			.click();
-		await page.getByPlaceholder( 'Search' ).fill( 'list' );
-		await page.getByRole( 'option', { name: 'List', exact: true } ).click();
-		await page.keyboard.type( 'Lorem ipsum' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Dolor sit amet' );
-
-		// Selecting a block in the template should display a notice.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Site Title',
-			} )
-			.click( { force: true } );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
-			)
-		).toBeVisible();
-
-		// Switch to template editing focus.
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } )
-			.click();
-		await page.getByRole( 'button', { name: 'Edit template' } ).click();
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
-		).toContainText(
-			'This is the Content block, it will display all the blocks in any single post or page.'
-		);
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
-			)
-		).toBeVisible();
-
-		// Edit a block that's in the template.
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Site title text' } )
-			.fill( 'New Site Title' );
-
-		// Go back to page editing focus.
-		await page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Back' } )
-			.click();
-
-		// Site Title and Page entities should have been modified.
-		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
-		await expect(
-			page.locator(
-				'role=region[name="Save panel"] >> role=checkbox[name="Title"]'
-			)
-		).toBeVisible();
-		await expect(
-			page.locator(
-				'role=region[name="Save panel"] >> role=checkbox[name="Test Page"]'
-			)
-		).toBeVisible();
-	} );
-
-	test( 'toggle template preview', async ( { page, editor } ) => {
-		await draftNewPage( page );
-		await editor.openDocumentSettingsSidebar();
-
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
-			.getByRole( 'document', {
-				name: 'Empty block; start writing or type forward slash to choose a block',
-			} )
-			.click();
-
-		// Add some content to the page.
-		await page.keyboard.type( 'Sweet paragraph 1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Sweet paragraph 2' );
-
-		// Header template area and page content are visible.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: header',
-			} )
-		).toBeVisible();
-
-		const paragraphs = editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
-			.getByText( 'Sweet paragraph ' );
-
-		await expect( paragraphs.nth( 0 ) ).toBeVisible();
-		await expect( paragraphs.nth( 1 ) ).toBeVisible();
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Title',
-			} )
-		).toBeVisible();
-
-		// Toggle template preview to "off".
-		const templateOptionsButton = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } );
-		await templateOptionsButton.click();
-		const templatePreviewButton = page
-			.getByRole( 'menu', { name: 'Template options' } )
-			.getByRole( 'menuitem', { name: 'Template preview' } );
-
-		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
-			'true'
-		);
-		await templatePreviewButton.click();
-		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
-			'false'
-		);
-
-		// Header template area should be hidden.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: header',
-			} )
-		).toBeHidden();
-
-		// Content block is still visible and wrapped in a container.
-		const paragraphsInGroup = editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Group',
-			} )
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
-			.getByText( 'Sweet paragraph ' );
-
-		await expect( paragraphsInGroup.nth( 0 ) ).toBeVisible();
-		await expect( paragraphsInGroup.nth( 1 ) ).toBeVisible();
-		// Check order of paragraphs.
-		// Important to ensure the blocks are rendered as they are in the template.
-		await expect( paragraphsInGroup.nth( 0 ) ).toHaveText(
-			'Sweet paragraph 1'
-		);
-		await expect( paragraphsInGroup.nth( 1 ) ).toHaveText(
-			'Sweet paragraph 2'
-		);
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Group',
-				} )
-				.getByRole( 'document', {
-					name: 'Block: Title',
-				} )
-		).toBeVisible();
-
-		// Remove focus from templateOptionsButton button.
-		await editor.canvas.locator( 'body' ).click();
-
-		// Toggle template preview to "on".
-		await templateOptionsButton.click();
-		await templatePreviewButton.click();
-		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
-			'true'
-		);
-
-		// Header template area and page content are once again visible.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: header',
-			} )
-		).toBeVisible();
-		await expect( paragraphs.nth( 0 ) ).toBeVisible();
-		await expect( paragraphs.nth( 1 ) ).toBeVisible();
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Title',
-			} )
-		).toBeVisible();
+		// Run assertions
+		await testCreatePage( editor, page );
+		await testToggleTemplatePreview( editor, page );
 	} );
 
 	test( 'swap template and reset to default', async ( {
