@@ -94,6 +94,10 @@ function register_block_core_post_excerpt_length_filter( $value ) {
 		return $value;
 	}
 
+	if ( empty( $_REQUEST['context'] ) || ( 'edit' !== $_REQUEST['context'] ) ) {
+		return $value;
+	}
+
 	return 100;
 }
 add_filter( 'excerpt_length', 'register_block_core_post_excerpt_length_filter', PHP_INT_MAX );
