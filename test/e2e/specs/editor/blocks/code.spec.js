@@ -49,7 +49,7 @@ test.describe( 'Code', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/code',
-				attributes: { content: '&lt;img />\n\t&lt;br>' },
+				attributes: { content: '&lt;img /><br>\t&lt;br>' },
 			},
 		] );
 	} );
