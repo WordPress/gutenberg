@@ -10,7 +10,7 @@
 /**
  * Mark if the block is a root block. Checks that there is already a root block
  * in order not to mark template-parts or synced patterns as root blocks, where
- * the parent is not null.
+ * the parent is null.
  *
  * @param array $parsed_block The parsed block.
  * @param array $source_block The source block.
