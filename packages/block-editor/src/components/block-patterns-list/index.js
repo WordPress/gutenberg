@@ -9,10 +9,8 @@ import classnames from 'classnames';
 import { useState, forwardRef } from '@wordpress/element';
 import {
 	VisuallyHidden,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -22,9 +20,16 @@ import { Icon, symbol } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -34,11 +39,11 @@ const WithToolTip = ( { showTooltip, title, children } ) => {
 };
 
 function BlockPattern( {
+	id,
 	isDraggable,
 	pattern,
 	onClick,
 	onHover,
-	composite,
 	showTooltip,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -75,16 +80,26 @@ function BlockPattern( {
 						title={ pattern.title }
 					>
 						<CompositeItem
-							role="option"
-							as="div"
-							{ ...composite }
-							className={ classnames(
-								'block-editor-block-patterns-list__item',
-								{
-									'block-editor-block-patterns-list__list-item-synced':
-										pattern.id && ! pattern.syncStatus,
-								}
-							) }
+							render={
+								<div
+									role="option"
+									aria-label={ pattern.title }
+									aria-describedby={
+										pattern.description
+											? descriptionId
+											: undefined
+									}
+									className={ classnames(
+										'block-editor-block-patterns-list__item',
+										{
+											'block-editor-block-patterns-list__list-item-synced':
+												pattern.id &&
+												! pattern.syncStatus,
+										}
+									) }
+								/>
+							}
+							id={ id }
 							onClick={ () => {
 								onClick( pattern, blocks );
 								onHover?.( null );
@@ -96,10 +111,6 @@ function BlockPattern( {
 								onHover?.( pattern );
 							} }
 							onMouseLeave={ () => onHover?.( null ) }
-							aria-label={ pattern.title }
-							aria-describedby={
-								pattern.description ? descriptionId : undefined
-							}
 						>
 							<BlockPreview
 								blocks={ blocks }
@@ -141,7 +152,7 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList(
+function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
@@ -155,10 +166,33 @@ function BlockPatternList(
 	},
 	ref
 ) {
-	const composite = useCompositeState( { orientation } );
+	const compositeStore = useCompositeStore( {
+		orientation,
+		setItems: ( items ) => {
+			// This is necessary for if/when we filter the block patterns;
+			// we can potentially remove the currently active item, so we
+			// check to see if the active item is still present, and if not,
+			// reset the active item to be the first available block.
+
+			const currentIds = items.map( ( item ) => item.id );
+			if ( ! currentIds.includes( activeId ) ) {
+				// We can't rely on the order of `currentIds` here, because
+				// `blockPatterns` may not be in the same order the blocks were
+				// originally registered in. So we filter the blocks by what's
+				// visible, and take the first item in that list instead.
+				const firstPattern = blockPatterns.filter( ( pattern ) =>
+					currentIds.includes( pattern.name )
+				)[ 0 ];
+				compositeStore.setActiveId( firstPattern?.name );
+			}
+		},
+	} );
+
+	const activeId = compositeStore.useState( 'activeId' );
+
 	return (
 		<Composite
-			{ ...composite }
+			store={ compositeStore }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
@@ -169,11 +203,11 @@ function BlockPatternList(
 				return isShown ? (
 					<BlockPattern
 						key={ pattern.name }
+						id={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
-						composite={ composite }
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
@@ -185,4 +219,4 @@ function BlockPatternList(
 	);
 }
 
-export default forwardRef( BlockPatternList );
+export default forwardRef( BlockPatternsList );
