@@ -42,7 +42,7 @@ const fileContent = JSON.stringify(
 );
 const filename = 'file.json';
 
-downloadBlob( fileName, fileContent, 'application/json' );
+downloadBlob( filename, fileContent, 'application/json' );
 ```
 
 _Parameters_
