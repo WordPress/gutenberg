@@ -229,7 +229,8 @@ export default function InsertionPoint( props ) {
 	 * Render a popover that overlays the block when the desired operation is to replace it.
 	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
 	 */
-	return insertionPoint.operation === 'replace' ? (
+	return insertionPoint.operation === 'replace' ||
+		insertionPoint.operation === 'group' ? (
 		<BlockDropZonePopover
 			// Force remount to trigger the animation.
 			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }

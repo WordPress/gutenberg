@@ -4,6 +4,7 @@
 import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
+	createBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -210,6 +211,7 @@ export default function useOnBlockDrop(
 		getBlockOrder,
 		getBlocksByClientId,
 		getSettings,
+		getBlock,
 	} = useSelect( blockEditorStore );
 	const {
 		insertBlocks,
@@ -223,11 +225,35 @@ export default function useOnBlockDrop(
 
 	const insertOrReplaceBlocks = useCallback(
 		( blocks, updateSelection = true, initialPosition = 0 ) => {
+			const clientIds = getBlockOrder( targetRootClientId );
+			const clientId = clientIds[ targetBlockIndex ];
 			if ( operation === 'replace' ) {
-				const clientIds = getBlockOrder( targetRootClientId );
-				const clientId = clientIds[ targetBlockIndex ];
-
 				replaceBlocks( clientId, blocks, undefined, initialPosition );
+			} else if ( operation === 'group' ) {
+				const targetBlock = getBlock( clientId );
+				blocks.unshift( targetBlock );
+
+				const groupInnerBlocks = blocks.map( ( block ) => {
+					return createBlock(
+						block.name,
+						block.attributes,
+						block.innerBlocks
+					);
+				} );
+
+				const wrappedBlocks = createBlock(
+					'core/group',
+					{
+						layout: { type: 'flex' },
+					},
+					groupInnerBlocks
+				);
+				replaceBlocks(
+					clientId,
+					wrappedBlocks,
+					undefined,
+					initialPosition
+				);
 			} else {
 				insertBlocks(
 					blocks,
@@ -239,12 +265,13 @@ export default function useOnBlockDrop(
 			}
 		},
 		[
-			operation,
 			getBlockOrder,
-			insertBlocks,
-			replaceBlocks,
-			targetBlockIndex,
 			targetRootClientId,
+			targetBlockIndex,
+			operation,
+			replaceBlocks,
+			getBlock,
+			insertBlocks,
 		]
 	);
 
