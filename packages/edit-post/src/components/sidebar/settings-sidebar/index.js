@@ -99,7 +99,10 @@ const SettingsSidebar = () => {
 				isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabPanel id={ 'edit-post/document' }>
+					<Tabs.TabPanel
+						id={ 'edit-post/document' }
+						focusable={ false }
+					>
 						{ ! isTemplateMode && (
 							<>
 								<PostStatus />
@@ -115,7 +118,7 @@ const SettingsSidebar = () => {
 						) }
 						{ isTemplateMode && <TemplateSummary /> }
 					</Tabs.TabPanel>
-					<Tabs.TabPanel id={ 'edit-post/block' }>
+					<Tabs.TabPanel id={ 'edit-post/block' } focusable={ false }>
 						<BlockInspector />
 					</Tabs.TabPanel>
 				</Tabs.Context.Provider>
