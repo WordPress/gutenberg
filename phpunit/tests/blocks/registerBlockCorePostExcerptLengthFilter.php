@@ -48,9 +48,14 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 		}
 
 		$request->set_param( '_locale', 'user' );
-		$mock = $this->getMockBuilder( stdClass::class )
-					->addMethods( array( 'excerpt_length_callback' ) )
-					->getMock();
+		$mock = $this->getMockBuilder( stdClass::class );
+		if ( method_exists( $mock, 'addMethods' ) ) {
+			$mock->addMethods( array( 'excerpt_length_callback' ) );
+		} else {
+			// Ensure compatibility with older PHPUnit versions.
+			$mock->setMethods( array( 'excerpt_length_callback' ) );
+		}
+		$mock = $mock->getMock();
 
 		$mock->expects( $this->atLeastOnce() )
 			->method( 'excerpt_length_callback' )
