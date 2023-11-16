@@ -617,6 +617,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$processor->add_class( $class_name );
 		}
 		return $processor->get_updated_html();
+	} elseif ( ! $block_supports_layout ) {
+		// Ensure layout classnames are not injected if there is no layout support.
+		return $block_content;
 	}
 
 	$global_settings = gutenberg_get_global_settings();
