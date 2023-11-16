@@ -899,19 +899,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_remove_invalid_font_family_settings() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings'  => array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
 					'typography' => array(
 						'fontFamilies' => array(
 							'custom' => array(
 								array(
-									'name' => 'Open Sans',
-									'slug' => 'open-sans',
+									'name'       => 'Open Sans',
+									'slug'       => 'open-sans',
 									'fontFamily' => '"Open Sans", sans-serif</style><script>alert("xss")</script>',
 								),
 								array(
-									'name' => 'Arial',
-									'slug' => 'arial',
+									'name'       => 'Arial',
+									'slug'       => 'arial',
 									'fontFamily' => 'Arial, serif',
 								),
 							),
@@ -923,18 +923,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'settings'  => array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
 				'typography' => array(
 					'fontFamilies' => array(
 						'custom' => array(
 							array(
-								'name' => 'Arial',
-								'slug' => 'arial',
+								'name'       => 'Arial',
+								'slug'       => 'arial',
 								'fontFamily' => 'Arial, serif',
 							),
 						),
-					)
+					),
 				),
 			),
 		);
