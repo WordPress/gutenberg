@@ -111,9 +111,7 @@ async function testToggleTemplatePreview( editor, page ) {
 		} )
 	).toBeHidden();
 
-	// Check order of paragraphs.
-	// Important to ensure the blocks are rendered as they are in the template.
-
+	// Content blocks are wrapped in a Group block by default.
 	await expect(
 		editor.canvas
 			.getByRole( 'document', {
@@ -123,6 +121,7 @@ async function testToggleTemplatePreview( editor, page ) {
 				name: 'Block: Content',
 			} )
 	).toBeVisible();
+
 	// Ensure order is preserved between toggling.
 	await page
 		.locator(
@@ -254,8 +253,10 @@ test.describe( 'Pages', () => {
 		await addPageContent( editor, page );
 
 		// Run assertions
+		/* eslint-disable playwright/expect-expect */
 		await testCreatePage( editor, page );
 		await testToggleTemplatePreview( editor, page );
+		/* eslint-enable playwright/expect-expect */
 	} );
 
 	test( 'swap template and reset to default', async ( {
