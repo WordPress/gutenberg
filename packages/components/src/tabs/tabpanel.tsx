@@ -24,7 +24,9 @@ export const TabPanel = forwardRef<
 >( function TabPanel( { children, id, focusable = true, ...otherProps }, ref ) {
 	const context = useTabsContext();
 	if ( ! context ) {
-		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
+		warning(
+			'`Tabs.TabPanel` needs to receive context from a `Tabs` component or a `Tabs.Context.Provider`.'
+		);
 		return null;
 	}
 	const { store, instanceId } = context;

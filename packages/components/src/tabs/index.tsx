@@ -172,4 +172,6 @@ function Tabs( {
 Tabs.TabList = TabList;
 Tabs.Tab = Tab;
 Tabs.TabPanel = TabPanel;
+Tabs.Context = TabsContext;
+
 export default Tabs;

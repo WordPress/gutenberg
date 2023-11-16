@@ -19,7 +19,9 @@ export const Tab = forwardRef<
 >( function Tab( { children, id, disabled, render, ...otherProps }, ref ) {
 	const context = useTabsContext();
 	if ( ! context ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+		warning(
+			'`Tabs.Tab` needs to receive context from a `Tabs` component or a `Tabs.Context.Provider`.'
+		);
 		return null;
 	}
 	const { store, instanceId } = context;
