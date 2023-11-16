@@ -59,7 +59,8 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 
 		// Using PHP_INT_MAX for testing purposes only; this should be avoided in production code.
 		add_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
-		rest_get_server()->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( WP_Http::OK, $response->get_status(), 'Expected response status to be ' . WP_Http::OK );
 		remove_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
 		unset ( $_REQUEST['context'] );
 	}
