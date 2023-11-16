@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Functional unit test for wp_register_block_core_post_excerpt_length_filter().
  *
@@ -17,7 +16,8 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 	protected static $admin_id;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$post_id = $factory->post->create( array(
+		self::$post_id = $factory->post->create(
+			array(
 				'post_excerpt' => '',
 			)
 		);
@@ -49,20 +49,20 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 
 		$request->set_param( '_locale', 'user' );
 		$mock = $this->getMockBuilder( stdClass::class )
-		             ->addMethods( [ 'excerpt_length_callback' ] )
-		             ->getMock();
+					->addMethods( array( 'excerpt_length_callback' ) )
+					->getMock();
 
 		$mock->expects( $this->atLeastOnce() )
-		     ->method( 'excerpt_length_callback' )
-		     ->with( $this->equalTo( $expeceted_excerpt_length ) )
-		     ->willReturn( $expeceted_excerpt_length );
+			->method( 'excerpt_length_callback' )
+			->with( $this->equalTo( $expeceted_excerpt_length ) )
+			->willReturn( $expeceted_excerpt_length );
 
 		// Using PHP_INT_MAX for testing purposes only; this should be avoided in production code.
-		add_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
+		add_filter( 'excerpt_length', array( $mock, 'excerpt_length_callback' ), PHP_INT_MAX );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( WP_Http::OK, $response->get_status(), 'Expected response status to be ' . WP_Http::OK );
-		remove_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
-		unset ( $_REQUEST['context'] );
+		remove_filter( 'excerpt_length', array( $mock, 'excerpt_length_callback' ), PHP_INT_MAX );
+		unset( $_REQUEST['context'] );
 	}
 
 	/**
@@ -74,11 +74,11 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 		return array(
 			'no_edit_context' => array(
 				55, // Default filter value.
-				''
+				'',
 			),
 			'edit_context'    => array(
 				100,
-				'edit'
+				'edit',
 			),
 		);
 	}
