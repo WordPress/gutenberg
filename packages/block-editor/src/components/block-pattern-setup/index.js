@@ -32,94 +32,41 @@ const SetupContent = ( {
 	viewMode,
 	activeSlide,
 	patterns,
-	onChangeSlide,
 	onBlockPatternSelect,
 	showTitles,
 } ) => {
+	const compositeStore = useCompositeStore();
 	const containerClass = 'block-editor-block-pattern-setup__container';
-	const commonProps = { containerClass, patterns };
 
-	return viewMode === VIEWMODES.carousel ? (
-		<SetupContentAsCarousel
-			{ ...commonProps }
-			activeSlide={ activeSlide }
-			onChangeSlide={ onChangeSlide }
-		/>
-	) : (
-		<SetupContentAsGrid
-			{ ...commonProps }
-			onBlockPatternSelect={ onBlockPatternSelect }
-			showTitles={ showTitles }
-		/>
-	);
-};
-
-function SetupContentAsCarousel( {
-	containerClass,
-	patterns,
-	activeSlide,
-	onChangeSlide,
-} ) {
-	const activeId = `block-editor-block-pattern-setup__carousel__${ patterns[ activeSlide ].name }__tab`;
-	const composite = useCompositeStore( {
-		defaultActiveId: activeId,
-		orientation: 'horizontal',
-	} );
-	composite.setActiveId( activeId );
-	const slideClass = new Map( [
-		[ activeSlide, 'active-slide' ],
-		[ activeSlide - 1, 'previous-slide' ],
-		[ activeSlide + 1, 'next-slide' ],
-	] );
-
-	return (
-		<div className="block-editor-block-pattern-setup__carousel">
-			<div className={ containerClass }>
-				<div className="carousel-container">
-					<Composite store={ composite } role="tablist">
-						<VisuallyHidden>
-							{ patterns.map( ( pattern, index ) => (
-								<CompositeItem
-									key={ pattern.name }
-									role="tab"
-									id={ `block-editor-block-pattern-setup__carousel__${ pattern.name }__tab` }
-									aria-controls={ `block-editor-block-pattern-setup__carousel__${ pattern.name }` }
-									onClick={ () => onChangeSlide( index ) }
-									onFocus={ () => onChangeSlide( index ) }
-								>
-									{ pattern.title }
-								</CompositeItem>
-							) ) }
-						</VisuallyHidden>
-					</Composite>
-					{ patterns.map( ( pattern, index ) => (
-						<BlockPatternSlide
-							className={ slideClass.get( index ) || '' }
-							key={ pattern.name }
-							pattern={ pattern }
-							id={ `block-editor-block-pattern-setup__carousel__${ pattern.name }` }
-							aria-hidden={ activeSlide !== index }
-						/>
-					) ) }
+	if ( viewMode === VIEWMODES.carousel ) {
+		const slideClass = new Map( [
+			[ activeSlide, 'active-slide' ],
+			[ activeSlide - 1, 'previous-slide' ],
+			[ activeSlide + 1, 'next-slide' ],
+		] );
+		return (
+			<div className="block-editor-block-pattern-setup__carousel">
+				<div className={ containerClass }>
+					<div className="carousel-container">
+						{ patterns.map( ( pattern, index ) => (
+							<BlockPatternSlide
+								active={ index === activeSlide }
+								className={ slideClass.get( index ) || '' }
+								key={ pattern.name }
+								pattern={ pattern }
+							/>
+						) ) }
+					</div>
 				</div>
 			</div>
-		</div>
-	);
-}
-
-function SetupContentAsGrid( {
-	containerClass,
-	patterns,
-	onBlockPatternSelect,
-	showTitles,
-} ) {
-	const composite = useCompositeStore( { orientation: 'vertical' } );
+		);
+	}
 
 	return (
 		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
-				store={ composite }
-				role="list"
+				store={ compositeStore }
+				role="listbox"
 				className={ containerClass }
 				aria-label={ __( 'Patterns list' ) }
 			>
@@ -134,7 +81,7 @@ function SetupContentAsGrid( {
 			</Composite>
 		</div>
 	);
-}
+};
 
 function BlockPattern( { pattern, onSelect, showTitles } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
@@ -144,46 +91,41 @@ function BlockPattern( { pattern, onSelect, showTitles } ) {
 		`${ baseClassName }__item-description`
 	);
 	return (
-		<div className={ `${ baseClassName }__list-item` } role="listitem">
+		<div className={ `${ baseClassName }__list-item` }>
 			<CompositeItem
-				role="button"
-				render={ <div /> }
-				className={ `${ baseClassName }__item` }
+				render={
+					<div
+						aria-describedby={
+							description ? descriptionId : undefined
+						}
+						aria-label={ pattern.title }
+						className={ `${ baseClassName }__item` }
+					/>
+				}
+				id={ `${ baseClassName }__pattern__${ pattern.name }` }
+				role="option"
 				onClick={ () => onSelect( blocks ) }
 			>
-				<div
-					role="img"
-					aria-label={ pattern.title }
-					aria-describedby={
-						pattern.description ? descriptionId : undefined
-					}
-				>
-					<BlockPreview
-						blocks={ blocks }
-						viewportWidth={ viewportWidth }
-					/>
-					{ showTitles && (
-						<div className={ `${ baseClassName }__item-title` }>
-							{ pattern.title }
-						</div>
-					) }
-					{ !! description && (
-						<VisuallyHidden id={ descriptionId }>
-							{ description }
-						</VisuallyHidden>
-					) }
-				</div>
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ viewportWidth }
+				/>
+				{ showTitles && (
+					<div className={ `${ baseClassName }__item-title` }>
+						{ pattern.title }
+					</div>
+				) }
+				{ !! description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ description }
+					</VisuallyHidden>
+				) }
 			</CompositeItem>
 		</div>
 	);
 }
 
-function BlockPatternSlide( {
-	className,
-	pattern,
-	minHeight,
-	...additionalProps
-} ) {
+function BlockPatternSlide( { active, className, pattern, minHeight } ) {
 	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
@@ -191,22 +133,18 @@ function BlockPatternSlide( {
 	);
 	return (
 		<div
-			{ ...additionalProps }
+			aria-hidden={ ! active }
+			role="img"
 			className={ `pattern-slide ${ className }` }
-			role="tabpanel"
+			aria-label={ title }
+			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<div
-				role="img"
-				aria-label={ title }
-				aria-describedby={ description ? descriptionId : undefined }
-			>
-				<BlockPreview blocks={ blocks } minHeight={ minHeight } />
-				{ !! description && (
-					<VisuallyHidden id={ descriptionId }>
-						{ description }
-					</VisuallyHidden>
-				) }
-			</div>
+			<BlockPreview blocks={ blocks } minHeight={ minHeight } />
+			{ !! description && (
+				<VisuallyHidden id={ descriptionId }>
+					{ description }
+				</VisuallyHidden>
+			) }
 		</div>
 	);
 }
@@ -244,14 +182,6 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
-					onChangeSlide={ ( newSlide ) => {
-						setActiveSlide(
-							Math.min(
-								Math.max( newSlide, 0 ),
-								patterns.length - 1
-							)
-						);
-					} }
 					showTitles={ showTitles }
 				/>
 				<SetupToolbar
