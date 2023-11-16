@@ -43,6 +43,7 @@ const UnconnectedBorderBoxControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
+		__next40pxDefaultSize = false,
 		className,
 		colors,
 		disableCustomColors,
@@ -90,6 +91,8 @@ const UnconnectedBorderBoxControl = (
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
+	const inputHeight = __next40pxDefaultSize ? '__unstable-large' : size;
+
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel
@@ -119,7 +122,7 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						size={ size }
+						size={ inputHeight }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -134,13 +137,13 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						size={ size }
+						size={ inputHeight }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					size={ size }
+					size={ inputHeight }
 				/>
 			</View>
 		</View>
