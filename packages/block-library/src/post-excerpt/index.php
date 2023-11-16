@@ -83,21 +83,22 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * the excerpt length block setting has no effect.
  * Returns 100 because 100 is the max length in the setting.
  *
- * @param int $value Excerpt length.
- *
  * @return int Filtered excerpt length.
  */
-function register_block_core_post_excerpt_length_filter( $value ) {
-	// This check needs to be inside the callback since the REST_REQUEST constant
-	// is not defined at the time add_filter() is called.
-	if ( ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-		return $value;
-	}
-
-	if ( empty( $_REQUEST['context'] ) || ( 'edit' !== $_REQUEST['context'] ) ) {
-		return $value;
-	}
-
+function register_block_core_post_excerpt_length_filter() {
 	return 100;
 }
-add_filter( 'excerpt_length', 'register_block_core_post_excerpt_length_filter', 20 );
+
+// This needs to be wrapped in the rest_pre_dispatch hook to ensure
+// that the code works when using REST API preloading or batch requests.
+add_filter(
+	'rest_pre_dispatch',
+	static function ( $result, $server, $request ) {
+		if ( 'edit' !== $request['context'] ) {
+			return;
+		}
+		add_filter( 'excerpt_length', 'register_block_core_post_excerpt_length_filter', 20 );
+	},
+	10,
+	3
+);
