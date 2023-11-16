@@ -31,7 +31,7 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		&:last-child {
+		&[data-field-id="actions"] {
 			text-align: right;
 		}
 	}
@@ -48,4 +48,8 @@
 		max-width: 100%;
 		object-fit: cover;
 	}
+}
+
+.dataviews-action-modal {
+	z-index: z-index(".dataviews-action-modal");
 }

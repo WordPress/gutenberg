@@ -59,6 +59,7 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 	const textControl = (
 		<TextControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			className="html-anchor-control"
 			label={ __( 'HTML anchor' ) }
 			help={
@@ -123,26 +124,23 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
  *
  * @return {Component} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			return (
-				<>
-					<BlockEdit { ...props } />
-					{ props.isSelected &&
-						hasBlockSupport( props.name, 'anchor' ) && (
-							<BlockEditAnchorControl
-								blockName={ props.name }
-								attributes={ props.attributes }
-								setAttributes={ props.setAttributes }
-							/>
-						) }
-				</>
-			);
-		};
-	},
-	'withInspectorControl'
-);
+export const withAnchorControls = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ props.isSelected &&
+					hasBlockSupport( props.name, 'anchor' ) && (
+						<BlockEditAnchorControl
+							blockName={ props.name }
+							attributes={ props.attributes }
+							setAttributes={ props.setAttributes }
+						/>
+					) }
+			</>
+		);
+	};
+}, 'withAnchorControls' );
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -166,11 +164,11 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
 addFilter(
 	'editor.BlockEdit',
-	'core/editor/anchor/with-inspector-control',
-	withInspectorControl
+	'core/editor/anchor/with-inspector-controls',
+	withAnchorControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',
-	'core/anchor/save-props',
+	'core/editor/anchor/save-props',
 	addSaveProps
 );

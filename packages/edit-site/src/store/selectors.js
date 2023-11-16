@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { uploadMedia } from '@wordpress/media-utils';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -18,27 +12,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../utils/constants';
+import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
-
-/**
- * Helper for getting a preference from the preferences store.
- *
- * This is only present so that `getSettings` doesn't need to be made a
- * registry selector.
- *
- * It's unstable because the selector needs to be exported and so part of the
- * public API to work.
- */
-export const __unstableGetPreference = createRegistrySelector(
-	( select ) => ( state, name ) =>
-		select( preferencesStore ).get( 'core/edit-site', name )
-);
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -49,14 +26,19 @@ export const __unstableGetPreference = createRegistrySelector(
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, featureName ) {
-	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
-		since: '6.0',
-		alternative: `select( 'core/preferences' ).get`,
-	} );
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( _, featureName ) => {
+		deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
+			since: '6.0',
+			alternative: `select( 'core/preferences' ).get`,
+		} );
 
-	return !! __unstableGetPreference( state, featureName );
-}
+		return !! select( preferencesStore ).get(
+			'core/edit-site',
+			featureName
+		);
+	}
+);
 
 /**
  * Returns the current editing canvas device type.
@@ -88,6 +70,13 @@ export const getCanUserCreateMedia = createRegistrySelector(
  * @return {Array} The available reusable blocks.
  */
 export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+	deprecated(
+		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
+		{
+			since: '6.5',
+			version: '6.8',
+		}
+	);
 	const isWeb = Platform.OS === 'web';
 	return isWeb
 		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
@@ -97,67 +86,18 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
 } );
 
 /**
- * Returns the settings, taking into account active features and permissions.
+ * Returns the site editor settings.
  *
- * @param {Object}   state             Global application state.
- * @param {Function} setIsInserterOpen Setter for the open state of the global inserter.
+ * @param {Object} state Global application state.
  *
  * @return {Object} Settings.
  */
-export const getSettings = createSelector(
-	( state, setIsInserterOpen ) => {
-		const settings = {
-			...state.settings,
-			outlineMode: true,
-			focusMode: !! __unstableGetPreference( state, 'focusMode' ),
-			isDistractionFree: !! __unstableGetPreference(
-				state,
-				'distractionFree'
-			),
-			hasFixedToolbar: !! __unstableGetPreference(
-				state,
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! __unstableGetPreference(
-				state,
-				'keepCaretInsideBlock'
-			),
-			showIconLabels: !! __unstableGetPreference(
-				state,
-				'showIconLabels'
-			),
-			__experimentalSetIsInserterOpened: setIsInserterOpen,
-			__experimentalReusableBlocks: getReusableBlocks( state ),
-			__experimentalPreferPatternsOnRoot:
-				TEMPLATE_POST_TYPE === getEditedPostType( state ),
-		};
-
-		const canUserCreateMedia = getCanUserCreateMedia( state );
-		if ( ! canUserCreateMedia ) {
-			return settings;
-		}
-
-		settings.mediaUpload = ( { onError, ...rest } ) => {
-			uploadMedia( {
-				wpAllowedMimeTypes: state.settings.allowedMimeTypes,
-				onError: ( { message } ) => onError( message ),
-				...rest,
-			} );
-		};
-		return settings;
-	},
-	( state ) => [
-		getCanUserCreateMedia( state ),
-		state.settings,
-		__unstableGetPreference( state, 'focusMode' ),
-		__unstableGetPreference( state, 'distractionFree' ),
-		__unstableGetPreference( state, 'fixedToolbar' ),
-		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
-		__unstableGetPreference( state, 'showIconLabels' ),
-		getReusableBlocks( state ),
-		getEditedPostType( state ),
-	]
-);
+export function getSettings( state ) {
+	// It is important that we don't inject anything into these settings locally.
+	// The reason for this is that we have an effect in place that calls setSettings based on the previous value of getSettings.
+	// If we add computed settings here, we'll be adding these computed settings to the state which is very unexpected.
+	return state.settings;
+}
 
 /**
  * @deprecated
@@ -317,9 +257,9 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return __unstableGetPreference( state, 'editorMode' );
-}
+export const getEditorMode = createRegistrySelector( ( select ) => () => {
+	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+} );
 
 /**
  * @deprecated

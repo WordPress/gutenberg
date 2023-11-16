@@ -16,6 +16,22 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
 import { ViewGrid } from './view-grid';
+import { ViewSideBySide } from './view-side-by-side';
+
+// To do: convert to view type registry.
+export const viewTypeSupportsMap = {
+	list: {},
+	grid: {},
+	'side-by-side': {
+		preview: true,
+	},
+};
+
+const viewTypeMap = {
+	list: ViewList,
+	grid: ViewGrid,
+	'side-by-side': ViewSideBySide,
+};
 
 export default function DataViews( {
 	view,
@@ -27,8 +43,9 @@ export default function DataViews( {
 	data,
 	isLoading = false,
 	paginationInfo,
+	supportedLayouts,
 } ) {
-	const ViewComponent = view.type === 'list' ? ViewList : ViewGrid;
+	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
@@ -53,11 +70,12 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end">
+					<HStack justify="end" expanded={ false }>
 						<ViewActions
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							supportedLayouts={ supportedLayouts }
 						/>
 					</HStack>
 				</HStack>

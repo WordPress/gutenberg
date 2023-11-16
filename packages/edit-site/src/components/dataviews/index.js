@@ -1,1 +1,1 @@
-export { default as DataViews } from './dataviews';
+export { default as DataViews, viewTypeSupportsMap } from './dataviews';

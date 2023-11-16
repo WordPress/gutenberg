@@ -40,7 +40,7 @@ function _gutenberg_register_data_views_post_type() {
 		'wp_dataviews_type',
 		array( 'wp_dataviews' ),
 		array(
-			'public'            => true,
+			'public'            => false,
 			'hierarchical'      => false,
 			'labels'            => array(
 				'name'          => __( 'Dataview types', 'gutenberg' ),

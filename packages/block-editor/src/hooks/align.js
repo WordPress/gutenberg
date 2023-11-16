@@ -98,8 +98,8 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
-				// Allow for '' since it is used by updateAlignment function
-				// in withToolbarControls for special cases with defined default values.
+				// Allow for '' since it is used by the `updateAlignment` function
+				// in toolbar controls for special cases with defined default values.
 				enum: [ ...ALL_ALIGNMENTS, '' ],
 			},
 		};
@@ -115,7 +115,7 @@ function BlockEditAlignmentToolbarControls( {
 } ) {
 	// Compute the block valid alignments by taking into account,
 	// if the theme supports wide alignments or not and the layout's
-	// availble alignments. We do that for conditionally rendering
+	// available alignments. We do that for conditionally rendering
 	// Slot.
 	const blockAllowedAlignments = getValidAlignments(
 		getBlockSupport( blockName, 'align' ),
@@ -160,7 +160,7 @@ function BlockEditAlignmentToolbarControls( {
  *
  * @return {Function} Wrapped component.
  */
-export const withToolbarControls = createHigherOrderComponent(
+export const withAlignmentControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const hasAlignmentSupport = hasBlockSupport(
 			props.name,
@@ -181,7 +181,7 @@ export const withToolbarControls = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withAlignmentControls'
 );
 
 function BlockListBlockWithDataAlign( { block: BlockListBlock, props } ) {
@@ -257,7 +257,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/align/addAttribute',
+	'core/editor/align/addAttribute',
 	addAttribute
 );
 addFilter(
@@ -268,10 +268,10 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/align/with-toolbar-controls',
-	withToolbarControls
+	withAlignmentControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',
-	'core/align/addAssignedAlign',
+	'core/editor/align/addAssignedAlign',
 	addAssignedAlign
 );

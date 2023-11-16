@@ -10,45 +10,10 @@
  */
 class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 
-	private static $post_1;
-	private static $post_2;
-	private static $post_3;
+	private static $posts;
 
-	public function set_up() {
-		parent::set_up();
-
-		self::$post_1 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-1',
-				'post_title'   => 'Post 1',
-				'post_content' => 'Post 1 content',
-				'post_excerpt' => 'Post 1',
-			)
-		);
-
-		self::$post_2 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-2',
-				'post_title'   => 'Post 2',
-				'post_content' => 'Post 2 content',
-				'post_excerpt' => 'Post 2',
-			)
-		);
-
-		self::$post_3 = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'post',
-				'post_status'  => 'publish',
-				'post_name'    => 'post-2',
-				'post_title'   => 'Post 2',
-				'post_content' => 'Post 2 content',
-				'post_excerpt' => 'Post 2',
-			)
-		);
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$posts = $factory->post->create_many( 3 );
 
 		register_block_type(
 			'test/plugin-block',
@@ -60,9 +25,8 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 		);
 	}
 
-	public function tear_down() {
+	public static function wpTearDownAfterClass() {
 		unregister_block_type( 'test/plugin-block' );
-		parent::tear_down();
 	}
 
 	/**
@@ -109,7 +73,7 @@ HTML;
 		$this->assertSame( true, $p->get_attribute( 'data-wp-interactive' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
-		$this->assertSame( 'post-template-item-' . self::$post_2->ID, $p->get_attribute( 'data-wp-key' ) );
+		$this->assertSame( 'post-template-item-' . self::$posts[1], $p->get_attribute( 'data-wp-key' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-previous' ) );
 		$this->assertSame( 'query-pagination-previous', $p->get_attribute( 'data-wp-key' ) );
@@ -165,6 +129,49 @@ HTML;
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
 		$this->assertSame( 'true', $p->get_attribute( 'data-wp-navigation-disabled' ) );
+	}
+
+
+	/**
+	 * Tests that the `core/query` last tag is rendered with the tagName attribute
+	 * if is defined, having a div as default.
+	 */
+	public function test_enhanced_query_markup_rendering_at_bottom_on_custom_html_element_tags() {
+		global $wp_query, $wp_the_query;
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"tagName":"aside","enhancedPagination":true} -->
+		<aside class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:test/plugin-block /-->
+			<!-- /wp:post-template -->
+			<span>Helper to get last HTML Tag</span>
+		</aside>
+		<!-- /wp:query -->
+
+HTML;
+
+		// Set main query to single post.
+		$wp_query = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+			)
+		);
+
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$p = new WP_HTML_Tag_Processor( $output );
+
+		$p->next_tag( 'span' );
+
+		// Test that there is a div added just after the last tag inside the aside.
+		$this->assertSame( $p->next_tag(), true );
+		// Test that that div is the accesibility one.
+		$this->assertSame( 'screen-reader-text', $p->get_attribute( 'class' ) );
+		$this->assertSame( 'context.core.query.message', $p->get_attribute( 'data-wp-text' ) );
+		$this->assertSame( 'polite', $p->get_attribute( 'aria-live' ) );
 	}
 
 	/**
