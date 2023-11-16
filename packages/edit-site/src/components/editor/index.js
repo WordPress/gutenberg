@@ -6,31 +6,37 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
-	BlockContextProvider,
 	BlockBreadcrumb,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	BlockInspector,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { EditorNotices, EditorSnackbars } from '@wordpress/editor';
+import {
+	EditorNotices,
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
-import BlockEditor from '../block-editor';
+import {
+	SidebarComplementaryAreaFills,
+	SidebarInspectorFill,
+} from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -46,8 +52,13 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
+import SiteEditorCanvas from '../block-editor/site-editor-canvas';
+import TemplatePartConverter from '../template-part-converter';
+import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+const { ExperimentalEditorProvider: EditorProvider } =
+	unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -79,10 +90,11 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		isLoaded: hasLoadedPost,
 	} = useEditedEntityRecord();
 
-	const { id: editedPostId, type: editedPostType } = editedPost;
+	const { type: editedPostType } = editedPost;
 
 	const {
 		context,
+		contextPost,
 		editorMode,
 		canvasMode,
 		blockEditorMode,
@@ -92,6 +104,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 		hasPageContentFocus,
+		pageContentFocusType,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -100,14 +113,24 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			isInserterOpened,
 			isListViewOpened,
 			hasPageContentFocus: _hasPageContentFocus,
+			getPageContentFocusType,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEntityRecord } = select( coreDataStore );
+		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
-			context: getEditedPostContext(),
+			context: _context,
+			contextPost: _context?.postId
+				? getEntityRecord(
+						'postType',
+						_context.postType,
+						_context.postId
+				  )
+				: undefined,
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
 			blockEditorMode: __unstableGetEditorMode(),
@@ -125,6 +148,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				'showBlockBreadcrumbs'
 			),
 			hasPageContentFocus: _hasPageContentFocus(),
+			pageContentFocusType: getPageContentFocusType(),
 		};
 	}, [] );
 
@@ -141,18 +165,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const blockContext = useMemo( () => {
-		const { postType, postId, ...nonPostFields } = context ?? {};
-
-		return {
-			...( hasPageContentFocus ? context : nonPostFields ),
-			// Ideally this context should be removed. However, it is currently used by the Query Loop block.
-			templateSlug:
-				editedPostType === TEMPLATE_POST_TYPE
-					? editedPost.slug
-					: undefined,
-		};
-	}, [ editedPost.slug, editedPostType, hasPageContentFocus, context ] );
+	const postWithTemplate = context?.postId;
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -174,110 +187,131 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const contentProps = isLoading
-		? {
-				'aria-busy': 'true',
-				'aria-describedby': loadingProgressId,
-		  }
-		: undefined;
+	const settings = useSpecificEditorSettings();
+	const isReady =
+		! isLoading &&
+		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
+			( ! postWithTemplate && !! editedPost ) );
+	const mode = useMemo( () => {
+		if ( isViewMode ) {
+			return postWithTemplate ? 'template-locked' : 'all';
+		}
+
+		if ( isEditMode && pageContentFocusType === 'hideTemplate' ) {
+			return 'post-only';
+		}
+
+		if ( postWithTemplate && hasPageContentFocus ) {
+			return 'template-locked';
+		}
+
+		if ( postWithTemplate && ! hasPageContentFocus ) {
+			return 'template-only';
+		}
+
+		return 'all';
+	}, [
+		isViewMode,
+		isEditMode,
+		postWithTemplate,
+		pageContentFocusType,
+		hasPageContentFocus,
+	] );
 
 	return (
 		<>
-			{ isLoading ? <CanvasLoader id={ loadingProgressId } /> : null }
+			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
-			<EntityProvider kind="root" type="site">
-				<EntityProvider
-					kind="postType"
-					type={ editedPostType }
-					id={ editedPostId }
+			{ hasLoadedPost && ! editedPost && (
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+					) }
+				</Notice>
+			) }
+			{ isReady && (
+				<EditorProvider
+					post={ postWithTemplate ? contextPost : editedPost }
+					__unstableTemplate={
+						postWithTemplate ? editedPost : undefined
+					}
+					settings={ settings }
+					useSubRegistry={ false }
+					mode={ mode }
 				>
-					<BlockContextProvider value={ blockContext }>
-						<SidebarComplementaryAreaFills />
-						{ isEditMode && <StartTemplateOptions /> }
-						<InterfaceSkeleton
-							isDistractionFree={ true }
-							enableRegionNavigation={ false }
-							className={ classnames(
-								'edit-site-editor__interface-skeleton',
-								{
-									'show-icon-labels': showIconLabels,
-									'is-loading': isLoading,
-								}
-							) }
-							notices={ <EditorSnackbars /> }
-							content={
-								<>
-									<GlobalStylesRenderer />
-									{ isEditMode && <EditorNotices /> }
-									{ showVisualEditor && editedPost && (
-										<>
-											<BlockEditor />
-											<BlockRemovalWarningModal
-												rules={ blockRemovalRules }
-											/>
-											<PatternModal />
-										</>
-									) }
-									{ editorMode === 'text' &&
-										editedPost &&
-										isEditMode && <CodeEditor /> }
-									{ hasLoadedPost && ! editedPost && (
-										<Notice
-											status="warning"
-											isDismissible={ false }
-										>
-											{ __(
-												"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-											) }
-										</Notice>
-									) }
-									{ isEditMode && (
-										<KeyboardShortcutsEditMode />
-									) }
-								</>
+					<SidebarComplementaryAreaFills />
+					{ isEditMode && <StartTemplateOptions /> }
+					<InterfaceSkeleton
+						isDistractionFree={ true }
+						enableRegionNavigation={ false }
+						className={ classnames(
+							'edit-site-editor__interface-skeleton',
+							{
+								'show-icon-labels': showIconLabels,
 							}
-							contentProps={ contentProps }
-							secondarySidebar={
-								isEditMode &&
-								( ( shouldShowInserter && (
-									<InserterSidebar />
-								) ) ||
-									( shouldShowListView && (
-										<ListViewSidebar
-											listViewToggleElement={
-												listViewToggleElement
-											}
-										/>
-									) ) )
-							}
-							sidebar={
-								isEditMode &&
-								isRightSidebarOpen && (
+						) }
+						notices={ <EditorSnackbars /> }
+						content={
+							<>
+								<GlobalStylesRenderer />
+								{ isEditMode && <EditorNotices /> }
+								{ showVisualEditor && (
 									<>
-										<ComplementaryArea.Slot scope="core/edit-site" />
-										<SidebarFixedBottomSlot />
+										<TemplatePartConverter />
+										<SidebarInspectorFill>
+											<BlockInspector />
+										</SidebarInspectorFill>
+										<SiteEditorCanvas />
+										<BlockRemovalWarningModal
+											rules={ blockRemovalRules }
+										/>
+										<PatternModal />
 									</>
-								)
-							}
-							footer={
-								shouldShowBlockBreadcrumbs && (
-									<BlockBreadcrumb
-										rootLabelText={
-											hasPageContentFocus
-												? __( 'Page' )
-												: __( 'Template' )
+								) }
+								{ editorMode === 'text' && isEditMode && (
+									<CodeEditor />
+								) }
+								{ isEditMode && <KeyboardShortcutsEditMode /> }
+							</>
+						}
+						secondarySidebar={
+							isEditMode &&
+							( ( shouldShowInserter && <InserterSidebar /> ) ||
+								( shouldShowListView && (
+									<ListViewSidebar
+										listViewToggleElement={
+											listViewToggleElement
 										}
 									/>
-								)
-							}
-							labels={ {
-								...interfaceLabels,
-								secondarySidebar: secondarySidebarLabel,
-							} }
-						/>
-					</BlockContextProvider>
-				</EntityProvider>
-			</EntityProvider>
+								) ) )
+						}
+						sidebar={
+							isEditMode &&
+							isRightSidebarOpen && (
+								<>
+									<ComplementaryArea.Slot scope="core/edit-site" />
+									<SidebarFixedBottomSlot />
+								</>
+							)
+						}
+						footer={
+							shouldShowBlockBreadcrumbs && (
+								<BlockBreadcrumb
+									rootLabelText={
+										hasPageContentFocus
+											? __( 'Page' )
+											: __( 'Template' )
+									}
+								/>
+							)
+						}
+						labels={ {
+							...interfaceLabels,
+							secondarySidebar: secondarySidebarLabel,
+						} }
+					/>
+				</EditorProvider>
+			) }
 		</>
 	);
 }
