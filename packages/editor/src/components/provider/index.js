@@ -70,12 +70,12 @@ function useForceFocusModeForNavigation( navigationBlockClientId ) {
  *
  * @return {Array} Flattened object.
  */
-function extractedPageContentBlockTypesFromTemplateBlocks( blocks ) {
+function extractPageContentBlockTypesFromTemplateBlocks( blocks ) {
 	const result = [];
 	for ( let i = 0; i < blocks.length; i++ ) {
 		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
 		// we skip it because we only want to render stand-alone page content blocks in the block list.
-		if ( [ 'core/query' ].includes( blocks[ i ].name ) ) {
+		if ( blocks[ i ].name === 'core/query' ) {
 			continue;
 		}
 		if ( PAGE_CONTENT_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
@@ -83,7 +83,7 @@ function extractedPageContentBlockTypesFromTemplateBlocks( blocks ) {
 		}
 		if ( blocks[ i ].innerBlocks.length ) {
 			result.push(
-				...extractedPageContentBlockTypesFromTemplateBlocks(
+				...extractPageContentBlockTypesFromTemplateBlocks(
 					blocks[ i ].innerBlocks
 				)
 			);
@@ -99,7 +99,7 @@ function extractedPageContentBlockTypesFromTemplateBlocks( blocks ) {
  *
  * @param {Array}   post     Block list.
  * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
- * @param {boolean} mode     Rendering mode.
+ * @param {string}  mode     Rendering mode.
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
@@ -141,7 +141,7 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					extractedPageContentBlockTypesFromTemplateBlocks(
+					extractPageContentBlockTypesFromTemplateBlocks(
 						templateBlocks
 					)
 				),

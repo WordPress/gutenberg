@@ -43,11 +43,7 @@ export default function EditTemplate() {
 				select( blockEditorStore );
 			const _context = getEditedPostContext();
 			const _postType = getEditedPostType();
-			const queryArgs = [
-				'postType',
-				getEditedPostType(),
-				getEditedPostId(),
-			];
+			const queryArgs = [ 'postType', _postType, getEditedPostId() ];
 			return {
 				hasPostContentBlocks: !! __experimentalGetGlobalBlocksByName(
 					Object.keys( PAGE_CONTENT_BLOCK_TYPES )
