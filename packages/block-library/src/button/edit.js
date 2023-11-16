@@ -33,11 +33,17 @@ import {
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	createBlock,
+	cloneBlock,
+	getDefaultBlockName,
+} from '@wordpress/blocks';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -46,6 +52,62 @@ const LINK_SETTINGS = [
 		title: __( 'Mark as nofollow' ),
 	},
 ];
+
+function useEnter( props ) {
+	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const { getBlock, getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
+	const propsRef = useRef( props );
+	propsRef.current = props;
+	return useRefEffect( ( element ) => {
+		function onKeyDown( event ) {
+			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+				return;
+			}
+			const { content, clientId } = propsRef.current;
+			if ( content.length ) {
+				return;
+			}
+			event.preventDefault();
+			const topParentListBlock = getBlock(
+				getBlockRootClientId( clientId )
+			);
+			const blockIndex = getBlockIndex( clientId );
+			const head = cloneBlock( {
+				...topParentListBlock,
+				innerBlocks: topParentListBlock.innerBlocks.slice(
+					0,
+					blockIndex
+				),
+			} );
+			const middle = createBlock( getDefaultBlockName() );
+			const after = topParentListBlock.innerBlocks.slice(
+				blockIndex + 1
+			);
+			const tail = after.length
+				? [
+						cloneBlock( {
+							...topParentListBlock,
+							innerBlocks: after,
+						} ),
+				  ]
+				: [];
+			replaceBlocks(
+				topParentListBlock.clientId,
+				[ head, middle, ...tail ],
+				1
+			);
+			// We manually change the selection here because we are replacing
+			// a different block than the selected one.
+			selectionChange( middle.clientId );
+		}
+
+		element.addEventListener( 'keydown', onKeyDown );
+		return () => {
+			element.removeEventListener( 'keydown', onKeyDown );
+		};
+	}, [] );
+}
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -88,6 +150,7 @@ function ButtonEdit( props ) {
 		isSelected,
 		onReplace,
 		mergeBlocks,
+		clientId,
 	} = props;
 	const {
 		tagName,
@@ -164,6 +227,9 @@ function ButtonEdit( props ) {
 		[ url, opensInNewTab, nofollow ]
 	);
 
+	const useEnterRef = useEnter( { content: text, clientId } );
+	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
+
 	return (
 		<>
 			<div
@@ -175,7 +241,7 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
-					ref={ richTextRef }
+					ref={ mergedRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
