@@ -195,12 +195,23 @@ const UnconnectedDropdownMenu = (
 
 	const computedDirection = isRTL() ? 'rtl' : 'ltr';
 
-	// If an explicit value for the `placement` prop is not passed,
-	// apply a default placement of `bottom-start` for the root dropdown,
-	// and of `right-start` for nested dropdowns.
-	let computedPlacement =
-		props.placement ??
-		( parentContext?.store ? 'right-start' : 'bottom-start' );
+	let computedPlacement: typeof props.placement;
+	if ( props.placement ) {
+		// The `placement` prop has priority.
+		computedPlacement = props.placement;
+	} else if ( parentContext?.store.parent ) {
+		// If the current menu is at least a second-gen nested menu, it inherits
+		// the placement from its parent menu.
+		computedPlacement = parentContext.store.useState( 'currentPlacement' );
+	} else if ( parentContext?.store ) {
+		// If the current menu is at least a first-gen nested menu, the default
+		// placement is `right-start`.
+		computedPlacement = 'right-start';
+	} else {
+		// For the root dropdown menu, the default placement is `bottom-start`.
+		computedPlacement = 'bottom-start';
+	}
+
 	// Swap left/right in case of RTL direction
 	if ( computedDirection === 'rtl' ) {
 		if ( /right/.test( computedPlacement ) ) {

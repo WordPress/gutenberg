@@ -52,6 +52,9 @@ export interface DropdownMenuProps {
 	/**
 	 * The placement of the dropdown menu popover.
 	 *
+	 * Submenus from the second level of nesting onwards will inherit the parent
+	 * menu's placement by default, which can still be changed via this prop.
+	 *
 	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
 	 */
 	placement?: Placement;
