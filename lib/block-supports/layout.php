@@ -618,8 +618,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 		return $processor->get_updated_html();
 	} elseif ( ! $block_supports_layout ) {
-		// Ensure that layout classnames are not injected if the block does not
-		// support layout, and no child layout styles were generated.
+		// Ensure layout classnames are not injected if there is no layout support.
 		return $block_content;
 	}
 
