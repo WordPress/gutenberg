@@ -12,6 +12,7 @@ import {
 	getPxFromCssUnit,
 	useSettings,
 	useMultipleOriginColorsAndGradients,
+	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -362,13 +363,17 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 		[]
 	);
 	// Default editor colors/gradients if it's not a block-based theme.
-	const colorPalette =
+	const defaultPaletteSetting =
 		type === 'colors' ? 'color.palette' : 'color.gradients';
-	const [ editorDefaultPalette ] = useSettings( colorPalette );
+	const [ defaultPaletteValue ] = useSettings( defaultPaletteSetting );
+	// In edge cases, the default palette might be undefined. To avoid
+	// exceptions across the editor in that case, we explicitly return
+	// the default editor colors.
+	const defaultPalette = defaultPaletteValue ?? SETTINGS_DEFAULTS.colors;
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors
-		: editorDefaultPalette;
+		: defaultPalette;
 }
 
 export function getColorsAndGradients(

@@ -26,6 +26,31 @@ _Returns_
 
 -   `string`: The blob URL.
 
+### downloadBlob
+
+Downloads a file, e.g., a text or readable stream, in the browser. Appropriate for downloading smaller file sizes, e.g., \< 5 MB.
+
+Example usage:
+
+```js
+const fileContent = JSON.stringify(
+	{
+		title: 'My Post',
+	},
+	null,
+	2
+);
+const fileName = 'file.json';
+
+downloadBlob( 'file.json', fileContent, 'application/json' );
+```
+
+_Parameters_
+
+-   _filename_ `string`: File name.
+-   _content_ `BlobPart`: File content (BufferSource | Blob | string).
+-   _contentType_ `string`: (Optional) File mime type. Default is `''`.
+
 ### getBlobByURL
 
 Retrieve a file based on a blob URL. The file must have been created by `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return `undefined`.

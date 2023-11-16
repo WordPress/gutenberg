@@ -20,7 +20,7 @@ test.describe( 'RichText', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.clickBlockToolbarButton( 'Change level' );
-		await page.locator( 'button[aria-label="Heading 3"]' ).click();
+		await page.locator( 'role=menuitemradio[name="Heading 3"]' ).click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{

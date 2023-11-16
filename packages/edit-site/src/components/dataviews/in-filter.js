@@ -5,37 +5,52 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	SelectControl,
 } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
-const OPERATOR_IN = 'in';
+export const OPERATOR_IN = 'in';
 
 export default ( { filter, view, onChangeView } ) => {
-	const activeValue = view.filters.find(
-		( f ) => f.field === filter.id && f.operator === OPERATOR_IN
-	)?.value;
+	const valueFound = view.filters.find(
+		( f ) => f.field === filter.field && f.operator === OPERATOR_IN
+	);
+
+	const activeValue =
+		! valueFound || ! valueFound.hasOwnProperty( 'value' )
+			? ''
+			: valueFound.value;
+
+	const id = `dataviews__filters-in-${ filter.field }`;
 
 	return (
 		<SelectControl
+			id={ id }
+			__nextHasNoMarginBottom
 			value={ activeValue }
 			prefix={
 				<InputControlPrefixWrapper
-					as="span"
+					as="label"
+					htmlFor={ id }
 					className="dataviews__select-control-prefix"
 				>
-					{ filter.name + ':' }
+					{ sprintf(
+						/* translators: filter name. */
+						__( '%s:' ),
+						filter.name
+					) }
 				</InputControlPrefixWrapper>
 			}
 			options={ filter.elements }
 			onChange={ ( value ) => {
 				const filters = view.filters.filter(
-					( f ) => f.field !== filter.id || f.operator !== OPERATOR_IN
+					( f ) =>
+						f.field !== filter.field || f.operator !== OPERATOR_IN
 				);
-				if ( value !== '' ) {
-					filters.push( {
-						field: filter.id,
-						operator: OPERATOR_IN,
-						value,
-					} );
-				}
+
+				filters.push( {
+					field: filter.field,
+					operator: OPERATOR_IN,
+					value,
+				} );
 
 				onChangeView( ( currentView ) => ( {
 					...currentView,

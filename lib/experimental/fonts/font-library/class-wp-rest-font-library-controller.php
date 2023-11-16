@@ -345,6 +345,18 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Checks whether the font directory exists or not.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return bool Whether the font directory exists.
+	 */
+	private function has_upload_directory() {
+		$upload_dir = WP_Font_Library::get_fonts_dir();
+		return is_dir( $upload_dir );
+	}
+
+	/**
 	 * Checks whether the user has write permissions to the temp and fonts directories.
 	 *
 	 * @since 6.5.0
@@ -418,12 +430,29 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			$response_status = 400;
 		}
 
-		if ( $this->needs_write_permission( $fonts_to_install ) && ! $this->has_write_permission() ) {
-			$errors[]        = new WP_Error(
-				'cannot_write_fonts_folder',
-				__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
-			);
-			$response_status = 500;
+		if ( $this->needs_write_permission( $fonts_to_install ) ) {
+			$upload_dir = WP_Font_Library::get_fonts_dir();
+			if ( ! $this->has_upload_directory() ) {
+				if ( ! wp_mkdir_p( $upload_dir ) ) {
+					$errors[] = new WP_Error(
+						'cannot_create_fonts_folder',
+						sprintf(
+							/* translators: %s: Directory path. */
+							__( 'Error: Unable to create directory %s.', 'gutenberg' ),
+							esc_html( $upload_dir )
+						)
+					);
+					$response_status = 500;
+				}
+			}
+
+			if ( $this->has_upload_directory() && ! $this->has_write_permission() ) {
+				$errors[]        = new WP_Error(
+					'cannot_write_fonts_folder',
+					__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
+				);
+				$response_status = 500;
+			}
 		}
 
 		if ( ! empty( $errors ) ) {

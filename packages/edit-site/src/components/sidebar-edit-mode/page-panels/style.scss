@@ -84,4 +84,17 @@
 	.components-popover__content {
 		min-width: 240px;
 	}
+	.components-button.is-pressed,
+	.components-button.is-pressed:hover {
+		background: inherit;
+		color: inherit;
+	}
 }
+
+.edit-site-page-panels-edit-slug__dropdown {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}
+

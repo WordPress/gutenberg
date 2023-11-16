@@ -83,16 +83,17 @@ function Pagination( {
 										min={ 1 }
 										max={ totalPages }
 										onChange={ ( value ) => {
+											const _value = +value;
 											if (
-												! value ||
-												value < 1 ||
-												value > totalPages
+												! _value ||
+												_value < 1 ||
+												_value > totalPages
 											) {
 												return;
 											}
 											onChangeView( {
 												...view,
-												page: value,
+												page: _value,
 											} );
 										} }
 										step="1"

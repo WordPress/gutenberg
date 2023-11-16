@@ -295,7 +295,10 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
+		await admin.createNewPost( {
+			postType: 'not_public',
+			title: 'aaaaa',
+		} );
 
 		// Open the view menu.
 		await page.click( 'role=button[name="Preview"i]' );

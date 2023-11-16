@@ -150,6 +150,19 @@ _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
 
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
+
 ### getEditedEntityRecord
 
 Returns the specified entity record, merged with its edits.
@@ -643,6 +656,19 @@ _Parameters_
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
 
 _Returns_
 

@@ -15,7 +15,7 @@ _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/
     - [Interactive Mode](#interactive-mode)
     - [`slug`](#slug)
     - [`options`](#options)
-- [Available Commands](#available-commands)
+- [Available Commands](#available-commands-in-the-scaffolded-project)
 - [External Project Templates](#external-project-templates)
 - [Contributing to this package](#contributing-to-this-package)
 
@@ -141,7 +141,7 @@ For example, running the `start` script from inside the generated folder (`npm s
 
 ## External Project Templates
 
-[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/external-template.md) for information on External Project Templates
+[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/packages-create-block-external-template/) for information on External Project Templates
 
 ## Contributing to this package
 

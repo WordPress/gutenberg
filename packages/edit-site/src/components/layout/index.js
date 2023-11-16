@@ -116,7 +116,7 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const showSidebar =
-		( isMobileViewport && ! isListPage ) ||
+		( isMobileViewport && canvasMode === 'view' && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
@@ -192,6 +192,7 @@ export default function Layout() {
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
+						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
@@ -282,7 +283,7 @@ export default function Layout() {
 							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
 							// so we can't remove the element entirely. Using `inert` will make
 							// it inaccessible to screen readers and keyboard navigation.
-							inert={ showSidebar ? undefined : 'inert' }
+							inert={ showSidebar ? undefined : 'true' }
 							animate={ { opacity: showSidebar ? 1 : 0 } }
 							transition={ {
 								type: 'tween',
