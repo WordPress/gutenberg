@@ -8,6 +8,10 @@ describe( 'wpKebabCase', () => {
 		const input = 'abc1def';
 		const expectedOutput = 'abc-1def';
 		expect( wpKebabCase( input ) ).toEqual( expectedOutput );
+
+		const input2 = 'abc1def2ghi';
+		const expectedOutput2 = 'abc-1def-2ghi';
+		expect( wpKebabCase( input2 ) ).toEqual( expectedOutput2 );
 	} );
 
 	it( 'should not insert a dash between two letters', () => {
