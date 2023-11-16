@@ -31,7 +31,7 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 	}
 
 	/**
-	 * Unit test for ensuring correct length of the post excerpt in the REST API context.
+	 * Unit test to ensure the correct length of the post excerpt in the REST API context.
 	 *
 	 * @dataProvider data_register_block_core_post_excerpt_length_filter
 	 *
@@ -57,6 +57,7 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 		     ->with( $this->equalTo( $expeceted_excerpt_length ) )
 		     ->willReturn( $expeceted_excerpt_length );
 
+		// Using PHP_INT_MAX for testing purposes only; this should be avoided in production code.
 		add_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
 		rest_get_server()->dispatch( $request );
 		remove_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
