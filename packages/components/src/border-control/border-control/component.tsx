@@ -38,6 +38,7 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
+		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
 		disableUnits,
@@ -64,6 +65,8 @@ const UnconnectedBorderControl = (
 		...otherProps
 	} = useBorderControl( props );
 
+	const inputHeight = __next40pxDefaultSize ? '__unstable-large' : size;
+
 	return (
 		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
@@ -86,7 +89,7 @@ const UnconnectedBorderControl = (
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							size={ size }
+							size={ inputHeight }
 						/>
 					}
 					label={ __( 'Border width' ) }
@@ -97,7 +100,7 @@ const UnconnectedBorderControl = (
 					placeholder={ placeholder }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
-					size={ size }
+					size={ inputHeight }
 				/>
 				{ withSlider && (
 					<RangeControl
