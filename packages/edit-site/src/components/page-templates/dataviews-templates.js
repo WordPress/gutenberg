@@ -7,6 +7,7 @@ import removeAccents from 'remove-accents';
  * WordPress dependencies
  */
 import {
+	Icon,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -78,11 +79,15 @@ function TemplateTitle( { item } ) {
 }
 
 function AuthorField( { item } ) {
-	const { text, type, imageUrl } = useAddedBy( item.type, item.id );
+	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	return (
 		<HStack alignment="left">
-			{ type === 'user' && imageUrl && (
+			{ imageUrl ? (
 				<AvatarImage imageUrl={ imageUrl } />
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
 			) }
 			<span>{ text }</span>
 		</HStack>
