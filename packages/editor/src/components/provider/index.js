@@ -81,11 +81,13 @@ function extractedPageContentBlockTypesFromTemplateBlocks( blocks ) {
 		if ( PAGE_CONTENT_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
 			result.push( createBlock( blocks[ i ].name ) );
 		}
-		result.push(
-			...extractedPageContentBlockTypesFromTemplateBlocks(
-				blocks[ i ].innerBlocks
-			)
-		);
+		if ( blocks[ i ].innerBlocks.length ) {
+			result.push(
+				...extractedPageContentBlockTypesFromTemplateBlocks(
+					blocks[ i ].innerBlocks
+				)
+			);
+		}
 	}
 
 	return result;
