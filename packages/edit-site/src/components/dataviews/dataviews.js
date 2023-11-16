@@ -54,7 +54,7 @@ export default function DataViews( {
 	}, [ fields ] );
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 4 } justify="flex-start">
+			<VStack spacing={ 0 } justify="flex-start">
 				<HStack className="dataviews-filters-options">
 					<HStack justify="start">
 						{ search && (

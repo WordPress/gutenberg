@@ -203,9 +203,6 @@ $z-layers: (
 
 	// Ensure modal footer actions appear above modal contents
 	".edit-site-start-template-options__modal__actions": 1,
-
-	// Data views
-	".dataviews-filters-options": 1,
 );
 
 @function z-index( $key ) {
