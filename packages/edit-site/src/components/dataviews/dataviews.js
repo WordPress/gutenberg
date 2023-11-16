@@ -70,7 +70,7 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end">
+					<HStack justify="end" expanded={ false }>
 						<ViewActions
 							fields={ fields }
 							view={ view }
