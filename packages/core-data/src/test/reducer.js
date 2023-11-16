@@ -299,6 +299,80 @@ describe( 'entities', () => {
 				},
 			} );
 		} );
+
+		it( 'returns with removed revision items', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+								4: {
+									items: {
+										default: {
+											3: { id: 3, parent: 4 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											3: true,
+										},
+									},
+									queries: {},
+								},
+								6: {
+									items: {
+										default: {
+											9: { id: 11, parent: 6 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											9: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'REMOVE_ITEMS',
+				itemIds: [ 4, 6 ],
+				kind: 'root',
+				name: 'postType',
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
 	} );
 } );
 

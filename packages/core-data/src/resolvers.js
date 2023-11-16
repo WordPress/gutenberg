@@ -804,12 +804,12 @@ export const getRevisions =
 	};
 
 // Invalidate cache when a new revision is created.
-getRevisions.shouldInvalidate = ( action, kind, name, parentId ) =>
+getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
 	name === action.name &&
 	kind === action.kind &&
 	! action.error &&
-	parentId === action.recordId;
+	recordKey === action.recordId;
 
 /**
  * Requests a specific Entity revision from the REST API.

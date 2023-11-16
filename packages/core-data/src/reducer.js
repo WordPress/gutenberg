@@ -375,6 +375,27 @@ function entity( entityConfig ) {
 									[ recordKey ]: newState,
 								};
 							}
+
+							if ( action.type === 'REMOVE_ITEMS' ) {
+								return Object.fromEntries(
+									Object.entries( state ).filter(
+										( [ id ] ) =>
+											! action.itemIds.some(
+												( itemId ) => {
+													if (
+														Number.isInteger(
+															itemId
+														)
+													) {
+														return itemId === +id;
+													}
+													return itemId === id;
+												}
+											)
+									)
+								);
+							}
+
 							return state;
 						},
 				  }
