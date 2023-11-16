@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Tests for hooked blocks rendering.
+ * Functional unit test for wp_register_block_core_post_excerpt_length_filter().
  *
  * @package WordPress
  * @subpackage Blocks
- * @since 6.5.0
- *
+ */
+
+/**
  * @group blocks
+ * @covers ::register_block_core_post_excerpt_length_filter
  */
 class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST_TestCase {
 
@@ -29,9 +31,14 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 	}
 
 	/**
+	 * Unit test for ensuring correct length of the post excerpt in the REST API context.
+	 *
 	 * @dataProvider data_register_block_core_post_excerpt_length_filter
+	 *
+	 * @param int    $expeceted_excerpt_length Expected excerpt length.
+	 * @param string $context                  Current context.
 	 */
-	public function test_register_block_core_post_excerpt_length_filter( $expected_word_length, $context ) {
+	public function test_register_block_core_post_excerpt_length_filter( $expeceted_excerpt_length, $context ) {
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id );
@@ -47,8 +54,8 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 
 		$mock->expects( $this->atLeastOnce() )
 		     ->method( 'excerpt_length_callback' )
-		     ->with( $this->equalTo( $expected_word_length ) )
-		     ->willReturn( $expected_word_length );
+		     ->with( $this->equalTo( $expeceted_excerpt_length ) )
+		     ->willReturn( $expeceted_excerpt_length );
 
 		add_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
 		rest_get_server()->dispatch( $request );
@@ -56,6 +63,11 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 		unset ( $_REQUEST['context'] );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_register_block_core_post_excerpt_length_filter() {
 		return array(
 			'no_edit_context' => array(
