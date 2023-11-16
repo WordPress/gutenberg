@@ -11,9 +11,16 @@
 					},
 					{
 						"docs/getting-started/devenv/get-started-with-wp-env.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-create-block.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-wp-scripts.md": []
 					}
 				]
 			},
+			{ "docs/getting-started/quick-start-guide.md": [] },
 			{
 				"docs/getting-started/create-block/README.md": [
 					{

@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
-	useSetting,
+	useSettings,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
 	isValueSpacingPreset,
 } from '@wordpress/block-editor';
@@ -25,22 +25,19 @@ import { MIN_SPACER_SIZE } from './constants';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const [ spacingSizes, spacingUnits ] = useSettings(
+		'spacing.spacingSizes',
+		'spacing.units'
+	);
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This
 	// unit is disabled from the UI.
-	const availableUnitSettings = (
-		useSetting( 'spacing.units' ) || undefined
-	)?.filter( ( availableUnit ) => availableUnit !== '%' );
+	const availableUnits = spacingUnits
+		? spacingUnits.filter( ( unit ) => unit !== '%' )
+		: [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 	const units = useCustomUnits( {
-		availableUnits: availableUnitSettings || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits,
 		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
 	} );
 

@@ -101,7 +101,7 @@ A transformation of type `enter` is an object that takes the following parameter
 
 **Example: from --- to Separator block**
 
-To create a separator block when the user types the hypen three times and then hits the ENTER key we can use the following code:
+To create a separator block when the user types the hyphen three times and then hits the ENTER key we can use the following code:
 
 ```js
 transforms = {
@@ -162,7 +162,7 @@ This type of transformations support the _from_ direction, allowing blocks to be
 A transformation of type `prefix` is an object that takes the following parameters:
 
 -   **type** _(string)_: the value `prefix`.
--   **prefix** _(string)_: the character or sequence of characters that match this transfrom.
+-   **prefix** _(string)_: the character or sequence of characters that match this transform.
 -   **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
 -   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
@@ -260,7 +260,7 @@ schema = ({ phrasingContentSchema }) => {
 
 When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
 
-Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with a `<summary>`. Without declaring the custom schema the editor will skip over these other contructions before attempting to run them through any block transforms.
+Schemas are most-important when wanting to match HTML snippets containing non-phrasing content, such as `<details>` with a `<summary>`. Without declaring the custom schema the editor will skip over these other constructions before attempting to run them through any block transforms.
 
 ### Shortcode
 

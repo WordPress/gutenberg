@@ -14,6 +14,10 @@ const resultsFiles = [
 		metricsPrefix: '',
 	},
 	{
+		file: 'site-editor.performance-results.json',
+		metricsPrefix: 'site-editor-',
+	},
+	{
 		file: 'front-end-block-theme.performance-results.json',
 		metricsPrefix: 'block-theme-',
 	},

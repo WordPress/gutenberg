@@ -20,7 +20,7 @@ jobs:
             - name: 'Get PR commit count'
               run: echo "PR_COMMIT_COUNT=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
             - name: Checkout code
-              uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}

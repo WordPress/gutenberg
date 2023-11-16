@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -104,7 +104,7 @@ function Tabs( {
 	] );
 
 	// Handle the currently selected tab becoming disabled.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! selectedTab?.dimmed ) {
 			return;
 		}
@@ -136,7 +136,7 @@ function Tabs( {
 	] );
 
 	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! isControlled ) {
 			return;
 		}

@@ -22,7 +22,7 @@ import {
 	transformStyles,
 	shouldSkipSerialization,
 } from './utils';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import {
 	getTypographyFontSizeValue,
@@ -122,7 +122,7 @@ export function FontSizeEdit( props ) {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const fontSizes = useSetting( 'typography.fontSizes' );
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
@@ -167,7 +167,7 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = useSetting( 'typography.fontSizes' );
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
@@ -186,7 +186,7 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const fontSizes = useSetting( 'typography.fontSizes' );
+		const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 		const {
 			name: blockName,
 			attributes: { fontSize, style },

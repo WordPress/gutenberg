@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 8.11.0 (2023-11-02)
+
+### Enhancement
+
+-   `wp-env` now works offline after the environment has been created. Note that many `wp-env` configuration changes involve internet connectivity and may not work in offline mode. [#53547](https://github.com/WordPress/gutenberg/pull/53547)
+
+## 8.10.0 (2023-10-18)
+
 ### Bug Fix
 
 -   Corrected `PATH` to include the host user's Composer bin directory.
