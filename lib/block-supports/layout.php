@@ -865,6 +865,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
+	/**
+	 * This filter runs after the layout classnames have been added to the block, so they
+	 * have to be removed from the outer wrapper and then added to the inner.
+	*/
 	$layout_classes = array();
 	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
@@ -907,6 +911,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		$content_without_layout_classes
 	);
 
+	// Add layout classes to inner wrapper.
 	if ( ! empty( $layout_classes ) ) {
 		$processor = new WP_HTML_Tag_Processor( $updated_content );
 		if ( $processor->next_tag( array( 'class_name' => 'wp-block-group__inner-container' ) ) ) {
