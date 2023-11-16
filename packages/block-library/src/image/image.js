@@ -100,7 +100,7 @@ const ImageWrapper = ( { href, children } ) => {
 				// and remove pointer events. Safari needs the display property.
 				pointerEvents: 'none',
 				cursor: 'default',
-				display: 'inline-block',
+				display: 'inline',
 			} }
 		>
 			{ children }
