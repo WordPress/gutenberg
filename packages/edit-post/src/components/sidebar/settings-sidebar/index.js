@@ -40,8 +40,8 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 } );
 
 const SettingsSidebar = () => {
-	const { sidebarName, keyboardShortcut, isTemplateMode } = useSelect(
-		( select ) => {
+	const { sidebarName, isSidebarOpen, keyboardShortcut, isTemplateMode } =
+		useSelect( ( select ) => {
 			// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 			// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
 			// If one of the two sidebars is active the component will contain the content of that sidebar.
@@ -52,6 +52,7 @@ const SettingsSidebar = () => {
 			let sidebar = select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
 			);
+			const isOpen = sidebar !== null;
 			if (
 				! [ 'edit-post/document', 'edit-post/block' ].includes(
 					sidebar
@@ -67,14 +68,13 @@ const SettingsSidebar = () => {
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 			return {
 				sidebarName: sidebar,
+				isSidebarOpen: isOpen,
 				keyboardShortcut: shortcut,
 				isTemplateMode:
 					select( editorStore ).getRenderingMode() ===
 					'template-only',
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const Content = () => {
 		// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
@@ -129,7 +129,7 @@ const SettingsSidebar = () => {
 	const { openGeneralSidebar } = useDispatch( editPostStore );
 	return (
 		<Tabs
-			selectedTabId={ sidebarName }
+			selectedTabId={ isSidebarOpen ? sidebarName : null }
 			onSelect={ ( selectedId ) => {
 				openGeneralSidebar( selectedId );
 			} }
