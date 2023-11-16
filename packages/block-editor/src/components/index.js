@@ -143,6 +143,7 @@ export {
 	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
+export { default as StarterPatternsModal } from './starter-patterns-modal';
 export {
 	default as Typewriter,
 	useTypewriter as __unstableUseTypewriter,

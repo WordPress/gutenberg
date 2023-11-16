@@ -37,6 +37,7 @@ import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
+import StartPageOptions from '../start-page-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
@@ -194,6 +195,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 					<BlockContextProvider value={ blockContext }>
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
+						{ isEditMode && <StartPageOptions /> }
 						<InterfaceSkeleton
 							isDistractionFree={ true }
 							enableRegionNavigation={ false }
