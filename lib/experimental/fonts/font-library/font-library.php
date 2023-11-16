@@ -61,22 +61,22 @@ if ( ! function_exists( 'sanitize_font_family_content' ) ) {
 	/**
 	 * Sanitize font family content.
 	 *
-	 * @param array $data An array of slashed, sanitized, and processed post data.
-	 * @param array $postarr An array of sanitized (and slashed) but otherwise unmodified post data.
+     * @param array $data                An array of slashed and processed post data.
+	 * @param array $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
+	 * @param array $unsanitized_postarr An array of slashed yet *unsanitized* and unprocessed post data as originally passed to wp_insert_post().
 	 *
 	 * @return array The post data that will be inserted in the database.
 	 */
-	function sanitize_font_family_content( $data, $postarr ) {
+	function sanitize_font_family_content( $data, $postarr, $unsanitized_postarr ) {
 		// Check if the post type is 'wp_font_family'.
 		if ( isset( $postarr['post_type'] ) && 'wp_font_family' === $postarr['post_type'] ) {
-			$data['post_content'] = WP_Font_Family_Utils::sanitize( $data['post_content'] );
-
+			$data['post_content'] = WP_Font_Family_Utils::sanitize( $unsanitized_postarr['post_content'] );
 		}
 		// Return the (possibly modified) data.
 		return $data;
 	}
 
-	add_filter( 'wp_insert_post_data', 'sanitize_font_family_content', 10, 2 );
+	add_filter( 'wp_insert_post_data', 'sanitize_font_family_content', 10, 3 );
 }
 
 $default_font_collection = array(
