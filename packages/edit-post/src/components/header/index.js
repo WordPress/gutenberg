@@ -119,7 +119,9 @@ function Header( {
 							className={ classnames(
 								'selected-block-tools-wrapper',
 								{
-									'is-collapsed': isBlockToolsCollapsed,
+									'is-collapsed':
+										isEditingTemplate &&
+										isBlockToolsCollapsed,
 								}
 							) }
 						>
@@ -150,9 +152,10 @@ function Header( {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
+							isEditingTemplate &&
 							! isBlockToolsCollapsed &&
-							isLargeViewport &&
-							isEditingTemplate,
+							hasFixedToolbar &&
+							isLargeViewport,
 					} ) }
 				>
 					{ isEditingTemplate && <DocumentActions /> }
