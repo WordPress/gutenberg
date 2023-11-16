@@ -198,7 +198,9 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed && isLargeViewport,
+								! isBlockToolsCollapsed &&
+								hasBlockSelected &&
+								isLargeViewport,
 						}
 					) }
 				>
