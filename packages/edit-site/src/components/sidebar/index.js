@@ -60,7 +60,6 @@ function SidebarScreens() {
 				<NavigatorScreen path="/pages">
 					<SidebarNavigationScreen
 						title={ __( 'Pages' ) }
-						description={ __( 'Manage your pages.' ) }
 						backPath="/page"
 						content={ <DataViewsSidebarContent /> }
 					/>
