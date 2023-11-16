@@ -3,7 +3,7 @@
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -15,11 +15,6 @@ import { unlock } from '../../../lock-unlock';
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SettingsHeader = ( { sidebarName } ) => {
-	const { openGeneralSidebar } = useDispatch( editPostStore );
-	const openDocumentSettings = () =>
-		openGeneralSidebar( 'edit-post/document' );
-	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
-
 	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
 		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
 
@@ -53,7 +48,6 @@ const SettingsHeader = ( { sidebarName } ) => {
 			<Tabs.TabList>
 				<Tabs.Tab
 					id={ 'edit-post/document' }
-					onClick={ openDocumentSettings }
 					aria-label={
 						isTemplateMode ? templateAriaLabel : documentAriaLabel
 					}
@@ -65,7 +59,6 @@ const SettingsHeader = ( { sidebarName } ) => {
 				</Tabs.Tab>
 				<Tabs.Tab
 					id={ 'edit-post/block' }
-					onClick={ openBlockSettings }
 					aria-label={ blockAriaLabel }
 					// translators: Data label for the Block Settings Sidebar tab.
 					data-label={ __( 'Block' ) }

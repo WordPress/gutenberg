@@ -5,7 +5,7 @@ import {
 	BlockInspector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Platform, useContext } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
@@ -123,8 +123,14 @@ const SettingsSidebar = () => {
 		);
 	};
 
+	const { openGeneralSidebar } = useDispatch( editPostStore );
 	return (
-		<Tabs selectedTabId={ sidebarName }>
+		<Tabs
+			selectedTabId={ sidebarName }
+			onSelect={ ( selectedId ) => {
+				openGeneralSidebar( selectedId );
+			} }
+		>
 			<Content />
 		</Tabs>
 	);
