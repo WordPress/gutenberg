@@ -159,7 +159,7 @@ const MemoizedBlockList = memo( BlockList );
 
 function ScreenBlockList() {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const defferedFilterValue = useDeferredValue( filterValue );
+	const deferredFilterValue = useDeferredValue( filterValue );
 
 	return (
 		<>
@@ -177,7 +177,7 @@ function ScreenBlockList() {
 				label={ __( 'Search for blocks' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<MemoizedBlockList filterValue={ defferedFilterValue } />
+			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>
 	);
 }
