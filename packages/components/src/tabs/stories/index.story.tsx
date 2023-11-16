@@ -20,6 +20,14 @@ import Button from '../../button';
 const meta: Meta< typeof Tabs > = {
 	title: 'Components (Experimental)/Tabs',
 	component: Tabs,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Tabs.TabList': Tabs.TabList,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Tabs.Tab': Tabs.Tab,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Tabs.TabPanel': Tabs.TabPanel,
+	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
