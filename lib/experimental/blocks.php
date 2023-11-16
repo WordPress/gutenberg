@@ -101,7 +101,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$blocks_attributes_allowlist = array(
 			'core/paragraph' => array( 'content' ),
 			'core/image'     => array( 'url' ),
-			'core/heading' => array( 'content' ),
 		);
 
 		// Whitelist of the block types that support block connections.

@@ -14,7 +14,7 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-			"selector": "h2",
+			"selector": "h1,h2,h3,h4,h5,h6",
 			"default": "",
 			"__experimentalRole": "content"
 		},
@@ -63,8 +63,7 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSlashInserter": true,
-		"__experimentalConnections": true
+		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"

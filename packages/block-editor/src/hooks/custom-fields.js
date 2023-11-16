@@ -56,11 +56,7 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 
 		// Check if the current block is a paragraph or image block.
 		// Currently, only these two blocks are supported.
-		if (
-			! [ 'core/paragraph', 'core/image', 'core/heading' ].includes(
-				props.name
-			)
-		) {
+		if ( ! [ 'core/paragraph', 'core/image' ].includes( props.name ) ) {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -70,7 +66,6 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 		let attributeName;
 		if ( props.name === 'core/paragraph' ) attributeName = 'content';
 		if ( props.name === 'core/image' ) attributeName = 'url';
-		if ( props.name === 'core/heading' ) attributeName = 'content';
 
 		const connectionSource =
 			props.attributes?.connections?.attributes?.[ attributeName ]
