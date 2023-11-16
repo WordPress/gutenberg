@@ -21,7 +21,10 @@ test.describe( 'Query block', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost( { postType: 'page', title: 'Query Page' } );
+		await admin.createNewPost( {
+			postType: 'page',
+			title: 'Query Page',
+		} );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

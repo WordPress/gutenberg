@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -29,6 +29,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
 	useBlockCommands,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -71,7 +72,6 @@ export default function Layout() {
 	useCommonCommands();
 	useBlockCommands();
 
-	const hubRef = useRef();
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
@@ -80,6 +80,7 @@ export default function Layout() {
 	const {
 		isDistractionFree,
 		hasFixedToolbar,
+		hasBlockSelected,
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
@@ -104,6 +105,8 @@ export default function Layout() {
 				'core/edit-site',
 				'distractionFree'
 			),
+			hasBlockSelected:
+				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
 	const isEditing = canvasMode === 'edit';
@@ -113,7 +116,7 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const showSidebar =
-		( isMobileViewport && ! isListPage ) ||
+		( isMobileViewport && canvasMode === 'view' && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
@@ -152,10 +155,14 @@ export default function Layout() {
 	}
 
 	// Sets the right context for the command palette
-	const commandContext =
-		canvasMode === 'edit' && isEditorPage
-			? 'site-editor-edit'
-			: 'site-editor';
+	let commandContext = 'site-editor';
+
+	if ( canvasMode === 'edit' && isEditorPage ) {
+		commandContext = 'site-editor-edit';
+	}
+	if ( hasBlockSelected ) {
+		commandContext = 'block-selection-edit';
+	}
 	useCommandContext( commandContext );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -185,6 +192,7 @@ export default function Layout() {
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
+						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
@@ -218,13 +226,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						variants={ {
-							isDistractionFree: { x: '-100%' },
-							isDistractionFreeHovering: { x: 0 },
-							view: { x: 0 },
-							edit: { x: 0 },
-						} }
-						ref={ hubRef }
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
@@ -282,7 +283,7 @@ export default function Layout() {
 							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
 							// so we can't remove the element entirely. Using `inert` will make
 							// it inaccessible to screen readers and keyboard navigation.
-							inert={ showSidebar ? undefined : 'inert' }
+							inert={ showSidebar ? undefined : 'true' }
 							animate={ { opacity: showSidebar ? 1 : 0 } }
 							transition={ {
 								type: 'tween',

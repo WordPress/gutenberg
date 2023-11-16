@@ -61,9 +61,9 @@ export default function RenameMenuItem( { item, onClose } ) {
 			const fallbackErrorMessage =
 				item.type === TEMPLATE_PART_POST_TYPE
 					? __(
-							'An error occurred while reverting the template part.'
+							'An error occurred while renaming the template part.'
 					  )
-					: __( 'An error occurred while reverting the pattern.' );
+					: __( 'An error occurred while renaming the pattern.' );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message

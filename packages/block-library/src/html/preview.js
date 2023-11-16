@@ -22,12 +22,17 @@ const DEFAULT_STYLES = `
 `;
 
 export default function HTMLEditPreview( { content, isSelected } ) {
-	const settingStyles = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()?.styles;
-	}, [] );
+	const settingStyles = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().styles
+	);
 
 	const styles = useMemo(
-		() => [ DEFAULT_STYLES, ...transformStyles( settingStyles ) ],
+		() => [
+			DEFAULT_STYLES,
+			...transformStyles(
+				settingStyles.filter( ( style ) => style.css )
+			),
+		],
 		[ settingStyles ]
 	);
 

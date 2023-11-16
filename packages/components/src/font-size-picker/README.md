@@ -6,8 +6,8 @@ The component renders a user interface that allows the user to select predefined
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { FontSizePicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const fontSizes = [

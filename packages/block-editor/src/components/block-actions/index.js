@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useNotifyCopy } from '../copy-handler';
+import { useNotifyCopy } from '../../utils/use-notify-copy';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
 

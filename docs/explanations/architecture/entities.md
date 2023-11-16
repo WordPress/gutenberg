@@ -40,7 +40,7 @@ wp.data.dispatch( 'core' ).saveEditedEntityRecord( 'postType', 'post', 1 );
 
 Since the WordPress editors allow multiple entity records to be edited at the same time, the `core-data` package keeps track of all the entity records that have been fetched and edited in a common undo/redo stack. Each step in the undo/redo stack contains a list of "edits" that should be undone or redone at the same time when calling the `undo` or `redo` action.
 
-And to be able to perform both undo and redo operations propertly, each modification in the list of edits contains the following information:
+And to be able to perform both undo and redo operations properly, each modification in the list of edits contains the following information:
 
  - Entity kind and name: Each entity in core-data is identified by the pair _(kind, name)_. This corresponds to the identifier of the modified entity. 
  - Entity Record ID: The ID of the modified record.

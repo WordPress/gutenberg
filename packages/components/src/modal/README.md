@@ -120,8 +120,8 @@ The modal is used to create an accessible modal over an application.
 The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Modal } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyModal = () => {
 	const [ isOpen, setOpen ] = useState( false );

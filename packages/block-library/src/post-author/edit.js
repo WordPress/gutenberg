@@ -196,7 +196,6 @@ function PostAuthorEdit( {
 					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
 						<RichText
 							className="wp-block-post-author__byline"
-							multiline={ false }
 							aria-label={ __( 'Post author byline text' ) }
 							placeholder={ __( 'Write byline…' ) }
 							value={ byline }
