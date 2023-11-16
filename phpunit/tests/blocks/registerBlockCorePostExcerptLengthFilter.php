@@ -72,7 +72,7 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 	public function data_register_block_core_post_excerpt_length_filter() {
 		return array(
 			'no_edit_context' => array(
-				55,
+				55, // Default filter value.
 				''
 			),
 			'edit_context'    => array(
