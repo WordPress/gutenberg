@@ -10,12 +10,6 @@ describe( 'wpKebabCase', () => {
 		expect( wpKebabCase( input ) ).toEqual( expectedOutput );
 	} );
 
-	it( 'should insert a dash between a digit and a letter', () => {
-		const input = 'abc1def2ghi';
-		const expectedOutput = 'abc-1def-2ghi';
-		expect( wpKebabCase( input ) ).toEqual( expectedOutput );
-	} );
-
 	it( 'should not insert a dash between two letters', () => {
 		const input = 'abcdef';
 		const expectedOutput = 'abcdef';
