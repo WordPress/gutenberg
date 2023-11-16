@@ -34,13 +34,15 @@ const CarouselNavigation = ( {
 			icon={ chevronLeft }
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
-			aria-disabled={ activeSlide === 0 }
+			disabled={ activeSlide === 0 }
+			__experimentalIsFocusable
 		/>
 		<Button
 			icon={ chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
-			aria-disabled={ activeSlide === totalSlides - 1 }
+			disabled={ activeSlide === totalSlides - 1 }
+			__experimentalIsFocusable
 		/>
 	</div>
 );
