@@ -249,6 +249,7 @@ const ImageURLInputUI = ( {
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
+				isActive={ !! url }
 			/>
 			{ isOpen && (
 				<URLPopover

@@ -152,7 +152,7 @@ export function useAddedBy( postType, postId ) {
  * @param {Object} props
  * @param {string} props.imageUrl
  */
-function AvatarImage( { imageUrl } ) {
+export function AvatarImage( { imageUrl } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
 	return (

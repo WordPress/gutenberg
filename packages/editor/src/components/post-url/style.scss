@@ -1,3 +1,33 @@
+.editor-post-url__panel {
+	width: 100%;
+	justify-content: flex-start;
+	align-items: flex-start;
+
+	span {
+		display: block;
+		width: 30%;
+	}
+}
+
+.editor-post-url__panel-dropdown {
+	width: 70%;
+}
+
+.components-button.editor-post-url__panel-toggle {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.editor-post-url__panel-dialog .editor-post-url {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+}
+
 .editor-post-url__link-label {
 	font-size: $default-font-size;
 	font-weight: 400;

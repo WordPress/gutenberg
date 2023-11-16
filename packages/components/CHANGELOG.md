@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Toolbar`: Remove CSS rule that prevented focus outline to be visible for toolbar buttons in the `:active` state. ([#56123](https://github.com/WordPress/gutenberg/pull/56123)).
+
 ### Internal
 
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
@@ -19,6 +23,11 @@
 
 -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
 -   `TextControl`: Add opt-in prop for 40px default size ([#55471](https://github.com/WordPress/gutenberg/pull/55471)).
+
+### Bug Fix
+
+-   `DropdownMenu`: remove extra vertical space around the toggle button ([#56136](https://github.com/WordPress/gutenberg/pull/56136)).
+-   Package should not depend on `@ariakit/test`, that package is only needed for testing ([#56091](https://github.com/WordPress/gutenberg/pull/56091)).
 
 ## 25.11.0 (2023-11-02)
 
