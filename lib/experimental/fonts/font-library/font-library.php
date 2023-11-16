@@ -61,7 +61,7 @@ if ( ! function_exists( 'sanitize_font_family_content' ) ) {
 	/**
 	 * Sanitize font family content.
 	 *
-     * @param array $data                An array of slashed and processed post data.
+	 * @param array $data                An array of slashed and processed post data.
 	 * @param array $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
 	 * @param array $unsanitized_postarr An array of slashed yet *unsanitized* and unprocessed post data as originally passed to wp_insert_post().
 	 *
