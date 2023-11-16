@@ -45,15 +45,15 @@ class Tests_Blocks_RegisterBlockCorePostExcerptLengthFilter extends WP_Test_REST
 		             ->addMethods( [ 'excerpt_length_callback' ] )
 		             ->getMock();
 
-		$mock->expects( $this->atLeast( 1 ) )
+		$mock->expects( $this->atLeastOnce() )
 		     ->method( 'excerpt_length_callback' )
 		     ->with( $this->equalTo( $expected_word_length ) )
 		     ->willReturn( $expected_word_length );
 
-		add_filter('excerpt_length', [$mock, 'excerpt_length_callback'], PHP_INT_MAX );
+		add_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
 		rest_get_server()->dispatch( $request );
-		remove_filter('excerpt_length', [$mock, 'excerpt_length_callback'], PHP_INT_MAX );
-		unset ($_REQUEST['context']);
+		remove_filter( 'excerpt_length', [ $mock, 'excerpt_length_callback' ], PHP_INT_MAX );
+		unset ( $_REQUEST['context'] );
 	}
 
 	public function data_register_block_core_post_excerpt_length_filter() {
