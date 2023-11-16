@@ -450,6 +450,8 @@ extension RNReactNativeGutenbergBridge {
         case showEditorHelp
         case onUndoPressed
         case onRedoPressed
+        case filesDrop
+        case filesOver
     }
 
     public override func supportedEvents() -> [String]! {

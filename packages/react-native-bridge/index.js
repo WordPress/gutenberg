@@ -152,6 +152,14 @@ export function subscribeShowNotice( callback ) {
 	return gutenbergBridgeEvents.addListener( 'showNotice', callback );
 }
 
+export function subscribeOnFilesDrop( callback ) {
+	return gutenbergBridgeEvents.addListener( 'filesDrop', callback );
+}
+
+export function subscribeOnFilesOver( callback ) {
+	return gutenbergBridgeEvents.addListener( 'filesOver', callback );
+}
+
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html     the HTML to replace the block.

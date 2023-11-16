@@ -197,6 +197,18 @@ public class Gutenberg: UIResponder {
         let settingsUpdates = properties(from: editorSettings)
         sendEvent(.updateEditorSettings, body: settingsUpdates)
     }
+    
+    public func filesDrop(_ filesDrop: [String]?) {
+        if let files = filesDrop {
+            let body: [String: Any] = ["files": files]
+            sendEvent(.filesDrop, body: body)
+        }
+    }
+    
+    public func filesOver(coords: CGPoint) {
+        let body: [String: Any] = ["event": ["x": coords.x, "y": coords.y]]
+        sendEvent(.filesOver, body: body)
+    }
 
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)

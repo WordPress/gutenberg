@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -33,7 +33,36 @@ export function onBlockDrop(
 		targetBlockIndex,
 		targetRootClientId,
 		type: dropType,
+		files,
 	} ) => {
+		if ( dropType === 'file' ) {
+			let blockResult;
+			const localFiles = files?.files;
+
+			if ( localFiles && localFiles.length > 1 ) {
+				const innerBlocks = localFiles.map( ( file ) =>
+					createBlock( 'core/image', {
+						url: file,
+					} )
+				);
+
+				blockResult = createBlock( 'core/gallery', {}, innerBlocks );
+			} else if ( localFiles.length === 1 ) {
+				blockResult = createBlock( 'core/image', {
+					url: localFiles[ 0 ],
+				} );
+			}
+
+			if ( blockResult ) {
+				insertBlocks(
+					blockResult,
+					targetBlockIndex,
+					targetRootClientId,
+					true,
+					null
+				);
+			}
+		}
 		// If the user is inserting a block.
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();

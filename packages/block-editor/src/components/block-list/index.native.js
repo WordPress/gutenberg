@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
-import { View, Platform, Pressable } from 'react-native';
+import { View, Platform, Pressable, Text } from 'react-native';
+import Animated, {
+	useSharedValue,
+	useAnimatedStyle,
+	withTiming,
+	useAnimatedReaction,
+	runOnJS,
+} from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useState, useCallback, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -14,7 +21,12 @@ import {
 	WIDE_ALIGNMENTS,
 	alignmentHelpers,
 } from '@wordpress/components';
+import { Icon, upload } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import {
+	subscribeOnFilesDrop,
+	subscribeOnFilesOver,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -30,6 +42,7 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
+import useBlockDropZone from '../use-block-drop-zone';
 
 const identity = ( x ) => x;
 
@@ -47,6 +60,42 @@ const getStyles = ( isStackedHorizontally, horizontalAlignment ) => {
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
 };
+
+function DropZone( { opacity } ) {
+	const animatedStyles = useAnimatedStyle( () => {
+		return {
+			opacity: withTiming( opacity.value, { duration: 200 } ),
+			top: 16,
+			left: 16,
+			right: 16,
+			bottom: 16,
+			position: 'absolute',
+			zIndex: 1000,
+			justifyContent: 'center',
+			alignItems: 'center',
+		};
+	} );
+
+	return (
+		<Animated.View pointerEvents="none" style={ animatedStyles }>
+			<View
+				style={ {
+					backgroundColor: '#007CBA',
+					justifyContent: 'center',
+					alignItems: 'center',
+					padding: 30,
+					width: '80%',
+					borderRadius: 6,
+				} }
+			>
+				<Icon icon={ upload } color="#FFFFFF" />
+				<Text style={ { color: '#FFFFFF' } }>
+					{ __( 'Drop files to upload' ) }
+				</Text>
+			</View>
+		</Animated.View>
+	);
+}
 
 export default function BlockList( {
 	blockWidth: initialBlockWidth,
@@ -88,7 +137,6 @@ export default function BlockList( {
 				isBlockInsertionPointVisible,
 				getSettings,
 			} = select( blockEditorStore );
-
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const rootBlockId = getBlockHierarchyRootClientId(
 				selectedBlockClientId
@@ -122,8 +170,41 @@ export default function BlockList( {
 		},
 		[ filterInnerBlocks, orientation, rootClientId ]
 	);
-
+	const isDragging = useSharedValue( false );
 	const { insertBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
+	const onFilesDropSubscription = useRef();
+	const onFilesOverSubscription = useRef();
+	const { onBlockDragOver, onBlockDrop } = useBlockDropZone();
+
+	const opacity = useSharedValue( 0 );
+
+	useAnimatedReaction(
+		() => isDragging.value,
+		( value ) => {
+			if ( ! value ) {
+				opacity.value = 0;
+			} else {
+				opacity.value = 1;
+			}
+		}
+	);
+	useEffect( () => {
+		onFilesDropSubscription.current = subscribeOnFilesDrop( ( content ) => {
+			onBlockDrop( { type: 'file', files: content } );
+			isDragging.value = false;
+		} );
+		onFilesOverSubscription.current = subscribeOnFilesOver(
+			( { event } ) => {
+				isDragging.value = true;
+				onBlockDragOver( event );
+			}
+		);
+
+		return () => {
+			onFilesDropSubscription.current?.remove();
+			onFilesOverSubscription.current?.remove();
+		};
+	}, [] );
 
 	const extraData = useRef( {
 		parentWidth,
@@ -235,6 +316,7 @@ export default function BlockList( {
 			onLayout={ onLayout }
 			testID="block-list-wrapper"
 		>
+			<DropZone opacity={ opacity } />
 			{ isRootList ? (
 				<BlockListProvider
 					value={ {
