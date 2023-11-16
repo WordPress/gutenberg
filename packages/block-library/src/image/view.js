@@ -568,6 +568,9 @@ function setStyles( context, ref ) {
 			--wp--lightbox-image-width: ${ lightboxImgWidth }px;
 			--wp--lightbox-image-height: ${ lightboxImgHeight }px;
 			--wp--lightbox-scale: ${ containerScale };
+			--wp--lightbox-scrollbar-width: ${
+				window.innerWidth - document.documentElement.clientWidth
+			}px;
 		}
 	`;
 }

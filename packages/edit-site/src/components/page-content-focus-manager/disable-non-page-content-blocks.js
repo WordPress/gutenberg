@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { addFilter, removeFilter } from '@wordpress/hooks';
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -11,42 +13,45 @@ import { useEffect } from '@wordpress/element';
  */
 import { PAGE_CONTENT_BLOCK_TYPES } from '../../utils/constants';
 
+function DisableBlock( { clientId } ) {
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			return (
+				getBlockParentsByBlockName( clientId, 'core/query' ).length !==
+				0
+			);
+		},
+		[ clientId ]
+	);
+	const mode = isDescendentOfQueryLoop ? undefined : 'contentOnly';
+	const { setBlockEditingMode, unsetBlockEditingMode } =
+		useDispatch( blockEditorStore );
+	useEffect( () => {
+		if ( mode ) {
+			setBlockEditingMode( clientId, mode );
+			return () => {
+				unsetBlockEditingMode( clientId );
+			};
+		}
+	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
+}
+
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	useDisableNonPageContentBlocks();
-	return null;
-}
-
-/**
- * Disables non-content blocks using the `useBlockEditingMode` hook.
- */
-export function useDisableNonPageContentBlocks() {
 	useBlockEditingMode( 'disabled' );
-	useEffect( () => {
-		addFilter(
-			'editor.BlockEdit',
-			'core/edit-site/disable-non-content-blocks',
-			withDisableNonPageContentBlocks
+	const clientIds = useSelect( ( select ) => {
+		const { __experimentalGetGlobalBlocksByName } =
+			select( blockEditorStore );
+		return __experimentalGetGlobalBlocksByName(
+			Object.keys( PAGE_CONTENT_BLOCK_TYPES )
 		);
-		return () =>
-			removeFilter(
-				'editor.BlockEdit',
-				'core/edit-site/disable-non-content-blocks'
-			);
 	}, [] );
-}
 
-const withDisableNonPageContentBlocks = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const isDescendentOfQueryLoop = props.context.queryId !== undefined;
-		const isPageContent =
-			PAGE_CONTENT_BLOCK_TYPES[ props.name ] && ! isDescendentOfQueryLoop;
-		const mode = isPageContent ? 'contentOnly' : undefined;
-		useBlockEditingMode( mode );
-		return <BlockEdit { ...props } />;
-	},
-	'withDisableNonPageContentBlocks'
-);
+	return clientIds.map( ( clientId ) => {
+		return <DisableBlock key={ clientId } clientId={ clientId } />;
+	} );
+}

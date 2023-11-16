@@ -394,6 +394,11 @@ class WP_Font_Family {
 				continue;
 			}
 
+			// If the font face requires the use of the filesystem, create the fonts dir if it doesn't exist.
+			if ( ! empty( $font_face['downloadFromUrl'] ) && ! empty( $font_face['uploadedFile'] ) ) {
+				wp_mkdir_p( WP_Font_Library::get_fonts_dir() );
+			}
+
 			// If installing google fonts, download the font face assets.
 			if ( ! empty( $font_face['downloadFromUrl'] ) ) {
 				$new_font_face = $this->download_font_face_assets( $new_font_face );

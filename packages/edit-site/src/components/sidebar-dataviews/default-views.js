@@ -14,7 +14,6 @@ const DEFAULT_PAGE_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	visibleFilters: [ 'author', 'status' ],
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
