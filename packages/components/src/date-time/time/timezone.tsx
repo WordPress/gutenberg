@@ -32,12 +32,22 @@ const TimeZone = () => {
 			? timezone.abbr
 			: `UTC${ offsetSymbol }${ timezone.offset }`;
 
+	// Replace underscore with space in strings like `America/Costa_Rica`.
+	const prettyTimezoneString = timezone.string.replace( '_', ' ' );
+
 	const timezoneDetail =
 		'UTC' === timezone.string
 			? __( 'Coordinated Universal Time' )
-			: `(${ zoneAbbr }) ${ timezone.string.replace( '_', ' ' ) }`;
+			: `(${ zoneAbbr }) ${ prettyTimezoneString }`;
 
-	return (
+	const isAbbrSameAsDetails =
+		`${ zoneAbbr } ${ prettyTimezoneString }`.trim() === zoneAbbr;
+
+	return isAbbrSameAsDetails ? (
+		<StyledComponent className="components-datetime__timezone">
+			{ zoneAbbr }
+		</StyledComponent>
+	) : (
 		<Tooltip placement="top" text={ timezoneDetail }>
 			<StyledComponent className="components-datetime__timezone">
 				{ zoneAbbr }
