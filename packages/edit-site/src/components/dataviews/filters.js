@@ -70,7 +70,11 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 	if ( filterComponents.length > 1 ) {
 		filterComponents.push(
-			<ResetFilters view={ view } onChangeView={ onChangeView } />
+			<ResetFilters
+				key="reset-filters"
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
 		);
 	}
 
