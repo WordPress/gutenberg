@@ -10,7 +10,20 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
+
+## 1.108.0
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+-   [*] Fix crash related to accessing undefined value in `TextColorEdit` [#55664]
+
+## 1.107.0
+-   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
+-   [*] Classic block: Add option to convert to blocks [#55461]
+
+## 1.106.0
 -   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+-   [*] Fix quote block border visibility when used with block based themes in dark mode [#54964]
 
 ## 1.105.0
 -   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]

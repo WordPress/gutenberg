@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.23.0 (2023-11-16)
+
+## 6.22.0 (2023-11-02)
+
+## 6.21.0 (2023-10-18)
+
 ## Enhancements
 
 -   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).

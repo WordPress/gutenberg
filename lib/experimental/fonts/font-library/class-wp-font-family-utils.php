@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Family_Utils' ) ) {
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Font_Family_Utils' ) ) {
 /**
  * A class of utilities for working with the Font Library.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Family_Utils {
 
@@ -26,7 +26,7 @@ class WP_Font_Family_Utils {
 	 * Creates a filename for a font face asset using font family, style, weight and
 	 * extension information.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $font_slug The font slug to use in the filename.
 	 * @param array  $font_face The font face array containing 'fontFamily', 'fontStyle', and
@@ -48,7 +48,7 @@ class WP_Font_Family_Utils {
 	/**
 	 * Merges two fonts and their font faces.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font1 The first font to merge.
 	 * @param array $font2 The second font to merge.
@@ -79,7 +79,7 @@ class WP_Font_Family_Utils {
 	/**
 	 * Returns whether the given file has a font MIME type.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $filepath The file to check.
 	 * @return bool True if the file has a font MIME type, false otherwise.

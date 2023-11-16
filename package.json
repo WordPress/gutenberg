@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "16.8.0",
+	"version": "17.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -96,6 +96,7 @@
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
+		"@ariakit/test": "^0.3.0",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -107,7 +108,7 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
-		"@playwright/test": "1.32.0",
+		"@playwright/test": "1.39.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
 		"@storybook/addon-a11y": "7.2.2",
 		"@storybook/addon-actions": "7.2.2",
@@ -166,7 +167,7 @@
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"ajv": "8.7.1",
 		"ajv-draft-04": "1.0.0",
-		"appium": "1.22.3",
+		"appium": "2.0.0",
 		"babel-jest": "29.6.2",
 		"babel-loader": "8.2.3",
 		"babel-plugin-inline-json-import": "0.3.2",
@@ -252,7 +253,7 @@
 		"typescript": "5.1.6",
 		"uglify-js": "3.13.7",
 		"uuid": "9.0.1",
-		"wd": "1.12.1",
+		"webdriverio": "8.16.20",
 		"webpack": "5.88.2",
 		"webpack-bundle-analyzer": "4.9.1",
 		"worker-farm": "1.7.0"

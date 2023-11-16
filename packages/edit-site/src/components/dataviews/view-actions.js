@@ -4,17 +4,16 @@
 import {
 	Button,
 	Icon,
-	SelectControl,
 	privateApis as componentsPrivateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import {
 	chevronRightSmall,
 	check,
 	blockTable,
-	chevronDown,
 	arrowUp,
 	arrowDown,
+	grid,
+	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -31,35 +30,73 @@ const {
 	DropdownSubMenuTriggerV2,
 } = unlock( componentsPrivateApis );
 
-export const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+const availableViews = [
+	{
+		id: 'list',
+		label: __( 'List' ),
+	},
+	{
+		id: 'grid',
+		label: __( 'Grid' ),
+	},
+	{
+		id: 'side-by-side',
+		label: __( 'Side by side' ),
+	},
+];
 
-export function PageSizeControl( { dataView } ) {
-	const label = __( 'Rows per page:' );
+function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
+	let _availableViews = availableViews;
+	if ( supportedLayouts ) {
+		_availableViews = _availableViews.filter( ( _view ) =>
+			supportedLayouts.includes( _view.id )
+		);
+	}
+	if ( _availableViews.length === 1 ) {
+		return null;
+	}
+	const activeView = _availableViews.find( ( v ) => view.type === v.id );
 	return (
-		<SelectControl
-			__nextHasNoMarginBottom
-			label={ label }
-			hideLabelFromVision
-			// TODO: This should probably use a label based on the wanted design
-			// and we could remove InputControlPrefixWrapper usage.
-			prefix={
-				<InputControlPrefixWrapper
-					as="span"
-					className="dataviews__per-page-control-prefix"
+		<DropdownSubMenuV2
+			trigger={
+				<DropdownSubMenuTriggerV2
+					suffix={
+						<>
+							{ activeView.label }
+							<Icon icon={ chevronRightSmall } />
+						</>
+					}
 				>
-					{ label }
-				</InputControlPrefixWrapper>
+					{ __( 'Layout' ) }
+				</DropdownSubMenuTriggerV2>
 			}
-			value={ dataView.getState().pagination.pageSize }
-			options={ PAGE_SIZE_VALUES.map( ( pageSize ) => ( {
-				value: pageSize,
-				label: pageSize,
-			} ) ) }
-			onChange={ ( value ) => dataView.setPageSize( +value ) }
-		/>
+		>
+			{ _availableViews.map( ( availableView ) => {
+				return (
+					<DropdownMenuItemV2
+						key={ availableView.id }
+						prefix={
+							availableView.id === view.type && (
+								<Icon icon={ check } />
+							)
+						}
+						onSelect={ ( event ) => {
+							// We need to handle this on DropDown component probably..
+							event.preventDefault();
+							onChangeView( { ...view, type: availableView.id } );
+						} }
+						// TODO: check about role and a11y.
+						role="menuitemcheckbox"
+					>
+						{ availableView.label }
+					</DropdownMenuItemV2>
+				);
+			} ) }
+		</DropdownSubMenuV2>
 	);
 }
 
+const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2
@@ -87,7 +124,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							onChangeView( { ...view, perPage: size, page: 0 } );
+							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 						// TODO: check about role and a11y.
 						role="menuitemcheckbox"
@@ -238,18 +275,35 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-export default function ViewActions( { fields, view, onChangeView } ) {
+const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
+
+export default function ViewActions( {
+	fields,
+	view,
+	onChangeView,
+	supportedLayouts,
+} ) {
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
 			trigger={
-				<Button variant="tertiary" icon={ blockTable }>
+				<Button
+					variant="tertiary"
+					size="compact"
+					icon={
+						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+					}
+				>
 					{ __( 'View' ) }
-					<Icon icon={ chevronDown } />
 				</Button>
 			}
 		>
 			<DropdownMenuGroupV2>
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

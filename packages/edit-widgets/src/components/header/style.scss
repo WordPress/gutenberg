@@ -9,12 +9,22 @@
 	@include break-small {
 		overflow: visible;
 	}
+
+	.selected-block-tools-wrapper {
+		overflow-x: hidden;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed {
+		border: none;
+	}
 }
 
 .edit-widgets-header__navigable-toolbar-wrapper {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 2;
+	overflow-x: hidden;
 	padding-left: $grid-unit-20;
 }
 

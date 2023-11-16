@@ -30,6 +30,24 @@
 		"parent": "devenv"
 	},
 	{
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Quick Start Guide",
+		"slug": "quick-start-guide",
+		"markdown_source": "../docs/getting-started/quick-start-guide.md",
+		"parent": "getting-started"
+	},
+	{
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
 		"markdown_source": "../docs/getting-started/create-block/README.md",
@@ -813,6 +831,12 @@
 		"title": "DropZone",
 		"slug": "drop-zone",
 		"markdown_source": "../packages/components/src/drop-zone/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DropdownMenuV2Ariakit",
+		"slug": "dropdown-menu-v2-ariakit",
+		"markdown_source": "../packages/components/src/dropdown-menu-v2-ariakit/README.md",
 		"parent": "components"
 	},
 	{

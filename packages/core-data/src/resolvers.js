@@ -7,6 +7,7 @@ import { camelCase } from 'change-case';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -233,9 +234,6 @@ export const getEntityRecords =
 				const response = await apiFetch( { path, parse: false } );
 				records = Object.values( await response.json() );
 				meta = {
-					totalPages: parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					),
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
 					),
@@ -653,13 +651,14 @@ export const getUserPatternCategories =
 			{
 				per_page: -1,
 				_fields: 'id,name,description,slug',
+				context: 'view',
 			}
 		);
 
 		const mappedPatternCategories =
 			patternCategories?.map( ( userCategory ) => ( {
 				...userCategory,
-				label: userCategory.name,
+				label: decodeEntities( userCategory.name ),
 				name: userCategory.slug,
 			} ) ) || [];
 
@@ -706,5 +705,16 @@ export const getNavigationFallbackId =
 				'wp_navigation',
 				fallback?.id,
 			] );
+		}
+	};
+
+export const getDefaultTemplateId =
+	( query ) =>
+	async ( { dispatch } ) => {
+		const template = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
+		} );
+		if ( template ) {
+			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
 	};

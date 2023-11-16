@@ -78,10 +78,7 @@ test.describe( 'new editor state', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Here is the title' );
 		// Save the post as a draft.
-		await page.click( 'role=button[name="Save draft"i]' );
-		await page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await editor.saveDraft();
 
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();

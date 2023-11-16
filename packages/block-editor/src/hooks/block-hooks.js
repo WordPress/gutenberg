@@ -235,23 +235,27 @@ function BlockHooksControl( props ) {
 	);
 }
 
-export const withBlockHooks = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		return (
-			<>
-				{ blockEdit }
-				<BlockHooksControl
-					blockName={ props.name }
-					clientId={ props.clientId }
-				/>
-			</>
-		);
-	};
-}, 'withBlockHooks' );
+export const withBlockHooksControls = createHigherOrderComponent(
+	( BlockEdit ) => {
+		return ( props ) => {
+			return (
+				<>
+					<BlockEdit key="edit" { ...props } />
+					{ props.isSelected && (
+						<BlockHooksControl
+							blockName={ props.name }
+							clientId={ props.clientId }
+						/>
+					) }
+				</>
+			);
+		};
+	},
+	'withBlockHooksControls'
+);
 
 addFilter(
 	'editor.BlockEdit',
-	'core/block-hooks/with-inspector-control',
-	withBlockHooks
+	'core/editor/block-hooks/with-inspector-controls',
+	withBlockHooksControls
 );
