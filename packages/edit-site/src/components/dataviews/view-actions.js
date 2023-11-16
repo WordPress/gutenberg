@@ -275,10 +275,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-function getDataViewIcon( type ) {
-	const icons = { list: blockTable, grid: grid, 'side-by-side': columns };
-	return icons[ type ];
-}
+const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
 
 export default function ViewActions( {
 	fields,
@@ -286,14 +283,17 @@ export default function ViewActions( {
 	onChangeView,
 	supportedLayouts,
 } ) {
-
-	const iconToUse = getDataViewIcon( view.type );
-
 	return (
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
 			trigger={
-				<Button variant="tertiary" size="compact" icon={ iconToUse }>
+				<Button
+					variant="tertiary"
+					size="compact"
+					icon={
+						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+					}
+				>
 					{ __( 'View' ) }
 				</Button>
 			}
