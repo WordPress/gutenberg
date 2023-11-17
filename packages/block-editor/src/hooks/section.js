@@ -8,10 +8,11 @@ import classnames from 'classnames';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import {
-	TextControl,
+	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
@@ -21,6 +22,7 @@ import { __ } from '@wordpress/i18n';
  */
 import InspectorControls from '../components/inspector-controls';
 import useDisplayBlockControls from '../components/use-display-block-controls';
+import { store as blockEditorStore } from '../store';
 import { useBlockEditingMode } from '..';
 
 export const SECTION_SUPPORT_KEY = 'section';
@@ -92,7 +94,15 @@ function addEditProps( settings ) {
 }
 
 function SectionPanelItem( props ) {
-	const { attributes, clientId, setAttributes } = props;
+	const { attributes, clientId, setAttributes, sections = [] } = props;
+
+	const sectionOptions = [
+		{ value: '', label: __( 'Default' ) },
+		...sections.map( ( section, index ) => ( {
+			value: index,
+			label: section.title, // TODO: Make sure this is translatable in theme.json.
+		} ) ),
+	];
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -100,6 +110,12 @@ function SectionPanelItem( props ) {
 			section: undefined,
 		};
 	}, [] );
+
+	const onChange = ( nextValue ) => {
+		setAttributes( {
+			section: nextValue !== '' ? nextValue : undefined,
+		} );
+	};
 
 	return (
 		<ToolsPanelItem
@@ -110,33 +126,34 @@ function SectionPanelItem( props ) {
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
-			<TextControl
+			<SelectControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Index' ) }
+				hideLabelFromVision
+				label={ __( 'Section Style' ) }
 				value={ attributes.section ?? '' }
-				onChange={ ( nextValue ) => {
-					setAttributes( {
-						section:
-							nextValue !== ''
-								? parseInt( nextValue, 10 )
-								: undefined,
-					} );
-				} }
+				options={ sectionOptions }
+				onChange={ onChange }
 			/>
 		</ToolsPanelItem>
 	);
 }
 
 function SectionPanel( props ) {
+	const sections = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().__experimentalStyles
+			?.sections;
+	} );
+
 	// TODO: Add theme.json setting to disable section styling.
 
-	if ( ! hasSectionSupport( props.name ) ) {
+	if ( ! sections || ! hasSectionSupport( props.name ) ) {
 		return null;
 	}
 
 	return (
 		<InspectorControls group="section">
-			<SectionPanelItem { ...props } />
+			<SectionPanelItem { ...props } sections={ sections } />
 		</InspectorControls>
 	);
 }

@@ -27,10 +27,7 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot
-				group="section"
-				label={ __( 'Sections' ) }
-			/>
+			<InspectorControls.Slot group="section" label={ __( 'Section' ) } />
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }

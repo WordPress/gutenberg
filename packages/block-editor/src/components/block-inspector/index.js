@@ -123,7 +123,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						<InspectorControls.Slot />
 						<InspectorControls.Slot
 							group="section"
-							label={ __( 'Sections' ) }
+							label={ __( 'Section' ) }
 						/>
 						<InspectorControls.Slot
 							group="color"
@@ -288,7 +288,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					<InspectorControls.Slot group="list" />
 					<InspectorControls.Slot
 						group="section"
-						label={ __( 'Sections' ) }
+						label={ __( 'Section' ) }
 					/>
 					<InspectorControls.Slot
 						group="color"
