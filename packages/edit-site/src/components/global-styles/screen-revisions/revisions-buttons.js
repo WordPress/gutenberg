@@ -13,19 +13,22 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
-const dateFormat = getSettings().formats.date;
-const datetimeAbbreviatedFormat = getSettings().formats.datetimeAbbreviated;
 
 /**
  * Returns a button label for the revision.
  *
- * @param {string|number} id                A revision object.
- * @param {boolean}       isLatest          Whether the revision is the most current.
- * @param {string}        authorDisplayName Author name.
- * @param {Date}          modifiedDate      Revision modified date object.
+ * @param {string|number} id                    A revision object.
+ * @param {boolean}       isLatest              Whether the revision is the most current.
+ * @param {string}        authorDisplayName     Author name.
+ * @param {string}        formattedModifiedDate Revision modified date formatted.
  * @return {string} Translated label.
  */
-function getRevisionLabel( id, isLatest, authorDisplayName, modifiedDate ) {
+function getRevisionLabel(
+	id,
+	isLatest,
+	authorDisplayName,
+	formattedModifiedDate
+) {
 	if ( 'parent' === id ) {
 		return __( 'Reset the styles to the theme defaults' );
 	}
@@ -38,20 +41,18 @@ function getRevisionLabel( id, isLatest, authorDisplayName, modifiedDate ) {
 		);
 	}
 
-	const formattedDate = dateI18n( datetimeAbbreviatedFormat, modifiedDate );
-
 	return isLatest
 		? sprintf(
 				/* translators: %1$s author display name, %2$s: revision creation date */
 				__( 'Changes saved by %1$s on %2$s (current)' ),
 				authorDisplayName,
-				formattedDate
+				formattedModifiedDate
 		  )
 		: sprintf(
 				/* translators: %1$s author display name, %2$s: revision creation date */
 				__( 'Changes saved by %1$s on %2$s' ),
 				authorDisplayName,
-				formattedDate
+				formattedModifiedDate
 		  );
 }
 
@@ -77,6 +78,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 		};
 	}, [] );
 	const dateNowInMs = getDate().getTime();
+	const { date: dateFormat, datetimeAbbreviated } = getSettings().formats;
 
 	return (
 		<ol
@@ -101,6 +103,12 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 					dateNowInMs - modifiedDate.getTime() > DAY_IN_MILLISECONDS
 						? dateI18n( dateFormat, modifiedDate )
 						: humanTimeDiff( modified );
+				const revisionLabel = getRevisionLabel(
+					id,
+					isLatest,
+					authorDisplayName,
+					dateI18n( datetimeAbbreviated, modifiedDate )
+				);
 
 				return (
 					<li
@@ -119,12 +127,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							onClick={ () => {
 								onChange( revision );
 							} }
-							label={ getRevisionLabel(
-								id,
-								isLatest,
-								authorDisplayName,
-								modifiedDate
-							) }
+							label={ revisionLabel }
 						>
 							{ isReset ? (
 								<span className="edit-site-global-styles-screen-revisions__description">

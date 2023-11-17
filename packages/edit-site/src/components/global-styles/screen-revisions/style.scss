@@ -50,7 +50,7 @@
 		left: $grid-unit-20;
 		top: 0;
 		width: 0;
-		border: 0.5px solid #ddd;
+		border: 0.5px solid $gray-300;
 	}
 
 	&:first-child::after {
