@@ -208,7 +208,7 @@ export default function DataviewsTemplates() {
 		[ view, setView ]
 	);
 	return (
-		<Page title={ __( 'Templates' ) }>
+		<Page>
 			<DataViews
 				paginationInfo={ paginationInfo }
 				fields={ fields }
