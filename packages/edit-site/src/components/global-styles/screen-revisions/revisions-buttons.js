@@ -12,11 +12,6 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import getGlobalStylesChanges from './get-revision-changes';
-
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const dateFormat = getSettings().formats.date;
 const datetimeAbbreviatedFormat = getSettings().formats.datetimeAbbreviated;
@@ -152,11 +147,6 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 											{ displayDate }
 										</time>
 									) }
-									<span className="edit-site-global-styles-screen-revisions__changes">
-										{ getGlobalStylesChanges(
-											revision
-										).join( ', ' ) }
-									</span>
 									<span className="edit-site-global-styles-screen-revisions__meta">
 										<img
 											alt={ authorDisplayName }
