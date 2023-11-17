@@ -7,7 +7,14 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import {
+	layout,
+	media,
+	symbol,
+	navigation,
+	styles,
+	page,
+} from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 
 import { useEffect } from '@wordpress/element';
@@ -82,6 +89,14 @@ export default function SidebarNavigationScreenMain() {
 							icon={ symbol }
 						>
 							{ __( 'Patterns' ) }
+						</NavigatorButton>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/media/all"
+							withChevron
+							icon={ media }
+						>
+							{ __( 'Media' ) }
 						</NavigatorButton>
 					</ItemGroup>
 					<TemplatePartHint />

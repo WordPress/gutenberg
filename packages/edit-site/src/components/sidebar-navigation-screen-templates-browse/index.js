@@ -12,12 +12,17 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { store as editSiteStore } from '../../store';
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const config = {
+	[ ATTACHMENT_POST_TYPE ]: {
+		title: __( 'Media' ),
+		description: __( 'Media, media, media!' ),
+	},
 	[ TEMPLATE_POST_TYPE ]: {
 		title: __( 'All templates' ),
 		description: __(

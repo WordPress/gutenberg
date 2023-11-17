@@ -71,7 +71,7 @@ function SidebarScreens() {
 			<NavigatorScreen path="/patterns">
 				<SidebarNavigationScreenPatterns />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part|media)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
