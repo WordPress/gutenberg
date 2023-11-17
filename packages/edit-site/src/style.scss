@@ -67,7 +67,8 @@ body.js.site-editor-php {
 }
 
 .edit-site,
-// The modals are shown outside the .edit-site wrapper, they need these styles.
+// The popovers and modals are shown outside the .edit-site wrapper, they need these styles.
+.components-popover,
 .components-modal__frame {
 	@include reset;
 }
