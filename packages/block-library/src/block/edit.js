@@ -2,17 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import fastDeepEqual from 'fast-deep-equal';
 
 /**
  * WordPress dependencies
  */
-import { RegistryProvider, useRegistry } from '@wordpress/data';
-import { useRef, useMemo } from '@wordpress/element';
-import {
-	useEntityBlockEditor,
-	useEntityProp,
-	useEntityRecord,
-} from '@wordpress/core-data';
+import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
+import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useEntityProp, useEntityRecord } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
@@ -31,7 +28,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -59,57 +56,6 @@ function getAttributeSynced( block ) {
 	}
 	return attributes;
 }
-
-const updateBlockAttributes =
-	( patternClientId ) =>
-	( clientIds, attributes, uniqueByBlock = false ) =>
-	( { select, dispatch } ) => {
-		const updates = {};
-		for ( const clientId of [].concat( clientIds ) ) {
-			const attrs = uniqueByBlock ? attributes[ clientId ] : attributes;
-			const parentPattern = select.getBlock( patternClientId );
-			const block = select.getBlock( clientId );
-			if ( ! parentPattern || ! hasAttributeSynced( block ) ) {
-				continue;
-			}
-
-			const contentAttributes = getAttributeSynced( block );
-			const dynamicContent = {};
-			for ( const attributeKey of Object.keys( attrs ) ) {
-				if ( Object.hasOwn( contentAttributes, attributeKey ) ) {
-					dynamicContent[ contentAttributes[ attributeKey ] ] =
-						attrs[ attributeKey ];
-				}
-			}
-			if ( Object.keys( dynamicContent ).length > 0 ) {
-				updates[ parentPattern.clientId ] = {
-					dynamicContent: {
-						...parentPattern.attributes.dynamicContent,
-						...dynamicContent,
-					},
-				};
-			}
-		}
-
-		if (
-			Object.values( updates ).every(
-				( updatedAttributes, _index, arr ) =>
-					updatedAttributes === arr[ 0 ]
-			)
-		) {
-			dispatch.updateBlockAttributes(
-				Object.keys( updates ),
-				Object.values( updates )[ 0 ],
-				false
-			);
-		} else {
-			dispatch.updateBlockAttributes(
-				Object.keys( updates ),
-				updates,
-				true
-			);
-		}
-	};
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -142,9 +88,58 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
+function applyInitialDynamicContent(
+	blocks,
+	dynamicContent = {},
+	defaultValues
+) {
+	return blocks.map( ( block ) => {
+		const innerBlocks = applyInitialDynamicContent(
+			block.innerBlocks,
+			dynamicContent,
+			defaultValues
+		);
+		if ( ! hasAttributeSynced( block ) ) return { ...block, innerBlocks };
+		const attributes = getAttributeSynced( block );
+		const newAttributes = { ...block.attributes };
+		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
+			defaultValues[ id ] = block.attributes[ attributeKey ];
+			if ( dynamicContent[ id ] ) {
+				newAttributes[ attributeKey ] = dynamicContent[ id ];
+			}
+		}
+		return {
+			...block,
+			attributes: newAttributes,
+			innerBlocks,
+		};
+	} );
+}
+
+function getDynamicContentFromBlocks( blocks, defaultValues ) {
+	/** @type {Record<string, unknown>} */
+	const dynamicContent = {};
+	for ( const block of blocks ) {
+		Object.assign(
+			dynamicContent,
+			getDynamicContentFromBlocks( block.innerBlocks, defaultValues )
+		);
+		if ( ! hasAttributeSynced( block ) ) continue;
+		const attributes = getAttributeSynced( block );
+		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
+			if ( block.attributes[ attributeKey ] !== defaultValues[ id ] ) {
+				dynamicContent[ id ] = block.attributes[ attributeKey ];
+			}
+		}
+	}
+	return Object.keys( dynamicContent ).length > 0
+		? dynamicContent
+		: undefined;
+}
+
 export default function ReusableBlockEdit( {
 	name,
-	attributes: { ref },
+	attributes: { ref, dynamicContent },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 } ) {
@@ -156,11 +151,46 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
+	const initialDynamicContent = useRef( dynamicContent );
+	const defaultValuesRef = useRef( {} );
+	const {
+		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		setBlockEditingMode,
+	} = useDispatch( blockEditorStore );
+	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_block',
-		{ id: ref }
+	useEffect( () => {
+		if ( ! record?.content?.raw ) return;
+		const initialBlocks = parse( record.content.raw );
+
+		const editingMode = getBlockEditingMode( patternClientId );
+		registry.batch( () => {
+			setBlockEditingMode( patternClientId, 'default' );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks(
+				patternClientId,
+				applyInitialDynamicContent(
+					initialBlocks,
+					initialDynamicContent.current,
+					defaultValuesRef.current
+				)
+			);
+			setBlockEditingMode( patternClientId, editingMode );
+		} );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		patternClientId,
+		record,
+		replaceInnerBlocks,
+		registry,
+		getBlockEditingMode,
+		setBlockEditingMode,
+	] );
+
+	const innerBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( patternClientId ),
+		[ patternClientId ]
 	);
 
 	const [ title, setTitle ] = useEntityProp(
@@ -170,7 +200,10 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 
-	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const { alignment, layout } = useInferredLayout(
+		innerBlocks,
+		parentLayout
+	);
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
@@ -182,65 +215,44 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		value: blocks,
 		layout,
-		onInput,
-		onChange,
-		renderAppender: blocks?.length
+		renderAppender: innerBlocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	const subRegistry = useMemo( () => {
-		return {
-			...registry,
-			_selectAttributes( block ) {
-				if ( ! hasAttributeSynced( block ) ) return block.attributes;
-				const { dynamicContent } = registry
-					.select( blockEditorStore )
-					.getBlockAttributes( patternClientId );
-				if ( ! dynamicContent ) return block.attributes;
-				const attributeIds = getAttributeSynced( block );
-				const newAttributes = { ...block.attributes };
-				for ( const [ attributeKey, id ] of Object.entries(
-					attributeIds
-				) ) {
-					if ( dynamicContent[ id ] ) {
-						newAttributes[ attributeKey ] = dynamicContent[ id ];
-					}
-				}
-				return newAttributes;
-			},
-			dispatch( store ) {
+	// Sync the `dynamicContent` attribute from the updated blocks.
+	// `syncDerivedBlockAttributes` is an action that just like `updateBlockAttributes`
+	// but won't create an undo level.
+	// This can be abstracted into a `useSyncDerivedAttributes` hook if needed.
+	useEffect( () => {
+		const { getBlocks, getBlockAttributes } =
+			registry.select( blockEditorStore );
+		const { syncDerivedBlockAttributes } = unlock(
+			registry.dispatch( blockEditorStore )
+		);
+		let prevBlocks = getBlocks( patternClientId );
+		return registry.subscribe( () => {
+			const blocks = getBlocks( patternClientId );
+			if ( blocks !== prevBlocks ) {
+				prevBlocks = blocks;
+				const nextDynamicContent = getDynamicContentFromBlocks(
+					blocks,
+					defaultValuesRef.current
+				);
 				if (
-					store !== blockEditorStore &&
-					store !== blockEditorStore.name
+					! fastDeepEqual(
+						getBlockAttributes( patternClientId ).dynamicContent,
+						nextDynamicContent
+					)
 				) {
-					return registry.dispatch( store );
+					syncDerivedBlockAttributes( patternClientId, {
+						dynamicContent: nextDynamicContent,
+					} );
 				}
-				const dispatch = registry.dispatch( store );
-				const select = registry.select( store );
-				return {
-					...dispatch,
-					updateBlockAttributes(
-						clientId,
-						attributes,
-						uniqueByBlock
-					) {
-						return updateBlockAttributes( patternClientId )(
-							clientId,
-							attributes,
-							uniqueByBlock
-						)( {
-							registry,
-							select,
-							dispatch,
-						} );
-					},
-				};
-			},
-		};
-	}, [ registry, patternClientId ] );
+			}
+		}, blockEditorStore );
+	}, [ patternClientId, registry ] );
 
 	let children = null;
 
@@ -269,25 +281,23 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RegistryProvider value={ subRegistry }>
-			<RecursionProvider uniqueId={ ref }>
-				<InspectorControls>
-					<PanelBody>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-						/>
-					</PanelBody>
-				</InspectorControls>
-				{ children === null ? (
-					<div { ...innerBlocksProps } />
-				) : (
-					<div { ...blockProps }>{ children }</div>
-				) }
-			</RecursionProvider>
-		</RegistryProvider>
+		<RecursionProvider uniqueId={ ref }>
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+					/>
+				</PanelBody>
+			</InspectorControls>
+			{ children === null ? (
+				<div { ...innerBlocksProps } />
+			) : (
+				<div { ...blockProps }>{ children }</div>
+			) }
+		</RecursionProvider>
 	);
 }
