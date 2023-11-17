@@ -62,9 +62,9 @@ function Image( block ) {
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { blocks, mediaUpload } = useSelect( ( select ) => {
-		const { getEditorBlocks, getSettings } = select( blockEditorStore );
+		const { getBlocks, getSettings } = select( blockEditorStore );
 		return {
-			blocks: getEditorBlocks(),
+			blocks: getBlocks(),
 			mediaUpload: getSettings().mediaUpload,
 		};
 	}, [] );
