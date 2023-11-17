@@ -72,9 +72,13 @@
 	}
 }
 
-// Reverse on mobile style: Reverse column order
+// Reverse on mobile: Reverse column order
 @media (max-width: #{ ($break-medium - 1) }) {
-	.wp-block-columns.is-reversed-on-mobile {
+	.wp-block-columns.is-reversed-on-mobile.is-not-stacked-on-mobile {
+		flex-direction: row-reverse;
+	}
+
+	.wp-block-columns.is-reversed-on-mobile:not(.is-not-stacked-on-mobile) {
 		flex-direction: column-reverse;
 	}
 }
