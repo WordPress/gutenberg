@@ -3,6 +3,7 @@
  */
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
+import { combineReducers as combineReducersModule } from './redux-store';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -75,7 +76,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export { combineReducers } from './redux-store';
+export const combineReducers = combineReducersModule;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../../components/use-setting';
+import { useSettings } from '../../components/use-settings';
 
 /**
  * Control for letter-spacing.
@@ -28,8 +28,9 @@ export default function LetterSpacingControl( {
 	__unstableInputWidth = '60px',
 	...otherProps
 } ) {
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 		defaultValues: { px: 2, em: 0.2, rem: 0.2 },
 	} );
 	return (

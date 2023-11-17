@@ -110,7 +110,7 @@ export default function ScaleTool( {
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				__nextHasNoMarginBottom
+				size={ '__unstable-large' }
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

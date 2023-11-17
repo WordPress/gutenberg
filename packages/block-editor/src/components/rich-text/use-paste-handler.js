@@ -35,7 +35,6 @@ export function usePasteHandler( props ) {
 				onReplace,
 				onSplit,
 				__unstableEmbedURLOnPaste,
-				preserveWhiteSpace,
 				pastePlainText,
 			} = propsRef.current;
 
@@ -56,26 +55,6 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			const transformed = formatTypes.reduce(
-				( accumlator, { __unstablePasteRule } ) => {
-					// Only allow one transform.
-					if ( __unstablePasteRule && accumlator === value ) {
-						accumlator = __unstablePasteRule( value, {
-							html,
-							plainText,
-						} );
-					}
-
-					return accumlator;
-				},
-				value
-			);
-
-			if ( transformed !== value ) {
-				onChange( transformed );
-				return;
-			}
-
 			const isInternal =
 				event.clipboardData.getData( 'rich-text' ) === 'true';
 
@@ -83,10 +62,7 @@ export function usePasteHandler( props ) {
 			// without filtering the data. The filters are only meant for externally
 			// pasted content and remove inline styles.
 			if ( isInternal ) {
-				const pastedValue = create( {
-					html,
-					preserveWhiteSpace,
-				} );
+				const pastedValue = create( { html } );
 				addActiveFormats( pastedValue, value.activeFormats );
 				onChange( insert( value, pastedValue ) );
 				return;
@@ -139,10 +115,14 @@ export function usePasteHandler( props ) {
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
+			const trimmedPlainText = plainText.trim();
+
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
-				isURL( plainText.trim() )
+				isURL( trimmedPlainText ) &&
+				// For the link pasting feature, allow only http(s) protocols.
+				/^https?:/.test( trimmedPlainText )
 			) {
 				mode = 'BLOCKS';
 			}
@@ -152,13 +132,31 @@ export function usePasteHandler( props ) {
 				plainText,
 				mode,
 				tagName,
-				preserveWhiteSpace,
 			} );
 
 			if ( typeof content === 'string' ) {
-				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
-				onChange( insert( value, valueToInsert ) );
+				const transformed = formatTypes.reduce(
+					( accumlator, { __unstablePasteRule } ) => {
+						// Only allow one transform.
+						if ( __unstablePasteRule && accumlator === value ) {
+							accumlator = __unstablePasteRule( value, {
+								html,
+								plainText,
+							} );
+						}
+
+						return accumlator;
+					},
+					value
+				);
+
+				if ( transformed !== value ) {
+					onChange( transformed );
+				} else {
+					const valueToInsert = create( { html: content } );
+					addActiveFormats( valueToInsert, value.activeFormats );
+					onChange( insert( value, valueToInsert ) );
+				}
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );

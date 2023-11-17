@@ -789,12 +789,22 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
--   _wrapperClassName_ `string`: Wrapper Class Name.
+-   _styles_ `EditorStyle[]`: CSS rules.
+-   _wrapperSelector_ `string`: Wrapper selector.
 
 _Returns_
 
 -   `Array`: converted rules.
+
+_Type Definition_
+
+-   _EditorStyle_ `Object`
+
+_Properties_
+
+-   _css_ `string`: the CSS block(s), as a single string.
+-   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
+-   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -944,9 +954,11 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.4.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -961,6 +973,26 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
+
+### useSettings
+
+Hook that retrieves the given settings for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
+
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
+_Parameters_
+
+-   _paths_ `string[]`: The paths to the settings.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
 
 ### Warning
 

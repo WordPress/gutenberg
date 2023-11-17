@@ -9,7 +9,9 @@ test.describe( 'Block Locking', () => {
 	} );
 
 	test( 'can prevent removal', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Some paragraph' );
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
@@ -23,7 +25,9 @@ test.describe( 'Block Locking', () => {
 	} );
 
 	test( 'can disable movement', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
 
 		await page.keyboard.type( 'Enter' );
@@ -47,7 +51,9 @@ test.describe( 'Block Locking', () => {
 	} );
 
 	test( 'can lock everything', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Some paragraph' );
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
@@ -62,7 +68,9 @@ test.describe( 'Block Locking', () => {
 	} );
 
 	test( 'can unlock from toolbar', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Some paragraph' );
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );

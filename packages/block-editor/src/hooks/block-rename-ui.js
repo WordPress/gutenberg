@@ -4,7 +4,7 @@
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	MenuItem,
 	__experimentalHStack as HStack,
@@ -92,6 +92,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }
@@ -130,6 +131,7 @@ function BlockRenameControl( props ) {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Block name' ) }
 					value={ customName || '' }
 					onChange={ onChange }
@@ -187,23 +189,15 @@ function BlockRenameControl( props ) {
 	);
 }
 
-export const withBlockRenameControl = createHigherOrderComponent(
+export const withBlockRenameControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { clientId, name, attributes, setAttributes } = props;
+		const { clientId, name, attributes, setAttributes, isSelected } = props;
 
-		const metaDataSupport = getBlockSupport(
-			name,
-			'__experimentalMetadata',
-			false
-		);
-
-		const supportsBlockNaming = !! (
-			true === metaDataSupport || metaDataSupport?.name
-		);
+		const supportsBlockNaming = hasBlockSupport( name, 'renaming', true );
 
 		return (
 			<>
-				{ supportsBlockNaming && (
+				{ isSelected && supportsBlockNaming && (
 					<>
 						<BlockRenameControl
 							clientId={ clientId }
@@ -211,8 +205,7 @@ export const withBlockRenameControl = createHigherOrderComponent(
 							onChange={ ( newName ) => {
 								setAttributes( {
 									metadata: {
-										...( attributes?.metadata &&
-											attributes?.metadata ),
+										...attributes?.metadata,
 										name: newName,
 									},
 								} );
@@ -225,11 +218,11 @@ export const withBlockRenameControl = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withBlockRenameControls'
 );
 
 addFilter(
 	'editor.BlockEdit',
-	'core/block-rename-ui/with-block-rename-control',
-	withBlockRenameControl
+	'core/block-rename-ui/with-block-rename-controls',
+	withBlockRenameControls
 );

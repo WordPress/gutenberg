@@ -494,6 +494,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
+				} else {
+					removeBlock( clientId );
 				}
 			}
 		},

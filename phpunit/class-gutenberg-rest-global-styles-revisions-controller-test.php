@@ -242,6 +242,11 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 			$routes,
 			'Global style revisions based on the given parentID route does not exist.'
 		);
+		$this->assertArrayHasKey(
+			'/wp/v2/global-styles/(?P<parent>[\d]+)/revisions/(?P<id>[\d]+)',
+			$routes,
+			'Single global style revisions based on the given parentID and revision ID route does not exist.'
+		);
 	}
 
 	/**
@@ -299,6 +304,38 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	}
 
 	/**
+	 * @ticket 59810
+	 *
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_item
+	 */
+	public function test_get_item() {
+		wp_set_current_user( self::$admin_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions/' . $this->revision_1_id );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status(), 'Response status is 200.' );
+		$this->check_get_revision_response( $data, $this->revision_1 );
+	}
+
+	/**
+	 * @ticket 59810
+	 *
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_revision
+	 */
+	public function test_get_item_invalid_revision_id_should_error() {
+		wp_set_current_user( self::$admin_id );
+
+		$expected_error  = 'rest_post_invalid_id';
+		$expected_status = 404;
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions/20000001' );
+		$response        = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( $expected_error, $response, $expected_status );
+	}
+
+	/**
 	 * @ticket 58524
 	 *
 	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_item_schema
@@ -320,18 +357,12 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array has "modified" key.' );
 		$this->assertArrayHasKey( 'modified_gmt', $properties, 'Schema properties array has "modified_gmt" key.' );
 	}
+
 	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {
 		// Controller does not implement test_context_param().
-	}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_get_item() {
-		// Controller does not implement get_item().
 	}
 
 	/**

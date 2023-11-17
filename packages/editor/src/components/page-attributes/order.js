@@ -39,6 +39,7 @@ function PageAttributesOrder() {
 		<Flex>
 			<FlexBlock>
 				<NumberControl
+					__next40pxDefaultSize
 					label={ __( 'Order' ) }
 					value={ value }
 					onChange={ setUpdatedOrder }

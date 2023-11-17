@@ -137,4 +137,4 @@ The optional custom text to display as the confirmation button's label
 -   Required: No
 -   Default: "Cancel"
 
-The optional custom text to display as the cancelation button's label
+The optional custom text to display as the cancellation button's label

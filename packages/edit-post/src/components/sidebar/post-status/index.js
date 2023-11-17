@@ -7,14 +7,18 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { PostSwitchToDraftButton, PostSyncStatus } from '@wordpress/editor';
+import {
+	PostSchedulePanel,
+	PostSwitchToDraftButton,
+	PostSyncStatus,
+	PostURLPanel,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
-import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
@@ -23,7 +27,6 @@ import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
 import PostTemplate from '../post-template';
-import PostURL from '../post-url';
 
 /**
  * Module Constants
@@ -58,9 +61,9 @@ export default function PostStatus() {
 				{ ( fills ) => (
 					<>
 						<PostVisibility />
-						<PostSchedule />
+						<PostSchedulePanel />
 						<PostTemplate />
-						<PostURL />
+						<PostURLPanel />
 						<PostSticky />
 						<PostPendingStatus />
 						<PostFormat />

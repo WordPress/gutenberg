@@ -50,6 +50,7 @@ export {
 	default as PostScheduleLabel,
 	usePostScheduleLabel,
 } from './post-schedule/label';
+export { default as PostSchedulePanel } from './post-schedule/panel';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
@@ -71,6 +72,7 @@ export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
 export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
+export { default as PostURLPanel } from './post-url/panel';
 export { default as PostVisibility } from './post-visibility';
 export {
 	default as PostVisibilityLabel,

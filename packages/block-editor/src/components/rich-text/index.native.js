@@ -17,10 +17,10 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	insert,
+	remove,
 	create,
 	split,
 	toHTMLString,
@@ -45,6 +45,7 @@ import {
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
+import RichText from './native';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -70,6 +71,7 @@ function RichTextWrapper(
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -339,14 +341,28 @@ function RichTextWrapper(
 				splitStart === splitEnd &&
 				splitEnd === text.length;
 
-			if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+			if ( shiftKey ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( value, '\n' ) );
 				}
-			} else if ( ! canSplit && canSplitAtEnd ) {
-				onSplitAtEnd();
 			} else if ( canSplit ) {
 				splitValue( value );
+			} else if ( canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				value.start = value.end - 2;
+				onChange( remove( value ) );
+				onSplitAtDoubleLineEnd();
+			} else if ( ! disableLineBreaks ) {
+				onChange( insert( value, '\n' ) );
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -671,6 +687,8 @@ ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
+
+ForwardedRichTextContainer.Raw = RichText;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
