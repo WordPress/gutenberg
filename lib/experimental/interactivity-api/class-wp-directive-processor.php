@@ -23,9 +23,9 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
 class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 
 	/**
-	 * An array of root blocks.
+	 * A string containing the main root block.
 	 *
-	 * @var array
+	 * @var string
 	 */
 	public static $root_block = null;
 
@@ -68,6 +68,57 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	public static function has_root_block() {
 		return isset( self::$root_block );
 	}
+
+
+
+	/**
+	 * A string containing the main children of interactive.
+	 *
+	 * @var string
+	 */
+	public static $children_of_interactive_block = null;
+
+
+		/**
+		 * Add a root block to the variable.
+		 *
+		 * @param array $block The block to add.
+		 *
+		 * @return void
+		 */
+	public static function mark_children_of_interactive_block( $block ) {
+		self::$children_of_interactive_block = md5( serialize( $block ) );
+	}
+
+	/**
+	 * Remove a root block to the variable.
+	 *
+	 * @return void
+	 */
+	public static function unmark_children_of_interactive_block() {
+		self::$children_of_interactive_block = null;
+	}
+
+	/**
+	 * Check if block is a root block.
+	 *
+	 * @param array $block The block to check.
+	 *
+	 * @return bool True if block is a root block, false otherwise.
+	 */
+	public static function is_marked_as_children_of_interactive_block( $block ) {
+		return md5( serialize( $block ) ) === self::$children_of_interactive_block;
+	}
+
+	/**
+	 * Check if a root block has already been defined.
+	 *
+	 * @return bool True if block is a root block, false otherwise.
+	 */
+	public static function has_children_of_interactive_block() {
+		return isset( self::$children_of_interactive_block );
+	}
+
 
 
 	/**
