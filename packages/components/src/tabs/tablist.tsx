@@ -24,9 +24,7 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 	if ( ! context ) {
-		warning(
-			'`Tabs.TabList` needs to receive context from a `Tabs` component or a `Tabs.Context.Provider`.'
-		);
+		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
 	const { store } = context;
