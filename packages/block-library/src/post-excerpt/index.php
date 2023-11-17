@@ -89,16 +89,32 @@ function register_block_core_post_excerpt_length_filter() {
 	return 100;
 }
 
-// This needs to be wrapped in the rest_pre_dispatch hook to ensure
+// This needs to be wrapped in the rest_dispatch_request hook to ensure
 // that the code works when using REST API preloading or batch requests.
 add_filter(
-	'rest_pre_dispatch',
-	static function ( $result, $server, $request ) {
+	'rest_dispatch_request',
+	static function ( $dispatch_result, $request, $route, $handler ) {
 		if ( 'edit' !== $request['context'] ) {
 			return;
 		}
+
+		if ( empty( $handler['callback'][0] ) || ! is_object( $handler['callback'][0] ) ) {
+			return;
+		}
+
+		$controller = $handler['callback'][0];
+
+		if ( ! is_callable( array( $controller, 'get_fields_for_response' ) ) ) {
+			return;
+		}
+
+		$fields = $controller->get_fields_for_response( $request );
+		if ( ! rest_is_field_included( 'excerpt', $fields ) ) {
+			return;
+		}
+
 		add_filter( 'excerpt_length', 'register_block_core_post_excerpt_length_filter', 20 );
 	},
 	10,
-	3
+	4
 );
