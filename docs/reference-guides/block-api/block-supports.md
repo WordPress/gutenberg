@@ -556,6 +556,7 @@ supports: {
     -   `allowVerticalAlignment`: type `boolean`, default value `true`
     -   `allowJustification`: type `boolean`, default value `true`
     -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowCustomContentSize`: type `boolean`, default value `true`
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
 
@@ -614,6 +615,13 @@ For the `flex` layout type, determines display of the justification control in t
 -   Default value: `true`
 
 For the `flex` layout type only, determines display of the orientation control in the block toolbar.
+
+### layout.allowCustomContentSize
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
 
 
 ## multiple

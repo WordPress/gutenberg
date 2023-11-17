@@ -383,9 +383,10 @@ class WP_Theme_JSON_Gutenberg {
 			'minHeight' => null,
 		),
 		'layout'                        => array(
-			'contentSize'  => null,
-			'wideSize'     => null,
-			'allowEditing' => null,
+			'contentSize'            => null,
+			'wideSize'               => null,
+			'allowEditing'           => null,
+			'allowCustomContentSize' => null,
 		),
 		'lightbox'                      => array(
 			'enabled'      => null,
