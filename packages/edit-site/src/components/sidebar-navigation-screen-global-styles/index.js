@@ -2,10 +2,24 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit, seen } from '@wordpress/icons';
+import {
+	edit,
+	seen,
+	typography,
+	color,
+	layout,
+	media,
+	styles,
+	widget,
+} from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import {
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalHeading as Heading,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
@@ -14,16 +28,17 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import { useLink } from '../routes/link';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import StyleVariationsContainer from '../global-styles/style-variations-container';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
+const { useLocation } = unlock( routerPrivateApis );
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
@@ -60,6 +75,104 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 }
 
 function SidebarNavigationScreenGlobalStylesContent() {
+	const {
+		params: { path },
+	} = useLocation();
+
+	const linkInfo = useLink( {
+		path,
+		activeView: 'test',
+	} );
+
+	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
+	// loaded. This is necessary because the Iframe component waits until
+	// the block editor store's `__internalIsInitialized` is true before
+	// rendering the iframe. Without this, the iframe previews will not render
+	// in mobile viewport sizes, where the editor canvas is hidden.
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Active' ) }</Heading>
+			</div>
+			<ItemGroup>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Moonlight
+				</SidebarNavigationItem>
+			</ItemGroup>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Presets' ) }</Heading>
+			</div>
+			<ItemGroup>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ typography }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Typography
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ color }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Colors
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ layout }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Layout
+				</SidebarNavigationItem>
+			</ItemGroup>
+			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
+				<Heading level={ 2 }>{ __( 'Blocks' ) }</Heading>
+			</div>
+			<ItemGroup>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ typography }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Text
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ media }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Media
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ styles }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Design
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ widget }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Widgets
+				</SidebarNavigationItem>
+				<SidebarNavigationItem
+					{ ...linkInfo }
+					icon={ layout }
+					aria-current={ false ? 'true' : undefined }
+				>
+					Theme
+				</SidebarNavigationItem>
+			</ItemGroup>
+		</>
+	);
+}
+
+function SidebarNavigationScreenStyleVariations() {
 	const { storedSettings } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -191,7 +304,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
+			{ /* { isStyleBookOpened && ! isMobileViewport && isViewMode && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }
@@ -200,7 +313,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 					showCloseButton={ false }
 					showTabs={ false }
 				/>
-			) }
+			) } */ }
 		</>
 	);
 }
