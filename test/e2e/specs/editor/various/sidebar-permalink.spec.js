@@ -24,6 +24,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'public_q_not_public' } );
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
@@ -43,6 +44,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'not_public_q_public' } );
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
@@ -62,6 +64,7 @@ test.describe( 'Sidebar Permalink', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'public_q_public' } );
+		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
