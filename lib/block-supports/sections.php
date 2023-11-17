@@ -24,9 +24,9 @@ function gutenberg_get_section_class_name( $block ) {
 	// TODO: Improve the logic here to handle when sections are deleted and new
 	// sections created after the fact.
 
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$theme_json = $tree->get_raw_data();
-	$section_count = count( $theme_json['styles']['sections'] ?? [] );
+	$tree          = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$theme_json    = $tree->get_raw_data();
+	$section_count = count( $theme_json['styles']['sections'] ?? array() );
 
 	if ( ! $section_count ) {
 		return null;
@@ -94,4 +94,3 @@ WP_Block_Supports::get_instance()->register(
 );
 
 add_filter( 'render_block', 'gutenberg_render_section_support', 10, 2 );
-

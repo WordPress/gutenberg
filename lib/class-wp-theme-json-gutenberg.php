@@ -2138,7 +2138,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$path_length = count( $node_path );
 
-		foreach( self::ELEMENTS as $element => $selector ) {
+		foreach ( self::ELEMENTS as $element => $selector ) {
 			if ( ! isset( $elements[ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
 				continue;
 			}
@@ -2176,21 +2176,20 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array  $nodes     Block styles definition.
 	 * @param array  $node      Block styles definition.
 	 * @param array  $node_path Path to the block styles definition.
+	 * @param array  $selectors Block's CSS selectors.
 	 * @param string $scope     Selector to scope the node's individual selectors with.
-	 *
-	 * @return array Block node including block name, path, selectors, duotone & variations.
 	 */
 	protected static function generate_block_nodes( $name, &$nodes, $node, $node_path, $selectors, $scope = null ) {
 		// Feature selectors are an array and need to be scoped individually.
 		$feature_selectors = $selectors[ $name ]['selectors'] ?? null;
 
 		if ( $scope && $feature_selectors ) {
-			foreach( $feature_selectors as $feature => $feature_selector ) {
+			foreach ( $feature_selectors as $feature => $feature_selector ) {
 				if ( is_string( $feature_selector ) ) {
-					$feature_selectors[ $feature ] = static::scope_selector( $scope, $feature_selector  );
+					$feature_selectors[ $feature ] = static::scope_selector( $scope, $feature_selector );
 				}
 
-				if ( is_array( $feature_selector ) ){
+				if ( is_array( $feature_selector ) ) {
 					foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
 						$feature_selectors[ $feature ][ $subfeature ] = static::scope_selector( $scope, $subfeature_selector );
 					}
@@ -2231,8 +2230,9 @@ class WP_Theme_JSON_Gutenberg {
 			// Handle any pseudo selectors for the element.
 			$valid_pseudo_selectors = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ?? array();
 			foreach ( $valid_pseudo_selectors as $pseudo_selector ) {
-				if ( isset( $node['elements'][ $element ][ $pseudo_selector] ) ) {
+				if ( isset( $node['elements'][ $element ][ $pseudo_selector ] ) ) {
 					$combined_pseudo_selector = static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector );
+
 					$nodes[] = array(
 						'path'     => $element_path,
 						'selector' => static::scope_selector( $scope, $combined_pseudo_selector ),
@@ -2241,7 +2241,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 	}
-
 
 	/**
 	 * Builds metadata for the style nodes, which returns in the form of:
@@ -2278,7 +2277,7 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		$elements = $theme_json['styles']['elements'] ?? null;
-		static::generate_element_nodes( $nodes, $elements, array( 'styles', 'elements') );
+		static::generate_element_nodes( $nodes, $elements, array( 'styles', 'elements' ) );
 
 		if (
 			! isset( $theme_json['styles']['blocks'] ) &&
@@ -2295,10 +2294,10 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		// Sections
+		// Sections.
 		if ( isset( $theme_json['styles']['sections'] ) ) {
 			foreach ( $theme_json['styles']['sections'] as $section_index => $section ) {
-				$index = intval( $section_index );
+				$index         = intval( $section_index );
 				$section_class = ".wp-section-$index";
 
 				// General section styles.
@@ -2309,7 +2308,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Section element styles.
 				$section_elements = $theme_json['styles']['sections'][ $index ]['elements'] ?? null;
-				$elements_path = array( 'styles', 'sections', $index, 'elements' );
+				$elements_path    = array( 'styles', 'sections', $index, 'elements' );
 				static::generate_element_nodes( $nodes, $section_elements, $elements_path, $section_class );
 			}
 		}
@@ -2401,7 +2400,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $theme_json['styles']['sections'] ) ) {
 			foreach ( $theme_json['styles']['sections'] as $section_index => $section ) {
-				$index = intval( $section_index );
+				$index         = intval( $section_index );
 				$section_class = ".wp-section-$index";
 
 				if ( empty( $section['blocks'] ) ) {
