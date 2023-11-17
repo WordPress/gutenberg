@@ -209,6 +209,14 @@ public class Gutenberg: UIResponder {
         let body: [String: Any] = ["event": ["x": coords.x, "y": coords.y]]
         sendEvent(.filesOver, body: body)
     }
+    
+    public func filesDropOutside() {
+        sendEvent(.filesDropOutside)
+    }
+    
+    public func filesDropEnded() {
+        sendEvent(.filesDropEnded)
+    }
 
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)

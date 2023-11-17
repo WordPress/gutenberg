@@ -452,6 +452,8 @@ extension RNReactNativeGutenbergBridge {
         case onRedoPressed
         case filesDrop
         case filesOver
+        case filesDropOutside
+        case filesDropEnded
     }
 
     public override func supportedEvents() -> [String]! {

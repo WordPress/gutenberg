@@ -160,6 +160,14 @@ export function subscribeOnFilesOver( callback ) {
 	return gutenbergBridgeEvents.addListener( 'filesOver', callback );
 }
 
+export function subscribeOnFilesDropOutside( callback ) {
+	return gutenbergBridgeEvents.addListener( 'filesDropOutside', callback );
+}
+
+export function subscribeOnFilesDropEnded( callback ) {
+	return gutenbergBridgeEvents.addListener( 'filesDropEnded', callback );
+}
+
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html     the HTML to replace the block.

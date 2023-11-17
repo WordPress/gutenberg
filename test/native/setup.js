@@ -119,6 +119,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
+		subscribeOnFilesDrop: jest.fn(),
+		subscribeOnFilesOver: jest.fn(),
+		subscribeOnFilesDropOutside: jest.fn(),
+		subscribeOnFilesDropEnded: jest.fn(),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',

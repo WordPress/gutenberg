@@ -7,7 +7,6 @@ import Animated, {
 	useAnimatedStyle,
 	withTiming,
 	useAnimatedReaction,
-	runOnJS,
 } from 'react-native-reanimated';
 
 /**
@@ -26,6 +25,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	subscribeOnFilesDrop,
 	subscribeOnFilesOver,
+	subscribeOnFilesDropOutside,
+	subscribeOnFilesDropEnded,
 } from '@wordpress/react-native-bridge';
 
 /**
@@ -61,23 +62,28 @@ const getStyles = ( isStackedHorizontally, horizontalAlignment ) => {
 	return computedStyles;
 };
 
+const dropZoneStyles = {
+	top: 16,
+	left: 16,
+	right: 16,
+	bottom: 16,
+	position: 'absolute',
+	zIndex: 1000,
+	justifyContent: 'center',
+	alignItems: 'center',
+};
+
 function DropZone( { opacity } ) {
 	const animatedStyles = useAnimatedStyle( () => {
 		return {
 			opacity: withTiming( opacity.value, { duration: 200 } ),
-			top: 16,
-			left: 16,
-			right: 16,
-			bottom: 16,
-			position: 'absolute',
-			zIndex: 1000,
-			justifyContent: 'center',
-			alignItems: 'center',
 		};
 	} );
 
+	const containerStyles = [ animatedStyles, dropZoneStyles ];
+
 	return (
-		<Animated.View pointerEvents="none" style={ animatedStyles }>
+		<Animated.View pointerEvents="none" style={ containerStyles }>
 			<View
 				style={ {
 					backgroundColor: '#007CBA',
@@ -88,7 +94,7 @@ function DropZone( { opacity } ) {
 					borderRadius: 6,
 				} }
 			>
-				<Icon icon={ upload } color="#FFFFFF" />
+				<Icon icon={ upload } style={ { color: '#FFFFFF' } } />
 				<Text style={ { color: '#FFFFFF' } }>
 					{ __( 'Drop files to upload' ) }
 				</Text>
@@ -174,6 +180,8 @@ export default function BlockList( {
 	const { insertBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const onFilesDropSubscription = useRef();
 	const onFilesOverSubscription = useRef();
+	const onFilesDropOutsideSubscription = useRef();
+	const onFilesDropEndedSubscription = useRef();
 	const { onBlockDragOver, onBlockDrop } = useBlockDropZone();
 
 	const opacity = useSharedValue( 0 );
@@ -188,10 +196,11 @@ export default function BlockList( {
 			}
 		}
 	);
+
 	useEffect( () => {
 		onFilesDropSubscription.current = subscribeOnFilesDrop( ( content ) => {
-			onBlockDrop( { type: 'file', files: content } );
 			isDragging.value = false;
+			onBlockDrop( { type: 'file', files: content } );
 		} );
 		onFilesOverSubscription.current = subscribeOnFilesOver(
 			( { event } ) => {
@@ -199,11 +208,24 @@ export default function BlockList( {
 				onBlockDragOver( event );
 			}
 		);
+		onFilesDropOutsideSubscription.current = subscribeOnFilesDropOutside(
+			() => {
+				isDragging.value = false;
+			}
+		);
+		onFilesDropEndedSubscription.current = subscribeOnFilesDropEnded(
+			() => {
+				isDragging.value = false;
+			}
+		);
 
 		return () => {
 			onFilesDropSubscription.current?.remove();
 			onFilesOverSubscription.current?.remove();
+			onFilesDropOutsideSubscription.current?.remove();
+			onFilesDropEndedSubscription.current?.remove();
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const extraData = useRef( {
@@ -316,7 +338,6 @@ export default function BlockList( {
 			onLayout={ onLayout }
 			testID="block-list-wrapper"
 		>
-			<DropZone opacity={ opacity } />
 			{ isRootList ? (
 				<BlockListProvider
 					value={ {
@@ -324,6 +345,7 @@ export default function BlockList( {
 						scrollRef: scrollViewRef.current,
 					} }
 				>
+					<DropZone opacity={ opacity } />
 					<BlockDraggableWrapper isRTL={ isRTL }>
 						{ ( { onScroll } ) => (
 							<KeyboardAwareFlatList
