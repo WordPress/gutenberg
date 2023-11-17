@@ -52,7 +52,7 @@ function render_block_core_block( $attributes ) {
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
 	if ( isset( $attributes['dynamicContent'] ) ) {
-		$filter_block_context = static function( $context ) use ( $attributes ) {
+		$filter_block_context = static function ( $context ) use ( $attributes ) {
 			$context['dynamicContent'] = $attributes['dynamicContent'];
 			return $context;
 		};
@@ -84,7 +84,14 @@ add_action( 'init', 'register_block_core_block' );
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
-	add_filter( 'register_block_type_args', function( $args, $block_name ) {
+	/**
+	 * Registers the dynamicContent attribute for core/block.
+	 *
+	 * @param array  $args       Array of arguments for registering a block type.
+	 * @param string $block_name Block name including namespace.
+	 * @return array $args
+	 */
+	function register_block_core_block_args( $args, $block_name ) {
 		if ( 'core/block' === $block_name ) {
 			$args['attributes'] = array_merge(
 				$args['attributes'],
@@ -96,5 +103,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			);
 		}
 		return $args;
-	}, 10, 2 );
+	}
+	add_filter( 'register_block_type_args', 'register_block_core_block_args', 10, 2 );
 }
