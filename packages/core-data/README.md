@@ -205,6 +205,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -443,6 +456,19 @@ _Parameters_
 _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
+
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 

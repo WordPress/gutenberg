@@ -6,11 +6,7 @@ import {
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function DefaultSidebar( {
 	className,
@@ -24,7 +20,11 @@ export default function DefaultSidebar( {
 	panelClassName,
 } ) {
 	const showIconLabels = useSelect(
-		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
 		[]
 	);
 

@@ -16,25 +16,26 @@ import { forwardRef } from '@wordpress/element';
 import type { TabListProps } from './types';
 import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
+import type { WordPressComponentProps } from '../context';
 
-export const TabList = forwardRef< HTMLDivElement, TabListProps >(
-	function TabList( { children, className, style }, ref ) {
-		const context = useTabsContext();
-		if ( ! context ) {
-			warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-			return null;
-		}
-		const { store } = context;
-		return (
-			<Ariakit.TabList
-				ref={ ref }
-				style={ style }
-				store={ store }
-				className={ className }
-				render={ <TabListWrapper /> }
-			>
-				{ children }
-			</Ariakit.TabList>
-		);
+export const TabList = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< TabListProps, 'div', false >
+>( function TabList( { children, ...otherProps }, ref ) {
+	const context = useTabsContext();
+	if ( ! context ) {
+		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+		return null;
 	}
-);
+	const { store } = context;
+	return (
+		<Ariakit.TabList
+			ref={ ref }
+			store={ store }
+			render={ <TabListWrapper /> }
+			{ ...otherProps }
+		>
+			{ children }
+		</Ariakit.TabList>
+	);
+} );

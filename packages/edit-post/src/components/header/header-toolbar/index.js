@@ -19,7 +19,6 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -33,7 +32,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar( { setListViewToggleElement } ) {
+function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
@@ -44,7 +43,6 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
 			select( blockEditorStore );
@@ -52,7 +50,6 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { get: getPreference } = select( preferencesStore );
 
 		return {
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
@@ -69,7 +66,6 @@ function HeaderToolbar( { setListViewToggleElement } ) {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-post/toggle-list-view'
 			),
-			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
 		};
 	}, [] );
 

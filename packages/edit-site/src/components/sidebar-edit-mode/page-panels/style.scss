@@ -84,4 +84,9 @@
 	.components-popover__content {
 		min-width: 240px;
 	}
+	.components-button.is-pressed,
+	.components-button.is-pressed:hover {
+		background: inherit;
+		color: inherit;
+	}
 }
