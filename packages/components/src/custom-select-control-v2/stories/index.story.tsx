@@ -64,6 +64,46 @@ const Template: StoryFn< typeof CustomSelect > = () => {
 
 export const Default = Template.bind( {} );
 
+const MultiSelectTemplate: StoryFn< typeof CustomSelect > = () => {
+	function renderValue( value: string | string[] ) {
+		if ( value.length === 0 ) return '0 colors selected';
+		return <div>{ value.length } colors selected</div>;
+	}
+
+	const items = [
+		'amber',
+		'aquamarine',
+		'flamingo pink',
+		'lavendar',
+		'maroon',
+		'tangerine',
+	];
+
+	const [ value, setValue ] = useState< string | string[] >( [
+		'lavendar',
+		'tangerine',
+	] );
+
+	return (
+		<CustomSelect
+			onChange={ ( nextValue ) => setValue( nextValue ) }
+			defaultValue={ value }
+			label="Select Colors"
+			renderSelectedValue={ ( currentValue ) =>
+				renderValue( currentValue )
+			}
+		>
+			{ items.map( ( item ) => (
+				<CustomSelectItem key={ item } value={ item }>
+					{ item }
+				</CustomSelectItem>
+			) ) }
+		</CustomSelect>
+	);
+};
+
+export const MultiSelect = MultiSelectTemplate.bind( {} );
+
 const ControlledTemplate = () => {
 	function renderValue( gravatar: string | string[] ) {
 		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
