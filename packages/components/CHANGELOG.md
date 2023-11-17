@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+
 ## 25.12.0 (2023-11-16)
 
 ### Bug Fix
