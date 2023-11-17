@@ -25,6 +25,7 @@ import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
 	parse,
+	serialize,
 	getUnregisteredTypeHandlerName,
 	createBlock,
 } from '@wordpress/blocks';
@@ -278,7 +279,10 @@ class NativeEditorProvider extends Component {
 			// Let's request the HTML from the component's state directly.
 			html = applyFilters( 'native.persist-html' );
 		} else {
-			html = this.props.getEditedPostContent();
+			const blocks = this.props.getEditedPostAttribute( 'blocks' );
+			html = blocks?.length
+				? serialize( blocks )
+				: this.props.getEditedPostContent();
 		}
 
 		const hasChanges =
