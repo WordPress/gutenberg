@@ -6,11 +6,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { default as InFilter, OPERATOR_IN } from './in-filter';
+import { default as InFilter } from './in-filter';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
-
-const ENUMERATION_TYPE = 'enumeration';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 export default function Filters( { fields, view, onChangeView } ) {
 	const filters = [];

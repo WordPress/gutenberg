@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { OPERATOR_IN } from './in-filter';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2,
@@ -21,9 +21,6 @@ const {
 	DropdownSubMenuTriggerV2,
 	DropdownMenuItemV2,
 } = unlock( componentsPrivateApis );
-
-// TODO: find a place where these constants can be shared across components.
-const ENUMERATION_TYPE = 'enumeration';
 
 export default function AddFilter( { fields, view, onChangeView } ) {
 	const filters = [];
