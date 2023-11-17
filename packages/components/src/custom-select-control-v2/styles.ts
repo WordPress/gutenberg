@@ -54,6 +54,9 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	margin: ${ space( 3 ) } 0;
 `;
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	padding: ${ space( 2 ) };
 	&:hover {
 		background-color: ${ COLORS.gray[ 300 ] };

@@ -47,11 +47,11 @@ export default meta;
 
 const Template: StoryFn< typeof CustomSelect > = () => {
 	return (
-		<CustomSelect label="Label">
+		<CustomSelect label="Label" defaultValue="Default">
 			<CustomSelectItem value="Small">
 				<span style={ { fontSize: '75%' } }>Small</span>
 			</CustomSelectItem>
-			<CustomSelectItem value="Default" />
+			<CustomSelectItem value="Default">Default</CustomSelectItem>
 			<CustomSelectItem value="Large">
 				<span style={ { fontSize: '150%' } }>Large</span>
 			</CustomSelectItem>
@@ -68,7 +68,7 @@ const ControlledTemplate = () => {
 	function renderValue( gravatar: string | string[] ) {
 		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 		return (
-			<>
+			<div style={ { display: 'flex', alignItems: 'center' } }>
 				<img
 					style={ { maxHeight: '75px', marginRight: '10px' } }
 					key={ avatar }
@@ -76,8 +76,8 @@ const ControlledTemplate = () => {
 					alt=""
 					aria-hidden
 				/>
-				<div>{ gravatar }</div>
-			</>
+				<span>{ gravatar }</span>
+			</div>
 		);
 	}
 
@@ -88,7 +88,7 @@ const ControlledTemplate = () => {
 	return (
 		<>
 			<CustomSelect
-				label="Default Gravatars:"
+				label="Default Gravatars"
 				onChange={ ( nextValue ) => setValue( nextValue ) }
 				size="large"
 				value={ value }

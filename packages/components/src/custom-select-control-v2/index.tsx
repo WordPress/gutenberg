@@ -51,7 +51,9 @@ export function CustomSelect( props: CustomSelectProps ) {
 
 	return (
 		<>
-			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
+			<Styled.CustomSelectLabel store={ store }>
+				{ label }
+			</Styled.CustomSelectLabel>
 			<Styled.CustomSelectButton className={ classes } store={ store }>
 				{ renderSelectedValue
 					? renderSelectedValue( currentValue )
@@ -67,12 +69,18 @@ export function CustomSelect( props: CustomSelectProps ) {
 	);
 }
 
-export function CustomSelectItem( { ...props }: CustomSelectItemProps ) {
+export function CustomSelectItem( {
+	children,
+	...props
+}: CustomSelectItemProps ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
 		<Styled.CustomSelectItem
 			store={ customSelectContext?.store }
 			{ ...props }
-		/>
+		>
+			{ children }
+			<Ariakit.SelectItemCheck />
+		</Styled.CustomSelectItem>
 	);
 }
