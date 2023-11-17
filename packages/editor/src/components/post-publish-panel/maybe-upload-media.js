@@ -15,11 +15,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-
 function flattenBlocks( blocks ) {
 	const result = [];
 
@@ -66,14 +61,14 @@ function Image( block ) {
 
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
-	const { editorBlocks, mediaUpload } = useSelect(
-		( select ) => ( {
-			editorBlocks: select( editorStore ).getEditorBlocks(),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		} ),
-		[]
-	);
-	const externalImages = flattenBlocks( editorBlocks ).filter(
+	const { blocks, mediaUpload } = useSelect( ( select ) => {
+		const { getEditorBlocks, getSettings } = select( blockEditorStore );
+		return {
+			blocks: getEditorBlocks(),
+			mediaUpload: getSettings().mediaUpload,
+		};
+	}, [] );
+	const externalImages = flattenBlocks( blocks ).filter(
 		( block ) =>
 			block.name === 'core/image' &&
 			block.attributes.url &&

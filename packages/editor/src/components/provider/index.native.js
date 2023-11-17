@@ -25,7 +25,6 @@ import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
 	parse,
-	serialize,
 	getUnregisteredTypeHandlerName,
 	createBlock,
 } from '@wordpress/blocks';
@@ -256,7 +255,9 @@ class NativeEditorProvider extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( ! prevProps.isReady && this.props.isReady ) {
-			const blocks = this.props.blocks;
+			const blocks =
+				this.props.getEditedPostAttribute( 'blocks' ) ||
+				parse( this.props.getEditedPostContent() );
 			const isUnsupportedBlock = ( { name } ) =>
 				name === getUnregisteredTypeHandlerName();
 			const unsupportedBlockNames = blocks
@@ -277,7 +278,7 @@ class NativeEditorProvider extends Component {
 			// Let's request the HTML from the component's state directly.
 			html = applyFilters( 'native.persist-html' );
 		} else {
-			html = serialize( this.props.blocks );
+			html = this.props.getEditedPostContent();
 		}
 
 		const hasChanges =
@@ -354,7 +355,6 @@ const ComposedNativeProvider = compose( [
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
-			getEditorBlocks,
 			getEditedPostAttribute,
 			getEditedPostContent,
 			getEditorSettings,
@@ -372,8 +372,8 @@ const ComposedNativeProvider = compose( [
 		return {
 			mode: getEditorMode(),
 			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
+			getEditedPostAttribute,
 			getEditedPostContent,
 			defaultEditorColors,
 			defaultEditorGradients,

@@ -5,12 +5,14 @@ import { Button, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { POST_FORMATS } from '../post-format';
 import { store as editorStore } from '../../store';
+import { getSuggestedPostFormat } from '../../utils/get-suggested-post-format';
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
 	const formats = POST_FORMATS.filter( ( format ) =>
@@ -33,19 +35,22 @@ const PostFormatSuggestion = ( {
 );
 
 export default function PostFormatPanel() {
-	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } =
-			select( editorStore );
-		const supportedFormats =
-			select( coreStore ).getThemeSupports().formats ?? [];
-		return {
-			currentPostFormat: getEditedPostAttribute( 'format' ),
-			suggestion: getSuggestion(
-				supportedFormats,
-				getSuggestedPostFormat()
-			),
-		};
-	}, [] );
+	const { currentPostFormat, supportedFormats, blocks } = useSelect(
+		( select ) => {
+			const { getEditedPostAttribute } = select( editorStore );
+			return {
+				currentPostFormat: getEditedPostAttribute( 'format' ),
+				supportedFormats:
+					select( coreStore ).getThemeSupports().formats,
+				blocks: select( blockEditorStore ).getBlocks(),
+			};
+		},
+		[]
+	);
+	const suggestion = getSuggestion(
+		supportedFormats ?? [],
+		getSuggestedPostFormat( blocks )
+	);
 
 	const { editPost } = useDispatch( editorStore );
 

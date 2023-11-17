@@ -6,12 +6,14 @@ import { Button, SelectControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import PostFormatCheck from './check';
 import { store as editorStore } from '../../store';
+import { getSuggestedPostFormat } from '../../utils/get-suggested-post-format';
 
 // All WP post formats, sorted alphabetically by translated name.
 export const POST_FORMATS = [
@@ -42,20 +44,17 @@ export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
 	const postFormatSelectorId = `post-format-selector-${ instanceId }`;
 
-	const { postFormat, suggestedFormat, supportedFormats } = useSelect(
-		( select ) => {
-			const { getEditedPostAttribute, getSuggestedPostFormat } =
-				select( editorStore );
-			const _postFormat = getEditedPostAttribute( 'format' );
-			const themeSupports = select( coreStore ).getThemeSupports();
-			return {
-				postFormat: _postFormat ?? 'standard',
-				suggestedFormat: getSuggestedPostFormat(),
-				supportedFormats: themeSupports.formats,
-			};
-		},
-		[]
-	);
+	const { postFormat, blocks, supportedFormats } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const _postFormat = getEditedPostAttribute( 'format' );
+		const themeSupports = select( coreStore ).getThemeSupports();
+		return {
+			postFormat: _postFormat ?? 'standard',
+			blocks: select( blockEditorStore ).getBlocks(),
+			supportedFormats: themeSupports.formats,
+		};
+	}, [] );
+	const suggestedFormat = getSuggestedPostFormat( blocks );
 
 	const formats = POST_FORMATS.filter( ( format ) => {
 		// Ensure current format is always in the set.
