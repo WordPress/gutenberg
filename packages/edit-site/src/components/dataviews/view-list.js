@@ -52,6 +52,11 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
+
+// TODO: find a place where these constants can be shared across components.
+const ENUMERATION_TYPE = 'enumeration';
+const OPERATOR_IN = 'in';
+
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
 		return null;
@@ -68,7 +73,7 @@ function HeaderMenu( { dataView, header } ) {
 	const sortedDirection = header.column.getIsSorted();
 
 	let filter;
-	if ( header.column.columnDef.type === 'enumeration' ) {
+	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
 		filter = {
 			field: header.column.columnDef.id,
 			elements: [
@@ -197,7 +202,8 @@ function HeaderMenu( { dataView, header } ) {
 														return (
 															field !==
 																filter.field ||
-															operator !== 'in'
+															operator !==
+																OPERATOR_IN
 														);
 													}
 												);

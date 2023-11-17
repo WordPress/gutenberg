@@ -22,7 +22,8 @@ const {
 	DropdownMenuItemV2,
 } = unlock( componentsPrivateApis );
 
-const ENUMERATION_TYPE = 'enumeration'; // TODO: merge with the one in filters.js
+// TODO: find a place where these constants can be shared across components.
+const ENUMERATION_TYPE = 'enumeration';
 
 export default function AddFilter( { fields, view, onChangeView } ) {
 	const filters = [];
