@@ -37,8 +37,10 @@ export type CustomSelectProps = {
 	renderSelectedValue?: ( selectValue: string | string[] ) => React.ReactNode;
 	/**
 	 * The size of the control.
+	 *
+	 * @default 'default'
 	 */
-	size?: 'default' | 'large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */

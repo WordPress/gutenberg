@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { useCx } from '../utils/hooks/use-cx';
 import * as Styled from './styles';
+import { customSelectSizes } from './styles';
 import type {
 	CustomSelectProps,
 	CustomSelectItemProps,
@@ -45,8 +46,8 @@ export function CustomSelect( props: CustomSelectProps ) {
 	const cx = useCx();
 
 	const classes = useMemo(
-		() => cx( Styled.inputSize[ size ] ),
-		[ cx, size ]
+		() => cx( customSelectSizes( { renderSelectedValue, size } ) ),
+		[ cx, renderSelectedValue, size ]
 	);
 
 	return (

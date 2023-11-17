@@ -11,6 +11,47 @@ import * as Ariakit from '@ariakit/react';
  */
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
+import type { CustomSelectProps } from './types';
+
+export const customSelectHeight = (
+	renderSelectedValue: CustomSelectProps[ 'renderSelectedValue' ],
+	size: NonNullable< CustomSelectProps[ 'size' ] >
+) => {
+	const defaultSizes = {
+		default: {
+			height: '40px',
+		},
+		small: {
+			height: '24px',
+		},
+	};
+
+	const customHeight = {
+		default: {
+			height: 'auto',
+			minHeight: '40px',
+		},
+		small: {
+			height: 'auto',
+			minHeight: '24px',
+		},
+	};
+
+	if ( ! renderSelectedValue ) {
+		return defaultSizes[ size ];
+	}
+
+	return css( customHeight[ size ] );
+};
+
+export const customSelectSizes = ( {
+	renderSelectedValue,
+	size,
+}: Pick< CustomSelectProps, 'renderSelectedValue' > & {
+	size: NonNullable< CustomSelectProps[ 'size' ] >;
+} ) => css`
+	${ customSelectHeight( renderSelectedValue, size ) }
+`;
 
 export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
@@ -37,15 +78,6 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 		border: 1.5px solid ${ COLORS.theme.accent };
 	}
 `;
-
-export const inputSize = {
-	default: css`
-		height: 40px;
-	`,
-	large: css`
-		height: auto;
-	`,
-};
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: ${ space( 0.5 ) };

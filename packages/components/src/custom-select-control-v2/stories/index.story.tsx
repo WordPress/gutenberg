@@ -130,7 +130,6 @@ const ControlledTemplate = () => {
 			<CustomSelect
 				label="Default Gravatars"
 				onChange={ ( nextValue ) => setValue( nextValue ) }
-				size="large"
 				value={ value }
 				renderSelectedValue={ ( currentValue ) =>
 					renderValue( currentValue )
