@@ -19,3 +19,12 @@
 		padding: $grid-unit-20;
 	}
 }
+
+.editor-post-schedule__dialog-toggle {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

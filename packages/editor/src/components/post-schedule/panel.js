@@ -8,25 +8,15 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
-import { humanTimeDiff } from '@wordpress/date';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
-import { store as editorStore } from '../../store';
 import { usePostScheduleLabel } from './label';
 
 export default function PostSchedulePanel() {
-	const { date } = useSelect(
-		( select ) => ( {
-			date: select( editorStore ).getEditedPostAttribute( 'date' ),
-		} ),
-		[]
-	);
-
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
@@ -40,8 +30,8 @@ export default function PostSchedulePanel() {
 		[ popoverAnchor ]
 	);
 
-	const relateToNow = date ? humanTimeDiff( date ) : __( 'Immediately' );
 	const label = usePostScheduleLabel();
+	const fullLabel = usePostScheduleLabel( { full: true } );
 
 	return (
 		<PostScheduleCheck>
@@ -55,7 +45,7 @@ export default function PostSchedulePanel() {
 					focusOnMount
 					className="editor-post-schedule__panel-dropdown"
 					contentClassName="editor-post-schedule__dialog"
-					renderToggle={ ( { onToggle } ) => (
+					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
@@ -65,8 +55,11 @@ export default function PostSchedulePanel() {
 								__( 'Change date: %s' ),
 								label
 							) }
+							label={ fullLabel }
+							showTooltip
+							aria-expanded={ isOpen }
 						>
-							{ relateToNow }
+							{ label }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
