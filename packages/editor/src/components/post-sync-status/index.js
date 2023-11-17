@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	PanelRow,
 	Modal,
@@ -109,7 +109,10 @@ export function PostSyncStatusModal() {
 						<VStack spacing="5">
 							<ReusableBlocksRenameHint />
 							<ToggleControl
-								label={ __( 'Synced' ) }
+								label={ _x(
+									'Synced',
+									'Option that makes an individual pattern synchronized'
+								) }
 								help={ __(
 									'Editing the pattern will update it anywhere it is used.'
 								) }

@@ -63,7 +63,7 @@ const variations = [
 		name: 'wp-privacy-form',
 		title: __( 'Experimental privacy request form' ),
 		keywords: [ 'GDPR' ],
-		description: __( 'A form torequest data exports and/or deletion.' ),
+		description: __( 'A form to request data exports and/or deletion.' ),
 		attributes: {
 			submissionMethod: 'custom',
 			action: '',

@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
+
+## 1.108.0
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+-   [*] Fix crash related to accessing undefined value in `TextColorEdit` [#55664]
 
 ## 1.107.0
 -   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]

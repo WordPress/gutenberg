@@ -71,7 +71,8 @@ _Optional._ A list of autocompleters to use instead of the default.
 
 ### `preserveWhiteSpace: Boolean`
 
-_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
+_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
+trimmed.
 
 ## RichText.Content
 
@@ -94,7 +95,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return React.createElement( wp.editor.RichText, {
+		return React.createElement( wp.blockEditor.RichText, {
 			tagName: 'h2',
 			className: props.className,
 			value: props.attributes.content,
@@ -105,7 +106,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return React.createElement( wp.editor.RichText.Content, {
+		return React.createElement( wp.blockEditor.RichText.Content, {
 			tagName: 'h2', value: props.attributes.content
 		} );
 	}
@@ -115,8 +116,8 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 
 ```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -161,7 +162,7 @@ wp.richText.registerFormatType( /* ... */, {
 	/* ... */
 	edit: function( props ) {
 		return React.createElement(
-			wp.editor.RichTextToolbarButton, {
+			wp.blockEditor.RichTextToolbarButton, {
 				icon: 'editor-code',
 				title: 'My formatting button',
 				onClick: function() { /* ... */ }
@@ -175,8 +176,8 @@ wp.richText.registerFormatType( /* ... */, {
 {% ESNext %}
 
 ```js
-import { registerFormatType } from 'wp-rich-text';
-import { richTextToolbarButton } from 'wp-editor';
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 registerFormatType( /* ... */, {
 	/* ... */

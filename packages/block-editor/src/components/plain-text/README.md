@@ -34,7 +34,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return React.createElement( wp.editor.PlainText, {
+		return React.createElement( wp.blockEditor.PlainText, {
 			className: props.className,
 			value: props.attributes.content,
 			onChange: function( content ) {
@@ -48,8 +48,8 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 
 ```js
-const { registerBlockType } = wp.blocks;
-const { PlainText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...

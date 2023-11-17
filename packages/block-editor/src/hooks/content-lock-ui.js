@@ -37,7 +37,7 @@ function StopEditingAsBlocksOnOutsideSelect( {
 	return null;
 }
 
-export const withBlockControls = createHigherOrderComponent(
+export const withContentLockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { getBlockListSettings, getSettings } =
 			useSelect( blockEditorStore );
@@ -155,11 +155,11 @@ export const withBlockControls = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withContentLockControls'
 );
 
 addFilter(
 	'editor.BlockEdit',
 	'core/content-lock-ui/with-block-controls',
-	withBlockControls
+	withContentLockControls
 );
