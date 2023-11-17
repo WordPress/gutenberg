@@ -69,8 +69,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 
 - **Presets**: [color palettes](/docs/how-to-guides/themes/theme-support.md#block-color-palettes), [font sizes](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or [gradients](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
 
-{% codetabs %}
-{% Input %}
+#### Input
 
 ```json
 {
@@ -94,7 +93,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -103,12 +102,10 @@ body {
 }
 ```
 
-{% end %}
-
 -   **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
 
-{% codetabs %}
-{% Input %}
+
+#### Input
 
 ```json
 {
@@ -124,7 +121,7 @@ body {
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -132,8 +129,6 @@ body {
 	--wp--custom--line-height--heading: 1.3;
 }
 ```
-
-{% end %}
 
 ## Specification
 
@@ -166,8 +161,8 @@ The tabs below show WordPress 5.8 supported settings and the ones supported by t
 
 The settings section has the following structure:
 
-{% codetabs %}
-{% WordPress %}
+
+#### WordPress
 
 ```json
 {
@@ -231,7 +226,7 @@ The settings section has the following structure:
 }
 ```
 
-{% Gutenberg %}
+#### Gutenberg
 
 ```json
 {
@@ -310,8 +305,6 @@ The settings section has the following structure:
 }
 ```
 
-{% end %}
-
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
@@ -376,8 +369,8 @@ The naming schema for the classes and the custom properties is as follows:
 - Custom Properties: `--wp--preset--{preset-category}--{preset-slug}` such as `--wp--preset--color--black`
 - Classes: `.has-{preset-slug}-{preset-category}` such as `.has-black-color`.
 
-{% codetabs %}
-{% Input %}
+
+#### Input
 
 ```json
 {
@@ -490,7 +483,7 @@ The naming schema for the classes and the custom properties is as follows:
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 /* Top-level custom properties */
@@ -540,8 +533,6 @@ body {
 
 ```
 
-{% end %}
-
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
 Preset classes are attached to the content of a post by some user action. That's why the engine will add `!important` to these, because user styles should take precedence over theme styles.
@@ -552,8 +543,7 @@ In addition to create CSS Custom Properties for the presets, the `theme.json` al
 
 For example:
 
-{% codetabs %}
-{% Input %}
+#### Input
 
 ```json
 {
@@ -578,7 +568,7 @@ For example:
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -592,7 +582,6 @@ body {
 }
 ```
 
-{% end %}
 
 Note that the name of the variable is created by adding `--` in between each nesting level and `camelCase` fields are transformed to `kebab-case`.
 
@@ -702,9 +691,9 @@ The tabs below show WordPress 5.8 supported styles and the ones supported by the
 
 Each block declares which style properties it exposes via the [block supports mechanism](/docs/reference-guides/block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
-{% codetabs %}
 
-{% WordPress %}
+
+#### WordPress
 
 ```json
 {
@@ -784,7 +773,7 @@ Each block declares which style properties it exposes via the [block supports me
 }
 ```
 
-{% Gutenberg %}
+#### Gutenberg
 
 ```json
 {
@@ -873,14 +862,11 @@ Each block declares which style properties it exposes via the [block supports me
 }
 ```
 
-{% end %}
-
 ### Top-level styles
 
 Styles found at the top-level will be enqueued using the `body` selector.
 
-{% codetabs %}
-{% Input %}
+#### Input
 
 ```json
 {
@@ -893,7 +879,7 @@ Styles found at the top-level will be enqueued using the `body` selector.
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -901,7 +887,6 @@ body {
 }
 ```
 
-{% end %}
 
 ### Block styles
 
@@ -909,8 +894,7 @@ Styles found within a block will be enqueued using the block selector.
 
 By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file. Note that the block needs to be registered server-side for the `__experimentalSelector` field to be available to the style engine.
 
-{% codetabs %}
-{% Input %}
+#### Input
 
 ```json
 {
@@ -935,7 +919,7 @@ By default, the block selector is generated based on its name such as `.wp-block
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -949,7 +933,6 @@ p { /* The core/paragraph opts out from the default behaviour and uses p as a se
 }
 ```
 
-{% end %}
 
 #### Referencing a style
 
@@ -996,8 +979,8 @@ Supported by WordPress:
 
 If they're found in the top-level the element selector will be used. If they're found within a block, the selector to be used will be the element's appended to the corresponding block.
 
-{% codetabs %}
-{% Input %}
+
+#### Input
 
 ```json
 {
@@ -1043,7 +1026,7 @@ If they're found in the top-level the element selector will be used. If they're 
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -1065,8 +1048,6 @@ h3 {
 	font-size: var( --wp--preset--font-size--smaller );
 }
 ```
-
-{% end %}
 
 ##### Element pseudo selectors
 
@@ -1236,8 +1217,8 @@ This is for clarity, but also because we want a mechanism to parse back a variab
 
 For example:
 
-{% codetabs %}
-{% Input %}
+
+#### Input
 
 ```json
 {
@@ -1253,7 +1234,7 @@ For example:
 }
 ```
 
-{% Output %}
+#### Output
 
 ```css
 body {
@@ -1262,7 +1243,6 @@ body {
 }
 ```
 
-{% end %}
 
 A few notes about this process:
 
