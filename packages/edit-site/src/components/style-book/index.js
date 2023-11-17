@@ -337,6 +337,7 @@ const StyleBookBody = ( {
 				}
 				isSelected={ isSelected }
 				onSelect={ onSelect }
+				key={ category }
 			/>
 		</Iframe>
 	);
@@ -344,19 +345,7 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
-		const compositeStore = useCompositeStore( {
-			orientation: 'vertical',
-			setItems: ( compositeItems ) => {
-				if ( ! compositeItems.length ) return;
-
-				for ( const compositeItem in compositeItems ) {
-					if ( compositeItem?.id === activeId ) return;
-				}
-
-				compositeStore.setActiveId( compositeItems[ 0 ]?.id );
-			},
-		} );
-		const activeId = compositeStore.useState( 'activeId' );
+		const compositeStore = useCompositeStore( { orientation: 'vertical' } );
 
 		return (
 			<Composite
