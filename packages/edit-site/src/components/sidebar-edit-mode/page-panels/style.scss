@@ -59,25 +59,15 @@
 	}
 }
 
-.edit-site-summary-field {
-	.components-dropdown {
-		width: 70%;
-	}
+.edit-site-summary-field__trigger {
+	max-width: 100%;
 
-	.edit-site-summary-field__trigger {
-		max-width: 100%;
-
-		// Truncate
-		display: block;
-		text-align: left;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.edit-site-summary-field__label {
-		width: 30%;
-	}
+	// Truncate
+	display: block;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .edit-site-page-panels-edit-template__dropdown {
