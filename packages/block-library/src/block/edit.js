@@ -236,6 +236,7 @@ export default function ReusableBlockEdit( {
 			const blocks = getBlocks( patternClientId );
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
+				// TODO: We should probably cache this somehow to improve performance.
 				const nextDynamicContent = getDynamicContentFromBlocks(
 					blocks,
 					defaultValuesRef.current
