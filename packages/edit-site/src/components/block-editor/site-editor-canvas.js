@@ -136,7 +136,7 @@ export default function SiteEditorCanvas() {
 										) }
 										__unstableDropZoneElement={
 											// Pass in the html element of the iframe to ensure that
-											// the drop zone extends ot the very edges of the iframe,
+											// the drop zone extends to the very edges of the iframe,
 											// even if the template is shorter than the viewport.
 											contentRef.current?.parentNode
 										}
