@@ -23,6 +23,7 @@ describe( 'useEntityRecord', () => {
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
+		triggerFetch.mockReset();
 	} );
 
 	const TEST_RECORD = { id: 1, hello: 'world' };
@@ -140,7 +141,10 @@ describe( 'useEntityRecord', () => {
 			save: expect.any( Function ),
 		} );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
+		await waitFor( () => {
+			expect( triggerFetch ).not.toHaveBeenCalled();
+		} );
 		await waitFor( () =>
 			expect( triggerFetch ).not.toHaveBeenCalledWith( {
 				path: '/wp/v2/widgets/2?context=edit',
