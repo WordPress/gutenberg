@@ -207,11 +207,11 @@ When you save the post and view it published, you will see the `Hola mundo (from
 
 ## Conclusion
 
-This shows the most basic static block. The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository has complete examples for both.
+This shows the most basic static block. The [block-development-examples](https://github.com/WordPress/block-development-examples) repository has complete examples for both.
 
--   [Basic Example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/01-basic-esnext)
+-   [Basic Example with JSX build](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/basic-esnext-a2ab62)
 
--   [Basic Example Plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/01-basic),
+-   [Basic Example Plain JavaScript](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6),
 
 **NOTE:** The examples include a more complete block setup with translation features included, it is recommended to follow those examples for a production block. The internationalization features were left out of this guide for simplicity and focusing on the very basics of a block.
 
@@ -219,7 +219,7 @@ This shows the most basic static block. The [gutenberg-examples](https://github.
 
 A couple of things to note when creating your blocks:
 
--   A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `gutenberg-examples`.
+-   A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name. In this example, the namespace is `block-development-examples`.
 
 -   Block names _must_ include only lowercase alphanumeric characters or dashes and start with a letter. Example: `my-plugin/my-custom-block`.
 
