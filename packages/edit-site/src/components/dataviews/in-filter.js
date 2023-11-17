@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+// TODO: find a place where these constants can be shared across components.
 export const OPERATOR_IN = 'in';
 
 export default ( { filter, view, onChangeView } ) => {
