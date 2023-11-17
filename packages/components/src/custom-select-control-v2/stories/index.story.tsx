@@ -22,6 +22,7 @@ const meta: Meta< typeof CustomSelect > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		renderSelectedValue: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -45,104 +46,98 @@ const meta: Meta< typeof CustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof CustomSelect > = () => {
+const Template: StoryFn< typeof CustomSelect > = ( props ) => {
+	return <CustomSelect { ...props } />;
+};
+
+const ControlledTemplate: StoryFn< typeof CustomSelect > = ( props ) => {
+	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<CustomSelect label="Label" defaultValue="Default">
-			<CustomSelectItem value="Small">
-				<span style={ { fontSize: '75%' } }>Small</span>
-			</CustomSelectItem>
-			<CustomSelectItem value="Default">Default</CustomSelectItem>
-			<CustomSelectItem value="Large">
-				<span style={ { fontSize: '150%' } }>Large</span>
-			</CustomSelectItem>
-			<CustomSelectItem value="Huge">
-				<span style={ { fontSize: '200%' } }>Huge</span>
-			</CustomSelectItem>
-		</CustomSelect>
+		<CustomSelect
+			{ ...props }
+			onChange={ ( nextValue ) => {
+				setValue( nextValue );
+				props.onChange?.( nextValue );
+			} }
+			value={ value }
+		/>
 	);
 };
 
 export const Default = Template.bind( {} );
+Default.args = {
+	label: 'Label',
+	children: (
+		<>
+			<CustomSelectItem value="Small">
+				<span style={ { fontSize: '75%' } }>Small</span>
+			</CustomSelectItem>
+			<CustomSelectItem value="Something bigger">
+				<span style={ { fontSize: '200%' } }>Something bigger</span>
+			</CustomSelectItem>
+		</>
+	),
+};
 
-const MultiSelectTemplate: StoryFn< typeof CustomSelect > = () => {
-	function renderValue( value: string | string[] ) {
-		if ( value.length === 0 ) return '0 colors selected';
-		return <div>{ value.length } colors selected</div>;
-	}
-
-	const items = [
-		'amber',
-		'aquamarine',
-		'flamingo pink',
-		'lavendar',
-		'maroon',
-		'tangerine',
-	];
-
-	const [ value, setValue ] = useState< string | string[] >( [
-		'lavendar',
-		'tangerine',
-	] );
-
-	return (
-		<CustomSelect
-			onChange={ ( nextValue ) => setValue( nextValue ) }
-			defaultValue={ value }
-			label="Select Colors"
-			renderSelectedValue={ ( currentValue ) =>
-				renderValue( currentValue )
-			}
-		>
-			{ items.map( ( item ) => (
+export const MultiSelect = Template.bind( {} );
+MultiSelect.args = {
+	defaultValue: [ 'lavender', 'tangerine' ],
+	label: 'Select Colors',
+	renderSelectedValue: ( currentValue: string | string[] ) => {
+		if ( ! Array.isArray( currentValue ) ) {
+			return currentValue;
+		}
+		if ( currentValue.length === 0 ) return 'No colors selected';
+		if ( currentValue.length === 1 ) return `${ currentValue[ 0 ] }`;
+		return <div>{ currentValue.length } colors selected</div>;
+	},
+	children: (
+		<>
+			{ [
+				'amber',
+				'aquamarine',
+				'flamingo pink',
+				'lavender',
+				'maroon',
+				'tangerine',
+			].map( ( item ) => (
 				<CustomSelectItem key={ item } value={ item }>
 					{ item }
 				</CustomSelectItem>
 			) ) }
-		</CustomSelect>
-	);
+		</>
+	),
 };
 
-export const MultiSelect = MultiSelectTemplate.bind( {} );
-
-const ControlledTemplate = () => {
-	function renderValue( gravatar: string | string[] ) {
-		const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
-		return (
-			<div style={ { display: 'flex', alignItems: 'center' } }>
-				<img
-					style={ { maxHeight: '75px', marginRight: '10px' } }
-					key={ avatar }
-					src={ avatar }
-					alt=""
-					aria-hidden
-				/>
-				<span>{ gravatar }</span>
-			</div>
-		);
-	}
-
-	const options = [ 'mystery-person', 'identicon', 'wavatar', 'retro' ];
-
-	const [ value, setValue ] = useState< string | string[] >();
-
+const renderControlledValue = ( gravatar: string | string[] ) => {
+	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
-		<>
-			<CustomSelect
-				label="Default Gravatars"
-				onChange={ ( nextValue ) => setValue( nextValue ) }
-				value={ value }
-				renderSelectedValue={ ( currentValue ) =>
-					renderValue( currentValue )
-				}
-			>
-				{ options.map( ( option ) => (
-					<CustomSelectItem key={ option } value={ option }>
-						{ renderValue( option ) }
-					</CustomSelectItem>
-				) ) }
-			</CustomSelect>
-		</>
+		<div style={ { display: 'flex', alignItems: 'center' } }>
+			<img
+				style={ { maxHeight: '75px', marginRight: '10px' } }
+				key={ avatar }
+				src={ avatar }
+				alt=""
+				aria-hidden
+			/>
+			<span>{ gravatar }</span>
+		</div>
 	);
 };
 
 export const Controlled = ControlledTemplate.bind( {} );
+Controlled.args = {
+	label: 'Default Gravatars',
+	renderSelectedValue: renderControlledValue,
+	children: (
+		<>
+			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
+				( option ) => (
+					<CustomSelectItem key={ option } value={ option }>
+						{ renderControlledValue( option ) }
+					</CustomSelectItem>
+				)
+			) }
+		</>
+	),
+};
