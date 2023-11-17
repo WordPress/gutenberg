@@ -9,11 +9,13 @@ import classnames from 'classnames';
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, isReversedOnMobile, verticalAlignment } =
+		attributes;
 
 	const className = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-reversed-on-mobile` ]: isReversedOnMobile,
 	} );
 
 	const blockProps = useBlockProps.save( { className } );

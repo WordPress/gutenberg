@@ -107,7 +107,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 -	**Name:** core/columns
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, color (background, button, gradients, heading, link, text), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
+-	**Attributes:** isReversedOnMobile, isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
 
@@ -434,7 +434,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 -	**Name:** core/media-text
 -	**Category:** media
 -	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
+-	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isReversedOnMobile, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
 
 ## Unsupported
 

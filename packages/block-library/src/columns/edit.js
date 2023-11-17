@@ -58,7 +58,12 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+	const {
+		isStackedOnMobile,
+		isReversedOnMobile,
+		verticalAlignment,
+		templateLock,
+	} = attributes;
 
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
@@ -97,6 +102,7 @@ function ColumnsEditContainer( {
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-reversed-on-mobile` ]: isReversedOnMobile,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -154,6 +160,16 @@ function ColumnsEditContainer( {
 						onChange={ () =>
 							setAttributes( {
 								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Reverse on mobile' ) }
+						checked={ isReversedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isReversedOnMobile: ! isReversedOnMobile,
 							} )
 						}
 					/>
