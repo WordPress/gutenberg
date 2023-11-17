@@ -10,21 +10,20 @@ import { default as InFilter, OPERATOR_IN } from './in-filter';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 
-const VALID_OPERATORS = [ OPERATOR_IN ];
+const ENUMERATION_TYPE = 'enumeration';
 
 export default function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
-		if ( ! field.filters ) {
+		if ( ! field.type ) {
 			return;
 		}
 
-		field.filters.forEach( ( filter ) => {
-			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
+		switch ( field.type ) {
+			case ENUMERATION_TYPE:
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					operator: filter,
 					elements: [
 						{
 							value: '',
@@ -33,30 +32,26 @@ export default function Filters( { fields, view, onChangeView } ) {
 						...( field.elements || [] ),
 					],
 					isVisible: view.filters.some(
-						( f ) => f.field === field.id && f.operator === filter
+						( f ) =>
+							f.field === field.id && f.operator === OPERATOR_IN
 					),
 				} );
-			}
-		} );
+		}
 	} );
 
-	const filterComponents = filters?.map( ( filter ) => {
+	const filterComponents = filters.map( ( filter ) => {
 		if ( ! filter.isVisible ) {
 			return null;
 		}
 
-		if ( OPERATOR_IN === filter.operator ) {
-			return (
-				<InFilter
-					key={ filter.field + '.' + filter.operator }
-					filter={ filter }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-			);
-		}
-
-		return null;
+		return (
+			<InFilter
+				key={ filter.field + '.' + filter.operator }
+				filter={ filter }
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
+		);
 	} );
 
 	filterComponents.push(
@@ -70,7 +65,11 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 	if ( filterComponents.length > 1 ) {
 		filterComponents.push(
-			<ResetFilters view={ view } onChangeView={ onChangeView } />
+			<ResetFilters
+				key="reset-filters"
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
 		);
 	}
 

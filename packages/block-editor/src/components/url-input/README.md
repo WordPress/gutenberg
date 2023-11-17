@@ -36,41 +36,6 @@ This prop is passed directly to the `URLInput` component.
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		url: {
-			type: 'string'
-		},
-		text: {
-			type: 'string'
-		}
-	},
-
-	edit: function( props ) {
-		return React.createElement( wp.blockEditor.URLInputButton, {
-			className: props.className,
-			url: props.attributes.url,
-			onChange: function( url, post ) {
-				props.setAttributes( { url: url, text: (post && post.title) || 'Click here' } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return React.createElement( 'a', {
-			href: props.attributes.url,
-		}, props.attributes.text );
-	}
-} );
-```
-
-{% ESNext %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -103,7 +68,6 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% end %}
 
 # `URLInput`
 
@@ -172,41 +136,6 @@ Start opting into the new margin-free styles that will become the default in a f
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		url: {
-			type: 'string'
-		},
-		text: {
-			type: 'string'
-		}
-	},
-
-	edit: function( props ) {
-		return React.createElement( wp.blockEditor.URLInput, {
-			className: props.className,
-			value: props.attributes.url,
-			onChange: function( url, post ) {
-				props.setAttributes( { url: url, text: (post && post.title) || 'Click here' } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return React.createElement( 'a', {
-			href: props.attributes.url,
-		}, props.attributes.text );
-	}
-} );
-```
-
-{% ESNext %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -240,5 +169,3 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
-
-{% end %}
