@@ -28,9 +28,8 @@ export default ( { filter, view, onChangeView } ) => {
 	return (
 		<DropdownMenuV2
 			key={ filter.field }
-			label={ filter.name }
 			trigger={
-				<Button variant="tertiary" size="compact">
+				<Button variant="tertiary" size="compact" label={ filter.name }>
 					{ activeElement !== undefined
 						? sprintf(
 								/* translators: 1: Filter name. 2: filter value. e.g.: "Author is Admin". */
