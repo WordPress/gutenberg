@@ -376,7 +376,7 @@ class WP_Font_Family {
 
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
-			// If the fonts are not meant to be dowloaded or uploaded
+			// If the fonts are not meant to be downloaded or uploaded
 			// (for example to install fonts that use a remote url).
 			$new_font_face = $font_face;
 
@@ -392,6 +392,11 @@ class WP_Font_Family {
 
 			if ( $font_face_is_repeated ) {
 				continue;
+			}
+
+			// If the font face requires the use of the filesystem, create the fonts dir if it doesn't exist.
+			if ( ! empty( $font_face['downloadFromUrl'] ) && ! empty( $font_face['uploadedFile'] ) ) {
+				wp_mkdir_p( WP_Font_Library::get_fonts_dir() );
 			}
 
 			// If installing google fonts, download the font face assets.

@@ -70,14 +70,6 @@ function toFormat( { tagName, attributes } ) {
 
 		registeredAttributes[ key ] = _attributes[ name ];
 
-		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[ key ] =
-				formatType.__unstableFilterAttributeValue(
-					key,
-					registeredAttributes[ key ]
-				);
-		}
-
 		// delete the attribute and what's left is considered
 		// to be unregistered.
 		delete _attributes[ name ];
@@ -135,8 +127,6 @@ function toFormat( { tagName, attributes } ) {
  * @param {string}  [$1.text]                     Text to create value from.
  * @param {string}  [$1.html]                     HTML to create value from.
  * @param {Range}   [$1.range]                    Range to create value from.
- * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse
- *                                                white space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.
@@ -147,7 +137,6 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
-	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -171,7 +160,6 @@ export function create( {
 		element,
 		range,
 		isEditableTree,
-		preserveWhiteSpace,
 	} );
 }
 
@@ -272,9 +260,17 @@ function filterRange( node, range, filter ) {
  * Collapse any whitespace used for HTML formatting to one space character,
  * because it will also be displayed as such by the browser.
  *
+ * We need to strip it from the content because we use white-space: pre-wrap for
+ * displaying editable rich text. Without using white-space: pre-wrap, the
+ * browser will litter the content with non breaking spaces, among other issues.
+ * See packages/rich-text/src/component/use-default-style.js.
+ *
+ * @see
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
+ *
  * @param {string} string
  */
-function collapseWhiteSpace( string ) {
+export function collapseWhiteSpace( string ) {
 	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
@@ -294,21 +290,14 @@ export function removeReservedCharacters( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}  $1                      Named argements.
- * @param {Element} [$1.element]            Element to create value from.
- * @param {Range}   [$1.range]              Range to create value from.
- * @param {boolean} [$1.preserveWhiteSpace] Whether or not to collapse white
- *                                          space characters.
+ * @param {Object}  $1                  Named argements.
+ * @param {Element} [$1.element]        Element to create value from.
+ * @param {Range}   [$1.range]          Range to create value from.
  * @param {boolean} [$1.isEditableTree]
  *
  * @return {RichTextValue} A rich text value.
  */
-function createFromElement( {
-	element,
-	range,
-	isEditableTree,
-	preserveWhiteSpace,
-} ) {
+function createFromElement( { element, range, isEditableTree } ) {
 	const accumulator = createEmptyValue();
 
 	if ( ! element ) {
@@ -328,15 +317,8 @@ function createFromElement( {
 		const tagName = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let filter = removeReservedCharacters;
-
-			if ( ! preserveWhiteSpace ) {
-				filter = ( string ) =>
-					removeReservedCharacters( collapseWhiteSpace( string ) );
-			}
-
-			const text = filter( node.nodeValue );
-			range = filterRange( node, range, filter );
+			const text = removeReservedCharacters( node.nodeValue );
+			range = filterRange( node, range, removeReservedCharacters );
 			accumulateSelection( accumulator, node, range, { text } );
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -417,7 +399,6 @@ function createFromElement( {
 			element: node,
 			range,
 			isEditableTree,
-			preserveWhiteSpace,
 		} );
 
 		accumulateSelection( accumulator, node, range, value );

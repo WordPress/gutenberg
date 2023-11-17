@@ -6,11 +6,13 @@
 
 	span {
 		display: block;
-		width: 45%;
-		flex-shrink: 0;
-		// Match padding on tertiary buttons for alignment.
-		padding: $grid-unit-15 * 0.5 0;
+		width: 30%;
+		margin-right: 8px;
 	}
+}
+
+.edit-post-post-schedule__dropdown {
+	width: 70%;
 }
 
 .components-button.edit-post-post-schedule__toggle {

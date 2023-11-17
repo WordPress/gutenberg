@@ -269,8 +269,7 @@ const getVariantVars = ( variants, variant ) => {
 	for ( const variantName of variantNames ) {
 		const key =
 			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-		variantVars[ `is${ key }Variant` ] =
-			currentVariant === variantName ?? false;
+		variantVars[ `is${ key }Variant` ] = currentVariant === variantName;
 	}
 
 	return variantVars;

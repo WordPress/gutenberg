@@ -29,6 +29,7 @@ export default function PostSchedule() {
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					popoverProps={ popoverProps }
+					className="edit-post-post-schedule__dropdown"
 					contentClassName="edit-post-post-schedule__dialog"
 					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (
