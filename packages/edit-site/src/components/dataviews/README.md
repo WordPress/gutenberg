@@ -5,7 +5,7 @@ This file documents the DataViews UI component, which provides an API to render 
 ```js
 <DataViews
 	data={ pages }
-	isLoading= { isLoadingPages }
+	isLoading={ isLoadingPages }
 	view={ view }
 	onChangeView={ onChangeView }
 	fields={ fields }
@@ -16,7 +16,7 @@ This file documents the DataViews UI component, which provides an API to render 
 
 ## Data
 
-The dataset to work with, represented as a one-dimensional array. 
+The dataset to work with, represented as a one-dimensional array.
 
 Example:
 
@@ -43,50 +43,73 @@ Example:
 		direction: 'desc',
 	},
 	search: '',
-	filters: {
-		author: 2,
-		status: 'publish, draft'
-	},
-	visibleFilters: [ 'author', 'status' ],
+	filters: [
+		{ field: 'author', operator: 'in', value: 2 },
+		{ field: 'status', operator: 'in', value: 'publish,draft' }
+	],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
 }
 ```
 
-- `type`: view type, one of `list` or `grid`.
-- `perPage`: number of records to show per page.
-- `page`: the page that is visible.
-- `sort.field`: field used for sorting the dataset.
-- `sort.direction`: the direction to use for sorting, one of `asc` or `desc`.
-- `search`: the text search applied to the dataset.
-- `filters`: the filters applied to the dataset. See filters section.
-- `visibleFilters`: the `id` of the filters that are visible in the UI.
-- `hiddenFields`: the `id` of the fields that are hidden in the UI.
-- `layout`: ...
+-   `type`: view type, one of `list` or `grid`.
+-   `perPage`: number of records to show per page.
+-   `page`: the page that is visible.
+-   `sort.field`: field used for sorting the dataset.
+-   `sort.direction`: the direction to use for sorting, one of `asc` or `desc`.
+-   `search`: the text search applied to the dataset.
+-   `filters`: the filters applied to the dataset. Each item describes:
+    -   `field`: which field this filter is bound to.
+    -   `operator`: which type of filter it is. Only `in` available at the moment.
+    -   `value`: the actual value selected by the user.
+-   `hiddenFields`: the `id` of the fields that are hidden in the UI.
+-   `layout`: ...
 
-Note that it's the consumer's responsibility to provide the data and make sure the dataset corresponds to the view's config (sort, pagination, filters, etc.).
+### View <=> data
 
-Example:
+The view is a representation of the visible state of the dataset. Note, however, that it's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected.
+
+The following example shows how a view object is used to query the WordPress REST API via the entities abstraction. The same can be done with any other data provider.
 
 ```js
-function MyCustomPageList() { 
+function MyCustomPageList() {
 	const [ view, setView ] = useState( {
 		type: 'list',
+		perPage: 5,
 		page: 1,
-		"...": "..."
+		sort: {
+			field: 'date',
+			direction: 'desc',
+		},
+		search: '',
+		filters: [
+			{ field: 'author', operator: 'in', value: 2 },
+			{ field: 'status', operator: 'in', value: 'publish,draft' }
+		],
+		hiddenFields: [ 'date', 'featured-image' ],
+		layout: {},
 	} );
 
-	const queryArgs = useMemo(
-		() => ( {
+	const queryArgs = useMemo( () => {
+		const filters = {};
+		view.filters.forEach( ( filter ) => {
+			if ( filter.field === 'status' && filter.operator === 'in' ) {
+				filters.status = filter.value;
+			}
+			if ( filter.field === 'author' && filter.operator === 'in' ) {
+				filters.author = filter.value;
+			}
+		} );
+		return {
 			per_page: view.perPage,
 			page: view.page,
+			_embed: 'author',
 			order: view.sort?.direction,
-			orderby: view.sort?.field
+			orderby: view.sort?.field,
 			search: view.search,
-			...view.filters
-		} ),
-		[ view ]
-	);
+			...filters,
+		};
+	}, [ view ] );
 
 	const {
 		records
@@ -119,7 +142,8 @@ Example:
 			return (
 				<time>{ getFormattedDate( item.date ) }</time>
 			);
-		}
+		},
+		enableHiding: false
 	},
 	{
 		id: 'author',
@@ -134,61 +158,31 @@ Example:
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
 		]
-		filters: [ 'enumeration' ],
+		filters: [ 'in' ],
+		enableSorting: false
 	}
 ]
 ```
 
-- `id`: identifier for the field. Unique.
-- `header`: the field's name to be shown in the UI.
-- `getValue`: function that returns the value of the field.
-- `render`: function that renders the field.
-- `elements`: the set of valid values for the field's value.
-- `filters`: what filters are available for the user to use. See filters section.
+-   `id`: identifier for the field. Unique.
+-   `header`: the field's name to be shown in the UI.
+-   `getValue`: function that returns the value of the field.
+-   `render`: function that renders the field.
+-   `elements`: the set of valid values for the field's value.
+-   `filters`: what filter operators are available for the user to use over this field. Only `in` available at the moment.
+-   `enableSorting`: whether the data can be sorted by the given field. True by default.
+-   `enableHiding`: whether the field can be hidden. True by default.
 
-## Filters
+## Actions
 
-Filters describe the conditions a record should match to be listed as part of the dataset. Filters are provided per field.
+Array of operations that can be performed upon each record. Each action is an object with the following properties:
 
-```js
-const field = [
-	{
-		id: 'author',
-		filters: [ 'enumeration' ],
-	}
-];
-
-<DataViews
-	fields={ fields }
-/>
-```
-
-A filter is an object that may contain the following properties:
-
-- `id`: unique identifier for the filter. Matches the entity query param. Field filters may omit it, in which case the field's `id` will be used.
-- `name`: nice looking name for the filter. Field filters may omit it, in which case the field's `header` will be used.
-- `type`: the type of filter. Only `enumeration` is supported at the moment.
-- `elements`: for filters of type `enumeration`, the list of options to show. A one-dimensional array of object with value/label keys, as in `[ { value: 1, label: "Value name" } ]`.
-	- `value`: what's serialized into the view's filters.
-	- `label`: nice-looking name for users.
-- `resetValue`: for filters of type `enumeration`, this is the value for the reset option. If none is provided, `''` will be used.
-- `resetLabel`: for filters of type `enumeration`, this is the label for the reset option. If none is provided, `All` will be used.
-
-As a convenience, field's filter can provide abbreviated versions for the filter. All of following examples result in the same filter:
-
-```js
-const field = [
-	{
-		id: 'author',
-		header: __( 'Author' ),
-		elements: authors,
-		filters: [
-			'enumeration',
-			{ type: 'enumeration' },
-			{ id: 'author', type: 'enumeration' },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ) },
-			{ id: 'author', type: 'enumeration', name: __( 'Author' ), elements: authors },
-		],
-	}
-];
-```
+-   `id`: string, required. Unique identifier of the action. For example, `move-to-trash`.
+-   `label`: string, required. User facing description of the action. For example, `Move to Trash`.
+-   `isPrimary`: boolean, optional. Whether the action should be listed inline (primary) or in hidden in the more actions menu (secondary).
+-   `icon`: icon to show for primary actions. It's required for a primary action, otherwise the action would be considered secondary.
+-   `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.
+-   `isDestructive`: boolean, optional. Whether the action can delete data, in which case the UI would communicate it via red color.
+-   `callback`: function, required. Callback function that takes the record as input and performs the required action.
+-   `RenderModal`: ReactElement, optional. If an action requires to render contents in a modal, can provide a component which takes as input the record and a `closeModal` function. If this prop is provided, the `callback` property would be ignored.
+-   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.

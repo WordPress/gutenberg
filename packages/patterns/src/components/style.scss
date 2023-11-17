@@ -34,3 +34,12 @@
 	// Override the default 1px margin-x.
 	margin: 0;
 }
+
+.patterns-rename-pattern-category-modal__validation-message {
+	color: $alert-red;
+
+	// Match the input size.
+	@include break-medium() {
+		width: $grid-unit * 40;
+	}
+}

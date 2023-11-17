@@ -16,7 +16,6 @@ import {
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,12 +33,10 @@ import {
 } from '../components/duotone/utils';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings } from './utils';
+import { useBlockSettings, useStyleOverride } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
-import { store as blockEditorStore } from '../store';
-import { unlock } from '../lock-unlock';
 
 const EMPTY_ARRAY = [];
 
@@ -102,6 +99,7 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	const style = attributes?.style;
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
+	const blockEditingMode = useBlockEditingMode();
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -121,6 +119,10 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		( colorPalette?.length === 0 && disableCustomColors );
 
 	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
+
+	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 
@@ -219,17 +221,13 @@ const withDuotoneControls = createHigherOrderComponent(
 			'filter.duotone'
 		);
 
-		const blockEditingMode = useBlockEditingMode();
-
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && blockEditingMode === 'default' && (
-					<DuotonePanel { ...props } />
-				) }
+				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 				<BlockEdit { ...props } />
 			</>
 		);
@@ -290,27 +288,33 @@ function DuotoneStyles( {
 
 	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
 
-	const { setStyleOverride, deleteStyleOverride } = unlock(
-		useDispatch( blockEditorStore )
+	useStyleOverride(
+		isValidFilter
+			? {
+					css:
+						colors !== 'unset'
+							? getDuotoneStylesheet( selector, filterId )
+							: getDuotoneUnsetStylesheet( selector ),
+					__unstableType: 'presets',
+			  }
+			: undefined
+	);
+	useStyleOverride(
+		isValidFilter
+			? {
+					assets:
+						colors !== 'unset'
+							? getDuotoneFilter( filterId, colors )
+							: '',
+					__unstableType: 'svgs',
+			  }
+			: undefined
 	);
 
 	const blockElement = useBlockElement( clientId );
 
 	useEffect( () => {
 		if ( ! isValidFilter ) return;
-
-		setStyleOverride( filterId, {
-			css:
-				colors !== 'unset'
-					? getDuotoneStylesheet( selector, filterId )
-					: getDuotoneUnsetStylesheet( selector ),
-			__unstableType: 'presets',
-		} );
-		setStyleOverride( `duotone-${ filterId }`, {
-			assets:
-				colors !== 'unset' ? getDuotoneFilter( filterId, colors ) : '',
-			__unstableType: 'svgs',
-		} );
 
 		// Safari does not always update the duotone filter when the duotone colors
 		// are changed. When using Safari, force the block element to be repainted by
@@ -328,20 +332,7 @@ function DuotoneStyles( {
 			blockElement.offsetHeight;
 			blockElement.style.display = display;
 		}
-
-		return () => {
-			deleteStyleOverride( filterId );
-			deleteStyleOverride( `duotone-${ filterId }` );
-		};
-	}, [
-		isValidFilter,
-		blockElement,
-		colors,
-		selector,
-		filterId,
-		setStyleOverride,
-		deleteStyleOverride,
-	] );
+	}, [ isValidFilter, blockElement ] );
 
 	return null;
 }

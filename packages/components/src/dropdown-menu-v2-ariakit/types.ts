@@ -72,7 +72,7 @@ export interface DropdownMenuProps {
 	 * Determines whether the menu popover will be hidden when the user presses
 	 * the Escape key.
 	 *
-	 * @default true
+	 * @default `( event ) => { event.preventDefault(); return true; }`
 	 */
 	hideOnEscape?:
 		| boolean
