@@ -61,7 +61,7 @@ export default function PageMedia() {
 			title: item.title?.rendered || item.slug || __( '(no title)' ),
 			type: item.media_type,
 			alt: item.alt_text,
-			thumbnail: item.media_details.sizes.thumbnail.source_url,
+			thumbnail: item?.media_details?.sizes?.thumbnail?.source_url,
 			filesize: item?.media_details?.filesize,
 			author: item?.author,
 		} ) );
