@@ -2,15 +2,21 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import {
-	PostURLCheck,
-	PostURL as PostURLForm,
-	usePostURLLabel,
-} from '@wordpress/editor';
+	__experimentalHStack as HStack,
+	Dropdown,
+	Button,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
-export default function PostURL() {
+/**
+ * Internal dependencies
+ */
+import PostURLCheck from './check';
+import PostURL from './index';
+import { usePostURLLabel } from './label';
+
+export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -22,21 +28,21 @@ export default function PostURL() {
 
 	return (
 		<PostURLCheck>
-			<PanelRow className="edit-post-post-url" ref={ setPopoverAnchor }>
+			<HStack className="editor-post-url__panel" ref={ setPopoverAnchor }>
 				<span>{ __( 'URL' ) }</span>
 				<Dropdown
 					popoverProps={ popoverProps }
-					className="edit-post-post-url__dropdown"
-					contentClassName="edit-post-post-url__dialog"
+					className="editor-post-url__panel-dropdown"
+					contentClassName="editor-post-url__panel-dialog"
 					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<PostURLToggle isOpen={ isOpen } onClick={ onToggle } />
 					) }
 					renderContent={ ( { onClose } ) => (
-						<PostURLForm onClose={ onClose } />
+						<PostURL onClose={ onClose } />
 					) }
 				/>
-			</PanelRow>
+			</HStack>
 		</PostURLCheck>
 	);
 }
@@ -45,7 +51,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 	const label = usePostURLLabel();
 	return (
 		<Button
-			className="edit-post-post-url__toggle"
+			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			// translators: %s: Current post URL.

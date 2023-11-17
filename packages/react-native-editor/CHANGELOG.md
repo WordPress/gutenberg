@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
 
 ## 1.108.0
 -   [*] Fix error when pasting deeply nested structure content [#55613]
