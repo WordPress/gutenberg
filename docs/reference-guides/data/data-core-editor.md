@@ -321,10 +321,6 @@ _Returns_
 
 Return the current block list.
 
-_Parameters_
-
--   _state_ `Object`:
-
 _Returns_
 
 -   `Array`: Block list.

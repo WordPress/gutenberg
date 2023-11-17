@@ -1097,12 +1097,10 @@ export const isPublishSidebarEnabled = createRegistrySelector(
 /**
  * Return the current block list.
  *
- * @param {Object} state
  * @return {Array} Block list.
  */
-export const getEditorBlocks = createSelector(
-	() => getBlocks(),
-	() => [ getBlocks() ]
+export const getEditorBlocks = createRegistrySelector(
+	( select ) => () => select( blockEditorStore ).getBlocks()
 );
 
 /**
