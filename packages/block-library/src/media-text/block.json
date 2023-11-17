@@ -81,10 +81,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"isReversedOnMobile": {
-			"type": "boolean",
-			"default": false
-		},
 		"verticalAlignment": {
 			"type": "string"
 		},

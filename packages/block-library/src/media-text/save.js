@@ -20,7 +20,6 @@ const noop = () => {};
 export default function save( { attributes } ) {
 	const {
 		isStackedOnMobile,
-		isReversedOnMobile,
 		mediaAlt,
 		mediaPosition,
 		mediaType,
@@ -71,7 +70,6 @@ export default function save( { attributes } ) {
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
-		'is-reversed-on-mobile': isReversedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
 	} );

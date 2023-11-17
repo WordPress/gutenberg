@@ -133,7 +133,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		href,
 		imageFill,
 		isStackedOnMobile,
-		isReversedOnMobile,
 		linkClass,
 		linkDestination,
 		linkTarget,
@@ -194,7 +193,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
-		'is-reversed-on-mobile': isReversedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
 	} );
@@ -239,16 +237,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				onChange={ () =>
 					setAttributes( {
 						isStackedOnMobile: ! isStackedOnMobile,
-					} )
-				}
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Reverse on mobile' ) }
-				checked={ isReversedOnMobile }
-				onChange={ () =>
-					setAttributes( {
-						isReversedOnMobile: ! isReversedOnMobile,
 					} )
 				}
 			/>
@@ -387,7 +375,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						imageFill,
 						isSelected,
 						isStackedOnMobile,
-						isReversedOnMobile,
 						mediaAlt,
 						mediaId,
 						mediaPosition,
