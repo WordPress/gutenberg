@@ -23,6 +23,8 @@ export const customSelectHeight = (
 		},
 		small: {
 			height: '24px',
+			fontSize: '11px',
+			padding: `${ space( 2 ) }`,
 		},
 	};
 
@@ -69,7 +71,7 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 	border: 1px solid ${ COLORS.gray[ 600 ] };
 	border-radius: ${ space( 0.5 ) };
 	cursor: pointer;
-	padding: ${ space( 2 ) };
+	padding: ${ space( 4 ) };
 	width: 100%;
 	&[data-focus-visible] {
 		outline-style: solid;
