@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -158,30 +157,6 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withCustomFieldsControls' );
 
-const createEditFunctionWithPatternSource = () =>
-	createHigherOrderComponent(
-		( BlockEdit ) =>
-			( { attributes, ...props } ) => {
-				const registry = useRegistry();
-				const sourceAttributes =
-					registry._selectAttributes?.( {
-						clientId: props.clientId,
-						name: props.name,
-						attributes,
-					} ) ?? attributes;
-
-				return (
-					<BlockEdit { ...props } attributes={ sourceAttributes } />
-				);
-			}
-	);
-
-function shimAttributeSource( settings ) {
-	settings.edit = createEditFunctionWithPatternSource()( settings.edit );
-
-	return settings;
-}
-
 if ( window.__experimentalConnections ) {
 	addFilter(
 		'blocks.registerBlockType',
@@ -192,10 +167,5 @@ if ( window.__experimentalConnections ) {
 		'editor.BlockEdit',
 		'core/editor/connections/with-inspector-controls',
 		withCustomFieldsControls
-	);
-	addFilter(
-		'blocks.registerBlockType',
-		'core/pattern/shimAttributeSource',
-		shimAttributeSource
 	);
 }

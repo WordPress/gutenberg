@@ -41,30 +41,30 @@ function render_block_core_block( $attributes ) {
 
 	$seen_refs[ $attributes['ref'] ] = true;
 
-	$filter_block_context = static function( $context ) use ( $attributes ) {
-		if ( isset( $attributes['dynamicContent'] ) && $attributes['dynamicContent'] ) {
-			$context['dynamicContent'] = $attributes['dynamicContent'];
-		}
-
-		return $context;
-	};
+	// Handle embeds for reusable blocks.
+	global $wp_embed;
+	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
+	$content = $wp_embed->autoembed( $content );
 
 	/**
 	 * We set the `dynamicContent` context through the `render_block_context`
 	 * filter so that it is available when a pattern's inner blocks are
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
-	add_filter( 'render_block_context', $filter_block_context, 1 );
-
-	// Handle embeds for reusable blocks.
-	global $wp_embed;
-	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
-	$content = $wp_embed->autoembed( $content );
+	if ( isset( $attributes['dynamicContent'] ) ) {
+		$filter_block_context = static function( $context ) use ( $attributes ) {
+			$context['dynamicContent'] = $attributes['dynamicContent'];
+			return $context;
+		};
+		add_filter( 'render_block_context', $filter_block_context, 1 );
+	}
 
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
 
-	remove_filter( 'render_block_context', $filter_block_context, 1 );
+	if ( isset( $attributes['dynamicContent'] ) ) {
+		remove_filter( 'render_block_context', $filter_block_context, 1 );
+	}
 
 	return $content;
 }
@@ -81,3 +81,20 @@ function register_block_core_block() {
 	);
 }
 add_action( 'init', 'register_block_core_block' );
+
+$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+	add_filter( 'register_block_type_args', function( $args, $block_name ) {
+		if ( 'core/block' === $block_name ) {
+			$args['attributes'] = array_merge(
+				$args['attributes'],
+				array(
+					'dynamicContent' => array(
+						'type' => 'object',
+					),
+				)
+			);
+		}
+		return $args;
+	}, 10, 2 );
+}

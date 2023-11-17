@@ -37,7 +37,7 @@ import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
-function hasAttributeSynced( block ) {
+function isPartiallySynced( block ) {
 	return (
 		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
 		!! block.attributes.connections?.attributes &&
@@ -46,7 +46,7 @@ function hasAttributeSynced( block ) {
 		)
 	);
 }
-function getAttributeSynced( block ) {
+function getPartiallySyncedAttributes( block ) {
 	const attributes = {};
 	for ( const [ attribute, connection ] of Object.entries(
 		block.attributes.connections.attributes
@@ -99,8 +99,8 @@ function applyInitialDynamicContent(
 			dynamicContent,
 			defaultValues
 		);
-		if ( ! hasAttributeSynced( block ) ) return { ...block, innerBlocks };
-		const attributes = getAttributeSynced( block );
+		if ( ! isPartiallySynced( block ) ) return { ...block, innerBlocks };
+		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			defaultValues[ id ] = block.attributes[ attributeKey ];
@@ -124,8 +124,8 @@ function getDynamicContentFromBlocks( blocks, defaultValues ) {
 			dynamicContent,
 			getDynamicContentFromBlocks( block.innerBlocks, defaultValues )
 		);
-		if ( ! hasAttributeSynced( block ) ) continue;
-		const attributes = getAttributeSynced( block );
+		if ( ! isPartiallySynced( block ) ) continue;
+		const attributes = getPartiallySyncedAttributes( block );
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			if ( block.attributes[ attributeKey ] !== defaultValues[ id ] ) {
 				dynamicContent[ id ] = block.attributes[ attributeKey ];
