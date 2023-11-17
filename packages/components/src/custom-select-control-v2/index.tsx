@@ -7,6 +7,8 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { createContext, useContext, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -53,7 +55,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 			<Styled.CustomSelectButton className={ classes } store={ store }>
 				{ renderSelectedValue
 					? renderSelectedValue( currentValue )
-					: currentValue ?? 'Select an item' }
+					: currentValue ?? __( 'Select an item' ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover store={ store } sameWidth>
