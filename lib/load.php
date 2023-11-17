@@ -116,7 +116,7 @@ require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings.
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/post-meta.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/pattern.php';
-
+require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
