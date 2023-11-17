@@ -18,7 +18,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					operator: filter,
 					elements: field.elements || [],
 					isVisible: view.filters.some(
 						( f ) =>
