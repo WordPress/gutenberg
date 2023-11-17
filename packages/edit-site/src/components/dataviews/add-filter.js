@@ -22,28 +22,27 @@ const {
 	DropdownMenuItemV2,
 } = unlock( componentsPrivateApis );
 
-const VALID_OPERATORS = [ OPERATOR_IN ];
+const ENUMERATION_TYPE = 'enumeration'; // TODO: merge with the one in filters.js
 
 export default function AddFilter( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
-		if ( ! field.filters ) {
+		if ( ! field.type ) {
 			return;
 		}
 
-		field.filters.forEach( ( filter ) => {
-			if ( VALID_OPERATORS.some( ( operator ) => operator === filter ) ) {
+		switch ( field.type ) {
+			case ENUMERATION_TYPE:
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					operator: filter,
 					elements: field.elements || [],
 					isVisible: view.filters.some(
-						( f ) => f.field === field.id && f.operator === filter
+						( f ) =>
+							f.field === field.id && f.operator === OPERATOR_IN
 					),
 				} );
-			}
-		} );
+		}
 	} );
 
 	if ( filters.length === 0 ) {
@@ -92,7 +91,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 											...currentView.filters,
 											{
 												field: filter.field,
-												operator: 'in',
+												operator: OPERATOR_IN,
 												value: element.value,
 											},
 										],

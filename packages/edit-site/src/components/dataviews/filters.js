@@ -23,9 +23,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 			case ENUMERATION_TYPE:
 				filters.push( {
 					field: field.id,
-					operator: OPERATOR_IN,
 					name: field.header,
-					type: field.type,
 					elements: [
 						{
 							value: '',
@@ -34,29 +32,26 @@ export default function Filters( { fields, view, onChangeView } ) {
 						...( field.elements || [] ),
 					],
 					isVisible: view.filters.some(
-						( f ) => f.field === field.id && f.operator === filter
+						( f ) =>
+							f.field === field.id && f.operator === OPERATOR_IN
 					),
 				} );
 		}
 	} );
 
-	const filterComponents = filters?.map( ( filter ) => {
+	const filterComponents = filters.map( ( filter ) => {
 		if ( ! filter.isVisible ) {
 			return null;
 		}
 
-		if ( OPERATOR_IN === filter.operator ) {
-			return (
-				<InFilter
-					key={ filter.field + '.' + filter.operator }
-					filter={ filter }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-			);
-		}
-
-		return null;
+		return (
+			<InFilter
+				key={ filter.field + '.' + filter.operator }
+				filter={ filter }
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
+		);
 	} );
 
 	filterComponents.push(
