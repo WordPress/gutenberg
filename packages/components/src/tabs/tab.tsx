@@ -11,11 +11,12 @@ import type { TabProps } from './types';
 import warning from '@wordpress/warning';
 import { TabsContext } from './context';
 import { Tab as StyledTab } from './styles';
+import type { WordPressComponentProps } from '../context';
 
-export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
-	{ children, id, className, disabled, render, style },
-	ref
-) {
+export const Tab = forwardRef<
+	HTMLButtonElement,
+	WordPressComponentProps< TabProps, 'button', false >
+>( function Tab( { children, id, disabled, render, ...otherProps }, ref ) {
 	const context = useContext( TabsContext );
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
@@ -28,10 +29,9 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 			ref={ ref }
 			store={ store }
 			id={ instancedTabId }
-			className={ className }
-			style={ style }
 			disabled={ disabled }
 			render={ render }
+			{ ...otherProps }
 		>
 			{ children }
 		</StyledTab>

@@ -69,17 +69,17 @@ function ListViewBlock( {
 	const blockTitle =
 		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
 
-	const block = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
-		[ clientId ]
-	);
-	const blockName = useSelect(
-		( select ) => select( blockEditorStore ).getBlockName( clientId ),
-		[ clientId ]
-	);
-	const blockEditingMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockEditingMode( clientId ),
+	const { block, blockName, blockEditingMode } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getBlockEditingMode } =
+				select( blockEditorStore );
+
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				blockEditingMode: getBlockEditingMode( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 

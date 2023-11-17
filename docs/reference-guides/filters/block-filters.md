@@ -187,7 +187,7 @@ const { createHigherOrderComponent } = wp.compose;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
@@ -198,12 +198,12 @@ const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withInspectorControl' );
+}, 'withMyPluginControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'my-plugin/with-inspector-controls',
-	withInspectorControls
+	withMyPluginControls
 );
 ```
 
@@ -212,7 +212,7 @@ wp.hooks.addFilter(
 ```js
 var el = React.createElement;
 
-var withInspectorControls = wp.compose.createHigherOrderComponent( function (
+var withMyPluginControls = wp.compose.createHigherOrderComponent( function (
 	BlockEdit
 ) {
 	return function ( props ) {
@@ -227,12 +227,12 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function (
 			)
 		);
 	};
-}, 'withInspectorControls' );
+}, 'withMyPluginControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'my-plugin/with-inspector-controls',
-	withInspectorControls
+	withMyPluginControls
 );
 ```
 
@@ -245,7 +245,7 @@ To mitigate this, consider whether any work you perform can be altered to run on
 For example, if you are adding components that only need to render when the block is _selected_, then you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
 
 ```js
-const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
@@ -258,7 +258,7 @@ const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withInspectorControl' );
+}, 'withMyPluginControls' );
 ```
 
 #### `editor.BlockListBlock`

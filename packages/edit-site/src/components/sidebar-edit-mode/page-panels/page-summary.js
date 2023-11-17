@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
+import { PostURLPanel } from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */
@@ -32,6 +34,7 @@ export default function PageSummary( {
 				postType={ postType }
 			/>
 			<EditTemplate />
+			<PostURLPanel />
 		</VStack>
 	);
 }

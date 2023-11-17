@@ -44,7 +44,7 @@ function addAttribute( settings ) {
  *
  * @return {Component} Wrapped component.
  */
-const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
 		const hasCustomFieldsSupport = hasBlockSupport(
@@ -123,17 +123,17 @@ const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 
 		return <BlockEdit { ...props } />;
 	};
-}, 'withInspectorControl' );
+}, 'withCustomFieldsControls' );
 
 if ( window.__experimentalConnections ) {
 	addFilter(
 		'blocks.registerBlockType',
-		'core/connections/attribute',
+		'core/editor/connections/attribute',
 		addAttribute
 	);
 	addFilter(
 		'editor.BlockEdit',
-		'core/connections/with-inspector-control',
-		withInspectorControl
+		'core/editor/connections/with-inspector-controls',
+		withCustomFieldsControls
 	);
 }

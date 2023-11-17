@@ -29,7 +29,7 @@ import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../dataviews/sidebar-content';
+import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -59,8 +59,7 @@ function SidebarScreens() {
 			{ window?.__experimentalAdminViews && (
 				<NavigatorScreen path="/pages">
 					<SidebarNavigationScreen
-						title={ __( 'All Pages' ) }
-						description={ __( 'Manage your pages.' ) }
+						title={ __( 'Pages' ) }
 						backPath="/page"
 						content={ <DataViewsSidebarContent /> }
 					/>

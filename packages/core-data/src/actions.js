@@ -908,3 +908,19 @@ export function receiveNavigationFallbackId( fallbackId ) {
 		fallbackId,
 	};
 }
+
+/**
+ * Returns an action object used to set the template for a given query.
+ *
+ * @param {Object} query      The lookup query.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( query, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		query,
+		templateId,
+	};
+}
