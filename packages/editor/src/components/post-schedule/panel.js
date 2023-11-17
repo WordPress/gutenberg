@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Dropdown,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 
@@ -15,6 +11,7 @@ import { useState, useMemo } from '@wordpress/element';
 import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
 import { usePostScheduleLabel } from './label';
+import PostPanelRow from '../post-panel-row';
 
 export default function PostSchedulePanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -35,11 +32,7 @@ export default function PostSchedulePanel() {
 
 	return (
 		<PostScheduleCheck>
-			<HStack
-				className="editor-post-schedule__panel"
-				ref={ setPopoverAnchor }
-			>
-				<span>{ __( 'Publish' ) }</span>
+			<PostPanelRow label={ __( 'Publish' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
 					focusOnMount
@@ -66,7 +59,7 @@ export default function PostSchedulePanel() {
 						<PostScheduleForm onClose={ onClose } />
 					) }
 				/>
-			</HStack>
+			</PostPanelRow>
 		</PostScheduleCheck>
 	);
 }
