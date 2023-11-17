@@ -10,7 +10,6 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
-	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
@@ -1102,16 +1101,8 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @return {Array} Block list.
  */
 export const getEditorBlocks = createSelector(
-	( state ) => {
-		return (
-			getEditedPostAttribute( state, 'blocks' ) ||
-			parse( getEditedPostContent( state ) )
-		);
-	},
-	( state ) => [
-		getEditedPostAttribute( state, 'blocks' ),
-		getEditedPostContent( state ),
-	]
+	() => getBlocks(),
+	() => [ getBlocks() ]
 );
 
 /**
