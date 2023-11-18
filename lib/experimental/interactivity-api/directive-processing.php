@@ -105,11 +105,24 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		// Mark children of interactive blocks that are not interactive themselves
 		// to so we can skip them later.
 		WP_Directive_Processor::unmark_children_of_interactive_block( $block );
-		return sprintf(
-			'<br class="non-interactive-start" /> %s <br class="non-interactive-end" />',
-			// '<!-- wp:non-interactivity-wrapper {"blockName":"%s"} -->%s<!-- /wp:non-interactivity-wrapper -->',
+		return get_comment_delimited_block_content(
+			'core/interactivity-wrapper',
+			array(
+				'blockName' => $block['blockName'],
+				// We can put extra information about the block here.
+			),
 			$block_content
 		);
+		/**
+		 * Debugging purposes only.
+		 */
+			return sprintf(
+				'<br class="non-interactive-start" /> %s <br class="non-interactive-end" />',
+				// '<!-- wp:non-interactivity-wrapper {"blockName":"%s"} -->%s<!-- /wp:non-interactivity-wrapper -->',
+				// $block['blockName'],
+				$block_content
+			);
+
 	}
 
 		return $block_content;
