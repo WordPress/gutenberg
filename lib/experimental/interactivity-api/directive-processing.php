@@ -92,7 +92,6 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 			isset( $block_instance->block_type->supports['interactivity'] ) &&
 			$block_instance->block_type->supports['interactivity']
 		) {
-		WP_Directive_Processor::unmark_children_of_interactive_block();
 		// Mark interactive blocks so we can process them later.
 		return get_comment_delimited_block_content(
 			'core/interactivity-wrapper',
@@ -105,10 +104,10 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 	} elseif ( WP_Directive_Processor::is_marked_as_children_of_interactive_block( $block ) ) {
 		// Mark children of interactive blocks that are not interactive themselves
 		// to so we can skip them later.
-		WP_Directive_Processor::unmark_children_of_interactive_block();
-		return get_comment_delimited_block_content(
-			'core/non-interactivity-wrapper',
-			array(),
+		WP_Directive_Processor::unmark_children_of_interactive_block( $block );
+		return sprintf(
+			'<br class="non-interactive-start" /> %s <br class="non-interactive-end" />',
+			// '<!-- wp:non-interactivity-wrapper {"blockName":"%s"} -->%s<!-- /wp:non-interactivity-wrapper -->',
 			$block_content
 		);
 	}
