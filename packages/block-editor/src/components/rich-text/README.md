@@ -21,6 +21,10 @@ _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-na
 _Optional._ Placeholder text to show when the field is empty, similar to the
 [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
+### `disableLineBreaks: Boolean`
+
+_Optional._ `Text` won't insert line breaks on `Enter` if set to `true`.
+
 ### `multiline: Boolean | String`
 
 _Optional._ By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
