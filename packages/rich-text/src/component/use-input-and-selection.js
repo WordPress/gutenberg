@@ -99,6 +99,24 @@ export function useInputAndSelection( props ) {
 			const currentValue = createRecord();
 			const { start, activeFormats: oldActiveFormats = [] } =
 				record.current;
+			const insertedChars = currentValue.text.slice(
+				start,
+				currentValue.start
+			);
+
+			// When inserting multiple spaces, alternate between a normal space
+			// and a non-breaking space. This is to prevent browsers from
+			// collapsing multiple spaces into one.
+			if ( insertedChars === ' ' ) {
+				const previousChar = currentValue.text.charAt( start - 1 );
+
+				if ( previousChar === ' ' ) {
+					currentValue.text =
+						currentValue.text.slice( 0, currentValue.start - 1 ) +
+						'\u00a0' +
+						currentValue.text.slice( currentValue.start );
+				}
+			}
 
 			// Update the formats between the last and new caret position.
 			const change = updateFormats( {
