@@ -77,7 +77,6 @@ function gutenberg_mark_interactive_block_children( $parsed_block, $source_block
 }
 add_filter( 'render_block_data', 'gutenberg_mark_interactive_block_children', 100, 3 );
 
-
 /**
  * Add a marker indicating if the block is interactive or not.
  * core/interactivity-wrapper if it is interactive.
@@ -107,23 +106,22 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		WP_Directive_Processor::unmark_children_of_interactive_block();
 
 		/**
-		 * Debugging purposes only. It seems that comments are being stripped.
+		 * Debugging purposes only. Nested comments are not allowed.
+		 * We wrap a hidden textarea to save the block content delimited
+		 * by comments so we can later process it.
 		 */
 		return sprintf(
-			'<br class="non-interactive-start" /> %s <br class="non-interactive-end" />',
-			// '<!-- wp:non-interactivity-wrapper {"blockName":"%s"} -->%s<!-- /wp:non-interactivity-wrapper -->',
-			// $block['blockName'],
-			$block_content
-		);
-		return get_comment_delimited_block_content(
-			'core/interactivity-wrapper',
-			array(
-				'blockName' => $block['blockName'],
+			'<textarea style="display:none"> %1s </textarea> %2s',
+			get_comment_delimited_block_content(
+				'core/non-interactivity-wrapper',
+				array(
+					'blockName' => $block['blockName'],
 				// We can put extra information about the block here.
+				),
+				$block_content
 			),
 			$block_content
 		);
-
 	}
 
 		return $block_content;
