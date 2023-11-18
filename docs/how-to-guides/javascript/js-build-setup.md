@@ -22,7 +22,7 @@ The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) packa
 
 ## Quick Start
 
-If you prefer a quick start, you can use one of the examples from the [Block Development Examples repository](https://github.com/wordpress/block-development-examples/) and skip below. Each one of the `-esnext` directories in the examples repository contain the necessary files for working with ESNext and JSX.
+If you prefer a quick start, you can use one of the examples from the [Block Development Examples repository](https://github.com/wordpress/block-development-examples/) and skip below. [Most of the examples in this repository](https://github.com/WordPress/block-development-examples/wiki/02-Examples) contain the necessary files for working with ESNext and JSX.
 
 ## Setup
 
