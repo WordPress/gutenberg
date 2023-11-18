@@ -1,5 +1,9 @@
 # Get started with wp-env
 
+<div class="callout callout-info">
+Before following this guide, ensure you have the proper <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/">Node.js development environment</a> installed
+</div>
+
 The [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) package (`wp-env`) lets you set up a local WordPress environment (site) for building and testing plugins and themes, without any additional configuration.
 
 Before following this guide, install [Node.js development tools](/docs/getting-started/devenv#node-js-development-tools) if you have not already done so.
