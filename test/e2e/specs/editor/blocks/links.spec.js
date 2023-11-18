@@ -969,9 +969,7 @@ test.describe( 'Links', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Text with leading and trailing<a href="https://wordpress.org/gutenberg">' +
-							textToSelect +
-							'</a>',
+							'Text with leading and trailing<a href="https://wordpress.org/gutenberg">         spaces     </a>',
 					},
 				},
 			] );

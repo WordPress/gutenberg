@@ -853,4 +853,64 @@ test.describe( 'RichText', () => {
 			},
 		] );
 	} );
+
+	test( 'should pad multiple spaces', async ( { page, editor } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a  b' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a  b' },
+			},
+		] );
+	} );
+
+	test( 'should pad starting from space', async ( { page, editor } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a b' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( ' ' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a  b' },
+			},
+		] );
+	} );
+
+	test( 'should restore alternating padding on backspace', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a    b' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a   b' },
+			},
+		] );
+	} );
+
+	test( 'should restore alternating padding on delete', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a    b' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Delete' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a   b' },
+			},
+		] );
+	} );
 } );
