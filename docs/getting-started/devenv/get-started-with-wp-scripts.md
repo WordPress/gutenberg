@@ -1,5 +1,9 @@
 # Get started with wp-scripts
 
+<div class="callout callout-info">
+Before following this guide, ensure you have the proper <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/">Node.js development environment</a> installed
+</div>
+
 The [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package, commonly referred to as `wp-scripts`, is a set of configuration files and scripts that primarily aims to standardize and simplify the development process of WordPress projects that require a JavaScript build step.
 
 A JavaScript build step refers to the process of transforming, bundling, and optimizing JavaScript source code and related assets into a format suitable for production environments. These build steps often take modern JavaScript (ESNext and JSX) and convert it to a version compatible with most browsers. They can also bundle multiple files into one, minify the code to reduce file size and perform various other tasks to optimize the code.
