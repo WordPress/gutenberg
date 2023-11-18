@@ -34,7 +34,9 @@ export type CustomSelectProps = {
 	/**
 	 * Can be used to render select UI with custom styled values.
 	 */
-	renderSelectedValue?: ( selectValue: string | string[] ) => React.ReactNode;
+	renderSelectedValue?: (
+		selectedValue: string | string[]
+	) => React.ReactNode;
 	/**
 	 * The size of the control.
 	 *

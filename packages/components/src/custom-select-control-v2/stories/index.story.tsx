@@ -36,7 +36,7 @@ const meta: Meta< typeof CustomSelect > = {
 		( Story ) => (
 			<div
 				style={ {
-					minHeight: '250px',
+					minHeight: '150px',
 				} }
 			>
 				<Story />

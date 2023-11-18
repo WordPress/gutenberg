@@ -85,7 +85,6 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: ${ space( 0.5 ) };
 	background: ${ COLORS.white };
 	border: 1px solid ${ COLORS.gray[ 900 ] };
-	margin: ${ space( 3 ) } 0;
 `;
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	display: flex;

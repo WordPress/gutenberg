@@ -61,7 +61,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 					: currentValue ?? __( 'Select an item' ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
-			<Styled.CustomSelectPopover store={ store } sameWidth>
+			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
 				</CustomSelectContext.Provider>
