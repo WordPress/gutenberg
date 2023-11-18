@@ -92,12 +92,13 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 			$block_instance->block_type->supports['interactivity']
 		) {
 		// Mark interactive blocks so we can process them later.
-		return get_comment_delimited_block_content(
-			'core/interactivity-wrapper',
-			array(
-				'blockName' => $block['blockName'],
-				// We can put extra information about the block here.
-			),
+		/**
+		 * Debugging purposes only. Nested comments are not allowed.
+		 * We wrap a hidden textarea to save the block content delimited
+		 * by comments so we can later process it.
+		 */
+		return sprintf(
+			'<div data-wp-delimiter="interactivity-wrapper-start" style="display:none"></div>%s<div data-wp-delimiter="interactivity-wrapper-end" style="display:none"></div>',
 			$block_content
 		);
 	} elseif ( WP_Directive_Processor::is_marked_as_children_of_interactive_block( $block ) ) {
@@ -111,15 +112,7 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		 * by comments so we can later process it.
 		 */
 		return sprintf(
-			'<textarea style="display:none"> %1s </textarea> %2s',
-			get_comment_delimited_block_content(
-				'core/non-interactivity-wrapper',
-				array(
-					'blockName' => $block['blockName'],
-				// We can put extra information about the block here.
-				),
-				$block_content
-			),
+			'<div data-wp-delimiter="non-interactivity-wrapper-start" style="display:none"></div>%s<div data-wp-delimiter="non-interactivity-wrapper-end" style="display:none"></div>',
 			$block_content
 		);
 	}
