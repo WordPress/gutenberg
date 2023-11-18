@@ -9,6 +9,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
+import { isCollapsed } from '../is-collapsed';
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -96,33 +97,53 @@ export function useInputAndSelection( props ) {
 				return;
 			}
 
-			const currentValue = createRecord();
-			const { start, activeFormats: oldActiveFormats = [] } =
+			const newValue = createRecord();
+			const { start: oldStart, activeFormats: oldActiveFormats = [] } =
 				record.current;
-			const insertedChars = currentValue.text.slice(
-				start,
-				currentValue.start
-			);
+
+			const SP = ' ';
+			const NBSP = '\u00a0';
+			const isSpOrNbsp = ( char ) => char === SP || char === NBSP;
 
 			// When inserting multiple spaces, alternate between a normal space
 			// and a non-breaking space. This is to prevent browsers from
 			// collapsing multiple spaces into one.
-			if ( insertedChars === ' ' ) {
-				const previousChar = currentValue.text.charAt( start - 1 );
+			if (
+				isCollapsed( newValue ) &&
+				oldStart !== newValue.start &&
+				( oldStart < newValue.start
+					? newValue.text.slice( oldStart, newValue.start ) === SP
+					: isSpOrNbsp(
+							record.current.text.slice(
+								newValue.start,
+								oldStart
+							)
+					  ) )
+			) {
+				const text = newValue.text;
+				let startOffset = newValue.start;
+				let endOffset = newValue.start;
 
-				if ( previousChar === ' ' ) {
-					currentValue.text =
-						currentValue.text.slice( 0, currentValue.start - 1 ) +
-						'\u00a0' +
-						currentValue.text.slice( currentValue.start );
+				while ( isSpOrNbsp( text[ startOffset - 1 ] ) ) {
+					startOffset--;
 				}
+				while ( isSpOrNbsp( text[ endOffset ] ) ) {
+					endOffset++;
+				}
+
+				newValue.text =
+					text.slice( 0, startOffset ) +
+					Array.from( { length: endOffset - startOffset } )
+						.map( ( _, index ) => ( index % 2 === 0 ? SP : NBSP ) )
+						.join( '' ) +
+					text.slice( endOffset );
 			}
 
 			// Update the formats between the last and new caret position.
 			const change = updateFormats( {
-				value: currentValue,
-				start,
-				end: currentValue.start,
+				value: newValue,
+				start: oldStart,
+				end: newValue.start,
 				formats: oldActiveFormats,
 			} );
 
