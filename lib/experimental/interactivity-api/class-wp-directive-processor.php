@@ -72,11 +72,11 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 
 
 	/**
-	 * A string containing the main children of interactive.
+	 * An array containing the main children of interactive.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	public static $children_of_interactive_block = null;
+	public static $children_of_interactive_block = array();
 
 
 		/**
@@ -87,16 +87,18 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		 * @return void
 		 */
 	public static function mark_children_of_interactive_block( $block ) {
-		self::$children_of_interactive_block = md5( serialize( $block ) );
+		self::$children_of_interactive_block[] = md5( serialize( $block ) );
 	}
 
 	/**
 	 * Remove a root block to the variable.
 	 *
+	 * @param array $block The block to remove.
+	 *
 	 * @return void
 	 */
-	public static function unmark_children_of_interactive_block() {
-		self::$children_of_interactive_block = null;
+	public static function unmark_children_of_interactive_block( $block ) {
+		self::$children_of_interactive_block = array_diff( self::$children_of_interactive_block, array( md5( serialize( $block ) ) ) );
 	}
 
 	/**
@@ -107,7 +109,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 * @return bool True if block is a root block, false otherwise.
 	 */
 	public static function is_marked_as_children_of_interactive_block( $block ) {
-		return md5( serialize( $block ) ) === self::$children_of_interactive_block;
+		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
 	}
 
 	/**
