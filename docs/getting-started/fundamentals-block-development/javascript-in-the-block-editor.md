@@ -25,8 +25,6 @@ For code developments with few requirements (especially those not requiring JSX)
 
 Without a build process you access the methods directly from the `wp` global object and you need to enqueue manually the script.
 
-### `wp` Global Object
-
 `wp` is the main WordPress JavaScript object available a [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable). It is provisionned with different properties depending on what page is loaded. In the Block Editor context 
 [several of its related packages are available through this `wp` global variable](https://developer.wordpress.org/block-editor/reference-guides/packages/#using-the-packages-via-wordpress-global). Some examples:
 - `wp.blocks` for `@wordpress/blocks`
