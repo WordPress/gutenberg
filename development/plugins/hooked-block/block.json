@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "my-plugin/hooked-block",
+	"title": "Hooked Block",
+	"category": "text",
+	"parent": [],
+	"icon": "smiley",
+	"description": "Block for inserting dummy content.",
+	"keywords": [ "dummy", "content" ],
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": "Hooked Block Dummy Content"
+		}
+	},
+	"blockHooks": {
+		"core/paragraph": "after",
+		"core/column": "firstChild"
+	}
+}

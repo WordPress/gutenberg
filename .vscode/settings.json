@@ -1,0 +1,12 @@
+{
+	"favorites.resources": [
+		{
+			"filePath": "packages/blocks",
+			"group": "Default"
+		},
+		{
+			"filePath": "packages/block-editor",
+			"group": "Default"
+		}
+	]
+}
