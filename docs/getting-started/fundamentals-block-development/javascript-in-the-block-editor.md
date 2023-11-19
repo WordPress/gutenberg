@@ -25,7 +25,9 @@ For code developments with few requirements (especially those not requiring JSX)
 
 Without a build process you access the methods directly from the `wp` global object and you need to manually enqueue the script.
 
-`wp` is the main WordPress JavaScript object available a [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable). It is provisionned with different properties depending on what page is loaded. In the Block Editor context 
+Any of the WordPress bundled packages can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable). Every script that wants to use any of these bundled packages is responsible for adding the handle or that package to the dependency array when registered. 
+
+So for example if a script wants to use the `RichText` component out of the block editor package `wp-block-editor` would need to get added to the dependency array to ensure that `wp.blockEditor.RichText` is defined then the script tries to access it.
 [several of its related packages are available through this `wp` global variable](https://developer.wordpress.org/block-editor/reference-guides/packages/#using-the-packages-via-wordpress-global). Some examples:
 - `wp.blocks` for `@wordpress/blocks`
 - `wp.data` for `@wordpress/data`
