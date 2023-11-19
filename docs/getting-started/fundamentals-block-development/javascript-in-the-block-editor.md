@@ -23,7 +23,7 @@ With the [proper `package.json` scripts](https://developer.wordpress.org/block-e
 
 For code developments with few requirements (especially those not requiring JSX) using Javascript without a build process may be another good option. 
 
-Without a build process you access the methods directly from the `wp` global object and you need to enqueue manually the script.
+Without a build process you access the methods directly from the `wp` global object and you need to manually enqueue the script.
 
 `wp` is the main WordPress JavaScript object available a [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable). It is provisionned with different properties depending on what page is loaded. In the Block Editor context 
 [several of its related packages are available through this `wp` global variable](https://developer.wordpress.org/block-editor/reference-guides/packages/#using-the-packages-via-wordpress-global). Some examples:
