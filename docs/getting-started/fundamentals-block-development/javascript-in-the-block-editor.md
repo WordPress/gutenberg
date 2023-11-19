@@ -1,6 +1,6 @@
 # Working with Javascript for the Block Editor
 
-When working with Javascript for the Block Editor, a JavaScript Build Process is recommended in most of the cases. With a build process you'll be able to work with ESNext and JSX syntaxes and features (among others) in your code whilst produce code ready for the majority of the browsers.
+When working with Javascript for the Block Editor, a JavaScript Build Process is recommended in most of the cases. With a build process you'll be able to work with ESNext and JSX (among others) syntaxes and features in your code whilst produce code ready for the majority of the browsers.
 
 ## JavaScript Build Process
 
