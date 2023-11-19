@@ -14,7 +14,7 @@ Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation st
 
 Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
 
-With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts`  in production and development mode:
+With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts` in production and development mode:
 
 - **`npm run build` for "production" mode build** - This process [minifies the code](https://developer.mozilla.org/en-US/docs/Glossary/Minification) down so it downloads faster in the browser. 
 - **`npm run start` for "development" mode build**  - This process does not minify the code of the bundled files, provides [source maps files](https://firefox-source-docs.mozilla.org/devtools-user/debugger/how_to/use_a_source_map/index.html) for them, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
@@ -25,13 +25,9 @@ For code developments with few requirements (especially those not requiring JSX)
 
 Without a build process you access the methods directly from the `wp` global object and you need to manually enqueue the script.
 
-Any of the WordPress bundled packages can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable). Every script that wants to use any of these bundled packages is responsible for adding the handle or that package to the dependency array when registered. 
+Any of the [WordPress Javascript packages](https://developer.wordpress.org/block-editor/reference-guides/packages/) can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable) but every script that wants to use them through this `wp` object is responsible for adding [the handle or that package](https://developer.wordpress.org/block-editor/contributors/code/scripts/) to the dependency array when registered.
 
-So for example if a script wants to use the `RichText` component out of the block editor package `wp-block-editor` would need to get added to the dependency array to ensure that `wp.blockEditor.RichText` is defined then the script tries to access it.
-[several of its related packages are available through this `wp` global variable](https://developer.wordpress.org/block-editor/reference-guides/packages/#using-the-packages-via-wordpress-global). Some examples:
-- `wp.blocks` for `@wordpress/blocks`
-- `wp.data` for `@wordpress/data`
-- `wp.blockEditor` for `@wordpress/block-editor`
+So for example if a script wants to register a block variation using the `registerBlockVariation` method out of the [blocks package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/) `wp-blocks` would need to get added to the dependency array to ensure that `wp.blocks.registerBlockVariation` is defined when the script tries to access it (see [example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php)). 
 
 <div class="callout callout-tip">
     Try running <code>wp.data.select('core/editor').getBlocks())</code> in your browser's dev tools while editing a post or a site. The entire editor is available from the console.
@@ -47,3 +43,4 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) repo
 - [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/)
 - [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/)
+- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/)
