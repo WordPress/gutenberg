@@ -20,7 +20,7 @@ The package abstracts away much of the initial setup, configuration, and boilerp
 ## Quick start
 
 <div class="callout callout-tip">
-    If you use <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/"><code>@wordpress/create-block</code></a> package to scaffold the structure of files needed to create and register a block, you'll also get a modern JavaScript build setup (using <code>wp-scripts</code>) with no configuration required, so you don't need to worry about installing `wp-scripts` or enqueuing assets. Refer to <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with <code>create-block</code></a> for more details.
+    If you use <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/"><code>@wordpress/create-block</code></a> package to scaffold the structure of files needed to create and register a block, you'll also get a modern JavaScript build setup (using <code>wp-scripts</code>) with no configuration required, so you don't need to worry about installing <code>wp-scripts</code> or enqueuing assets. Refer to <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with <code>create-block</code></a> for more details.
 </div>
 
 ### Installation
