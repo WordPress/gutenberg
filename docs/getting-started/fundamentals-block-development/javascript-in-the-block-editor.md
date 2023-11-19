@@ -10,7 +10,7 @@ Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation st
 
 ["webpack"](https://webpack.js.org/concepts/why-webpack/) is a pluggable tool that processes JavaScript and creates a compiled bundle that runs in a browser. ["babel"](https://babeljs.io/) transforms JavaScript from one format to another. Babel is used as a plugin to webpack to transform both ESNext and JSX to production-ready JavaScript.
 
-[`@wordpress/scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) package abstracts these libraries away to standardize and simplify development, so you won’t need to handle the details for configuring webpack or babel. 
+[`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package abstracts these libraries away to standardize and simplify development, so you won’t need to handle the details for configuring webpack or babel. Check the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) intro guide.
 
 Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
 
@@ -36,11 +36,12 @@ Without a build process you access the methods directly from the `wp` global obj
 </div>
 <br/>
 
-Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) (and [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/)) to enqueue javascript assets for the Editor with access to these packages via `wp` (see [example](https://github.com/wptrainingteam/block-theme-examples/tree/master/example-block-variation)).
+Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) (and [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/)) to enqueue javascript assets for the Editor with access to these packages via `wp` (see [example](https://github.com/wptrainingteam/block-theme-examples/tree/master/example-block-variation)). Refer to [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) for more info.
 
 ## Additional resources
 
 - [Javascript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) 
 - [block-development-examples](https://github.com/WordPress/block-development-examples) repo
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) repo
+- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/)
 - [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/)
