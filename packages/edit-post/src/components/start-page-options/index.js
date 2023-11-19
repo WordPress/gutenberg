@@ -11,6 +11,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -92,11 +93,15 @@ export default function StartPageOptions() {
 	const shouldEnableModal = useSelect( ( select ) => {
 		const { isCleanNewPost } = select( editorStore );
 		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
-
+		const disableChoosePatternModal = select( preferencesStore ).get(
+			'core/edit-post',
+			'disableChoosePatternModal'
+		);
 		return (
 			! isEditingTemplate() &&
 			! isFeatureActive( 'welcomeGuide' ) &&
-			isCleanNewPost()
+			isCleanNewPost() &&
+			! disableChoosePatternModal
 		);
 	}, [] );
 
