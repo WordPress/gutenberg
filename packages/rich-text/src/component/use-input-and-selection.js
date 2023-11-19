@@ -112,8 +112,12 @@ export function useInputAndSelection( props ) {
 				isCollapsed( newValue ) &&
 				oldStart !== newValue.start &&
 				( oldStart < newValue.start
-					? newValue.text.slice( oldStart, newValue.start ) === SP
-					: isSpOrNbsp(
+					? // Check if the inserted character is a space.
+					  newValue.text.slice( oldStart, newValue.start ) === SP
+					: // Check if the deleted character is a space or
+					  // non-breaking space (in both cases we need to fix the
+					  // alternating pattern).
+					  isSpOrNbsp(
 							record.current.text.slice(
 								newValue.start,
 								oldStart
@@ -124,6 +128,8 @@ export function useInputAndSelection( props ) {
 				let startOffset = newValue.start;
 				let endOffset = newValue.start;
 
+				// We need to make sure the alternating pattern is maintained,
+				// so replace all spaces before and after the selection.
 				while ( isSpOrNbsp( text[ startOffset - 1 ] ) ) {
 					startOffset--;
 				}
