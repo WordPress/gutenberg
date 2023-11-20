@@ -151,11 +151,9 @@ export default function EditPostPreferencesModal() {
 								<EnableFeature
 									featureName="enableChoosePatternModal"
 									help={ __(
-										'Enables the choose pattern modal when adding a new page.'
+										'Shows starter patterns when creating a new page.'
 									) }
-									label={ __(
-										'Enable choose pattern modal'
-									) }
+									label={ __( 'Show starter patterns' ) }
 								/>
 							) }
 							{ showBlockBreadcrumbsOption && (
