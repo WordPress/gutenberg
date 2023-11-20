@@ -12,7 +12,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { select as directSelect, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
@@ -54,7 +54,9 @@ function addAttribute( settings ) {
 
 /**
  * Filters registered block settings to extend the block edit wrapper to apply
- * the section class name.
+ * the section class name. The section class is only applied on edit props
+ * as a php render callback will handle the frontend so fallback logic can be
+ * applied without needing to re-save all posts, pages etc with sections.
  *
  * @param {Object} settings Original block settings.
  *
@@ -76,13 +78,33 @@ function addEditProps( settings ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
 
-		// A render hook will handle class application on the PHP side
 		if ( attributes.section === undefined ) {
 			return props;
 		}
 
-		// TODO: Handle fallback logic if the current section index isn't available.
-		const sectionClass = `wp-section-${ attributes.section }`;
+		// TODO: The following access to the Global Styles sections data is far
+		// from ideal. We should be using useSelect( blockEditorStore ) except
+		// we cannot do so here as `getEditWrapperProps` is a plain JS function
+		// called by `BlockListBlock` and not a React component. See font size
+		// support for further details regarding this.
+		//
+		// If the className prop is injected via the editor.BlockEdit filter and
+		// its HoC, it would require each block opting into support to ensure it
+		// plumbs through it's `className` prop on the block wrapper.
+		const sections =
+			directSelect( blockEditorStore ).getSettings().__experimentalStyles
+				?.sections;
+
+		if ( ! sections?.length ) {
+			return props;
+		}
+
+		const sectionIndex = Math.min(
+			attributes.section,
+			sections.length - 1
+		);
+
+		const sectionClass = `wp-section-${ sectionIndex }`;
 		const newClassName = classnames( props.className, sectionClass );
 
 		props.className = newClassName ? newClassName : undefined;
@@ -113,7 +135,7 @@ function SectionPanelItem( props ) {
 
 	const onChange = ( nextValue ) => {
 		setAttributes( {
-			section: nextValue !== '' ? nextValue : undefined,
+			section: nextValue !== '' ? parseInt( nextValue, 10 ) : undefined,
 		} );
 	};
 
