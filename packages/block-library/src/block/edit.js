@@ -32,6 +32,7 @@ import {
 	parse,
 	serializeRawBlock,
 	getSaveContent,
+	serialize,
 } from '@wordpress/blocks';
 
 /**
@@ -109,9 +110,7 @@ function applyInitialDynamicContent(
 		let newInnerBlocks;
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			if ( attributeKey === 'innerBlocks' && dynamicContent[ id ] ) {
-				let blockString = dynamicContent[ id ].replace( '<ul>', '' );
-				blockString = blockString.replace( '</ul>', '' );
-				newInnerBlocks = parse( blockString );
+				newInnerBlocks = parse( dynamicContent[ id ] );
 				continue;
 			}
 			defaultValues[ id ] = block.attributes[ attributeKey ];
@@ -140,11 +139,8 @@ function getDynamicContentFromBlocks( blocks, defaultValues ) {
 
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			if ( attributeKey === 'innerBlocks' ) {
-				const innerBlockContent = getSaveContent(
-					block.name,
-					block.attributes,
-					block.innerBlocks
-				);
+				const innerBlockContent = serialize( block.innerBlocks );
+
 				if ( innerBlockContent !== defaultValues[ id ] ) {
 					dynamicContent[ id ] = innerBlockContent;
 				}
