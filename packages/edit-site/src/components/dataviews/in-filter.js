@@ -17,9 +17,7 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 export default ( { filter, view, onChangeView } ) => {
@@ -76,23 +74,6 @@ export default ( { filter, view, onChangeView } ) => {
 					</DropdownMenuCheckboxItem>
 				);
 			} ) }
-			<DropdownMenuSeparator />
-			<DropdownMenuItem
-				key="remove-filter"
-				onSelect={ () =>
-					onChangeView( ( currentView ) => ( {
-						...currentView,
-						page: 1,
-						filters: [
-							...view.filters.filter(
-								( f ) => f.field !== filter.field
-							),
-						],
-					} ) )
-				}
-			>
-				{ __( 'Reset' ) }
-			</DropdownMenuItem>
 		</DropdownMenu>
 	);
 };
