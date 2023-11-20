@@ -17,6 +17,7 @@ import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES,
 } from '../../utils/constants';
+import { getPathAndQueryString } from '@wordpress/url';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -54,7 +55,6 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			const {
 				getEditedEntityRecord,
 				getEntityRecords,
-				getDefaultTemplateId,
 				__experimentalGetTemplateForLink,
 			} = select( coreDataStore );
 
@@ -67,7 +67,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 					postTypeToResolve,
 					postIdToResolve
 				);
-				if ( ! editedEntity ) {
+				if (
+					! editedEntity ||
+					// Edited entities are initialized as an empty object.
+					Object.keys( editedEntity ).length === 0
+				) {
 					return undefined;
 				}
 				// First see if the post/page has an assigned template and fetch it.
@@ -85,10 +89,10 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 					}
 				}
 
-				// If no template is assigned, use the default template.
-				return getDefaultTemplateId( {
-					slug: `${ postTypeToResolve }-${ editedEntity?.slug }`,
-				} );
+				const path = getPathAndQueryString( editedEntity.link );
+
+				// If no template is assigned, use the link to fetch the right template.
+				return __experimentalGetTemplateForLink( path )?.id;
 			}
 
 			// If we're rendering a specific page, post... we need to resolve its template.
