@@ -16,6 +16,15 @@ The registration of a block in the server, usually takes place in the main plugi
 
 Note that if there's a build process involved, the registered `block.json` should be the one in `build` folder.
 
+```php
+function minimal_block_ca6eda___register_block() {
+	register_block_type( __DIR__ . '/build' );
+}
+
+add_action( 'init', 'minimal_block_ca6eda___register_block' );
+```
+_See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)_
+
 Registering a block in the server by calling to `register_block_type` with just its first argument is enough in most of the cases.
 
 ## Registering the block in the client
@@ -23,12 +32,10 @@ Registering a block in the server by calling to `register_block_type` with just 
 The registration of a block in the client (for the Block Editor), usually takes place in the `index.js` file (or any other file defined in the `editorScript` property of `block.json`) via the [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype).
 
 The `registerBlockType` function takes the following paramenters:
-- a first parameter with the block name or an object with the metadata of the block
-- a second parameter with an object with the setting 
-
-of the block that can be provided:
--  with the path to the `block.json` file with the metadata definition for the block
--  with the path to the folder where the `block.json` file is located
+- A first parameter with the block name (if the block has also been registered on the server) or an object with the metadata of the block
+- A second parameter with an object with settings for the block. The most important properties of this object settings are:
+	- `edit`:  
+	- `save`:  
 
 ```
 import { registerBlockType } from '@wordpress/blocks';
@@ -43,8 +50,7 @@ registerBlockType( metadata.name, {
 	},
 } );
 ```
-
-(see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))
+_See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)_
 
 
 <div class="callout callout-info">
@@ -57,3 +63,4 @@ At its simplest form, a block it is a <code>registerBlockType</code> function ca
 - [`wp-scripts build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build)
 - [`wp-scripts start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start)
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
+- [Why a block needs to be registered in both the server and the client?](https://github.com/WordPress/gutenberg/discussions/55884) | GitHub Discussion
