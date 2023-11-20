@@ -42,6 +42,22 @@ function findSelection( blocks ) {
 	return [];
 }
 
+function convertSpaces( value ) {
+	const { text, start } = value;
+	const lastTwoCharacters = text.slice( start - 2, start );
+
+	// Replace two spaces with an em space.
+	if ( lastTwoCharacters === '  ' ) {
+		return insert( value, '\u2002', start - 2, start );
+	}
+	// Replace an en space followed by a space with an em space.
+	else if ( lastTwoCharacters === '\u2002 ' ) {
+		return insert( value, '\u2003', start - 2, start );
+	}
+
+	return value;
+}
+
 export function useInputRules( props ) {
 	const {
 		__unstableMarkLastChangeAsPersistent,
@@ -122,7 +138,7 @@ export function useInputRules( props ) {
 
 					return accumlator;
 				},
-				preventEventDiscovery( value )
+				preventEventDiscovery( convertSpaces( value ) )
 			);
 
 			if ( transformed !== value ) {
