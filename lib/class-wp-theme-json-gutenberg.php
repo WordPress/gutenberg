@@ -412,7 +412,82 @@ class WP_Theme_JSON_Gutenberg {
 			'fluid'          => null,
 			'customFontSize' => null,
 			'dropCap'        => null,
-			'fontFamilies'   => null,
+			'fontFamilies'   => array(
+
+				array (
+					'fontFamily' => null,
+					'name' => null,
+					'slug' => null,
+					'fontFace'  => array(
+						array(
+							'ascentOverride'        => null,
+							'descentOverride'       => null,
+							'fontDisplay'           => null,
+							'fontFamily'            => null,
+							'fontFeatureSettings'   => null,
+							'fontStyle'             => null,
+							'fontStretch'           => null,
+							'fontVariationSettings' => null,
+							'fontWeight'            => null,
+							'lineGapOverride'       => null,
+							'sizeAdjust'            => null,
+							'src'                   => null,
+							'unicodeRange'          => null,
+						)
+					)
+				),
+
+				'theme' => array (
+					array (
+						'fontFamily' => null,
+						'name' => null,
+						'slug' => null,
+						'fontFace'  => array(
+							array(
+								'ascentOverride'        => null,
+								'descentOverride'       => null,
+								'fontDisplay'           => null,
+								'fontFamily'            => null,
+								'fontFeatureSettings'   => null,
+								'fontStyle'             => null,
+								'fontStretch'           => null,
+								'fontVariationSettings' => null,
+								'fontWeight'            => null,
+								'lineGapOverride'       => null,
+								'sizeAdjust'            => null,
+								'src'                   => null,
+								'unicodeRange'          => null,
+							)
+						)
+					)
+				),
+
+				'custom' => array (
+					array (
+						'fontFamily' => null,
+						'name' => null,
+						'slug' => null,
+						'fontFace'  => array(
+							array(
+								'ascentOverride'        => null,
+								'descentOverride'       => null,
+								'fontDisplay'           => null,
+								'fontFamily'            => null,
+								'fontFeatureSettings'   => null,
+								'fontStyle'             => null,
+								'fontStretch'           => null,
+								'fontVariationSettings' => null,
+								'fontWeight'            => null,
+								'lineGapOverride'       => null,
+								'sizeAdjust'            => null,
+								'src'                   => null,
+								'unicodeRange'          => null,
+							)
+						)
+					)
+				),
+				
+			),
 			'fontSizes'      => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
@@ -965,27 +1040,47 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $schema Schema to adhere to.
 	 * @return array The modified $tree.
 	 */
-	protected static function remove_keys_not_in_schema( $tree, $schema ) {
-		$tree = array_intersect_key( $tree, $schema );
+    protected static function remove_keys_not_in_schema( $tree, $schema ) {
+        if ( ! is_array( $tree ) ) {
+            return $tree;
+        }
 
-		foreach ( $schema as $key => $data ) {
-			if ( ! isset( $tree[ $key ] ) ) {
+        foreach ( $tree as $key => $value ) {
+			// Remove keys not in the schema or with null/empty values
+			if ( ! array_key_exists( $key, $schema )  ) {
+				unset( $tree[ $key ] );
 				continue;
 			}
 
-			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
-				$tree[ $key ] = static::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+            // Check if the value is an array and requires further processing
+            if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+                // Determine if the schema is for an associative or indexed array
+                $schema_is_assoc = self::is_assoc( $value );
 
-				if ( empty( $tree[ $key ] ) ) {
-					unset( $tree[ $key ] );
-				}
-			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
-				unset( $tree[ $key ] );
-			}
-		}
+                if ( $schema_is_assoc ) {
+                    // If associative, process as a single object
+                    $tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+                } else {
+                    // If indexed, process each item in the array
+                    foreach ( $value as $item_key => $item_value ) {
+                        if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+                            $tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
+                        } else {
+                            // If the schema does not define a further structure, keep the value as is
+                            $tree[ $key ][ $item_key ] = $item_value;
+                        }
+                    }
+                }
+            }
+        }
 
-		return $tree;
-	}
+        return $tree;
+    }
+
+    protected static function is_assoc( array $array ) {
+        if ( [] === $array ) return false;
+        return array_keys( $array ) !== range( 0, count( $array ) - 1 );
+    }
 
 	/**
 	 * Returns the existing settings for each block.
