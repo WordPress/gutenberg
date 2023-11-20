@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal';
 
 /**
  * WordPress dependencies
@@ -226,8 +225,7 @@ export default function ReusableBlockEdit( {
 	// but won't create an undo level.
 	// This can be abstracted into a `useSyncDerivedAttributes` hook if needed.
 	useEffect( () => {
-		const { getBlocks, getBlockAttributes } =
-			registry.select( blockEditorStore );
+		const { getBlocks } = registry.select( blockEditorStore );
 		const { syncDerivedBlockAttributes } = unlock(
 			registry.dispatch( blockEditorStore )
 		);
@@ -236,21 +234,12 @@ export default function ReusableBlockEdit( {
 			const blocks = getBlocks( patternClientId );
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
-				// TODO: We should probably cache this somehow to improve performance.
-				const nextDynamicContent = getDynamicContentFromBlocks(
-					blocks,
-					defaultValuesRef.current
-				);
-				if (
-					! fastDeepEqual(
-						getBlockAttributes( patternClientId ).dynamicContent,
-						nextDynamicContent
-					)
-				) {
-					syncDerivedBlockAttributes( patternClientId, {
-						dynamicContent: nextDynamicContent,
-					} );
-				}
+				syncDerivedBlockAttributes( patternClientId, {
+					dynamicContent: getDynamicContentFromBlocks(
+						blocks,
+						defaultValuesRef.current
+					),
+				} );
 			}
 		}, blockEditorStore );
 	}, [ patternClientId, registry ] );
