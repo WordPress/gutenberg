@@ -45,7 +45,7 @@ The `index.js` file (or any other file defined in the `editorScript` property of
 
 ### `edit.js`
 
-The `edit.js` file usually returns the `edit` function used in block registration that defines the React component that will be loaded on the Editor when the block is loaded or inserted.
+The `edit.js` commonly gets used to contain the React component that gets used in the editor for our block. It usually exports a single component that then gets passed to the `edit` property of the `registerBlockType` function in the `index.js` file.
 
 ### `save.js`
 
