@@ -212,10 +212,7 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label:
-				innerBlockCount > 1
-					? __( 'Detach patterns' )
-					: __( 'Detach pattern' ),
+			label: __( 'Detach pattern' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
 				/* translators: %s: name of the synced block */

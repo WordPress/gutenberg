@@ -219,7 +219,7 @@ describe( 'Pattern blocks', () => {
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach patterns' );
+		await clickMenuItem( 'Detach pattern' );
 
 		// Check that we have two paragraph blocks on the page.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
