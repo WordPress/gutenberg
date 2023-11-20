@@ -220,12 +220,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'typography' => array(
 						'fontFamilies' => array(
-							'custom' => array(
-								array(
-									'name'       => 'Arial',
-									'slug'       => 'arial',
-									'fontFamily' => 'Arial, serif',
-								),
+							array(
+								'name'       => 'Arial',
+								'slug'       => 'arial',
+								'fontFamily' => 'Arial, serif',
 							),
 						),
 						'fontSizes'    => array(
