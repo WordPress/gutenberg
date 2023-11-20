@@ -18,7 +18,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editPostStore } from '../../store';
 
-function useStartPatterns() {
+export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
 	// and it has no postTypes declared and the current post type is page or if
 	// the current post type is part of the postTypes declared.

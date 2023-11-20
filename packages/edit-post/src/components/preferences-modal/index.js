@@ -35,12 +35,16 @@ import {
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
+import { useStartPatterns } from '../start-page-options';
 
 export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
 
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( interfaceStore );
+	const starterPatterns = useStartPatterns();
+	const themeHasStarterPatterns = starterPatterns.length > 0;
+
 	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
@@ -143,13 +147,17 @@ export default function EditPostPreferencesModal() {
 								) }
 								label={ __( 'Use theme styles' ) }
 							/>
-							<EnableFeature
-								featureName="enableChoosePatternModal"
-								help={ __(
-									'Enables the choose pattern modal when adding a new page.'
-								) }
-								label={ __( 'Enable choose pattern modal' ) }
-							/>
+							{ themeHasStarterPatterns && (
+								<EnableFeature
+									featureName="enableChoosePatternModal"
+									help={ __(
+										'Enables the choose pattern modal when adding a new page.'
+									) }
+									label={ __(
+										'Enable choose pattern modal'
+									) }
+								/>
+							) }
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
 									featureName="showBlockBreadcrumbs"
@@ -259,7 +267,7 @@ export default function EditPostPreferencesModal() {
 				),
 			},
 		],
-		[ isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption, themeHasStarterPatterns ]
 	);
 
 	if ( ! isModalActive ) {
