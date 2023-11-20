@@ -43,6 +43,10 @@ const availableViews = [
 		id: 'side-by-side',
 		label: __( 'Side by side' ),
 	},
+	{
+		id: 'media-grid',
+		label: __( 'Grid' ),
+	},
 ];
 
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {

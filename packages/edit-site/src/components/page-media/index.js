@@ -5,11 +5,15 @@ import {
 	Icon,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
+	DropZone,
+	Tooltip,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback } from '@wordpress/element';
+import { page } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -20,7 +24,7 @@ import { useAddedBy, AvatarImage } from '../list/added-by';
 const EMPTY_ARRAY = [];
 
 const DEFAULT_VIEW = {
-	type: 'list',
+	type: 'media-grid',
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -29,6 +33,95 @@ const DEFAULT_VIEW = {
 	hiddenFields: [],
 	layout: {},
 };
+
+function getMediaTypeFromMimeType( mimeType ) {
+	// @todo this needs to be abstracted and the
+	//  media types formalized somewhere.
+	if ( mimeType.startsWith( 'image/' ) ) {
+		return 'image';
+	}
+
+	if ( mimeType.startsWith( 'video/' ) ) {
+		return 'video';
+	}
+
+	if ( mimeType.startsWith( 'audio/' ) ) {
+		return 'audio';
+	}
+
+	return 'application';
+}
+
+function getFeaturedImageDetails( post, size ) {
+	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
+
+	return {
+		url:
+			image?.media_details?.sizes?.[ size ]?.source_url ??
+			image?.source_url,
+		alt: image?.alt_text,
+	};
+}
+
+function MediaPreview( { item } ) {
+	const mediaType = item?.mimeType
+		? getMediaTypeFromMimeType( item?.mimeType )
+		: undefined;
+	if ( mediaType === 'application' ) {
+		return (
+			<Tooltip
+				text={ `${ item?.title } - ${ item?.filesize / 1000 } kb` }
+			>
+				<a href={ item?.url } target="_blank" rel="noreferrer">
+					<Icon icon={ page } size={ 128 } />
+				</a>
+			</Tooltip>
+		);
+	}
+
+	if ( mediaType === 'image' ) {
+		return (
+			<img
+				src={ item.thumbnail }
+				alt={ item.alt }
+				style={ {
+					maxHeight: '80px',
+				} }
+			/>
+		);
+	}
+
+	if ( mediaType === 'audio' ) {
+		return (
+			<audio
+				controls="controls"
+				src={ item?.url }
+				autoPlay={ false }
+				preload="true"
+			/>
+		);
+	}
+
+	if ( mediaType === 'video' ) {
+		return (
+			<video
+				controls="controls"
+				poster={ item?.featuredImage?.url }
+				preload="true"
+				src={ item?.url }
+				height="80"
+				playsInline
+			/>
+		);
+	}
+
+	// Everything else is a file.
+	return (
+		<div className="edit-site-media-item__icon">
+			<Icon icon={ page } />
+		</div>
+	);
+}
 
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
@@ -48,9 +141,11 @@ function AuthorField( { item } ) {
 
 export default function PageMedia() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const [ hasDropped, setHasDropped ] = useState( false );
 	const { records: attachments, isResolving: isLoadingData } =
 		useEntityRecords( 'root', 'media', {
 			per_page: -1,
+			_embed: 'wp:featuredmedia',
 		} );
 
 	const mediaItems = useMemo( () => {
@@ -60,10 +155,15 @@ export default function PageMedia() {
 		return attachments.map( ( item ) => ( {
 			title: item.title?.rendered || item.slug || __( '(no title)' ),
 			type: item.media_type,
+			id: item.id,
 			alt: item.alt_text,
 			thumbnail: item?.media_details?.sizes?.thumbnail?.source_url,
 			filesize: item?.media_details?.filesize,
 			author: item?.author,
+			url: item?.source_url,
+			poster: item?.poster,
+			mimeType: item?.mime_type,
+			featuredImage: getFeaturedImageDetails( item ),
 		} ) );
 	}, [ attachments ] );
 
@@ -75,13 +175,7 @@ export default function PageMedia() {
 				getValue: ( { item } ) => item.title,
 				render: ( { item } ) => (
 					<HStack spacing={ 2 } justify="flex-start">
-						<img
-							src={ item.thumbnail }
-							alt={ item.alt }
-							style={ {
-								maxHeight: '80px',
-							} }
-						/>
+						<MediaPreview item={ item } />
 						<Heading as="h3" level={ 5 }>
 							{ decodeEntities( item.title ) }
 						</Heading>
@@ -93,8 +187,8 @@ export default function PageMedia() {
 			{
 				id: 'type',
 				header: __( 'Type' ),
-				getValue: ( { item } ) => item.type,
-				render: ( { item } ) => item.type,
+				getValue: ( { item } ) => item.mimeType,
+				render: ( { item } ) => item.mimeType,
 			},
 			{
 				id: 'filesize',
@@ -196,7 +290,12 @@ export default function PageMedia() {
 				fields={ fields }
 				isLoading={ isLoadingData }
 				view={ view }
-				supportedLayouts={ [ 'list', 'grid' ] }
+				supportedLayouts={ [ 'list', 'media-grid' ] }
+			/>
+			<DropZone
+				onFilesDrop={ () => setHasDropped( true ) }
+				onHTMLDrop={ () => setHasDropped( true ) }
+				onDrop={ () => setHasDropped( true ) }
 			/>
 		</Page>
 	);
