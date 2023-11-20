@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { size, MiddlewareArguments } from '@floating-ui/react-dom';
+import type { MiddlewareState } from '@floating-ui/react-dom';
+import { size } from '@floating-ui/react-dom';
 
 export function overlayMiddlewares() {
 	return [
 		{
 			name: 'overlay',
-			fn( { rects }: MiddlewareArguments ) {
+			fn( { rects }: MiddlewareState ) {
 				return rects.reference;
 			},
 		},

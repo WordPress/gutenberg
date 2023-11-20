@@ -9,15 +9,27 @@ import { createReduxStore, register } from '@wordpress/data';
 import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
+import * as privateActions from './private-actions';
+import { unlock } from '../lock-unlock';
 
 const STORE_NAME = 'core/commands';
 
 /**
  * Store definition for the commands namespace.
  *
+ * See how the Commands Store is being used in components like [site-hub](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-site/src/components/site-hub/index.js#L23) and [document-actions](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/header/document-actions/index.js#L14).
+ *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
+ *
+ * @example
+ * ```js
+ * import { store as commandsStore } from '@wordpress/commands';
+ * import { useDispatch } from '@wordpress/data';
+ * ...
+ * const { open: openCommandCenter } = useDispatch( commandsStore );
+ * ```
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
@@ -26,3 +38,4 @@ export const store = createReduxStore( STORE_NAME, {
 } );
 
 register( store );
+unlock( store ).registerPrivateActions( privateActions );

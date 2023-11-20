@@ -35,6 +35,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 				<PanelBody>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>

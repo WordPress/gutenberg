@@ -18,8 +18,10 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -69,7 +71,7 @@ test.describe( 'Classic', () => {
 		const createGallery = page.getByRole( 'button', {
 			name: 'Create a new gallery',
 		} );
-		await expect( createGallery ).not.toBeDisabled();
+		await expect( createGallery ).toBeEnabled();
 		await createGallery.click();
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
@@ -83,10 +85,6 @@ test.describe( 'Classic', () => {
 			'role=document[name="Block: Gallery"i]'
 		);
 		await expect( galleryBlock ).toBeVisible();
-
-		// Focus on the editor so that keyboard shortcuts work.
-		// See: https://github.com/WordPress/gutenberg/issues/46844
-		await galleryBlock.focus();
 
 		// Check that you can undo back to a Classic block gallery in one step.
 		await pageUtils.pressKeys( 'primary+z' );
@@ -121,14 +119,12 @@ test.describe( 'Classic', () => {
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
 
-		await page.click( 'role=button[name="Save draft"i]' );
-
-		await expect(
-			page.locator( 'role=button[name="Saved"i]' )
-		).toBeDisabled();
-
+		await editor.saveDraft();
 		await page.reload();
 		await page.unroute( '**' );
+
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {

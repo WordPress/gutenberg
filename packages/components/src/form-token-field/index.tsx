@@ -27,6 +27,7 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import { Spacer } from '../spacer';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const identity = ( value: string ) => value;
 
@@ -69,10 +70,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
-	} = props;
+		tokenizeOnBlur = false,
+	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
+		props,
+		'wp.components.FormTokenField'
+	);
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -163,6 +168,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
+			if ( tokenizeOnBlur && inputHasValidValue() ) {
+				addNewToken( incompleteTokenValue );
+			}
 		} else {
 			// Reset to initial state
 			setIncompleteTokenValue( '' );
@@ -447,7 +455,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive ) {
+		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
 	}
@@ -702,7 +710,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					align="center"
 					gap={ 1 }
 					wrap={ true }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }

@@ -50,6 +50,8 @@ export type ToolsPanelProps = {
 	/**
 	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
 	 * placeholder content instead of null when they are toggled off and hidden.
+	 * Note that placeholder items won't apply the `className` that would be
+	 * normally applied to a visible `ToolsPanelItem` via the `className` prop.
 	 *
 	 * @default false
 	 */

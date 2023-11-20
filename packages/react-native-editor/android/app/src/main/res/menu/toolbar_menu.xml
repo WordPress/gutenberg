@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuUndo"
+        android:icon="@drawable/undo"
+        android:title="@string/undo"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menuRedo"
+        android:icon="@drawable/redo"
+        android:title="@string/redo"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menuButton"
+        android:icon="@drawable/more_vertical"
+        android:title="@string/more_options"
+        app:showAsAction="ifRoom" />
+</menu>

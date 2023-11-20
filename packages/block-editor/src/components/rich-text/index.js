@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	RawHTML,
 	useRef,
 	useCallback,
 	forwardRef,
@@ -45,7 +44,9 @@ import { useInputEvents } from './use-input-events';
 import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
-import { getMultilineTag, getAllowedFormats } from './utils';
+import { getAllowedFormats } from './utils';
+import { Content } from './content';
+import RichTextMultiline from './multiline';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -81,12 +82,12 @@ function removeNativeProps( props ) {
 	return restProps;
 }
 
-function RichTextWrapper(
+export function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
-		value: originalValue = '',
-		onChange: originalOnChange,
+		value: adjustedValue = '',
+		onChange: adjustedOnChange,
 		isSelected: originalIsSelected,
 		multiline,
 		inlineToolbar,
@@ -100,7 +101,7 @@ function RichTextWrapper(
 		onMerge,
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
-		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -112,18 +113,6 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	if ( multiline ) {
-		deprecated( 'wp.blockEditor.RichText multiline prop', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'nested blocks (InnerBlocks)',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
-		} );
-	}
-
-	const instanceId = useInstanceId( RichTextWrapper );
-
-	identifier = identifier || instanceId;
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
@@ -152,39 +141,18 @@ function RichTextWrapper(
 		};
 	};
 	// This selector must run on every render so the right selection state is
-	// retreived from the store on merge.
+	// retrieved from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-	let adjustedValue = originalValue;
-	let adjustedOnChange = originalOnChange;
-
-	// Handle deprecated format.
-	if ( Array.isArray( originalValue ) ) {
-		deprecated( 'wp.blockEditor.RichText value prop as children type', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'value prop as string',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
-		} );
-
-		adjustedValue = childrenSource.toHTML( originalValue );
-		adjustedOnChange = ( newValue ) =>
-			originalOnChange(
-				childrenSource.fromDOM(
-					__unstableCreateElement( document, newValue ).childNodes
-				)
-			);
-	}
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
@@ -293,7 +261,6 @@ function RichTextWrapper(
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
-		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
@@ -380,10 +347,7 @@ function RichTextWrapper(
 						tagName,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						__unstableEmbedURLOnPaste,
-						multilineTag,
-						preserveWhiteSpace,
 						pastePlainText,
 					} ),
 					useDelete( {
@@ -396,11 +360,10 @@ function RichTextWrapper(
 						value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
-						multilineTag,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
+						onSplitAtDoubleLineEnd,
 					} ),
 					useFirefoxCompat(),
 					anchorRef,
@@ -412,20 +375,25 @@ function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
+				// Setting tabIndex to 0 is unnecessary, the element is already
+				// focusable because it's contentEditable. This also fixes a
+				// Safari bug where it's not possible to Shift+Click multi
+				// select blocks when Shift Clicking into an element with
+				// tabIndex because Safari will focus the element. However,
+				// Safari will correctly ignore nested contentEditable elements.
+				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
 			/>
 		</>
 	);
 }
 
-const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
+function RichTextSwitcher( props, ref ) {
+	let value = props.value;
+	let onChange = props.onChange;
+
+	// Handle deprecated format.
 	if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
 			since: '6.1',
@@ -434,25 +402,34 @@ ForwardedRichTextContainer.Content = ( {
 			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 		} );
 
-		value = childrenSource.toHTML( value );
+		value = childrenSource.toHTML( props.value );
+		onChange = ( newValue ) =>
+			props.onChange(
+				childrenSource.fromDOM(
+					__unstableCreateElement( document, newValue ).childNodes
+				)
+			);
 	}
 
-	const MultilineTag = getMultilineTag( multiline );
+	const Component = props.multiline
+		? RichTextMultiline
+		: ForwardedRichTextWrapper;
+	const instanceId = useInstanceId( RichTextSwitcher );
 
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
+	return (
+		<Component
+			{ ...props }
+			identifier={ props.identifier || instanceId }
+			value={ value }
+			onChange={ onChange }
+			ref={ ref }
+		/>
+	);
+}
 
-	const content = <RawHTML>{ value }</RawHTML>;
+const ForwardedRichTextContainer = forwardRef( RichTextSwitcher );
 
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ content }</Tag>;
-	}
-
-	return content;
-};
-
+ForwardedRichTextContainer.Content = Content;
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };

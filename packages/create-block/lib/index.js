@@ -185,9 +185,8 @@ program
 										],
 										variant
 									).filter( filterOptionsProvided );
-									const result = await inquirer.prompt(
-										pluginPrompts
-									);
+									const result =
+										await inquirer.prompt( pluginPrompts );
 									return result;
 								} )
 						: {};

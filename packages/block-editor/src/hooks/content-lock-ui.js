@@ -13,10 +13,6 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
-/**
- * External dependencies
- */
-import classnames from 'classnames';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -37,11 +33,11 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		if ( ! isBlockOrDescendantSelected ) {
 			stopEditingAsBlock();
 		}
-	}, [ isBlockOrDescendantSelected ] );
+	}, [ isBlockOrDescendantSelected, stopEditingAsBlock ] );
 	return null;
 }
 
-export const withBlockControls = createHigherOrderComponent(
+export const withContentLockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { getBlockListSettings, getSettings } =
 			useSelect( blockEditorStore );
@@ -91,7 +87,6 @@ export const withBlockControls = createHigherOrderComponent(
 			__unstableSetTemporarilyEditingAsBlocks();
 		}, [
 			props.clientId,
-			focusModeToRevert,
 			updateSettings,
 			updateBlockListSettings,
 			getBlockListSettings,
@@ -101,7 +96,7 @@ export const withBlockControls = createHigherOrderComponent(
 		] );
 
 		if ( ! isContentLocked && ! isEditingAsBlocks ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
@@ -156,22 +151,15 @@ export const withBlockControls = createHigherOrderComponent(
 						) }
 					</BlockSettingsMenuControls>
 				) }
-				<BlockEdit
-					{ ...props }
-					className={ classnames(
-						props.className,
-						isEditingAsBlocks &&
-							'is-content-locked-editing-as-blocks'
-					) }
-				/>
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
-	'withToolbarControls'
+	'withContentLockControls'
 );
 
 addFilter(
 	'editor.BlockEdit',
 	'core/content-lock-ui/with-block-controls',
-	withBlockControls
+	withContentLockControls
 );

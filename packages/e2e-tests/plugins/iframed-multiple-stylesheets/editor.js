@@ -4,7 +4,7 @@
 	const { useBlockProps } = blockEditor;
 
 	registerBlockType( 'test/iframed-multiple-stylesheets', {
-		apiVersion: 2,
+		apiVersion: 3,
 		edit: function Edit() {
 			return el( 'div', useBlockProps(), 'Edit' );
 		},

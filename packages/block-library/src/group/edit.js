@@ -7,7 +7,6 @@ import {
 	useBlockProps,
 	InspectorControls,
 	useInnerBlocksProps,
-	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
@@ -53,6 +52,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 		<InspectorControls group="advanced">
 			<SelectControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'HTML element' ) }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },
@@ -71,13 +71,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 	);
 }
 
-function GroupEdit( {
-	attributes,
-	name,
-	setAttributes,
-	clientId,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -90,24 +84,24 @@ function GroupEdit( {
 		[ clientId ]
 	);
 
-	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		allowedBlocks,
+		layout = {},
+	} = attributes;
 
 	// Layout settings.
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = ! layout?.type
-		? { ...defaultLayout, ...layout, type: 'default' }
-		: { ...defaultLayout, ...layout };
-	const { type = 'default' } = usedLayout;
+	const { type = 'default' } = layout;
 	const layoutSupportEnabled =
 		themeSupportsLayout || type === 'flex' || type === 'grid';
 
 	// Hooks.
-	const blockProps = useBlockProps( {
-		className: ! layoutSupportEnabled ? layoutClassNames : null,
-	} );
+	const blockProps = useBlockProps();
+
 	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
 		attributes,
-		usedLayoutType: usedLayout?.type,
+		usedLayoutType: type,
 		hasInnerBlocks,
 	} );
 
@@ -131,8 +125,8 @@ function GroupEdit( {
 			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
+			allowedBlocks,
 			renderAppender,
-			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
 
@@ -156,7 +150,6 @@ function GroupEdit( {
 				<View>
 					{ innerBlocksProps.children }
 					<GroupPlaceHolder
-						clientId={ clientId }
 						name={ name }
 						onSelect={ selectVariation }
 					/>

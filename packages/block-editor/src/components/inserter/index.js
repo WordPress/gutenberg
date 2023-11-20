@@ -102,7 +102,7 @@ class PrivateInserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown toggle element.
+	 * @return {Element} Dropdown toggle element.
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
@@ -135,7 +135,7 @@ class PrivateInserter extends Component {
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *
-	 * @return {WPElement} Dropdown content element.
+	 * @return {Element} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
 		const {
@@ -150,7 +150,6 @@ class PrivateInserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
-			orderInitialBlockItems,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -174,7 +173,6 @@ class PrivateInserter extends Component {
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
-					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 			);
 		}
@@ -214,7 +212,7 @@ class PrivateInserter extends Component {
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }
 				) }
-				popoverProps={ { position } }
+				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
@@ -233,7 +231,7 @@ export const ComposedPrivateInserter = compose( [
 				getBlockRootClientId,
 				hasInserterItems,
 				getAllowedBlocks,
-				__experimentalGetDirectInsertBlock,
+				getDirectInsertBlock,
 				getSettings,
 			} = select( blockEditorStore );
 
@@ -245,8 +243,7 @@ export const ComposedPrivateInserter = compose( [
 			const allowedBlocks = getAllowedBlocks( rootClientId );
 
 			const directInsertBlock =
-				shouldDirectInsert &&
-				__experimentalGetDirectInsertBlock( rootClientId );
+				shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
 			const settings = getSettings();
 
@@ -426,13 +423,7 @@ export const ComposedPrivateInserter = compose( [
 ] )( PrivateInserter );
 
 const Inserter = forwardRef( ( props, ref ) => {
-	return (
-		<ComposedPrivateInserter
-			ref={ ref }
-			{ ...props }
-			orderInitialBlockItems={ undefined }
-		/>
-	);
+	return <ComposedPrivateInserter ref={ ref } { ...props } />;
 } );
 
 export default Inserter;

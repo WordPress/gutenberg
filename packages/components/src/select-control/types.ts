@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
 type SelectControlBaseProps = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
+	| '__next40pxDefaultSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'
@@ -40,6 +41,12 @@ type SelectControlBaseProps = Pick<
 			 * @default false
 			 */
 			disabled?: boolean;
+			/**
+			 * Whether or not the option should be hidden.
+			 *
+			 * @default false
+			 */
+			hidden?: boolean;
 		}[];
 		/**
 		 * As an alternative to the `options` prop, `optgroup`s and `options` can be

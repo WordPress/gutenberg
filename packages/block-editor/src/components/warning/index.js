@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { moreHorizontal } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 
 function Warning( { className, actions, children, secondaryActions } ) {
 	return (
@@ -34,7 +34,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 							{ secondaryActions && (
 								<DropdownMenu
 									className="block-editor-warning__secondary"
-									icon={ moreHorizontal }
+									icon={ moreVertical }
 									label={ __( 'More options' ) }
 									popoverProps={ {
 										position: 'bottom left',

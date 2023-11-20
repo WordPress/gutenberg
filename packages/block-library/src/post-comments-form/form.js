@@ -23,7 +23,11 @@ const CommentsFormPlaceholder = () => {
 	return (
 		<div className="comment-respond">
 			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
-			<form noValidate className="comment-form" inert="true">
+			<form
+				noValidate
+				className="comment-form"
+				onSubmit={ ( event ) => event.preventDefault() }
+			>
 				<p>
 					<label htmlFor={ `comment-${ instanceId }` }>
 						{ __( 'Comment' ) }
@@ -33,6 +37,7 @@ const CommentsFormPlaceholder = () => {
 						name="comment"
 						cols="45"
 						rows="8"
+						readOnly
 					/>
 				</p>
 				<p className="form-submit wp-block-button">
@@ -45,6 +50,7 @@ const CommentsFormPlaceholder = () => {
 						) }
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }
+						aria-disabled="true"
 					/>
 				</p>
 			</form>

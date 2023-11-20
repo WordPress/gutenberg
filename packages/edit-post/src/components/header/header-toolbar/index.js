@@ -8,6 +8,7 @@ import {
 	NavigableToolbar,
 	ToolSelector,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	EditorHistoryRedo,
@@ -23,12 +24,15 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar() {
+function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
@@ -64,9 +68,20 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-
+	const {
+		shouldShowContextualToolbar,
+		canFocusHiddenToolbar,
+		fixedToolbarCanBeFocused,
+	} = useShouldContextualToolbarShow();
+	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
+	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
+	const blockToolbarCanBeFocused =
+		shouldShowContextualToolbar ||
+		canFocusHiddenToolbar ||
+		fixedToolbarCanBeFocused;
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -88,6 +103,8 @@ function HeaderToolbar() {
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
+				aria-expanded={ isListViewOpen }
+				ref={ setListViewToggleElement }
 			/>
 		</>
 	);
@@ -114,6 +131,8 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
+			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
@@ -128,10 +147,11 @@ function HeaderToolbar() {
 					icon={ plus }
 					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
+					aria-expanded={ isInserterOpened }
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }

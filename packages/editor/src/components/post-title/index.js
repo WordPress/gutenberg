@@ -74,7 +74,10 @@ function PostTitle( _, forwardedRef ) {
 			return;
 		}
 
-		const { ownerDocument } = ref.current;
+		const { defaultView } = ref.current.ownerDocument;
+		const { name, parent } = defaultView;
+		const ownerDocument =
+			name === 'editor-canvas' ? parent.document : defaultView.document;
 		const { activeElement, body } = ownerDocument;
 
 		// Only autofocus the title when the post is entirely empty. This should
@@ -219,7 +222,6 @@ function PostTitle( _, forwardedRef ) {
 			} );
 		},
 		__unstableDisableFormats: true,
-		preserveWhiteSpace: true,
 	} );
 
 	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */

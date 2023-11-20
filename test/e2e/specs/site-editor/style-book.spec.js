@@ -20,32 +20,29 @@ test.describe( 'Style Book', () => {
 
 	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
 		).toBeVisible();
 	} );
 
-	test( 'should disable toolbar butons when open', async ( { page } ) => {
+	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 		await expect(
 			page.locator( 'role=button[name="Undo"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 		await expect(
 			page.locator( 'role=button[name="Redo"i]' )
-		).not.toBeVisible();
-		await expect(
-			page.locator( 'role=button[name="Show template details"i]' )
-		).not.toBeVisible();
+		).toBeHidden();
 		await expect(
 			page.locator( 'role=button[name="View"i]' )
-		).not.toBeVisible();
+		).toBeDisabled();
 	} );
 
 	test( 'should have tabs containing block examples', async ( { page } ) => {
@@ -111,7 +108,6 @@ test.describe( 'Style Book', () => {
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
 		await page.click( 'role=button[name="Heading block styles"]' );
-		await page.click( 'role=button[name="Typography styles"]' );
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
@@ -143,7 +139,7 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'should close when close button is clicked'
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Open Style Book again.
 		await page.getByRole( 'button', { name: 'Style Book' } ).click();
@@ -157,7 +153,7 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'should close when Escape key is pressed'
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 } );
 
@@ -166,18 +162,11 @@ class StyleBook {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async open() {
-		await this.disableWelcomeGuide();
-		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Style Book"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+		await this.page.getByRole( 'button', { name: 'Style Book' } ).click();
 	}
 }

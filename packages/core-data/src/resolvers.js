@@ -7,6 +7,7 @@ import { camelCase } from 'change-case';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -15,6 +16,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import { getSyncProvider } from './sync';
 
 /**
  * Requests authors from the REST API.
@@ -71,51 +73,100 @@ export const getEntityRecord =
 		);
 
 		try {
-			if ( query !== undefined && query._fields ) {
-				// If requesting specific fields, items and query association to said
-				// records are stored by ID reference. Thus, fields must always include
-				// the ID.
-				query = {
-					...query,
-					_fields: [
-						...new Set( [
-							...( getNormalizedCommaSeparable( query._fields ) ||
-								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
-						] ),
-					].join(),
-				};
-			}
+			// Entity supports configs,
+			// use the sync algorithm instead of the old fetch behavior.
+			if (
+				window.__experimentalEnableSync &&
+				entityConfig.syncConfig &&
+				! query
+			) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					const objectId = entityConfig.getSyncObjectId( key );
 
-			// Disable reason: While true that an early return could leave `path`
-			// unused, it's important that path is derived using the query prior to
-			// additional query modifications in the condition below, since those
-			// modifications are relevant to how the data is tracked in state, and not
-			// for how the request is made to the REST API.
+					// Loads the persisted document.
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType,
+						objectId,
+						( record ) => {
+							dispatch.receiveEntityRecords(
+								kind,
+								name,
+								record,
+								query
+							);
+						}
+					);
 
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const path = addQueryArgs(
-				entityConfig.baseURL + ( key ? '/' + key : '' ),
-				{
-					...entityConfig.baseURLParams,
-					...query,
+					// Boostraps the edited document as well (and load from peers).
+					await getSyncProvider().bootstrap(
+						entityConfig.syncObjectType + '--edit',
+						objectId,
+						( record ) => {
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits: record,
+								meta: {
+									undo: undefined,
+								},
+							} );
+						}
+					);
 				}
-			);
-
-			if ( query !== undefined ) {
-				query = { ...query, include: [ key ] };
-
-				// The resolution cache won't consider query as reusable based on the
-				// fields, so it's tested here, prior to initiating the REST request,
-				// and without causing `getEntityRecords` resolution to occur.
-				const hasRecords = select.hasEntityRecords( kind, name, query );
-				if ( hasRecords ) {
-					return;
+			} else {
+				if ( query !== undefined && query._fields ) {
+					// If requesting specific fields, items and query association to said
+					// records are stored by ID reference. Thus, fields must always include
+					// the ID.
+					query = {
+						...query,
+						_fields: [
+							...new Set( [
+								...( getNormalizedCommaSeparable(
+									query._fields
+								) || [] ),
+								entityConfig.key || DEFAULT_ENTITY_KEY,
+							] ),
+						].join(),
+					};
 				}
-			}
 
-			const record = await apiFetch( { path } );
-			dispatch.receiveEntityRecords( kind, name, record, query );
+				// Disable reason: While true that an early return could leave `path`
+				// unused, it's important that path is derived using the query prior to
+				// additional query modifications in the condition below, since those
+				// modifications are relevant to how the data is tracked in state, and not
+				// for how the request is made to the REST API.
+
+				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+				const path = addQueryArgs(
+					entityConfig.baseURL + ( key ? '/' + key : '' ),
+					{
+						...entityConfig.baseURLParams,
+						...query,
+					}
+				);
+
+				if ( query !== undefined ) {
+					query = { ...query, include: [ key ] };
+
+					// The resolution cache won't consider query as reusable based on the
+					// fields, so it's tested here, prior to initiating the REST request,
+					// and without causing `getEntityRecords` resolution to occur.
+					const hasRecords = select.hasEntityRecords(
+						kind,
+						name,
+						query
+					);
+					if ( hasRecords ) {
+						return;
+					}
+				}
+
+				const record = await apiFetch( { path } );
+				dispatch.receiveEntityRecords( kind, name, record, query );
+			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
@@ -178,9 +229,21 @@ export const getEntityRecords =
 				...query,
 			} );
 
-			let records = Object.values( await apiFetch( { path } ) );
+			let records, meta;
+			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
+				const response = await apiFetch( { path, parse: false } );
+				records = Object.values( await response.json() );
+				meta = {
+					totalItems: parseInt(
+						response.headers.get( 'X-WP-Total' )
+					),
+				};
+			} else {
+				records = Object.values( await apiFetch( { path } ) );
+			}
+
 			// If we request fields but the result doesn't contain the fields,
-			// explicitely set these fields as "undefined"
+			// explicitly set these fields as "undefined"
 			// that way we consider the query "fullfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
@@ -194,7 +257,15 @@ export const getEntityRecords =
 				} );
 			}
 
-			dispatch.receiveEntityRecords( kind, name, records, query );
+			dispatch.receiveEntityRecords(
+				kind,
+				name,
+				records,
+				query,
+				false,
+				undefined,
+				meta
+			);
 
 			// When requesting all fields, the list of results can be used to
 			// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
@@ -409,15 +480,15 @@ export const getAutosave =
 export const __experimentalGetTemplateForLink =
 	( link ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		// Ideally this should be using an apiFetch call
-		// We could potentially do so by adding a "filter" to the `wp_template` end point.
-		// Also it seems the returned object is not a regular REST API post type.
 		let template;
 		try {
-			template = await window
-				.fetch( addQueryArgs( link, { '_wp-find-template': true } ) )
-				.then( ( res ) => res.json() )
-				.then( ( { data } ) => data );
+			// This is NOT calling a REST endpoint but rather ends up with a response from
+			// an Ajax function which has a different shape from a WP_REST_Response.
+			template = await apiFetch( {
+				url: addQueryArgs( link, {
+					'_wp-find-template': true,
+				} ),
+			} ).then( ( { data } ) => data );
 		} catch ( e ) {
 			// For non-FSE themes, it is possible that this request returns an error.
 		}
@@ -500,6 +571,51 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		);
 	};
 
+/**
+ * Fetches and returns the revisions of the current global styles theme.
+ */
+export const getCurrentThemeGlobalStylesRevisions =
+	() =>
+	async ( { resolveSelect, dispatch } ) => {
+		const globalStylesId =
+			await resolveSelect.__experimentalGetCurrentGlobalStylesId();
+		const record = globalStylesId
+			? await resolveSelect.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+			  )
+			: undefined;
+		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+
+		if ( revisionsURL ) {
+			const resetRevisions = await apiFetch( {
+				url: revisionsURL,
+			} );
+			const revisions = resetRevisions?.map( ( revision ) =>
+				Object.fromEntries(
+					Object.entries( revision ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
+			);
+			dispatch.receiveThemeGlobalStyleRevisions(
+				globalStylesId,
+				revisions
+			);
+		}
+	};
+
+getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
+	return (
+		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+		action.kind === 'root' &&
+		! action.error &&
+		action.name === 'globalStyles'
+	);
+};
+
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
@@ -524,4 +640,81 @@ export const getBlockPatternCategories =
 			path: '/wp/v2/block-patterns/categories',
 		} );
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
+	};
+
+export const getUserPatternCategories =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const patternCategories = await resolveSelect.getEntityRecords(
+			'taxonomy',
+			'wp_pattern_category',
+			{
+				per_page: -1,
+				_fields: 'id,name,description,slug',
+				context: 'view',
+			}
+		);
+
+		const mappedPatternCategories =
+			patternCategories?.map( ( userCategory ) => ( {
+				...userCategory,
+				label: decodeEntities( userCategory.name ),
+				name: userCategory.slug,
+			} ) ) || [];
+
+		dispatch( {
+			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
+			patternCategories: mappedPatternCategories,
+		} );
+	};
+
+export const getNavigationFallbackId =
+	() =>
+	async ( { dispatch, select } ) => {
+		const fallback = await apiFetch( {
+			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
+				_embed: true,
+			} ),
+		} );
+
+		const record = fallback?._embedded?.self;
+
+		dispatch.receiveNavigationFallbackId( fallback?.id );
+
+		if ( record ) {
+			// If the fallback is already in the store, don't invalidate navigation queries.
+			// Otherwise, invalidate the cache for the scenario where there were no Navigation
+			// posts in the state and the fallback created one.
+			const existingFallbackEntityRecord = select.getEntityRecord(
+				'postType',
+				'wp_navigation',
+				fallback?.id
+			);
+			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
+			dispatch.receiveEntityRecords(
+				'postType',
+				'wp_navigation',
+				record,
+				undefined,
+				invalidateNavigationQueries
+			);
+
+			// Resolve to avoid further network requests.
+			dispatch.finishResolution( 'getEntityRecord', [
+				'postType',
+				'wp_navigation',
+				fallback?.id,
+			] );
+		}
+	};
+
+export const getDefaultTemplateId =
+	( query ) =>
+	async ( { dispatch } ) => {
+		const template = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
+		} );
+		if ( template ) {
+			dispatch.receiveDefaultTemplateId( query, template.id );
+		}
 	};

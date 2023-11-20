@@ -37,6 +37,7 @@ export default function PostDateEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),
 	} );
 
@@ -175,6 +176,9 @@ export default function PostDateEdit( {
 							} )
 						}
 						checked={ displayType === 'modified' }
+						help={ __(
+							'Only shows if the post has been modified'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

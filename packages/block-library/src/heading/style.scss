@@ -7,4 +7,8 @@ h6 {
 	&.has-background {
 		padding: $block-bg-padding--v $block-bg-padding--h;
 	}
+	&.has-text-align-right[style*="writing-mode"]:where([style*="vertical-rl"]),
+	&.has-text-align-left[style*="writing-mode"]:where([style*="vertical-lr"]) {
+		rotate: 180deg;
+	}
 }

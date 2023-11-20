@@ -29,7 +29,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const EMPTY_OBJECT = {};
 
@@ -45,6 +45,9 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		template,
@@ -62,6 +65,9 @@ function UncontrolledInnerBlocks( props ) {
 	useNestedSettingsUpdate(
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		templateLock,
@@ -86,11 +92,13 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const defaultLayoutBlockSupport =
-		getBlockSupport( name, '__experimentalLayout' ) || EMPTY_OBJECT;
+		getBlockSupport( name, 'layout' ) ||
+		getBlockSupport( name, '__experimentalLayout' ) ||
+		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 
-	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
+	const [ defaultLayout ] = useSettings( 'layout' );
 
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
@@ -114,7 +122,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ memoedLayout }
+				layout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>
@@ -161,8 +169,11 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
-		options;
+	const {
+		__unstableDisableLayoutClassNames,
+		__unstableDisableDropZone,
+		__unstableDropZoneElement,
+	} = options;
 	const {
 		clientId,
 		layout = null,
@@ -203,6 +214,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {
+		dropZoneElement: __unstableDropZoneElement,
 		rootClientId: clientId,
 	} );
 

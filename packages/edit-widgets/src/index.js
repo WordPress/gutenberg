@@ -70,7 +70,7 @@ export function initializeEditor( id, settings ) {
 		themeStyles: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
@@ -112,7 +112,6 @@ export function reinitializeEditor() {
  * Function to register an individual block.
  *
  * @param {Object} block The block to be registered.
- *
  */
 const registerBlock = ( block ) => {
 	if ( ! block ) {
@@ -124,3 +123,5 @@ const registerBlock = ( block ) => {
 	}
 	registerBlockType( name, settings );
 };
+
+export { store } from './store';

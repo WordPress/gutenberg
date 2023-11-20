@@ -3,8 +3,8 @@
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 
-/** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
-/** @typedef {import('../create').RichTextValue} RichTextValue */
+/** @typedef {import('../register-format-type').WPFormat} WPFormat */
+/** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**
  * Given a range and a format tag name and class name, returns the closest
@@ -20,8 +20,21 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 function getFormatElement( range, editableContentElement, tagName, className ) {
 	let element = range.startContainer;
 
-	// If the caret is right before the element, select the next element.
-	element = element.nextElementSibling || element;
+	// Even if the active format is defined, the actualy DOM range's start
+	// container may be outside of the format's DOM element:
+	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
+	// So at a given selection index, start with the deepest format DOM element.
+	if (
+		element.nodeType === element.TEXT_NODE &&
+		range.startOffset === element.length &&
+		element.nextSibling
+	) {
+		element = element.nextSibling;
+
+		while ( element.firstChild ) {
+			element = element.firstChild;
+		}
+	}
 
 	if ( element.nodeType !== element.ELEMENT_NODE ) {
 		element = element.parentElement;
@@ -50,8 +63,8 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 
 /**
  * @typedef {Object} VirtualAnchorElement
- * @property {Function} getBoundingClientRect A function returning a DOMRect
- * @property {Document} ownerDocument         The element's ownerDocument
+ * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
+ * @property {HTMLElement}   contextElement        The actual DOM element
  */
 
 /**
@@ -64,7 +77,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
  */
 function createVirtualAnchorElement( range, editableContentElement ) {
 	return {
-		ownerDocument: range.startContainer.ownerDocument,
+		contextElement: editableContentElement,
 		getBoundingClientRect() {
 			return editableContentElement.contains( range.startContainer )
 				? range.getBoundingClientRect()
@@ -117,10 +130,10 @@ function getAnchor( editableContentElement, tagName, className ) {
  * no format is active. The returned value is meant to be used for positioning
  * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
  *
- * @param {Object}             $1                        Named parameters.
- * @param {HTMLElement|null}   $1.editableContentElement The element containing
- *                                                       the editable content.
- * @param {RichTextFormatType} $1.settings               The format type's settings.
+ * @param {Object}           $1                        Named parameters.
+ * @param {HTMLElement|null} $1.editableContentElement The element containing
+ *                                                     the editable content.
+ * @param {WPFormat=}        $1.settings               The format type's settings.
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
@@ -155,7 +168,12 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		editableContentElement.addEventListener( 'focusin', attach );
 		editableContentElement.addEventListener( 'focusout', detach );
 
-		return detach;
+		return () => {
+			detach();
+
+			editableContentElement.removeEventListener( 'focusin', attach );
+			editableContentElement.removeEventListener( 'focusout', detach );
+		};
 	}, [ editableContentElement, tagName, className ] );
 
 	return anchor;

@@ -472,14 +472,6 @@ _Parameters_
 
 -   _searchTerm_ `string`: The term by which to find the pattern to insert.
 
-### insertReusableBlock
-
-Inserts a reusable block matching a given search term via the global inserter.
-
-_Parameters_
-
--   _searchTerm_ `string`: The term by which to find the reusable block to insert.
-
 ### installPlugin
 
 Installs a plugin from the WP.org repository.

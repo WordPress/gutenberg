@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	useThrottle,
@@ -127,7 +127,8 @@ export function getDropTargetPosition(
 
 /**
  * @typedef  {Object} WPBlockDropZoneConfig
- * @property {string} rootClientId The root client id for the block list.
+ * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
+ * @property {string}       rootClientId    The root client id for the block list.
  */
 
 /**
@@ -136,12 +137,14 @@ export function getDropTargetPosition(
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  */
 export default function useBlockDropZone( {
+	dropZoneElement,
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
 	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 } = {} ) {
+	const registry = useRegistry();
 	const [ dropTarget, setDropTarget ] = useState( {
 		index: null,
 		operation: 'insert',
@@ -150,15 +153,13 @@ export default function useBlockDropZone( {
 	const isDisabled = useSelect(
 		( select ) => {
 			const {
-				getTemplateLock,
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
-			const templateLock = getTemplateLock( targetRootClientId );
+			const blockEditingMode = getBlockEditingMode( targetRootClientId );
 			return (
-				[ 'all', 'contentOnly' ].some(
-					( lock ) => lock === templateLock
-				) ||
+				blockEditingMode !== 'default' ||
 				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
 				__unstableIsWithinBlockOverlay( targetRootClientId )
 			);
@@ -181,9 +182,14 @@ export default function useBlockDropZone( {
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
 				if ( blocks.length === 0 ) {
-					setDropTarget( {
-						index: 0,
-						operation: 'insert',
+					registry.batch( () => {
+						setDropTarget( {
+							index: 0,
+							operation: 'insert',
+						} );
+						showInsertionPoint( targetRootClientId, 0, {
+							operation: 'insert',
+						} );
 					} );
 					return;
 				}
@@ -208,20 +214,30 @@ export default function useBlockDropZone( {
 					getBlockListSettings( targetRootClientId )?.orientation
 				);
 
-				setDropTarget( {
-					index: targetIndex,
-					operation,
-				} );
-				showInsertionPoint( targetRootClientId, targetIndex, {
-					operation,
+				registry.batch( () => {
+					setDropTarget( {
+						index: targetIndex,
+						operation,
+					} );
+					showInsertionPoint( targetRootClientId, targetIndex, {
+						operation,
+					} );
 				} );
 			},
-			[ targetRootClientId ]
+			[
+				getBlocks,
+				targetRootClientId,
+				getBlockListSettings,
+				registry,
+				showInsertionPoint,
+				getBlockIndex,
+			]
 		),
 		200
 	);
 
 	return useDropZone( {
+		dropZoneElement,
 		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {

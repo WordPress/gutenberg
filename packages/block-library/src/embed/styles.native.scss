@@ -4,19 +4,28 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-color: $gray-lighten-30;
+	background-color: #e0e0e0; // $light-dim
 	padding-left: 12;
 	padding-right: 12;
 	padding-top: 12;
 	padding-bottom: 12;
-	border-top-left-radius: 4;
-	border-top-right-radius: 4;
-	border-bottom-left-radius: 4;
-	border-bottom-right-radius: 4;
+	border-top-left-radius: 2;
+	border-top-right-radius: 2;
+	border-bottom-left-radius: 2;
+	border-bottom-right-radius: 2;
 }
 
 .embed__container--dark {
-	background-color: $background-dark-secondary;
+	background-color: #1f1f1f; // $dark-dim
+}
+
+.embed__container-selected {
+	border-width: 2px;
+	border-color: $blue-40;
+}
+
+.embed__container-selected--dark {
+	border-color: $blue-50;
 }
 
 .embed__icon--error {
@@ -24,23 +33,38 @@
 	fill: $alert-red;
 }
 
+.embed__placeholder-header {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 4;
+	margin-bottom: 16;
+}
+
+.embed__icon {
+	fill: $light-secondary;
+}
+
+.embed__icon--dark {
+	fill: $dark-tertiary;
+}
+
 .embed__label {
 	text-align: center;
-	margin-top: 4;
-	margin-bottom: 4;
-	font-size: 14;
-	font-weight: 500;
-	color: $gray-90;
+	margin-left: $grid-unit;
+	font-size: 16;
+	font-weight: 400;
+	color: $light-secondary;
 }
 
 .embed__label--dark {
-	color: $gray-10;
+	color: $dark-tertiary;
 }
 
 .embed__description {
 	font-size: $default-font-size;
 	text-align: center;
-	margin-bottom: 4;
+	margin-top: 4;
+	margin-bottom: 16;
 	color: $light-secondary;
 }
 
@@ -53,12 +77,14 @@
 }
 
 .embed__action {
-	width: 100%;
 	text-align: center;
-	color: $blue-wordpress;
-	font-size: 14;
-	font-weight: 500;
-	margin-top: 4;
+	color: $white;
+	font-size: 16;
+	font-weight: 400;
+}
+
+.embed__action--dark {
+	color: $black;
 }
 
 .embed-preview__loading {
@@ -157,4 +183,14 @@
 
 .embed-no-preview__sheet-button--dark {
 	color: $blue-30;
+}
+
+.embed__button {
+	background-color: $light-primary;
+	border-radius: 3px;
+	padding: $grid-unit $grid-unit-20;
+}
+
+.embed__button--dark {
+	background-color: $dark-primary;
 }
