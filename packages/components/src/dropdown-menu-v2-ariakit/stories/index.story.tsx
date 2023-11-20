@@ -4,12 +4,24 @@
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { matchSorter } from 'match-sorter';
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { wordpress } from '@wordpress/icons';
-import { useState, useMemo, useContext } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useContext,
+	// startTransition,
+	forwardRef,
+	useEffect,
+	useId,
+	useDeferredValue,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -500,4 +512,143 @@ InsideModal.parameters = {
 	docs: {
 		source: { type: 'code' },
 	},
+};
+
+// QUESTIONS
+// - when to use select item RENDER as combobox, and when to do the other way around
+// - how to make it work with Menu, MenuItem, checkboxes and radios (including keyboard navigation, submenus)
+// - is it possible to pass items declaratively
+// - does it make sense to keep this as a separate implementation specific to menu?
+
+const people = [ 'Brad', 'Marin', 'Marco', 'Lena', 'Chad', 'Brooke', 'Andrew' ];
+
+interface ComboboxItemProps extends Ariakit.SelectItemProps {
+	children?: React.ReactNode;
+}
+const ComboboxItem = forwardRef< HTMLDivElement, ComboboxItemProps >(
+	function ComboboxItem( props, ref ) {
+		return (
+			// Here we're combining both SelectItem and ComboboxItem into the same
+			// element. SelectItem adds the multi-selectable attributes to the element
+			// (for example, aria-selected).
+			<Ariakit.SelectItem
+				ref={ ref }
+				{ ...props }
+				render={ <Ariakit.ComboboxItem render={ props.render } /> }
+				style={ { display: 'flex' } }
+			>
+				<Ariakit.SelectItemCheck />
+				{ props.children || props.value }
+			</Ariakit.SelectItem>
+		);
+	}
+);
+
+interface ComboboxProps extends Omit< Ariakit.ComboboxProps, 'onChange' > {
+	label?: string;
+	searchValue?: string;
+	onSearchValueChange?: ( value: string ) => void;
+	defaultSearchValue?: string;
+	selectedValues?: string[];
+	onSelectedValuesChange?: ( values: string[] ) => void;
+	defaultSelectedValues?: string[];
+}
+
+const Combobox = forwardRef< HTMLInputElement, ComboboxProps >(
+	function Combobox( props, ref ) {
+		const {
+			label,
+			defaultSearchValue,
+			searchValue,
+			onSearchValueChange,
+			defaultSelectedValues,
+			selectedValues,
+			onSelectedValuesChange,
+			children,
+			...comboboxProps
+		} = props;
+
+		const combobox = Ariakit.useComboboxStore();
+		const select = Ariakit.useSelectStore( { combobox } );
+		const selectValue = select.useState( 'value' );
+
+		// Reset the combobox value whenever an item is checked or unchecked.
+		useEffect( () => combobox.setValue( '' ), [ selectValue, combobox ] );
+
+		const defaultInputId = useId();
+		const inputId = comboboxProps.id || defaultInputId;
+
+		return (
+			<Ariakit.ComboboxProvider
+				store={ combobox }
+				value={ searchValue }
+				setValue={ onSearchValueChange }
+				defaultValue={ defaultSearchValue }
+				resetValueOnHide
+			>
+				<Ariakit.SelectProvider
+					store={ select }
+					value={ selectedValues }
+					setValue={ onSelectedValuesChange }
+					defaultValue={ defaultSelectedValues }
+				>
+					{ label && <label htmlFor={ inputId }>{ label }</label> }
+					<Ariakit.Combobox
+						ref={ ref }
+						id={ inputId }
+						{ ...comboboxProps }
+						className={ comboboxProps.className }
+					/>
+					<Ariakit.ComboboxList
+						className="popover"
+						alwaysVisible
+						render={ <Ariakit.SelectList /> }
+					>
+						{ children }
+					</Ariakit.ComboboxList>
+				</Ariakit.SelectProvider>
+			</Ariakit.ComboboxProvider>
+		);
+	}
+);
+
+export const WithCombobox: StoryFn< typeof DropdownMenu > = ( props ) => {
+	const [ searchValue, setSearchValue ] = useState( '' );
+	const [ values, setValues ] = useState< string[] >( [ 'Marco' ] );
+	const deferredSearchValue = useDeferredValue( searchValue );
+
+	const matches = useMemo( () => {
+		return matchSorter( people, deferredSearchValue, {
+			baseSort: ( a, b ) => ( a.index < b.index ? -1 : 1 ),
+		} );
+	}, [ deferredSearchValue ] );
+
+	return (
+		<DropdownMenu { ...props }>
+			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+			>
+				<Combobox
+					label="Pick an author"
+					placeholder="placeholder"
+					value={ searchValue }
+					onSearchValueChange={ setSearchValue }
+					selectedValues={ values }
+					onSelectedValuesChange={ setValues }
+				>
+					{ matches.map( ( matchValue, i ) => (
+						<ComboboxItem
+							key={ matchValue + i }
+							value={ matchValue }
+						/>
+					) ) }
+					{ ! matches.length && <div>No results found</div> }
+				</Combobox>
+			</DropdownMenu>
+		</DropdownMenu>
+	);
+};
+WithCombobox.args = {
+	...Default.args,
 };
