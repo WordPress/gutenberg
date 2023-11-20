@@ -19,13 +19,10 @@ function gutenberg_get_section_class_name( $block ) {
 		return null;
 	}
 
+	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$theme_json = $tree->get_raw_data();
+
 	// Confirm that a section at the specified index exists.
-
-	// TODO: Improve the logic here to handle when sections are deleted and new
-	// sections created after the fact.
-
-	$tree          = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$theme_json    = $tree->get_raw_data();
 	$section_count = count( $theme_json['styles']['sections'] ?? array() );
 
 	if ( ! $section_count ) {
@@ -79,6 +76,10 @@ function gutenberg_render_section_support( $block_content, $block ) {
 	// hook only applies to blocks with a single wrapper.
 	$tags          = new WP_HTML_Tag_Processor( $block_content );
 	$section_class = gutenberg_get_section_class_name( $block );
+
+	if ( ! $section_class ) {
+		return $block_content;
+	}
 
 	if ( $tags->next_tag() ) {
 		$tags->add_class( $section_class );
