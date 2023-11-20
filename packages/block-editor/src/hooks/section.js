@@ -53,21 +53,44 @@ function addAttribute( settings ) {
 }
 
 /**
- * Determines the section CSS class that should be applied.
+ * Filters registered block settings to extend the block edit wrapper to apply
+ * the section class name.
  *
- * @param {number} section           Index for the block's selected section style.
- * @param {Array}  availableSections The defined section styles.
+ * @param {Object} settings Original block settings.
  *
- * @return {string|undefined} The section CSS class to be applied.
+ * @return {Object} Filtered block settings.
  */
-function getSectionClass( section, availableSections ) {
-	if ( ! section || ! availableSections?.length ) {
-		return;
+function addEditProps( settings ) {
+	if (
+		! hasSectionSupport( settings ) ||
+		! SECTION_SUPPORTED_BLOCKS.includes( settings.name )
+	) {
+		return settings;
 	}
 
-	const sectionIndex = Math.min( section, availableSections.length );
+	const existingGetEditWrapperProps = settings.getEditWrapperProps;
+	settings.getEditWrapperProps = ( attributes ) => {
+		let props = {};
 
-	return `wp-section-${ sectionIndex }`;
+		if ( existingGetEditWrapperProps ) {
+			props = existingGetEditWrapperProps( attributes );
+		}
+
+		// A render hook will handle class application on the PHP side
+		if ( attributes.section === undefined ) {
+			return props;
+		}
+
+		// TODO: Handle fallback logic if the current section index isn't available.
+		const sectionClass = `wp-section-${ attributes.section }`;
+		const newClassName = classnames( props.className, sectionClass );
+
+		props.className = newClassName ? newClassName : undefined;
+
+		return props;
+	};
+
+	return settings;
 }
 
 function SectionPanelItem( props ) {
@@ -116,43 +139,40 @@ function SectionPanelItem( props ) {
 	);
 }
 
+function SectionPanel( props ) {
+	const sections = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().__experimentalStyles
+			?.sections;
+	} );
+
+	// TODO: Add theme.json setting to disable section styling.
+
+	if ( ! sections || ! hasSectionSupport( props.name ) ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls group="section">
+			<SectionPanelItem { ...props } sections={ sections } />
+		</InspectorControls>
+	);
+}
+
 const withSectionControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const sections = useSelect( ( select ) => {
-			return select( blockEditorStore ).getSettings().__experimentalStyles
-				?.sections;
-		} );
-
-		// TODO: Add theme.json setting to disable section styling.
-		if (
-			! SECTION_SUPPORTED_BLOCKS.includes( props.name ) ||
-			! hasSectionSupport( props.name ) ||
-			! sections?.length
-		) {
+		if ( ! hasSectionSupport( props.name ) ) {
 			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
 
-		const sectionClass = getSectionClass(
-			props.attributes.section,
-			sections
-		);
-
-		const newClassName =
-			classnames( props.className, {
-				[ sectionClass ]: !! sectionClass,
-			} ) || undefined;
-
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<InspectorControls group="section">
-						<SectionPanelItem { ...props } sections={ sections } />
-					</InspectorControls>
+					<SectionPanel { ...props } />
 				) }
-				<BlockEdit key="edit" { ...props } className={ newClassName } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},
@@ -163,6 +183,12 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/section/addAttribute',
 	addAttribute
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/section/addEditProps',
+	addEditProps
 );
 
 addFilter(
