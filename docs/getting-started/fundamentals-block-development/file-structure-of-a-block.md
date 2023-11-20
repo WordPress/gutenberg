@@ -1,6 +1,6 @@
 # File structure of a block
 
-At its simplest, a block in the WordPress block editor is a JSON object with a specific set of properties that is registered in the system so it can be used.
+At its simplest form, a block it is a [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) call with some parameters passed in JS. To make things easier, a block for the WordPress block editor is usually defined in a JSON object that is registered in the system so it can be used.
 
 The recommended way to register a block is via a plugin. With the `create-block` tool you can quickly scaffold the structure of the files required to create a plugin that registers a block. 
 
@@ -26,12 +26,18 @@ In a standard project you'll place your block files in the `src` folder. By defa
 
 ### `block.json`
 
-This files contains the metadata of the block, and it's required for its registration. Among other things it provides properties to define the files you need to be part of the definition of the block:
-- `editorScript` → `index.js` by default
-- `style` → `style-index.css` (output build for `style.scss`) by default
-- `editorStyle` → `index.css` (output build for `editor.scss`) by default
-- `render` → `render.php` by default
-- `viewScript` → `view.js` by default
+This file contains the metadata of the block, and it's used to simplify the definition and registration of the block. 
+
+Among other data it provides properties to define the paths of the files involved in the block's behaviour, output and style. If there's a build process involved, this `block.json` along with the generated files are placed into a destination folder (usually the `build` folder) so the paths provided target to the bundled versions of these files.
+
+The most relevant properties that can be defined in a `block.json` to set the files involved in the block's behaviour, output or style are:
+- The `editorScript` property, usually set with the path of a bundled `index.js` file (output build from `src/index.js`).
+- The `style` property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.scss`).
+- The `editorStyle` property, usually set with the path of a bundled `index.css` (output build from `src/editor.scss`).
+- The `render` property, usually set with the path of a bundled `render.php` (output copied from `src/render.php`).
+- The `viewScript` property, usually set with the path of a bundled `view.js` (output copied from `src/view.php`).
+
+[![Open Build Output Diagram in excalidraw](https://developer.wordpress.org/files/2023/11/file-structure-build-output.png)](https://excalidraw.com/#json=c22LROgcG4JkD-7SkuE-N,rQW_ViJBq0Yk3qhCgqD6zQ "Open Build Output Diagram in excalidraw")
 
 ### `index.js`
 
@@ -49,6 +55,10 @@ The `save.js` file usually returns the `save` function used in block registratio
 
 The `style.scss` file contains the styles of the block that will be loaded in both the editor and the frontend. In the build process this file is converted into `style-index.css` which is usually defined at `style` property in `block.json`
 
+<div class="callout callout-info">
+    <code>.scss</code> files correspond to files with SASS Syntax. <a href="https://sass-lang.com/">SASS</a> ("Syntactically Awesome Style Sheets") is a preprocessor scripting language for CSS. It is used to enhance the capabilities of CSS by providing features like variables, mixins, nesting, and more. The build process transforms the code from these <code>.scss</code> source files into CSS code in <code>.css</code> files.
+</div>
+
 
 ### `editor.scss`
 
@@ -60,13 +70,11 @@ The `render.php` file (or any other file defined in the `render` property of `bl
 
 ### `view.js`
 
-The `view.js` file (or any other file defined in the `view` property of `block.json`) will be loaded in the front-end when the block is displayed.
+The `view.js` file (or any other file defined in the `viewScript` property of `block.json`) will be loaded in the front-end when the block is displayed.
 
 ### `build` folder
 
 In a standard project, the `build` folder contains the generated files in the build process triggered by the `build` or `start` commands of `wp-scripts`. 
-
-[![Open Build Output Diagram in excalidraw](https://developer.wordpress.org/files/2023/11/file-structure-build-output.png)](https://excalidraw.com/#json=c22LROgcG4JkD-7SkuE-N,rQW_ViJBq0Yk3qhCgqD6zQ "Open Build Output Diagram in excalidraw")
 
 <div class="callout callout-tip">
     You can use <code>webpack-src-dir</code> and <code>output-path</code> option of <code>wp-scripts</code> build commands to <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#automatic-block-json-detection-and-the-source-code-directory">customize the entry and output points</a>
@@ -74,6 +82,7 @@ In a standard project, the `build` folder contains the generated files in the bu
 
 ## Additional resources
 
+- [Metadata in block.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)
 - [`wp-scripts build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build)
 - [`wp-scripts start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start)
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
