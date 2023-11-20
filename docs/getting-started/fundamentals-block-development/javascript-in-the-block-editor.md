@@ -15,7 +15,7 @@ Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation st
 
 Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
 
-[![Build Process Diagram](https://developer.wordpress.org/files/2023/11/build-process.png)](https://excalidraw.com/#json=cA-M1LvbYs5kSAqhCveLw,x2hX6jjcW0zyFEYYZo33kA "Open Build Process Diagram in Excalidraw")
+[![Build Process Diagram](https://developer.wordpress.org/files/2023/11/build-process.png)](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw "Open Build Process Diagram in Excalidraw")
 
 With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts` in production and development mode:
 
