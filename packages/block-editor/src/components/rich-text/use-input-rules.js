@@ -42,7 +42,15 @@ function findSelection( blocks ) {
 	return [];
 }
 
-function convertSpaces( value ) {
+/**
+ * An input rule that replaces two spaces with an en space, and an en space
+ * followed by a space with an em space.
+ *
+ * @param {Object} value Value to replace spaces in.
+ *
+ * @return {Object} Value with spaces replaced.
+ */
+function replacePrecedingSpaces( value ) {
 	if ( ! isCollapsed( value ) ) {
 		return value;
 	}
@@ -142,7 +150,7 @@ export function useInputRules( props ) {
 
 					return accumlator;
 				},
-				preventEventDiscovery( convertSpaces( value ) )
+				preventEventDiscovery( replacePrecedingSpaces( value ) )
 			);
 
 			if ( transformed !== value ) {
