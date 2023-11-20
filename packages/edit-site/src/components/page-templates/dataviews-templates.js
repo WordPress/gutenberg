@@ -31,6 +31,7 @@ import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
+import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
@@ -59,6 +60,7 @@ const DEFAULT_VIEW = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
 	layout: {},
+	filters: [],
 };
 
 function normalizeSearchInput( input = '' ) {
@@ -143,6 +145,20 @@ export default function DataviewsTemplates() {
 			per_page: -1,
 		} );
 
+	const authors = useMemo( () => {
+		if ( ! allTemplates ) {
+			return EMPTY_ARRAY;
+		}
+		const authorsSet = new Set();
+		allTemplates.forEach( ( template ) => {
+			authorsSet.add( template.author_text );
+		} );
+		return Array.from( authorsSet ).map( ( author ) => ( {
+			value: author,
+			label: author,
+		} ) );
+	}, [ allTemplates ] );
+
 	const fields = useMemo(
 		() => [
 			{
@@ -192,9 +208,11 @@ export default function DataviewsTemplates() {
 					return <AuthorField item={ item } />;
 				},
 				enableHiding: false,
+				type: ENUMERATION_TYPE,
+				elements: authors,
 			},
 		],
-		[]
+		[ authors ]
 	);
 
 	const { shownTemplates, paginationInfo } = useMemo( () => {
@@ -218,6 +236,21 @@ export default function DataviewsTemplates() {
 						normalizedSearch
 					)
 				);
+			} );
+		}
+
+		// Handle filters.
+		if ( view.filters.length > 0 ) {
+			view.filters.forEach( ( filter ) => {
+				if (
+					filter.field === 'author' &&
+					filter.operator === OPERATOR_IN &&
+					!! filter.value
+				) {
+					filteredTemplates = filteredTemplates.filter( ( item ) => {
+						return item.author_text === filter.value;
+					} );
+				}
 			} );
 		}
 
