@@ -144,11 +144,11 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Use theme styles' ) }
 							/>
 							<EnableFeature
-								featureName="disableChoosePatternModal"
+								featureName="enableChoosePatternModal"
 								help={ __(
-									'Prevents the choose pattern modal from displaying when adding a new page.'
+									'Enables the choose pattern modal when adding a new page.'
 								) }
-								label={ __( 'Disable choose pattern modal' ) }
+								label={ __( 'Enable choose pattern modal' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature

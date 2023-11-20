@@ -57,7 +57,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
-		disableChoosePatternModal: false,
+		enableChoosePatternModal: true,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,

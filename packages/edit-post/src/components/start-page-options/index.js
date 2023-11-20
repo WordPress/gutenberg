@@ -93,15 +93,15 @@ export default function StartPageOptions() {
 	const shouldEnableModal = useSelect( ( select ) => {
 		const { isCleanNewPost } = select( editorStore );
 		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
-		const disableChoosePatternModal = select( preferencesStore ).get(
+		const enableChoosePatternModal = select( preferencesStore ).get(
 			'core/edit-post',
-			'disableChoosePatternModal'
+			'enableChoosePatternModal'
 		);
 		return (
 			! isEditingTemplate() &&
 			! isFeatureActive( 'welcomeGuide' ) &&
 			isCleanNewPost() &&
-			! disableChoosePatternModal
+			enableChoosePatternModal
 		);
 	}, [] );
 
