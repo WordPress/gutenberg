@@ -20,17 +20,36 @@ Registering a block in the server by calling to `register_block_type` with just 
 
 ## Registering the block in the client
 
-The registration of a block in the client (for the Block Editor), usually takes place in the index.js file (or any other file defined in the `editorScript` property of `block.json`) that act as an entry point for the javascript files required for the block.
+The registration of a block in the client (for the Block Editor), usually takes place in the `index.js` file (or any other file defined in the `editorScript` property of `block.json`) via the [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype).
 
+The `registerBlockType` function takes the following paramenters:
+- a first parameter with the block name or an object with the metadata of the block
+- a second parameter with an object with the setting 
 
-in the main plugin PHP file with the [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function called on the [`init` action](https://developer.wordpress.org/reference/hooks/init/)  
+of the block that can be provided:
+-  with the path to the `block.json` file with the metadata definition for the block
+-  with the path to the folder where the `block.json` file is located
+
+```
+import { registerBlockType } from '@wordpress/blocks';
+import metadata from './block.json';
+
+registerBlockType( metadata.name, {
+	edit() {
+		return <p>Hello World - Block Editor</p>;
+	},
+	save() {
+		return <p>Hello World - Frontend</p>;
+	},
+} );
+```
+
+(see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))
 
 
 <div class="callout callout-info">
 At its simplest form, a block it is a <code>registerBlockType</code> function call with some parameters passed in JS. 
 </div>
-
-You can use the functions documented on this page to register a block with JavaScript only on the client, but the recommended method is to register new block types also with PHP on the server using the `block.json` metadata file. See metadata documentation for complete information
 
 
 ## Additional resources
