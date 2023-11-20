@@ -15,7 +15,7 @@ export type CustomSelectContext =
 
 export type CustomSelectProps = {
 	/**
-	 * The child elements. This should be composed of CustomSelect.Item components.
+	 * The child elements. This should be composed of CustomSelectItem components.
 	 */
 	children: React.ReactNode;
 	/**
@@ -58,5 +58,5 @@ export type CustomSelectItemProps = {
 	 * The value of the select item. This will be used as the children if
 	 * children are left `undefined`.
 	 */
-	value?: string;
+	value: string;
 };
