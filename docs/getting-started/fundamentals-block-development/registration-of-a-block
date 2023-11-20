@@ -1,0 +1,32 @@
+# Registration of a block
+
+A block is registered in both the server and the client using its `block.json` metadata. 
+
+Although technically blocks could be registered only on the client, **registering blocks in both the server and the client is a general recommendation**, as some key features like Dynamic Rendering, Block Hooks, Block style variations or [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) won't work properly without a server registration of the block. 
+
+[![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700482616586.png)](https://excalidraw.com/#json=jnTPR4qeVGZryJWl4L5f9,INSSi_8rCAxCf1cI3Q-sSw "Open Block Registration diagram in excalidraw")
+
+## Registering the block in the server
+
+Registering the block in the server is important, especially when there's a server-side rendering process for the front-end markup.
+
+The registration of a block in the server, usually takes place in the main plugin PHP file with the [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function called on the [`init` action](https://developer.wordpress.org/reference/hooks/init/)  
+
+`register_block_type` takes a first parameter with the metadata of the block that can be provided:
+-  path to the `block.json` file with the metadata definition for the block
+-  path to the folder where the `block.json` file is located
+
+Registering a block in the server by calling to `register_block_type` with just this first argument is enough in most of the cases.
+
+## Registering the block in the client
+
+
+
+You can use the functions documented on this page to register a block with JavaScript only on the client, but the recommended method is to register new block types also with PHP on the server using the `block.json` metadata file. See metadata documentation for complete information
+
+
+## Additional resources
+
+- [`wp-scripts build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build)
+- [`wp-scripts start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start)
+- [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
