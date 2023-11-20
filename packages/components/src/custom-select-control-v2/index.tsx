@@ -80,7 +80,7 @@ export function CustomSelectItem( {
 			store={ customSelectContext?.store }
 			{ ...props }
 		>
-			{ children }
+			{ children ?? props.value }
 			<Ariakit.SelectItemCheck />
 		</Styled.CustomSelectItem>
 	);
