@@ -6,6 +6,10 @@
 
 -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
 
+### Internal
+
+-   `DropdownMenuV2`: add support for rendering in legacy popover slot ([#56342](https://github.com/WordPress/gutenberg/pull/56342)).
+
 ## 25.12.0 (2023-11-16)
 
 ### Bug Fix
