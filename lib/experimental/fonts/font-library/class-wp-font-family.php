@@ -314,31 +314,8 @@ class WP_Font_Family {
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
 
-		// Ensure slugs are kebab-cased and font families are wrapped in quotes.
-		if ( isset( $sanitized_font['slug'] ) ) {
-			$sanitized_font['slug'] = _wp_to_kebab_case( $sanitized_font['slug'] );
-		}
-
-		if ( isset( $sanitized_font['fontFamily'] ) ) {
-			$font_families         = explode( ',', $sanitized_font['fontFamily'] );
-			$wrapped_font_families = array_map(
-				function ( $font_family ) {
-					$trimmed = trim( $font_family );
-					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
-							return "'" . $trimmed . "'";
-					}
-					return $trimmed;
-				},
-				$font_families
-			);
-
-			if ( count( $wrapped_font_families ) === 1 ) {
-				$sanitized_font['fontFamily'] = $wrapped_font_families[0];
-			} else {
-				$sanitized_font['fontFamily'] = implode( ', ', $wrapped_font_families );
-			}
-		}
-		$this->data = $sanitized_font;
+		$sanitized_font = WP_Font_Family_Utils::format_slug_and_family( $sanitized_font );
+		$this->data     = $sanitized_font;
 		return $this->data;
 	}
 

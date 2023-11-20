@@ -90,4 +90,41 @@ class WP_Font_Family_Utils {
 
 		return in_array( $filetype['type'], $allowed_mime_types, true );
 	}
+
+	/**
+	 * Format font slug and family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $font The font to format.
+	 * @return array The formatted font.
+	 */
+	public static function format_slug_and_family( $font ) {
+		// Ensure slugs are kebab-cased and font families are wrapped in quotes.
+		if ( isset( $font['slug'] ) ) {
+			$font['slug'] = _wp_to_kebab_case( $font['slug'] );
+		}
+
+		if ( isset( $font['fontFamily'] ) ) {
+			$font_families         = explode( ',', $font['fontFamily'] );
+			$wrapped_font_families = array_map(
+				function ( $font_family ) {
+					$trimmed = trim( $font_family );
+					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
+							return "'" . $trimmed . "'";
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$font['fontFamily'] = $wrapped_font_families[0];
+			} else {
+				$font['fontFamily'] = implode( ', ', $wrapped_font_families );
+			}
+		}
+
+		return $font;
+	}
 }
