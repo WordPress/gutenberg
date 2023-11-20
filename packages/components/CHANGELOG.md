@@ -6,6 +6,10 @@
 
 -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
 
+### Internal
+
+-   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
+
 ## 25.12.0 (2023-11-16)
 
 ### Bug Fix
