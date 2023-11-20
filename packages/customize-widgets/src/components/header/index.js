@@ -8,10 +8,7 @@ import classnames from 'classnames';
  */
 import { Popover, ToolbarButton } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	NavigableToolbar,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockToolbar, NavigableToolbar } from '@wordpress/block-editor';
 import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { __, _x, isRTL } from '@wordpress/i18n';
@@ -22,9 +19,6 @@ import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
  */
 import Inserter from '../inserter';
 import MoreMenu from '../more-menu';
-import { unlock } from '../../lock-unlock';
-
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 function Header( {
 	sidebar,
@@ -111,7 +105,7 @@ function Header( {
 			{ isFixedToolbarActive && isLargeViewport && (
 				<>
 					<div className="selected-block-tools-wrapper">
-						<BlockContextualToolbar isFixed />
+						<BlockToolbar isFixed />
 					</div>
 					<Popover.Slot
 						ref={ blockToolbarRef }
