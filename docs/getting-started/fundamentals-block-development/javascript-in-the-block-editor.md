@@ -12,7 +12,10 @@ Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation st
 
 [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package abstracts these libraries away to standardize and simplify development, so you won’t need to handle the details for configuring webpack or babel. Check the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) intro guide.
 
+
 Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
+
+[![Build Process Diagram](https://developer.wordpress.org/files/2023/11/build-process.png)](https://excalidraw.com/#json=cA-M1LvbYs5kSAqhCveLw,x2hX6jjcW0zyFEYYZo33kA "Open Build Process Diagram in Excalidraw")
 
 With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts` in production and development mode:
 
@@ -20,7 +23,7 @@ With the [proper `package.json` scripts](https://developer.wordpress.org/block-e
 - **`npm run start` for "development" mode build**  - This process does not minify the code of the bundled files, provides [source maps files](https://firefox-source-docs.mozilla.org/devtools-user/debugger/how_to/use_a_source_map/index.html) for them, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
 
 <div class="callout callout-tip">
-    You can <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config">provide your own custom <code>webpack.config.js</code></a> to `wp-scripts` to customize the build process to suit your needs 
+    You can <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config">provide your own custom <code>webpack.config.js</code></a> to <code>wp-scripts</code> to customize the build process to suit your needs 
 </div>
 
 ## Javascript without a build process
