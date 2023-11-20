@@ -16,5 +16,8 @@
 	text-align: left;
 	white-space: unset;
 	height: auto;
+
+	// The line height + the padding should be the same as the button size.
 	padding: 10px 12px;
+	line-height: 16px;
 }
