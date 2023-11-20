@@ -27,7 +27,7 @@ export function ViewMedia( { data, fields, view, actions } ) {
 				return (
 					<VStack key={ index }>
 						<div className="dataviews-view-grid__media">
-
+							{ /* featured image for files, images for image */ }
 						</div>
 
 						<HStack justify="space-between" alignment="top">
