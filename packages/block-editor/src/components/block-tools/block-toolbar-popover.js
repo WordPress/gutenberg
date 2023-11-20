@@ -21,7 +21,7 @@ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { useShouldContextualToolbarShow } from '../../utils/use-should-contextual-toolbar-show';
 
-export default function SelectedBlockTools( {
+export default function BlockToolbarPopover( {
 	clientId,
 	showEmptyBlockSideInserter,
 	__unstableContentRef,
