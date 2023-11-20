@@ -16,10 +16,10 @@ import { OPERATOR_IN } from './constants';
 import { unlock } from '../../lock-unlock';
 
 const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuCheckboxItemV2Ariakit: DropdownMenuCheckboxItem,
+	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 export default ( { filter, view, onChangeView } ) => {
@@ -51,7 +51,7 @@ export default ( { filter, view, onChangeView } ) => {
 						key={ element.value }
 						value={ element.value }
 						checked={ activeElement?.value === element.value }
-						onSelect={ () =>
+						onChange={ () =>
 							onChangeView( ( currentView ) => ( {
 								...currentView,
 								page: 1,
