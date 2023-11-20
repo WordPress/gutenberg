@@ -13,48 +13,6 @@ import { COLORS } from '../utils';
 import { space } from '../utils/space';
 import type { CustomSelectProps } from './types';
 
-export const customSelectHeight = (
-	renderSelectedValue: CustomSelectProps[ 'renderSelectedValue' ],
-	size: NonNullable< CustomSelectProps[ 'size' ] >
-) => {
-	const defaultSizes = {
-		default: {
-			height: '40px',
-		},
-		small: {
-			height: '24px',
-			fontSize: '11px',
-			padding: `${ space( 2 ) }`,
-		},
-	};
-
-	const customHeight = {
-		default: {
-			height: 'auto',
-			minHeight: '40px',
-		},
-		small: {
-			height: 'auto',
-			minHeight: '24px',
-		},
-	};
-
-	if ( ! renderSelectedValue ) {
-		return defaultSizes[ size ];
-	}
-
-	return css( customHeight[ size ] );
-};
-
-export const customSelectSizes = ( {
-	renderSelectedValue,
-	size,
-}: Pick< CustomSelectProps, 'renderSelectedValue' > & {
-	size: NonNullable< CustomSelectProps[ 'size' ] >;
-} ) => css`
-	${ customSelectHeight( renderSelectedValue, size ) }
-`;
-
 export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
@@ -63,7 +21,32 @@ export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	margin-bottom: ${ space( 2 ) };
 `;
 
-export const CustomSelectButton = styled( Ariakit.Select )`
+const inputHeights = {
+	default: 40,
+	small: 24,
+};
+
+const getVariableInputStyles = (
+	size: NonNullable< CustomSelectProps[ 'size' ] >,
+	hasCustomRenderProp: boolean
+) => {
+	return css`
+		${ hasCustomRenderProp ? 'min-height' : 'height' }: ${ inputHeights[
+			size
+		] }px;
+		font-size: ${ size === 'small' && ! hasCustomRenderProp
+			? '11px'
+			: '13px' };
+		padding: ${ size === 'small' && ! hasCustomRenderProp
+			? space( 2 )
+			: space( 4 ) };
+	`;
+};
+
+export const CustomSelectButton = styled( Ariakit.Select )< {
+	size: NonNullable< CustomSelectProps[ 'size' ] >;
+	hasCustomRenderProp: boolean;
+} >`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -71,7 +54,6 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 	border: 1px solid ${ COLORS.gray[ 600 ] };
 	border-radius: ${ space( 0.5 ) };
 	cursor: pointer;
-	padding: ${ space( 4 ) };
 	width: 100%;
 	&[data-focus-visible] {
 		outline-style: solid;
@@ -79,6 +61,9 @@ export const CustomSelectButton = styled( Ariakit.Select )`
 	&[aria-expanded='true'] {
 		border: 1.5px solid ${ COLORS.theme.accent };
 	}
+
+	${ ( props ) =>
+		getVariableInputStyles( props.size, props.hasCustomRenderProp ) }
 `;
 
 export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
@@ -86,6 +71,7 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	background: ${ COLORS.white };
 	border: 1px solid ${ COLORS.gray[ 900 ] };
 `;
+
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	display: flex;
 	align-items: center;

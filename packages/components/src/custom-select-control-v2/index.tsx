@@ -6,15 +6,13 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useMemo } from '@wordpress/element';
+import { createContext, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useCx } from '../utils/hooks/use-cx';
 import * as Styled from './styles';
-import { customSelectSizes } from './styles';
 import type {
 	CustomSelectProps,
 	CustomSelectItemProps,
@@ -43,19 +41,16 @@ export function CustomSelect( props: CustomSelectProps ) {
 
 	const { value: currentValue } = store.useState();
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() => cx( customSelectSizes( { renderSelectedValue, size } ) ),
-		[ cx, renderSelectedValue, size ]
-	);
-
 	return (
 		<>
 			<Styled.CustomSelectLabel store={ store }>
 				{ label }
 			</Styled.CustomSelectLabel>
-			<Styled.CustomSelectButton className={ classes } store={ store }>
+			<Styled.CustomSelectButton
+				size={ size }
+				hasCustomRenderProp={ !! renderSelectedValue }
+				store={ store }
+			>
 				{ renderSelectedValue
 					? renderSelectedValue( currentValue )
 					: currentValue ?? __( 'Select an item' ) }
