@@ -101,6 +101,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		$blocks_attributes_allowlist = array(
 			'core/paragraph' => array( 'content' ),
 			'core/image'     => array( 'url' ),
+			'core/list'      => array( 'innerBlocks' ),
 		);
 
 		// Whitelist of the block types that support block connections.
@@ -138,7 +139,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			}
 
 			// If the attribute does not have a source, skip it.
-			if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
+			if ( 'innerBlocks' !== $attribute_name && ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
 				continue;
 			}
 
@@ -153,6 +154,12 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				$attribute_value['value']
 			);
 
+			$block_tag = 'innerBlocks' === $attribute_name ? null : $block_type->attributes[ $attribute_name ]['selector'];
+
+			if ( 'innerBlocks' === $attribute_name ) {
+				$custom_value = do_blocks( $custom_value );
+			}
+
 			if ( false === $custom_value ) {
 				continue;
 			}
@@ -162,7 +169,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				array(
 					// TODO: In the future, when blocks other than Paragraph and Image are
 					// supported, we should build the full query from CSS selector.
-					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
+					'tag_name' => $block_tag,
 				)
 			);
 			if ( ! $found ) {
