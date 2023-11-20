@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function useTitle( title ) {
+export default function useTitle( title, accessibleTitle ) {
 	const location = useLocation();
 	const siteTitle = useSelect(
 		( select ) =>
@@ -47,14 +47,17 @@ export default function useTitle( title ) {
 			document.title = formattedTitle;
 
 			// Announce title on route change for screen readers.
+			if ( ! accessibleTitle ) {
+				return;
+			}
 			speak(
 				sprintf(
 					/* translators: The page title that is currently displaying. */
 					__( 'Now displaying: %s' ),
-					document.title
+					accessibleTitle
 				),
 				'assertive'
 			);
 		}
-	}, [ title, siteTitle, location ] );
+	}, [ title, accessibleTitle, siteTitle, location ] );
 }
