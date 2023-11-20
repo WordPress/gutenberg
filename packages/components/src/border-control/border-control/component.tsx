@@ -65,8 +65,6 @@ const UnconnectedBorderControl = (
 		...otherProps
 	} = useBorderControl( props );
 
-	const inputHeight = __next40pxDefaultSize ? '__unstable-large' : size;
-
 	return (
 		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
@@ -89,7 +87,7 @@ const UnconnectedBorderControl = (
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							size={ inputHeight }
+							size={ size }
 						/>
 					}
 					label={ __( 'Border width' ) }
@@ -100,7 +98,7 @@ const UnconnectedBorderControl = (
 					placeholder={ placeholder }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
-					size={ inputHeight }
+					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl
@@ -115,6 +113,7 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 			</HStack>
