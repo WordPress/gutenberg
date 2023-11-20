@@ -54,10 +54,10 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 				<Button
 					disabled={ filters.length === view.filters?.length }
 					__experimentalIsFocusable
-					icon={ plus }
 					variant="tertiary"
 					size="compact"
 				>
+					<Icon icon={ plus } style={ { flexShrink: 0 } } />
 					{ __( 'Add filter' ) }
 				</Button>
 			}

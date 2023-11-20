@@ -41,7 +41,7 @@ export default ( { filter, view, onChangeView } ) => {
 								activeElement.label
 						  )
 						: filter.name }
-					<Icon icon={ chevronDown } />
+					<Icon icon={ chevronDown } style={ { flexShrink: 0 } } />
 				</Button>
 			}
 		>
