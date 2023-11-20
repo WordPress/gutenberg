@@ -41,7 +41,7 @@ The most relevant properties that can be defined in a `block.json` to set the fi
 
 ### `index.js`
 
-The `index.js` file (or any other file defined in the `editorScript` property of `block.json`) is the entry point file for javascript files and it usually registers the block in the client. In a standard structure it imports the `edit.js` and `save.js` files to get functions required in block registration.
+The `index.js` file (or any other file defined in the `editorScript` property of `block.json`) is the entry point file for javascript that should only get loaded in the editor. It is responsible for calling the `registerBlockType` function to register the block on the client. In a standard structure it imports the `edit.js` and `save.js` files to get functions required in block registration.
 
 ### `edit.js`
 
