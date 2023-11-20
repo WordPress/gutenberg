@@ -27,7 +27,12 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	parse,
+	serializeRawBlock,
+	getSaveContent,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -101,7 +106,14 @@ function applyInitialDynamicContent(
 		if ( ! isPartiallySynced( block ) ) return { ...block, innerBlocks };
 		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
+		let newInnerBlocks;
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
+			if ( attributeKey === 'innerBlocks' && dynamicContent[ id ] ) {
+				let blockString = dynamicContent[ id ].replace( '<ul>', '' );
+				blockString = blockString.replace( '</ul>', '' );
+				newInnerBlocks = parse( blockString );
+				continue;
+			}
 			defaultValues[ id ] = block.attributes[ attributeKey ];
 			if ( dynamicContent[ id ] ) {
 				newAttributes[ attributeKey ] = dynamicContent[ id ];
@@ -110,7 +122,7 @@ function applyInitialDynamicContent(
 		return {
 			...block,
 			attributes: newAttributes,
-			innerBlocks,
+			innerBlocks: newInnerBlocks || innerBlocks,
 		};
 	} );
 }
@@ -125,7 +137,19 @@ function getDynamicContentFromBlocks( blocks, defaultValues ) {
 		);
 		if ( ! isPartiallySynced( block ) ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
+
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
+			if ( attributeKey === 'innerBlocks' ) {
+				const innerBlockContent = getSaveContent(
+					block.name,
+					block.attributes,
+					block.innerBlocks
+				);
+				if ( innerBlockContent !== defaultValues[ id ] ) {
+					dynamicContent[ id ] = innerBlockContent;
+				}
+				continue;
+			}
 			if ( block.attributes[ attributeKey ] !== defaultValues[ id ] ) {
 				dynamicContent[ id ] = block.attributes[ attributeKey ];
 			}
