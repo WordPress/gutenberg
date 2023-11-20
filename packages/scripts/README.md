@@ -48,7 +48,7 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 ## Automatic block.json detection and the source code directory
 
-When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
+When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag and the output directory with the `--output-path` flag.
 
 ## Updating to New Release
 
@@ -106,6 +106,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
 
 #### Advanced information
 
@@ -388,6 +389,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
 
 #### Advanced information
 
