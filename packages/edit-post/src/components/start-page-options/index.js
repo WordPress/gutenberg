@@ -12,11 +12,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { PREFERENCES_MODAL_NAME } from '../preferences-modal';
 
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -97,11 +99,15 @@ export default function StartPageOptions() {
 			'core/edit-post',
 			'enableChoosePatternModal'
 		);
+		const preferencesModalActive = select( interfaceStore ).isModalActive(
+			PREFERENCES_MODAL_NAME
+		);
 		return (
 			! isEditingTemplate() &&
 			! isFeatureActive( 'welcomeGuide' ) &&
 			isCleanNewPost() &&
-			enableChoosePatternModal
+			enableChoosePatternModal &&
+			! preferencesModalActive
 		);
 	}, [] );
 
