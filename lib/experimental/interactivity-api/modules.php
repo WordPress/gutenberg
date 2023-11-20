@@ -14,9 +14,7 @@ function gutenberg_register_interactivity_module() {
 		'@wordpress/interactivity',
 		'/wp-content/plugins/gutenberg/build/interactivity/index.min.js',
 		array(),
-		array(
-			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
-		)
+		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 
 	// TODO: Move this to a local file and replace with a simpler version that

@@ -196,9 +196,7 @@ function register_block_core_search() {
 		'@wordpress/block-library/search-block',
 		'/wp-content/plugins/gutenberg/build/interactivity/search.min.js',
 		array( '@wordpress/interactivity' ),
-		array(
-			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
-		)
+		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 add_action( 'init', 'register_block_core_search' );

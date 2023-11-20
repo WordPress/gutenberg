@@ -90,9 +90,7 @@ function register_block_core_file() {
 		'@wordpress/block-library/file-block',
 		'/wp-content/plugins/gutenberg/build/interactivity/file.min.js',
 		array( '@wordpress/interactivity' ),
-		array(
-			'version' => defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
-		)
+		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 }
 add_action( 'init', 'register_block_core_file' );
