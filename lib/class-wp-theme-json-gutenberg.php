@@ -412,82 +412,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fluid'          => null,
 			'customFontSize' => null,
 			'dropCap'        => null,
-			'fontFamilies'   => array(
-
-				array (
-					'fontFamily' => null,
-					'name' => null,
-					'slug' => null,
-					'fontFace'  => array(
-						array(
-							'ascentOverride'        => null,
-							'descentOverride'       => null,
-							'fontDisplay'           => null,
-							'fontFamily'            => null,
-							'fontFeatureSettings'   => null,
-							'fontStyle'             => null,
-							'fontStretch'           => null,
-							'fontVariationSettings' => null,
-							'fontWeight'            => null,
-							'lineGapOverride'       => null,
-							'sizeAdjust'            => null,
-							'src'                   => null,
-							'unicodeRange'          => null,
-						)
-					)
-				),
-
-				'theme' => array (
-					array (
-						'fontFamily' => null,
-						'name' => null,
-						'slug' => null,
-						'fontFace'  => array(
-							array(
-								'ascentOverride'        => null,
-								'descentOverride'       => null,
-								'fontDisplay'           => null,
-								'fontFamily'            => null,
-								'fontFeatureSettings'   => null,
-								'fontStyle'             => null,
-								'fontStretch'           => null,
-								'fontVariationSettings' => null,
-								'fontWeight'            => null,
-								'lineGapOverride'       => null,
-								'sizeAdjust'            => null,
-								'src'                   => null,
-								'unicodeRange'          => null,
-							)
-						)
-					)
-				),
-
-				'custom' => array (
-					array (
-						'fontFamily' => null,
-						'name' => null,
-						'slug' => null,
-						'fontFace'  => array(
-							array(
-								'ascentOverride'        => null,
-								'descentOverride'       => null,
-								'fontDisplay'           => null,
-								'fontFamily'            => null,
-								'fontFeatureSettings'   => null,
-								'fontStyle'             => null,
-								'fontStretch'           => null,
-								'fontVariationSettings' => null,
-								'fontWeight'            => null,
-								'lineGapOverride'       => null,
-								'sizeAdjust'            => null,
-								'src'                   => null,
-								'unicodeRange'          => null,
-							)
-						)
-					)
-				),
-				
-			),
+			'fontFamilies'   => null,
 			'fontSizes'      => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
@@ -497,6 +422,31 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
+		),
+	);
+
+	const FONT_FAMILY_SCHEMA = array(
+		array(
+			'fontFamily' => null,
+			'name'       => null,
+			'slug'       => null,
+			'fontFace'   => array(
+				array(
+					'ascentOverride'        => null,
+					'descentOverride'       => null,
+					'fontDisplay'           => null,
+					'fontFamily'            => null,
+					'fontFeatureSettings'   => null,
+					'fontStyle'             => null,
+					'fontStretch'           => null,
+					'fontVariationSettings' => null,
+					'fontWeight'            => null,
+					'lineGapOverride'       => null,
+					'sizeAdjust'            => null,
+					'src'                   => null,
+					'unicodeRange'          => null,
+				),
+			),
 		),
 	);
 
@@ -623,6 +573,14 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing'              => 'spacing',
 		'typography'           => 'typography',
 	);
+
+	protected static function schema_by_origins( $schema ) {
+		$schema_by_origins = array( $schema );
+		foreach ( VALID_ORIGINS as $origin ) {
+			$schema_by_origins[ $origin ] = $schema;
+		}
+		return $schema_by_origins;
+	}
 
 	/**
 	 * Returns a class name by an element name.
@@ -865,11 +823,12 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
 		}
 
-		$schema['styles']             = static::VALID_STYLES;
-		$schema['styles']['blocks']   = $schema_styles_blocks;
-		$schema['styles']['elements'] = $schema_styles_elements;
-		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
+		$schema['styles']                                 = static::VALID_STYLES;
+		$schema['styles']['blocks']                       = $schema_styles_blocks;
+		$schema['styles']['elements']                     = $schema_styles_elements;
+		$schema['settings']                               = static::VALID_SETTINGS;
+		$schema['settings']['blocks']                     = $schema_settings_blocks;
+		// $schema['settings']['typography']['fontFamilies'] = static::schema_by_origins( static::FONT_FAMILY_SCHEMA );
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -1040,47 +999,95 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $schema Schema to adhere to.
 	 * @return array The modified $tree.
 	 */
-    protected static function remove_keys_not_in_schema( $tree, $schema ) {
-        if ( ! is_array( $tree ) ) {
-            return $tree;
-        }
+	protected static function remove_keys_not_in_schema( $tree, $schema ) {
+		if ( ! is_array( $tree ) ) {
+			return $tree;
+		}
 
-        foreach ( $tree as $key => $value ) {
-			// Remove keys not in the schema or with null/empty values
-			if ( ! array_key_exists( $key, $schema )  ) {
+		foreach ( $tree as $key => $value ) {
+			// Remove keys not in the schema or with null/empty values.
+			if ( ! array_key_exists( $key, $schema ) ) {
 				unset( $tree[ $key ] );
 				continue;
 			}
 
-            // Check if the value is an array and requires further processing
-            if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
-                // Determine if the schema is for an associative or indexed array
-                $schema_is_assoc = self::is_assoc( $value );
+			// Check if the value is an array and requires further processing.
+			if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+				// Determine if the schema is for an associative or indexed array.
+				$schema_is_assoc = self::is_assoc( $value );
 
-                if ( $schema_is_assoc ) {
-                    // If associative, process as a single object
-                    $tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
-                } else {
-                    // If indexed, process each item in the array
-                    foreach ( $value as $item_key => $item_value ) {
-                        if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
-                            $tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
-                        } else {
-                            // If the schema does not define a further structure, keep the value as is
-                            $tree[ $key ][ $item_key ] = $item_value;
-                        }
-                    }
-                }
-            }
-        }
+				if ( self::is_nested_empty_array( $value ) ) {
+					unset( $tree[ $key ] );
+					continue;
+				}
 
-        return $tree;
-    }
+				if ( $schema_is_assoc ) {
+					// If associative, process as a single object.
+					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+				} else {
+					// If indexed, process each item in the array.
+					foreach ( $value as $item_key => $item_value ) {
+						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
+						} else {
+							// If the schema does not define a further structure, keep the value as is.
+							$tree[ $key ][ $item_key ] = $item_value;
+						}
+					}
+				}
+			}
+		}
 
-    protected static function is_assoc( array $array ) {
-        if ( [] === $array ) return false;
-        return array_keys( $array ) !== range( 0, count( $array ) - 1 );
-    }
+		return $tree;
+	}
+
+	protected static function is_assoc( array $array ) {
+		if ( array() === $array ) {
+			return false;
+		}
+		return array_keys( $array ) !== range( 0, count( $array ) - 1 );
+	}
+
+	protected static function is_nested_empty_array( $array ) {
+		// If the value is null, return false
+		if ( $array === null ) {
+			return false;
+		}
+
+		// If the array is empty, return true.
+		if ( ! is_array( $array ) || empty( $array ) ) {
+			return true;
+		}
+
+		foreach ( $array as $item ) {
+			// Check if each item is an array.
+			if ( is_array( $item ) ) {
+				if ( self::is_nullish_array( $item ) ) {
+					return true;
+				}
+
+				// If a nested array is not empty, return false.
+				if ( ! self::is_nested_empty_array( $item ) ) {
+					return false;
+				}
+			} elseif ( is_null( $item ) || trim( $item ) !== '' || $item === false ) {
+				// If an item is not an array and not an empty string, return false.
+				return false;
+			}
+		}
+
+		// If all nested arrays are empty or only contain empty strings, return true.
+		return true;
+	}
+
+	protected static function is_nullish_array( $array ) {
+		foreach ( $array as $item ) {
+			if ( $item !== null && $item !== '' && $item !== false && $item !== array() ) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Returns the existing settings for each block.
