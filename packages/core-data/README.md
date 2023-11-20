@@ -123,7 +123,7 @@ The package provides general methods to interact with the entities (`getEntityRe
 
 ```js
 // Get the record collection for the user entity.
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 
 // Get a single record for the user entity.
 wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
@@ -138,7 +138,7 @@ In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc
 
 ```js
 // Collection
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 wp.data.select( 'core' ).getUsers();
 
 // Single record
@@ -243,6 +243,24 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 _Parameters_
 
 -   _fallbackId_ `integer`: the id of the fallback Navigation Menu
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveRevisions
+
+Returns an action object used in signalling that revisions have been received.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
@@ -726,6 +744,39 @@ _Parameters_
 _Returns_
 
 -   A value whose reference will change only when an edit occurs.
+
+### getRevision
+
+Returns a single, specific revision of a parent entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+
+_Returns_
+
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+
+### getRevisions
+
+Returns an entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `RevisionRecord[] | null`: Record.
 
 ### getThemeSupports
 

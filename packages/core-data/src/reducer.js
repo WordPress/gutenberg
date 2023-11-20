@@ -245,7 +245,6 @@ function entity( entityConfig ) {
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -355,6 +354,52 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			// Add revisions to the state tree if the post type supports it.
+			...( entityConfig?.supports?.revisions
+				? {
+						revisions: ( state = {}, action ) => {
+							// Use the same queriedDataReducer shape for revisions.
+							if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+								const recordKey = action.recordKey;
+								delete action.recordKey;
+								const newState = queriedDataReducer(
+									state[ recordKey ],
+									{
+										...action,
+										type: 'RECEIVE_ITEMS',
+									}
+								);
+								return {
+									...state,
+									[ recordKey ]: newState,
+								};
+							}
+
+							if ( action.type === 'REMOVE_ITEMS' ) {
+								return Object.fromEntries(
+									Object.entries( state ).filter(
+										( [ id ] ) =>
+											! action.itemIds.some(
+												( itemId ) => {
+													if (
+														Number.isInteger(
+															itemId
+														)
+													) {
+														return itemId === +id;
+													}
+													return itemId === id;
+												}
+											)
+									)
+								);
+							}
+
+							return state;
+						},
+				  }
+				: {} ),
 		} )
 	);
 }

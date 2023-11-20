@@ -19,6 +19,10 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
+// A hardcoded list of post types that support revisions.
+// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
+const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
+
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
@@ -207,6 +211,12 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // Should be different than name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions`,
+		supports: {
+			revisions: true,
+		},
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -295,6 +305,11 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			supports: {
+				revisions: POST_TYPES_WITH_REVISIONS_SUPPORT.includes(
+					postType?.slug
+				),
+			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
@@ -328,6 +343,12 @@ async function loadPostTypeEntities() {
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
 		};
 	} );
 }
