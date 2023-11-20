@@ -10,15 +10,18 @@ import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
-	TabPanel,
 	ColorPalette,
 	GradientPicker,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -26,19 +29,6 @@ const colorsAndGradientKeys = [
 	'gradients',
 	'disableCustomGradients',
 ];
-
-const TAB_COLOR = {
-	name: 'color',
-	title: __( 'Solid' ),
-	value: 'color',
-};
-const TAB_GRADIENT = {
-	name: 'gradient',
-	title: __( 'Gradient' ),
-	value: 'gradient',
-};
-
-const TABS_SETTINGS = [ TAB_COLOR, TAB_GRADIENT ];
 
 function ColorGradientControlInner( {
 	colors,
@@ -69,7 +59,7 @@ function ColorGradientControlInner( {
 	}
 
 	const tabPanels = {
-		[ TAB_COLOR.value ]: (
+		color: (
 			<ColorPalette
 				value={ colorValue }
 				onChange={
@@ -89,7 +79,7 @@ function ColorGradientControlInner( {
 				headingLevel={ headingLevel }
 			/>
 		),
-		[ TAB_GRADIENT.value ]: (
+		gradient: (
 			<GradientPicker
 				__nextHasNoMargin
 				value={ gradientValue }
@@ -137,22 +127,44 @@ function ColorGradientControlInner( {
 						</legend>
 					) }
 					{ canChooseAColor && canChooseAGradient && (
-						<TabPanel
-							className="block-editor-color-gradient-control__tabs"
-							tabs={ TABS_SETTINGS }
-							initialTabName={
-								gradientValue
-									? TAB_GRADIENT.value
-									: !! canChooseAColor && TAB_COLOR.value
-							}
-						>
-							{ ( tab ) => renderPanelType( tab.value ) }
-						</TabPanel>
+						<div className="block-editor-color-gradient-control__tabs">
+							<Tabs
+								initialTabId={
+									gradientValue
+										? 'gradient'
+										: !! canChooseAColor && 'color'
+								}
+							>
+								<Tabs.TabList>
+									<Tabs.Tab id={ 'color' }>
+										{ __( 'Solid' ) }
+									</Tabs.Tab>
+									<Tabs.Tab id={ 'gradient' }>
+										{ __( 'Gradient' ) }
+									</Tabs.Tab>
+								</Tabs.TabList>
+								<Tabs.TabPanel
+									id={ 'color' }
+									className={
+										'block-editor-color-gradient-control__panel'
+									}
+								>
+									{ tabPanels.color }
+								</Tabs.TabPanel>
+								<Tabs.TabPanel
+									id={ 'gradient' }
+									className={
+										'block-editor-color-gradient-control__panel'
+									}
+								>
+									{ tabPanels.gradient }
+								</Tabs.TabPanel>
+							</Tabs>
+						</div>
 					) }
-					{ ! canChooseAGradient &&
-						renderPanelType( TAB_COLOR.value ) }
-					{ ! canChooseAColor &&
-						renderPanelType( TAB_GRADIENT.value ) }
+
+					{ ! canChooseAGradient && renderPanelType( 'color' ) }
+					{ ! canChooseAColor && renderPanelType( 'gradient' ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>
