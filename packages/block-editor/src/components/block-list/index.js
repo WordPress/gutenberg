@@ -17,12 +17,7 @@ import {
 	useMergeRefs,
 	useDebounce,
 } from '@wordpress/compose';
-import {
-	createContext,
-	useState,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
+import { createContext, useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,13 +35,10 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 
-const elementContext = createContext();
-
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
-	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
 		( select ) => {
@@ -115,13 +107,9 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 	return (
-		<elementContext.Provider value={ element }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				<div { ...innerBlocksProps } />
-				{ /* Ensure element and layout styles are always at the end of the document */ }
-				<div ref={ setElement } />
-			</IntersectionObserver.Provider>
-		</elementContext.Provider>
+		<IntersectionObserver.Provider value={ intersectionObserver }>
+			<div { ...innerBlocksProps } />
+		</IntersectionObserver.Provider>
 	);
 }
 
@@ -132,8 +120,6 @@ export default function BlockList( settings ) {
 		</BlockEditContextProvider>
 	);
 }
-
-BlockList.__unstableElementContext = elementContext;
 
 function Items( {
 	placeholder,

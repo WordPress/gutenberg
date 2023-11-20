@@ -121,7 +121,7 @@ function ScreenRevisions() {
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
 				description={ __(
-					'Revisions are added to the timeline when style changes are saved.'
+					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }
 			/>
 			{ isLoading && (

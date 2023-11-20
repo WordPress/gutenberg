@@ -5,8 +5,12 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	SelectControl,
 } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
-export const OPERATOR_IN = 'in';
+/**
+ * Internal dependencies
+ */
+import { OPERATOR_IN } from './constants';
 
 export default ( { filter, view, onChangeView } ) => {
 	const valueFound = view.filters.find(
@@ -23,6 +27,7 @@ export default ( { filter, view, onChangeView } ) => {
 	return (
 		<SelectControl
 			id={ id }
+			__nextHasNoMarginBottom
 			value={ activeValue }
 			prefix={
 				<InputControlPrefixWrapper
@@ -30,7 +35,11 @@ export default ( { filter, view, onChangeView } ) => {
 					htmlFor={ id }
 					className="dataviews__select-control-prefix"
 				>
-					{ filter.name + ':' }
+					{ sprintf(
+						/* translators: filter name. */
+						__( '%s:' ),
+						filter.name
+					) }
 				</InputControlPrefixWrapper>
 			}
 			options={ filter.elements }
@@ -39,13 +48,12 @@ export default ( { filter, view, onChangeView } ) => {
 					( f ) =>
 						f.field !== filter.field || f.operator !== OPERATOR_IN
 				);
-				if ( value !== '' ) {
-					filters.push( {
-						field: filter.field,
-						operator: OPERATOR_IN,
-						value,
-					} );
-				}
+
+				filters.push( {
+					field: filter.field,
+					operator: OPERATOR_IN,
+					value,
+				} );
 
 				onChangeView( ( currentView ) => ( {
 					...currentView,

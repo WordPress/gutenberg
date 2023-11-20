@@ -29,23 +29,25 @@ import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
 import { atSymbol, plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import {
+	applyFormat,
+	getActiveFormat,
+	getActiveFormats,
+	insert,
+	getTextContent,
+	isEmpty,
+	create,
+	toHTMLString,
+	isCollapsed,
+	remove,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
-import { applyFormat } from '../apply-format';
-import { getActiveFormat } from '../get-active-format';
-import { getActiveFormats } from '../get-active-formats';
-import { insert } from '../insert';
-import { getTextContent } from '../get-text-content';
-import { isEmpty } from '../is-empty';
-import { create } from '../create';
-import { toHTMLString } from '../to-html-string';
-import { isCollapsed } from '../is-collapsed';
-import { remove } from '../remove';
-import { getFormatColors } from '../get-format-colors';
+import { getFormatColors } from './get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 

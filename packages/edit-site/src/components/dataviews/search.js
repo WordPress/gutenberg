@@ -31,6 +31,7 @@ export default function Search( { label, view, onChangeView } ) {
 	const searchLabel = label || __( 'Filter list' );
 	return (
 		<SearchControl
+			__nextHasNoMarginBottom
 			onChange={ setSearch }
 			value={ search }
 			label={ searchLabel }
