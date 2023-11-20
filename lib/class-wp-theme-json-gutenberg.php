@@ -574,12 +574,12 @@ class WP_Theme_JSON_Gutenberg {
 		'typography'           => 'typography',
 	);
 
-	protected static function schema_by_origins( $schema ) {
-		$schema_by_origins = array( $schema );
-		foreach ( VALID_ORIGINS as $origin ) {
-			$schema_by_origins[ $origin ] = $schema;
+	protected static function schema_per_origin( $schema ) {
+		$schema_per_origin = $schema;
+		foreach ( static::VALID_ORIGINS as $origin ) {
+			$schema_per_origin[ $origin ] = $schema;
 		}
-		return $schema_by_origins;
+		return $schema_per_origin;
 	}
 
 	/**
@@ -828,7 +828,7 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
-		// $schema['settings']['typography']['fontFamilies'] = static::schema_by_origins( static::FONT_FAMILY_SCHEMA );
+		$schema['settings']['typography']['fontFamilies'] = static::schema_per_origin( static::FONT_FAMILY_SCHEMA );
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
