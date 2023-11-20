@@ -106,6 +106,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
 
 #### Advanced information
 
@@ -388,6 +389,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
 
 #### Advanced information
 
