@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import { insert, isCollapsed, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -43,6 +43,10 @@ function findSelection( blocks ) {
 }
 
 function convertSpaces( value ) {
+	if ( ! isCollapsed( value ) ) {
+		return value;
+	}
+
 	const { text, start } = value;
 	const lastTwoCharacters = text.slice( start - 2, start );
 
