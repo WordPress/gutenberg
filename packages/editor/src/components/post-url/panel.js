@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
-import {
-	__experimentalHStack as HStack,
-	Dropdown,
-	Button,
-} from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import PostURLCheck from './check';
 import PostURL from './index';
 import { usePostURLLabel } from './label';
+import PostPanelRow from '../post-panel-row';
 
 export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
@@ -28,8 +25,7 @@ export default function PostURLPanel() {
 
 	return (
 		<PostURLCheck>
-			<HStack className="editor-post-url__panel" ref={ setPopoverAnchor }>
-				<span>{ __( 'URL' ) }</span>
+			<PostPanelRow label={ __( 'URL' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
 					className="editor-post-url__panel-dropdown"
@@ -42,7 +38,7 @@ export default function PostURLPanel() {
 						<PostURL onClose={ onClose } />
 					) }
 				/>
-			</HStack>
+			</PostPanelRow>
 		</PostURLCheck>
 	);
 }
