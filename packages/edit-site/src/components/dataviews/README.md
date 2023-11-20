@@ -44,8 +44,8 @@ Example:
 	},
 	search: '',
 	filters: [
-		{ field: 'author', operator: 'in', value: 2 },
-		{ field: 'status', operator: 'in', value: 'publish,draft' }
+		{ field: 'author', operator: OPERATOR_IN, value: 2 },
+		{ field: 'status', operator: OPERATOR_IN, value: 'publish,draft' }
 	],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
@@ -83,8 +83,8 @@ function MyCustomPageList() {
 		},
 		search: '',
 		filters: [
-			{ field: 'author', operator: 'in', value: 2 },
-			{ field: 'status', operator: 'in', value: 'publish,draft' }
+			{ field: 'author', operator: OPERATOR_IN, value: 2 },
+			{ field: 'status', operator: OPERATOR_IN, value: 'publish,draft' }
 		],
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
@@ -93,10 +93,10 @@ function MyCustomPageList() {
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
-			if ( filter.field === 'status' && filter.operator === 'in' ) {
+			if ( filter.field === 'status' && filter.operator === OPERATOR_IN ) {
 				filters.status = filter.value;
 			}
-			if ( filter.field === 'author' && filter.operator === 'in' ) {
+			if ( filter.field === 'author' && filter.operator === OPERATOR_IN ) {
 				filters.author = filter.value;
 			}
 		} );
@@ -154,7 +154,7 @@ Example:
 				<a href="...">{ item.author }</a>
 			);
 		},
-		type: 'enumeration',
+		type: ENUMERATION_TYPE,
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }

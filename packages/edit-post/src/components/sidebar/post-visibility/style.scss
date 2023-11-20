@@ -1,14 +1,3 @@
-.edit-post-post-visibility {
-	width: 100%;
-	justify-content: flex-start;
-
-	span {
-		display: block;
-		width: 30%;
-		margin-right: 8px;
-	}
-}
-
 .edit-post-post-visibility__dialog .editor-post-visibility {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
