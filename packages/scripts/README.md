@@ -48,7 +48,7 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 ## Automatic block.json detection and the source code directory
 
-When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
+When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag and the output directory with the `--output-path` flag.
 
 ## Updating to New Release
 
