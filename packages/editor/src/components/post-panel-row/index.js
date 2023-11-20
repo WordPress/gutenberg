@@ -12,9 +12,7 @@ import { forwardRef } from '@wordpress/element';
 const PostPanelRow = forwardRef( ( { className, label, children }, ref ) => {
 	return (
 		<HStack
-			className={ classnames( 'editor-post-panel__row', className, {
-				'has-label': !! label,
-			} ) }
+			className={ classnames( 'editor-post-panel__row', className ) }
 			ref={ ref }
 		>
 			{ label ? (
