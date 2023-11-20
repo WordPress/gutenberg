@@ -22,10 +22,10 @@ function InserterListboxItem(
 		<CompositeItem
 			ref={ ref }
 			role="option"
-			// Use the CompositeItem `focusable` prop over Button's
-			// isFocusable. The latter was shown to cause an issue
-			// with tab order in the inserter list.
-			focusable
+			// Use the CompositeItem `accessibleWhenDisabled` prop
+			// over Button's `isFocusable`. The latter was shown to
+			// cause an issue with tab order in the inserter list.
+			accessibleWhenDisabled
 			{ ...props }
 			render={ ( htmlProps ) => {
 				const propsWithTabIndex = {
