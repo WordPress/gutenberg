@@ -18,7 +18,7 @@ import {
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
 import { store as blockEditorStore } from '../../store';
-import BlockContextualToolbar from './block-contextual-toolbar';
+import BlockToolbar from '../block-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
@@ -180,7 +180,7 @@ export default function BlockTools( {
 				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
 
 				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
-					<BlockContextualToolbar isFixed />
+					<BlockToolbar isFixed />
 				) }
 
 				{ showEmptyBlockSideInserter && (

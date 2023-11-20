@@ -14,7 +14,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import BlockSelectionButton from './block-selection-button';
-import BlockContextualToolbar from './block-contextual-toolbar';
+import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
@@ -101,7 +101,7 @@ export default function BlockToolbarPopover( {
 				{ ...popoverProps }
 			>
 				{ shouldShowContextualToolbar && (
-					<BlockContextualToolbar
+					<BlockToolbar
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
 						focusOnMount={ isToolbarForced.current }

@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
-	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -42,8 +42,6 @@ import {
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
-
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const {
@@ -163,7 +161,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 									}
 								) }
 							>
-								<BlockContextualToolbar isFixed />
+								<BlockToolbar isFixed />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }
