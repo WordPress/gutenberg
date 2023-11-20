@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
@@ -32,38 +33,70 @@ import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
+import NavigableToolbar from '../navigable-toolbar';
+import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-const BlockToolbar = ( { hideDragHandle } ) => {
-	const { blockClientIds, blockType, isValid, isVisual, blockEditingMode } =
-		useSelect( ( select ) => {
-			const {
-				getBlockName,
-				getBlockMode,
-				getSelectedBlockClientIds,
-				isBlockValid,
-				getBlockRootClientId,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const blockRootClientId = getBlockRootClientId(
-				selectedBlockClientId
-			);
-			return {
-				blockClientIds: selectedBlockClientIds,
-				blockType:
-					selectedBlockClientId &&
-					getBlockType( getBlockName( selectedBlockClientId ) ),
-				rootClientId: blockRootClientId,
-				isValid: selectedBlockClientIds.every( ( id ) =>
-					isBlockValid( id )
-				),
-				isVisual: selectedBlockClientIds.every(
-					( id ) => getBlockMode( id ) === 'visual'
-				),
-				blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
-			};
-		}, [] );
+// TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
+const BlockToolbar = ( {
+	hideDragHandle,
+	focusOnMount,
+	isFixed,
+	...props
+} ) => {
+	const {
+		blockClientId,
+		blockClientIds,
+		blockEditingMode,
+		blockType,
+		hasParents,
+		isValid,
+		isVisual,
+		showParentSelector,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockMode,
+			getBlockParents,
+			getSelectedBlockClientIds,
+			isBlockValid,
+			getBlockRootClientId,
+			getBlockEditingMode,
+		} = select( blockEditorStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+		const parents = getBlockParents( selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( firstParentClientId );
+		const parentBlockType = getBlockType( parentBlockName );
+		return {
+			blockClientId: selectedBlockClientId,
+			blockClientIds: selectedBlockClientIds,
+			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
+			blockType:
+				selectedBlockClientId &&
+				getBlockType( getBlockName( selectedBlockClientId ) ),
+
+			hasParents: parents.length,
+			isValid: selectedBlockClientIds.every( ( id ) =>
+				isBlockValid( id )
+			),
+			isVisual: selectedBlockClientIds.every(
+				( id ) => getBlockMode( id ) === 'visual'
+			),
+			rootClientId: blockRootClientId,
+			showParentSelector:
+				parentBlockType &&
+				getBlockEditingMode( firstParentClientId ) === 'default' &&
+				hasBlockSupport(
+					parentBlockType,
+					'__experimentalParentSelector',
+					true
+				) &&
+				selectedBlockClientIds.length <= 1 &&
+				getBlockEditingMode( selectedBlockClientId ) === 'default',
+		};
+	}, [] );
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -76,10 +109,16 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
-	if ( blockType ) {
-		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
-			return null;
-		}
+	const isToolbarEnabled =
+		blockType &&
+		hasBlockSupport( blockType, '__experimentalToolbar', true );
+	const hasAnyBlockControls = useHasAnyBlockControls();
+
+	if (
+		! isToolbarEnabled ||
+		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
+	) {
+		return null;
 	}
 
 	if ( blockClientIds.length === 0 ) {
@@ -91,67 +130,89 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
-	const classes = classnames( 'block-editor-block-toolbar', {
+	// Shifts the toolbar to make room for the parent block selector.
+	const classes = classnames( 'block-editor-block-contextual-toolbar', {
+		'has-parent': hasParents && showParentSelector,
+		'is-fixed': isFixed,
+	} );
+
+	const innerClasses = classnames( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 	} );
 
 	return (
-		<div className={ classes } ref={ toolbarWrapperRef }>
-			{ ! isMultiToolbar &&
-				isLargeViewport &&
-				blockEditingMode === 'default' && <BlockParentSelector /> }
-			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-				blockEditingMode === 'default' && (
-					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
-						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-							<BlockSwitcher clientIds={ blockClientIds } />
-							{ ! isMultiToolbar && (
-								<BlockLockToolbar
-									clientId={ blockClientIds[ 0 ] }
-									wrapperRef={ toolbarWrapperRef }
+		<NavigableToolbar
+			focusOnMount={ focusOnMount }
+			focusEditorOnEscape
+			className={ classes }
+			/* translators: accessibility text for the block toolbar */
+			aria-label={ __( 'Block tools' ) }
+			variant={ isFixed ? 'unstyled' : undefined }
+			// Resets the index whenever the active block changes so
+			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+			key={ blockClientId }
+			{ ...props }
+		>
+			<div ref={ toolbarWrapperRef } className={ innerClasses }>
+				{ ! isMultiToolbar &&
+					isLargeViewport &&
+					blockEditingMode === 'default' && <BlockParentSelector /> }
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
+					blockEditingMode === 'default' && (
+						<div
+							ref={ nodeRef }
+							{ ...showHoveredOrFocusedGestures }
+						>
+							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+								<BlockSwitcher clientIds={ blockClientIds } />
+								{ ! isMultiToolbar && (
+									<BlockLockToolbar
+										clientId={ blockClientIds[ 0 ] }
+										wrapperRef={ toolbarWrapperRef }
+									/>
+								) }
+								<BlockMover
+									clientIds={ blockClientIds }
+									hideDragHandle={ hideDragHandle }
 								/>
-							) }
-							<BlockMover
-								clientIds={ blockClientIds }
-								hideDragHandle={ hideDragHandle }
-							/>
-						</ToolbarGroup>
-					</div>
+							</ToolbarGroup>
+						</div>
+					) }
+				{ shouldShowVisualToolbar && isMultiToolbar && (
+					<BlockGroupToolbar />
 				) }
-			{ shouldShowVisualToolbar && isMultiToolbar && (
-				<BlockGroupToolbar />
-			) }
-			{ shouldShowVisualToolbar && (
-				<>
-					<BlockControls.Slot
-						group="parent"
-						className="block-editor-block-toolbar__slot"
-					/>
-					<BlockControls.Slot
-						group="block"
-						className="block-editor-block-toolbar__slot"
-					/>
-					<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-					<BlockControls.Slot
-						group="inline"
-						className="block-editor-block-toolbar__slot"
-					/>
-					<BlockControls.Slot
-						group="other"
-						className="block-editor-block-toolbar__slot"
-					/>
-					<__unstableBlockNameContext.Provider
-						value={ blockType?.name }
-					>
-						<__unstableBlockToolbarLastItem.Slot />
-					</__unstableBlockNameContext.Provider>
-				</>
-			) }
-			<BlockEditVisuallyButton clientIds={ blockClientIds } />
-			{ blockEditingMode === 'default' && (
-				<BlockSettingsMenu clientIds={ blockClientIds } />
-			) }
-		</div>
+				{ shouldShowVisualToolbar && (
+					<>
+						<BlockControls.Slot
+							group="parent"
+							className="block-editor-block-toolbar__slot"
+						/>
+						<BlockControls.Slot
+							group="block"
+							className="block-editor-block-toolbar__slot"
+						/>
+						<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+						<BlockControls.Slot
+							group="inline"
+							className="block-editor-block-toolbar__slot"
+						/>
+						<BlockControls.Slot
+							group="other"
+							className="block-editor-block-toolbar__slot"
+						/>
+						<__unstableBlockNameContext.Provider
+							value={ blockType?.name }
+						>
+							<__unstableBlockToolbarLastItem.Slot />
+						</__unstableBlockNameContext.Provider>
+					</>
+				) }
+				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				{ blockEditingMode === 'default' && (
+					<BlockSettingsMenu clientIds={ blockClientIds } />
+				) }
+			</div>
+		</NavigableToolbar>
 	);
 };
 
