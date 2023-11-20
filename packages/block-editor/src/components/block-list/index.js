@@ -28,7 +28,7 @@ import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
-import { useInnerBlocksProps } from '../inner-blocks';
+import { usePrivateInnerBlocksProps } from '../inner-blocks';
 import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
@@ -91,7 +91,7 @@ function Root( { className, ...settings } ) {
 			delayedBlockVisibilityUpdates();
 		} );
 	}, [] );
-	const innerBlocksProps = useInnerBlocksProps(
+	const innerBlocksProps = usePrivateInnerBlocksProps(
 		{
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
@@ -113,10 +113,20 @@ function Root( { className, ...settings } ) {
 	);
 }
 
-export default function BlockList( settings ) {
+export function PrivateBlockList( settings ) {
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
 			<Root { ...settings } />
+		</BlockEditContextProvider>
+	);
+}
+
+export default function BlockList( settings ) {
+	// Strip `dropZoneElement` as it is currently a private API.
+	const strippedSettings = { ...settings, dropZoneElement: undefined };
+	return (
+		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
+			<Root { ...strippedSettings } />
 		</BlockEditContextProvider>
 	);
 }

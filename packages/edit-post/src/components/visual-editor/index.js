@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { PostTitle, store as editorStore } from '@wordpress/editor';
 import {
-	BlockList,
 	BlockTools,
 	store as blockEditorStore,
 	__unstableUseTypewriter as useTypewriter,
@@ -36,6 +35,7 @@ const {
 	useLayoutClasses,
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
+	PrivateBlockList: BlockList,
 } = unlock( blockEditorPrivateApis );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
@@ -411,7 +411,7 @@ export default function VisualEditor( { styles } ) {
 										: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								layout={ blockListLayout }
-								__unstableDropZoneElement={
+								dropZoneElement={
 									// When iframed, pass in the html element of the iframe to
 									// ensure the drop zone extends to the edges of the iframe.
 									isToBeIframed

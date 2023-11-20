@@ -8,9 +8,9 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import {
-	BlockList,
 	BlockTools,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 /**
@@ -34,6 +34,8 @@ const LAYOUT = {
 	// At the root level of the site editor, no alignments should be allowed.
 	alignments: [],
 };
+
+const { PrivateBlockList: BlockList } = unlock( blockEditorPrivateApis );
 
 export default function SiteEditorCanvas() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -134,7 +136,7 @@ export default function SiteEditorCanvas() {
 													isTemplateTypeNavigation,
 											}
 										) }
-										__unstableDropZoneElement={
+										dropZoneElement={
 											// Pass in the html element of the iframe to ensure that
 											// the drop zone extends to the very edges of the iframe,
 											// even if the template is shorter than the viewport.

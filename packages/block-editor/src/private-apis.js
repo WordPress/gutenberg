@@ -15,6 +15,7 @@ import { useShouldContextualToolbarShow } from './utils/use-should-contextual-to
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
+import { PrivateBlockList } from './components/block-list';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
@@ -56,4 +57,5 @@ lock( privateApis, {
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
+	PrivateBlockList,
 } );
