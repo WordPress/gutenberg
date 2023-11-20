@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { check, chevronDown } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,9 +15,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { OPERATOR_IN } from './constants';
 import { unlock } from '../../lock-unlock';
 
-const { DropdownMenuV2, DropdownMenuItemV2, DropdownMenuSeparatorV2 } = unlock(
-	componentsPrivateApis
-);
+const {
+	DropdownMenuV2,
+	DropdownMenuItemV2,
+	DropdownMenuCheckboxItemV2,
+	DropdownMenuSeparatorV2,
+} = unlock( componentsPrivateApis );
 
 export default ( { filter, view, onChangeView } ) => {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
@@ -44,13 +47,10 @@ export default ( { filter, view, onChangeView } ) => {
 		>
 			{ filter.elements.map( ( element ) => {
 				return (
-					<DropdownMenuItemV2
+					<DropdownMenuCheckboxItemV2
 						key={ element.value }
-						suffix={
-							activeElement?.value === element.value && (
-								<Icon icon={ check } />
-							)
-						}
+						value={ element.value }
+						checked={ activeElement?.value === element.value }
 						onSelect={ () =>
 							onChangeView( ( currentView ) => ( {
 								...currentView,
@@ -71,10 +71,9 @@ export default ( { filter, view, onChangeView } ) => {
 								],
 							} ) )
 						}
-						role="menuitemcheckbox"
 					>
 						{ element.label }
-					</DropdownMenuItemV2>
+					</DropdownMenuCheckboxItemV2>
 				);
 			} ) }
 			<DropdownMenuSeparatorV2 />
