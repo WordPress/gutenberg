@@ -3,7 +3,7 @@
 The most common way to create a custom block is via a JSON object that is registered in the system so it can be used.
 
 <div class="callout callout-info">
-At its simplest form, a block it is a [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) call with some parameters passed in JS. 
+At its simplest form, a block it is a <code>registerBlockType</code> function call with some parameters passed in JS. 
 </div>
 
 The recommended way to register a block is via a plugin. With the `create-block` tool you can quickly scaffold the structure of the files required to create a plugin that registers a block. 
