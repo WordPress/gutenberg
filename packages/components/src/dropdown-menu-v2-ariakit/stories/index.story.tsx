@@ -28,6 +28,7 @@ import {
 import Icon from '../../icon';
 import Button from '../../button';
 import Modal from '../../modal';
+import Popover from '../../popover';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { ContextSystemProvider } from '../../context';
 
@@ -500,4 +501,69 @@ InsideModal.parameters = {
 	docs: {
 		source: { type: 'code' },
 	},
+};
+
+export const WithDefaultSlotFill: StoryFn< typeof DropdownMenu > = (
+	props
+) => (
+	<SlotFillProvider>
+		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+		<Popover.Slot />
+		<DropdownMenu { ...props }>
+			<DropdownMenuItem>Top level item</DropdownMenuItem>
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
+			>
+				<DropdownMenuItem>Nested item</DropdownMenuItem>
+			</DropdownMenu>
+		</DropdownMenu>
+	</SlotFillProvider>
+);
+WithDefaultSlotFill.args = {
+	...Default.args,
+};
+
+export const WithNamedSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => (
+	<SlotFillProvider>
+		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+		<Popover.Slot name="dropdown-menu-slot-with-name" />
+		<DropdownMenu { ...props }>
+			<DropdownMenuItem>Top level item</DropdownMenuItem>
+			<DropdownMenu
+				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
+			>
+				<DropdownMenuItem>Nested item</DropdownMenuItem>
+			</DropdownMenu>
+		</DropdownMenu>
+	</SlotFillProvider>
+);
+WithNamedSlotFill.args = {
+	...Default.args,
+	slotName: 'dropdown-menu-slot-with-name',
+};
+
+// @ts-expect-error __unstableSlotNameProvider is not currently typed on Popover
+const SlotNameProvider = Popover.__unstableSlotNameProvider;
+export const WithSlotFillViaContext: StoryFn< typeof DropdownMenu > = (
+	props
+) => (
+	<SlotFillProvider>
+		<SlotNameProvider value="dropdown-menu-slot-via-context">
+			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+			<Popover.Slot name="dropdown-menu-slot-via-context" />
+			<DropdownMenu { ...props }>
+				<DropdownMenuItem>Top level item</DropdownMenuItem>
+				<DropdownMenu
+					trigger={
+						<DropdownMenuItem>Open submenu</DropdownMenuItem>
+					}
+				>
+					<DropdownMenuItem>Nested item</DropdownMenuItem>
+				</DropdownMenu>
+			</DropdownMenu>
+		</SlotNameProvider>
+	</SlotFillProvider>
+);
+WithSlotFillViaContext.args = {
+	...Default.args,
 };
