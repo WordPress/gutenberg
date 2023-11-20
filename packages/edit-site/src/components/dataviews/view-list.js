@@ -36,6 +36,7 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import ItemActions from './item-actions';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2,
@@ -52,10 +53,6 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
-
-// TODO: find a place where these constants can be shared across components.
-const ENUMERATION_TYPE = 'enumeration';
-const OPERATOR_IN = 'in';
 
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {

@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { OPERATOR_IN } from '../dataviews/constants';
+
 const DEFAULT_PAGE_BASE = {
 	type: 'list',
 	search: '',
@@ -33,7 +38,7 @@ const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: 'in', value: 'draft' },
+					{ field: 'status', operator: OPERATOR_IN, value: 'draft' },
 				],
 			},
 		},
@@ -44,7 +49,7 @@ const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: 'in', value: 'trash' },
+					{ field: 'status', operator: OPERATOR_IN, value: 'trash' },
 				],
 			},
 		},
