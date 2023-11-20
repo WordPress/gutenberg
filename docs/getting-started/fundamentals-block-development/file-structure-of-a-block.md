@@ -49,7 +49,7 @@ The `edit.js` commonly gets used to contain the React component that gets used i
 
 ### `save.js`
 
-The `save.js` file usually returns the `save` function used in block registration that defines the markup used to save the block in the DB.
+The `save.js` is similar to the `edit.js` file in that it exports a single React component. This component generates the static HTML markup that gets saved to the Database. 
 
 ### `style.scss`
 
