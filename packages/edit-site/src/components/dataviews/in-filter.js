@@ -16,10 +16,10 @@ import { OPERATOR_IN } from './constants';
 import { unlock } from '../../lock-unlock';
 
 const {
-	DropdownMenuV2,
-	DropdownMenuItemV2,
-	DropdownMenuCheckboxItemV2,
-	DropdownMenuSeparatorV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 export default ( { filter, view, onChangeView } ) => {
@@ -29,7 +29,7 @@ export default ( { filter, view, onChangeView } ) => {
 	);
 
 	return (
-		<DropdownMenuV2
+		<DropdownMenu
 			key={ filter.field }
 			trigger={
 				<Button variant="tertiary" size="compact" label={ filter.name }>
@@ -47,7 +47,7 @@ export default ( { filter, view, onChangeView } ) => {
 		>
 			{ filter.elements.map( ( element ) => {
 				return (
-					<DropdownMenuCheckboxItemV2
+					<DropdownMenuCheckboxItem
 						key={ element.value }
 						value={ element.value }
 						checked={ activeElement?.value === element.value }
@@ -73,11 +73,11 @@ export default ( { filter, view, onChangeView } ) => {
 						}
 					>
 						{ element.label }
-					</DropdownMenuCheckboxItemV2>
+					</DropdownMenuCheckboxItem>
 				);
 			} ) }
-			<DropdownMenuSeparatorV2 />
-			<DropdownMenuItemV2
+			<DropdownMenuSeparator />
+			<DropdownMenuItem
 				key="remove-filter"
 				onSelect={ () =>
 					onChangeView( ( currentView ) => ( {
@@ -92,7 +92,7 @@ export default ( { filter, view, onChangeView } ) => {
 				}
 			>
 				{ __( 'Reset' ) }
-			</DropdownMenuItemV2>
-		</DropdownMenuV2>
+			</DropdownMenuItem>
+		</DropdownMenu>
 	);
 };
