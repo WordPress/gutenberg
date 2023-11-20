@@ -26,7 +26,7 @@ In a standard project you'll place your block files in the `src` folder. By defa
 
 ### `block.json`
 
-This file contains the metadata of the block, and it's used to simplify the definition and registration of the block. 
+This file contains the metadata of the block, and it's used to simplify the definition and registration of the block both in the browser and on the server. 
 
 Among other data it provides properties to define the paths of the files involved in the block's behaviour, output and style. If there's a build process involved, this `block.json` along with the generated files are placed into a destination folder (usually the `build` folder) so the paths provided target to the bundled versions of these files.
 
