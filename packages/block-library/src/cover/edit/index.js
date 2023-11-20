@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
@@ -324,6 +324,10 @@ function CoverEdit( {
 		fontSize: hasFontSizes ? 'large' : undefined,
 	} );
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
@@ -335,6 +339,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			__unstableDropZoneElement: dropZoneElement,
 		}
 	);
 
@@ -494,6 +499,7 @@ function CoverEdit( {
 			<TagName
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
+				ref={ setDropZoneElement }
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
