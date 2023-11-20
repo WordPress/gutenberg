@@ -331,6 +331,7 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
 				'@typescript-eslint/await-thenable': 'error',
 				'@typescript-eslint/no-floating-promises': 'error',
 				'@typescript-eslint/no-misused-promises': 'error',

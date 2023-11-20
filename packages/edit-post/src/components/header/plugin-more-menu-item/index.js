@@ -21,14 +21,14 @@ import { withPluginContext } from '@wordpress/plugins';
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
  * }
  *
  * function MyButtonMoreMenuItem() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginMoreMenuItem,
  * 		{
  * 			icon: moreIcon,
@@ -60,7 +60,7 @@ import { withPluginContext } from '@wordpress/plugins';
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {

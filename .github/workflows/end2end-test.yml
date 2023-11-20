@@ -27,7 +27,7 @@ jobs:
                 totalParts: [3]
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -73,7 +73,7 @@ jobs:
                 totalParts: [4]
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -119,7 +119,7 @@ jobs:
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}

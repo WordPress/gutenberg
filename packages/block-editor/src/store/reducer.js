@@ -1949,6 +1949,40 @@ export function styleOverrides( state = new Map(), action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of the registered inserter media categories.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function registeredInserterMediaCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'REGISTER_INSERTER_MEDIA_CATEGORY':
+			return [ ...state, action.category ];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting last focused element
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function lastFocus( state = false, action ) {
+	switch ( action.type ) {
+		case 'LAST_FOCUS':
+			return action.lastFocus;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1965,6 +1999,7 @@ const combinedReducers = combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
 	highlightedBlock,
@@ -1976,6 +2011,7 @@ const combinedReducers = combineReducers( {
 	removalPromptData,
 	blockRemovalRules,
 	openedBlockSettingsMenu,
+	registeredInserterMediaCategories,
 } );
 
 function withAutomaticChangeReset( reducer ) {

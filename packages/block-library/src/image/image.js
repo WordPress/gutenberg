@@ -24,7 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
@@ -82,6 +82,31 @@ const scaleOptions = [
 		help: __( 'Image is contained without distortion.' ),
 	},
 ];
+
+// If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles.
+const ImageWrapper = ( { href, children } ) => {
+	if ( ! href ) {
+		return children;
+	}
+	return (
+		<a
+			href={ href }
+			onClick={ ( event ) => event.preventDefault() }
+			aria-disabled={ true }
+			style={ {
+				// When the Image block is linked,
+				// it's wrapped with a disabled <a /> tag.
+				// Restore cursor style so it doesn't appear 'clickable'
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
+				cursor: 'default',
+				display: 'inline',
+			} }
+		>
+			{ children }
+		</a>
+	);
+};
 
 export default function Image( {
 	temporaryURL,
@@ -369,13 +394,15 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
-	const lightboxSetting = useSetting( 'lightbox' );
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxToggle =
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const lightboxToggleDisabled = linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -541,20 +568,28 @@ export default function Image( {
 					{ showLightboxToggle && (
 						<ToolsPanelItem
 							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on Click' ) }
+							label={ __( 'Expand on click' ) }
 							onDeselect={ () => {
 								setAttributes( { lightbox: undefined } );
 							} }
 							isShownByDefault={ true }
 						>
 							<ToggleControl
-								label={ __( 'Expand on Click' ) }
+								label={ __( 'Expand on click' ) }
 								checked={ lightboxChecked }
 								onChange={ ( newValue ) => {
 									setAttributes( {
 										lightbox: { enabled: newValue },
 									} );
 								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
 							/>
 						</ToolsPanelItem>
 					) }
@@ -638,25 +673,31 @@ export default function Image( {
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				width={ numericWidth }
-				height={ numericHeight }
-				clientWidth={ fallbackClientWidth }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) =>
-					setAttributes( imageAttributes )
-				}
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-				borderProps={ isRounded ? undefined : borderProps }
-			/>
+			<ImageWrapper href={ href }>
+				<ImageEditor
+					id={ id }
+					url={ url }
+					width={ numericWidth }
+					height={ numericHeight }
+					clientWidth={ fallbackClientWidth }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+					onSaveImage={ ( imageAttributes ) =>
+						setAttributes( imageAttributes )
+					}
+					onFinishEditing={ () => {
+						setIsEditingImage( false );
+					} }
+					borderProps={ isRounded ? undefined : borderProps }
+				/>
+			</ImageWrapper>
 		);
 	} else if ( ! isResizable ) {
-		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
+		img = (
+			<div style={ { width, height, aspectRatio } }>
+				<ImageWrapper href={ href }>{ img }</ImageWrapper>
+			</div>
+		);
 	} else {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
 		const customRatio = numericWidth / numericHeight;
@@ -715,7 +756,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -760,7 +800,7 @@ export default function Image( {
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
-				{ img }
+				<ImageWrapper href={ href }>{ img }</ImageWrapper>
 			</ResizableBox>
 		);
 	}

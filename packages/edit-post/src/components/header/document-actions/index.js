@@ -20,21 +20,18 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as editPostStore } from '../../../store';
 
 function DocumentActions() {
-	const { template, isEditing } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } =
-			select( editPostStore );
-		const _isEditing = isEditingTemplate();
+	const { template } = useSelect( ( select ) => {
+		const { getEditedPostTemplate } = select( editPostStore );
 
 		return {
-			template: _isEditing ? getEditedPostTemplate() : null,
-			isEditing: _isEditing,
+			template: getEditedPostTemplate(),
 		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
-	if ( ! isEditing || ! template ) {
+	if ( ! template ) {
 		return null;
 	}
 

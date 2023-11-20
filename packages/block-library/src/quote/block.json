@@ -54,6 +54,12 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true
 		}
 	},
 	"styles": [

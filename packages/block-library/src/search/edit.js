@@ -16,7 +16,7 @@ import {
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -125,8 +125,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const fluidTypographySettings = useSetting( 'typography.fluid' );
-	const layout = useSetting( 'layout' );
+	const [ fluidTypographySettings, layout ] = useSettings(
+		'typography.fluid',
+		'layout'
+	);
 	const typographyProps = useTypographyProps( attributes, {
 		typography: {
 			fluid: fluidTypographySettings,

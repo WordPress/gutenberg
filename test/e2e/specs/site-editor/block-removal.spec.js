@@ -17,7 +17,7 @@ test.describe( 'Site editor block removal prompt', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should appear when attempting to remove Query Block', async ( {

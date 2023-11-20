@@ -19,17 +19,14 @@ import { toTree } from './to-tree';
 /**
  * Create an HTML string from a Rich Text value.
  *
- * @param {Object}        $1                      Named argements.
- * @param {RichTextValue} $1.value                Rich text value.
- * @param {boolean}       [$1.preserveWhiteSpace] Whether or not to use newline
- *                                                characters for line breaks.
+ * @param {Object}        $1       Named argements.
+ * @param {RichTextValue} $1.value Rich text value.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, preserveWhiteSpace } ) {
+export function toHTMLString( { value } ) {
 	const tree = toTree( {
 		value,
-		preserveWhiteSpace,
 		createEmpty,
 		append,
 		getLastChild,

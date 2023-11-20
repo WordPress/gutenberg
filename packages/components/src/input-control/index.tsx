@@ -16,7 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
