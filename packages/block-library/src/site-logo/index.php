@@ -50,8 +50,12 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
+	$classnames = array();
+
 	$border_attributes = block_core_site_logo_get_border_attributes( $attributes );
 	if ( $border_attributes ) {
+		$classnames[] = 'has-custom-border';
+
 		$processor = new WP_HTML_Tag_Processor( $custom_logo );
 		$processor->next_tag( 'img' );
 		if ( ! empty( $border_attributes['class'] ) ) {
@@ -63,7 +67,6 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
-	$classnames = array();
 	if ( empty( $attributes['width'] ) ) {
 		$classnames[] = 'is-default-size';
 	}

@@ -61,6 +61,34 @@ import { MIN_SIZE } from '../image/constants';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
+// If the logo is linked, wrap in an <a /> tag to trigger any inherited link element styles.
+const ImageWrapper = ( { isLink, href, title, classes, children } ) => {
+	if ( ! isLink ) {
+		return children;
+	}
+	return (
+		<a
+			href={ href }
+			className={ classes }
+			title={ title }
+			rel="home"
+			onClick={ ( event ) => event.preventDefault() }
+			aria-disabled={ true }
+			style={ {
+				// When the site logo block is linked,
+				// it's wrapped with a disabled <a /> tag.
+				// Restore cursor style so it doesn't appear 'clickable'
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
+				cursor: 'default',
+				display: 'inline',
+			} }
+		>
+			{ children }
+		</a>
+	);
+};
+
 const SiteLogo = ( {
 	alt,
 	attributes,
@@ -209,27 +237,34 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditor
-				id={ logoId }
-				url={ logoUrl }
-				width={ currentWidth }
-				height={ currentHeight }
-				clientWidth={ clientWidth }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id );
-				} }
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-				borderProps={ borderProps }
-			/>
+			<ImageWrapper
+				isLink={ isLink }
+				href={ siteUrl }
+				title={ title }
+				classes={ classes }
+			>
+				<ImageEditor
+					id={ logoId }
+					url={ logoUrl }
+					width={ currentWidth }
+					height={ currentHeight }
+					clientWidth={ clientWidth }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+					onSaveImage={ ( imageAttributes ) => {
+						setLogo( imageAttributes.id );
+					} }
+					onFinishEditing={ () => {
+						setIsEditingImage( false );
+					} }
+					borderProps={ borderProps }
+				/>
+			</ImageWrapper>
 		) : (
 			<ResizableBox
 				size={ {
 					width: currentWidth,
-					height: 'auto',
+					height: currentHeight,
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
@@ -252,7 +287,14 @@ const SiteLogo = ( {
 					} );
 				} }
 			>
-				{ img }
+				<ImageWrapper
+					isLink={ isLink }
+					href={ siteUrl }
+					title={ title }
+					classes={ classes }
+				>
+					{ img }
+				</ImageWrapper>
 			</ResizableBox>
 		);
 
@@ -340,19 +382,7 @@ const SiteLogo = ( {
 					/>
 				) }
 			</BlockControls>
-			{ isLink ? (
-				<a
-					href={ siteUrl }
-					className={ classes }
-					rel="home"
-					title={ title }
-					{ ...disabledClickProps }
-				>
-					{ imgEdit }
-				</a>
-			) : (
-				imgEdit
-			) }
+			{ imgEdit }
 		</>
 	);
 };
@@ -394,11 +424,6 @@ const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
 			</HStack>
 		</ItemGroup>
 	);
-};
-
-const disabledClickProps = {
-	onClick: ( event ) => event.preventDefault(),
-	'aria-disabled': true,
 };
 
 export default function LogoEdit( {
