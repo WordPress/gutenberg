@@ -6,7 +6,7 @@ import { Keyboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import '@wordpress/interface';
 
 /**
@@ -14,47 +14,34 @@ import '@wordpress/interface';
  */
 import HeaderToolbar from './header-toolbar';
 
-export default class Header extends Component {
-	constructor() {
-		super( ...arguments );
+const Header = () => {
+	const [ isKeyboardVisible, setKeyboardVisible ] = useState( false );
 
-		this.keyboardDidShow = this.keyboardDidShow.bind( this );
-		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+	const keyboardDidShow = () => {
+		setKeyboardVisible( true );
+	};
 
-		this.state = {
-			isKeyboardVisible: false,
-		};
-	}
+	const keyboardDidHide = () => {
+		setKeyboardVisible( false );
+	};
 
-	componentDidMount() {
-		this.keyboardShowSubscription = Keyboard.addListener(
+	useEffect( () => {
+		const keyboardShowSubscription = Keyboard.addListener(
 			'keyboardDidShow',
-			this.keyboardDidShow
+			keyboardDidShow
 		);
-		this.keyboardHideSubscription = Keyboard.addListener(
+		const keyboardHideSubscription = Keyboard.addListener(
 			'keyboardDidHide',
-			this.keyboardDidHide
+			keyboardDidHide
 		);
-	}
 
-	componentWillUnmount() {
-		this.keyboardShowSubscription.remove();
-		this.keyboardHideSubscription.remove();
-	}
+		return () => {
+			keyboardShowSubscription.remove();
+			keyboardHideSubscription.remove();
+		};
+	}, [] );
 
-	keyboardDidShow() {
-		this.setState( { isKeyboardVisible: true } );
-	}
+	return <HeaderToolbar showKeyboardHideButton={ isKeyboardVisible } />;
+};
 
-	keyboardDidHide() {
-		this.setState( { isKeyboardVisible: false } );
-	}
-
-	render() {
-		return (
-			<HeaderToolbar
-				showKeyboardHideButton={ this.state.isKeyboardVisible }
-			/>
-		);
-	}
-}
+export default Header;
