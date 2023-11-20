@@ -76,7 +76,7 @@ When you are ready to deploy your project, use the `npm run build` command. This
 
 After the build finishes, you will see the compiled JavaScript file created at `build/index.js`. 
 
-A `build/index.asset.php` file will also be created in the build process, which contains an array of dependencies and a version number (for cache busting). Please, note that to register a block without this `wp-scripts` build process you'll need to manually create `*.asset.php` dependencies files (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6))
+A `build/index.asset.php` file will also be created in the build process, which contains an array of dependencies and a version number (for cache busting). Please, note that to register a block without this `wp-scripts` build process you'll need to manually create `*.asset.php` dependencies files (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6)).
 
 ### Enqueuing assets
 
