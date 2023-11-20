@@ -64,7 +64,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-					{ __( 'Detach pattern' ) }
+					{ __( 'Detach' ) }
 				</MenuItem>
 			) }
 		</>

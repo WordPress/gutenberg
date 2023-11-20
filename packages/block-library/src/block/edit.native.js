@@ -177,11 +177,11 @@ export default function ReusableBlockEdit( {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'Alternatively, you can detach and edit this block separately by tapping “Detach pattern”.'
+							'Alternatively, you can detach and edit this block separately by tapping “Detach”.'
 						) }
 					</Text>
 					<TextControl
-						label={ __( 'Detach pattern' ) }
+						label={ __( 'Detach' ) }
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }
