@@ -34,8 +34,8 @@ The registration of a block in the client (for the Block Editor), usually takes 
 The `registerBlockType` function takes the following paramenters:
 - A first parameter with the block name (if the block has also been registered on the server) or an object with the metadata of the block
 - A second parameter with an object with settings for the block. The most important properties of this object settings are:
-	- `edit`:  
-	- `save`:  
+	- `edit`: React component that gets used in the editor for our block.
+	- `save`: React component that generates the static HTML markup that gets saved to the Database. 
 
 ```
 import { registerBlockType } from '@wordpress/blocks';
@@ -60,7 +60,7 @@ At its simplest form, a block it is a <code>registerBlockType</code> function ca
 
 ## Additional resources
 
-- [`wp-scripts build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build)
-- [`wp-scripts start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start)
-- [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
+- [`register_block_type` PHP function](https://developer.wordpress.org/reference/functions/register_block_type/)
+- [`registerBlockType` JS function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype)
+- [Reference Guides / Block API Reference / Registration](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/)
 - [Why a block needs to be registered in both the server and the client?](https://github.com/WordPress/gutenberg/discussions/55884) | GitHub Discussion
