@@ -19,6 +19,10 @@ With the [proper `package.json` scripts](https://developer.wordpress.org/block-e
 - **`npm run build` for "production" mode build** - This process [minifies the code](https://developer.mozilla.org/en-US/docs/Glossary/Minification) down so it downloads faster in the browser. 
 - **`npm run start` for "development" mode build**  - This process does not minify the code of the bundled files, provides [source maps files](https://firefox-source-docs.mozilla.org/devtools-user/debugger/how_to/use_a_source_map/index.html) for them, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
 
+<div class="callout callout-tip">
+    You can <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config">provide your own custom <code>webpack.config.js</code></a> to `wp-scripts` to customize the build process to suit your needs 
+</div>
+
 ## Javascript without a build process
 
 For code developments with few requirements (especially those not requiring JSX) using Javascript without a build process may be another good option. 
@@ -32,7 +36,6 @@ So for example if a script wants to register a block variation using the `regist
 <div class="callout callout-tip">
     Try running <code>wp.data.select('core/editor').getBlocks())</code> in your browser's dev tools while editing a post or a site. The entire editor is available from the console.
 </div>
-<br/>
 
 Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) (and [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/)) to enqueue javascript assets for the Editor with access to these packages via `wp` (see [example](https://github.com/wptrainingteam/block-theme-examples/tree/master/example-block-variation)). Refer to [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) for more info.
 
