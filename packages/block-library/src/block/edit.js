@@ -27,13 +27,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	getBlockSupport,
-	parse,
-	serializeRawBlock,
-	getSaveContent,
-	serialize,
-} from '@wordpress/blocks';
+import { getBlockSupport, parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
