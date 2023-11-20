@@ -32,8 +32,8 @@ Among other data it provides properties to define the paths of the files involve
 
 The most relevant properties that can be defined in a `block.json` to set the files involved in the block's behaviour, output or style are:
 - The `editorScript` property, usually set with the path of a bundled `index.js` file (output build from `src/index.js`).
-- The `style` property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.scss`).
-- The `editorStyle` property, usually set with the path of a bundled `index.css` (output build from `src/editor.scss`).
+- The `style` property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.(css|scss|sass)`).
+- The `editorStyle` property, usually set with the path of a bundled `index.css` (output build from `src/editor.(css|scss|sass)`).
 - The `render` property, usually set with the path of a bundled `render.php` (output copied from `src/render.php`).
 - The `viewScript` property, usually set with the path of a bundled `view.js` (output copied from `src/view.php`).
 
@@ -51,18 +51,18 @@ The `edit.js` commonly gets used to contain the React component that gets used i
 
 The `save.js` is similar to the `edit.js` file in that it exports a single React component. This component generates the static HTML markup that gets saved to the Database. 
 
-### `style.scss`
+### `style.(css|scss|sass)`
 
-The `style.scss` file contains the styles of the block that will be loaded in both the editor and the frontend. In the build process this file is converted into `style-index.css` which is usually defined at `style` property in `block.json`
+A `style` file with any of the extensions `.css`, `.scss` or `.sass`, contains the styles of the block that will be loaded in both the editor and the frontend. In the build process this file is converted into `style-index.css` which is usually defined at `style` property in `block.json`
 
 <div class="callout callout-info">
-    <code>.scss</code> files correspond to files with SASS Syntax. <a href="https://sass-lang.com/">SASS</a> ("Syntactically Awesome Style Sheets") is a preprocessor scripting language for CSS. It is used to enhance the capabilities of CSS by providing features like variables, mixins, nesting, and more. The build process transforms the code from these <code>.scss</code> source files into CSS code in <code>.css</code> files.
+    The webpack config used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a herf="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
 </div>
 
 
-### `editor.scss`
+### `editor.(css|scss|sass)`
 
-The `editor.scss` file contains the additional styles applied to the block only in the editor’s context. In the build process this file is converted into `index.css` which is usually defined at `editorStyle` property in `block.json`
+An `editor` file with any of the extensions `.css`, `.scss` or `.sass`, contains the additional styles applied to the block only in the editor’s context. In the build process this file is converted into `index.css` which is usually defined at `editorStyle` property in `block.json`
 
 ### `render.php`
 
