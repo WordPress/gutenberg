@@ -1,6 +1,6 @@
 # File structure of a block
 
-The most common way to create a custom block is via a JSON object that is registered in the system so it can be used.
+The most common way to register a custom block is via a JSON file that contains all of the metadata of the block.
 
 The recommended way to register a block is via a plugin. With the `create-block` tool you can quickly scaffold the structure of the files required to create a plugin that registers a block. 
 
