@@ -35,6 +35,7 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 					page,
 					switchToDraftUtils,
 					pageUtils,
+					editor,
 				} ) => {
 					await pageUtils.setBrowserViewport( viewport );
 
@@ -43,6 +44,8 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 						viewport,
 						postStatus === 'schedule'
 					);
+
+					await editor.openDocumentSettingsSidebar();
 
 					await switchToDraftUtils.switchToDraftButton.click();
 
@@ -100,9 +103,9 @@ class SwitchToDraftUtils {
 		this.#admin = admin;
 		this.#requestUtils = requestUtils;
 
-		this.switchToDraftButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'draft' } );
+		this.switchToDraftButton = page.locator(
+			'role=button[name="Switch to draft"i]'
+		);
 	}
 
 	/**
@@ -136,20 +139,7 @@ class SwitchToDraftUtils {
 			id = page.id;
 		}
 
-		await this.#admin.visitAdminPage(
-			'post.php',
-			`post=${ id }&action=edit`
-		);
-
-		// Disable welcome guide and full screen mode.
-		await this.#page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'fullscreenMode', false );
-		} );
+		await this.#admin.editPost( id );
 	};
 
 	getPostStatus = async () => {

@@ -25,14 +25,14 @@ The block editor handbook is a mix of markdown files in the `/docs/` directory o
 
 An automated job publishes the docs every 15 minutes to the [block editor handbook site](https://developer.wordpress.org/block-editor/).
 
-See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-developer-documentation-to-gutenberg/).
 
 ### Handbook structure
 
 The handbook is organized into four sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
 
 -   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
--   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
+-   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docs/how-to-guides/format-api.md).
 -   **Reference guides** - API documentation, purely functional descriptions,
 -   **Explanations** - longer documentation focused on learning, not a specific task.
 
@@ -50,7 +50,7 @@ To update an existing page:
 2. Create a branch to work, for example `docs/update-contrib-guide`.
 3. Make the necessary changes to the existing document.
 4. Commit your changes.
-5. Create a pull request using "\[Type\] Documentation" label.
+5. Create a pull request using the [\[Type\] Developer Documentation](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Developer%20Documentation) label.
 
 ### Create a new document
 
@@ -103,6 +103,10 @@ Use the full directory and filename from the Gutenberg repository, not the publi
 
 An example, the link to this page is: `/docs/contributors/documentation/README.md`
 
+<div class="callout callout-warning">
+<b>Note:</b> The usual link transformation is not applied to links in callouts. See below. 
+</div>
+
 ### Code examples
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
@@ -132,7 +136,7 @@ The preferred format for code examples is JSX, this should be the default view. 
 
 The Block Editor handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the block editor handbook documentation is published (npm, GitHub).
 
-The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
+The recommended way to implement in markdown is to use the raw HTML and`callout callout-LEVEL` classes. For example:
 
 ```html
 <div class="callout callout-info">This is an **info** callout.</div>
@@ -156,6 +160,14 @@ This is an **alert** callout.
 This is a **warning** callout.
 </div>
 
+<div class="callout callout-warning">
+Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
+The usual link transformation is not applied to links in callouts.
+For instance, to reach the Getting started > Create Block page the URL in GitHub is
+https://developer.wordpress.org/docs/getting-started/create-block/README.md
+and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
+<a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
+</div>
 ### Editor config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.

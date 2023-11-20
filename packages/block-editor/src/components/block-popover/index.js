@@ -142,7 +142,7 @@ function BlockPopover(
 
 				return new window.DOMRect( left, top, width, height );
 			},
-			ownerDocument: selectedElement.ownerDocument,
+			contextElement: selectedElement,
 		};
 	}, [
 		bottomClientId,
@@ -163,7 +163,8 @@ function BlockPopover(
 			anchor={ popoverAnchor }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			placement="top-start"
 			resize={ false }
 			flip={ false }

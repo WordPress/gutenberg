@@ -17,12 +17,7 @@ import {
 	useMergeRefs,
 	useDebounce,
 } from '@wordpress/compose';
-import {
-	createContext,
-	useState,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
+import { createContext, useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,23 +26,19 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
-import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
-import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useInnerBlocksProps } from '../inner-blocks';
 import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
-
-const elementContext = createContext();
+import { useTypingObserver } from '../observe-typing';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
-	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
 		( select ) => {
@@ -105,7 +96,7 @@ function Root( { className, ...settings } ) {
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
-				setElement,
+				useTypingObserver(),
 			] ),
 			className: classnames( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
@@ -116,33 +107,26 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 	return (
-		<elementContext.Provider value={ element }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				<div { ...innerBlocksProps } />
-			</IntersectionObserver.Provider>
-		</elementContext.Provider>
+		<IntersectionObserver.Provider value={ intersectionObserver }>
+			<div { ...innerBlocksProps } />
+		</IntersectionObserver.Provider>
 	);
 }
 
 export default function BlockList( settings ) {
-	usePreParsePatterns();
 	return (
-		<BlockToolsBackCompat>
-			<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
-				<Root { ...settings } />
-			</BlockEditContextProvider>
-		</BlockToolsBackCompat>
+		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
+			<Root { ...settings } />
+		</BlockEditContextProvider>
 	);
 }
-
-BlockList.__unstableElementContext = elementContext;
 
 function Items( {
 	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	__experimentalLayout: layout = defaultLayout,
+	layout = defaultLayout,
 } ) {
 	const { order, selectedBlocks, visibleBlocks } = useSelect(
 		( select ) => {

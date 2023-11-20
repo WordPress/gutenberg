@@ -51,7 +51,9 @@ describe( 'PostSavedState', () => {
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {
@@ -60,16 +62,6 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
-		} ) );
-
-		render( <PostSavedState /> );
-
-		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
-	} );
-
-	it( 'returns a switch to draft link if the post is published', () => {
-		useSelect.mockImplementation( () => ( {
-			isPublished: true,
 		} ) );
 
 		render( <PostSavedState /> );

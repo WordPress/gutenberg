@@ -2,17 +2,24 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import { get } from 'lodash';
 import { Dimensions } from 'react-native';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
  */
 import {
 	getPxFromCssUnit,
-	useSetting,
+	useSettings,
 	useMultipleOriginColorsAndGradients,
+	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { useGlobalStyles } from './index.native';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -191,6 +198,22 @@ export function getBlockTypography(
 	return typographyStyles;
 }
 
+/**
+ * Return a value from a certain path of the object.
+ * Path is specified as an array of properties, like: [ 'parent', 'child' ].
+ *
+ * @param {Object} object Input object.
+ * @param {Array}  path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
 	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
@@ -231,11 +254,11 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 						customValuesData
 					)
 				) {
-					return get( customValuesData, path );
+					return getValueFromObjectPath( customValuesData, path );
 				}
 
 				// Check for camelcase properties.
-				return get( customValuesData, [
+				return getValueFromObjectPath( customValuesData, [
 					...path.slice( 0, path.length - 1 ),
 					camelCase( path[ path.length - 1 ] ),
 				] );
@@ -340,13 +363,17 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 		[]
 	);
 	// Default editor colors/gradients if it's not a block-based theme.
-	const colorPalette =
+	const defaultPaletteSetting =
 		type === 'colors' ? 'color.palette' : 'color.gradients';
-	const editorDefaultPalette = useSetting( colorPalette );
+	const [ defaultPaletteValue ] = useSettings( defaultPaletteSetting );
+	// In edge cases, the default palette might be undefined. To avoid
+	// exceptions across the editor in that case, we explicitly return
+	// the default editor colors.
+	const defaultPalette = defaultPaletteValue ?? SETTINGS_DEFAULTS.colors;
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors
-		: editorDefaultPalette;
+		: defaultPalette;
 }
 
 export function getColorsAndGradients(
@@ -421,3 +448,40 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
+
+/**
+ * Determine and apply appropriate color scheme based on global styles or device's light/dark mode.
+ *
+ * The function first attempts to retrieve the editor's background color from global styles.
+ * If the detected background color is light, light styles are applied, and dark styles otherwise.
+ * If no custom background color is defined, styles are applied using the device's dark/light setting.
+ *
+ * @param {Object} baseStyle - An object representing the base (light theme) styles for the editor.
+ * @param {Object} darkStyle - An object representing the additional styles to apply when the editor is in dark mode.
+ *
+ * @return {Object} - The combined style object that should be applied to the editor.
+ */
+export const useEditorColorScheme = ( baseStyle, darkStyle ) => {
+	const globalStyles = useGlobalStyles();
+
+	const deviceColorScheme = usePreferredColorSchemeStyle(
+		baseStyle,
+		darkStyle
+	);
+
+	const editorColors = globalStyles?.baseColors?.color;
+	const editorBackgroundColor = editorColors?.background;
+
+	const isBackgroundColorDefined =
+		typeof editorBackgroundColor !== 'undefined' &&
+		editorBackgroundColor !== 'undefined';
+
+	if ( isBackgroundColorDefined ) {
+		const isEditorBackgroundDark = colord( editorBackgroundColor ).isDark();
+		return isEditorBackgroundDark
+			? { ...baseStyle, ...darkStyle }
+			: baseStyle;
+	}
+
+	return deviceColorScheme;
+};

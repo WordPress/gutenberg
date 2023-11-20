@@ -472,9 +472,27 @@ Use this setting to enable the following Global Styles settings:
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- dimensions: minHeight
+- position: sticky
 
 ```php
 add_theme_support( 'appearance-tools' );
+```
+
+## Border
+
+Use this to enable all border settings:
+
+```php
+add_theme_support( 'border' );
+```
+
+## Link color
+
+Use this to enable the link color setting:
+
+```php
+add_theme_support( 'link-color' );
 ```
 
 ## Block Based Template Parts

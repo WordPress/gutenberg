@@ -11,9 +11,11 @@ import {
 	editedPost,
 	blockInserterPanel,
 	listViewPanel,
+	hasPageContentFocus,
+	pageContentFocusType,
 } from '../reducer';
 
-import { setIsInserterOpened, setIsListViewOpened } from '../actions';
+import { setIsInserterOpened } from '../actions';
 
 describe( 'state', () => {
 	describe( 'settings()', () => {
@@ -94,13 +96,19 @@ describe( 'state', () => {
 
 		it( 'should close the inserter when opening the list view panel', () => {
 			expect(
-				blockInserterPanel( true, setIsListViewOpened( true ) )
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
 			).toBe( false );
 		} );
 
 		it( 'should not change the state when closing the list view panel', () => {
 			expect(
-				blockInserterPanel( true, setIsListViewOpened( false ) )
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
 			).toBe( true );
 		} );
 	} );
@@ -115,12 +123,18 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set the open state of the list view panel', () => {
-			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
-				true
-			);
-			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
-				false
-			);
+			expect(
+				listViewPanel( false, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
+			).toBe( true );
+			expect(
+				listViewPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
+			).toBe( false );
 		} );
 
 		it( 'should close the list view when opening the inserter panel', () => {
@@ -133,6 +147,66 @@ describe( 'state', () => {
 			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
 				true
 			);
+		} );
+	} );
+
+	describe( 'hasPageContentFocus()', () => {
+		it( 'defaults to false', () => {
+			expect( hasPageContentFocus( undefined, {} ) ).toBe( false );
+		} );
+
+		it( 'becomes false when editing a template', () => {
+			expect(
+				hasPageContentFocus( true, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+				} )
+			).toBe( false );
+		} );
+
+		it( 'becomes true when editing a page', () => {
+			expect(
+				hasPageContentFocus( false, {
+					type: 'SET_EDITED_POST',
+					postType: 'wp_template',
+					context: {
+						postType: 'page',
+						postId: 123,
+					},
+				} )
+			).toBe( true );
+		} );
+
+		it( 'can be set', () => {
+			expect(
+				hasPageContentFocus( false, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: true,
+				} )
+			).toBe( true );
+			expect(
+				hasPageContentFocus( true, {
+					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
+					hasPageContentFocus: false,
+				} )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'pageContentFocusType', () => {
+		it( 'defaults to disableTemplate', () => {
+			expect( pageContentFocusType( undefined, {} ) ).toBe(
+				'disableTemplate'
+			);
+		} );
+
+		it( 'can be set', () => {
+			expect(
+				pageContentFocusType( 'disableTemplate', {
+					type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
+					pageContentFocusType: 'enableTemplate',
+				} )
+			).toBe( 'enableTemplate' );
 		} );
 	} );
 } );

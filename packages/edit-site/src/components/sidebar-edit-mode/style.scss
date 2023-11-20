@@ -99,3 +99,13 @@
 		}
 	}
 }
+
+.edit-site-sidebar-fixed-bottom-slot {
+	position: sticky;
+	bottom: 0;
+	background: $white;
+	display: flex;
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
+	box-sizing: content-box;
+}

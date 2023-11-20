@@ -162,7 +162,7 @@ class VideoEdit extends Component {
 	onSelectURL( url ) {
 		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( url ) ) {
+		if ( isURL( url ) && /^https?:/.test( getProtocol( url ) ) ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url },
@@ -172,7 +172,7 @@ class VideoEdit extends Component {
 				return;
 			}
 
-			setAttributes( { id: url, src: url } );
+			setAttributes( { src: url, id: undefined, poster: undefined } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
@@ -235,7 +235,7 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		if ( ! src ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder

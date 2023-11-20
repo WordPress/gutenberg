@@ -23,6 +23,7 @@ describe( 'useEntityRecord', () => {
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
+		triggerFetch.mockReset();
 	} );
 
 	const TEST_RECORD = { id: 1, hello: 'world' };
@@ -46,6 +47,7 @@ describe( 'useEntityRecord', () => {
 			edit: expect.any( Function ),
 			editedRecord: {},
 			hasEdits: false,
+			edits: {},
 			record: undefined,
 			save: expect.any( Function ),
 			hasResolved: false,
@@ -64,6 +66,7 @@ describe( 'useEntityRecord', () => {
 			edit: expect.any( Function ),
 			editedRecord: { hello: 'world', id: 1 },
 			hasEdits: false,
+			edits: {},
 			record: { hello: 'world', id: 1 },
 			save: expect.any( Function ),
 			hasResolved: true,
@@ -92,6 +95,7 @@ describe( 'useEntityRecord', () => {
 				edit: expect.any( Function ),
 				editedRecord: { hello: 'world', id: 1 },
 				hasEdits: false,
+				edits: {},
 				record: { hello: 'world', id: 1 },
 				save: expect.any( Function ),
 				hasResolved: true,
@@ -108,5 +112,43 @@ describe( 'useEntityRecord', () => {
 
 		expect( widget.record ).toEqual( { hello: 'world', id: 1 } );
 		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
+		expect( widget.edits ).toEqual( { hello: 'foo' } );
+	} );
+
+	it( 'does not resolve entity record when disabled via options', async () => {
+		// Provide response
+		triggerFetch.mockImplementation( () => TEST_RECORD );
+
+		let data;
+		const TestComponent = () => {
+			data = useEntityRecord( 'root', 'widget', 2, {
+				options: { enabled: false },
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( data ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
+			edits: {},
+			record: null,
+			save: expect.any( Function ),
+		} );
+
+		// Fetch request should have been issued.
+		await waitFor( () => {
+			expect( triggerFetch ).not.toHaveBeenCalled();
+		} );
+		await waitFor( () =>
+			expect( triggerFetch ).not.toHaveBeenCalledWith( {
+				path: '/wp/v2/widgets/2?context=edit',
+			} )
+		);
 	} );
 } );

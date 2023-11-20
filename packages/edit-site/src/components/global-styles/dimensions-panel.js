@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,
@@ -26,19 +26,16 @@ const DEFAULT_CONTROLS = {
 	childLayout: false,
 };
 
-export default function DimensionsPanel( { name, variation = '' } ) {
-	let prefixParts = [];
-	if ( variation ) {
-		prefixParts = [ 'variations', variation ].concat( prefixParts );
-	}
-	const prefix = prefixParts.join( '.' );
-
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+export default function DimensionsPanel() {
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
-	const settings = useSettingsForBlockElement( rawSettings, name );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
+		shouldDecodeEncode: false,
+	} );
+	const [ userSettings ] = useGlobalSetting( '', undefined, 'user' );
+	const [ rawSettings, setSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
@@ -52,20 +49,27 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 
 	const onChange = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
-			setSettings( {
-				...rawSettings,
+		if ( newStyle.layout !== userSettings.layout ) {
+			const updatedSettings = {
+				...userSettings,
 				layout: newStyle.layout,
-			} );
+			};
+
+			// Ensure any changes to layout definitions are not persisted.
+			if ( updatedSettings.layout?.definitions ) {
+				delete updatedSettings.layout.definitions;
+			}
+
+			setSettings( updatedSettings );
 		}
 	};
 

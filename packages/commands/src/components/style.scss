@@ -1,10 +1,15 @@
 // dirty hack to clean up modal
 .commands-command-menu {
-	padding: 0;
-	width: 100%;
-	max-width: 680px;
+	border-radius: $grid-unit-05;
+	width: calc(100% - #{$grid-unit-40});
+	margin: auto;
+	max-width: 420px;
 	position: relative;
-	top: 15%;
+	top: calc(15% + #{$header-height});
+
+	@include break-small() {
+		top: 15%;
+	}
 
 	.components-modal__content {
 		margin: 0;
@@ -20,7 +25,7 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
-	margin: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
+	padding-left: $grid-unit-20;
 
 	.components-button {
 		height: $grid-unit-70;
@@ -38,72 +43,46 @@
 }
 
 .commands-command-menu__container {
-	[cmdk-linear-badge] {
-		height: 24px;
-		padding: 0 8px;
-		font-size: 12px;
-		color: $gray-800;
-		background: $gray-300;
-		border-radius: 4px;
-		width: fit-content;
-		display: flex;
-		align-items: center;
-		margin: $grid-unit-20 $grid-unit-20 0;
-	}
-
-	[cmdk-linear-shortcuts] {
-		display: flex;
-		margin-left: auto;
-		gap: $grid-unit-10;
-
-		kbd {
-			color: $gray-800;
-		}
-	}
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
 
 	[cmdk-input] {
-		border: 1px solid $gray-600;
+		border: none;
 		width: 100%;
-		padding: $grid-unit-15 $grid-unit-20;
-		min-height: $grid-unit-70;
+		padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-10;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
-		border-radius: $radius-block-ui;
+		font-size: 16px;
+		line-height: 28px;
+		border-radius: 0;
 
 		&::placeholder {
-			color: $gray-600;
+			color: $gray-700;
 		}
 
 		&:focus {
-			outline: 2px solid transparent;
-			border-color: var(--wp-admin-theme-color);
-			box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+			box-shadow: none;
+			outline: none;
 		}
 	}
 
 	[cmdk-item] {
-		content-visibility: auto;
 		border-radius: $radius-block-ui;
 		cursor: pointer;
-		height: $grid-unit-50;
 		display: flex;
 		align-items: center;
-		gap: $grid-unit-15;
-		padding: 0 $grid-unit-20;
 		color: $gray-900;
-		user-select: none;
-		will-change: background, color;
-		transition: all 150ms ease;
-		transition-property: none;
-		position: relative;
+		font-size: $default-font-size;
+		min-height: $button-size-next-default-40px;
 
-		&[aria-selected="true"] {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-			color: var(--wp-admin-theme-color);
+		&[aria-selected="true"],
+		&:active {
+			background: var(--wp-admin-theme-color);
+			color: $white;
 
 			svg {
-				color: var(--wp-admin-theme-color);
+				fill: $white;
 			}
 		}
 
@@ -112,55 +91,36 @@
 			cursor: not-allowed;
 		}
 
-		&:active {
-			transition-property: background;
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		svg {
+			fill: $gray-900;
 		}
 
-		& + [cmdk-item] {
-			margin-top: $grid-unit-05;
+		> div {
+			padding: $grid-unit;
+			padding-left: $grid-unit-50; // Account for commands without icons.
 		}
 
-		svg,
-		.dashicon {
-			width: $grid-unit-20;
-			height: $grid-unit-20;
-			color: $gray-800;
+		> .has-icon {
+			padding-left: $grid-unit;
 		}
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		min-height: 300px;
-		max-height: 400px;
+		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
-		overscroll-behavior: contain;
-		transition: 100ms ease;
-		transition-property: height;
-		margin: $grid-unit-15;
-	}
 
-	[cmdk-group-heading] {
-		user-select: none;
-		color: $gray-700;
-		padding: $grid-unit-30 $grid-unit-20 $grid-unit-20;
-		display: flex;
-		align-items: center;
-		font-size: 11px;
-		text-transform: uppercase;
-		font-weight: 500;
-		position: sticky;
-		top: 0;
-		background: $white;
-		z-index: 1;
+		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
+			padding: 0 $grid-unit $grid-unit;
+		}
 	}
 
 	[cmdk-empty] {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		height: $grid-unit-80;
 		white-space: pre-wrap;
-		color: $gray-800;
+		color: $gray-900;
+		padding: $grid-unit-10 0 $grid-unit-40;
 	}
 
 	[cmdk-loading] {
@@ -170,6 +130,14 @@
 	[cmdk-list-sizer] {
 		position: relative;
 	}
+}
+
+.commands-command-menu__item span {
+	// Ensure commands do not run off the edge (great for post titles).
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .commands-command-menu__item mark {

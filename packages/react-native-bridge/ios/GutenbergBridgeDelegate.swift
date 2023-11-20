@@ -1,3 +1,5 @@
+import React
+
 public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
@@ -277,6 +279,10 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     /// Tells the delegate the editor requested sending an event
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
+    
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

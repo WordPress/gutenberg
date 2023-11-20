@@ -4,10 +4,12 @@
 import PostTypeSupportCheck from '../post-type-support-check';
 import ThemeSupportCheck from '../theme-support-check';
 
-function PostFeaturedImageCheck( props ) {
+function PostFeaturedImageCheck( { children } ) {
 	return (
 		<ThemeSupportCheck supportKeys="post-thumbnails">
-			<PostTypeSupportCheck { ...props } supportKeys="thumbnail" />
+			<PostTypeSupportCheck supportKeys="thumbnail">
+				{ children }
+			</PostTypeSupportCheck>
 		</ThemeSupportCheck>
 	);
 }

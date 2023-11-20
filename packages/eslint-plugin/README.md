@@ -53,6 +53,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `react` – rules for React components.
 -   `test-e2e` – rules for end-to-end tests written in Puppeteer.
 -   `test-unit`– rules for unit tests written in Jest.
+-   `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 

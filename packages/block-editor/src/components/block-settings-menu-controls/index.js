@@ -4,9 +4,12 @@
 import {
 	createSlotFill,
 	MenuGroup,
+	MenuItem,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { pipe } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,6 +20,7 @@ import {
 } from '../convert-to-group-buttons';
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
+import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -25,19 +29,15 @@ const BlockSettingsMenuControlsSlot = ( {
 	clientIds = null,
 	__unstableDisplayLocation,
 } ) => {
-	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
+	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
-			const {
-				getBlockNamesByClientId,
-				getSelectedBlockClientIds,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
+			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
-				canRemove: canRemoveBlocks( ids ),
 			};
 		},
 		[ clientIds ]
@@ -51,8 +51,7 @@ const BlockSettingsMenuControlsSlot = ( {
 	const convertToGroupButtonProps =
 		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 
 	return (
 		<Slot
@@ -74,16 +73,32 @@ const BlockSettingsMenuControlsSlot = ( {
 
 				return (
 					<MenuGroup>
+						{ showConvertToGroupButton && (
+							<ConvertToGroupButton
+								{ ...convertToGroupButtonProps }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
 						{ fills }
-						{ showConvertToGroupButton && (
-							<ConvertToGroupButton
-								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
+						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
+							<MenuItem
+								onClick={ pipe(
+									fillProps?.onClose,
+									fillProps?.onMoveTo
+								) }
+							>
+								{ __( 'Move to' ) }
+							</MenuItem>
+						) }
+						{ fillProps?.count === 1 && (
+							<BlockModeToggle
+								clientId={ fillProps?.firstBlockClientId }
+								onToggle={ fillProps?.onClose }
 							/>
 						) }
 					</MenuGroup>
@@ -97,7 +112,7 @@ const BlockSettingsMenuControlsSlot = ( {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
  * @param {Object} props Fill props.
- * @return {WPElement} Element.
+ * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (

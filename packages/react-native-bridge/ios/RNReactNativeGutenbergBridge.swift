@@ -1,3 +1,5 @@
+import React
+
 struct GutenbergEvent {
     let name: String
     let body: Any?
@@ -409,6 +411,16 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func generateHapticFeedback() {
         UISelectionFeedbackGenerator().selectionChanged()
     }
+    
+    @objc
+    func toggleUndoButton(_ isDisabled: Bool) {
+        self.delegate?.gutenbergDidRequestToggleUndoButton(isDisabled)
+    }
+    
+    @objc
+    func toggleRedoButton(_ isDisabled: Bool) {
+        self.delegate?.gutenbergDidRequestToggleRedoButton(isDisabled)
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
@@ -426,6 +438,7 @@ extension RNReactNativeGutenbergBridge {
         case toggleHTMLMode
         case updateHtml
         case featuredImageIdNativeUpdated
+        case postHasBeenJustSaved
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
@@ -435,6 +448,8 @@ extension RNReactNativeGutenbergBridge {
         case showNotice
         case mediaSave
         case showEditorHelp
+        case onUndoPressed
+        case onRedoPressed
     }
 
     public override func supportedEvents() -> [String]! {

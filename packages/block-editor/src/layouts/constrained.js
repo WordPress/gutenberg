@@ -21,10 +21,11 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'constrained',
@@ -59,14 +60,9 @@ export default {
 				label: __( 'Justify items right' ),
 			},
 		];
+		const [ availableUnits ] = useSettings( 'spacing.units' );
 		const units = useCustomUnits( {
-			availableUnits: useSetting( 'spacing.units' ) || [
-				'%',
-				'px',
-				'em',
-				'rem',
-				'vw',
-			],
+			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
 			<>
@@ -152,7 +148,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const { contentSize, wideSize, justifyContent } = layout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );

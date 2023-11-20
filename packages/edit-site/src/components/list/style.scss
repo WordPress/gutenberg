@@ -33,6 +33,11 @@
 
 .edit-site {
 	.edit-site-list {
+		flex-grow: 1;
+		background: $white;
+		border-radius: $radius-block-ui * 4;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+
 		.interface-interface-skeleton__editor {
 			min-width: 100%;
 
@@ -125,6 +130,8 @@
 }
 
 .edit-site-list__rename-modal {
+	// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
+	z-index: z-index(".edit-site-list__rename-modal");
 	.components-base-control {
 		@include break-medium() {
 			width: $grid-unit * 40;

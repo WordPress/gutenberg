@@ -43,6 +43,7 @@ function Store( registry, suspense ) {
 	let lastMapResultValid = false;
 	let lastIsAsync;
 	let subscriber;
+	let didWarnUnstableReference;
 
 	const createSubscriber = ( stores ) => {
 		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
@@ -134,6 +135,19 @@ function Store( registry, suspense ) {
 				listeningStores
 			);
 
+			if ( process.env.NODE_ENV === 'development' ) {
+				if ( ! didWarnUnstableReference ) {
+					const secondMapResult = mapSelect( select, registry );
+					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`
+						);
+						didWarnUnstableReference = true;
+					}
+				}
+			}
+
 			if ( ! subscriber ) {
 				subscriber = createSubscriber( listeningStores.current );
 			} else {
@@ -179,7 +193,14 @@ function useStaticSelect( storeName ) {
 function useMappingSelect( suspense, mapSelect, deps ) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const store = useMemo( () => Store( registry, suspense ), [ registry ] );
+	const store = useMemo(
+		() => Store( registry, suspense ),
+		[ registry, suspense ]
+	);
+
+	// These are "pass-through" dependencies from the parent hook,
+	// and the parent should catch any hook rule violations.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
 	const { subscribe, getValue } = store( selector, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );

@@ -1,22 +1,13 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { Button, TabPanel } from '@wordpress/components';
+import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useCallback, useRef, useState } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -27,30 +18,47 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { store as editPostStore } from '../../store';
 import ListViewOutline from './list-view-outline';
 
-export default function ListViewSidebar() {
+export default function ListViewSidebar( { listViewToggleElement } ) {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
+	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const headerFocusReturnRef = useFocusReturn();
-	const contentFocusReturnRef = useFocusReturn();
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			setIsListViewOpened( false );
-		}
-	}
+	// When closing the list view, focus should return to the toggle button.
+	const closeListView = useCallback( () => {
+		setIsListViewOpened( false );
+		listViewToggleElement?.focus();
+	}, [ listViewToggleElement, setIsListViewOpened ] );
 
+	const closeOnEscape = useCallback(
+		( event ) => {
+			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+				event.preventDefault();
+				closeListView();
+			}
+		},
+		[ closeListView ]
+	);
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the dropZoneElement updates.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	// Tracks our current tab.
 	const [ tab, setTab ] = useState( 'list-view' );
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
-	// This ref refers to the list view tab button.
-	const listViewTabRef = useRef();
-	// This ref refers to the outline tab button.
-	const outlineTabRef = useRef();
+	// This ref refers to the tab panel.
+	const tabPanelRef = useRef();
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
+
+	// Must merge the refs together so focus can be handled properly in the next function.
+	const listViewContainerRef = useMergeRefs( [
+		focusOnMountRef,
+		listViewRef,
+		setDropZoneElement,
+	] );
 
 	/*
 	 * Callback function to handle list view or outline focus.
@@ -60,9 +68,11 @@ export default function ListViewSidebar() {
 	 * @return void
 	 */
 	function handleSidebarFocus( currentTab ) {
+		// Tab panel focus.
+		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
-			// Either focus the list view or the list view tab button. Must have a fallback because the list view does not render when there are no blocks.
+			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
 			const listViewApplicationFocus = focus.tabbable.find(
 				listViewRef.current
 			)[ 0 ];
@@ -70,28 +80,50 @@ export default function ListViewSidebar() {
 				listViewApplicationFocus
 			)
 				? listViewApplicationFocus
-				: listViewTabRef.current;
+				: tabPanelFocus;
 			listViewFocusArea.focus();
 			// Outline tab is selected.
 		} else {
-			outlineTabRef.current.focus();
+			tabPanelFocus.focus();
 		}
 	}
 
-	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut( 'core/edit-post/toggle-list-view', () => {
+	const handleToggleListViewShortcut = useCallback( () => {
 		// If the sidebar has focus, it is safe to close.
 		if (
 			sidebarRef.current.contains(
 				sidebarRef.current.ownerDocument.activeElement
 			)
 		) {
-			setIsListViewOpened( false );
-			// If the list view or outline does not have focus, focus should be moved to it.
+			closeListView();
 		} else {
+			// If the list view or outline does not have focus, focus should be moved to it.
 			handleSidebarFocus( tab );
 		}
-	} );
+	}, [ closeListView, tab ] );
+
+	// This only fires when the sidebar is open because of the conditional rendering.
+	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
+	useShortcut(
+		'core/edit-post/toggle-list-view',
+		handleToggleListViewShortcut
+	);
+
+	/**
+	 * Render tab content for a given tab name.
+	 *
+	 * @param {string} tabName The name of the tab to render.
+	 */
+	function renderTabContent( tabName ) {
+		if ( tabName === 'list-view' ) {
+			return (
+				<div className="edit-post-editor__list-view-panel-content">
+					<ListView dropZoneElement={ dropZoneElement } />
+				</div>
+			);
+		}
+		return <ListViewOutline />;
+	}
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -100,63 +132,39 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<div
-				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
-				ref={ headerFocusReturnRef }
+			<Button
+				className="edit-post-editor__document-overview-panel__close-button"
+				icon={ closeSmall }
+				label={ __( 'Close' ) }
+				onClick={ closeListView }
+			/>
+			<TabPanel
+				className="edit-post-editor__document-overview-panel__tab-panel"
+				ref={ tabPanelRef }
+				onSelect={ ( tabName ) => setTab( tabName ) }
+				selectOnMove={ false }
+				tabs={ [
+					{
+						name: 'list-view',
+						title: _x( 'List View', 'Post overview' ),
+						className: 'edit-post-sidebar__panel-tab',
+					},
+					{
+						name: 'outline',
+						title: _x( 'Outline', 'Post overview' ),
+						className: 'edit-post-sidebar__panel-tab',
+					},
+				] }
 			>
-				<Button
-					icon={ closeSmall }
-					label={ __( 'Close' ) }
-					onClick={ () => setIsListViewOpened( false ) }
-				/>
-				<ul>
-					<li>
-						<Button
-							ref={ listViewTabRef }
-							onClick={ () => {
-								setTab( 'list-view' );
-							} }
-							className={ classnames(
-								'edit-post-sidebar__panel-tab',
-								{ 'is-active': tab === 'list-view' }
-							) }
-							aria-current={ tab === 'list-view' }
-						>
-							{ __( 'List View' ) }
-						</Button>
-					</li>
-					<li>
-						<Button
-							ref={ outlineTabRef }
-							onClick={ () => {
-								setTab( 'outline' );
-							} }
-							className={ classnames(
-								'edit-post-sidebar__panel-tab',
-								{ 'is-active': tab === 'outline' }
-							) }
-							aria-current={ tab === 'outline' }
-						>
-							{ __( 'Outline' ) }
-						</Button>
-					</li>
-				</ul>
-			</div>
-			<div
-				ref={ useMergeRefs( [
-					contentFocusReturnRef,
-					focusOnMountRef,
-					listViewRef,
-				] ) }
-				className="edit-post-editor__list-view-container"
-			>
-				{ tab === 'list-view' && (
-					<div className="edit-post-editor__list-view-panel-content">
-						<ListView />
+				{ ( currentTab ) => (
+					<div
+						className="edit-post-editor__list-view-container"
+						ref={ listViewContainerRef }
+					>
+						{ renderTabContent( currentTab.name ) }
 					</div>
 				) }
-				{ tab === 'outline' && <ListViewOutline /> }
-			</div>
+			</TabPanel>
 		</div>
 	);
 }

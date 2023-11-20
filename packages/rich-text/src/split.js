@@ -2,9 +2,7 @@
  * Internal dependencies
  */
 
-import { replace } from './replace';
-
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
@@ -76,9 +74,5 @@ function splitAtSelection(
 		end: 0,
 	};
 
-	return [
-		// Ensure newlines are trimmed.
-		replace( before, /\u2028+$/, '' ),
-		replace( after, /^\u2028+/, '' ),
-	];
+	return [ before, after ];
 }

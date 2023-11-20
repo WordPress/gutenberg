@@ -91,6 +91,7 @@ function ListViewBranch( props ) {
 		selectedClientIds,
 		level = 1,
 		path = '',
+		isBranchDragged = false,
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
@@ -109,13 +110,7 @@ function ListViewBranch( props ) {
 			if ( ! parentId ) {
 				return true;
 			}
-
-			const isContentLocked =
-				select( blockEditorStore ).getTemplateLock( parentId ) ===
-				'contentOnly';
-			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
-
-			return isContentLocked ? false : canEdit;
+			return select( blockEditorStore ).canEditBlock( parentId );
 		},
 		[ parentId ]
 	);
@@ -173,7 +168,18 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
-				const showBlock = isDragged || blockInView || isSelected;
+
+				// To avoid performance issues, we only render blocks that are in view,
+				// or blocks that are selected or dragged. If a block is selected,
+				// it is only counted if it is the first of the block selection.
+				// This prevents the entire tree from being rendered when a branch is
+				// selected, or a user selects all blocks, while still enabling scroll
+				// into view behavior when selecting a block or opening the list view.
+				const showBlock =
+					isDragged ||
+					blockInView ||
+					isBranchDragged ||
+					( isSelected && clientId === selectedClientIds[ 0 ] );
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
@@ -182,7 +188,7 @@ function ListViewBranch( props ) {
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
 								isBranchSelected={ isSelectedBranch }
-								isDragged={ isDragged }
+								isDragged={ isDragged || isBranchDragged }
 								level={ level }
 								position={ position }
 								rowCount={ rowCount }
@@ -200,7 +206,7 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && ! isDragged && (
+						{ hasNestedBlocks && shouldExpand && (
 							<ListViewBranch
 								parentId={ clientId }
 								blocks={ innerBlocks }
@@ -211,6 +217,7 @@ function ListViewBranch( props ) {
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
+								isBranchDragged={ isDragged || isBranchDragged }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }

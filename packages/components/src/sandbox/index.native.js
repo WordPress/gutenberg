@@ -68,7 +68,7 @@ const observeAndResizeJS = `
 					style
 				) {
 					if (
-						/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+						/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test( ruleOrNode.style[ style ] )
 					) {
 						ruleOrNode.style[ style ] = '';
 					}
@@ -186,6 +186,8 @@ const Sandbox = forwardRef( function Sandbox(
 		url,
 		onWindowEvents = {},
 		viewportProps = '',
+		onLoadEnd = () => {},
+		testID,
 	},
 	ref
 ) {
@@ -372,6 +374,8 @@ const Sandbox = forwardRef( function Sandbox(
 			showsHorizontalScrollIndicator={ false }
 			showsVerticalScrollIndicator={ false }
 			mediaPlaybackRequiresUserAction={ false }
+			onLoadEnd={ onLoadEnd }
+			testID={ testID }
 		/>
 	);
 } );

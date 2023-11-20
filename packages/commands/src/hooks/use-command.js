@@ -10,9 +10,25 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command to the Global command menu.
+ * Attach a command to the command palette. Used for static commands.
  *
  * @param {import('../store/actions').WPCommandConfig} command command config.
+ *
+ * @example
+ * ```js
+ * import { useCommand } from '@wordpress/commands';
+ * import { plus } from '@wordpress/icons';
+ *
+ * useCommand( {
+ *     name: 'myplugin/my-command-name',
+ *     label: __( 'Add new post' ),
+ *	   icon: plus,
+ *     callback: ({ close }) => {
+ *         document.location.href = 'post-new.php';
+ *         close();
+ *     },
+ * } );
+ * ```
  */
 export default function useCommand( command ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
@@ -24,17 +40,21 @@ export default function useCommand( command ) {
 	useEffect( () => {
 		registerCommand( {
 			name: command.name,
-			group: command.group,
+			context: command.context,
 			label: command.label,
-			callback: currentCallback.current,
+			searchLabel: command.searchLabel,
+			icon: command.icon,
+			callback: ( ...args ) => currentCallback.current( ...args ),
 		} );
 		return () => {
-			unregisterCommand( command.name, command.group );
+			unregisterCommand( command.name );
 		};
 	}, [
 		command.name,
 		command.label,
-		command.group,
+		command.searchLabel,
+		command.icon,
+		command.context,
 		registerCommand,
 		unregisterCommand,
 	] );

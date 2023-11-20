@@ -1,22 +1,30 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Icon, symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import BlockPatternsPaging from '../block-patterns-paging';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -63,14 +71,20 @@ function BlockPattern( {
 					} }
 				>
 					<WithToolTip
-						showTooltip={ showTooltip }
+						showTooltip={ showTooltip && ! pattern.id }
 						title={ pattern.title }
 					>
 						<CompositeItem
 							role="option"
 							as="div"
 							{ ...composite }
-							className="block-editor-block-patterns-list__item"
+							className={ classnames(
+								'block-editor-block-patterns-list__item',
+								{
+									'block-editor-block-patterns-list__list-item-synced':
+										pattern.id && ! pattern.syncStatus,
+								}
+							) }
 							onClick={ () => {
 								onClick( pattern, blocks );
 								onHover?.( null );
@@ -91,11 +105,23 @@ function BlockPattern( {
 								blocks={ blocks }
 								viewportWidth={ viewportWidth }
 							/>
-							{ ! showTooltip && (
-								<div className="block-editor-block-patterns-list__item-title">
-									{ pattern.title }
-								</div>
-							) }
+
+							<HStack className="block-editor-patterns__pattern-details">
+								{ pattern.id && ! pattern.syncStatus && (
+									<div className="block-editor-patterns__pattern-icon-wrapper">
+										<Icon
+											className="block-editor-patterns__pattern-icon"
+											icon={ symbol }
+										/>
+									</div>
+								) }
+								{ ( ! showTooltip || pattern.id ) && (
+									<div className="block-editor-block-patterns-list__item-title">
+										{ pattern.title }
+									</div>
+								) }
+							</HStack>
+
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
 									{ pattern.description }
@@ -115,16 +141,20 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList( {
-	isDraggable,
-	blockPatterns,
-	shownPatterns,
-	onHover,
-	onClickPattern,
-	orientation,
-	label = __( 'Block Patterns' ),
-	showTitlesAsTooltip,
-} ) {
+function BlockPatternList(
+	{
+		isDraggable,
+		blockPatterns,
+		shownPatterns,
+		onHover,
+		onClickPattern,
+		orientation,
+		label = __( 'Block patterns' ),
+		showTitlesAsTooltip,
+		pagingProps,
+	},
+	ref
+) {
 	const composite = useCompositeState( { orientation } );
 	return (
 		<Composite
@@ -132,6 +162,7 @@ function BlockPatternList( {
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
+			ref={ ref }
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
@@ -149,8 +180,9 @@ function BlockPatternList( {
 					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
+			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
 }
 
-export default BlockPatternList;
+export default forwardRef( BlockPatternList );

@@ -31,9 +31,11 @@ $red-50: #d63638;
 // Primary Accent (Blues)
 $blue-wordpress: #0087be;
 $blue-medium: #00aadc;
+$blue-60: #055d9c;
 $blue-500: #016087;
 // Primary tint color (light)
 $blue-50: #2271b1;
+$blue-40: #1689db;
 // Primary tint color (dark)
 $blue-30: #5198d9;
 
@@ -97,11 +99,13 @@ $dark-secondary: #fff9; //rgba(255, 255, 255, 0.6);
 $dark-tertiary: #ffffff6d; //rgba(255, 255, 255, 0.43);
 $dark-quaternary: #ffffff3f; //rgba(255, 255, 255, 0.25);
 $dark-ultra-dim: #ffffff14; //rgba(255, 255, 255, 0.08);
+$dark-dim: #ffffff1f; //rgba(255, 255, 255, 0.12)
 
 // Design Token colors
 $app-background: $white;
 $app-background-dark: $black;
 $app-background-dark-alt: $background-dark-elevated;
+$app-safe-area-background-dark: #141414;
 
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;

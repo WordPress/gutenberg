@@ -17,7 +17,7 @@ test.describe( 'Compatibility with classic editor', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/html' } );
-		await page.focus( 'role=textbox[name="HTML"i]' );
+		await editor.canvas.locator( 'role=textbox[name="HTML"i]' ).focus();
 		await page.keyboard.type( '<a>' );
 		await page.keyboard.type( 'Random Link' );
 		await page.keyboard.type( '</a> ' );

@@ -272,6 +272,35 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               </kbd>
             </div>
           </li>
+          <li
+            class="edit-post-keyboard-shortcut-help-modal__shortcut"
+          >
+            <div
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+            >
+              Select text across multiple blocks.
+            </div>
+            <div
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+            >
+              <kbd
+                aria-label="Shift + Arrow"
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+              >
+                <kbd
+                  class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+                >
+                  Shift
+                </kbd>
+                +
+                <kbd
+                  class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+                >
+                  Arrow
+                </kbd>
+              </kbd>
+            </div>
+          </li>
         </ul>
       </section>
       <section

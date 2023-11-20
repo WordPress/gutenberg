@@ -124,9 +124,14 @@ function IndentUI( { clientId } ) {
 }
 
 export default function Edit( { attributes, setAttributes, clientId, style } ) {
+	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
-		...( Platform.isNative && { style } ),
+		style: {
+			...( Platform.isNative && style ),
+			listStyleType: ordered && type !== 'decimal' ? type : undefined,
+		},
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
@@ -135,11 +140,11 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		...( Platform.isNative && {
 			marginVertical: NATIVE_MARGIN_SPACING,
 			marginHorizontal: NATIVE_MARGIN_SPACING,
-			useCompactList: true,
+			renderAppender: false,
 		} ),
+		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
-	const { ordered, type, reversed, start } = attributes;
 
 	const controls = (
 		<BlockControls group="block">
@@ -171,16 +176,17 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 				ordered={ ordered }
 				reversed={ reversed }
 				start={ start }
-				type={ type }
 				{ ...innerBlocksProps }
 			/>
 			{ controls }
 			{ ordered && (
 				<OrderedListSettings
-					setAttributes={ setAttributes }
-					ordered={ ordered }
-					reversed={ reversed }
-					start={ start }
+					{ ...{
+						setAttributes,
+						reversed,
+						start,
+						type,
+					} }
 				/>
 			) }
 		</>

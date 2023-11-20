@@ -16,12 +16,12 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
@@ -92,7 +92,7 @@ function HeadingEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					selectedLevel={ level }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
@@ -132,7 +132,6 @@ function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				aria-label={ __( 'Heading text' ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side

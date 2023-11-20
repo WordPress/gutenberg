@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../../components/use-setting';
+import { useSettings } from '../../components/use-settings';
 
 /**
  * Control for letter-spacing.
@@ -20,7 +20,7 @@ import useSetting from '../../components/use-setting';
  * @param {Function}                props.onChange             Handles change in letter-spacing selection.
  * @param {string|number|undefined} props.__unstableInputWidth Input width to pass through to inner UnitControl. Should be a valid CSS value.
  *
- * @return {WPElement} Letter-spacing control.
+ * @return {Element} Letter-spacing control.
  */
 export default function LetterSpacingControl( {
 	value,
@@ -28,8 +28,9 @@ export default function LetterSpacingControl( {
 	__unstableInputWidth = '60px',
 	...otherProps
 } ) {
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 		defaultValues: { px: 2, em: 0.2, rem: 0.2 },
 	} );
 	return (

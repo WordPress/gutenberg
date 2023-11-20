@@ -14,6 +14,10 @@ const resultsFiles = [
 		metricsPrefix: '',
 	},
 	{
+		file: 'site-editor.performance-results.json',
+		metricsPrefix: 'site-editor-',
+	},
+	{
 		file: 'front-end-block-theme.performance-results.json',
 		metricsPrefix: 'block-theme-',
 	},
@@ -37,7 +41,7 @@ const data = new TextEncoder().encode(
 		branch,
 		hash,
 		baseHash,
-		timestamp: parseInt( timestamp, 10 ),
+		timestamp,
 		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
 			return {
 				...result,

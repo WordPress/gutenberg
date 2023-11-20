@@ -88,7 +88,7 @@ export default function useDragSelection() {
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
 				// multi selecting when the mouse leaves the wrapper.
-				if ( ! target.getAttribute( 'contenteditable' ) ) {
+				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
 					return;
 				}
 
@@ -96,7 +96,11 @@ export default function useDragSelection() {
 					return;
 				}
 
-				anchorElement = ownerDocument.activeElement;
+				// Do not rely on the active element because it may change after
+				// the mouse leaves for the first time. See
+				// https://github.com/WordPress/gutenberg/issues/48747.
+				anchorElement = target;
+
 				startMultiSelect();
 
 				// `onSelectionStart` is called after `mousedown` and

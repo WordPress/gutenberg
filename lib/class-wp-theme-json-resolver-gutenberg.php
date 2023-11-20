@@ -6,6 +6,10 @@
  * @since 5.8.0
  */
 
+if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
+	return;
+}
+
 /**
  * Class that abstracts the processing of the different data sources
  * for site-level config and offers an API to work with them.
@@ -237,9 +241,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
 
 		if ( null === static::$theme || ! static::has_same_registered_blocks( 'theme' ) ) {
-			$theme_json_file = static::get_file_path_from_theme( 'theme.json' );
 			$wp_theme        = wp_get_theme();
-			if ( '' !== $theme_json_file ) {
+			$theme_json_file = $wp_theme->get_file_path( 'theme.json' );
+			if ( is_readable( $theme_json_file ) ) {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
@@ -259,8 +263,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
-				$parent_theme_json_file = static::get_file_path_from_theme( 'theme.json', true );
-				if ( '' !== $parent_theme_json_file ) {
+				$parent_theme_json_file = $wp_theme->parent()->get_file_path( 'theme.json' );
+				if ( $theme_json_file !== $parent_theme_json_file && is_readable( $parent_theme_json_file ) ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
 					$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
@@ -275,7 +279,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
+			if ( ! class_exists( 'WP_Font_Face' ) && class_exists( 'WP_Fonts_Resolver' ) ) {
+				static::$theme = WP_Fonts_Resolver::add_missing_fonts_to_theme_json( static::$theme );
+			}
 			// END OF EXPERIMENTAL CODE.
 
 		}
@@ -319,6 +325,26 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 
+			// Allow themes to enable all border settings via theme_support.
+			if ( current_theme_supports( 'border' ) ) {
+				$theme_support_data['settings']['border']['color']  = true;
+				$theme_support_data['settings']['border']['radius'] = true;
+				$theme_support_data['settings']['border']['style']  = true;
+				$theme_support_data['settings']['border']['width']  = true;
+			}
+
+			// Allow themes to enable link colors via theme_support.
+			if ( current_theme_supports( 'link-color' ) ) {
+				$theme_support_data['settings']['color']['link'] = true;
+			}
+			if ( current_theme_supports( 'experimental-link-color' ) ) {
+				_doing_it_wrong(
+					current_theme_supports( 'experimental-link-color' ),
+					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
+					'6.3.0'
+				);
+			}
+
 			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
 			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
@@ -357,7 +383,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			if (
 				isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) &&
-				null === _wp_array_get( $config, array( 'styles', 'blocks', $block_name, 'spacing', 'blockGap' ), null )
+				! isset( $config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] )
 			) {
 				// Ensure an empty placeholder value exists for the block, if it provides a default blockGap value.
 				// The real blockGap value to be used will be determined when the styles are rendered for output.
@@ -382,18 +408,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * When given an array, this will remove any keys with the name `//`.
 	 *
-	 * @param array $array The array to filter.
+	 * @param array $json_array The array to filter.
 	 * @return array The filtered array.
 	 */
-	private static function remove_json_comments( $array ) {
-		unset( $array['//'] );
-		foreach ( $array as $k => $v ) {
+	private static function remove_json_comments( $json_array ) {
+		unset( $json_array['//'] );
+		foreach ( $json_array as $k => $v ) {
 			if ( is_array( $v ) ) {
-				$array[ $k ] = static::remove_json_comments( $v );
+				$json_array[ $k ] = static::remove_json_comments( $v );
 			}
 		}
 
-		return $array;
+		return $json_array;
 	}
 
 	/**
@@ -644,6 +670,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	protected static function get_file_path_from_theme( $file_name, $template = false ) {
+		// TODO: Remove this method from core on 6.3 release.
+		_deprecated_function( __METHOD__, '6.3.0' );
 		$path      = $template ? get_template_directory() : get_stylesheet_directory();
 		$candidate = $path . '/' . $file_name;
 

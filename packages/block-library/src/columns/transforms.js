@@ -105,14 +105,8 @@ const transforms = {
 			},
 		},
 	],
-	to: [
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( attributes, innerBlocks ) =>
-				innerBlocks.flatMap( ( innerBlock ) => innerBlock.innerBlocks ),
-		},
-	],
+	ungroup: ( attributes, innerBlocks ) =>
+		innerBlocks.flatMap( ( innerBlock ) => innerBlock.innerBlocks ),
 };
 
 export default transforms;

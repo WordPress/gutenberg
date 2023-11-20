@@ -47,12 +47,17 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
+    private static final String EVENT_NAME_POST_SAVE_EVENT = "postHasBeenJustSaved";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
     private static final String EVENT_NAME_UPDATE_EDITOR_SETTINGS = "updateEditorSettings";
     private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
     private static final String EVENT_NAME_SHOW_EDITOR_HELP = "showEditorHelp";
+
+    private static final String EVENT_NAME_ON_UNDO_PRESSED = "onUndoPressed";
+
+    private static final String EVENT_NAME_ON_REDO_PRESSED = "onRedoPressed";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -189,6 +194,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void showEditorHelp() {
         emitToJS(EVENT_NAME_SHOW_EDITOR_HELP, null);
+    }
+
+    public void onUndoPressed() {
+        emitToJS(EVENT_NAME_ON_UNDO_PRESSED, null);
+    }
+
+    public void onRedoPressed() {
+        emitToJS(EVENT_NAME_ON_REDO_PRESSED, null);
     }
 
     @ReactMethod
@@ -367,6 +380,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestEmbedFullscreenPreview(String content, String title) {
+        mGutenbergBridgeJS2Parent.requestEmbedFullscreenPreview(content,title);
+    }
+
+    @ReactMethod
     public void actionButtonPressed(String buttonType) {
         mGutenbergBridgeJS2Parent.gutenbergDidSendButtonPressedAction(buttonType);
     }
@@ -449,6 +467,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);
     }
 
+    public void sendToJSPostSaveEvent() {
+        emitToJS(EVENT_NAME_POST_SAVE_EVENT, null);
+    }
+
     public void notifyModalClosed() {
         emitToJS(EVENT_NAME_NOTIFY_MODAL_CLOSED, null);
     }
@@ -485,6 +507,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void sendEventToHost(final String eventName, final ReadableMap properties) {
         mGutenbergBridgeJS2Parent.sendEventToHost(eventName, properties);
+    }
+
+    @ReactMethod
+    public void toggleUndoButton(final boolean isDisabled) {
+        mGutenbergBridgeJS2Parent.toggleUndoButton(isDisabled);
+    }
+
+    @ReactMethod
+    public void toggleRedoButton(final boolean isDisabled) {
+        mGutenbergBridgeJS2Parent.toggleRedoButton(isDisabled);
     }
 
     @ReactMethod
