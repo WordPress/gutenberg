@@ -946,7 +946,7 @@ class WP_Duotone_Gutenberg {
 				wp_add_inline_style( $style_tag_id, self::get_global_styles_presets( self::$used_global_styles_presets ) );
 			}
 			if ( ! empty( self::$block_css_declarations ) ) {
-				wp_add_inline_style( $style_tag_id, wp_style_engine_get_stylesheet_from_css_rules( self::$block_css_declarations ) );
+				wp_add_inline_style( $style_tag_id, gutenberg_style_engine_get_stylesheet_from_css_rules( self::$block_css_declarations ) );
 			}
 			wp_enqueue_style( $style_tag_id );
 		}
