@@ -12,6 +12,11 @@ import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { getRevisionChanges } from './get-revision-changes';
+
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
 /**
@@ -67,7 +72,13 @@ function getRevisionLabel(
  * @param    {props}         Component          props.
  * @return {JSX.Element} The modal component.
  */
-function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
+function RevisionsButtons( {
+	userRevisions,
+	selectedRevisionId,
+	onChange,
+	onSelect,
+	canApplyRevision,
+} ) {
 	const { currentThemeName, currentUser } = useSelect( ( select ) => {
 		const { getCurrentTheme, getCurrentUser } = select( coreStore );
 		const currentTheme = getCurrentTheme();
@@ -78,7 +89,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 		};
 	}, [] );
 	const dateNowInMs = getDate().getTime();
-	const { date: dateFormat, datetimeAbbreviated } = getSettings().formats;
+	const { datetimeAbbreviated } = getSettings().formats;
 
 	return (
 		<ol
@@ -101,7 +112,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 				const displayDate =
 					modified &&
 					dateNowInMs - modifiedDate.getTime() > DAY_IN_MILLISECONDS
-						? dateI18n( dateFormat, modifiedDate )
+						? dateI18n( datetimeAbbreviated, modifiedDate )
 						: humanTimeDiff( modified );
 				const revisionLabel = getRevisionLabel(
 					id,
@@ -160,6 +171,27 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 								</span>
 							) }
 						</Button>
+						{ isSelected && canApplyRevision && (
+							<>
+								<p>
+									{ getRevisionChanges(
+										revision,
+										index < userRevisions.length
+											? userRevisions[ index + 1 ]
+											: {}
+									) }
+								</p>
+								<Button
+									variant="primary"
+									className="edit-site-global-styles-screen-revision__button"
+									onClick={ onSelect }
+								>
+									{ isReset
+										? __( 'Reset to defaults' )
+										: __( 'Apply' ) }
+								</Button>
+							</>
+						) }
 					</li>
 				);
 			} ) }

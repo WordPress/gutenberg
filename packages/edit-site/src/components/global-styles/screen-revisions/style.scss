@@ -89,6 +89,13 @@
 .edit-site-global-styles-screen-revisions__button {
 	justify-content: center;
 	width: 100%;
+	margin: 0 0 10px 10px;
+}
+
+.edit-site-global-styles-screen-revision__button {
+	justify-content: center;
+	width: 90%;
+	margin: 0 0 $grid-unit-10 $grid-unit-20;
 }
 
 .edit-site-global-styles-screen-revisions__description {

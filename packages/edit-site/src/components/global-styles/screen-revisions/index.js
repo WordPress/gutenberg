@@ -3,7 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	Button,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
@@ -23,7 +22,6 @@ import {
 import ScreenHeader from '../header';
 import { unlock } from '../../../lock-unlock';
 import Revisions from '../../revisions';
-import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
@@ -135,7 +133,8 @@ function ScreenRevisions() {
 		}
 	}, [ shouldSelectFirstItem, firstRevision ] );
 
-	// Only display load button if there is a revision to load and it is different from the current editor styles.
+	// Only display load button if there is a revision to load,
+	// and it is different from the current editor styles.
 	const isLoadButtonEnabled =
 		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
@@ -168,35 +167,19 @@ function ScreenRevisions() {
 							onChange={ selectRevision }
 							selectedRevisionId={ currentlySelectedRevisionId }
 							userRevisions={ revisions }
+							canApplyRevision={ isLoadButtonEnabled }
+							onSelect={ () => {
+								if ( hasUnsavedChanges ) {
+									setIsLoadingRevisionWithUnsavedChanges(
+										true
+									);
+								} else {
+									restoreRevision(
+										currentlySelectedRevision
+									);
+								}
+							} }
 						/>
-						{ isLoadButtonEnabled && (
-							<SidebarFixedBottom>
-								<Button
-									variant="primary"
-									className="edit-site-global-styles-screen-revisions__button"
-									disabled={
-										! currentlySelectedRevisionId ||
-										currentlySelectedRevisionId ===
-											'unsaved'
-									}
-									onClick={ () => {
-										if ( hasUnsavedChanges ) {
-											setIsLoadingRevisionWithUnsavedChanges(
-												true
-											);
-										} else {
-											restoreRevision(
-												currentlySelectedRevision
-											);
-										}
-									} }
-								>
-									{ currentlySelectedRevisionId === 'parent'
-										? __( 'Reset to defaults' )
-										: __( 'Apply' ) }
-								</Button>
-							</SidebarFixedBottom>
-						) }
 					</div>
 					{ isLoadingRevisionWithUnsavedChanges && (
 						<ConfirmDialog
