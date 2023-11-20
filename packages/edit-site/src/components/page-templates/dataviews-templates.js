@@ -177,6 +177,15 @@ export default function DataviewsTemplates() {
 						: titleB.localeCompare( titleA );
 				} );
 			}
+			if ( view.sort.field === 'author' ) {
+				filteredTemplates.sort( ( a, b ) => {
+					const authorA = a.author_text;
+					const authorB = b.author_text;
+					return view.sort.direction === 'asc'
+						? authorA.localeCompare( authorB )
+						: authorB.localeCompare( authorA );
+				} );
+			}
 		}
 		// Handle pagination.
 		const start = ( view.page - 1 ) * view.perPage;
@@ -237,9 +246,12 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				render: ( { item } ) => <AuthorField item={ item } />,
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField item={ item } />;
+				},
 				enableHiding: false,
-				enableSorting: false,
+				enableSorting: true,
 			},
 		],
 		[]
