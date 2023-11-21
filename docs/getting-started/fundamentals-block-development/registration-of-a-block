@@ -1,20 +1,20 @@
 # Registration of a block
 
-A block is usually registered in both the server and the client using its `block.json` metadata. 
+A block is usually registered through a plugin in both the server and the client using its `block.json` metadata. 
 
-Although technically blocks could be registered only on the client, **registering blocks in both the server and the client is a general recommendation**, as some key features like Dynamic Rendering, Block Hooks or Block style variations won't work properly without a server registration of the block. 
+Although technically, blocks could be registered only on the client, **registering blocks in both the server and the client is a general recommendation**, as some key features like Dynamic Rendering, Block Hooks, or Block style variations won't work properly without a server registration of the block. 
 
 [![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g "Open Block Registration diagram in excalidraw")
 
 ## Registering the block in the server
 
-The registration of a block in the server, usually takes place in the main plugin PHP file with the [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function called on the [`init` action](https://developer.wordpress.org/reference/hooks/init/)  
+A block registration in the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the `init` action.
 
-`register_block_type` takes a first parameter to get the metadata of the block that can be provided:
+`register_block_type` takes a first argument to get the metadata of the block:
 -  with the path to the `block.json` file with the metadata definition for the block
 -  with the path to the folder where the `block.json` file is located
 
-Note that if there's a build process involved, the registered `block.json` should be the one in `build` folder.
+Note that if a build process is involved, the registered `block.json` should be the one in the `build` folder, and the bundled files generated in the build process and linked from `block.json` should also be in the same folder.
 
 ```php
 function minimal_block_ca6eda___register_block() {
@@ -23,19 +23,19 @@ function minimal_block_ca6eda___register_block() {
 
 add_action( 'init', 'minimal_block_ca6eda___register_block' );
 ```
-_See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)_
+_See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php) in [an example]_
 
-Registering a block in the server by calling to `register_block_type` with just its first argument is enough in most of the cases.
+In most cases, registering a block in the server by calling `register_block_type` with just its first argument is enough.
 
 ## Registering the block in the client
 
-The registration of a block in the client (for the Block Editor), usually takes place in the `index.js` file (or any other file defined in the `editorScript` property of `block.json`) via the [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype).
+The block registration in the client (for the Block Editor) usually takes place in the `index.js` file (or any other file defined in the `editorScript` property of `block.json`) via the [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype).
 
-The `registerBlockType` function takes the following paramenters:
+The `registerBlockType` function takes the following parameters:
 - A first parameter with the block name (if the block has also been registered on the server) or an object with the metadata of the block
 - A second parameter with an object with settings for the block. The most important properties of this object settings are:
-	- `edit`: React component that gets used in the editor for our block.
-	- `save`: React component that generates the static HTML markup that gets saved to the Database. 
+	- `edit`: The React component that gets used in the editor for our block.
+	- `save`: The React component that generates the static HTML markup that gets saved to the Database. 
 
 ```
 import { registerBlockType } from '@wordpress/blocks';
@@ -54,7 +54,7 @@ _See the [code above](https://github.com/WordPress/block-development-examples/bl
 
 
 <div class="callout callout-info">
-At its simplest form, a block it is a <code>registerBlockType</code> function call with some parameters passed in JS. 
+At its simplest form, a block is a <code>registerBlockType</code> function call with some parameters passed in JS. 
 </div>
 
 
