@@ -51,12 +51,13 @@ export type CustomSelectProps = {
 
 export type CustomSelectItemProps = {
 	/**
-	 * The children to display for each select item.
-	 */
-	children?: React.ReactNode;
-	/**
 	 * The value of the select item. This will be used as the children if
 	 * children are left `undefined`.
 	 */
 	value: string;
+	/**
+	 * The children to display for each select item. The `value` will be
+	 * used if left `undefined`.
+	 */
+	children?: React.ReactNode;
 };

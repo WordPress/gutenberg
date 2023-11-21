@@ -4,7 +4,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ### `CustomSelect`
 
-Used to render a checkbox item.
+Used to render a customizable select control component.
 
 #### Props
 
@@ -52,7 +52,7 @@ Can be used to externally control the value of the control.
 
 -   Required: no
 
-### `CustomSelectItemProps`
+### `CustomSelectItem`
 
 Used to render a select item.
 
@@ -60,14 +60,14 @@ Used to render a select item.
 
 The component accepts the following props:
 
-##### `children`: `React.ReactNode`
-
-The children to display for each select item.
-
--   Required: no
-
 ##### `value`: `string`
 
 The value of the select item. This will be used as the children if children are left `undefined`.
 
 -   Required: yes
+
+##### `children`: `React.ReactNode`
+
+The children to display for each select item. The `value` will be used if left `undefined`.
+
+-   Required: no
