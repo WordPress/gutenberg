@@ -651,6 +651,26 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
+### LinkControl
+
+Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
+
+_Parameters_
+
+-   _props_ `WPLinkControlProps`: Component props.
+
+### LinkControlSearchInput
+
+Undocumented declaration.
+
+### LinkControlSearchItem
+
+Undocumented declaration.
+
+### LinkControlSearchResults
+
+Undocumented declaration.
+
 ### MediaPlaceholder
 
 _Related_
