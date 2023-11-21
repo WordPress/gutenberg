@@ -10,6 +10,10 @@
 .edit-site-sidebar-dataviews-dataview-item {
 	padding-right: $grid-unit-10;
 
+	.components-dropdown-menu {
+		min-width: initial;
+	}
+
 	&:hover,
 	&:focus,
 	&[aria-current] {
