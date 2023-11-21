@@ -121,10 +121,6 @@ const BlockToolbar = ( {
 		return null;
 	}
 
-	if ( blockClientIds.length === 0 ) {
-		return null;
-	}
-
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
