@@ -151,7 +151,7 @@ export function toTree( {
 	let lastCharacterFormats;
 	let lastCharacter;
 
-	append( tree, '' );
+	append( tree, isEditableTree && text[ 0 ] === ' ' ? ZWNBSP : '' );
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
@@ -159,9 +159,10 @@ export function toTree( {
 			isEditableTree &&
 			// Pad the line if the line is empty.
 			( ! lastCharacter ||
-				// Pad the line if the previous character is a line break, otherwise
-				// the line break won't be visible.
-				lastCharacter === '\n' );
+				// Pad the line if the previous character is a line break or
+				// space, otherwise it won't be visible.
+				lastCharacter === '\n' ||
+				lastCharacter === ' ' );
 
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
