@@ -254,7 +254,7 @@ test.describe( 'Block Renaming', () => {
 			] );
 		} );
 
-		test( 'does now allow renaming of blocks that do not support the feature', async ( {
+		test( 'does not allow renaming of blocks that do not support the feature', async ( {
 			editor,
 			page,
 			pageUtils,
