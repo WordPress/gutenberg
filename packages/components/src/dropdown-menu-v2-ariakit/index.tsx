@@ -609,7 +609,7 @@ export const DropdownComboboxMenuItem = forwardRef<
 	}
 
 	return (
-		<Ariakit.SelectItem
+		<Styled.DropdownComboboxMenuItem
 			ref={ ref }
 			{ ...props }
 			value={ value }
@@ -618,6 +618,6 @@ export const DropdownComboboxMenuItem = forwardRef<
 		>
 			<Ariakit.SelectItemCheck />
 			{ props.children ?? value }
-		</Ariakit.SelectItem>
+		</Styled.DropdownComboboxMenuItem>
 	);
 } );

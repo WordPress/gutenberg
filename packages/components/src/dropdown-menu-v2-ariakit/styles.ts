@@ -248,6 +248,10 @@ export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
 	${ baseItem }
 `;
 
+export const DropdownComboboxMenuItem = styled( Ariakit.SelectItem )`
+	${ baseItem }
+`;
+
 export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
 
 export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
