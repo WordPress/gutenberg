@@ -1049,11 +1049,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	protected static function is_nested_empty_array( $array ) {
-		// If the value is null, return false
-		if ( $array === null ) {
-			return false;
-		}
-
 		// If the array is empty, return true.
 		if ( ! is_array( $array ) || empty( $array ) ) {
 			return true;
