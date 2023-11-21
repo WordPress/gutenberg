@@ -201,7 +201,7 @@ class ToolbarRovingTabindexUtils {
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
-		await this.expectLabelToHaveFocus( 'Select Group' );
+		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}
