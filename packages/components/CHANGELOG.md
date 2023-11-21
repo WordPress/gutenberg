@@ -35,6 +35,10 @@
 -   `DropdownMenu`: remove extra vertical space around the toggle button ([#56136](https://github.com/WordPress/gutenberg/pull/56136)).
 -   Package should not depend on `@ariakit/test`, that package is only needed for testing ([#56091](https://github.com/WordPress/gutenberg/pull/56091)).
 
+### Documentation
+
+-   `NavigableContainers`: Fix document typo in `onKeyDown` prop ([#56352](https://github.com/WordPress/gutenberg/pull/56352)).
+
 ## 25.11.0 (2023-11-02)
 
 ### Enhancements
