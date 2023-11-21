@@ -17,6 +17,11 @@ import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { parse } from '@wordpress/blocks';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -31,8 +36,19 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './template-actions';
+import usePatternSettings from '../page-patterns/use-pattern-settings';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const EMPTY_ARRAY = [];
+
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'preview',
+	},
+};
 
 const DEFAULT_VIEW = {
 	type: 'list',
@@ -41,7 +57,7 @@ const DEFAULT_VIEW = {
 	perPage: 20,
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [],
+	hiddenFields: [ 'preview' ],
 	layout: {},
 };
 
@@ -94,7 +110,18 @@ function AuthorField( { item } ) {
 	);
 }
 
+function TemplatePreview( { content } ) {
+	const blocks = useMemo( () => {
+		return parse( content );
+	}, [ content ] );
+	if ( ! blocks?.length ) {
+		return null;
+	}
+	return <BlockPreview blocks={ blocks } />;
+}
+
 export default function DataviewsTemplates() {
+	const settings = usePatternSettings();
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
@@ -162,6 +189,17 @@ export default function DataviewsTemplates() {
 				enableHiding: false,
 			},
 			{
+				header: __( 'Preview' ),
+				id: 'preview',
+				getValue: () => {},
+				render: ( { item } ) => {
+					return <TemplatePreview content={ item.content.raw } />;
+				},
+				minWidth: 300,
+				maxWidth: 300,
+				enableSorting: false,
+			},
+			{
 				header: __( 'Description' ),
 				id: 'description',
 				getValue: ( { item } ) => item.description,
@@ -199,27 +237,46 @@ export default function DataviewsTemplates() {
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
-			const updatedView =
+			let updatedView =
 				typeof viewUpdater === 'function'
 					? viewUpdater( view )
 					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
 			setView( updatedView );
 		},
 		[ view, setView ]
 	);
+
+	// Wrap everything in a block editor provider to ensure 'styles' that are needed
+	// for the previews are synced between the site editor store and the block editor store.
+	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+	// render patterns inside the previews.
+	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
+	// the block editor settings are needed in context where we don't have the block editor.
+	// Explore how we can solve this in a better way.
 	return (
-		<Page title={ __( 'Templates' ) }>
-			<DataViews
-				paginationInfo={ paginationInfo }
-				fields={ fields }
-				actions={ actions }
-				data={ shownTemplates }
-				getItemId={ ( item ) => item.id }
-				isLoading={ isLoadingData }
-				view={ view }
-				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list' ] }
-			/>
-		</Page>
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<Page title={ __( 'Templates' ) }>
+				<DataViews
+					paginationInfo={ paginationInfo }
+					fields={ fields }
+					actions={ actions }
+					data={ shownTemplates }
+					getItemId={ ( item ) => item.id }
+					isLoading={ isLoadingData }
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ [ 'list', 'grid' ] }
+				/>
+			</Page>
+		</ExperimentalBlockEditorProvider>
 	);
 }
