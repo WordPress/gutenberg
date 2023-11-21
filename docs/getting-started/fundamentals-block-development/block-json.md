@@ -4,13 +4,7 @@ The `block.json` file simplifies the processs of defining a block and using the 
 
 [![Open block.json diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-json.png)](https://excalidraw.com/#json=v1GrIkGsYGKv8P14irBy6,Yy0vl8q7DTTL2VsH5Ww27A "Open block.json diagram in excalidraw")
 
-Besides simplifying the registration of a block, the use of a `block.json` [has several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) including performance and development.
-
-Development is improved by using a defined schema definition file that provides tooltips, autocomplete, and schema validation in the IDE. To use the schema, add the following to the top of the `block.json`:
-
-```
-"$schema": "https://schemas.wp.org/trunk/block.json"
-```
+Besides simplifying a block's registration, using a `block.json` has [several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), including improved performance and development.
 
 Here's [the `block.json`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json) of [a block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) 
 
@@ -49,23 +43,36 @@ Here's [the `block.json`](https://github.com/WordPress/block-development-example
 }
 ```
 
-At [**Reference Guides / Block API Reference / Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block.
+At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. These properties used to define a block could be grouped according to their purpose:
 
-These properties allow to set different things for the block:
-    - Basic definition properties such as:
-        - The `$schema` property
-        - The `name` property
-        - The `title` property
-        - The `category` property
+- Basic definition properties such as:
+	- The `$schema` property
+	- The `name` property
+	- The `title` property
+	- The `category` property
 
-    - Relative path for files that define the block's behaviour, output or style such as:
-        - The `editorScript` property
-        - The `style` property
-        - The `editorStyle` property
-        - The `render` property
-        - The `viewScript` property
+- Relative path for key files that define the block's behaviour, output or style such as:
+	- The `editorScript` property
+	- The `style` property
+	- The `editorStyle` property
+	- The `render` property
+	- The `viewScript` property
 
-    - Feature enabler properties such as:
-        - The `attributes` property
-        - The `supports` property
+- Feature enabler properties such as:
+	- The `attributes` property
+	- The `supports` property
+
+
+## Definition properties
+
+Development is improved by using a defined schema definition file that provides tooltips, autocomplete, and schema validation in the IDE. To use the schema, add the following to the top of the `block.json`:
+
+```
+"$schema": "https://schemas.wp.org/trunk/block.json"
+```
+
+
+
+
+
 
