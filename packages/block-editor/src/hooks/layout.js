@@ -136,12 +136,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
-	const {
-		layout: {
-			allowEditing: allowEditingSetting,
-			allowCustomContentSize: allowCustomContentSizeSetting,
-		},
-	} = settings;
+	const { layout: layoutSettings } = settings;
 	// Layout comes from block attributes.
 	const { layout } = attributes;
 	const [ defaultThemeLayout ] = useSettings( 'layout' );
@@ -164,9 +159,8 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		{}
 	);
 	const blockSupportAndThemeSettings = {
+		...layoutSettings,
 		...layoutBlockSupport,
-		allowEditing: allowEditingSetting ?? true,
-		allowCustomContentSize: allowCustomContentSizeSetting ?? true,
 	};
 	const {
 		allowSwitching,
