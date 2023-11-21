@@ -148,6 +148,7 @@ function ColorGradientControlInner( {
 									className={
 										'block-editor-color-gradient-control__panel'
 									}
+									focusable={ false }
 								>
 									{ tabPanels.color }
 								</Tabs.TabPanel>
@@ -156,6 +157,7 @@ function ColorGradientControlInner( {
 									className={
 										'block-editor-color-gradient-control__panel'
 									}
+									focusable={ false }
 								>
 									{ tabPanels.gradient }
 								</Tabs.TabPanel>
