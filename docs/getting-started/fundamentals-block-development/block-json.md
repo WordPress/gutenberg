@@ -4,53 +4,36 @@ The `block.json` file simplifies the processs of defining a block and using the 
 
 [![Open block.json diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-json.png)](https://excalidraw.com/#json=v1GrIkGsYGKv8P14irBy6,Yy0vl8q7DTTL2VsH5Ww27A "Open block.json diagram in excalidraw")
 
+_Check [here](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json) the `block.json` of [a block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd)_
+
 Besides simplifying a block's registration, using a `block.json` has [several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), including improved performance and development.
 
-Here's [the `block.json`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json) of [a block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) 
+At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. Besides providing basic metadata to identify the block and discover it, with these properties you can define things such as:
 
-```json
-{
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "block-development-examples/block-supports-6aa4dd",
-	"version": "0.1.0",
-	"title": "Block Supports 6aa4dd",
-	"category": "widgets",
-	"attributes": {
-		"content": {
-			"type": "string",
-			"source": "html",
-			"selector": "p"
-		}
-	},
-	"example": {
-		"attributes": {
-			"content": "Hello world"
-		}
-	},
-	"textdomain": "block-development-examples",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"keywords": [ "6aa4dd" ],
-	"supports": {
-		"color": {
-			"text": true,
-			"link": true,
-			"background": true
-		}
-	}
-}
-```
+- Files to determine the block's behavior, output, or style 
+- Storing Data in the Block
+- Enabling UI panels for the block
 
-At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. These properties used to define a block could be grouped according to their purpose:
+## Files to determine the block's behavior, output, or style 
 
-- Basic definition properties such as:
-	- The `$schema` property
-	- The `name` property
-	- The `title` property
-	- The `category` property
+- The `editorScript` property,  They will only be enqueued in the context of the editor.
 
+
+It’s possible to pass a script handle registered with the wp_register_script function, a path to a JavaScript file relative to the block.json file, or a list with a mix of both (learn more).
+
+
+- The `style` property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.(css|scss|sass)`).
+- The `editorStyle` property, usually set with the path of a bundled `index.css` (output build from `src/editor.(css|scss|sass)`).
+- The `render` property, usually set with the path of a bundled `render.php` (output copied from `src/render.php`).
+- The `viewScript` property, usually set with the path of a bundled `view.js` (output copied from `src/view.php`).
+
+
+## Enable UI panels
+
+-----
+
+
+- Basic definition properties
 - Relative paths for key files that define the block's behaviour, output or style such as:
 	- The `editorScript` property
 	- The `style` property
@@ -62,6 +45,22 @@ At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/refer
 	- The `attributes` property
 	- The `supports` property
 
+
+-----
+
+ such as:
+	- The `$schema` property
+	- The `name` property
+	- The `title` property
+	- The `category` property
+
+-----
+One of the most versatile features of a block is their ability to store data  stored along witht
+
+
+Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
+
+See the the attributes documentation for more details.
 
 ## Definition properties
 
