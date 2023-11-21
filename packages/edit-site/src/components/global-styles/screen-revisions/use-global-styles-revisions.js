@@ -32,14 +32,19 @@ export default function useGlobalStylesRevisions() {
 			__experimentalGetDirtyEntityRecords,
 			getCurrentUser,
 			getUsers,
-			getCurrentThemeGlobalStylesRevisions,
+			getRevisions,
+			__experimentalGetCurrentGlobalStylesId,
 			isResolving,
 		} = select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		const _currentUser = getCurrentUser();
 		const _isDirty = dirtyEntityRecords.length > 0;
 		const globalStylesRevisions =
-			getCurrentThemeGlobalStylesRevisions() || EMPTY_ARRAY;
+			getRevisions(
+				'root',
+				'globalStyles',
+				__experimentalGetCurrentGlobalStylesId()
+			) || EMPTY_ARRAY;
 		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 
 		return {
