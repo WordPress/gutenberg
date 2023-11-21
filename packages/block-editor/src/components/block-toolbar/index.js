@@ -42,6 +42,7 @@ const BlockToolbar = ( {
 	isFixed, // TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
 	__experimentalInitialIndex,
 	__experimentalOnIndexChange,
+	variant,
 } ) => {
 	const {
 		blockClientId,
@@ -143,7 +144,7 @@ const BlockToolbar = ( {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			variant={ isFixed ? 'unstyled' : undefined } // TODO: Remove this. Let this be handled by the <BlockToolbarPopover />  wrapper and remove an assumed "toolbar" context from dropdowns.
+			variant={ variant }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }
