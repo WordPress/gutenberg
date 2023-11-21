@@ -21,8 +21,7 @@ import './content-lock-ui';
 import './metadata';
 import './custom-fields';
 import './block-hooks';
-import './block-renaming';
-import './block-rename-ui';
+import './block-rename';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
