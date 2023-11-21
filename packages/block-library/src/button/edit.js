@@ -31,7 +31,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalLinkControl as LinkControl,
+	LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
