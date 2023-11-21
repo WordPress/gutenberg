@@ -1,0 +1,30 @@
+.editor-post-schedule__panel {
+	width: 100%;
+	justify-content: flex-start;
+	align-items: flex-start;
+
+	span {
+		display: block;
+		width: 30%;
+	}
+}
+
+.editor-post-schedule__panel-dropdown {
+	width: 70%;
+}
+
+.editor-post-schedule__dialog {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}
+
+.editor-post-schedule__dialog-toggle {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

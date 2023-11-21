@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { PostURLPanel } from '@wordpress/editor';
+import { PostURLPanel, PostSchedulePanel } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PageStatus from './page-status';
-import PublishDate from './publish-date';
 import EditTemplate from './edit-template';
 
 export default function PageSummary( {
@@ -27,12 +26,7 @@ export default function PageSummary( {
 				postId={ postId }
 				postType={ postType }
 			/>
-			<PublishDate
-				status={ status }
-				date={ date }
-				postId={ postId }
-				postType={ postType }
-			/>
+			<PostSchedulePanel />
 			<EditTemplate />
 			<PostURLPanel />
 		</VStack>
