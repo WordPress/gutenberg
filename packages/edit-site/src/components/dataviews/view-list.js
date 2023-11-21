@@ -249,6 +249,7 @@ function ViewList( {
 	fields,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
 } ) {
@@ -370,6 +371,7 @@ function ViewList( {
 			},
 			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
 		},
+		getRowId: getItemId,
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
 				const sort =
@@ -488,7 +490,7 @@ function ViewList( {
 							<tr key={ row.id }>
 								{ row.getVisibleCells().map( ( cell ) => (
 									<td
-										key={ cell.id }
+										key={ cell.column.id }
 										style={ {
 											width:
 												cell.column.columnDef.width ||
