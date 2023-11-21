@@ -16,6 +16,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import deprecated from '@wordpress/deprecated';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -160,6 +161,16 @@ const LinkControlSearchInput = forwardRef(
 				{ children }
 			</div>
 		);
+	}
+);
+
+export const DeprecatedExperimentalLinkControlSearchInput = forwardRef(
+	( props, ref ) => {
+		deprecated( 'wp.blockEditor.__experimentalLinkControlSearchInput', {
+			since: '6.5',
+			alternative: 'wp.blockEditor.LinkControlSearchInput',
+		} );
+		return <LinkControlSearchInput { ...props } ref={ ref } />;
 	}
 );
 
