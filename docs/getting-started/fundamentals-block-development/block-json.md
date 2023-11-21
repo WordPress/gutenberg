@@ -11,21 +11,20 @@ Besides simplifying a block's registration, using a `block.json` has [several be
 At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. Besides providing basic metadata to identify the block and discover it, with these properties you can define things such as:
 
 - Files to determine the block's behavior, output, or style 
-- Storing Data in the Block
-- Enabling UI panels for the block
+- Data Storage in the Block
+- Setting UI panels for the block
 
 ## Files to determine the block's behavior, output, or style 
 
-- The `editorScript` property,  They will only be enqueued in the context of the editor.
+The `editorScript` and `editorStyle` properties allow us to define Javascript and CSS files to be enqueued and loaded **only in the editor**.
 
+The `script` and `style` properties allow us to define Javascript and CSS files to be enqueued and loaded **in both the editor and the frontend**.
 
-It’s possible to pass a script handle registered with the wp_register_script function, a path to a JavaScript file relative to the block.json file, or a list with a mix of both (learn more).
+The `viewScript` and `style` property allow us to define Javascript file to be enqueued and loaded **only in the editor**.
 
+All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScript`) accept as a value a path prefixed with `file:`, a handle registered with `wp_register_script` or `wp_register_style`, or an array with a mix of both.
 
-- The `style` property, usually set with the path of a bundled `style-index.css` file (output build from `src/style.(css|scss|sass)`).
-- The `editorStyle` property, usually set with the path of a bundled `index.css` (output build from `src/editor.(css|scss|sass)`).
-- The `render` property, usually set with the path of a bundled `render.php` (output copied from `src/render.php`).
-- The `viewScript` property, usually set with the path of a bundled `view.js` (output copied from `src/view.php`).
+The `render` property...
 
 
 ## Enable UI panels
