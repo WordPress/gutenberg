@@ -121,7 +121,7 @@ export default function CategoriesEdit( {
 					/>
 				) : (
 					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ __( 'Categories' ) }
+						{ label ? label : __( 'Categories' ) }
 					</VisuallyHidden>
 				) }
 				<select id={ selectId }>
