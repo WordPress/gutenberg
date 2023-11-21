@@ -27,10 +27,18 @@ import { useBlockEditingMode } from '..';
 
 export const SECTION_SUPPORT_KEY = 'section';
 
+// TODO: Should section support be available to all block types or not?
+// For the time being, we'll limit section support to a subset of core blocks.
 const SECTION_SUPPORTED_BLOCKS = [ 'core/group' ];
 
 function hasSectionSupport( blockType ) {
-	return !! getBlockSupport( blockType, SECTION_SUPPORT_KEY );
+	const blockName =
+		typeof blockType === 'string' ? blockType : blockType.name;
+
+	return (
+		SECTION_SUPPORTED_BLOCKS.includes( blockName ) &&
+		!! getBlockSupport( blockType, SECTION_SUPPORT_KEY )
+	);
 }
 
 /**
@@ -63,10 +71,7 @@ function addAttribute( settings ) {
  * @return {Object} Filtered block settings.
  */
 function addEditProps( settings ) {
-	if (
-		! hasSectionSupport( settings ) ||
-		! SECTION_SUPPORTED_BLOCKS.includes( settings.name )
-	) {
+	if ( ! hasSectionSupport( settings ) ) {
 		return settings;
 	}
 
@@ -169,7 +174,7 @@ function SectionPanel( props ) {
 
 	// TODO: Add theme.json setting to disable section styling.
 
-	if ( ! sections || ! hasSectionSupport( props.name ) ) {
+	if ( ! sections ) {
 		return null;
 	}
 
