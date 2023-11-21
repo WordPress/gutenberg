@@ -62,6 +62,8 @@ export function parseDropEvent( event ) {
  * @param {Function} moveBlocks                A function that moves blocks.
  * @param {Function} insertOrReplaceBlocks     A function that inserts or replaces blocks.
  * @param {Function} clearSelectedBlock        A function that clears block selection.
+ * @param {string}   operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
+ * @param {Function} getBlock                  A function that returns a block given its client id.
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -71,7 +73,9 @@ export function onBlockDrop(
 	getClientIdsOfDescendants,
 	moveBlocks,
 	insertOrReplaceBlocks,
-	clearSelectedBlock
+	clearSelectedBlock,
+	operation,
+	getBlock
 ) {
 	return ( event ) => {
 		const {
@@ -111,6 +115,21 @@ export function onBlockDrop(
 					( id ) => id === targetRootClientId
 				)
 			) {
+				return;
+			}
+
+			// If the user is dropping a block over another block, replace both blocks
+			// with a group block containing them
+			if ( operation === 'group' ) {
+				const blocksToInsert = sourceClientIds.map( ( clientId ) =>
+					getBlock( clientId )
+				);
+				insertOrReplaceBlocks(
+					blocksToInsert,
+					true,
+					null,
+					sourceClientIds
+				);
 				return;
 			}
 
@@ -224,7 +243,12 @@ export default function useOnBlockDrop(
 	const registry = useRegistry();
 
 	const insertOrReplaceBlocks = useCallback(
-		( blocks, updateSelection = true, initialPosition = 0 ) => {
+		(
+			blocks,
+			updateSelection = true,
+			initialPosition = 0,
+			clientIdsToReplace = []
+		) => {
 			const clientIds = getBlockOrder( targetRootClientId );
 			const clientId = clientIds[ targetBlockIndex ];
 			if ( operation === 'replace' ) {
@@ -248,8 +272,10 @@ export default function useOnBlockDrop(
 					},
 					groupInnerBlocks
 				);
+				// Need to make sure both the target block and the block being dragged are replaced
+				// otherwise the dragged block will be duplicated.
 				replaceBlocks(
-					clientId,
+					[ clientId, ...clientIdsToReplace ],
 					wrappedBlocks,
 					undefined,
 					initialPosition
@@ -324,7 +350,9 @@ export default function useOnBlockDrop(
 		getClientIdsOfDescendants,
 		moveBlocks,
 		insertOrReplaceBlocks,
-		clearSelectedBlock
+		clearSelectedBlock,
+		operation,
+		getBlock
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,
