@@ -21,7 +21,12 @@ const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
 // A hardcoded list of post types that support revisions.
 // @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
-const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
+const POST_TYPES_WITH_REVISIONS_SUPPORT = [
+	'post',
+	'page',
+	'wp_template',
+	'wp_template_part',
+];
 
 export const rootEntitiesConfig = [
 	{
