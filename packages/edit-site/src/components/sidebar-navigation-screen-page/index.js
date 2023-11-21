@@ -28,6 +28,7 @@ import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import PageActions from '../page-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+
 const { useHistory } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreenPage() {
@@ -43,35 +44,31 @@ export default function SidebarNavigationScreenPage() {
 		postId
 	);
 
-	const { isCanvasModeView, featuredMediaAltText, featuredMediaSourceUrl } =
-		useSelect(
-			( select ) => {
-				const { getEntityRecord } = select( coreStore );
-				// Featured image.
-				const attachedMedia = record?.featured_media
-					? getEntityRecord(
-							'postType',
-							'attachment',
-							record?.featured_media
-					  )
-					: null;
+	const { featuredMediaAltText, featuredMediaSourceUrl } = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			// Featured image.
+			const attachedMedia = record?.featured_media
+				? getEntityRecord(
+						'postType',
+						'attachment',
+						record?.featured_media
+				  )
+				: null;
 
-				return {
-					isCanvasModeView:
-						unlock( select( editSiteStore ) ).getCanvasMode() ===
-						'view',
-					featuredMediaSourceUrl:
-						attachedMedia?.media_details.sizes?.medium
-							?.source_url || attachedMedia?.source_url,
-					featuredMediaAltText: escapeAttribute(
-						attachedMedia?.alt_text ||
-							attachedMedia?.description?.raw ||
-							''
-					),
-				};
-			},
-			[ record ]
-		);
+			return {
+				featuredMediaSourceUrl:
+					attachedMedia?.media_details.sizes?.medium?.source_url ||
+					attachedMedia?.source_url,
+				featuredMediaAltText: escapeAttribute(
+					attachedMedia?.alt_text ||
+						attachedMedia?.description?.raw ||
+						''
+				),
+			};
+		},
+		[ record ]
+	);
 
 	// Redirect to the main pages navigation screen if the page is not found or has been deleted.
 	useEffect( () => {
@@ -83,7 +80,7 @@ export default function SidebarNavigationScreenPage() {
 				canvas: 'view',
 			} );
 		}
-	}, [ hasResolved, isCanvasModeView, history ] );
+	}, [ hasResolved, history ] );
 
 	const featureImageAltText = featuredMediaAltText
 		? decodeEntities( featuredMediaAltText )
