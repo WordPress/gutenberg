@@ -181,23 +181,23 @@ export default function DataviewsTemplates() {
 	const fields = useMemo(
 		() => [
 			{
-				header: __( 'Template' ),
-				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => <TemplateTitle item={ item } />,
-				maxWidth: 400,
-				enableHiding: false,
-			},
-			{
 				header: __( 'Preview' ),
 				id: 'preview',
 				getValue: () => {},
 				render: ( { item } ) => {
 					return <TemplatePreview content={ item.content.raw } />;
 				},
-				minWidth: 300,
-				maxWidth: 300,
+				minWidth: 120,
+				maxWidth: 120,
 				enableSorting: false,
+			},
+			{
+				header: __( 'Template' ),
+				id: 'title',
+				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				render: ( { item } ) => <TemplateTitle item={ item } />,
+				maxWidth: 400,
+				enableHiding: false,
 			},
 			{
 				header: __( 'Description' ),
