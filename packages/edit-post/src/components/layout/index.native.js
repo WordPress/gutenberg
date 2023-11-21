@@ -33,6 +33,7 @@ import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
 import { store as editPostStore } from '../../store';
+import OfflineStatus from './offline-status';
 
 class Layout extends Component {
 	constructor() {
@@ -179,6 +180,7 @@ class Layout extends Component {
 						</KeyboardAvoidingView>
 					) }
 					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
+					<OfflineStatus />
 				</SafeAreaView>
 			</Tooltip.Slot>
 		);
