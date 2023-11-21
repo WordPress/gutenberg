@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef } from '@wordpress/element';
+import { useEffect, useState, forwardRef } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	Tooltip,
@@ -166,29 +166,12 @@ function BlockPatternsList(
 	},
 	ref
 ) {
-	const compositeStore = useCompositeStore( {
-		orientation,
-		setItems: ( items ) => {
-			// This is necessary for if/when we filter the block patterns;
-			// we can potentially remove the currently active item, so we
-			// check to see if the active item is still present, and if not,
-			// reset the active item to be the first available block.
+	const compositeStore = useCompositeStore( { orientation } );
+	const { setActiveId } = compositeStore;
 
-			const currentIds = items.map( ( item ) => item.id );
-			if ( ! currentIds.includes( activeId ) ) {
-				// We can't rely on the order of `currentIds` here, because
-				// `blockPatterns` may not be in the same order the blocks were
-				// originally registered in. So we filter the blocks by what's
-				// visible, and take the first item in that list instead.
-				const firstPattern = blockPatterns.filter( ( pattern ) =>
-					currentIds.includes( pattern.name )
-				)[ 0 ];
-				compositeStore.setActiveId( firstPattern?.name );
-			}
-		},
-	} );
-
-	const activeId = compositeStore.useState( 'activeId' );
+	useEffect( () => {
+		setActiveId( undefined );
+	}, [ setActiveId, shownPatterns, blockPatterns ] );
 
 	return (
 		<Composite
