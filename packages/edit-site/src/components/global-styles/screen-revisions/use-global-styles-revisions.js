@@ -43,7 +43,10 @@ export default function useGlobalStylesRevisions() {
 			getRevisions(
 				'root',
 				'globalStyles',
-				__experimentalGetCurrentGlobalStylesId()
+				__experimentalGetCurrentGlobalStylesId(),
+				{
+					per_page: 100,
+				}
 			) || EMPTY_ARRAY;
 		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 
