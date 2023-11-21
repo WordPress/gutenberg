@@ -18,6 +18,8 @@ export default function Pagination( {
 	const isFirstPage = currentPage === 1;
 	const isLastPage = currentPage === numPages;
 
+	// Buttons in this component use `tabIndex={ 0 }` to workaround a Safari bug not
+	// setting focus on buttons when clicking them. See https://github.com/WordPress/gutenberg/pull/56162
 	return (
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<Text variant="muted">
