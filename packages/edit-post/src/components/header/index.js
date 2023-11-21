@@ -127,7 +127,7 @@ function Header( {
 								}
 							) }
 						>
-							<BlockToolbar isFixed />
+							<BlockToolbar isFixed variant="unstyled" />
 						</div>
 						<Popover.Slot
 							ref={ blockToolbarRef }

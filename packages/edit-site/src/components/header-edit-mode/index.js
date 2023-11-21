@@ -161,7 +161,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 									}
 								) }
 							>
-								<BlockToolbar isFixed />
+								<BlockToolbar isFixed variant="unstyled" />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }

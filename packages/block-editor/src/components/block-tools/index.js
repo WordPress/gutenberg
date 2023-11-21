@@ -180,7 +180,7 @@ export default function BlockTools( {
 				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
 
 				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
-					<BlockToolbar isFixed />
+					<BlockToolbar isFixed variant="unstyled" />
 				) }
 
 				{ showEmptyBlockSideInserter && (

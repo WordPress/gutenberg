@@ -53,7 +53,7 @@ function Header( { setListViewToggleElement } ) {
 					{ hasFixedToolbar && isLargeViewport && (
 						<>
 							<div className="selected-block-tools-wrapper">
-								<BlockToolbar isFixed />
+								<BlockToolbar isFixed variant="unstyled" />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }
