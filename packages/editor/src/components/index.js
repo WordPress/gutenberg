@@ -26,6 +26,7 @@ export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
+export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';

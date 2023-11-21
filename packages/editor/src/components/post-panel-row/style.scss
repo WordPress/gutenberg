@@ -15,4 +15,7 @@
 
 .editor-post-panel__row-control {
 	flex-grow: 1;
+	min-height: $button-size;
+	display: flex;
+	align-items: center;
 }
