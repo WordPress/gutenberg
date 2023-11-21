@@ -50,7 +50,7 @@ class WP_Font_Face_Resolver {
 	 * @param array $settings Font settings to parse.
 	 * @return array Returns an array of fonts, grouped by font-family.
 	 */
-	protected static function parse_settings( array $settings ) {
+	private static function parse_settings( array $settings ) {
 		$fonts = array();
 
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
