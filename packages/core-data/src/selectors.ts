@@ -1353,13 +1353,20 @@ export function getUserPatternCategories(
 /**
  * Returns the revisions of the current global styles theme.
  *
- * @param state Data state.
+ * @deprecated since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+ *
+ * @param      state Data state.
  *
  * @return The current global styles.
  */
 export function getCurrentThemeGlobalStylesRevisions(
 	state: State
 ): Array< object > | null {
+	deprecated( "select( 'core' ).getCurrentThemeGlobalStylesRevisions()", {
+		since: '6.5.0',
+		alternative:
+			"select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )",
+	} );
 	const currentGlobalStylesId =
 		__experimentalGetCurrentGlobalStylesId( state );
 
