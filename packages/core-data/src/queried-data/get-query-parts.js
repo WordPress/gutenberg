@@ -8,6 +8,13 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
 
+function appendToStableKey( stableKey, key, value ) {
+	stableKey +=
+		( stableKey ? '&' : '' ) +
+		addQueryArgs( '', { [ key ]: value } ).slice( 1 );
+	return stableKey;
+}
+
 /**
  * An object of properties describing a specific query.
  *
@@ -56,10 +63,22 @@ export function getQueryParts( query ) {
 		switch ( key ) {
 			case 'page':
 				parts[ key ] = Number( value );
+				// Add query param to stableKey to ensure it's included in cache key.
+				parts.stableKey = appendToStableKey(
+					parts.stableKey,
+					key,
+					parts[ key ]
+				);
 				break;
 
 			case 'per_page':
 				parts.perPage = Number( value );
+				// Add query param to stableKey to ensure it's included in cache key.
+				parts.stableKey = appendToStableKey(
+					parts.stableKey,
+					key,
+					parts.perPage
+				);
 				break;
 
 			case 'context':
@@ -97,9 +116,11 @@ export function getQueryParts( query ) {
 				// should accept a key value pair, which may optimize its
 				// implementation for our use here, vs. iterating an object
 				// with only a single key.
-				parts.stableKey +=
-					( parts.stableKey ? '&' : '' ) +
-					addQueryArgs( '', { [ key ]: value } ).slice( 1 );
+				parts.stableKey = appendToStableKey(
+					parts.stableKey,
+					key,
+					value
+				);
 		}
 	}
 
