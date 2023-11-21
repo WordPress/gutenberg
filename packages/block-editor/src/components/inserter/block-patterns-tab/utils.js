@@ -53,9 +53,11 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 		return true;
 	}
 
-	// If user source selected, filter out theme patterns. Any pattern without
-	// an id wasn't created by a user.
-	if ( sourceFilter === PATTERN_TYPES.user && ! pattern.id ) {
+	// If user source selected, filter out theme patterns.
+	if (
+		sourceFilter === PATTERN_TYPES.user &&
+		pattern.type !== PATTERN_TYPES.user
+	) {
 		return true;
 	}
 
