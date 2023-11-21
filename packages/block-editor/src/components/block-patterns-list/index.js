@@ -82,7 +82,8 @@ function BlockPattern( {
 								'block-editor-block-patterns-list__item',
 								{
 									'block-editor-block-patterns-list__list-item-synced':
-										pattern.id && ! pattern.syncStatus,
+										pattern.type === 'user' &&
+										! pattern.syncStatus,
 								}
 							) }
 							onClick={ () => {
@@ -107,14 +108,15 @@ function BlockPattern( {
 							/>
 
 							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.id && ! pattern.syncStatus && (
-									<div className="block-editor-patterns__pattern-icon-wrapper">
-										<Icon
-											className="block-editor-patterns__pattern-icon"
-											icon={ symbol }
-										/>
-									</div>
-								) }
+								{ pattern.type === 'user' &&
+									! pattern.syncStatus && (
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
+										</div>
+									) }
 								{ ( ! showTooltip || pattern.id ) && (
 									<div className="block-editor-block-patterns-list__item-title">
 										{ pattern.title }
