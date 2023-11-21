@@ -85,18 +85,6 @@ export function useInputAndSelection( props ) {
 			const { record, applyRecord, createRecord, handleChange } =
 				propsRef.current;
 
-			// When white space is collapsed (default rendering rule), the
-			// browser will insert non-breaking spaces instead of regular spaces
-			// when inserting multiple. We should prevent this behaviour because
-			// the browser doesn't always remove them when they're no longer
-			// needed, and we have custom handling for multiple spaces (see en
-			// and em input rule). At the start and end of a line with a regular
-			// space, we pad with a zero-width non-breaking space.
-			if ( inputType === 'insertText' && event?.data === ' ' ) {
-				applyRecord( insert( record.current, ' ' ) );
-				return;
-			}
-
 			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
 			// needed.
@@ -109,9 +97,20 @@ export function useInputAndSelection( props ) {
 				return;
 			}
 
-			const currentValue = createRecord();
+			let currentValue = createRecord();
 			const { start, activeFormats: oldActiveFormats = [] } =
 				record.current;
+
+			// When white space is collapsed (default rendering rule), the
+			// browser will insert non-breaking spaces instead of regular spaces
+			// when inserting multiple. We should prevent this behaviour because
+			// the browser doesn't always remove them when they're no longer
+			// needed, and we have custom handling for multiple spaces (see en
+			// and em input rule). At the start and end of a line with a regular
+			// space, we pad with a zero-width non-breaking space.
+			if ( inputType === 'insertText' && event?.data === ' ' ) {
+				currentValue = insert( record.current, ' ' );
+			}
 
 			// Update the formats between the last and new caret position.
 			const change = updateFormats( {
