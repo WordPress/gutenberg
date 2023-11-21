@@ -88,7 +88,7 @@ MultiSelect.args = {
 			return currentValue;
 		}
 		if ( currentValue.length === 0 ) return 'No colors selected';
-		if ( currentValue.length === 1 ) return `${ currentValue[ 0 ] }`;
+		if ( currentValue.length === 1 ) return currentValue[ 0 ];
 		return <div>{ currentValue.length } colors selected</div>;
 	},
 	children: (
