@@ -2,7 +2,7 @@
 
 A block is usually registered through a plugin in both the server and the client using its `block.json` metadata. 
 
-Although technically, blocks could be registered only on the client, **registering blocks in both the server and the client is a general recommendation**, as some key features like Dynamic Rendering, Block Hooks, or Block style variations won't work properly without a server registration of the block. 
+Although technically, blocks could be registered only on the client, **registering blocks in both the server and the client is a general recommendation**, as some features like Dynamic Rendering, Block Hooks, or Block style variations won't work properly without a server registration of the block. 
 
 [![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g "Open Block Registration diagram in excalidraw")
 
