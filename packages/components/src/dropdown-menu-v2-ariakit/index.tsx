@@ -19,6 +19,8 @@ import {
 	useId,
 	useDeferredValue,
 	useEffect,
+	useRef,
+	useState,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { check, chevronRightSmall } from '@wordpress/icons';
@@ -338,6 +340,10 @@ export const DropdownMenuSeparator = forwardRef<
 	);
 } );
 
+const ComboboxValuesContext = createContext<
+	React.Dispatch< React.SetStateAction< string[] > >
+>( () => {} );
+
 // TODO:
 // - custom search prop
 // - reuse dropdowmmenu
@@ -458,22 +464,20 @@ const UnconnectedDropdownComboboxMenu = (
 		[ computedDirection ]
 	);
 
+	const [ comboboxValues, setValues ] = useState< string[] >( [] );
+
 	const combobox = Ariakit.useComboboxStore();
 	const select = Ariakit.useSelectStore( { combobox } );
 	const selectValue = select.useState( 'value' );
-	const comboboxItemsValues = combobox
-		.useState()
-		// TODO: better way to ensure string
-		.items.map( ( item ) => item.element?.dataset.itemValue ?? '' );
 
 	const deferredSearchValue = useDeferredValue( searchValue );
 
 	// Expose searchFn prop and default to matchsorter
 	const matches = useMemo( () => {
-		return matchSorter( comboboxItemsValues, deferredSearchValue ?? '', {
+		return matchSorter( comboboxValues, deferredSearchValue ?? '', {
 			baseSort: ( a, b ) => ( a.index < b.index ? -1 : 1 ),
 		} );
-	}, [ comboboxItemsValues, deferredSearchValue ] );
+	}, [ comboboxValues, deferredSearchValue ] );
 
 	// Reset the combobox value whenever an item is checked or unchecked.
 	useEffect( () => combobox.setValue( '' ), [ selectValue, combobox ] );
@@ -489,6 +493,8 @@ const UnconnectedDropdownComboboxMenu = (
 		} ),
 		[ dropdownMenuStore, variant, matches ]
 	);
+
+	const comboboxRef = useRef( null );
 
 	return (
 		<>
@@ -527,38 +533,42 @@ const UnconnectedDropdownComboboxMenu = (
 				unmountOnHide
 				// The combobox widget will take care of composite behaviour
 				composite={ false }
+				initialFocus={ comboboxRef }
 			>
-				<DropdownMenuContext.Provider value={ contextValue }>
-					<Ariakit.ComboboxProvider
-						store={ combobox }
-						value={ searchValue }
-						setValue={ onSearchValueChange }
-						defaultValue={ defaultSearchValue }
-						resetValueOnHide
-					>
-						<Ariakit.SelectProvider
-							store={ select }
-							value={ selectedValues }
-							setValue={ onSelectedValuesChange }
-							defaultValue={ defaultSelectedValues }
+				<ComboboxValuesContext.Provider value={ setValues }>
+					<DropdownMenuContext.Provider value={ contextValue }>
+						<Ariakit.ComboboxProvider
+							store={ combobox }
+							value={ searchValue }
+							setValue={ onSearchValueChange }
+							defaultValue={ defaultSearchValue }
+							resetValueOnHide
 						>
-							<Ariakit.Combobox
-								id={ inputId }
-								placeholder={ placeholder }
-							/>
-							<Ariakit.ComboboxList
-								className="popover"
-								alwaysVisible
-								render={ <Ariakit.SelectList /> }
+							<Ariakit.SelectProvider
+								store={ select }
+								value={ selectedValues }
+								setValue={ onSelectedValuesChange }
+								defaultValue={ defaultSelectedValues }
 							>
-								{ children }
-								{ ! matches.length && (
-									<div>No results found</div>
-								) }
-							</Ariakit.ComboboxList>
-						</Ariakit.SelectProvider>
-					</Ariakit.ComboboxProvider>
-				</DropdownMenuContext.Provider>
+								<Ariakit.Combobox
+									ref={ comboboxRef }
+									id={ inputId }
+									placeholder={ placeholder }
+								/>
+								<Ariakit.ComboboxList
+									className="popover"
+									alwaysVisible
+									render={ <Ariakit.SelectList /> }
+								>
+									{ children }
+									{ ! matches.length && (
+										<div>No results found</div>
+									) }
+								</Ariakit.ComboboxList>
+							</Ariakit.SelectProvider>
+						</Ariakit.ComboboxProvider>
+					</DropdownMenuContext.Provider>
+				</ComboboxValuesContext.Provider>
 			</Styled.DropdownMenu>
 		</>
 	);
@@ -576,30 +586,38 @@ export const DropdownComboboxMenu = contextConnect(
 //   in order to handle selection individually on the item via selected prop?
 interface ComboboxItemProps extends Ariakit.SelectItemProps {
 	children?: React.ReactNode;
+	value: string;
 }
 export const DropdownComboboxMenuItem = forwardRef<
 	HTMLDivElement,
 	ComboboxItemProps
->( function ComboboxItem( props, ref ) {
+>( function ComboboxItem( { value, ...props }, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+	const setValues = useContext( ComboboxValuesContext );
+
+	useEffect( () => {
+		setValues( ( values ) => [ ...values, value ] );
+		return () =>
+			setValues( ( values ) => values.filter( ( v ) => v !== value ) );
+	}, [ value, setValues ] );
 
 	const isMatch =
-		props.value &&
-		dropdownMenuContext?.comboboxMatches?.includes( props.value );
+		value && dropdownMenuContext?.comboboxMatches?.includes( value );
+
+	if ( ! isMatch ) {
+		return null;
+	}
 
 	return (
 		<Ariakit.SelectItem
 			ref={ ref }
 			{ ...props }
+			value={ value }
 			render={ <Ariakit.ComboboxItem render={ props.render } /> }
-			// Using `display: none` because rendering `null` would cause the item to
-			// de-register from the combobox provider, which would in turn not be able
-			// to read this item's value when calculating matches
-			style={ { display: isMatch ? 'flex' : 'none' } }
-			data-item-value={ props.value }
+			style={ { display: 'flex' } }
 		>
 			<Ariakit.SelectItemCheck />
-			{ props.children || props.value }
+			{ props.children ?? value }
 		</Ariakit.SelectItem>
 	);
 } );
