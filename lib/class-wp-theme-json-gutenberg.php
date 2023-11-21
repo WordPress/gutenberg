@@ -1035,6 +1035,8 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 				}
+			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+				unset( $tree[ $key ] );
 			}
 		}
 
