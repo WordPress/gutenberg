@@ -51,7 +51,7 @@ At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/refer
 	- The `title` property
 	- The `category` property
 
-- Relative path for key files that define the block's behaviour, output or style such as:
+- Relative paths for key files that define the block's behaviour, output or style such as:
 	- The `editorScript` property
 	- The `style` property
 	- The `editorStyle` property
@@ -64,6 +64,8 @@ At ["Metadata in block.json"](https://developer.wordpress.org/block-editor/refer
 
 
 ## Definition properties
+
+https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/block.json
 
 Development is improved by using a defined schema definition file that provides tooltips, autocomplete, and schema validation in the IDE. To use the schema, add the following to the top of the `block.json`:
 
