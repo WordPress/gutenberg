@@ -332,3 +332,161 @@ export const DropdownMenuSeparator = forwardRef<
 		/>
 	);
 } );
+
+const UnconnectedDropdownComboboxMenu = (
+	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
+	ref: React.ForwardedRef< HTMLDivElement >
+) => {
+	const {
+		// Store props
+		open,
+		defaultOpen,
+		onOpenChange,
+		placement,
+
+		// Menu trigger props
+		trigger,
+
+		// Menu props
+		gutter,
+		children,
+		shift,
+		modal = true,
+
+		// From internal components context
+		variant,
+
+		// Rest
+		...otherProps
+	} = useContextSystem<
+		typeof props & Pick< DropdownMenuContextType, 'variant' >
+	>( props, 'DropdownMenu' );
+
+	const parentContext = useContext( DropdownMenuContext );
+
+	const computedDirection = isRTL() ? 'rtl' : 'ltr';
+
+	// If an explicit value for the `placement` prop is not passed,
+	// apply a default placement of `bottom-start` for the root dropdown,
+	// and of `right-start` for nested dropdowns.
+	let computedPlacement =
+		props.placement ??
+		( parentContext?.store ? 'right-start' : 'bottom-start' );
+	// Swap left/right in case of RTL direction
+	if ( computedDirection === 'rtl' ) {
+		if ( /right/.test( computedPlacement ) ) {
+			computedPlacement = computedPlacement.replace(
+				'right',
+				'left'
+			) as typeof computedPlacement;
+		} else if ( /left/.test( computedPlacement ) ) {
+			computedPlacement = computedPlacement.replace(
+				'left',
+				'right'
+			) as typeof computedPlacement;
+		}
+	}
+
+	const dropdownMenuStore = Ariakit.useMenuStore( {
+		parent: parentContext?.store,
+		open,
+		defaultOpen,
+		placement: computedPlacement,
+		focusLoop: true,
+		setOpen( willBeOpen ) {
+			onOpenChange?.( willBeOpen );
+		},
+		rtl: computedDirection === 'rtl',
+	} );
+
+	const contextValue = useMemo(
+		() => ( { store: dropdownMenuStore, variant } ),
+		[ dropdownMenuStore, variant ]
+	);
+
+	// Extract the side from the applied placement — useful for animations.
+	const appliedPlacementSide = dropdownMenuStore
+		.useState( 'placement' )
+		.split( '-' )[ 0 ];
+
+	if (
+		dropdownMenuStore.parent &&
+		! ( isValidElement( trigger ) && DropdownMenuItem === trigger.type )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
+		);
+	}
+
+	const hideOnEscape = useCallback(
+		( event: React.KeyboardEvent< Element > ) => {
+			// Pressing Escape can cause unexpected consequences (ie. exiting
+			// full screen mode on MacOs, close parent modals...).
+			event.preventDefault();
+			// Returning `true` causes the menu to hide.
+			return true;
+		},
+		[]
+	);
+
+	const wrapperProps = useMemo(
+		() => ( {
+			dir: computedDirection,
+			style: {
+				direction:
+					computedDirection as React.CSSProperties[ 'direction' ],
+			},
+		} ),
+		[ computedDirection ]
+	);
+
+	return (
+		<>
+			{ /* Menu trigger */ }
+			<Ariakit.MenuButton
+				ref={ ref }
+				store={ dropdownMenuStore }
+				render={
+					dropdownMenuStore.parent
+						? cloneElement( trigger, {
+								// Add submenu arrow, unless a `suffix` is explicitly specified
+								suffix: trigger.props.suffix ?? (
+									<Styled.SubmenuChevronIcon
+										aria-hidden="true"
+										icon={ chevronRightSmall }
+										size={ 24 }
+									/>
+								),
+						  } )
+						: trigger
+				}
+			/>
+
+			{ /* Menu popover */ }
+			<Styled.DropdownMenu
+				{ ...otherProps }
+				modal={ modal }
+				store={ dropdownMenuStore }
+				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 8 ) }
+				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
+				hideOnHoverOutside={ false }
+				data-side={ appliedPlacementSide }
+				variant={ variant }
+				wrapperProps={ wrapperProps }
+				hideOnEscape={ hideOnEscape }
+				unmountOnHide
+				// The combobox widget will take care of composite behaviour
+				composite={ false }
+			>
+				<DropdownMenuContext.Provider value={ contextValue }>
+					{ children }
+				</DropdownMenuContext.Provider>
+			</Styled.DropdownMenu>
+		</>
+	);
+};
+export const DropdownComboboxMenu = contextConnect(
+	UnconnectedDropdownComboboxMenu,
+	'DropdownMenu'
+);
