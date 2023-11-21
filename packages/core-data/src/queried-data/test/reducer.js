@@ -170,7 +170,7 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {
-				default: { 's=a': { itemIds: [ 1 ] } },
+				default: { 'per_page=3&s=a': { itemIds: [ 1 ] } },
 			},
 		} );
 	} );

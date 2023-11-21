@@ -4,14 +4,14 @@
 import { getQueryParts } from '../get-query-parts';
 
 describe( 'getQueryParts', () => {
-	it( 'parses out pagination data', () => {
+	it( 'parses out pagination data and adds to returned object', () => {
 		const parts = getQueryParts( { page: 2, per_page: 2 } );
 
 		expect( parts ).toEqual( {
 			context: 'default',
 			page: 2,
 			perPage: 2,
-			stableKey: '',
+			stableKey: 'per_page=2',
 			fields: null,
 			include: null,
 		} );
@@ -71,7 +71,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
-			stableKey: 'b=2',
+			stableKey: 'b=2&per_page=10',
 			fields: null,
 			include: null,
 		} );
@@ -84,7 +84,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: -1,
-			stableKey: 'b=2',
+			stableKey: 'b=2&per_page=-1',
 			fields: null,
 			include: null,
 		} );
