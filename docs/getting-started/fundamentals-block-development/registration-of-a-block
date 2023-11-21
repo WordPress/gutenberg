@@ -6,16 +6,33 @@ Although technically, blocks could be registered only on the client, **registeri
 
 [![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g "Open Block Registration diagram in excalidraw")
 
-## Registering the block in the server
+### Registration of the block with PHP (server-side)
 
 A block registration in the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the `init` action.
 
-`register_block_type` takes a first argument to get the metadata of the block:
--  with the path to the `block.json` file with the metadata definition for the block
--  with the path to the folder where the `block.json` file is located
+The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function, that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
 
-Note that if a build process is involved, the registered `block.json` should be the one in the `build` folder, and the bundled files generated in the build process and linked from `block.json` should also be in the same folder.
+This function takes two params relevant in this context (`$block_type` accepts more types and variants):
 
+-   `$block_type` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
+-   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
+    -   `$render_callback` (`callable`) – callback used to render blocks of this block type, it's an alternative to the `render` field in `block.json`.
+
+It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
+
+_As during the build process the `block.json` will be copied from the `src` folder to the `build` folder, please note that the path to the `block.json` registered should point to the one in the `build` folder, and the bundled files generated in the build process and linked from `block.json` should also be in the same folder._
+
+**Example:**
+```php
+register_block_type(
+	__DIR__ . '/notice',
+	array(
+		'render_callback' => 'render_block_core_notice',
+	)
+);
+```
+
+**Example:**
 ```php
 function minimal_block_ca6eda___register_block() {
 	register_block_type( __DIR__ . '/build' );
@@ -23,19 +40,36 @@ function minimal_block_ca6eda___register_block() {
 
 add_action( 'init', 'minimal_block_ca6eda___register_block' );
 ```
-_See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php) in [an example]_
+_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php)_
 
-In most cases, registering a block in the server by calling `register_block_type` with just its first argument is enough.
+### Registration of the block with JavaScript (client-side)
 
-## Registering the block in the client
+When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
 
-The block registration in the client (for the Block Editor) usually takes place in the `index.js` file (or any other file defined in the `editorScript` property of `block.json`) via the [`registerBlockType` function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype).
+**Example:**
 
-The `registerBlockType` function takes the following parameters:
-- A first parameter with the block name (if the block has also been registered on the server) or an object with the metadata of the block
-- A second parameter with an object with settings for the block. The most important properties of this object settings are:
+```js
+registerBlockType( 'my-plugin/notice', {
+	edit: Edit,
+	// ...other client-side settings
+} );
+```
+
+Although registering the block also on the server with PHP is still recommended for the reasons mentioned at ["Benefits using the metadata file"](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), if you want to register it only client-side you can use [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from `@wordpress/blocks` package to register a block type using the metadata loaded from `block.json` file.
+
+The function takes two params:
+
+-   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
+-   `$settings` (`Object`) – client-side block settings.
+
+The client-side block settings object passed as a second parameter include two properties that are especially relevant:
 	- `edit`: The React component that gets used in the editor for our block.
 	- `save`: The React component that generates the static HTML markup that gets saved to the Database. 
+
+
+`registerBlockType` returns the registered block type (`WPBlock`) on success or `undefined` on failure.
+
+**Example:**
 
 ```
 import { registerBlockType } from '@wordpress/blocks';
@@ -52,15 +86,8 @@ registerBlockType( metadata.name, {
 ```
 _See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)_
 
-
-<div class="callout callout-info">
-At its simplest form, a block is a <code>registerBlockType</code> function call with some parameters passed in JS. 
-</div>
-
-
 ## Additional resources
 
 - [`register_block_type` PHP function](https://developer.wordpress.org/reference/functions/register_block_type/)
 - [`registerBlockType` JS function](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype)
-- [Reference Guides / Block API Reference / Registration](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/)
 - [Why a block needs to be registered in both the server and the client?](https://github.com/WordPress/gutenberg/discussions/55884) | GitHub Discussion
