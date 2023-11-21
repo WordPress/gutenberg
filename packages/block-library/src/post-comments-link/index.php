@@ -33,16 +33,18 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 	$comments_number    = (int) get_comments_number( $block->context['postId'] );
 	$comments_link      = get_comments_link( $block->context['postId'] );
 	$post_title         = get_the_title( $block->context['postId'] );
-	$comment_html       = '';
-
-	if ( 0 === $comments_number ) {
-		$comment_html = sprintf(
+	$comment_html       = get_comments_number_text(
+		sprintf(
 			/* translators: %s post title */
 			__( 'No comments<span class="screen-reader-text"> on %s</span>' ),
 			$post_title
-		);
-	} else {
-		$comment_html = sprintf(
+		),
+		sprintf(
+			/* translators: %s post title */
+			__( '1 Comment<span class="screen-reader-text"> on %s</span>' ),
+			$post_title
+		),
+		sprintf(
 			/* translators: 1: Number of comments, 2: post title */
 			_n(
 				'%1$s comment<span class="screen-reader-text"> on %2$s</span>',
@@ -51,8 +53,9 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 			),
 			esc_html( number_format_i18n( $comments_number ) ),
 			$post_title
-		);
-	}
+		),
+		$block->context['postId']
+	);
 
 	return '<div ' . $wrapper_attributes . '><a href=' . esc_url( $comments_link ) . '>' . $comment_html . '</a></div>';
 }
