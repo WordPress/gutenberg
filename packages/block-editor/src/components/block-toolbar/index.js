@@ -36,12 +36,12 @@ import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-// TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
 const BlockToolbar = ( {
 	hideDragHandle,
 	focusOnMount,
-	isFixed,
-	...props
+	isFixed, // TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
+	__experimentalInitialIndex,
+	__experimentalOnIndexChange,
 } ) => {
 	const {
 		blockClientId,
@@ -147,11 +147,12 @@ const BlockToolbar = ( {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			variant={ isFixed ? 'unstyled' : undefined }
+			variant={ isFixed ? 'unstyled' : undefined } // TODO: Remove this. Let this be handled by the <BlockToolbarPopover />  wrapper and remove an assumed "toolbar" context from dropdowns.
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }
-			{ ...props }
+			__experimentalInitialIndex={ __experimentalInitialIndex }
+			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
