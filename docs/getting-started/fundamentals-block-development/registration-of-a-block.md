@@ -18,9 +18,9 @@ This function takes two params relevant in this context (`$block_type` accepts m
 -   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
     -   `$render_callback` (`callable`) – callback used to render blocks of this block type, it's an alternative to the `render` field in `block.json`.
 
-It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
+_As part of the build process, the `block.json` is usually copied from the `src` folder to the `build` folder, so please ensure the `block.json` registered is the one in the `build` folder, and that the bundled files linked from `block.json` have been generated in the proper folder._
 
-_As during the build process the `block.json` will be copied from the `src` folder to the `build` folder, please note that the path to the `block.json` registered should point to the one in the `build` folder, and the bundled files generated in the build process and linked from `block.json` should also be in the same folder._
+`register_block_type` returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
 
 **Example:**
 ```php
