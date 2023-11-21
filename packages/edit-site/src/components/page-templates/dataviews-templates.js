@@ -12,6 +12,7 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
@@ -167,10 +168,19 @@ export default function DataviewsTemplates() {
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return (
-						item.description && (
+						item.description ? (
 							<Text variant="muted">
 								{ decodeEntities( item.description ) }
 							</Text>
+						) : (
+							<>
+							<Text variant="muted" aria-hidden="true">
+								{ __( '—' ) }
+							</Text>
+							<VisuallyHidden>
+								{ __( 'No description.' ) }
+							</VisuallyHidden>
+							</>
 						)
 					);
 				},
