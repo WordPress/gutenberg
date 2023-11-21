@@ -120,6 +120,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 							style: {
 								color: 'inherit',
 							},
+							size: 'compact',
 						} }
 					>
 						{ ( { onClose } ) => (
