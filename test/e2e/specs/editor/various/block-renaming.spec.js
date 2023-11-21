@@ -4,8 +4,30 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Renaming', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+
+		// Registering block must be after creation of Post.
+		await page.evaluate( () => {
+			const registerBlockType = window.wp.blocks.registerBlockType;
+
+			registerBlockType(
+				'my-plugin/block-that-does-not-support-renaming',
+				{
+					title: 'No Rename Support Block',
+					icon: 'smiley',
+					supports: {
+						renaming: false,
+					},
+					edit() {
+						return null;
+					},
+					save() {
+						return null;
+					},
+				}
+			);
+		} );
 	} );
 
 	test.describe( 'Dialog renaming', () => {
@@ -155,29 +177,25 @@ test.describe( 'Block Renaming', () => {
 				name: 'Block navigation structure',
 			} );
 
-			// Only Group supports renaming.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'First Paragraph' },
+				name: 'my-plugin/block-that-does-not-support-renaming',
 			} );
 
-			// Multiselect via keyboard.
+			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
-			const listViewParagraphNode = listView.getByRole( 'gridcell', {
-				name: 'Paragraph',
-				exact: true,
-				selected: true,
+			const blockOptionsTrigger = listView.getByRole( 'button', {
+				name: 'Options for No Rename Support Block',
 			} );
 
-			await expect( listViewParagraphNode ).toBeVisible();
+			await blockOptionsTrigger.click();
 
-			// Expect the Rename control not to exist at all.
-			await expect(
-				listViewParagraphNode.getByRole( 'menuitem', {
-					name: 'Rename',
-				} )
-			).toBeHidden();
+			const renameMenuItem = page.getByRole( 'menuitem', {
+				name: 'Rename',
+			} );
+
+			// Expect the Rename menu item not to exist at all.
+			await expect( renameMenuItem ).toBeHidden();
 		} );
 	} );
 
@@ -259,10 +277,8 @@ test.describe( 'Block Renaming', () => {
 			page,
 			pageUtils,
 		} ) => {
-			// Only Group supports renaming.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'First Paragraph' },
+				name: 'my-plugin/block-that-does-not-support-renaming',
 			} );
 
 			// Multiselect via keyboard.
