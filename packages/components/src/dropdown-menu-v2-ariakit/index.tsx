@@ -344,12 +344,6 @@ const ComboboxValuesContext = createContext<
 	React.Dispatch< React.SetStateAction< string[] > >
 >( () => {} );
 
-// TODO:
-// - custom search prop
-// - reuse dropdowmmenu
-// - maybe no need to use store + provider, and use custom context instead
-// - other props and ref, should they go to the menu or to the combobox?
-// - focus management
 const UnconnectedDropdownComboboxMenu = (
 	props: WordPressComponentProps< DropdownComboboxMenuProps, 'div', false >,
 	ref: React.ForwardedRef< HTMLDivElement >
@@ -556,7 +550,6 @@ const UnconnectedDropdownComboboxMenu = (
 									placeholder={ placeholder }
 								/>
 								<Ariakit.ComboboxList
-									className="popover"
 									alwaysVisible
 									render={ <Ariakit.SelectList /> }
 								>
@@ -578,12 +571,6 @@ export const DropdownComboboxMenu = contextConnect(
 	'DropdownMenu'
 );
 
-// TODO:
-// - value mandatory
-// - is there a better way to do matches?
-// - style
-// - potentially consider adding onChange and communicate directly with combobox provider
-//   in order to handle selection individually on the item via selected prop?
 interface ComboboxItemProps extends Ariakit.SelectItemProps {
 	children?: React.ReactNode;
 	value: string;
@@ -596,8 +583,10 @@ export const DropdownComboboxMenuItem = forwardRef<
 	const setValues = useContext( ComboboxValuesContext );
 
 	useEffect( () => {
+		// Register item's value
 		setValues( ( values ) => [ ...values, value ] );
 		return () =>
+			// Unregister item's value
 			setValues( ( values ) => values.filter( ( v ) => v !== value ) );
 	}, [ value, setValues ] );
 
