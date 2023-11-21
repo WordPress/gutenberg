@@ -63,12 +63,6 @@ export function getQueryParts( query ) {
 		switch ( key ) {
 			case 'page':
 				parts[ key ] = Number( value );
-				// Add query param to stableKey to ensure it's included in cache key.
-				parts.stableKey = appendToStableKey(
-					parts.stableKey,
-					key,
-					parts[ key ]
-				);
 				break;
 
 			case 'per_page':
