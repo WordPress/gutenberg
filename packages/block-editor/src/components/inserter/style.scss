@@ -777,9 +777,3 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 }
-
-:focus {
-	outline: 4px solid $alert-red !important;
-	outline-offset: -4px;
-	box-shadow: 0 0 0 4px $alert-red !important;
-}
