@@ -10,6 +10,7 @@ export interface DropdownMenuContext {
 	 * The ariakit store shared across all DropdownMenu subcomponents.
 	 */
 	store: Ariakit.MenuStore;
+	comboboxMatches?: string[];
 	/**
 	 * The variant used by the underlying menu popover.
 	 */
@@ -79,6 +80,16 @@ export interface DropdownMenuProps {
 		| ( (
 				event: KeyboardEvent | React.KeyboardEvent< Element >
 		  ) => boolean );
+}
+
+export interface DropdownComboboxMenuProps extends DropdownMenuProps {
+	placeholder: string;
+	searchValue?: string;
+	onSearchValueChange?: ( value: string ) => void;
+	defaultSearchValue?: string;
+	selectedValues?: string[];
+	onSelectedValuesChange?: ( values: string[] ) => void;
+	defaultSelectedValues?: string[];
 }
 
 export interface DropdownMenuGroupProps {

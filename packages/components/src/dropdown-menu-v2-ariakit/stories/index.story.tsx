@@ -4,25 +4,12 @@
 import type { Meta, StoryFn } from '@storybook/react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { matchSorter } from 'match-sorter';
-// eslint-disable-next-line no-restricted-imports
-import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { wordpress } from '@wordpress/icons';
-import {
-	useState,
-	useMemo,
-	useContext,
-	// startTransition,
-	forwardRef,
-	useEffect,
-	useId,
-	useDeferredValue,
-	createContext,
-} from '@wordpress/element';
+import { useState, useMemo, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,6 +25,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuContext,
 	DropdownMenuRadioItem,
+	DropdownComboboxMenuItem,
 } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -524,135 +512,29 @@ InsideModal.parameters = {
 
 const people = [ 'Brad', 'Marin', 'Marco', 'Lena', 'Chad', 'Brooke', 'Andrew' ];
 
-const DropdownMenuComboboxContext = createContext();
-interface ComboboxItemProps extends Ariakit.SelectItemProps {
-	children?: React.ReactNode;
-}
-const ComboboxItem = forwardRef< HTMLDivElement, ComboboxItemProps >(
-	function ComboboxItem( props, ref ) {
-		const matches = useContext( DropdownMenuComboboxContext );
-
-		return matches.includes( props.value ) ? (
-			// Here we're combining both SelectItem and ComboboxItem into the same
-			// element. SelectItem adds the multi-selectable attributes to the element
-			// (for example, aria-selected).
-			<Ariakit.SelectItem
-				ref={ ref }
-				{ ...props }
-				render={ <Ariakit.ComboboxItem render={ props.render } /> }
-				style={ { display: 'flex' } }
-			>
-				<Ariakit.SelectItemCheck />
-				{ props.children || props.value }
-			</Ariakit.SelectItem>
-		) : null;
-	}
-);
-
-interface ComboboxProps extends Omit< Ariakit.ComboboxProps, 'onChange' > {
-	searchValue?: string;
-	onSearchValueChange?: ( value: string ) => void;
-	defaultSearchValue?: string;
-	selectedValues?: string[];
-	onSelectedValuesChange?: ( values: string[] ) => void;
-	defaultSelectedValues?: string[];
-	children: React.ReactNode;
-}
-
-const Combobox = forwardRef< HTMLInputElement, ComboboxProps >(
-	function Combobox( props, ref ) {
-		const {
-			defaultSearchValue,
-			searchValue,
-			onSearchValueChange,
-			defaultSelectedValues,
-			selectedValues,
-			onSelectedValuesChange,
-			children,
-			// searchFunction,
-			...comboboxProps
-		} = props;
-
-		const combobox = Ariakit.useComboboxStore();
-		const select = Ariakit.useSelectStore( { combobox } );
-		const selectValue = select.useState( 'value' );
-
-		const deferredSearchValue = useDeferredValue( searchValue );
-
-		// Expose searchFn prop and default to matchsorter
-		const matches = useMemo( () => {
-			return matchSorter( people, deferredSearchValue ?? '', {
-				baseSort: ( a, b ) => ( a.index < b.index ? -1 : 1 ),
-			} );
-		}, [ deferredSearchValue ] );
-
-		// Reset the combobox value whenever an item is checked or unchecked.
-		useEffect( () => combobox.setValue( '' ), [ selectValue, combobox ] );
-
-		const defaultInputId = useId();
-		const inputId = comboboxProps.id || defaultInputId;
-
-		return (
-			<Ariakit.ComboboxProvider
-				store={ combobox }
-				value={ searchValue }
-				setValue={ onSearchValueChange }
-				defaultValue={ defaultSearchValue }
-				resetValueOnHide
-			>
-				<Ariakit.SelectProvider
-					store={ select }
-					value={ selectedValues }
-					setValue={ onSelectedValuesChange }
-					defaultValue={ defaultSelectedValues }
-				>
-					<DropdownMenuComboboxContext.Provider value={ matches }>
-						<Ariakit.Combobox
-							ref={ ref }
-							id={ inputId }
-							{ ...comboboxProps }
-							className={ comboboxProps.className }
-						/>
-						<Ariakit.ComboboxList
-							className="popover"
-							alwaysVisible
-							render={ <Ariakit.SelectList /> }
-						>
-							{ children }
-							{ ! matches.length && <div>No results found</div> }
-						</Ariakit.ComboboxList>
-					</DropdownMenuComboboxContext.Provider>
-				</Ariakit.SelectProvider>
-			</Ariakit.ComboboxProvider>
-		);
-	}
-);
-
 export const WithCombobox: StoryFn< typeof DropdownMenu > = ( props ) => {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ values, setValues ] = useState< string[] >( [ 'Marco' ] );
+	const [ selectedValues, setSelectedValues ] = useState< string[] >( [
+		'Marco',
+	] );
 
 	return (
 		<DropdownMenu { ...props }>
 			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
 			<DropdownComboboxMenu
 				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+				placeholder="Select one or more authors"
+				searchValue={ searchValue }
+				onSearchValueChange={ setSearchValue }
+				selectedValues={ selectedValues }
+				onSelectedValuesChange={ setSelectedValues }
 			>
-				<Combobox
-					label="Pick an author"
-					placeholder="placeholder"
-					searchValue={ searchValue }
-					onSearchValueChange={ setSearchValue }
-					selectedValues={ values }
-					onSelectedValuesChange={ setValues }
-				>
-					{ people.map( ( matchValue, i ) => (
-						<ComboboxItem
-							key={ matchValue + i }
-							value={ matchValue }
-						/>
-					) ) }
-				</Combobox>
+				{ people.map( ( matchValue, i ) => (
+					<DropdownComboboxMenuItem
+						key={ matchValue + i }
+						value={ matchValue }
+					/>
+				) ) }
 			</DropdownComboboxMenu>
 		</DropdownMenu>
 	);
