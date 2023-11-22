@@ -24,9 +24,11 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		[]
 	);
 
-	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-	const { setBlockEditingMode } = useDispatch( blockEditorStore );
+	const {
+		replaceBlocks,
+		setBlockEditingMode,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { getBlockRootClientId, getBlockEditingMode } =
 		useSelect( blockEditorStore );
 
