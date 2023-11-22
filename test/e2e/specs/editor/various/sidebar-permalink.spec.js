@@ -48,7 +48,7 @@ test.describe( 'Sidebar Permalink', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'aaaaa' );
-		await editor.saveDraft();
+		await editor.publishPost();
 		// Start editing again.
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
