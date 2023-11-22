@@ -142,7 +142,6 @@ const PostTitleRich = forwardRef(
 				} );
 			},
 			__unstableDisableFormats: false,
-			preserveWhiteSpace: true,
 		} );
 
 		return (
