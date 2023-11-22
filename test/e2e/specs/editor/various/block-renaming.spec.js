@@ -195,6 +195,51 @@ test.describe( 'Block Renaming', () => {
 			// Expect the Rename menu item not to exist at all.
 			await expect( renameMenuItem ).toBeHidden();
 		} );
+
+		test( 'displays Rename option in related menu when block is not selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/heading',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+
+			// Select the Paragraph block.
+			await listView
+				.getByRole( 'link', {
+					name: 'Paragraph',
+				} )
+				.click();
+
+			// Trigger options menu for the Heading (not the selected block).
+			const blockOptionsTrigger = listView.getByRole( 'button', {
+				name: 'Options for Heading',
+			} );
+
+			await blockOptionsTrigger.click();
+
+			const renameMenuItem = page
+				.getByRole( 'menu', {
+					name: 'Options for Heading',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'Rename',
+				} );
+
+			// Expect the Rename menu item not to exist at all.
+			await expect( renameMenuItem ).toBeVisible();
+		} );
 	} );
 
 	test.describe( 'Block inspector renaming', () => {
