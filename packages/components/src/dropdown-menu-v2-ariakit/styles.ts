@@ -149,6 +149,12 @@ const baseItem = css`
 	padding-block: ${ ITEM_PADDING_BLOCK };
 	padding-inline: ${ ITEM_PADDING_INLINE };
 
+	/*
+	 * Make sure that, when an item is scrolled into view (eg. while using the
+	 * keyboard to move focus), the whole item comes into view
+	 */
+	scroll-margin: ${ CONTENT_WRAPPER_PADDING };
+
 	user-select: none;
 	outline: none;
 
