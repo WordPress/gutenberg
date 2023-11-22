@@ -5,35 +5,37 @@
  * @package gutenberg
  */
 
-/**
- * Keeps only supported settings for the mobile block editor.
- *
- * This is used to control the editor settings payload. Keys can be specified
- * as `true` to be allowed, which will also allow entire nested structures.
- * Alternatively, nested structures can have nested allow-lists for their keys.
- *
- * @param array $initial_array Existing block editor settings.
- *
- * @param array $allow_list_array Structured allow-list.
- *
- * @return array New block editor settings.
- */
-function keep_supported_block_editor_settings_mobile( $initial_array, $allow_list_array ) {
-	$result = array();
+if ( ! function_exists( 'keep_supported_block_editor_settings_mobile' ) ) {
+	/**
+	 * Keeps only supported settings for the mobile block editor.
+	 *
+	 * This is used to control the editor settings payload. Keys can be specified
+	 * as `true` to be allowed, which will also allow entire nested structures.
+	 * Alternatively, nested structures can have nested allow-lists for their keys.
+	 *
+	 * @param array $initial_array Existing block editor settings.
+	 *
+	 * @param array $allow_list_array Structured allow-list.
+	 *
+	 * @return array New block editor settings.
+	 */
+	function keep_supported_block_editor_settings_mobile( $initial_array, $allow_list_array ) {
+		$result = array();
 
-	foreach ( $allow_list_array as $key => $value ) {
-		$initial_value = $initial_array[ $key ];
+		foreach ( $allow_list_array as $key => $value ) {
+			$initial_value = $initial_array[ $key ];
 
-		if ( array_key_exists( $key, $initial_array ) ) {
-			if ( is_array( $value ) && is_array( $initial_value ) ) {
-							$result[ $key ] = keep_supported_block_editor_settings_mobile( $initial_value, $value );
-			} else {
-							$result[ $key ] = $initial_value;
+			if ( array_key_exists( $key, $initial_array ) ) {
+				if ( is_array( $value ) && is_array( $initial_value ) ) {
+					$result[ $key ] = keep_supported_block_editor_settings_mobile( $initial_value, $value );
+				} else {
+					$result[ $key ] = $initial_value;
+				}
 			}
 		}
-	}
 
-	return $result;
+		return $result;
+	}
 }
 
 
