@@ -54,6 +54,7 @@ export const DropdownMenuItem = forwardRef<
 		<Styled.DropdownMenuItem
 			ref={ ref }
 			{ ...props }
+			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
 		>
@@ -87,6 +88,7 @@ export const DropdownMenuCheckboxItem = forwardRef<
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }
 			{ ...props }
+			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
 		>
@@ -131,6 +133,7 @@ export const DropdownMenuRadioItem = forwardRef<
 		<Styled.DropdownMenuRadioItem
 			ref={ ref }
 			{ ...props }
+			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
 		>

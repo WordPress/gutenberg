@@ -158,7 +158,9 @@ const baseItem = css`
 	}
 
 	/* Hover */
-	&[data-active-item]:not( [data-focus-visible] ) {
+	&[data-active-item]:not( [data-focus-visible] ):not(
+			[aria-disabled='true']
+		) {
 		background-color: ${ COLORS.theme.accent };
 		color: ${ COLORS.white };
 	}
