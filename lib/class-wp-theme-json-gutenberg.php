@@ -1042,11 +1042,18 @@ class WP_Theme_JSON_Gutenberg {
 		return $tree;
 	}
 
-	protected static function is_assoc( array $array ) {
-		if ( array() === $array ) {
+	/**
+	 * Checks if the given array is associative.
+	 *
+	 * @since 6.5.0
+	 * @param array $data The array to check.
+	 * @return bool True if the array is associative, false otherwise.
+	 */
+	protected static function is_assoc( $data ) {
+		if ( array() === $data ) {
 			return false;
 		}
-		return array_keys( $array ) !== range( 0, count( $array ) - 1 );
+		return array_keys( $data ) !== range( 0, count( $data ) - 1 );
 	}
 
 	/**
