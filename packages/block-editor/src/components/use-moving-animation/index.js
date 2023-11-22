@@ -129,7 +129,7 @@ function useMovingAnimation( {
 		const finishedMoving = x === 0 && y === 0;
 		ref.current.style.transformOrigin = 'center center';
 		ref.current.style.transform = finishedMoving
-			? undefined
+			? null
 			: `translate3d(${ x }px,${ y }px,0)`;
 		ref.current.style.zIndex = isSelected ? '1' : '';
 
