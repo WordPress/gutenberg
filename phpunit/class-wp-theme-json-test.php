@@ -1647,7 +1647,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 											'src'        => 'https://example.com/font.ttf',
 										),
 										array(
-											'badKey10'    => 'I am Evil!!!!',
+											'badKey10'   => 'I am Evil!!!!',
 											'fontFamily' => 'Inter',
 											'fontStyle'  => 'italic',
 											'fontWeight' => '400',
