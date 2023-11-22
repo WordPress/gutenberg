@@ -186,6 +186,7 @@ export default function Editor( { isLoading } ) {
 	);
 
 	const settings = useSpecificEditorSettings();
+
 	const isReady =
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
