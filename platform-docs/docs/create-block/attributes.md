@@ -6,7 +6,7 @@ sidebar_position: 2
 
 Attributes are the way a block stores data, they define the structure of a block. Upon serialization, some attributes are saved into the HTML output while others are kept in a the HTML block comment delimiters.
 
-For this block tutorial, we want to allow the user to type in a message that we will display stylized in the saved content. So, we need to add a **message** attribute that will hold the user message. The following code defines a **message** attribute; the attribute type is a string; When serializing the blocks, the message is going to be saved within a "div". This means that we're going to source the value attribute from using `text` source from the selector which is a `div` tag.
+For this block tutorial, we want to allow the user to type a message that we will display stylized in the saved content. So, we need to add a **message** attribute that will hold the user message. The following code defines a **message** attribute; the attribute type is a string. When serializing the blocks, the message will be saved within a `div`container. This means that we're going to source the value attribute using `text` source from the selector, which is a `div` tag.
 
 ```js
 const attributes = {
@@ -48,11 +48,11 @@ registerBlockType( 'gutenpride/gutenpride-block', {
 
 ## TextControl Component
 
-For our example block, the component we are going to use is the **TextControl** component, it is similar to an HTML text input field. You can see [documentation for TextControl component](https://developer.wordpress.org/block-editor/reference-guides/components/text-control/). You can browse an [interactive set of components in this Storybook](https://wordpress.github.io/gutenberg/).
+For our example block, the component we are going to use is the **TextControl** component, which is similar to an HTML text input field. You can see [the documentation for the `TextControl` component](https://developer.wordpress.org/block-editor/reference-guides/components/text-control/). You can browse an [interactive set of components in this Storybook](https://wordpress.github.io/gutenberg/).
 
 The component is added similar to an HTML tag, setting a label, the `value` is set to the `attributes.message` and the `onChange` function uses the `setAttributes` to update the message attribute value.
 
-The save function will simply write the `attributes.message` as a div tag since that is how we defined it to be parsed. Update the edit.js and save.js files to the following, replacing the existing functions.
+The save function will simply write the `attributes.message` as a `div` tag since that is how we defined it to be parsed. Update the `edit.js` and `save.js` files to the following, replacing the existing functions.
 
 **edit.js** file:
 
