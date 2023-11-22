@@ -154,7 +154,7 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		pointer-events: none;
+		cursor: not-allowed;
 	}
 
 	/* Hover */
