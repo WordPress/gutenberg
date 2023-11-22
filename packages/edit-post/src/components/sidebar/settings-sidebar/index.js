@@ -43,6 +43,57 @@ export const sidebars = {
 	block: 'edit-post/block',
 };
 
+const SidebarContent = ( {
+	sidebarName,
+	keyboardShortcut,
+	isTemplateMode,
+} ) => {
+	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+	// need to forward the `Tabs` context so it can be passed through the
+	// underlying slot/fill.
+	const tabsContextValue = useContext( Tabs.Context );
+
+	return (
+		<PluginSidebarEditPost
+			identifier={ sidebarName }
+			header={
+				<Tabs.Context.Provider value={ tabsContextValue }>
+					<SettingsHeader />
+				</Tabs.Context.Provider>
+			}
+			closeLabel={ __( 'Close Settings' ) }
+			headerClassName="edit-post-sidebar__panel-tabs"
+			/* translators: button label text should, if possible, be under 16 characters. */
+			title={ __( 'Settings' ) }
+			toggleShortcut={ keyboardShortcut }
+			icon={ isRTL() ? drawerLeft : drawerRight }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+		>
+			<Tabs.Context.Provider value={ tabsContextValue }>
+				<Tabs.TabPanel id={ sidebars.document } focusable={ false }>
+					{ ! isTemplateMode && (
+						<>
+							<PostStatus />
+							<PluginDocumentSettingPanel.Slot />
+							<LastRevision />
+							<PostTaxonomies />
+							<FeaturedImage />
+							<PostExcerpt />
+							<DiscussionPanel />
+							<PageAttributes />
+							<MetaBoxes location="side" />
+						</>
+					) }
+					{ isTemplateMode && <TemplateSummary /> }
+				</Tabs.TabPanel>
+				<Tabs.TabPanel id={ sidebars.block } focusable={ false }>
+					<BlockInspector />
+				</Tabs.TabPanel>
+			</Tabs.Context.Provider>
+		</PluginSidebarEditPost>
+	);
+};
+
 const SettingsSidebar = () => {
 	const { sidebarName, isSidebarOpen, keyboardShortcut, isTemplateMode } =
 		useSelect( ( select ) => {
@@ -76,53 +127,6 @@ const SettingsSidebar = () => {
 			};
 		}, [] );
 
-	const Content = () => {
-		// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
-		// need to forward the `Tabs` context so it can be passed through the
-		// underlying slot/fill.
-		const tabsContextValue = useContext( Tabs.Context );
-
-		return (
-			<PluginSidebarEditPost
-				identifier={ sidebarName }
-				header={
-					<Tabs.Context.Provider value={ tabsContextValue }>
-						<SettingsHeader />
-					</Tabs.Context.Provider>
-				}
-				closeLabel={ __( 'Close Settings' ) }
-				headerClassName="edit-post-sidebar__panel-tabs"
-				/* translators: button label text should, if possible, be under 16 characters. */
-				title={ __( 'Settings' ) }
-				toggleShortcut={ keyboardShortcut }
-				icon={ isRTL() ? drawerLeft : drawerRight }
-				isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
-			>
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabPanel id={ sidebars.document } focusable={ false }>
-						{ ! isTemplateMode && (
-							<>
-								<PostStatus />
-								<PluginDocumentSettingPanel.Slot />
-								<LastRevision />
-								<PostTaxonomies />
-								<FeaturedImage />
-								<PostExcerpt />
-								<DiscussionPanel />
-								<PageAttributes />
-								<MetaBoxes location="side" />
-							</>
-						) }
-						{ isTemplateMode && <TemplateSummary /> }
-					</Tabs.TabPanel>
-					<Tabs.TabPanel id={ sidebars.block } focusable={ false }>
-						<BlockInspector />
-					</Tabs.TabPanel>
-				</Tabs.Context.Provider>
-			</PluginSidebarEditPost>
-		);
-	};
-
 	const { openGeneralSidebar } = useDispatch( editPostStore );
 
 	const onTabSelect = useCallback(
@@ -144,7 +148,11 @@ const SettingsSidebar = () => {
 			selectedTabId={ isSidebarOpen ? sidebarName : null }
 			onSelect={ onTabSelect }
 		>
-			<Content />
+			<SidebarContent
+				sidebarName={ sidebarName }
+				keyboardShortcut={ keyboardShortcut }
+				isTemplateMode={ isTemplateMode }
+			/>
 		</Tabs>
 	);
 };
