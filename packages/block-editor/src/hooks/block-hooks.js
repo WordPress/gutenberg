@@ -238,14 +238,15 @@ function BlockHooksControl( props ) {
 export const withBlockHooksControls = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const blockEdit = <BlockEdit key="edit" { ...props } />;
 			return (
 				<>
-					{ blockEdit }
-					<BlockHooksControl
-						blockName={ props.name }
-						clientId={ props.clientId }
-					/>
+					<BlockEdit key="edit" { ...props } />
+					{ props.isSelected && (
+						<BlockHooksControl
+							blockName={ props.name }
+							clientId={ props.clientId }
+						/>
+					) }
 				</>
 			);
 		};

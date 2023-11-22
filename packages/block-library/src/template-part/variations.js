@@ -35,10 +35,12 @@ export function enhanceTemplatePartVariations( settings, name ) {
 			// Find a matching variation from the created template part
 			// by checking the entity's `area` property.
 			if ( ! slug ) return false;
-			const entity = select( coreDataStore ).getEntityRecord(
+			const { getCurrentTheme, getEntityRecord } =
+				select( coreDataStore );
+			const entity = getEntityRecord(
 				'postType',
 				'wp_template_part',
-				`${ theme }//${ slug }`
+				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
 			);
 
 			if ( entity?.slug ) {

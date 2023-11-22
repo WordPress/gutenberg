@@ -112,7 +112,7 @@ describe( 'Pattern blocks', () => {
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach pattern' );
+		await clickMenuItem( 'Detach' );
 
 		// Check that we have a paragraph block on the page.
 		const paragraphBlock = await canvas().$(
@@ -219,7 +219,7 @@ describe( 'Pattern blocks', () => {
 
 		// Convert block to a regular block.
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach patterns' );
+		await clickMenuItem( 'Detach' );
 
 		// Check that we have two paragraph blocks on the page.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -352,7 +352,7 @@ describe( 'Pattern blocks', () => {
 		// Convert back to regular blocks.
 		await clickBlockToolbarButton( 'Select Edited block' );
 		await clickBlockToolbarButton( 'Options' );
-		await clickMenuItem( 'Detach pattern' );
+		await clickMenuItem( 'Detach' );
 		await page.waitForXPath( selector, {
 			hidden: true,
 		} );

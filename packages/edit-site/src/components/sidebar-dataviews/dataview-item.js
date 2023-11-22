@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { page, columns, pullRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -39,13 +45,23 @@ export default function DataViewItem( {
 		isCustom,
 	} );
 	return (
-		<SidebarNavigationItem
-			icon={ iconToUse }
-			{ ...linkInfo }
-			aria-current={ isActive ? 'true' : undefined }
-			suffix={ suffix }
+		<HStack
+			justify="flex-start"
+			className={ classnames(
+				'edit-site-sidebar-dataviews-dataview-item',
+				{
+					'is-selected': isActive,
+				}
+			) }
 		>
-			{ title }
-		</SidebarNavigationItem>
+			<SidebarNavigationItem
+				icon={ iconToUse }
+				{ ...linkInfo }
+				aria-current={ isActive ? 'true' : undefined }
+			>
+				{ title }
+			</SidebarNavigationItem>
+			{ suffix }
+		</HStack>
 	);
 }

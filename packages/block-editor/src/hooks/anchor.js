@@ -59,6 +59,7 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 	const textControl = (
 		<TextControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			className="html-anchor-control"
 			label={ __( 'HTML anchor' ) }
 			help={

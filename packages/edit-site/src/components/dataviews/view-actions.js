@@ -10,9 +10,10 @@ import {
 	chevronRightSmall,
 	check,
 	blockTable,
-	chevronDown,
 	arrowUp,
 	arrowDown,
+	grid,
+	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -95,7 +96,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 20, 50, 100 ];
+const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownSubMenuV2
@@ -274,6 +275,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
+const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
+
 export default function ViewActions( {
 	fields,
 	view,
@@ -284,9 +287,14 @@ export default function ViewActions( {
 		<DropdownMenuV2
 			label={ __( 'Actions' ) }
 			trigger={
-				<Button variant="tertiary" icon={ blockTable }>
+				<Button
+					variant="tertiary"
+					size="compact"
+					icon={
+						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+					}
+				>
 					{ __( 'View' ) }
-					<Icon icon={ chevronDown } />
 				</Button>
 			}
 		>
