@@ -52,9 +52,10 @@ export default function DuplicatePatternModal( {
 	const duplicatedProps = {
 		content: pattern.content,
 		defaultCategories: getTermLabels( pattern, categories ),
-		defaultSyncType: ! pattern.id // Theme patterns don't have an ID.
-			? PATTERN_SYNC_TYPES.unsynced
-			: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
+		defaultSyncType:
+			pattern.type !== PATTERN_TYPES.user // Theme patterns are unsynced by default.
+				? PATTERN_SYNC_TYPES.unsynced
+				: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 		defaultTitle: sprintf(
 			/* translators: %s: Existing pattern title */
 			__( '%s (Copy)' ),
