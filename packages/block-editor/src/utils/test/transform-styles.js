@@ -4,26 +4,53 @@
 import transformStyles from '../transform-styles';
 
 describe( 'transformStyles', () => {
-	it( 'should not throw error in case of invalid css', () => {
-		const run = () =>
-			transformStyles(
-				[
-					{
-						css: 'h1 { color: red; }', // valid CSS
-					},
-					{
-						css: 'h1 { color: red;', // invalid CSS
-					},
-				],
-				'.my-namespace'
+	describe( 'error handling', () => {
+		beforeEach( () => {
+			// Intentionally suppress the expected console errors and warnings to reduce
+			// noise in the test output.
+			jest.spyOn( console, 'warn' ).mockImplementation( jest.fn() );
+		} );
+
+		it( 'should not throw error in case of invalid css', () => {
+			const run = () =>
+				transformStyles(
+					[
+						{
+							css: 'h1 { color: red;', // invalid CSS
+						},
+					],
+					'.my-namespace'
+				);
+
+			expect( run ).not.toThrow();
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should warn invalid css in the console', () => {
+			const run = () =>
+				transformStyles(
+					[
+						{
+							css: 'h1 { color: red; }', // valid CSS
+						},
+						{
+							css: 'h1 { color: red;', // invalid CSS
+						},
+					],
+					'.my-namespace'
+				);
+
+			const [ validCSS, invalidCSS ] = run();
+
+			expect( validCSS ).toBe( '.my-namespace h1 { color: red; }' );
+			expect( invalidCSS ).toBe( null );
+
+			expect( console ).toHaveWarnedWith(
+				'wp.blockEditor.transformStyles Failed to transform CSS.',
+				'<css input>:1:1: Unclosed block\n> 1 | h1 { color: red;\n    | ^'
+				//                                                        ^^^^ In PostCSS, a tab is equal four spaces
 			);
-
-		expect( run ).not.toThrow();
-
-		const [ validCSS, invalidCSS ] = run();
-
-		expect( validCSS ).toBe( '.my-namespace h1 { color: red; }' );
-		expect( invalidCSS ).toBe( null );
+		} );
 	} );
 
 	describe( 'selector wrap', () => {

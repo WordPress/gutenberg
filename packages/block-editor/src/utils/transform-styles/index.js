@@ -33,7 +33,13 @@ const transformStyles = ( styles, wrapperSelector = '' ) => {
 				].filter( Boolean )
 			).process( css, {} ).css; // use sync PostCSS API
 		} catch ( error ) {
-			if ( ! ( error instanceof CssSyntaxError ) ) {
+			if ( error instanceof CssSyntaxError ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'wp.blockEditor.transformStyles Failed to transform CSS.',
+					error.message + '\n' + error.showSourceCode( false )
+				);
+			} else {
 				// eslint-disable-next-line no-console
 				console.warn(
 					'wp.blockEditor.transformStyles Failed to transform CSS.',
