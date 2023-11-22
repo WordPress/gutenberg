@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import EditorKeyboardShortcuts from './global-keyboard-shortcuts';
+
 // Block Creation Components.
 export * from './autocompleters';
 
@@ -5,8 +10,7 @@ export * from './autocompleters';
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
-export { default as VisualEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/visual-editor-shortcuts';
-export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
+export { EditorKeyboardShortcuts };
 export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-shortcuts/register-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
@@ -22,6 +26,7 @@ export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
+export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
@@ -46,6 +51,7 @@ export {
 	default as PostScheduleLabel,
 	usePostScheduleLabel,
 } from './post-schedule/label';
+export { default as PostSchedulePanel } from './post-schedule/panel';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
@@ -67,6 +73,7 @@ export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
 export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
+export { default as PostURLPanel } from './post-url/panel';
 export { default as PostVisibility } from './post-visibility';
 export {
 	default as PostVisibilityLabel,
@@ -84,3 +91,5 @@ export { default as CharacterCount } from './character-count';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;

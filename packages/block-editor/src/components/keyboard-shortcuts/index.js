@@ -94,6 +94,16 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/multi-text-selection',
+			category: 'selection',
+			description: __( 'Select text across multiple blocks.' ),
+			keyCombination: {
+				modifier: 'shift',
+				character: 'arrow',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/focus-toolbar',
 			category: 'global',
 			description: __( 'Navigate to the nearest toolbar.' ),

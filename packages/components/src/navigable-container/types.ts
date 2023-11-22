@@ -6,7 +6,7 @@ import type { ForwardedRef, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 type BaseProps = {
 	/**

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { View, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Platform, Pressable } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -372,20 +372,20 @@ function Footer( {
 	renderFooterAppender,
 	withFooter,
 } ) {
+	const onAddParagraphBlock = useCallback( () => {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		addBlockToEndOfPost( paragraphBlock );
+	}, [ addBlockToEndOfPost ] );
+
 	if ( ! isReadOnly && withFooter ) {
 		return (
-			<>
-				<TouchableWithoutFeedback
-					accessibilityLabel={ __( 'Add paragraph block' ) }
-					testID={ __( 'Add paragraph block' ) }
-					onPress={ () => {
-						const paragraphBlock = createBlock( 'core/paragraph' );
-						addBlockToEndOfPost( paragraphBlock );
-					} }
-				>
-					<View style={ styles.blockListFooter } />
-				</TouchableWithoutFeedback>
-			</>
+			<Pressable
+				accessibilityLabel={ __( 'Add paragraph block' ) }
+				testID={ __( 'Add paragraph block' ) }
+				onPress={ onAddParagraphBlock }
+			>
+				<View style={ styles.blockListFooter } />
+			</Pressable>
 		);
 	} else if ( renderFooterAppender ) {
 		return <View>{ renderFooterAppender() }</View>;

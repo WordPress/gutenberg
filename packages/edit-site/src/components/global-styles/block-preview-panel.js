@@ -4,26 +4,37 @@
 import { BlockPreview } from '@wordpress/block-editor';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 
 const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const blockExample = getBlockType( name )?.example;
-	const blockExampleWithVariation = {
-		...blockExample,
-		attributes: {
-			...blockExample?.attributes,
-			className: 'is-style-' + variation,
-		},
-	};
-	const blocks =
-		blockExample &&
-		getBlockFromExample(
-			name,
-			variation ? blockExampleWithVariation : blockExample
-		);
-	const viewportWidth = blockExample?.viewportWidth || null;
+	const blocks = useMemo( () => {
+		if ( ! blockExample ) {
+			return null;
+		}
+
+		let example = blockExample;
+		if ( variation ) {
+			example = {
+				...example,
+				attributes: {
+					...example.attributes,
+					className: 'is-style-' + variation,
+				},
+			};
+		}
+
+		return getBlockFromExample( name, example );
+	}, [ name, blockExample, variation ] );
+
+	const viewportWidth = blockExample?.viewportWidth ?? null;
 	const previewHeight = '150px';
 
-	return ! blockExample ? null : (
+	if ( ! blockExample ) {
+		return null;
+	}
+
+	return (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
 			<div
 				className="edit-site-global-styles__block-preview-panel"

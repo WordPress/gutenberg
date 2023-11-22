@@ -50,6 +50,8 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
@@ -88,7 +90,6 @@ export const useGlobalStylesReset = () => {
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -116,7 +117,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ??
 				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value ) {
+			if ( value !== undefined ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
@@ -135,7 +136,6 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
 		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -327,7 +327,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {

@@ -59,10 +59,12 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
+					ref={ lockButtonRef }
 					icon={ lock }
 					label={ __( 'Unlock' ) }
 					onClick={ toggleModal }
-					ref={ lockButtonRef }
+					aria-expanded={ isModalOpen }
+					aria-haspopup="dialog"
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (

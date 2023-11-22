@@ -225,7 +225,6 @@ export function EntitiesSavedStatesExtensible( {
 					<EntityTypeList
 						key={ list[ 0 ].name }
 						list={ list }
-						closePanel={ dismissPanel }
 						unselectedEntities={ unselectedEntities }
 						setUnselectedEntities={ setUnselectedEntities }
 					/>

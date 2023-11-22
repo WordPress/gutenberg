@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": "fse",
 	"name": "core/post-comments-link",
-	"title": "Post Comments Link",
+	"title": "Comments Link",
 	"category": "theme",
 	"description": "Displays the link to the current post comments.",
 	"textdomain": "default",

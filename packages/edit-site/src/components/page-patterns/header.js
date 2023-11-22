@@ -2,24 +2,25 @@
  * WordPress dependencies
  */
 import {
-	__experimentalVStack as VStack,
+	DropdownMenu,
+	MenuGroup,
+	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import RenameCategoryMenuItem from './rename-category-menu-item';
+import DeleteCategoryMenuItem from './delete-category-menu-item';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import {
-	USER_PATTERN_CATEGORY,
-	USER_PATTERNS,
-	TEMPLATE_PARTS,
-	PATTERNS,
-} from './utils';
+import { TEMPLATE_PART_POST_TYPE, PATTERN_TYPES } from '../../utils/constants';
 
 export default function PatternsHeader( {
 	categoryId,
@@ -34,18 +35,15 @@ export default function PatternsHeader( {
 		[]
 	);
 
-	let title, description;
-	if ( categoryId === USER_PATTERN_CATEGORY && type === USER_PATTERNS ) {
-		title = __( 'My Patterns' );
-		description = '';
-	} else if ( type === TEMPLATE_PARTS ) {
+	let title, description, patternCategory;
+	if ( type === TEMPLATE_PART_POST_TYPE ) {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === categoryId
 		);
 		title = templatePartArea?.label;
 		description = templatePartArea?.description;
-	} else if ( type === PATTERNS ) {
-		const patternCategory = patternCategories.find(
+	} else if ( type === PATTERN_TYPES.theme ) {
+		patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
 		);
 		title = patternCategory?.label;
@@ -56,9 +54,38 @@ export default function PatternsHeader( {
 
 	return (
 		<VStack className="edit-site-patterns__section-header">
-			<Heading as="h2" level={ 4 } id={ titleId }>
-				{ title }
-			</Heading>
+			<HStack justify="space-between">
+				<Heading as="h2" level={ 4 } id={ titleId }>
+					{ title }
+				</Heading>
+				{ !! patternCategory?.id && (
+					<DropdownMenu
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						toggleProps={ {
+							className: 'edit-site-patterns__button',
+							describedBy: sprintf(
+								/* translators: %s: pattern category name */
+								__( 'Action menu for %s pattern category' ),
+								title
+							),
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								<RenameCategoryMenuItem
+									category={ patternCategory }
+									onClose={ onClose }
+								/>
+								<DeleteCategoryMenuItem
+									category={ patternCategory }
+									onClose={ onClose }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				) }
+			</HStack>
 			{ description ? (
 				<Text variant="muted" as="p" id={ descriptionId }>
 					{ description }

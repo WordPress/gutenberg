@@ -116,9 +116,7 @@ _Usage_
 ```ts
 type Props = { foo: string };
 const Component = ( props: Props ) => <div>{ props.foo }</div>;
-const ConditionalComponent = ifCondition(
-	( props: Props ) => props.foo.length !== 0
-)( Component );
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
 <ConditionalComponent foo="" />; // => null
 <ConditionalComponent foo="bar" />; // => <div>bar</div>;
 ```
@@ -323,7 +321,7 @@ _Returns_
 
 ### useFocusReturn
 
-When opening modals/sidebars/dialogs, the focus must move to the opened area and return to the previously focused element when closed. The current hook implements the returning behavior.
+Adds the unmount behavior of returning focus to the element which had it previously as is expected for roles like menus or dialogs.
 
 _Usage_
 
@@ -483,6 +481,18 @@ const App = () => {
 	);
 };
 ```
+
+### useStateWithHistory
+
+useState with undo/redo history.
+
+_Parameters_
+
+-   _initialValue_ `T`: Initial value.
+
+_Returns_
+
+-   Value, setValue, hasUndo, hasRedo, undo, redo.
 
 ### useThrottle
 

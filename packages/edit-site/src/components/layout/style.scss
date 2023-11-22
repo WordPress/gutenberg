@@ -58,7 +58,7 @@
 	display: flex;
 }
 
-.edit-site-layout__sidebar {
+.edit-site-layout__sidebar-region {
 	z-index: z-index(".edit-site-layout__sidebar");
 	width: 100vw;
 	flex-shrink: 0;
@@ -75,7 +75,7 @@
 		top: 0;
 	}
 
-	> div {
+	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -121,7 +121,7 @@
 	justify-content: center;
 	align-items: center;
 
-	&:has(.edit-site-layout__resizable-frame-oversized) {
+	&.is-right-aligned {
 		justify-content: flex-end;
 	}
 
@@ -157,9 +157,14 @@
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
-.edit-site-layout__canvas .interface-interface-skeleton {
+.edit-site-layout__canvas .interface-interface-skeleton,
+.edit-site-page-pages-preview .interface-interface-skeleton {
 	position: relative !important;
 	min-height: 100% !important;
+}
+
+.edit-site-page-pages-preview {
+	height: 100%;
 }
 
 .edit-site-layout__view-mode-toggle.components-button {
@@ -246,23 +251,6 @@
 
 	@include break-medium {
 		border-left: $border-width solid $gray-300;
-	}
-}
-
-.edit-site-layout.has-fixed-toolbar {
-	// making the header be lower than the content
-	// so the fixed toolbar can be positioned on top of it
-	// but only on desktop
-	@include break-medium() {
-		.edit-site-layout__canvas-container {
-			z-index: 5;
-		}
-		.edit-site-site-hub {
-			z-index: 4;
-		}
-		.edit-site-layout__header:focus-within {
-			z-index: 3;
-		}
 	}
 }
 

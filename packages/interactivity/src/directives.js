@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { useContext, useMemo, useEffect } from 'preact/hooks';
+import {
+	useContext,
+	useMemo,
+	useEffect,
+	useRef,
+	useLayoutEffect,
+} from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -10,22 +16,21 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useSignalEffect } from './utils';
 import { directive } from './hooks';
+import { SlotProvider, Slot, Fill } from './slots';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
-const mergeDeepSignals = ( target, source ) => {
+const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
-		if ( typeof peek( target, k ) === 'undefined' ) {
-			target[ `$${ k }` ] = source[ `$${ k }` ];
-		} else if (
-			isObject( peek( target, k ) ) &&
-			isObject( peek( source, k ) )
-		) {
+		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
 			mergeDeepSignals(
 				target[ `$${ k }` ].peek(),
-				source[ `$${ k }` ].peek()
+				source[ `$${ k }` ].peek(),
+				overwrite
 			);
+		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
+			target[ `$${ k }` ] = source[ `$${ k }` ];
 		}
 	}
 };
@@ -36,32 +41,31 @@ export default () => {
 		'context',
 		( {
 			directives: {
-				context: { default: context },
+				context: { default: newContext },
 			},
 			props: { children },
-			context: inherited,
+			context: inheritedContext,
 		} ) => {
-			const { Provider } = inherited;
-			const inheritedValue = useContext( inherited );
-			const value = useMemo( () => {
-				const localValue = deepSignal( context );
-				mergeDeepSignals( localValue, inheritedValue );
-				return localValue;
-			}, [ context, inheritedValue ] );
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+			const currentValue = useRef( deepSignal( {} ) );
+			currentValue.current = useMemo( () => {
+				const newValue = deepSignal( newContext );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( currentValue.current, newValue, true );
+				return currentValue.current;
+			}, [ newContext, inheritedValue ] );
 
-			return <Provider value={ value }>{ children }</Provider>;
+			return (
+				<Provider value={ currentValue.current }>{ children }</Provider>
+			);
 		},
 		{ priority: 5 }
 	);
 
 	// data-wp-body
-	directive( 'body', ( { props: { children }, context: inherited } ) => {
-		const { Provider } = inherited;
-		const inheritedValue = useContext( inherited );
-		return createPortal(
-			<Provider value={ inheritedValue }>{ children }</Provider>,
-			document.body
-		);
+	directive( 'body', ( { props: { children } } ) => {
+		return createPortal( children, document.body );
 	} );
 
 	// data-wp-effect--[name]
@@ -139,6 +143,75 @@ export default () => {
 		}
 	);
 
+	const newRule =
+		/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
+	const ruleClean = /\/\*[^]*?\*\/|  +/g;
+	const ruleNewline = /\n+/g;
+	const empty = ' ';
+
+	/**
+	 * Convert a css style string into a object.
+	 *
+	 * Made by Cristian Bote (@cristianbote) for Goober.
+	 * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
+	 *
+	 * @param {string} val CSS string.
+	 * @return {Object} CSS object.
+	 */
+	const cssStringToObject = ( val ) => {
+		const tree = [ {} ];
+		let block, left;
+
+		while ( ( block = newRule.exec( val.replace( ruleClean, '' ) ) ) ) {
+			if ( block[ 4 ] ) {
+				tree.shift();
+			} else if ( block[ 3 ] ) {
+				left = block[ 3 ].replace( ruleNewline, empty ).trim();
+				tree.unshift( ( tree[ 0 ][ left ] = tree[ 0 ][ left ] || {} ) );
+			} else {
+				tree[ 0 ][ block[ 1 ] ] = block[ 2 ]
+					.replace( ruleNewline, empty )
+					.trim();
+			}
+		}
+
+		return tree[ 0 ];
+	};
+
+	// data-wp-style--[style-key]
+	directive(
+		'style',
+		( { directives: { style }, element, evaluate, context } ) => {
+			const contextValue = useContext( context );
+			Object.keys( style )
+				.filter( ( n ) => n !== 'default' )
+				.forEach( ( key ) => {
+					const result = evaluate( style[ key ], {
+						key,
+						context: contextValue,
+					} );
+					element.props.style = element.props.style || {};
+					if ( typeof element.props.style === 'string' )
+						element.props.style = cssStringToObject(
+							element.props.style
+						);
+					if ( ! result ) delete element.props.style[ key ];
+					else element.props.style[ key ] = result;
+
+					useEffect( () => {
+						// This seems necessary because Preact doesn't change the styles on
+						// the hydration, so we have to do it manually. It doesn't need deps
+						// because it only needs to do it the first time.
+						if ( ! result ) {
+							element.ref.current.style.removeProperty( key );
+						} else {
+							element.ref.current.style[ key ] = result;
+						}
+					}, [] );
+				} );
+		}
+	);
+
 	// data-wp-bind--[attribute]
 	directive(
 		'bind',
@@ -151,47 +224,66 @@ export default () => {
 						context: contextValue,
 					} );
 					element.props[ attribute ] = result;
+					// Preact doesn't handle the `role` attribute properly, as it doesn't remove it when `null`.
+					// We need this workaround until the following issue is solved:
+					// https://github.com/preactjs/preact/issues/4136
+					useLayoutEffect( () => {
+						if (
+							attribute === 'role' &&
+							( result === null || result === undefined )
+						) {
+							element.ref.current.removeAttribute( attribute );
+						}
+					}, [ attribute, result ] );
 
 					// This seems necessary because Preact doesn't change the attributes
 					// on the hydration, so we have to do it manually. It doesn't need
 					// deps because it only needs to do it the first time.
 					useEffect( () => {
+						const el = element.ref.current;
+
+						// We set the value directly to the corresponding
+						// HTMLElement instance property excluding the following
+						// special cases.
+						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+						if (
+							attribute !== 'width' &&
+							attribute !== 'height' &&
+							attribute !== 'href' &&
+							attribute !== 'list' &&
+							attribute !== 'form' &&
+							// Default value in browsers is `-1` and an empty string is
+							// cast to `0` instead
+							attribute !== 'tabIndex' &&
+							attribute !== 'download' &&
+							attribute !== 'rowSpan' &&
+							attribute !== 'colSpan' &&
+							attribute !== 'role' &&
+							attribute in el
+						) {
+							try {
+								el[ attribute ] =
+									result === null || result === undefined
+										? ''
+										: result;
+								return;
+							} catch ( err ) {}
+						}
 						// aria- and data- attributes have no boolean representation.
 						// A `false` value is different from the attribute not being
 						// present, so we can't remove it.
 						// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
-						if ( result === false && attribute[ 4 ] !== '-' ) {
-							element.ref.current.removeAttribute( attribute );
+						if (
+							result !== null &&
+							result !== undefined &&
+							( result !== false || attribute[ 4 ] === '-' )
+						) {
+							el.setAttribute( attribute, result );
 						} else {
-							element.ref.current.setAttribute(
-								attribute,
-								result === true && attribute[ 4 ] !== '-'
-									? ''
-									: result
-							);
+							el.removeAttribute( attribute );
 						}
 					}, [] );
 				} );
-		}
-	);
-
-	// data-wp-show
-	directive(
-		'show',
-		( {
-			directives: {
-				show: { default: show },
-			},
-			element,
-			evaluate,
-			context,
-		} ) => {
-			const contextValue = useContext( context );
-
-			if ( ! evaluate( show, { context: contextValue } ) )
-				element.props.children = (
-					<template>{ element.props.children }</template>
-				);
 		}
 	);
 
@@ -231,5 +323,73 @@ export default () => {
 				context: contextValue,
 			} );
 		}
+	);
+
+	// data-wp-slot
+	directive(
+		'slot',
+		( {
+			directives: {
+				slot: { default: slot },
+			},
+			props: { children },
+			element,
+		} ) => {
+			const name = typeof slot === 'string' ? slot : slot.name;
+			const position = slot.position || 'children';
+
+			if ( position === 'before' ) {
+				return (
+					<>
+						<Slot name={ name } />
+						{ children }
+					</>
+				);
+			}
+			if ( position === 'after' ) {
+				return (
+					<>
+						{ children }
+						<Slot name={ name } />
+					</>
+				);
+			}
+			if ( position === 'replace' ) {
+				return <Slot name={ name }>{ children }</Slot>;
+			}
+			if ( position === 'children' ) {
+				element.props.children = (
+					<Slot name={ name }>{ element.props.children }</Slot>
+				);
+			}
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-fill
+	directive(
+		'fill',
+		( {
+			directives: {
+				fill: { default: fill },
+			},
+			props: { children },
+			evaluate,
+			context,
+		} ) => {
+			const contextValue = useContext( context );
+			const slot = evaluate( fill, { context: contextValue } );
+			return <Fill slot={ slot }>{ children }</Fill>;
+		},
+		{ priority: 4 }
+	);
+
+	// data-wp-slot-provider
+	directive(
+		'slot-provider',
+		( { props: { children } } ) => (
+			<SlotProvider>{ children }</SlotProvider>
+		),
+		{ priority: 4 }
 	);
 };

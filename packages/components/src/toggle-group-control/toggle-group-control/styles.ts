@@ -7,14 +7,18 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
-export const ToggleGroupControl = ( {
+export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
 	size,
-}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
+	__next40pxDefaultSize,
+}: Pick<
+	ToggleGroupControlProps,
+	'isBlock' | 'isDeselectable' | '__next40pxDefaultSize'
+> & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
@@ -24,10 +28,8 @@ export const ToggleGroupControl = ( {
 	min-width: 0;
 	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 
-	${ toggleGroupControlSize( size ) }
+	${ toggleGroupControlSize( size, __next40pxDefaultSize ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
@@ -55,12 +57,17 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 };
 
 export const toggleGroupControlSize = (
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >,
+	__next40pxDefaultSize: ToggleGroupControlProps[ '__next40pxDefaultSize' ]
 ) => {
 	const heights = {
-		default: '36px',
+		default: '40px',
 		'__unstable-large': '40px',
 	};
+
+	if ( ! __next40pxDefaultSize ) {
+		heights.default = '36px';
+	}
 
 	return css`
 		min-height: ${ heights[ size ] };
@@ -70,21 +77,6 @@ export const toggleGroupControlSize = (
 export const block = css`
 	display: flex;
 	width: 100%;
-`;
-
-export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
-	left: 0;
-	position: absolute;
-	top: 2px;
-	bottom: 2px;
-	transition: transform ${ CONFIG.transitionDurationFast } ease;
-	${ reduceMotion( 'transition' ) }
-	z-index: 1;
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: -3px;
 `;
 
 export const VisualLabelWrapper = styled.div`

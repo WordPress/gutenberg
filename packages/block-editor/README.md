@@ -15,15 +15,13 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ```js
+import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
 	BlockTools,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
@@ -34,16 +32,9 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<SlotFillProvider>
-				<BlockTools>
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</BlockTools>
-				<Popover.Slot />
-			</SlotFillProvider>
+			<BlockTools>
+				<BlockCanvas height="400px" />
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }
@@ -123,7 +114,39 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Block Breadcrumb.
+-   `Element`: Block Breadcrumb.
+
+### BlockCanvas
+
+BlockCanvas component is a component used to display the canvas of the block editor. What we call the canvas is an iframe containing the block list that you can manipulate. The component is also responsible of wiring up all the necessary hooks to enable the keyboard navigation across blocks in the editor and inject content styles into the iframe.
+
+_Usage_
+
+```jsx
+function MyBlockEditor() {
+	const [ blocks, updateBlocks ] = useState( [] );
+	return (
+		<BlockEditorProvider
+			value={ blocks }
+			onInput={ updateBlocks }
+			onChange={ persistBlocks }
+		>
+			<BlockCanvas height="400px" />
+		</BlockEditorProvider>
+	);
+}
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.height_ `string`: Canvas height, defaults to 300px.
+-   _props.styles_ `Array`: Content styles to inject into the iframe.
+-   _props.children_ `Element`: Content of the canvas, defaults to the BlockList component.
+
+_Returns_
+
+-   `Element`: Block Breadcrumb.
 
 ### BlockColorsStyleSelector
 
@@ -203,7 +226,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### BlockSelectionClearer
 
@@ -225,7 +248,7 @@ _Parameters_
 
 _Returns_
 
--   `WPElement`: Element.
+-   `Element`: Element.
 
 ### BlockStyles
 
@@ -311,9 +334,11 @@ _Related_
 
 ### CopyHandler
 
-_Related_
+> **Deprecated**
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
+_Parameters_
+
+-   _props_ `Object`:
 
 ### createCustomColorsHOC
 
@@ -417,8 +442,8 @@ const fontSize = getComputedFluidTypographyValue( {
 _Parameters_
 
 -   _args_ `Object`:
--   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
--   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
 -   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
@@ -555,7 +580,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The toolbar.
+-   `ComponentType`: The toolbar.
 
 ### HeightControl
 
@@ -574,7 +599,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### InnerBlocks
 
@@ -764,12 +789,22 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
--   _wrapperClassName_ `string`: Wrapper Class Name.
+-   _styles_ `EditorStyle[]`: CSS rules.
+-   _wrapperSelector_ `string`: Wrapper selector.
 
 _Returns_
 
 -   `Array`: converted rules.
+
+_Type Definition_
+
+-   _EditorStyle_ `Object`
+
+_Properties_
+
+-   _css_ `string`: the CSS block(s), as a single string.
+-   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
+-   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -793,6 +828,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockCommands
+
+Undocumented declaration.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
@@ -815,9 +854,68 @@ _Returns_
 
 -   `Object`: Block edit context
 
+### useBlockEditingMode
+
+Allows a block to restrict the user interface that is displayed for editing that block and its inner blocks.
+
+_Usage_
+
+```js
+function MyBlock( { attributes, setAttributes } ) {
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
+}
+```
+
+`mode` can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
+    selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
+    toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+The mode is inherited by all of the block's inner blocks, unless they have
+their own mode.
+
+If called outside of a block context, the mode is applied to all blocks.
+
+_Parameters_
+
+-   _mode_ `?BlockEditingMode`: The editing mode to apply. If undefined, the current editing mode is not changed.
+
+_Returns_
+
+-   `BlockEditingMode`: The current editing mode.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
+
+Use of this hook on the outermost element of a block is required if using API >= v2.
+
+_Usage_
+
+```js
+import { useBlockProps } from '@wordpress/block-editor';
+
+export default function Edit() {
+
+  const blockProps = useBlockProps(
+    className: 'my-custom-class',
+    style: {
+      color: '#222222',
+      backgroundColor: '#eeeeee'
+    }
+  )
+
+  return (
+    <div { ...blockProps }>
+
+    </div>
+  )
+}
+```
 
 _Parameters_
 
@@ -856,9 +954,11 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.5.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -873,6 +973,26 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
+
+### useSettings
+
+Hook that retrieves the given settings for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
+
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
+_Parameters_
+
+-   _paths_ `string[]`: The paths to the settings.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
 
 ### Warning
 
@@ -926,7 +1046,7 @@ Handles selection and navigation across blocks. This component should be wrapped
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.children_ `WPElement`: Children to be rendered.
+-   _props.children_ `Element`: Children to be rendered.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

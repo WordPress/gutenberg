@@ -286,8 +286,8 @@ describe( 'ToolsPanel', () => {
 			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
 
 			expect( menuItems.length ).toEqual( 2 );
-			expect( menuItems[ 0 ] ).toHaveAttribute( 'aria-checked', 'true' );
-			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
+			expect( menuItems[ 0 ] ).toBeChecked();
+			expect( menuItems[ 1 ] ).not.toBeChecked();
 		} );
 
 		it( 'should render panel label as header text', () => {

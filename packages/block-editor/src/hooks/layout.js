@@ -17,20 +17,18 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-import useSetting from '../components/use-setting';
-import { LayoutStyle } from '../components/block-list/layout';
-import BlockList from '../components/block-list';
+import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { kebabCase } from '../utils/object';
+import { useBlockSettings, useStyleOverride } from './utils';
 
 const layoutBlockSupportKey = 'layout';
 
@@ -69,9 +67,12 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
 			LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className;
-		const compoundClassName = `wp-block-${ blockName
-			.split( '/' )
-			.pop() }-${ baseClassName }`;
+		const splitBlockName = blockName.split( '/' );
+		const fullBlockName =
+			splitBlockName[ 0 ] === 'core'
+				? splitBlockName.pop()
+				: splitBlockName.join( '-' );
+		const compoundClassName = `wp-block-${ fullBlockName }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
@@ -120,7 +121,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 			? { ...layout, type: 'constrained' }
 			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 	const css = fullLayoutType?.getLayoutStyle?.( {
 		blockName,
@@ -133,8 +134,13 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+	const settings = useBlockSettings( blockName );
+	const {
+		layout: { allowEditing: allowEditingSetting },
+	} = settings;
+
 	const { layout } = attributes;
-	const defaultThemeLayout = useSetting( 'layout' );
+	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -143,6 +149,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	}, [] );
 	const blockEditingMode = useBlockEditingMode();
 
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
 		layoutBlockSupportKey,
@@ -150,7 +160,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 	const {
 		allowSwitching,
-		allowEditing = true,
+		allowEditing = allowEditingSetting ?? true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
@@ -262,7 +272,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ ! inherit && blockEditingMode === 'default' && layoutType && (
+			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
@@ -321,21 +331,63 @@ export function addAttribute( settings ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withInspectorControls = createHigherOrderComponent(
+export const withLayoutControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const supportLayout = hasLayoutBlockSupport( blockName );
+		const supportLayout = hasLayoutBlockSupport( props.name );
 
-		const blockEditingMode = useBlockEditingMode();
 		return [
-			supportLayout && blockEditingMode === 'default' && (
-				<LayoutPanel key="layout" { ...props } />
-			),
+			supportLayout && <LayoutPanel key="layout" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withInspectorControls'
+	'withLayoutControls'
 );
+
+function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
+	const { name, attributes } = props;
+	const id = useInstanceId( BlockListBlock );
+	const { layout } = attributes;
+	const { default: defaultBlockLayout } =
+		getBlockSupport( name, layoutBlockSupportKey ) || {};
+	const usedLayout =
+		layout?.inherit || layout?.contentSize || layout?.wideSize
+			? { ...layout, type: 'constrained' }
+			: layout || defaultBlockLayout || {};
+	const layoutClasses = useLayoutClasses( attributes, name );
+
+	// Higher specificity to override defaults from theme.json.
+	const selector = `.wp-container-${ id }.wp-container-${ id }`;
+	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGapSupport !== null;
+
+	// Get CSS string for the current layout type.
+	// The CSS and `style` element is only output if it is not empty.
+	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
+	const css = fullLayoutType?.getLayoutStyle?.( {
+		blockName: name,
+		selector,
+		layout: usedLayout,
+		style: attributes?.style,
+		hasBlockGapSupport,
+	} );
+
+	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
+	const layoutClassNames = classnames(
+		{
+			[ `wp-container-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
+		},
+		layoutClasses
+	);
+
+	useStyleOverride( { css } );
+
+	return (
+		<BlockListBlock
+			{ ...props }
+			__unstableLayoutClassNames={ layoutClassNames }
+		/>
+	);
+}
 
 /**
  * Override the default block element to add the layout styles.
@@ -346,79 +398,59 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const blockSupportsLayout = hasLayoutBlockSupport( name );
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderLayoutStyles =
-			blockSupportsLayout && ! disableLayoutStyles;
-		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
-		const { layout } = attributes;
-		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout =
-			layout?.inherit || layout?.contentSize || layout?.wideSize
-				? { ...layout, type: 'constrained' }
-				: layout || defaultBlockLayout || {};
-		const layoutClasses = blockSupportsLayout
-			? useLayoutClasses( attributes, name )
-			: null;
-		// Higher specificity to override defaults from theme.json.
-		const selector = `.wp-container-${ id }.wp-container-${ id }`;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapSupport = blockGapSupport !== null;
+		const blockSupportsLayout = hasLayoutBlockSupport( props.name );
+		const shouldRenderLayoutStyles = useSelect(
+			( select ) => {
+				// The callback returns early to avoid block editor subscription.
+				if ( ! blockSupportsLayout ) {
+					return false;
+				}
 
-		// Get CSS string for the current layout type.
-		// The CSS and `style` element is only output if it is not empty.
-		let css;
-		if ( shouldRenderLayoutStyles ) {
-			const fullLayoutType = getLayoutType(
-				usedLayout?.type || 'default'
-			);
-			css = fullLayoutType?.getLayoutStyle?.( {
-				blockName: name,
-				selector,
-				layout: usedLayout,
-				style: attributes?.style,
-				hasBlockGapSupport,
-			} );
-		}
-
-		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const layoutClassNames = classnames(
-			{
-				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+				return ! select( blockEditorStore ).getSettings()
+					.disableLayoutStyles;
 			},
-			layoutClasses
+			[ blockSupportsLayout ]
 		);
 
+		if ( ! shouldRenderLayoutStyles ) {
+			return <BlockListBlock { ...props } />;
+		}
+
 		return (
-			<>
-				{ shouldRenderLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal(
-						<LayoutStyle
-							blockName={ name }
-							selector={ selector }
-							css={ css }
-							layout={ usedLayout }
-							style={ attributes?.style }
-						/>,
-						element
-					) }
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={ layoutClassNames }
-				/>
-			</>
+			<BlockWithLayoutStyles block={ BlockListBlock } props={ props } />
 		);
 	},
 	'withLayoutStyles'
 );
+
+function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
+	const layout = props.attributes.style?.layout ?? {};
+	const { selfStretch, flexSize } = layout;
+
+	const id = useInstanceId( BlockListBlock );
+	const selector = `.wp-container-content-${ id }`;
+
+	let css = '';
+	if ( selfStretch === 'fixed' && flexSize ) {
+		css = `${ selector } {
+				flex-basis: ${ flexSize };
+				box-sizing: border-box;
+			}`;
+	} else if ( selfStretch === 'fill' ) {
+		css = `${ selector } {
+				flex-grow: 1;
+			}`;
+	}
+
+	// Attach a `wp-container-content` id-based classname.
+	const className = classnames( props.className, {
+		[ `wp-container-content-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
+	} );
+
+	useStyleOverride( { css } );
+
+	return <BlockListBlock { ...props } className={ className } />;
+}
 
 /**
  * Override the default block element to add the child layout styles.
@@ -429,48 +461,32 @@ export const withLayoutStyles = createHigherOrderComponent(
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { attributes } = props;
-		const { style: { layout = {} } = {} } = attributes;
+		const layout = props.attributes.style?.layout ?? {};
 		const { selfStretch, flexSize } = layout;
 		const hasChildLayout = selfStretch || flexSize;
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderChildLayoutStyles =
-			hasChildLayout && ! disableLayoutStyles;
 
-		const element = useContext( BlockList.__unstableElementContext );
-		const id = useInstanceId( BlockListBlock );
-		const selector = `.wp-container-content-${ id }`;
+		const shouldRenderChildLayoutStyles = useSelect(
+			( select ) => {
+				// The callback returns early to avoid block editor subscription.
+				if ( ! hasChildLayout ) {
+					return false;
+				}
 
-		let css = '';
+				return ! select( blockEditorStore ).getSettings()
+					.disableLayoutStyles;
+			},
+			[ hasChildLayout ]
+		);
 
-		if ( selfStretch === 'fixed' && flexSize ) {
-			css += `${ selector } {
-				flex-basis: ${ flexSize };
-				box-sizing: border-box;
-			}`;
-		} else if ( selfStretch === 'fill' ) {
-			css += `${ selector } {
-				flex-grow: 1;
-			}`;
+		if ( ! shouldRenderChildLayoutStyles ) {
+			return <BlockListBlock { ...props } />;
 		}
 
-		// Attach a `wp-container-content` id-based classname.
-		const className = classnames( props?.className, {
-			[ `wp-container-content-${ id }` ]:
-				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-		} );
-
 		return (
-			<>
-				{ shouldRenderChildLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
+			<BlockWithChildLayoutStyles
+				block={ BlockListBlock }
+				props={ props }
+			/>
 		);
 	},
 	'withChildLayoutStyles'
@@ -494,5 +510,5 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/layout/with-inspector-controls',
-	withInspectorControls
+	withLayoutControls
 );

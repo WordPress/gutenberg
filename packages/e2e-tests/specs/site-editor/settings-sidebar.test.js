@@ -81,7 +81,7 @@ describe( 'Settings sidebar', () => {
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: 'Single Entries',
 				description:
-					'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g., Single Post, Page, or Attachment) cannot be found.',
+					'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.',
 			} );
 		} );
 	} );

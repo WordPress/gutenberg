@@ -26,23 +26,23 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 	}
 
 	public function test_get_template_hierarchy() {
-		$hierarchy = gutenberg_get_template_hierarchy( 'front-page' );
+		$hierarchy = get_template_hierarchy( 'front-page' );
 		$this->assertEquals( array( 'front-page', 'home', 'index' ), $hierarchy );
 		// Custom templates.
-		$hierarchy = gutenberg_get_template_hierarchy( 'whatever-slug', true );
+		$hierarchy = get_template_hierarchy( 'whatever-slug', true );
 		$this->assertEquals( array( 'page', 'singular', 'index' ), $hierarchy );
 		// Single slug templates(ex. page, tag, author, etc..
-		$hierarchy = gutenberg_get_template_hierarchy( 'page' );
+		$hierarchy = get_template_hierarchy( 'page' );
 		$this->assertEquals( array( 'page', 'singular', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'tag' );
+		$hierarchy = get_template_hierarchy( 'tag' );
 		$this->assertEquals( array( 'tag', 'archive', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'author' );
+		$hierarchy = get_template_hierarchy( 'author' );
 		$this->assertEquals( array( 'author', 'archive', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'date' );
+		$hierarchy = get_template_hierarchy( 'date' );
 		$this->assertEquals( array( 'date', 'archive', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy' );
+		$hierarchy = get_template_hierarchy( 'taxonomy' );
 		$this->assertEquals( array( 'taxonomy', 'archive', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'attachment' );
+		$hierarchy = get_template_hierarchy( 'attachment' );
 		$this->assertEquals(
 			array(
 				'attachment',
@@ -52,23 +52,23 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
-		$hierarchy = gutenberg_get_template_hierarchy( 'singular' );
+		$hierarchy = get_template_hierarchy( 'singular' );
 		$this->assertEquals( array( 'singular', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'single' );
+		$hierarchy = get_template_hierarchy( 'single' );
 		$this->assertEquals( array( 'single', 'singular', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'archive' );
+		$hierarchy = get_template_hierarchy( 'archive' );
 		$this->assertEquals( array( 'archive', 'index' ), $hierarchy );
-		$hierarchy = gutenberg_get_template_hierarchy( 'index' );
+		$hierarchy = get_template_hierarchy( 'index' );
 		$this->assertEquals( array( 'index' ), $hierarchy );
 
 		// Taxonomies.
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-book_type', false );
+		$hierarchy = get_template_hierarchy( 'taxonomy-book_type', false );
 		$this->assertEquals( array( 'taxonomy-book_type', 'taxonomy', 'archive', 'index' ), $hierarchy );
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-books', false, 'taxonomy-books' );
+		$hierarchy = get_template_hierarchy( 'taxonomy-books', false, 'taxonomy-books' );
 		$this->assertEquals( array( 'taxonomy-books', 'taxonomy', 'archive', 'index' ), $hierarchy );
 		// Single word category.
-		$hierarchy = gutenberg_get_template_hierarchy( 'category-fruits', false );
+		$hierarchy = get_template_hierarchy( 'category-fruits', false );
 		$this->assertEquals(
 			array(
 				'category-fruits',
@@ -79,7 +79,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'category-fruits', false, 'category' );
+		$hierarchy = get_template_hierarchy( 'category-fruits', false, 'category' );
 		$this->assertEquals(
 			array(
 				'category-fruits',
@@ -90,7 +90,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Multi word category.
-		$hierarchy = gutenberg_get_template_hierarchy( 'category-fruits-yellow', false );
+		$hierarchy = get_template_hierarchy( 'category-fruits-yellow', false );
 		$this->assertEquals(
 			array(
 				'category-fruits-yellow',
@@ -101,7 +101,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'category-fruits-yellow', false, 'category' );
+		$hierarchy = get_template_hierarchy( 'category-fruits-yellow', false, 'category' );
 		$this->assertEquals(
 			array(
 				'category-fruits-yellow',
@@ -112,7 +112,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Single word taxonomy.
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-books-action', false, 'taxonomy-books' );
+		$hierarchy = get_template_hierarchy( 'taxonomy-books-action', false, 'taxonomy-books' );
 		$this->assertEquals(
 			array(
 				'taxonomy-books-action',
@@ -124,10 +124,10 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-book_type-adventure', false );
+		$hierarchy = get_template_hierarchy( 'taxonomy-book_type-adventure', false );
 		$this->assertEquals( array( 'taxonomy-book_type-adventure', 'taxonomy-book_type', 'taxonomy', 'archive', 'index' ), $hierarchy );
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-books-action-adventure', false, 'taxonomy-books' );
+		$hierarchy = get_template_hierarchy( 'taxonomy-books-action-adventure', false, 'taxonomy-books' );
 		$this->assertEquals(
 			array(
 				'taxonomy-books-action-adventure',
@@ -139,7 +139,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Multi word taxonomy/terms.
-		$hierarchy = gutenberg_get_template_hierarchy( 'taxonomy-greek-books-action-adventure', false, 'taxonomy-greek-books' );
+		$hierarchy = get_template_hierarchy( 'taxonomy-greek-books-action-adventure', false, 'taxonomy-greek-books' );
 		$this->assertEquals(
 			array(
 				'taxonomy-greek-books-action-adventure',
@@ -151,7 +151,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Post types.
-		$hierarchy = gutenberg_get_template_hierarchy( 'single-book', false, 'single-book' );
+		$hierarchy = get_template_hierarchy( 'single-book', false, 'single-book' );
 		$this->assertEquals(
 			array(
 				'single-book',
@@ -161,7 +161,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
-		$hierarchy = gutenberg_get_template_hierarchy( 'single-art-project', false, 'single-art-project' );
+		$hierarchy = get_template_hierarchy( 'single-art-project', false, 'single-art-project' );
 		$this->assertEquals(
 			array(
 				'single-art-project',
@@ -171,7 +171,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
-		$hierarchy = gutenberg_get_template_hierarchy( 'single-art-project-imagine', false, 'single-art-project' );
+		$hierarchy = get_template_hierarchy( 'single-art-project-imagine', false, 'single-art-project' );
 		$this->assertEquals(
 			array(
 				'single-art-project-imagine',
@@ -183,7 +183,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'single-custom_book', false );
+		$hierarchy = get_template_hierarchy( 'single-custom_book', false );
 		$this->assertEquals(
 			array(
 				'single-custom_book',
@@ -194,7 +194,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'single-custom_book-book-1', false );
+		$hierarchy = get_template_hierarchy( 'single-custom_book-book-1', false );
 		$this->assertEquals(
 			array(
 				'single-custom_book-book-1',
@@ -206,7 +206,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 
-		$hierarchy = gutenberg_get_template_hierarchy( 'page-hi', false, 'page' );
+		$hierarchy = get_template_hierarchy( 'page-hi', false, 'page' );
 		$this->assertEquals(
 			array(
 				'page-hi',
@@ -216,7 +216,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
-		$hierarchy = gutenberg_get_template_hierarchy( 'page-hi', false );
+		$hierarchy = get_template_hierarchy( 'page-hi', false );
 		$this->assertEquals(
 			array(
 				'page-hi',
@@ -227,7 +227,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Authors.
-		$hierarchy = gutenberg_get_template_hierarchy( 'author-rigas', false, 'author' );
+		$hierarchy = get_template_hierarchy( 'author-rigas', false, 'author' );
 		$this->assertEquals(
 			array(
 				'author-rigas',
@@ -238,7 +238,7 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Archive post types.
-		$hierarchy = gutenberg_get_template_hierarchy( 'archive-book', false );
+		$hierarchy = get_template_hierarchy( 'archive-book', false );
 		$this->assertEquals(
 			array(
 				'archive-book',

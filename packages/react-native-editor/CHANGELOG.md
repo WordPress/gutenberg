@@ -10,11 +10,83 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
+
+## 1.108.0
+-   [*] Fix error when pasting deeply nested structure content [#55613]
+-   [*] Fix crash related to accessing undefined value in `TextColorEdit` [#55664]
+
+## 1.107.0
+-   [*] Social Icons: Fix visibility of inactive icons when used with block based themes in dark mode [#55398]
+-   [*] Synced Patterns: Fix visibility of heading section when used with block based themes in dark mode [#55399]
+-   [*] Classic block: Add option to convert to blocks [#55461]
+
+## 1.106.0
+-   [*] Exit Preformatted and Verse blocks by triple pressing the Return key [#53354]
+-   [*] Fix quote block border visibility when used with block based themes in dark mode [#54964]
+
+## 1.105.0
+-   [*] Limit inner blocks nesting depth to avoid call stack size exceeded crash [#54382]
+-   [*] Prevent crashes when setting an invalid media URL for Video or Audio blocks [#54834]
+-   [**] Fallback to Twitter provider when embedding X URLs [#54876]
+-   [*] [internal] Update Ruby version from 2.7.4 to 3.2.2 [#54897]
+
+## 1.104.0
+-   [*] Fix the obscurred "Insert from URL" input for media blocks when using a device in landscape orientation. [#54096]
+-   [**] RichText - Update logic for the placeholder text color [#54259]
+
+## 1.103.3
+-   [*] Bump `WordPress-Aztec-iOS` version to `1.19.9` [#54456]
+
+## 1.103.2
+-   [*] Fix issue with missing characters in Add Media placeholder button [#54281]
+
+## 1.103.1
+-   [**] Fix long-press gestures not working in RichText component [Android] [#54213]
+
+## 1.103.0
+-   [**] Replace third-party dependency react-native-hsv-color-picker with first-party code [#53329]
+-   [*] Search Control - Prevent calling TextInput's methods when undefined [#53745]
+-   [*] Improve horizontal rule styles to avoid invisible lines [#53883]
+-   [*] Fix horizontal rule style extensions [#53917]
+-   [*] Add block outline to all Social Link blocks when selected [#54011]
+-   [*] Columns block - Fix transforming into a Group block crash [#54035]
+-   [*] Fix Social Icons block alignment [#54100]
+
+## 1.102.1
+- [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.102.0
+-   [*] Display custom color value in mobile Cover Block color picker [#51414]
+-   [**] Display outline around selected Social Link block [#53377]
+-   [**] Fixes font customization not getting updated on iOS [#53391]
+
+## 1.101.2
+-  [**] Fix Voice Over and assistive keyboards [#53895]
+
+## 1.101.1
+-   [**] Fix the dynamic height when opening/closing navigation screens within the bottom sheet. [https://github.com/WordPress/gutenberg/pull/53608]
+
+## 1.101.0
+-   [*] Remove visual gap in mobile toolbar when a Gallery block is selected [#52966]
+-   [*] Remove Gallery caption button on mobile [#53010]
+-   [**] Upgrade React Native to 0.71.11 [#51303]
+-   [*] Upgrade Gradle to 8.2.1 & AGP to 8.1.0 [#52872]
+-   [*] Fix Gallery block selection when adding media [#53127]
+
+## 1.100.2
+-   [**] Fix iOS Focus loop for RichText components [#53217]
+
+## 1.100.1
+-   [**] Add WP hook for registering non-core blocks [#52791]
+
+## 1.100.0
 -   [**] Add media inserter buttons to editor toolbar [#51827]
 -   [**] Update native BlockOutline component styles to remove blue border from blocks [#51222]
 -   [**] Move the undo/redo buttons to the navigation bar [#51766]
--   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
--   [**] Update Editor toolbar icons and colors [#52336]
+-   [**] Update Editor block inserter button styles and default text input placeholder/selection styles [#52269]
+-   [**] Update Editor toolbar icons and colors [#52336]
+-   [*] Update Block Settings button border [#52715]
 
 ## 1.99.1
 - [**] Fix crash related to removing a block under certain conditions [#52595]
@@ -48,8 +120,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix undo/redo history when inserting a link configured to open in a new tab [#50460]
 -   [*] [List block] Fix an issue when merging a list item into a Paragraph would remove its nested list items. [#50701]
 
-
-
 ## 1.95.0
 -   [*] Fix crash when trying to convert to regular blocks an undefined/deleted reusable block [#50475]
 -   [**] Tapping on nested text blocks gets focus directly instead of having to tap multiple times depeding on the nesting levels. [#50108]
@@ -63,7 +133,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix regression with the Color hook and ColorPanel. [#49917]
 
 ## 1.93.0
--   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
+-   [***] [iOS] Fixed iOS scroll jumping issue by refactoring KeyboardAwareFlatList improving writing flow and caret focus handling. [#48791]
 
 ## 1.92.1
 -   [*] Avoid empty Gallery block error [#49557]
@@ -558,8 +628,8 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.42.0
 
 -   [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
--   [**] Button block - Add link picker to the block settings [#26206]
--   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
+-   [**] Button block - Add link picker to the block settings [#26206]
+-   [**] Support to render background/text colors in Group, Paragraph and Quote blocks [#25994]
 -   [*] Fix theme colors syncing with the editor [#26821]
 -   [**] Fix issue where a blocks would disappear when deleting all of the text inside without requiring the extra backspace to remove the block. [#27583]
 

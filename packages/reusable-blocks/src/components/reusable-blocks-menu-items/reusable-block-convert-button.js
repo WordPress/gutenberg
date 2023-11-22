@@ -3,9 +3,8 @@
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import {
-	BlockSettingsMenuControls,
 	store as blockEditorStore,
-	ReusableBlocksRenameHint,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -19,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -27,6 +26,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -34,20 +38,32 @@ import { store } from '../../store';
  * @param {Object}   props              Component props.
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
- * @return {import('@wordpress/element').WPComponent} The menu control or null.
+ * @param {()=>void} props.onClose      Callback to close the menu.
+ * @return {import('react').ComponentType} The menu control or null.
  */
 export default function ReusableBlockConvertButton( {
 	clientIds,
 	rootClientId,
+	onClose,
 } ) {
-	const [ syncType, setSyncType ] = useState( 'unsynced' );
+	const showRenameHint = useReusableBlocksRenameHint();
+	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } =
-				select( blockEditorStore );
+			const {
+				getBlocksByClientId,
+				canInsertBlockType,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+
+			const rootId =
+				rootClientId ||
+				( clientIds.length > 0
+					? getBlockRootClientId( clientIds[ 0 ] )
+					: undefined );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -65,7 +81,7 @@ export default function ReusableBlockConvertButton( {
 				// Hide when this is already a reusable block.
 				! isReusable &&
 				// Hide when reusable blocks are disabled.
-				canInsertBlockType( 'core/block', rootClientId ) &&
+				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
 					( block ) =>
 						// Guard against the case where a regular block has *just* been converted.
@@ -97,15 +113,15 @@ export default function ReusableBlockConvertButton( {
 					syncType
 				);
 				createSuccessNotice(
-					syncType === 'fully'
+					! syncType
 						? sprintf(
 								// translators: %s: the name the user has given to the pattern.
-								__( 'Synced Pattern created: %s' ),
+								__( 'Synced pattern created: %s' ),
 								reusableBlockTitle
 						  )
 						: sprintf(
 								// translators: %s: the name the user has given to the pattern.
-								__( 'Unsynced Pattern created: %s' ),
+								__( 'Unsynced pattern created: %s' ),
 								reusableBlockTitle
 						  ),
 					{
@@ -134,78 +150,74 @@ export default function ReusableBlockConvertButton( {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<>
-					<MenuItem
-						icon={ symbol }
-						onClick={ () => setIsModalOpen( true ) }
+		<>
+			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
+				{ showRenameHint
+					? __( 'Create pattern/reusable block' )
+					: __( 'Create pattern' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<Modal
+					title={ __( 'Create pattern' ) }
+					onRequestClose={ () => {
+						setIsModalOpen( false );
+						setTitle( '' );
+					} }
+					overlayClassName="reusable-blocks-menu-items__convert-modal"
+				>
+					<form
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							onConvert( title );
+							setIsModalOpen( false );
+							setTitle( '' );
+							onClose();
+						} }
 					>
-						{ __( 'Create pattern/reusable block' ) }
-					</MenuItem>
-					{ isModalOpen && (
-						<Modal
-							title={ __( 'Create pattern' ) }
-							onRequestClose={ () => {
-								setIsModalOpen( false );
-								setTitle( '' );
-							} }
-							overlayClassName="reusable-blocks-menu-items__convert-modal"
-						>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onConvert( title );
-									setIsModalOpen( false );
-									setTitle( '' );
-									onClose();
+						<VStack spacing="5">
+							<ReusableBlocksRenameHint />
+							<TextControl
+								__nextHasNoMarginBottom
+								label={ __( 'Name' ) }
+								value={ title }
+								onChange={ setTitle }
+								placeholder={ __( 'My pattern' ) }
+							/>
+
+							<ToggleControl
+								label={ _x(
+									'Synced',
+									'Option that makes an individual pattern synchronized'
+								) }
+								help={ __(
+									'Editing the pattern will update it anywhere it is used.'
+								) }
+								checked={ ! syncType }
+								onChange={ () => {
+									setSyncType(
+										! syncType ? 'unsynced' : undefined
+									);
 								} }
-							>
-								<VStack spacing="5">
-									<ReusableBlocksRenameHint />
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Name' ) }
-										value={ title }
-										onChange={ setTitle }
-										placeholder={ __( 'My pattern' ) }
-									/>
+							/>
+							<HStack justify="right">
+								<Button
+									variant="tertiary"
+									onClick={ () => {
+										setIsModalOpen( false );
+										setTitle( '' );
+									} }
+								>
+									{ __( 'Cancel' ) }
+								</Button>
 
-									<ToggleControl
-										label={ __( 'Synced' ) }
-										help={ __(
-											'Editing the pattern will update it anywhere it is used.'
-										) }
-										checked={ syncType === 'fully' }
-										onChange={ () => {
-											setSyncType(
-												syncType === 'fully'
-													? 'unsynced'
-													: 'fully'
-											);
-										} }
-									/>
-									<HStack justify="right">
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												setIsModalOpen( false );
-												setTitle( '' );
-											} }
-										>
-											{ __( 'Cancel' ) }
-										</Button>
-
-										<Button variant="primary" type="submit">
-											{ __( 'Create' ) }
-										</Button>
-									</HStack>
-								</VStack>
-							</form>
-						</Modal>
-					) }
-				</>
+								<Button variant="primary" type="submit">
+									{ __( 'Create' ) }
+								</Button>
+							</HStack>
+						</VStack>
+					</form>
+				</Modal>
 			) }
-		</BlockSettingsMenuControls>
+		</>
 	);
 }

@@ -9,13 +9,18 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { renderToString, useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import {
+	PRESET_METADATA,
+	ROOT_BLOCK_SELECTOR,
+	scopeSelector,
+	appendToSelector,
+} from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import {
 	getTypographyFontSizeValue,
@@ -23,7 +28,7 @@ import {
 } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
-import { PresetDuotoneFilter } from '../duotone/components';
+import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
@@ -32,6 +37,7 @@ import {
 	kebabCase,
 	setImmutably,
 } from '../../utils/object';
+import BlockContext from '../block-context';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -163,11 +169,9 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
 				presetByOrigin[ origin ].map( ( preset ) =>
-					renderToString(
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
+					getDuotoneFilter(
+						`wp-duotone-${ preset.slug }`,
+						preset.colors
 					)
 				)
 			)
@@ -198,7 +202,6 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {string} styleVariationSelector The style variation selector.
  * @return {string} Combined selector string.
- *
  */
 function concatFeatureVariationSelectorString(
 	featureSelector,
@@ -308,13 +311,15 @@ const getFeatureDeclarations = ( selectors, styles ) => {
  *
  * @param {Object}  tree                A theme.json tree containing layout definitions.
  *
+ * @param {boolean} isTemplate          Whether the entity being edited is a full template or a pattern.
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
 	useRootPaddingAlign,
-	tree = {}
+	tree = {},
+	isTemplate = true
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
@@ -387,10 +392,10 @@ export function getStylesDeclarations(
 	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
-		// Don't output padding properties if padding variables are set.
+		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
 			isRoot &&
-			useRootPaddingAlign &&
+			( useRootPaddingAlign || ! isTemplate ) &&
 			rule.key.startsWith( 'padding' )
 		) {
 			return;
@@ -758,7 +763,8 @@ export const toStyles = (
 	blockSelectors,
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
-	disableLayoutStyles = false
+	disableLayoutStyles = false,
+	isTemplate = true
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -783,17 +789,18 @@ export const toStyles = (
 		ruleset += ` --wp--style--global--wide-size: ${ wideSize };`;
 	}
 
-	if ( useRootPaddingAlign ) {
+	// Root padding styles should only be output for full templates, not patterns or template parts.
+	if ( useRootPaddingAlign && isTemplate ) {
 		/*
 		 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
 		 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
 		 */
 		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
+			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }
 			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
-			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }
+			.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
 
@@ -910,7 +917,8 @@ export const toStyles = (
 				styles,
 				selector,
 				useRootPaddingAlign,
-				tree
+				tree,
+				isTemplate
 			);
 			if ( declarations?.length ) {
 				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
@@ -1121,18 +1129,33 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
-const processCSSNesting = ( css, blockSelector ) => {
+export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
-		processedCSS += ! part.includes( '{' )
-			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
-			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+		const isRootCss = ! part.includes( '{' );
+		if ( isRootCss ) {
+			// If the part doesn't contain braces, it applies to the root level.
+			processedCSS += `${ blockSelector }{${ part.trim() }}`;
+		} else {
+			// If the part contains braces, it's a nested CSS rule.
+			const splittedPart = part.replace( '}', '' ).split( '{' );
+			if ( splittedPart.length !== 2 ) {
+				return;
+			}
+
+			const [ nestedSelector, cssValue ] = splittedPart;
+			const combinedSelector = nestedSelector.startsWith( ' ' )
+				? scopeSelector( blockSelector, nestedSelector )
+				: appendToSelector( blockSelector, nestedSelector );
+
+			processedCSS += `${ combinedSelector }{${ cssValue.trim() }}`;
+		}
 	} );
 	return processedCSS;
-};
+}
 
 /**
  * Returns the global styles output using a global styles configuration.
@@ -1152,6 +1175,10 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		const { getSettings } = select( blockEditorStore );
 		return !! getSettings().disableLayoutStyles;
 	} );
+
+	const blockContext = useContext( BlockContext );
+
+	const isTemplate = blockContext?.templateSlug !== undefined;
 
 	const getBlockStyles = useSelect( ( select ) => {
 		return select( blocksStore ).getBlockStyles;
@@ -1177,7 +1204,8 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			blockSelectors,
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
-			disableLayoutStyles
+			disableLayoutStyles,
+			isTemplate
 		);
 		const svgs = toSvgFilters( mergedConfig, blockSelectors );
 

@@ -31,6 +31,7 @@
 		"anchor": true,
 		"html": false,
 		"__experimentalOnEnter": true,
+		"__experimentalOnMerge": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -53,6 +54,12 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true
 		}
 	},
 	"styles": [

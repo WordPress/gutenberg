@@ -527,6 +527,7 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
+				testID="bottom-sheet"
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
@@ -575,6 +576,8 @@ class BottomSheet extends Component {
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,
+								maxHeight,
+								isMaxHeightSet,
 							} }
 						>
 							{ hasNavigation ? (

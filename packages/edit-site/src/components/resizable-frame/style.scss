@@ -1,23 +1,6 @@
 .edit-site-resizable-frame__inner {
 	position: relative;
 
-	&.edit-site-layout__resizable-frame-oversized {
-		@at-root {
-			body:has(&) {
-				.edit-site-site-hub {
-					.edit-site-site-hub__site-title,
-					.edit-site-site-hub_toggle-command-center {
-						opacity: 0 !important;
-					}
-
-					.edit-site-site-hub__view-mode-toggle-container {
-						background-color: transparent;
-					}
-				}
-			}
-		}
-	}
-
 	&.is-resizing {
 		@at-root {
 			body:has(&) {

@@ -26,11 +26,37 @@
 				"innerContent": [
 					"\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">My button 2</a></div>\n\t"
 				]
+			},
+			{
+				"blockName": "core/button",
+				"attrs": {
+					"tagName": "a"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">My button 3</a></div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">My button 3</a></div>\n\t"
+				]
+			},
+			{
+				"blockName": "core/button",
+				"attrs": {
+					"tagName": "button"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<div class=\"wp-block-button\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-button\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n\t"
+				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-buttons alignwide\">\n\t\n\n\t\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-buttons alignwide\">\n\t\n\n\t\n\n\t\n\n\t\n</div>\n",
 		"innerContent": [
 			"\n<div class=\"wp-block-buttons alignwide\">\n\t",
+			null,
+			"\n\n\t",
+			null,
+			"\n\n\t",
 			null,
 			"\n\n\t",
 			null,

@@ -98,4 +98,14 @@ test.describe( 'data-wp-class', () => {
 		await page.getByTestId( 'toggle context false value' ).click();
 		await expect( el ).toHaveClass( '' );
 	} );
+
+	test( 'can use BEM notation classes', async ( { page } ) => {
+		const el = page.getByTestId( 'can use BEM notation classes' );
+		await expect( el ).toHaveClass( 'block__element--modifier' );
+	} );
+
+	test( 'can use classes with several dashes', async ( { page } ) => {
+		const el = page.getByTestId( 'can use classes with several dashes' );
+		await expect( el ).toHaveClass( 'main-bg----color' );
+	} );
 } );

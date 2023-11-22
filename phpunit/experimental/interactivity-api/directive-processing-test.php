@@ -4,31 +4,34 @@
  *
  * @package Gutenberg
  * @subpackage Interactivity API
+ *
+ * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
+
 
 class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	function process_foo_test( $tags, $context ) {
+	public function process_foo_test( $tags, $context ) {
 	}
 
-	function increment( $store ) {
+	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 
-	static function static_increment( $store ) {
+	public static function static_increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
 }
 
 function gutenberg_test_process_directives_helper_increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
+	return $store['state']['count'] + $store['context']['count'];
 }
 
 /**
- * Tests for the gutenberg_interactivity_process_directives function.
+ * Tests for the gutenberg_interactivity_process_rendered_html function.
  *
  * @group  interactivity-api
- * @covers gutenberg_interactivity_process_directives
+ * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_correctly_call_attribute_directive_processor_on_closing_tag() {
@@ -37,43 +40,85 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$test_helper = $this->createMock( Helper_Class::class );
 
 		$test_helper->expects( $this->exactly( 2 ) )
-					->method( 'process_foo_test' )
-					->with(
-						$this->callback(
-							function( $p ) {
-								return 'DIV' === $p->get_tag() && (
-									// Either this is a closing tag...
-									$p->is_tag_closer() ||
-									// ...or it is an open tag, and has the directive attribute set.
-									( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
-								);
-							}
-						)
-					);
+				->method( 'process_foo_test' )
+				->with(
+					$this->callback(
+						function ( $p ) {
+							return 'DIV' === $p->get_tag() && (
+								// Either this is a closing tag...
+								$p->is_tag_closer() ||
+								// ...or it is an open tag, and has the directive attribute set.
+								( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
+							);
+						}
+					)
+				);
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
 		);
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->process_rendered_html( $tags, 'foo-', $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
 		$test_helper = $this->createMock( Helper_Class::class );
 		$test_helper->expects( $this->atLeastOnce() )
-					->method( 'process_foo_test' );
+				->method( 'process_foo_test' );
 
 		$directives = array(
 			'foo-test' => array( $test_helper, 'process_foo_test' ),
 		);
 
 		$markup = '<div foo-test--value="abc"></div>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
-		gutenberg_interactivity_process_directives( $tags, 'foo-', $directives );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->process_rendered_html( $tags, 'foo-', $directives );
+	}
+
+	public function test_interactivity_process_directives_in_root_blocks() {
+
+		$block_content =
+		'<!-- wp:paragraph -->' .
+			'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
+		'<!-- /wp:paragraph -->' .
+		'<!-- wp:paragraph -->' .
+			'<p>Welcome to WordPress.</p>' .
+		'<!-- /wp:paragraph -->';
+
+		$parsed_block = parse_blocks( $block_content )[0];
+
+		$source_block = $parsed_block;
+
+		$rendered_content = render_block( $parsed_block );
+
+		$parsed_block_second = parse_blocks( $block_content )[1];
+
+		$fake_parent_block = array();
+
+		// Test that root block is intially emtpy.
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
+
+		// Test that root block is not added if there is a parent block.
+		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, $fake_parent_block );
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
+
+		// Test that root block is added if there is no parent block.
+		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, null );
+		$current_root_block = WP_Directive_Processor::$root_block;
+		$this->assertNotEmpty( $current_root_block );
+
+		// Test that a root block is not added if there is already a root block defined.
+		gutenberg_interactivity_mark_root_blocks( $parsed_block_second, $source_block, null );
+		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
+
+		// Test that root block is removed after processing.
+		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
 	}
 }
+
 
 /**
  * Tests for the gutenberg_interactivity_evaluate_reference function.
@@ -129,7 +174,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 
 	public function test_evaluate_function_should_execute_anonymous_functions() {
 		$context = new WP_Directive_Context( array( 'count' => 2 ) );
-		$helper  = new Helper_Class;
+		$helper  = new Helper_Class();
 
 		wp_store(
 			array(
@@ -137,7 +182,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 					'count' => 3,
 				),
 				'selectors' => array(
-					'anonymous_function'           => function( $store ) {
+					'anonymous_function'           => function ( $store ) {
 						return $store['state']['count'] + $store['context']['count'];
 					},
 					// Other types of callables should not be executed.

@@ -182,7 +182,6 @@ class Gutenberg_Navigation_Fallback_Test extends WP_UnitTestCase {
 		// Check that only a single Navigation fallback was created.
 		$navs_in_db = $this->get_navigations_in_database();
 		$this->assertCount( 1, $navs_in_db, 'A single Navigation menu should be present in the database.' );
-
 	}
 
 	/**
@@ -335,7 +334,6 @@ class Gutenberg_Navigation_Fallback_Test extends WP_UnitTestCase {
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
-
 	}
 
 	private function get_navigations_in_database() {
@@ -351,5 +349,4 @@ class Gutenberg_Navigation_Fallback_Test extends WP_UnitTestCase {
 
 		return $navs_in_db->posts ? $navs_in_db->posts : array();
 	}
-
 }

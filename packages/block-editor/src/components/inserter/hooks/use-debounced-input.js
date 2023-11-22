@@ -6,12 +6,13 @@ import { useDebounce } from '@wordpress/compose';
 
 export default function useDebouncedInput( defaultValue = '' ) {
 	const [ input, setInput ] = useState( defaultValue );
-	const [ debounced, setter ] = useState( defaultValue );
-	const setDebounced = useDebounce( setter, 250 );
+	const [ debouncedInput, setDebouncedState ] = useState( defaultValue );
+
+	const setDebouncedInput = useDebounce( setDebouncedState, 250 );
+
 	useEffect( () => {
-		if ( debounced !== input ) {
-			setDebounced( input );
-		}
-	}, [ debounced, input ] );
-	return [ input, setInput, debounced ];
+		setDebouncedInput( input );
+	}, [ input ] );
+
+	return [ input, setInput, debouncedInput ];
 }

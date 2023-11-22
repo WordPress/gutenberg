@@ -68,7 +68,7 @@ export default function BoxInputControls( {
 					: selectedUnits[ corner ] || selectedUnits.flat;
 
 				return (
-					<Tooltip text={ label } position="top" key={ corner }>
+					<Tooltip text={ label } placement="top" key={ corner }>
 						<div className="components-border-radius-control__tooltip-wrapper">
 							<UnitControl
 								{ ...props }

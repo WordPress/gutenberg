@@ -56,6 +56,8 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
 			>
 				{ __( 'Create template part' ) }
 			</MenuItem>

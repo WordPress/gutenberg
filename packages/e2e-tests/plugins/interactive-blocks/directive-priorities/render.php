@@ -18,3 +18,7 @@
 		data-wp-test-context
 	></div>
 </div>
+
+<div data-testid="non-existent-directives">
+	<div data-wp-interactive ><div data-wp-non-existent-directive></div></div>
+</div>

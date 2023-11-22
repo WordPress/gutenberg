@@ -18,8 +18,15 @@ function gutenberg_trim_footnotes( $content ) {
 		return $content;
 	}
 
-	static $footnote_pattern = '_<sup data-fn="[^"]+" class="[^"]+">\s*<a href="[^"]+" id="[^"]+">\d+</a>\s*</sup>_';
-	return preg_replace( $footnote_pattern, '', $content );
+	if ( ! str_contains( $content, 'data-fn=' ) ) {
+		return $content;
+	}
+
+	return preg_replace(
+		'_<sup data-fn="[^"]+" class="[^"]+">\s*<a href="[^"]+" id="[^"]+">\d+</a>\s*</sup>_',
+		'',
+		$content
+	);
 }
 
 add_filter( 'the_content', 'gutenberg_trim_footnotes' );

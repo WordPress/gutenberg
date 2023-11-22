@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
-	?.stderr?.toString()
+	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com as' );
 
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
@@ -118,19 +118,10 @@ async function fetchPRs() {
 		id,
 		number,
 		title,
-		closed_at,
 		pull_request,
-	} ) ).sort( ( a, b ) => {
-		/*
-		 * `closed_at` and `pull_request.merged_at` are _usually_ the same,
-		 * but let's prefer the latter if it's available.
-		 */
-		if ( a?.pull_request?.merged_at && b?.pull_request?.merged_at ) {
-			return new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at );
-		}
-		return new Date( a.closed_at ) - new Date( b.closed_at );
-	} );
-
+	} ) )
+		.filter( ( { pull_request } ) => !! pull_request?.merged_at )
+		.sort( ( a, b ) => new Date(  a?.pull_request?.merged_at ) - new Date( b?.pull_request?.merged_at ) );
 
 	console.log( 'Found the following PRs to cherry-pick (sorted by closed date in ascending order): ' );
 	PRs.forEach( ( { number, title } ) =>

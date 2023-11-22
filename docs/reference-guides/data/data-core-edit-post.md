@@ -490,6 +490,10 @@ _Parameters_
 
 -   _mode_ `string`: The editor mode.
 
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
+
 ### toggleEditorPanelEnabled
 
 Returns an action object used to enable or disable a panel in the editor.

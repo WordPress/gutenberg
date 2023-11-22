@@ -100,6 +100,7 @@ function HeaderToolbar( {
 		( blockType ) => () => {
 			insertBlock( createBlock( blockType ), undefined, undefined, true, {
 				source: 'inserter_menu',
+				inserterMethod: 'quick-inserter',
 			} );
 		},
 		[ insertBlock ]

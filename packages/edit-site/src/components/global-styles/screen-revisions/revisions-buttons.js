@@ -9,46 +9,50 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
 /**
  * Returns a button label for the revision.
  *
- * @param {Object} revision A revision object.
+ * @param {string|number} id                    A revision object.
+ * @param {boolean}       isLatest              Whether the revision is the most current.
+ * @param {string}        authorDisplayName     Author name.
+ * @param {string}        formattedModifiedDate Revision modified date formatted.
  * @return {string} Translated label.
  */
-function getRevisionLabel( revision ) {
-	const authorDisplayName = revision?.author?.name || __( 'User' );
+function getRevisionLabel(
+	id,
+	isLatest,
+	authorDisplayName,
+	formattedModifiedDate
+) {
+	if ( 'parent' === id ) {
+		return __( 'Reset the styles to the theme defaults' );
+	}
 
-	if ( 'unsaved' === revision?.id ) {
+	if ( 'unsaved' === id ) {
 		return sprintf(
-			/* translators: %(name)s author display name */
-			__( 'Unsaved changes by %(name)s' ),
-			{
-				name: authorDisplayName,
-			}
+			/* translators: %s author display name */
+			__( 'Unsaved changes by %s' ),
+			authorDisplayName
 		);
 	}
-	const formattedDate = dateI18n(
-		getSettings().formats.datetimeAbbreviated,
-		getDate( revision?.modified )
-	);
 
-	return revision?.isLatest
+	return isLatest
 		? sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s (current)' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s (current)' ),
+				authorDisplayName,
+				formattedModifiedDate
 		  )
 		: sprintf(
-				/* translators: %(name)s author display name, %(date)s: revision creation date */
-				__( 'Changes saved by %(name)s on %(date)s' ),
-				{
-					name: authorDisplayName,
-					date: formattedDate,
-				}
+				/* translators: %1$s author display name, %2$s: revision creation date */
+				__( 'Changes saved by %1$s on %2$s' ),
+				authorDisplayName,
+				formattedModifiedDate
 		  );
 }
 
@@ -64,6 +68,18 @@ function getRevisionLabel( revision ) {
  * @return {JSX.Element} The modal component.
  */
 function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
+	const { currentThemeName, currentUser } = useSelect( ( select ) => {
+		const { getCurrentTheme, getCurrentUser } = select( coreStore );
+		const currentTheme = getCurrentTheme();
+		return {
+			currentThemeName:
+				currentTheme?.name?.rendered || currentTheme?.stylesheet,
+			currentUser: getCurrentUser(),
+		};
+	}, [] );
+	const dateNowInMs = getDate().getTime();
+	const { date: dateFormat, datetimeAbbreviated } = getSettings().formats;
+
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
@@ -71,13 +87,28 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 			role="group"
 		>
 			{ userRevisions.map( ( revision, index ) => {
-				const { id, author, modified } = revision;
-				const authorDisplayName = author?.name || __( 'User' );
-				const authorAvatar = author?.avatar_urls?.[ '48' ];
-				const isUnsaved = 'unsaved' === revision?.id;
+				const { id, isLatest, author, modified } = revision;
+				const isUnsaved = 'unsaved' === id;
+				// Unsaved changes are created by the current user.
+				const revisionAuthor = isUnsaved ? currentUser : author;
+				const authorDisplayName = revisionAuthor?.name || __( 'User' );
+				const authorAvatar = revisionAuthor?.avatar_urls?.[ '48' ];
 				const isSelected = selectedRevisionId
-					? selectedRevisionId === revision?.id
+					? selectedRevisionId === id
 					: index === 0;
+				const isReset = 'parent' === id;
+				const modifiedDate = getDate( modified );
+				const displayDate =
+					modified &&
+					dateNowInMs - modifiedDate.getTime() > DAY_IN_MILLISECONDS
+						? dateI18n( dateFormat, modifiedDate )
+						: humanTimeDiff( modified );
+				const revisionLabel = getRevisionLabel(
+					id,
+					isLatest,
+					authorDisplayName,
+					dateI18n( datetimeAbbreviated, modifiedDate )
+				);
 
 				return (
 					<li
@@ -85,6 +116,7 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
+								'is-reset': isReset,
 							}
 						) }
 						key={ id }
@@ -95,39 +127,38 @@ function RevisionsButtons( { userRevisions, selectedRevisionId, onChange } ) {
 							onClick={ () => {
 								onChange( revision );
 							} }
-							label={ getRevisionLabel( revision ) }
+							label={ revisionLabel }
 						>
-							<span className="edit-site-global-styles-screen-revisions__description">
-								<time dateTime={ modified }>
-									{ humanTimeDiff( modified ) }
-								</time>
-								<span className="edit-site-global-styles-screen-revisions__meta">
-									{ isUnsaved
-										? sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Unsaved changes by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
-										  )
-										: sprintf(
-												/* translators: %(name)s author display name */
-												__(
-													'Changes saved by %(name)s'
-												),
-												{
-													name: authorDisplayName,
-												}
-										  ) }
-
-									<img
-										alt={ author?.name }
-										src={ authorAvatar }
-									/>
+							{ isReset ? (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									{ __( 'Default styles' ) }
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										{ currentThemeName }
+									</span>
 								</span>
-							</span>
+							) : (
+								<span className="edit-site-global-styles-screen-revisions__description">
+									{ isUnsaved ? (
+										<span className="edit-site-global-styles-screen-revisions__date">
+											{ __( '(Unsaved)' ) }
+										</span>
+									) : (
+										<time
+											className="edit-site-global-styles-screen-revisions__date"
+											dateTime={ modified }
+										>
+											{ displayDate }
+										</time>
+									) }
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										<img
+											alt={ authorDisplayName }
+											src={ authorAvatar }
+										/>
+										{ authorDisplayName }
+									</span>
+								</span>
+							) }
 						</Button>
 					</li>
 				);

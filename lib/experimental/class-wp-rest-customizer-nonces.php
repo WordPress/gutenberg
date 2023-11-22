@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+if ( class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
+	return;
+}
+
 /**
  * Class that returns the customizer "save" nonce that's required for the
  * batch save operation using the customizer API endpoint.
@@ -68,5 +72,4 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 			'stylesheet' => $wp_customize->get_stylesheet(),
 		);
 	}
-
 }

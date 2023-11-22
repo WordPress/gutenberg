@@ -41,7 +41,6 @@ const pure = createHigherOrderComponent( function < Props extends {} >(
 			return <WrappedComponent { ...this.props } />;
 		}
 	};
-},
-'pure' );
+}, 'pure' );
 
 export default pure;

@@ -21,7 +21,7 @@ const directiveParser = new RegExp(
 		// (Optional) Match '--' followed by any alphanumeric charachters. It
 		// excludes underscore intentionally to prevent confusion, but it can
 		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9][a-z0-9-]+))?$',
+		'(?:--([a-z0-9_-]+))?$',
 	'i' // Case insensitive.
 );
 

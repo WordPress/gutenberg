@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
+import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
@@ -88,7 +89,7 @@ export function BlockPreview( {
  * @param {Array|Object} preview.blocks        A block instance (object) or an array of blocks to be previewed.
  * @param {number}       preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default memo( BlockPreview );
 
@@ -106,7 +107,6 @@ export default memo( BlockPreview );
  * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
  *                                   the ref if one is defined.
  * @param {Object}    options.layout Layout settings to be used in the preview.
- *
  */
 export function useBlockPreview( { blocks, props = {}, layout } ) {
 	const originalSettings = useSelect(
@@ -114,7 +114,11 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const disabledRef = useDisabled();
@@ -129,6 +133,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
+			<EditorStyles />
 			<BlockListItems renderAppender={ false } layout={ layout } />
 		</ExperimentalBlockEditorProvider>
 	);

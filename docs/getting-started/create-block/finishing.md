@@ -14,7 +14,7 @@ The **RichText component** allows for creating a richer input besides plain text
 
 The InspectorPanel (the settings on the right for a block) and Block Controls (toolbar controls) have a standard way to be implemented. See the [Block controls tutorial](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) for additional information.
 
-The [Sidebar tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md) is a good resource on how to create a sidebar for your plugin.
+The [Sidebar tutorial](/docs/how-to-guides/plugin-sidebar-0.md) is a good resource on how to create a sidebar for your plugin.
 
 Nested blocks, a block that contains additional blocks, is a common pattern used by various blocks such as Columns, Cover, and Social Links. The **InnerBlocks component** enables this functionality, see the [Using InnerBlocks documentation](/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md).
 

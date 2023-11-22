@@ -6,7 +6,6 @@ import {
 	BlockTools,
 	BlockSelectionClearer,
 	WritingFlow,
-	ObserveTyping,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -40,12 +39,13 @@ export default function WidgetAreasBlockEditorContent( {
 			<Notices />
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles styles={ styles } />
+				<EditorStyles
+					styles={ styles }
+					scope=".editor-styles-wrapper"
+				/>
 				<BlockSelectionClearer>
 					<WritingFlow>
-						<ObserveTyping>
-							<BlockList className="edit-widgets-main-block-list" />
-						</ObserveTyping>
+						<BlockList className="edit-widgets-main-block-list" />
 					</WritingFlow>
 				</BlockSelectionClearer>
 			</BlockTools>

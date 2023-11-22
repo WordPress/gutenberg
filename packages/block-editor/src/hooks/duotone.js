@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { useMemo, useContext, createPortal } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,62 +24,49 @@ import {
 	BlockControls,
 	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
-	useSetting,
+	useSettings,
 } from '../components';
-import BlockList from '../components/block-list';
 import {
-	__unstableDuotoneFilter as DuotoneFilter,
-	__unstableDuotoneStylesheet as DuotoneStylesheet,
-	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
-} from '../components/duotone';
+	getDuotoneFilter,
+	getDuotoneStylesheet,
+	getDuotoneUnsetStylesheet,
+} from '../components/duotone/utils';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings } from './utils';
+import { useBlockSettings, useStyleOverride } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 const EMPTY_ARRAY = [];
 
+// Safari does not always update the duotone filter when the duotone colors
+// are changed. This browser check is later used to force a re-render of the block
+// element to ensure the duotone filter is updated. The check is included at the
+// root of this file as it only needs to be run once per page load.
+const isSafari =
+	window?.navigator.userAgent &&
+	window.navigator.userAgent.includes( 'Safari' ) &&
+	! window.navigator.userAgent.includes( 'Chrome' ) &&
+	! window.navigator.userAgent.includes( 'Chromium' );
+
 extend( [ namesPlugin ] );
 
-/**
- * SVG and stylesheet needed for rendering the duotone filter.
- *
- * @param {Object}           props          Duotone props.
- * @param {string}           props.selector Selector to apply the filter to.
- * @param {string}           props.id       Unique id for this duotone filter.
- * @param {string[]|"unset"} props.colors   Array of RGB color strings ordered from dark to light.
- *
- * @return {WPElement} Duotone element.
- */
-function InlineDuotone( { selector, id, colors } ) {
-	if ( colors === 'unset' ) {
-		return <DuotoneUnsetStylesheet selector={ selector } />;
-	}
-
-	return (
-		<>
-			<DuotoneFilter id={ id } colors={ colors } />
-			<DuotoneStylesheet id={ id } selector={ selector } />
-		</>
-	);
-}
-
 function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
-	const disableDefault = ! useSetting( defaultSetting );
-	const userPresets =
-		useSetting( `${ presetSetting }.custom` ) || EMPTY_ARRAY;
-	const themePresets =
-		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
-	const defaultPresets =
-		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+	const [ enableDefault, userPresets, themePresets, defaultPresets ] =
+		useSettings(
+			defaultSetting,
+			`${ presetSetting }.custom`,
+			`${ presetSetting }.theme`,
+			`${ presetSetting }.default`
+		);
 	return useMemo(
 		() => [
-			...userPresets,
-			...themePresets,
-			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
+			...( userPresets || EMPTY_ARRAY ),
+			...( themePresets || EMPTY_ARRAY ),
+			...( ( enableDefault && defaultPresets ) || EMPTY_ARRAY ),
 		],
-		[ disableDefault, userPresets, themePresets, defaultPresets ]
+		[ enableDefault, userPresets, themePresets, defaultPresets ]
 	);
 }
 
@@ -112,6 +99,7 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	const style = attributes?.style;
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
+	const blockEditingMode = useBlockEditingMode();
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -121,12 +109,20 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
 	} );
-	const disableCustomColors = ! useSetting( 'color.custom' );
+	const [ enableCustomColors, enableCustomDuotone ] = useSettings(
+		'color.custom',
+		'color.customDuotone'
+	);
+	const disableCustomColors = ! enableCustomColors;
 	const disableCustomDuotone =
-		! useSetting( 'color.customDuotone' ) ||
+		! enableCustomDuotone ||
 		( colorPalette?.length === 0 && disableCustomColors );
 
 	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
+
+	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 
@@ -225,17 +221,13 @@ const withDuotoneControls = createHigherOrderComponent(
 			'filter.duotone'
 		);
 
-		const blockEditingMode = useBlockEditingMode();
-
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && blockEditingMode === 'default' && (
-					<DuotonePanel { ...props } />
-				) }
+				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 				<BlockEdit { ...props } />
 			</>
 		);
@@ -244,12 +236,11 @@ const withDuotoneControls = createHigherOrderComponent(
 );
 
 function DuotoneStyles( {
+	clientId,
 	id: filterId,
 	selector: duotoneSelector,
 	attribute: duotoneAttr,
 } ) {
-	const element = useContext( BlockList.__unstableElementContext );
-
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
@@ -290,25 +281,60 @@ function DuotoneStyles( {
 		// Assuming the selector part is a subclass selector (not a tag name)
 		// so we can prepend the filter id class. If we want to support elements
 		// such as `img` or namespaces, we'll need to add a case for that here.
-		return `.editor-styles-wrapper .${ filterId }${ selectorPart.trim() }`;
+		return `.${ filterId }${ selectorPart.trim() }`;
 	} );
 
 	const selector = selectorsScoped.join( ', ' );
 
 	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
 
-	return (
-		element &&
-		isValidFilter &&
-		createPortal(
-			<InlineDuotone
-				selector={ selector }
-				id={ filterId }
-				colors={ colors }
-			/>,
-			element
-		)
+	useStyleOverride(
+		isValidFilter
+			? {
+					css:
+						colors !== 'unset'
+							? getDuotoneStylesheet( selector, filterId )
+							: getDuotoneUnsetStylesheet( selector ),
+					__unstableType: 'presets',
+			  }
+			: undefined
 	);
+	useStyleOverride(
+		isValidFilter
+			? {
+					assets:
+						colors !== 'unset'
+							? getDuotoneFilter( filterId, colors )
+							: '',
+					__unstableType: 'svgs',
+			  }
+			: undefined
+	);
+
+	const blockElement = useBlockElement( clientId );
+
+	useEffect( () => {
+		if ( ! isValidFilter ) return;
+
+		// Safari does not always update the duotone filter when the duotone colors
+		// are changed. When using Safari, force the block element to be repainted by
+		// the browser to ensure any changes are reflected visually. This logic matches
+		// that used on the site frontend in `block-supports/duotone.php`.
+		if ( blockElement && isSafari ) {
+			const display = blockElement.style.display;
+			// Switch to `inline-block` to force a repaint. In the editor, `inline-block`
+			// is used instead of `none` to ensure that scroll position is not affected,
+			// as `none` results in the editor scrolling to the top of the block.
+			blockElement.style.display = 'inline-block';
+			// Simply accessing el.offsetHeight flushes layout and style
+			// changes in WebKit without having to wait for setTimeout.
+			// eslint-disable-next-line no-unused-expressions
+			blockElement.offsetHeight;
+			blockElement.style.display = display;
+		}
+	}, [ isValidFilter, blockElement ] );
+
+	return null;
 }
 
 /**
@@ -379,6 +405,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			<>
 				{ shouldRender && (
 					<DuotoneStyles
+						clientId={ props.clientId }
 						id={ filterClass }
 						selector={ selector }
 						attribute={ attribute }

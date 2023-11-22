@@ -766,9 +766,6 @@ describe( 'Manual link entry', () => {
 					name: 'Save',
 				} );
 
-				// debug the UI state
-				// screen.debug();
-
 				// Verify the submission UI is disabled.
 				expect( submitButton ).toBeVisible();
 				expect( submitButton ).toHaveAttribute(
@@ -936,6 +933,92 @@ describe( 'Manual link entry', () => {
 				);
 			}
 		);
+	} );
+} );
+
+describe( 'Link submission', () => {
+	it( 'should show a submit button when creating a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( {} );
+
+			return <LinkControl value={ link } onChange={ setLink } />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		expect( submitButton ).toBeVisible();
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( submitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( submitButton ).toBeVisible();
+
+		await user.type( searchInput, 'https://wordpress.org' );
+
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
+	it( 'should show a submit button when editing a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+
+			return (
+				<LinkControl
+					forceIsEditingLink
+					value={ link }
+					onChange={ setLink }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const createSubmitButton = screen.queryByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		// Check the submit button for "creation" of links is not displayed.
+		expect( createSubmitButton ).not.toBeInTheDocument();
+
+		const editSubmitButton = screen.getByRole( 'button', {
+			name: 'Save',
+		} );
+
+		expect( editSubmitButton ).toBeVisible();
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( editSubmitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( editSubmitButton ).toBeVisible();
+
+		await user.type( searchInput, '#appendtolinktext' );
+
+		// As typing triggers the search handler, we need to wait for the
+		// search results to be returned. We can use the presence of the
+		// search results listbox as a proxy for this.
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
 	} );
 } );
 
@@ -1135,9 +1218,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Resolve the `createSuggestion` promise.
 			resolver();
 
-			const currentLink = await screen.findByLabelText(
-				'Currently selected'
-			);
+			const currentLink =
+				await screen.findByLabelText( 'Currently selected' );
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -1734,7 +1816,67 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should not show a means to toggle the link settings when not editing a link', async () => {
+	it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
+		const user = userEvent.setup();
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+		const mockOnChange = jest.fn();
+
+		const customSettings = [
+			{
+				id: 'opensInNewTab',
+				title: 'Open in new tab',
+			},
+			{
+				id: 'noFollow',
+				title: 'No follow',
+			},
+		];
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					value={ link }
+					settings={ customSettings }
+					onChange={ ( newVal ) => {
+						mockOnChange( newVal );
+						setLink( newVal );
+					} }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const opensInNewTabField = screen.queryByRole( 'checkbox', {
+			name: 'Open in new tab',
+			checked: false,
+		} );
+
+		expect( opensInNewTabField ).toBeInTheDocument();
+
+		// No matter which settings are passed in only the `Opens in new tab`
+		// setting should be shown on the link preview (non-editing) state.
+		const noFollowField = screen.queryByRole( 'checkbox', {
+			name: 'No follow',
+		} );
+		expect( noFollowField ).not.toBeInTheDocument();
+
+		// Check that the link value is updated immediately upon checking
+		// the checkbox.
+		await user.click( opensInNewTabField );
+
+		expect( opensInNewTabField ).toBeChecked();
+
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenCalledWith( {
+			...selectedLink,
+			opensInNewTab: true,
+		} );
+	} );
+
+	it( 'should hide advanced link settings and toggle when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1749,7 +1891,8 @@ describe( 'Addition Settings UI', () => {
 
 		expect( settingsToggle ).not.toBeInTheDocument();
 	} );
-	it( 'should provides a means to toggle the link settings', async () => {
+
+	it( 'should provides a means to toggle the advanced link settings when editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
@@ -1784,7 +1927,7 @@ describe( 'Addition Settings UI', () => {
 		expect( newTabSettingInput ).not.toBeVisible();
 	} );
 
-	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is edited', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 		const expectedSettingText = 'Open in new tab';
 
@@ -1816,7 +1959,7 @@ describe( 'Addition Settings UI', () => {
 
 		const customSettings = [
 			{
-				id: 'newTab',
+				id: 'opensInNewTab',
 				title: 'Open in new tab',
 			},
 			{
@@ -1912,6 +2055,25 @@ describe( 'Addition Settings UI', () => {
 				opensInNewTab: true,
 			} )
 		);
+	} );
+
+	it( 'should show tooltip with full URL alongside filtered display', async () => {
+		const user = userEvent.setup();
+		const url =
+			'http://www.wordpress.org/wp-content/uploads/a-document.pdf';
+		render( <LinkControl value={ { url } } /> );
+
+		const link = screen.getByRole( 'link' );
+
+		expect( link ).toHaveTextContent( 'a-document.pdf' );
+
+		await user.hover( link );
+
+		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent( url );
+
+		await user.unhover( link );
+
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 	} );
 } );
 

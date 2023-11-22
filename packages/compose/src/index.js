@@ -33,6 +33,7 @@ export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
+export { default as useStateWithHistory } from './hooks/use-state-with-history';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useAsyncList } from './hooks/use-async-list';

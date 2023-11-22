@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
 import InputControl from '../../input-control';
 import { COLORS } from '../../utils';
 import Button from '../../button';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
 	if ( ! hideHTMLArrows ) {
@@ -36,7 +36,7 @@ export const Input = styled( InputControl )`
 
 export const SpinButton = styled( Button )`
 	&&&&& {
-		color: ${ COLORS.ui.theme };
+		color: ${ COLORS.theme.accent };
 	}
 `;
 

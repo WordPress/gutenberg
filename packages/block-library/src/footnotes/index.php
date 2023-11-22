@@ -8,6 +8,8 @@
 /**
  * Renders the `core/footnotes` block on the server.
  *
+ * @since 6.3.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -32,20 +34,25 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 	$footnotes = json_decode( $footnotes, true );
 
-	if ( count( $footnotes ) === 0 ) {
+	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$footnote_index     = 1;
 
 	$block_content = '';
 
 	foreach ( $footnotes as $footnote ) {
+		// Translators: %d: Integer representing the number of return links on the page.
+		$aria_label     = sprintf( __( 'Jump to footnote reference %1$d' ), $footnote_index );
 		$block_content .= sprintf(
-			'<li id="%1$s">%2$s <a href="#%1$s-link">↩︎</a></li>',
+			'<li id="%1$s">%2$s <a href="#%1$s-link" aria-label="%3$s">↩︎</a></li>',
 			$footnote['id'],
-			$footnote['content']
+			$footnote['content'],
+			$aria_label
 		);
+		++$footnote_index;
 	}
 
 	return sprintf(
@@ -57,6 +64,8 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/footnotes` block on the server.
+ *
+ * @since 6.3.0
  */
 function register_block_core_footnotes() {
 	foreach ( array( 'post', 'page' ) as $post_type ) {
@@ -64,9 +73,10 @@ function register_block_core_footnotes() {
 			$post_type,
 			'footnotes',
 			array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'revisions_enabled' => true,
 			)
 		);
 	}
@@ -78,3 +88,33 @@ function register_block_core_footnotes() {
 	);
 }
 add_action( 'init', 'register_block_core_footnotes' );
+
+/**
+ * Adds the footnotes field to the revisions display.
+ *
+ * @since 6.3.0
+ *
+ * @param array $fields The revision fields.
+ * @return array The revision fields.
+ */
+function wp_add_footnotes_to_revision( $fields ) {
+	$fields['footnotes'] = __( 'Footnotes' );
+	return $fields;
+}
+add_filter( '_wp_post_revision_fields', 'wp_add_footnotes_to_revision' );
+
+/**
+ * Gets the footnotes field from the revision for the revisions screen.
+ *
+ * @since 6.3.0
+ *
+ * @param string $revision_field The field value, but $revision->$field
+ *                               (footnotes) does not exist.
+ * @param string $field          The field name, in this case "footnotes".
+ * @param object $revision       The revision object to compare against.
+ * @return string The field value.
+ */
+function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
+	return get_metadata( 'post', $revision->ID, $field, true );
+}
+add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );

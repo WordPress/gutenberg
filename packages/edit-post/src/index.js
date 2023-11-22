@@ -62,10 +62,14 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
-	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+	// If `distractionFree` mode is enabled, the block list view should not be open.
+	if (
+		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+	) {
 		dispatch( editPostStore ).setIsListViewOpened( true );
 	}
 
@@ -202,4 +206,5 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalPluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
 export { store } from './store';

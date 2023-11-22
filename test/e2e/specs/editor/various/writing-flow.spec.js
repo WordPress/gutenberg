@@ -9,9 +9,12 @@ test.use( {
 	},
 } );
 
-test.describe( 'Writing Flow', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -46,9 +49,11 @@ test.describe( 'Writing Flow', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await editor.canvas.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
-		);
+		const activeElementBlockType = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			);
 		expect( activeElementBlockType ).toBe( 'core/columns' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -63,7 +68,42 @@ test.describe( 'Writing Flow', () => {
 		await expect( activeElementLocator ).toBeFocused();
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
+			{
+				name: 'core/columns',
+				attributes: {},
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1st col' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+						attributes: {},
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '2nd col' },
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
+		] );
 	} );
 
 	test( 'Should navigate between inner and root blocks in navigation mode', async ( {
@@ -167,7 +207,22 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'FirstAfter' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Before<strong>InsideSecondInside</strong>After',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'BeforeThird' },
+			},
+		] );
 	} );
 
 	test( 'should navigate around nested inline boundaries', async ( {
@@ -335,7 +390,7 @@ test.describe( 'Writing Flow', () => {
 		// Should navigate to the next block.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -424,7 +479,12 @@ test.describe( 'Writing Flow', () => {
 		await pageUtils.pressKeys( 'Enter', { times: 10 } );
 
 		// Check that none of the paragraph blocks have <br> in them.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject(
+			Array( 11 ).fill( {
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			} )
+		);
 	} );
 
 	test( 'should navigate empty paragraphs', async ( { editor, page } ) => {
@@ -438,7 +498,20 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '3' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '3' },
+			},
+		] );
 	} );
 
 	test( 'should navigate contenteditable with padding', async ( {
@@ -447,18 +520,27 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingTop = '100px';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingBottom = '100px';
 		} );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
 	} );
 
 	test( 'should navigate contenteditable with normal line height', async ( {
@@ -467,13 +549,22 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.lineHeight = 'normal';
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
 	} );
 
 	test( 'should not prematurely multi-select', async ( {
@@ -492,7 +583,16 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '>' },
+			},
+		] );
 	} );
 
 	test( 'should merge paragraphs', async ( { editor, page } ) => {
@@ -596,7 +696,7 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should preserve horizontal position when navigating vertically between blocks', async ( {
+	test( 'should preserve horizontal position when navigating vertically between blocks (-webkit)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -650,7 +750,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
-		await editor.canvas.evaluate( () => {
+		await editor.canvas.locator( ':root' ).evaluate( () => {
 			document.activeElement.style.paddingLeft = '100px';
 		} );
 		await page.keyboard.press( 'Enter' );
@@ -658,7 +758,20 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
 	} );
 
 	test( 'should extend selection into paragraph for list with longer last item', async ( {
@@ -697,7 +810,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		const paragraphBlock = editor.canvas
-			.locator( 'role=document[name="Paragraph block"i]' )
+			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.first();
 		const paragraphRect = await paragraphBlock.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
@@ -762,7 +875,7 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:image -->` );
 
 		const paragraphBlock = editor.canvas.locator(
-			'role=document[name="Paragraph block"i]'
+			'role=document[name="Block: Paragraph"i]'
 		);
 
 		// Find a point outside the paragraph between the blocks where it's
@@ -867,7 +980,7 @@ test.describe( 'Writing Flow', () => {
 		await page.mouse.up();
 
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveClass( /is-selected/ );
 	} );
 
@@ -899,7 +1012,7 @@ test.describe( 'Writing Flow', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp', async ( {
+	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -907,9 +1020,9 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -929,11 +1042,11 @@ test.describe( 'Writing Flow', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^\.a+$/ );
 	} );
 
-	test( 'should vertically move the caret from corner to corner', async ( {
+	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -941,9 +1054,9 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -963,7 +1076,7 @@ test.describe( 'Writing Flow', () => {
 
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
-			editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^a+\.a$/ );
 	} );
 
@@ -976,9 +1089,9 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'a' );
 
 		async function getHeight() {
-			return await editor.canvas.evaluate(
-				() => document.activeElement.offsetHeight
-			);
+			return await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.offsetHeight );
 		}
 
 		const height = await getHeight();
@@ -999,9 +1112,34 @@ test.describe( 'Writing Flow', () => {
 		// Expect the "." to be added at the start of the paragraph
 		await expect(
 			editor.canvas.locator(
-				'role=document[name="Paragraph block"i] >> nth = 0'
+				'role=document[name="Block: Paragraph"i] >> nth = 0'
 			)
 		).toHaveText( /^.a+$/ );
+	} );
+
+	test( 'should select synced pattern', async ( { page, editor } ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'synced' );
+
+		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'test' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			editor.canvas.locator(
+				'[data-type="core/block"] [data-type="core/paragraph"]'
+			)
+		).toBeVisible();
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/block"]' )
+		).toBeFocused();
 	} );
 } );
 
@@ -1027,19 +1165,23 @@ class WritingFlowUtils {
 		await this.page.keyboard.press( 'Enter' );
 		await this.page.keyboard.type( '/columns' );
 		await this.page.keyboard.press( 'Enter' );
-		await this.editor.canvas.click(
-			'role=button[name="Two columns; equal split"i]'
-		);
-		await this.editor.canvas.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.click();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
-		await this.editor.canvas.focus(
-			'role=document[name="Block: Column (2 of 2)"i]'
-		);
-		await this.editor.canvas.click( 'role=button[name="Add block"i]' );
+		await this.editor.canvas
+			.locator( 'role=document[name="Block: Column (2 of 2)"i]' )
+			.focus();
+		await this.editor.canvas
+			.locator( 'role=button[name="Add block"i]' )
+			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);

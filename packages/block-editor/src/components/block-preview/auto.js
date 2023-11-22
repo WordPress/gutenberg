@@ -58,12 +58,19 @@ function ScaledBlockPreview( {
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
+	const aspectRatio = contentHeight
+		? containerWidth / ( contentHeight * scale )
+		: 0;
 	return (
 		<Disabled
 			className="block-editor-block-preview__content"
 			style={ {
 				transform: `scale(${ scale })`,
-				height: contentHeight * scale,
+				// Using width + aspect-ratio instead of height here triggers browsers' native
+				// handling of scrollbar's visibility. It prevents the flickering issue seen
+				// in https://github.com/WordPress/gutenberg/issues/52027.
+				// See https://github.com/WordPress/gutenberg/pull/52921 for more info.
+				aspectRatio,
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
 				minHeight,

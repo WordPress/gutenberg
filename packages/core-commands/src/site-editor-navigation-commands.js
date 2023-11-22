@@ -20,9 +20,11 @@ import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
+import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const icons = {
 	post,
@@ -34,28 +36,22 @@ const icons = {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
-			postType
-		);
+		const isBlockBasedTheme = useIsBlockBasedTheme();
 		const { records, isLoading } = useSelect(
 			( select ) => {
 				const { getEntityRecords } = select( coreStore );
-				const query = supportsSearch
-					? {
-							search: !! search ? search : undefined,
-							per_page: 10,
-							orderby: search ? 'relevance' : 'date',
-							status: [
-								'publish',
-								'future',
-								'draft',
-								'pending',
-								'private',
-							],
-					  }
-					: {
-							per_page: -1,
-					  };
+				const query = {
+					search: !! search ? search : undefined,
+					per_page: 10,
+					orderby: search ? 'relevance' : 'date',
+					status: [
+						'publish',
+						'future',
+						'draft',
+						'pending',
+						'private',
+					],
+				};
 				return {
 					records: getEntityRecords( 'postType', postType, query ),
 					isLoading: ! select( coreStore ).hasFinishedResolution(
@@ -64,24 +60,52 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					),
 				};
 			},
-			[ supportsSearch, search ]
+			[ search ]
 		);
 
 		const commands = useMemo( () => {
-			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
-				const extraArgs = isSiteEditor
-					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
-					: {};
-				return {
+			return ( records ?? [] ).map( ( record ) => {
+				const command = {
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
 						? record.title?.rendered
 						: __( '(no title)' ),
 					icon: icons[ postType ],
+				};
+
+				if (
+					postType === 'post' ||
+					( postType === 'page' && ! isBlockBasedTheme )
+				) {
+					return {
+						...command,
+						callback: ( { close } ) => {
+							const args = {
+								post: record.id,
+								action: 'edit',
+							};
+							const targetUrl = addQueryArgs( 'post.php', args );
+							document.location = targetUrl;
+							close();
+						},
+					};
+				}
+
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				const extraArgs = isSiteEditor
+					? {
+							canvas: getQueryArg(
+								window.location.href,
+								'canvas'
+							),
+					  }
+					: {};
+
+				return {
+					...command,
 					callback: ( { close } ) => {
 						const args = {
 							postType,
@@ -101,7 +125,94 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, history ] );
+		}, [ records, isBlockBasedTheme, history ] );
+
+		return {
+			commands,
+			isLoading,
+		};
+	};
+
+const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
+	function useNavigationCommandLoader( { search } ) {
+		const history = useHistory();
+		const location = useLocation();
+
+		const isPatternsPage =
+			location?.params?.path === '/patterns' ||
+			location?.params?.postType === 'wp_block';
+		const didAccessPatternsPage =
+			!! location?.params?.didAccessPatternsPage;
+
+		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { records, isLoading } = useSelect( ( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = { per_page: -1 };
+			return {
+				records: getEntityRecords( 'postType', templateType, query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', templateType, query ]
+				),
+			};
+		}, [] );
+
+		/*
+		 * wp_template and wp_template_part endpoints do not support per_page or orderby parameters.
+		 * We need to sort the results based on the search query to avoid removing relevant
+		 * records below using .slice().
+		 */
+		const orderedRecords = useMemo( () => {
+			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
+		}, [ records, search ] );
+
+		const commands = useMemo( () => {
+			if (
+				! isBlockBasedTheme &&
+				! templateType === 'wp_template_part'
+			) {
+				return [];
+			}
+			return orderedRecords.map( ( record ) => {
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				const extraArgs = isSiteEditor
+					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
+					: {};
+
+				return {
+					name: templateType + '-' + record.id,
+					searchLabel: record.title?.rendered + ' ' + record.id,
+					label: record.title?.rendered
+						? record.title?.rendered
+						: __( '(no title)' ),
+					icon: icons[ templateType ],
+					callback: ( { close } ) => {
+						const args = {
+							postType: templateType,
+							postId: record.id,
+							didAccessPatternsPage:
+								! isBlockBasedTheme &&
+								( isPatternsPage || didAccessPatternsPage )
+									? 1
+									: undefined,
+							...extraArgs,
+						};
+						const targetUrl = addQueryArgs(
+							'site-editor.php',
+							args
+						);
+						if ( isSiteEditor ) {
+							history.push( args );
+						} else {
+							document.location = targetUrl;
+						}
+						close();
+					},
+				};
+			} );
+		}, [ isBlockBasedTheme, orderedRecords, history ] );
 
 		return {
 			commands,
@@ -114,20 +225,27 @@ const usePageNavigationCommandLoader =
 const usePostNavigationCommandLoader =
 	getNavigationCommandLoaderPerPostType( 'post' );
 const useTemplateNavigationCommandLoader =
-	getNavigationCommandLoaderPerPostType( 'wp_template' );
+	getNavigationCommandLoaderPerTemplate( 'wp_template' );
 const useTemplatePartNavigationCommandLoader =
-	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
+	getNavigationCommandLoaderPerTemplate( 'wp_template_part' );
 
 function useSiteEditorBasicNavigationCommands() {
 	const history = useHistory();
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
+	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
+
+		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
+			return result;
+		}
+
 		result.push( {
 			name: 'core/edit-site/open-navigation',
-			label: __( 'Open navigation' ),
+			label: __( 'Navigation' ),
 			icon: navigation,
 			callback: ( { close } ) => {
 				const args = {
@@ -144,26 +262,8 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
-			name: 'core/edit-site/open-pages',
-			label: __( 'Open pages' ),
-			icon: page,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/page',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-style-variations',
-			label: __( 'Open style variations' ),
+			name: 'core/edit-site/open-styles',
+			label: __( 'Styles' ),
 			icon: styles,
 			callback: ( { close } ) => {
 				const args = {
@@ -180,8 +280,26 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		result.push( {
+			name: 'core/edit-site/open-pages',
+			label: __( 'Pages' ),
+			icon: page,
+			callback: ( { close } ) => {
+				const args = {
+					path: '/page',
+				};
+				const targetUrl = addQueryArgs( 'site-editor.php', args );
+				if ( isSiteEditor ) {
+					history.push( args );
+				} else {
+					document.location = targetUrl;
+				}
+				close();
+			},
+		} );
+
+		result.push( {
 			name: 'core/edit-site/open-templates',
-			label: __( 'Open templates' ),
+			label: __( 'Templates' ),
 			icon: layout,
 			callback: ( { close } ) => {
 				const args = {
@@ -197,25 +315,8 @@ function useSiteEditorBasicNavigationCommands() {
 			},
 		} );
 
-		result.push( {
-			name: 'core/edit-site/open-template-parts',
-			label: __( 'Open library' ),
-			icon: symbolFilled,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
 		return result;
-	}, [ history, isSiteEditor ] );
+	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
 
 	return {
 		commands,

@@ -10,16 +10,9 @@ import { useRef } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
-	__unstableUseClipboardHandler as useClipboardHandler,
-	__unstableUseTypingObserver as useTypingObserver,
-	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -29,7 +22,10 @@ import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
 import useSiteEditorSettings from './use-site-editor-settings';
 import { store as editSiteStore } from '../../store';
-import { FOCUSABLE_ENTITIES } from './constants';
+import {
+	FOCUSABLE_ENTITIES,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import PageContentFocusManager from '../page-content-focus-manager';
 
@@ -78,13 +74,7 @@ export default function SiteEditorCanvas() {
 		! isMobileViewport;
 
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useClipboardHandler(),
-		useTypingObserver(),
-	] );
-
-	const isTemplateTypeNavigation = templateType === 'wp_navigation';
+	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 
@@ -121,7 +111,6 @@ export default function SiteEditorCanvas() {
 								}
 							} }
 						>
-							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }
@@ -134,8 +123,7 @@ export default function SiteEditorCanvas() {
 								<EditorCanvas
 									enableResizing={ enableResizing }
 									settings={ settings }
-									contentRef={ mergedRefs }
-									readonly={ isViewMode }
+									contentRef={ contentRef }
 								>
 									{ resizeObserver }
 									<BlockList
@@ -146,6 +134,12 @@ export default function SiteEditorCanvas() {
 													isTemplateTypeNavigation,
 											}
 										) }
+										dropZoneElement={
+											// Pass in the html element of the iframe to ensure that
+											// the drop zone extends to the very edges of the iframe,
+											// even if the template is shorter than the viewport.
+											contentRef.current?.parentNode
+										}
 										layout={ LAYOUT }
 										renderAppender={ showBlockAppender }
 									/>

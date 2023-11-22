@@ -165,9 +165,8 @@ describe( 'Synced patterns', () => {
 			/Pattern Block\. Row 1/
 		);
 
-		const innerBlockListWrapper = await within(
-			reusableBlock
-		).findByTestId( 'block-list-wrapper' );
+		const innerBlockListWrapper =
+			await within( reusableBlock ).findByTestId( 'block-list-wrapper' );
 
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.

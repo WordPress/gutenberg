@@ -7,6 +7,7 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
+	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -23,7 +24,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
-	BlockAlignmentControl,
+	useSettings,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
@@ -81,6 +82,31 @@ const scaleOptions = [
 	},
 ];
 
+// If the image has a href, wrap in an <a /> tag to trigger any inherited link element styles.
+const ImageWrapper = ( { href, children } ) => {
+	if ( ! href ) {
+		return children;
+	}
+	return (
+		<a
+			href={ href }
+			onClick={ ( event ) => event.preventDefault() }
+			aria-disabled={ true }
+			style={ {
+				// When the Image block is linked,
+				// it's wrapped with a disabled <a /> tag.
+				// Restore cursor style so it doesn't appear 'clickable'
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
+				cursor: 'default',
+				display: 'inline',
+			} }
+		>
+			{ children }
+		</a>
+	);
+};
+
 export default function Image( {
 	temporaryURL,
 	attributes,
@@ -113,7 +139,13 @@ export default function Image( {
 		scale,
 		linkTarget,
 		sizeSlug,
+		lightbox,
 	} = attributes;
+
+	// The only supported unit is px, so we can parseInt to strip the px here.
+	const numericWidth = width ? parseInt( width, 10 ) : undefined;
+	const numericHeight = height ? parseInt( height, 10 ) : undefined;
+
 	const imageRef = useRef();
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
@@ -166,6 +198,7 @@ export default function Image( {
 			},
 			[ clientId ]
 		);
+
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -319,16 +352,6 @@ export default function Image( {
 		} );
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
-	}
-
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -355,15 +378,67 @@ export default function Image( {
 		availableUnits: [ 'px' ],
 	} );
 
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
+
+	const showLightboxToggle =
+		!! lightbox || lightboxSetting?.allowEditing === true;
+
+	const lightboxChecked =
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const lightboxToggleDisabled = linkDestination !== 'none';
+
+	const dimensionsControl = (
+		<DimensionsTool
+			value={ { width, height, scale, aspectRatio } }
+			onChange={ ( {
+				width: newWidth,
+				height: newHeight,
+				scale: newScale,
+				aspectRatio: newAspectRatio,
+			} ) => {
+				// Rebuilding the object forces setting `undefined`
+				// for values that are removed since setAttributes
+				// doesn't do anything with keys that aren't set.
+				setAttributes( {
+					// CSS includes `height: auto`, but we need
+					// `width: auto` to fix the aspect ratio when
+					// only height is set due to the width and
+					// height attributes set via the server.
+					width: ! newWidth && newHeight ? 'auto' : newWidth,
+					height: newHeight,
+					scale: newScale,
+					aspectRatio: newAspectRatio,
+				} );
+			} }
+			defaultScale="cover"
+			defaultAspectRatio="auto"
+			scaleOptions={ scaleOptions }
+			unitsOptions={ dimensionsUnitsOptions }
+		/>
+	);
+
+	const resetAll = () => {
+		setAttributes( {
+			width: undefined,
+			height: undefined,
+			scale: undefined,
+			aspectRatio: undefined,
+			lightbox: undefined,
+		} );
+	};
+
+	const sizeControls = (
+		<InspectorControls>
+			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				{ isResizable && dimensionsControl }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ hasNonContentControls && (
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				) }
 				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {
@@ -433,17 +508,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () =>
-						setAttributes( {
-							width: undefined,
-							height: undefined,
-							scale: undefined,
-							aspectRatio: undefined,
-						} )
-					}
-				>
+				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -472,38 +537,40 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<DimensionsTool
-						value={ {
-							width: width && `${ width }px`,
-							height: height && `${ height }px`,
-							scale,
-							aspectRatio,
-						} }
-						onChange={ ( newValue ) => {
-							// Rebuilding the object forces setting `undefined`
-							// for values that are removed since setAttributes
-							// doesn't do anything with keys that aren't set.
-							setAttributes( {
-								width:
-									newValue.width &&
-									parseInt( newValue.width, 10 ),
-								height:
-									newValue.height &&
-									parseInt( newValue.height, 10 ),
-								scale: newValue.scale,
-								aspectRatio: newValue.aspectRatio,
-							} );
-						} }
-						defaultScale="cover"
-						defaultAspectRatio="auto"
-						scaleOptions={ scaleOptions }
-						unitsOptions={ dimensionsUnitsOptions }
-					/>
+					{ isResizable && dimensionsControl }
 					<ResolutionTool
 						value={ sizeSlug }
 						onChange={ updateImage }
 						options={ imageSizeOptions }
 					/>
+					{ showLightboxToggle && (
+						<ToolsPanelItem
+							hasValue={ () => !! lightbox }
+							label={ __( 'Expand on click' ) }
+							onDeselect={ () => {
+								setAttributes( { lightbox: undefined } );
+							} }
+							isShownByDefault={ true }
+						>
+							<ToggleControl
+								label={ __( 'Expand on click' ) }
+								checked={ lightboxChecked }
+								onChange={ ( newValue ) => {
+									setAttributes( {
+										lightbox: { enabled: newValue },
+									} );
+								} }
+								disabled={ lightboxToggleDisabled }
+								help={
+									lightboxToggleDisabled
+										? __(
+												'“Expand on click” scales the image up, and can’t be combined with a link.'
+										  )
+										: ''
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -566,9 +633,9 @@ export default function Image( {
 				className={ borderProps.className }
 				style={ {
 					width:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					height:
-						( width && height ) || aspectRatio ? '100%' : 'inherit',
+						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
 				} }
@@ -584,34 +651,44 @@ export default function Image( {
 
 	if ( canEditImage && isEditingImage ) {
 		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				width={ width }
-				height={ height }
-				clientWidth={ fallbackClientWidth }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) =>
-					setAttributes( imageAttributes )
-				}
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-				borderProps={ isRounded ? undefined : borderProps }
-			/>
+			<ImageWrapper href={ href }>
+				<ImageEditor
+					id={ id }
+					url={ url }
+					width={ numericWidth }
+					height={ numericHeight }
+					clientWidth={ fallbackClientWidth }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+					onSaveImage={ ( imageAttributes ) =>
+						setAttributes( imageAttributes )
+					}
+					onFinishEditing={ () => {
+						setIsEditingImage( false );
+					} }
+					borderProps={ isRounded ? undefined : borderProps }
+				/>
+			</ImageWrapper>
 		);
 	} else if ( ! isResizable ) {
-		img = <div style={ { width, height, aspectRatio } }>{ img }</div>;
+		img = (
+			<div style={ { width, height, aspectRatio } }>
+				<ImageWrapper href={ href }>{ img }</ImageWrapper>
+			</div>
+		);
 	} else {
-		const ratio =
-			( aspectRatio && evalAspectRatio( aspectRatio ) ) ||
-			( width && height && width / height ) ||
-			naturalWidth / naturalHeight ||
-			1;
-
-		const currentWidth = ! width && height ? height * ratio : width;
-		const currentHeight = ! height && width ? width / ratio : height;
+		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );
+		const customRatio = numericWidth / numericHeight;
+		const naturalRatio = naturalWidth / naturalHeight;
+		const ratio = numericRatio || customRatio || naturalRatio || 1;
+		const currentWidth =
+			! numericWidth && numericHeight
+				? numericHeight * ratio
+				: numericWidth;
+		const currentHeight =
+			! numericHeight && numericWidth
+				? numericWidth / ratio
+				: numericHeight;
 
 		const minWidth =
 			naturalWidth < naturalHeight ? MIN_SIZE : MIN_SIZE * ratio;
@@ -657,7 +734,6 @@ export default function Image( {
 			}
 		}
 		/* eslint-enable no-lonely-if */
-
 		img = (
 			<ResizableBox
 				style={ {
@@ -687,17 +763,28 @@ export default function Image( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+					// Since the aspect ratio is locked when resizing, we can
+					// use the width of the resized element to calculate the
+					// height in CSS to prevent stretching when the max-width
+					// is reached.
 					setAttributes( {
-						width: elt.offsetWidth,
-						height: elt.offsetHeight,
-						aspectRatio: undefined,
+						width: `${ elt.offsetWidth }px`,
+						height: 'auto',
+						aspectRatio:
+							ratio === naturalRatio
+								? undefined
+								: String( ratio ),
 					} );
 				} }
 				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
-				{ img }
+				<ImageWrapper href={ href }>{ img }</ImageWrapper>
 			</ResizableBox>
 		);
+	}
+
+	if ( ! url && ! temporaryURL ) {
+		return sizeControls;
 	}
 
 	return (

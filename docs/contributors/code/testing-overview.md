@@ -257,11 +257,10 @@ test( 'fires onChange when a new value is typed', () => {
 **Good**: using `user-event` to simulate user events.
 
 ```javascript
-
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-test('fires onChange when a new value is typed', async () => {
+test( 'fires onChange when a new value is typed', async () => {
 	const user = userEvent.setup();
 
 	const spyOnChange = jest.fn();
@@ -287,7 +286,7 @@ test('fires onChange when a new value is typed', async () => {
 	await user.selectOptions( select, [ 'optionValue' ] );
 
 	// ...
-})
+} );
 ```
 
 ### Integration testing for block UI
@@ -301,9 +300,7 @@ The advantage of this approach is that the bulk of a block editor's functionalit
 To set up a jest file for integration tests:
 
 ```js
-import {
-	initializeEditor
-} from 'test/integration/helpers/integration-test-editor';
+import { initializeEditor } from 'test/integration/helpers/integration-test-editor';
 
 async function setup( attributes ) {
 	const testBlock = { name: 'core/cover', attributes };
@@ -470,9 +467,7 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
-		spacer
-	);
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot( spacer );
 } );
 ```
 
@@ -516,7 +511,7 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.**
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.
 
 ### Using wp-env
 
@@ -598,7 +593,7 @@ Every core block is required to have at least one set of fixture files for its m
 
 ### Flaky Tests
 
-A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/blob/trunk/.github/report-flaky-tests/index.js) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
+A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
 
 ## PHP Testing
 
@@ -640,7 +635,6 @@ To set up the e2e testing environment, checkout the Gutenberg repository and swi
 ```
 nvm use && npm install
 npm run build:packages
-npm run wp-env start
 ```
 
 To run the tests run the following command:

@@ -74,45 +74,6 @@ export function showBlockInterface() {
 }
 
 /**
- * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
- */
-
-/**
- * Sets the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string}           clientId The block client ID, or `''` for the root container.
- * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
- *                                    `'contentOnly'`, or `'default'`.
- *
- * @return {Object} Action object.
- */
-export function setBlockEditingMode( clientId = '', mode ) {
-	return {
-		type: 'SET_BLOCK_EDITING_MODE',
-		clientId,
-		mode,
-	};
-}
-
-/**
- * Clears the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string} clientId The block client ID, or `''` for the root container.
- *
- * @return {Object} Action object.
- */
-export function unsetBlockEditingMode( clientId = '' ) {
-	return {
-		type: 'UNSET_BLOCK_EDITING_MODE',
-		clientId,
-	};
-}
-
-/**
  * Yields action objects used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
  *
@@ -131,7 +92,7 @@ export function unsetBlockEditingMode( clientId = '' ) {
  */
 export const privateRemoveBlocks =
 	( clientIds, selectPrevious = true, forceRemove = false ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
 		}
@@ -193,11 +154,14 @@ export const privateRemoveBlocks =
 			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
 		}
 
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		// To avoid a focus loss when removing the last block, assure there is
-		// always a default block if the last of the blocks have been removed.
-		dispatch( ensureDefaultBlock() );
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch( ensureDefaultBlock() );
+		} );
 	};
 
 /**
@@ -296,5 +260,33 @@ export function setBlockRemovalRules( rules = false ) {
 	return {
 		type: 'SET_BLOCK_REMOVAL_RULES',
 		rules,
+	};
+}
+
+/**
+ * Sets the client ID of the block settings menu that is currently open.
+ *
+ * @param {?string} clientId The block client ID.
+ * @return {Object} Action object.
+ */
+export function setOpenedBlockSettingsMenu( clientId ) {
+	return {
+		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+		clientId,
+	};
+}
+
+export function setStyleOverride( id, style ) {
+	return {
+		type: 'SET_STYLE_OVERRIDE',
+		id,
+		style,
+	};
+}
+
+export function deleteStyleOverride( id ) {
+	return {
+		type: 'DELETE_STYLE_OVERRIDE',
+		id,
 	};
 }

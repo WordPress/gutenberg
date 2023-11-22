@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 import type {
 	RangeMarkProps,
@@ -184,7 +184,7 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
 				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
-				background-color: ${ COLORS.ui.theme };
+				background-color: ${ COLORS.theme.accent };
 		  `;
 
 export const ThumbWrapper = styled.span`
@@ -215,7 +215,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: ${ COLORS.ui.theme };
+					background-color: ${ COLORS.theme.accent };
 					opacity: 0.4;
 					border-radius: 50%;
 					height: ${ thumbSize + 8 }px;
@@ -301,7 +301,7 @@ export const Tooltip = styled.span< TooltipProps >`
 `;
 
 // @todo: Refactor RangeControl with latest HStack configuration
-// @wordpress/components/ui/hstack.
+// @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;

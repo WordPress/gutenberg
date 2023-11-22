@@ -196,4 +196,19 @@ module.exports = {
 	'header-toolbar__keyboard-hide-shadow--solid': {
 		color: 'black',
 	},
+	'media-placeholder__header-icon': {
+		fill: 'black',
+	},
+	embed__icon: {
+		fill: 'black',
+	},
+	picker: {},
+	pickerPointer: {},
+	columnsContainer: {
+		marginLeft: 16,
+		minWidth: 32,
+	},
+	'unsupported-block-details__icon': {
+		color: 'gray',
+	},
 };

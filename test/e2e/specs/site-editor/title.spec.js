@@ -26,7 +26,7 @@ test.describe( 'Site editor title', () => {
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
 
-		await expect( title ).toHaveText( 'Editing template: Index' );
+		await expect( title ).toHaveText( 'Editing template:Index' );
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
@@ -43,6 +43,6 @@ test.describe( 'Site editor title', () => {
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
 
-		await expect( title ).toHaveText( 'Editing template part: header' );
+		await expect( title ).toHaveText( 'Editing template part:header' );
 	} );
 } );

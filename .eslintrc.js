@@ -52,6 +52,11 @@ const restrictedImports = [
 			'Please use Reakit API through `@wordpress/components` instead.',
 	},
 	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
@@ -87,6 +92,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -130,6 +136,13 @@ module.exports = {
 						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [
@@ -286,7 +299,7 @@ module.exports = {
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
 			extends: [
-				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@wordpress/eslint-plugin/test-playwright',
 				'plugin:@typescript-eslint/base',
 			],
 			parserOptions: {
@@ -300,7 +313,6 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
-				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{
@@ -319,6 +331,7 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
 				'@typescript-eslint/await-thenable': 'error',
 				'@typescript-eslint/no-floating-promises': 'error',
 				'@typescript-eslint/no-misused-promises': 'error',

@@ -7,7 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	CheckboxControl,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalTruncate as Truncate,
@@ -28,6 +27,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};
 
@@ -37,7 +37,7 @@ function TemplateAreaButton( { postId, icon, title } ) {
 		footer,
 	};
 	const linkInfo = useLink( {
-		postType: 'wp_template_part',
+		postType: TEMPLATE_PART_POST_TYPE,
 		postId,
 	} );
 
@@ -61,10 +61,6 @@ function TemplateAreaButton( { postId, icon, title } ) {
 }
 
 export default function HomeTemplateDetails() {
-	const navigator = useNavigator();
-	const {
-		params: { postType, postId },
-	} = navigator;
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const {
@@ -74,34 +70,30 @@ export default function HomeTemplateDetails() {
 		postsPageTitle,
 		postsPageId,
 		currentTemplateParts,
-	} = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const _currentTemplateParts =
-				select( editSiteStore ).getCurrentTemplateTemplateParts();
-			const siteEditorSettings = getSettings();
-			const _postsPageRecord = siteSettings?.page_for_posts
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'page',
-						siteSettings?.page_for_posts
-				  )
-				: EMPTY_OBJECT;
+	} = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const { getSettings, getCurrentTemplateTemplateParts } = unlock(
+			select( editSiteStore )
+		);
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		const _postsPageRecord = siteSettings?.page_for_posts
+			? getEntityRecord(
+					'postType',
+					'page',
+					siteSettings?.page_for_posts
+			  )
+			: EMPTY_OBJECT;
 
-			return {
-				allowCommentsOnNewPosts:
-					siteSettings?.default_comment_status === 'open',
-				postsPageTitle: _postsPageRecord?.title?.rendered,
-				postsPageId: _postsPageRecord?.id,
-				postsPerPage: siteSettings?.posts_per_page,
-				templatePartAreas: siteEditorSettings?.defaultTemplatePartAreas,
-				currentTemplateParts: _currentTemplateParts,
-			};
-		},
-		[ postType, postId ]
-	);
+		return {
+			allowCommentsOnNewPosts:
+				siteSettings?.default_comment_status === 'open',
+			postsPageTitle: _postsPageRecord?.title?.rendered,
+			postsPageId: _postsPageRecord?.id,
+			postsPerPage: siteSettings?.posts_per_page,
+			templatePartAreas: getSettings()?.defaultTemplatePartAreas,
+			currentTemplateParts: getCurrentTemplateTemplateParts(),
+		};
+	}, [] );
 
 	const [ commentsOnNewPostsValue, setCommentsOnNewPostsValue ] =
 		useState( '' );
@@ -124,13 +116,28 @@ export default function HomeTemplateDetails() {
 	 * which contains the template icon and fallback labels
 	 */
 	const templateAreas = useMemo( () => {
+		// Keep track of template part IDs that have already been added to the array.
+		const templatePartIds = new Set();
+		const filterOutDuplicateTemplateParts = ( currentTemplatePart ) => {
+			// If the template part has already been added to the array, skip it.
+			if ( templatePartIds.has( currentTemplatePart.templatePart.id ) ) {
+				return;
+			}
+			// Add to the array of template part IDs.
+			templatePartIds.add( currentTemplatePart.templatePart.id );
+			return currentTemplatePart;
+		};
+
 		return currentTemplateParts.length && templatePartAreas
-			? currentTemplateParts.map( ( { templatePart } ) => ( {
-					...templatePartAreas?.find(
-						( { area } ) => area === templatePart?.area
-					),
-					...templatePart,
-			  } ) )
+			? currentTemplateParts
+					.filter( filterOutDuplicateTemplateParts )
+					.map( ( { templatePart, block } ) => ( {
+						...templatePartAreas?.find(
+							( { area } ) => area === templatePart?.area
+						),
+						...templatePart,
+						clientId: block.clientId,
+					} ) )
 			: [];
 	}, [ currentTemplateParts, templatePartAreas ] );
 
@@ -198,8 +205,10 @@ export default function HomeTemplateDetails() {
 				<SidebarNavigationScreenDetailsPanelRow>
 					<CheckboxControl
 						className="edit-site-sidebar-navigation-screen__input-control"
-						label="Allow comments on new posts"
-						help="Changes will apply to new posts only. Individual posts may override these settings."
+						label={ __( 'Allow comments on new posts' ) }
+						help={ __(
+							'Changes will apply to new posts only. Individual posts may override these settings.'
+						) }
 						checked={ commentsOnNewPostsValue }
 						onChange={ setAllowCommentsOnNewPosts }
 					/>
@@ -211,9 +220,9 @@ export default function HomeTemplateDetails() {
 			>
 				<ItemGroup>
 					{ templateAreas.map(
-						( { label, icon, theme, slug, title } ) => (
+						( { clientId, label, icon, theme, slug, title } ) => (
 							<SidebarNavigationScreenDetailsPanelRow
-								key={ slug }
+								key={ clientId }
 							>
 								<TemplateAreaButton
 									postId={ `${ theme }//${ slug }` }

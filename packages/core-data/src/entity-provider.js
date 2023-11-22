@@ -5,23 +5,20 @@ import {
 	createContext,
 	useContext,
 	useCallback,
-	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { unlock } from './private-apis';
+import { updateFootnotesFromMeta } from './footnotes';
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
 const EMPTY_ARRAY = [];
-
-let oldFootnotes = {};
 
 /**
  * Internal dependencies
@@ -129,7 +126,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 				[ prop ]: newValue,
 			} );
 		},
-		[ kind, name, id, prop ]
+		[ editEntityRecord, kind, name, id, prop ]
 	);
 
 	return [ value, setValue, fullValue ];
@@ -142,7 +139,7 @@ export function useEntityProp( kind, name, prop, _id ) {
  * The return value has the shape `[ blocks, onInput, onChange ]`.
  * `onInput` is for block changes that don't create undo levels
  * or dirty the post, non-persistent changes, and `onChange` is for
- * peristent changes. They map directly to the props of a
+ * persistent changes. They map directly to the props of a
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
@@ -156,12 +153,15 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, blocks, meta } = useSelect(
+	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
-				blocks: editedRecord.blocks,
+				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
 			};
@@ -171,146 +171,22 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const { __unstableCreateUndoLevel, editEntityRecord } =
 		useDispatch( STORE_NAME );
 
-	useEffect( () => {
-		// Load the blocks from the content if not already in state
-		// Guard against other instances that might have
-		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
-			const parsedContent = parse( content );
-			editEntityRecord(
-				kind,
-				name,
-				id,
-				{
-					blocks: parsedContent,
-				},
-				{ undoIgnore: true }
-			);
+	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
 		}
-	}, [ content ] );
+
+		if ( editedBlocks ) {
+			return editedBlocks;
+		}
+
+		return content && typeof content !== 'function'
+			? parse( content )
+			: EMPTY_ARRAY;
+	}, [ id, editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
-		( _blocks ) => {
-			const output = { blocks: _blocks };
-			if ( ! meta ) return output;
-			// If meta.footnotes is empty, it means the meta is not registered.
-			if ( meta.footnotes === undefined ) return output;
-
-			const { getRichTextValues } = unlock( blockEditorPrivateApis );
-			const _content = getRichTextValues( _blocks ).join( '' ) || '';
-			const newOrder = [];
-
-			// This can be avoided when
-			// https://github.com/WordPress/gutenberg/pull/43204 lands. We can then
-			// get the order directly from the rich text values.
-			if ( _content.indexOf( 'data-fn' ) !== -1 ) {
-				const regex = /data-fn="([^"]+)"/g;
-				let match;
-				while ( ( match = regex.exec( _content ) ) !== null ) {
-					newOrder.push( match[ 1 ] );
-				}
-			}
-
-			const footnotes = meta.footnotes
-				? JSON.parse( meta.footnotes )
-				: [];
-			const currentOrder = footnotes.map( ( fn ) => fn.id );
-
-			if ( currentOrder.join( '' ) === newOrder.join( '' ) )
-				return output;
-
-			const newFootnotes = newOrder.map(
-				( fnId ) =>
-					footnotes.find( ( fn ) => fn.id === fnId ) ||
-					oldFootnotes[ fnId ] || {
-						id: fnId,
-						content: '',
-					}
-			);
-
-			function updateAttributes( attributes ) {
-				attributes = { ...attributes };
-
-				for ( const key in attributes ) {
-					const value = attributes[ key ];
-
-					if ( Array.isArray( value ) ) {
-						attributes[ key ] = value.map( updateAttributes );
-						continue;
-					}
-
-					if ( typeof value !== 'string' ) {
-						continue;
-					}
-
-					if ( value.indexOf( 'data-fn' ) === -1 ) {
-						continue;
-					}
-
-					// When we store rich text values, this would no longer
-					// require a regex.
-					const regex =
-						/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
-
-					attributes[ key ] = value.replace(
-						regex,
-						( match, opening, fnId ) => {
-							const index = newOrder.indexOf( fnId );
-							return `${ opening }${ index + 1 }</a></sup>`;
-						}
-					);
-
-					const compatRegex =
-						/<a[^>]+data-fn="([^"]+)"[^>]*>\*<\/a>/g;
-
-					attributes[ key ] = attributes[ key ].replace(
-						compatRegex,
-						( match, fnId ) => {
-							const index = newOrder.indexOf( fnId );
-							return `<sup data-fn="${ fnId }" class="fn"><a href="#${ fnId }" id="${ fnId }-link">${
-								index + 1
-							}</a></sup>`;
-						}
-					);
-				}
-
-				return attributes;
-			}
-
-			function updateBlocksAttributes( __blocks ) {
-				return __blocks.map( ( block ) => {
-					return {
-						...block,
-						attributes: updateAttributes( block.attributes ),
-						innerBlocks: updateBlocksAttributes(
-							block.innerBlocks
-						),
-					};
-				} );
-			}
-
-			// We need to go through all block attributs deeply and update the
-			// footnote anchor numbering (textContent) to match the new order.
-			const newBlocks = updateBlocksAttributes( _blocks );
-
-			oldFootnotes = {
-				...oldFootnotes,
-				...footnotes.reduce( ( acc, fn ) => {
-					if ( ! newOrder.includes( fn.id ) ) {
-						acc[ fn.id ] = fn;
-					}
-					return acc;
-				}, {} ),
-			};
-
-			return {
-				meta: {
-					...meta,
-					footnotes: JSON.stringify( newFootnotes ),
-				},
-				blocks: newBlocks,
-			};
-		},
+		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
 		[ meta ]
 	);
 
@@ -356,5 +232,5 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);
 
-	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
+	return [ blocks, onInput, onChange ];
 }

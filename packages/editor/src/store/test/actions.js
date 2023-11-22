@@ -33,6 +33,7 @@ const postTypeEntity = {
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
 		item_reverted_to_draft: 'Post reverted to draft.',
+		item_trashed: 'Post trashed.',
 	},
 };
 
@@ -286,7 +287,12 @@ describe( 'Post actions', () => {
 
 			// Check that there are no notices.
 			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toEqual( [] );
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Post trashed.',
+				},
+			] );
 
 			// Check the new status.
 			const { status } = registry.select( editorStore ).getCurrentPost();

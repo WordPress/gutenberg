@@ -17,8 +17,8 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { ComboboxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const options = [
 	{
@@ -47,9 +47,7 @@ function MyComboboxControl() {
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
 					options.filter( ( option ) =>
-						option.label
-							.toLowerCase()
-							.startsWith( inputValue.toLowerCase() )
+						option.value === inputValue
 					)
 				)
 			}

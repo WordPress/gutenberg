@@ -61,8 +61,6 @@ export default function save( { attributes } ) {
 				width,
 				height,
 			} }
-			width={ width }
-			height={ height }
 			title={ title }
 		/>
 	);

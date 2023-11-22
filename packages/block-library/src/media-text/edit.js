@@ -18,7 +18,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -44,9 +44,6 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
 } from './constants';
-import { unlock } from '../lock-unlock';
-
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -247,7 +244,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
-					checked={ imageFill }
+					checked={ !! imageFill }
 					onChange={ () =>
 						setAttributes( {
 							imageFill: ! imageFill,

@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
@@ -41,7 +41,6 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
@@ -206,7 +205,7 @@ export default function NavigationLinkEdit( {
 				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, [
-						name,
+						'core/navigation-link',
 						'core/navigation-submenu',
 					] ).length >= maxNestingLevel,
 				isTopLevelLink:
@@ -433,7 +432,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						value={ url || '' }
+						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
 								{ url: urlValue },
@@ -487,13 +486,8 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip position="top center" text={ tooltipText }>
-								<>
-									<span>{ missingText }</span>
-									<span className="wp-block-navigation-link__missing_text-tooltip">
-										{ tooltipText }
-									</span>
-								</>
+							<Tooltip text={ tooltipText }>
+								<span>{ missingText }</span>
 							</Tooltip>
 						</div>
 					) : (
@@ -549,35 +543,25 @@ export default function NavigationLinkEdit( {
 								isDraft ||
 								isLabelFieldFocused ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<Tooltip
-										position="top center"
-										text={ tooltipText }
-									>
-										<>
-											<span
-												aria-label={ __(
-													'Navigation link text'
-												) }
-											>
-												{
-													// Some attributes are stored in an escaped form. It's a legacy issue.
-													// Ideally they would be stored in a raw, unescaped form.
-													// Unescape is used here to "recover" the escaped characters
-													// so they display without encoding.
-													// See `updateAttributes` for more details.
-													`${ decodeEntities(
-														label
-													) } ${
-														isInvalid || isDraft
-															? placeholderText
-															: ''
-													}`.trim()
-												}
-											</span>
-											<span className="wp-block-navigation-link__missing_text-tooltip">
-												{ tooltipText }
-											</span>
-										</>
+									<Tooltip text={ tooltipText }>
+										<span
+											aria-label={ __(
+												'Navigation link text'
+											) }
+										>
+											{
+												// Some attributes are stored in an escaped form. It's a legacy issue.
+												// Ideally they would be stored in a raw, unescaped form.
+												// Unescape is used here to "recover" the escaped characters
+												// so they display without encoding.
+												// See `updateAttributes` for more details.
+												`${ decodeEntities( label ) } ${
+													isInvalid || isDraft
+														? placeholderText
+														: ''
+												}`.trim()
+											}
+										</span>
 									</Tooltip>
 								</div>
 							) }
@@ -585,7 +569,6 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
-							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }

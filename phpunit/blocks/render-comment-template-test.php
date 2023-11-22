@@ -91,7 +91,7 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 			'Comment Author Name block rendered markup is empty.'
 		);
 
-		$render_block_callback = static function( $block_content, $block ) use ( $parsed_comment_author_name_block ) {
+		$render_block_callback = static function ( $block_content, $block ) use ( $parsed_comment_author_name_block ) {
 			// Insert a Comment Author Name block (which requires `commentId`
 			// block context to work) after the Comment Content block.
 			if ( 'core/comment-content' !== $block['blockName'] ) {
@@ -126,7 +126,7 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 		$render_block_callback = new MockAction();
 		add_filter( 'render_block', array( $render_block_callback, 'filter' ), 10, 3 );
 
-		$render_block_data_callback = static function( $parsed_block ) {
+		$render_block_data_callback = static function ( $parsed_block ) {
 			// Add a Social Links block to a Comment Template block's inner blocks.
 			if ( 'core/comment-template' === $parsed_block['blockName'] ) {
 				$inserted_block_markup = <<<END

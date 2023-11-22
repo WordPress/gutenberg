@@ -10,8 +10,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -20,20 +18,13 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const {
-		getEditorMode,
-		isEditorSidebarOpened,
-		isListViewOpened,
-		isFeatureActive,
-	} = useSelect( editPostStore );
+	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
+		useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
-
-	const { createInfoNotice } = useDispatch( noticesStore );
 
 	const {
 		switchEditorMode,
@@ -41,22 +32,17 @@ function KeyboardShortcuts() {
 		closeGeneralSidebar,
 		toggleFeature,
 		setIsListViewOpened,
-		setIsInserterOpened,
+		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
-	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', false );
-		setIsInserterOpened( false );
-		setIsListViewOpened( false );
-		closeGeneralSidebar();
-	};
-
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockName,
+		getSelectedBlockClientId,
+		getBlockAttributes,
+		getBlockSelectionStart,
+	} = useSelect( blockEditorStore );
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();
@@ -224,16 +210,6 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
 		toggleDistractionFree();
-		toggleFeature( 'distractionFree' );
-		createInfoNotice(
-			isFeatureActive( 'distractionFree' )
-				? __( 'Distraction free mode turned on.' )
-				: __( 'Distraction free mode turned off.' ),
-			{
-				id: 'core/edit-post/distraction-free-mode/notice',
-				type: 'snackbar',
-			}
-		);
 	} );
 
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
@@ -252,8 +228,9 @@ function KeyboardShortcuts() {
 	} );
 
 	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
-	useShortcut( 'core/edit-post/toggle-list-view', () => {
+	useShortcut( 'core/edit-post/toggle-list-view', ( event ) => {
 		if ( ! isListViewOpened() ) {
+			event.preventDefault();
 			setIsListViewOpened( true );
 		}
 	} );

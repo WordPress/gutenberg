@@ -302,7 +302,7 @@ export const autosave =
 	};
 
 export const __unstableSaveForPreview =
-	( { forceIsAutosaveable } ) =>
+	( { forceIsAutosaveable } = {} ) =>
 	async ( { select, dispatch } ) => {
 		if (
 			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&

@@ -5,7 +5,7 @@ import initialHtml from '../src/initial-html';
 
 describe( 'Gutenberg Editor Blocks test', () => {
 	it( 'should be able to create a post with all blocks and scroll to the last one', async () => {
-		await editorPage.setHtmlContent( initialHtml );
+		await editorPage.initializeEditor( { initialData: initialHtml } );
 
 		// Scroll to the last element
 		const addBlockPlaceholder =

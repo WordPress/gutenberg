@@ -18,6 +18,7 @@ const HR = ( {
 	lineStyle,
 	marginLeft,
 	marginRight,
+	style,
 	textStyle,
 	text,
 	...props
@@ -25,12 +26,15 @@ const HR = ( {
 	const renderLine = ( key ) => (
 		<View
 			key={ key }
-			style={ getStylesFromColorScheme( styles.line, styles.lineDark ) }
+			style={ [
+				getStylesFromColorScheme( styles.line, styles.lineDark ),
+				lineStyle,
+			] }
 		/>
 	);
 
 	const renderText = ( key ) => (
-		<View key={ key }>
+		<View key={ key } style={ styles.textContainer }>
 			<Text style={ [ styles.text, textStyle ] }>{ text }</Text>
 		</View>
 	);
@@ -44,11 +48,7 @@ const HR = ( {
 
 	return (
 		<View
-			style={ [
-				styles.container,
-				{ marginLeft, marginRight },
-				props.style,
-			] }
+			style={ [ styles.container, { marginLeft, marginRight }, style ] }
 			{ ...props }
 		>
 			{ renderInner() }

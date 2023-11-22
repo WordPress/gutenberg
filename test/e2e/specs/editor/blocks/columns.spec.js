@@ -122,4 +122,193 @@ test.describe( 'Columns', () => {
 			},
 		] );
 	} );
+
+	test( 'can exit on Enter', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
+	} );
+
+	test( 'should not split in middle', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+				},
+			],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.locator(
+				'role=document[name="Block: Paragraph"i] >> text="1"'
+			)
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: '1' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '3' },
+							},
+							{
+								name: 'core/paragraph',
+								attributes: { content: '2' },
+							},
+						],
+					},
+					{
+						name: 'core/column',
+					},
+				],
+			},
+		] );
+	} );
+
+	test.describe( 'following paragraph', () => {
+		const columnsBlock = {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2' },
+						},
+					],
+				},
+			],
+		};
+
+		test( 'should be deleted on Backspace when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( columnsBlock );
+			await editor.insertBlock( { name: 'core/paragraph' } );
+
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				columnsBlock,
+			] );
+
+			// Ensure focus is on the columns block.
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [] );
+		} );
+
+		test( 'should only select Columns on Backspace when non-empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const paragraphBlock = {
+				name: 'core/paragraph',
+				attributes: { content: 'a' },
+			};
+			await editor.insertBlock( columnsBlock );
+			await editor.insertBlock( paragraphBlock );
+
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				columnsBlock,
+				paragraphBlock,
+			] );
+
+			// Ensure focus is on the columns block.
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( [
+				paragraphBlock,
+			] );
+		} );
+	} );
 } );

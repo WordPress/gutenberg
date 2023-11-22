@@ -33,6 +33,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+import { getAuthority } from '@wordpress/url';
 
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
@@ -159,6 +160,20 @@ const EmbedEdit = ( props ) => {
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, url, cannotEmbed, fetching ] );
+
+	// Try a different provider in case the embed url is not supported.
+	useEffect( () => {
+		if ( ! cannotEmbed || fetching || ! url ) {
+			return;
+		}
+
+		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
+		if ( getAuthority( url ) === 'x.com' ) {
+			const newURL = new URL( url );
+			newURL.host = 'twitter.com';
+			setAttributes( { url: newURL.toString() } );
+		}
+	}, [ url, cannotEmbed, fetching, setAttributes ] );
 
 	// Handle incoming preview.
 	useEffect( () => {

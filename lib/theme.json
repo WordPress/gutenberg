@@ -1,15 +1,5 @@
 {
 	"version": 2,
-	"behaviors": {
-		"blocks": {
-			"core/image": {
-				"lightbox": {
-					"enabled": false,
-					"animation": ""
-				}
-			}
-		}
-	},
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
@@ -283,17 +273,17 @@
 					"radius": true
 				}
 			},
+			"core/image": {
+				"lightbox": {
+					"allowEditing": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"color": true,
 					"radius": true,
 					"style": true,
 					"width": true
-				}
-			},
-			"core/image": {
-				"behaviors": {
-					"lightbox": true
 				}
 			}
 		}

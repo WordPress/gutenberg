@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -147,7 +147,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
 						disabled={ ! options.length }
-						__next36pxDefaultSize
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 				</FlexBlock>
@@ -158,12 +158,13 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						isBusy={ isBusy }
 						aria-disabled={ isBusy || ! selectedSidebar }
 					>
-						{ __( 'Import' ) }
+						{ _x( 'Import', 'button label' ) }
 					</Button>
 				</FlexItem>
 			</HStack>
