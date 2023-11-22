@@ -196,6 +196,7 @@ export default function BlockTools( {
 				) }
 
 				{ ! hasFixedToolbar &&
+					isLargeViewport &&
 					! showEmptyBlockSideInserter &&
 					hasSelectedBlock &&
 					! isEmptyDefaultBlock && (
