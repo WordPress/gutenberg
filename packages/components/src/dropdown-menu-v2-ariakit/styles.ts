@@ -220,10 +220,6 @@ export const ItemPrefixWrapper = styled.span`
 	align-items: center;
 	justify-content: center;
 
-	/* Override inline styles applied by ariakit */
-	width: auto !important;
-	height: auto !important;
-
 	color: ${ COLORS.gray[ '700' ] };
 
 	/*

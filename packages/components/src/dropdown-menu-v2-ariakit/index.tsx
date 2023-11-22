@@ -95,6 +95,8 @@ export const DropdownMenuCheckboxItem = forwardRef<
 			<Ariakit.MenuItemCheck
 				store={ dropdownMenuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
+				// Override some ariakit inline styles
+				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
@@ -140,6 +142,8 @@ export const DropdownMenuRadioItem = forwardRef<
 			<Ariakit.MenuItemCheck
 				store={ dropdownMenuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
+				// Override some ariakit inline styles
+				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
