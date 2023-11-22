@@ -1013,17 +1013,16 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Check if the value is an array and requires further processing.
 			if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
-				// Determine if the schema is for an associative or indexed array.
+				// Determine if it is an associative or indexed array.
 				$schema_is_assoc = self::is_assoc( $value );
-
-				if ( self::is_nested_empty_array( $value ) ) {
-					unset( $tree[ $key ] );
-					continue;
-				}
 
 				if ( $schema_is_assoc ) {
 					// If associative, process as a single object.
 					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+
+					if ( empty( $tree[ $key ] ) ) {
+						unset( $tree[ $key ] );
+					}
 				} else {
 					// If indexed, process each item in the array.
 					foreach ( $value as $item_key => $item_value ) {
@@ -1048,41 +1047,6 @@ class WP_Theme_JSON_Gutenberg {
 			return false;
 		}
 		return array_keys( $array ) !== range( 0, count( $array ) - 1 );
-	}
-
-	protected static function is_nested_empty_array( $array ) {
-		if ( empty( $array ) ) {
-			return true;
-		}
-
-		foreach ( $array as $item ) {
-			// Check if each item is an array.
-			if ( is_array( $item ) ) {
-				if ( self::is_nullish_array( $item ) ) {
-					return true;
-				}
-
-				// If a nested array is not empty, return false.
-				if ( ! self::is_nested_empty_array( $item ) ) {
-					return false;
-				}
-			} elseif ( is_null( $item ) || trim( $item ) !== '' || $item === false ) {
-				// If an item is not an array and not an empty string, return false.
-				return false;
-			}
-		}
-
-		// If all nested arrays are empty or only contain empty strings, return true.
-		return true;
-	}
-
-	protected static function is_nullish_array( $array ) {
-		foreach ( $array as $item ) {
-			if ( $item !== null && $item !== '' && $item !== false && $item !== array() ) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
