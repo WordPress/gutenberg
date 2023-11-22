@@ -26,7 +26,7 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	return (
-		<Grid gap={ 8 } columns={ 2 } alignment="top">
+		<Grid gap={ 8 } columns={ 2 } alignment="top" className="dataviews-grid-view">
 			{ shownData.map( ( item, index ) => {
 				return (
 					<VStack key={ getItemId?.( item ) || index }>

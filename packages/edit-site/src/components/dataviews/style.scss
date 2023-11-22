@@ -45,6 +45,14 @@
 	}
 }
 
+.dataviews-grid-view {
+	.block-editor-block-preview__container {
+		height: 320px;
+		border: 1px solid $gray-300;
+		border-radius: $radius-block-ui;
+	}
+}
+
 .dataviews-view-grid__media {
 	width: 100%;
 	min-height: 200px;
