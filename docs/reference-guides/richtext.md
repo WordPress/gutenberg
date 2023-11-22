@@ -25,8 +25,7 @@ There are a number of core blocks using the RichText component. The JavaScript e
 
 ## Example
 
-{% codetabs %}
-{% JSX %}
+
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -65,46 +64,6 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
-
-{% Plain %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'h2',
-		},
-	},
-
-	edit: function( props ) {
-		var blockProps = wp.blockEditor.useBlockProps();
-
-		return React.createElement( wp.blockEditor.RichText, Object.assign( blockProps, {
-			tagName: 'h2',  // The tag here is the element output and editable in the admin
-			value: props.attributes.content, // Any existing content, either from the database or an attribute default
-			allowedFormats: [ 'core/bold', 'core/italic' ], // Allow the content to be made bold or italic, but do not allow other formatting options
-			onChange: function( content ) {
-				props.setAttributes( { content: content } ); // Store updated content as a block attribute
-			},
-			placeholder: __( 'Heading...' ), // Display this text before any content has been added by the user
-		} ) );
-	},
-
-	save: function( props ) {
-		var blockProps = wp.blockEditor.useBlockProps.save();
-
-		return React.createElement( wp.blockEditor.RichText.Content, Object.assign( blockProps, {
-			tagName: 'h2', value: props.attributes.content // Saves <h2>Content added in the editor...</h2> to the database for frontend display
-		} ) );
-	}
-} );
-```
-
-{% end %}
 
 ## Common Issues & Solutions
 

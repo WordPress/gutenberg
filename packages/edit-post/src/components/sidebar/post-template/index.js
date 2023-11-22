@@ -2,10 +2,13 @@
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -13,6 +16,9 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import PostTemplateForm from './form';
 import { store as editPostStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { PostPanelRow } = unlock( editorPrivateApis );
 
 export default function PostTemplate() {
 	// Use internal state instead of a ref to make sure that the component
@@ -53,11 +59,9 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
-			<span>{ __( 'Template' ) }</span>
+		<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
 			<Dropdown
 				popoverProps={ popoverProps }
-				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
 				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
@@ -70,7 +74,7 @@ export default function PostTemplate() {
 					<PostTemplateForm onClose={ onClose } />
 				) }
 			/>
-		</PanelRow>
+		</PostPanelRow>
 	);
 }
 

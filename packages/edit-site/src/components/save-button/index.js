@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 
@@ -11,7 +11,10 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { isPreviewingTheme } from '../../utils/is-previewing-theme';
+import {
+	currentlyPreviewingTheme,
+	isPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -21,24 +24,34 @@ export default function SaveButton( {
 	icon,
 	__next40pxDefaultSize = false,
 } ) {
-	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-			isResolving,
-		} = select( coreStore );
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		const { isSaveViewOpened } = select( editSiteStore );
-		const isActivatingTheme = isResolving( 'activateTheme' );
-		return {
-			isDirty: dirtyEntityRecords.length > 0,
-			isSaving:
-				dirtyEntityRecords.some( ( record ) =>
-					isSavingEntityRecord( record.kind, record.name, record.key )
-				) || isActivatingTheme,
-			isSaveViewOpen: isSaveViewOpened(),
-		};
-	}, [] );
+	const { isDirty, isSaving, isSaveViewOpen, previewingThemeName } =
+		useSelect( ( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				isSavingEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const { isSaveViewOpened } = select( editSiteStore );
+			const isActivatingTheme = isResolving( 'activateTheme' );
+			const previewingTheme = select( coreStore ).getTheme(
+				currentlyPreviewingTheme()
+			);
+
+			return {
+				isDirty: dirtyEntityRecords.length > 0,
+				isSaving:
+					dirtyEntityRecords.some( ( record ) =>
+						isSavingEntityRecord(
+							record.kind,
+							record.name,
+							record.key
+						)
+					) || isActivatingTheme,
+				isSaveViewOpen: isSaveViewOpened(),
+				previewingThemeName: previewingTheme?.name?.rendered,
+			};
+		}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
@@ -47,13 +60,13 @@ export default function SaveButton( {
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
-				return __( 'Activating' );
+				return sprintf( 'Activating %s', previewingThemeName );
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				return __( 'Activate & Save' );
+				return sprintf( 'Activate %s & Save', previewingThemeName );
 			}
-			return __( 'Activate' );
+			return sprintf( 'Activate %s', previewingThemeName );
 		}
 
 		if ( isSaving ) {
