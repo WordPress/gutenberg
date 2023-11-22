@@ -15,7 +15,6 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
-	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -48,13 +47,11 @@ const BlockToolbar = ( {
 		blockEditingMode,
 		blockType,
 		hasParents,
-		isEmptyDefaultBlock,
 		isValid,
 		isVisual,
 		showParentSelector,
 	} = useSelect( ( select ) => {
 		const {
-			getBlock,
 			getBlockName,
 			getBlockMode,
 			getBlockParents,
@@ -79,9 +76,6 @@ const BlockToolbar = ( {
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 
 			hasParents: parents.length,
-			isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
-				getBlock( selectedBlockClientId ) || {}
-			),
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
 			),
@@ -119,7 +113,6 @@ const BlockToolbar = ( {
 	const hasAnyBlockControls = useHasAnyBlockControls();
 
 	if (
-		isEmptyDefaultBlock ||
 		! isToolbarEnabled ||
 		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
 	) {
@@ -140,7 +133,6 @@ const BlockToolbar = ( {
 	const innerClasses = classnames( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 	} );
-
 	return (
 		<NavigableToolbar
 			focusEditorOnEscape

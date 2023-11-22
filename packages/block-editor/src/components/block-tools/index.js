@@ -42,6 +42,9 @@ function selector( select ) {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		hasSelectedBlock: clientId && name,
+		isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
+			getBlock( clientId ) || {}
+		),
 		isTyping: isTyping(),
 		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		showEmptyBlockSideInserter:
@@ -71,6 +74,7 @@ export default function BlockTools( {
 		clientId,
 		hasFixedToolbar,
 		hasSelectedBlock,
+		isEmptyDefaultBlock,
 		isTyping,
 		isZoomOutMode,
 		showEmptyBlockSideInserter,
@@ -193,7 +197,8 @@ export default function BlockTools( {
 
 				{ ! hasFixedToolbar &&
 					! showEmptyBlockSideInserter &&
-					hasSelectedBlock && (
+					hasSelectedBlock &&
+					! isEmptyDefaultBlock && (
 						<BlockToolbarPopover
 							__unstableContentRef={ __unstableContentRef }
 							clientId={ clientId }
