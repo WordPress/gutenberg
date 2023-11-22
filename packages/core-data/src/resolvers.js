@@ -823,7 +823,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
  *                                       fields, fields must always include the ID.
  */
 export const getRevision =
-	( kind, name, recordKey, revisionKey, query = {} ) =>
+	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 		const entityConfig = configs.find(
