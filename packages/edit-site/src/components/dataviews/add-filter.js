@@ -90,7 +90,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 											{
 												field: filter.field,
 												operator: OPERATOR_IN,
-												value: element.value,
+												value: [ element.value ],
 											},
 										],
 									} ) );
