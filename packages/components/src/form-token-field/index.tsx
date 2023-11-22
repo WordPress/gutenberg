@@ -162,7 +162,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur() {
+	function onBlur( event: FocusEvent ) {
 		if (
 			inputHasValidValue() &&
 			__experimentalValidateInput( incompleteTokenValue )
@@ -176,7 +176,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			setIncompleteTokenValue( '' );
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
-			setIsExpanded( false );
+
+			// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
+			// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
+			const shouldKeepSuggestionsExpanded =
+				! __experimentalExpandOnFocus ||
+				( __experimentalExpandOnFocus &&
+					event.relatedTarget === tokensAndInput.current );
+			setIsExpanded( shouldKeepSuggestionsExpanded );
+
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );
 		}
