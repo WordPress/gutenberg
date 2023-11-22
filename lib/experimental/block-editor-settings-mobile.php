@@ -95,6 +95,13 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 			'enableCustomUnits'                => true,
 			'colors'                           => true,
 			'fontSizes'                        => true,
+			'__experimentalStyles'             => array(
+				'elements'   => true,
+				'spacing'    => true,
+				'blocks'     => true,
+				'color'      => true,
+				'typography' => true,
+			),
 			'__experimentalFeatures'           => array(
 				'appearanceTools'               => true,
 				'useRootPaddingAwareAlignments' => true,
