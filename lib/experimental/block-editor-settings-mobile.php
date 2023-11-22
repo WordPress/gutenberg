@@ -18,22 +18,22 @@
  *
  * @return array New block editor settings.
  */
-function keep_supported_block_editor_settings_mobile($initial_array, $allow_list_array) {
-    $result = array();
+function keep_supported_block_editor_settings_mobile( $initial_array, $allow_list_array ) {
+	$result = array();
 
-    foreach ($allow_list_array as $key => $value) {
-        $initial_value = $initial_array[$key];
+	foreach ( $allow_list_array as $key => $value ) {
+		$initial_value = $initial_array[ $key ];
 
-        if (array_key_exists($key, $initial_array)) {
-            if (is_array($value) && is_array($initial_value)) {
-							$result[$key] = keep_supported_block_editor_settings_mobile($initial_value, $value);
-            } else {
-							$result[$key] = $initial_value;
-            }
-        }
-    }
+		if ( array_key_exists( $key, $initial_array ) ) {
+			if ( is_array( $value ) && is_array( $initial_value ) ) {
+							$result[ $key ] = keep_supported_block_editor_settings_mobile( $initial_value, $value );
+			} else {
+							$result[ $key ] = $initial_value;
+			}
+		}
+	}
 
-    return $result;
+	return $result;
 }
 
 
@@ -65,61 +65,64 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		$settings['__experimentalEnableListBlockV2'] = true;
 	}
 
-	return keep_supported_block_editor_settings_mobile($settings, array(
-		"alignWide" => true,
-		"allowedBlockTypes" => true,
-		"allowedMimeTypes" => true,
-		"defaultEditorStyles" => true,
-		"blockCategories" => true,
-		"isRTL" => true,
-		"imageDefaultSize" => true,
-		"imageDimensions" => true,
-		"imageEditing" => true,
-		"imageSizes" => true,
-		"maxUploadFileSize" => true,
-		"__unstableGalleryWithImageBlocks" => true,
-		"disableCustomColors" => true,
-		"disableCustomFontSizes" => true,
-		"disableCustomGradients" => true,
-		"disableLayoutStyles" => true,
-		"enableCustomLineHeight" => true,
-		"enableCustomSpacing" => true,
-		"enableCustomUnits" => true,
-		"colors" => true,
-		"fontSizes" => true,
-		"__experimentalFeatures" => array(
-			"appearanceTools" => true,
-			"useRootPaddingAwareAlignments" => true,
-			"border" => true,
-			"color" => true,
-			"shadow" => true,
-			"spacing" => true,
-			"typography" => array(
-				"dropCap" => true,
-				"fontSizes" => true,
-				"fontStyle" => true,
-				"fontWeight" => true,
-				"letterSpacing" => true,
-				"textColumns" => true,
-				"textDecoration" => true,
-				"textTransform" => true,
-				"writingMode" => true,
+	return keep_supported_block_editor_settings_mobile(
+		$settings,
+		array(
+			'alignWide'                        => true,
+			'allowedBlockTypes'                => true,
+			'allowedMimeTypes'                 => true,
+			'defaultEditorStyles'              => true,
+			'blockCategories'                  => true,
+			'isRTL'                            => true,
+			'imageDefaultSize'                 => true,
+			'imageDimensions'                  => true,
+			'imageEditing'                     => true,
+			'imageSizes'                       => true,
+			'maxUploadFileSize'                => true,
+			'__unstableGalleryWithImageBlocks' => true,
+			'disableCustomColors'              => true,
+			'disableCustomFontSizes'           => true,
+			'disableCustomGradients'           => true,
+			'disableLayoutStyles'              => true,
+			'enableCustomLineHeight'           => true,
+			'enableCustomSpacing'              => true,
+			'enableCustomUnits'                => true,
+			'colors'                           => true,
+			'fontSizes'                        => true,
+			'__experimentalFeatures'           => array(
+				'appearanceTools'               => true,
+				'useRootPaddingAwareAlignments' => true,
+				'border'                        => true,
+				'color'                         => true,
+				'shadow'                        => true,
+				'spacing'                       => true,
+				'typography'                    => array(
+					'dropCap'        => true,
+					'fontSizes'      => true,
+					'fontStyle'      => true,
+					'fontWeight'     => true,
+					'letterSpacing'  => true,
+					'textColumns'    => true,
+					'textDecoration' => true,
+					'textTransform'  => true,
+					'writingMode'    => true,
+				),
+				'blocks'                        => true,
+				'background'                    => true,
+				'dimensions'                    => true,
+				'position'                      => true,
 			),
-			"blocks" => true,
-			"background" => true,
-			"dimensions" => true,
-			"position" => true,
-		),
-		"gradients" => true,
-		"disableCustomSpacingSizes" => true,
-		"spacingSizes" => true,
-		"__unstableIsBlockBasedTheme" => true,
-		"localAutosaveInterval" => true,
-		"__experimentalDiscussionSettings" => true,
-		"__experimentalDashboardLink" => true,
-		"__experimentalEnableQuoteBlockV2" => true,
-		"__experimentalEnableListBlockV2" => true,
-	));
+			'gradients'                        => true,
+			'disableCustomSpacingSizes'        => true,
+			'spacingSizes'                     => true,
+			'__unstableIsBlockBasedTheme'      => true,
+			'localAutosaveInterval'            => true,
+			'__experimentalDiscussionSettings' => true,
+			'__experimentalDashboardLink'      => true,
+			'__experimentalEnableQuoteBlockV2' => true,
+			'__experimentalEnableListBlockV2'  => true,
+		)
+	);
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
