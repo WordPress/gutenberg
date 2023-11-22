@@ -359,6 +359,7 @@ async function loadPostTypeEntities() {
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
