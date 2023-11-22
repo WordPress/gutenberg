@@ -955,8 +955,10 @@ export function receiveRevisions(
 	invalidateCache = false,
 	meta
 ) {
+	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( name );
 	return {
 		type: 'RECEIVE_ITEM_REVISIONS',
+		key: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		items: Array.isArray( records ) ? records : [ records ],
 		recordKey,
 		meta,

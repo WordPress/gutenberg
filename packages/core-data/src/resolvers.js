@@ -744,7 +744,9 @@ export const getRevisions =
 		) {
 			return;
 		}
-
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		if ( query._fields ) {
 			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
@@ -755,7 +757,7 @@ export const getRevisions =
 					...new Set( [
 						...( getNormalizedCommaSeparable( query._fields ) ||
 							[] ),
-						DEFAULT_ENTITY_KEY,
+						isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 					] ),
 				].join(),
 			};
@@ -857,7 +859,9 @@ export const getRevision =
 		) {
 			return;
 		}
-
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		if ( query !== undefined && query._fields ) {
 			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
@@ -868,7 +872,7 @@ export const getRevision =
 					...new Set( [
 						...( getNormalizedCommaSeparable( query._fields ) ||
 							[] ),
-						DEFAULT_ENTITY_KEY,
+						isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 					] ),
 				].join(),
 			};

@@ -238,8 +238,8 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
@@ -377,6 +377,12 @@ function entity( entityConfig ) {
 							}
 
 							if ( action.type === 'REMOVE_ITEMS' ) {
+								/*
+									For templates;
+									itemIds: ['twentytwentyfour//wp-custom-template-nag']
+									But the state key is with one slash: twentytwentyfour/wp-custom-template-nag
+									So deleteEntityRecord needs send extra data to removeItems?
+								 */
 								return Object.fromEntries(
 									Object.entries( state ).filter(
 										( [ id ] ) =>
