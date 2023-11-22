@@ -190,9 +190,13 @@ test.describe( 'Block Renaming', () => {
 
 			await blockOptionsTrigger.click();
 
-			const renameMenuItem = page.getByRole( 'menuitem', {
-				name: 'Rename',
-			} );
+			const renameMenuItem = page
+				.getByRole( 'menu', {
+					name: 'Options for No Rename Support Block',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'Rename',
+				} );
 
 			// Expect the Rename menu item not to exist at all.
 			await expect( renameMenuItem ).toBeHidden();
