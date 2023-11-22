@@ -165,7 +165,11 @@ function HeaderMenu( { dataView, header } ) {
 										Object.values( columnFilter )[ 0 ];
 									// Intentionally use loose comparison, so it does type conversion.
 									// This covers the case where a top-level filter for the same field converts a number into a string.
-									isActive = element.value == value; // eslint-disable-line eqeqeq
+									/* eslint-disable eqeqeq */
+									isActive = value.some(
+										( v ) => element.value == v
+									);
+									/* eslint-enable eqeqeq */
 								}
 
 								return (
@@ -193,14 +197,27 @@ function HeaderMenu( { dataView, header } ) {
 														);
 													}
 												);
+											const currentValues =
+												( columnFilter &&
+													Object.values(
+														columnFilter
+													)[ 0 ] ) ||
+												[];
 
 											dataView.setColumnFilters( [
 												...otherFilters,
 												{
 													[ filter.field + ':in' ]:
 														isActive
-															? undefined
-															: element.value,
+															? currentValues.filter(
+																	( v ) =>
+																		v !==
+																		element.value
+															  )
+															: [
+																	...currentValues,
+																	element.value,
+															  ],
 												},
 											] );
 										} }
