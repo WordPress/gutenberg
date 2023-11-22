@@ -10,11 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import CreatePatternModal from './create-pattern-modal';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../constants';
 
 function getTermLabels( pattern, categories ) {
-	// Theme patterns don't have an id and rely on core pattern categories.
-	if ( ! pattern.id ) {
+	// Theme patterns rely on core pattern categories.
+	if ( pattern.type !== PATTERN_TYPES.user ) {
 		return categories.core
 			?.filter( ( category ) =>
 				pattern.categories.includes( category.name )
