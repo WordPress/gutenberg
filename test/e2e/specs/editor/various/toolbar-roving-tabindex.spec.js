@@ -59,7 +59,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.type( 'List' );
 		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
 			'List text',
-			'Select List'
+			'Select parent block: List'
 		);
 		await page.click( `role=button[name="Select parent block: List"i]` );
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
