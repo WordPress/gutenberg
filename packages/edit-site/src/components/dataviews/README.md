@@ -174,6 +174,8 @@ Example:
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 
+TODO: how to disable multiselection?
+
 ## Actions
 
 Array of operations that can be performed upon each record. Each action is an object with the following properties:
