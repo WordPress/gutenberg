@@ -22,6 +22,11 @@
 			pointer-events: all;
 		}
 	}
+
+	&.is-hidden {
+		opacity: 0;
+		z-index: -1;
+	}
 }
 
 .components-popover.block-editor-block-popover__inbetween {

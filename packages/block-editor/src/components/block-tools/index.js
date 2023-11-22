@@ -17,6 +17,7 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
+import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
 import BlockToolbar from '../block-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -189,10 +190,18 @@ export default function BlockTools( {
 						clientId={ clientId }
 					/>
 				) }
-				{ /* Even if the toolbar is fixed, the block popover is still
-					needed for navigation and zoom-out mode. */ }
+
+				{ ! hasFixedToolbar &&
+					! showEmptyBlockSideInserter &&
+					hasSelectedBlock && (
+						<BlockToolbarPopover
+							__unstableContentRef={ __unstableContentRef }
+							clientId={ clientId }
+						/>
+					) }
+
 				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
-					<BlockToolbarPopover
+					<BlockToolbarBreadcrumb
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
