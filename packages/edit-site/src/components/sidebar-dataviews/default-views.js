@@ -38,7 +38,11 @@ const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'draft' },
+					{
+						field: 'status',
+						operator: OPERATOR_IN,
+						value: [ 'draft' ],
+					},
 				],
 			},
 		},
@@ -49,7 +53,11 @@ const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'trash' },
+					{
+						field: 'status',
+						operator: OPERATOR_IN,
+						value: [ 'trash' ],
+					},
 				],
 			},
 		},
