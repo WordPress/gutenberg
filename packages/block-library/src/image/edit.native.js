@@ -44,7 +44,6 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockStyles,
 	store as blockEditorStore,
 	blockSettingsScreens,
@@ -212,7 +211,6 @@ export class ImageEdit extends Component {
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator =
 			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
@@ -388,18 +386,6 @@ export class ImageEdit extends Component {
 			url,
 			width: undefined,
 			height: undefined,
-		} );
-	}
-
-	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = Object.values(
-			WIDE_ALIGNMENTS.alignments
-		).includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		this.props.setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
 		} );
 	}
 
@@ -711,10 +697,6 @@ export class ImageEdit extends Component {
 						onClick={ open }
 					/>
 				</ToolbarGroup>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
 			</BlockControls>
 		);
 

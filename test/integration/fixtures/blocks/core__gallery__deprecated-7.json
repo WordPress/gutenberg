@@ -18,6 +18,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
 					"alt": "",
 					"caption": "",
@@ -32,6 +33,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
 					"alt": "",
 					"caption": "",
@@ -46,6 +48,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
 					"alt": "",
 					"caption": "",
@@ -77,6 +80,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
 					"alt": "",
 					"caption": "",
@@ -91,6 +95,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
 					"alt": "",
 					"caption": "",
@@ -105,6 +110,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"align": "",
 					"url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
 					"alt": "",
 					"caption": "",

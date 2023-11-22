@@ -25,7 +25,6 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	useSettings,
-	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
@@ -353,21 +352,6 @@ export default function Image( {
 		} );
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? {
-					width: undefined,
-					height: undefined,
-					aspectRatio: undefined,
-					scale: undefined,
-			  }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
-	}
-
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -455,12 +439,6 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ hasNonContentControls && (
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				) }
 				{ hasNonContentControls && (
 					<ToolbarButton
 						onClick={ () => {

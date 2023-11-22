@@ -10,8 +10,6 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentControl,
-	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
@@ -106,7 +104,6 @@ export function ImageEdit( {
 		url = '',
 		alt,
 		caption,
-		align,
 		id,
 		width,
 		height,
@@ -255,16 +252,6 @@ export function ImageEdit( {
 		}
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
-	}
-
 	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
@@ -375,14 +362,6 @@ export function ImageEdit( {
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
 			/>
-			{ ! url && blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			) }
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }
