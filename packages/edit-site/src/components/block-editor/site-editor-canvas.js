@@ -22,6 +22,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import BlockPreview from '../block-preview';
 
 export default function SiteEditorCanvas() {
 	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
@@ -78,7 +79,10 @@ export default function SiteEditorCanvas() {
 						>
 							<EditorCanvas
 								enableResizing={ enableResizing }
-								settings={ settings }
+								settings={ {
+									...settings,
+									blockPreview: BlockPreview,
+								} }
 							>
 								{ resizeObserver }
 							</EditorCanvas>

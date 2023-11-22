@@ -28,6 +28,7 @@ import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
+import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const {
 	CompositeV2: Composite,
