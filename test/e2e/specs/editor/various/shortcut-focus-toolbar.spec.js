@@ -98,6 +98,10 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 
 			// Test: Focus the block toolbar from empty block
 			await editor.insertBlock( { name: 'core/paragraph' } );
+			// This fails if we don't wait for the block toolbar to show.
+			await expect(
+				toolbarUtils.blockToolbarParagraphButton
+			).toBeVisible();
 			await toolbarUtils.moveToToolbarShortcut();
 			await expect(
 				toolbarUtils.blockToolbarParagraphButton
