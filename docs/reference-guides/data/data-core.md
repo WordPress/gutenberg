@@ -128,6 +128,8 @@ _Returns_
 
 ### getCurrentThemeGlobalStylesRevisions
 
+> **Deprecated** since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+
 Returns the revisions of the current global styles theme.
 
 _Parameters_

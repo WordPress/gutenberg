@@ -30,6 +30,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	PATTERN_TYPES,
 } from './utils';
 
 const noop = () => {};
@@ -69,7 +70,10 @@ export function PatternCategoryPreviews( {
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
-				if ( category.name === myPatternsCategory.name && pattern.id ) {
+				if (
+					category.name === myPatternsCategory.name &&
+					pattern.type === PATTERN_TYPES.user
+				) {
 					return true;
 				}
 				if ( category.name !== 'uncategorized' ) {
