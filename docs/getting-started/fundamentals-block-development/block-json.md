@@ -1,6 +1,6 @@
 # `block.json`
 
-The `block.json` file simplifies the processs of defining a block and using the same block's definition to register the block in both the server and the client.
+The `block.json` file simplifies the processs of defining and registering a block by using the same block's definition in JSON format to register the block in both the server and the client.
 
 [![Open block.json diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-json.png)](https://excalidraw.com/#json=v1GrIkGsYGKv8P14irBy6,Yy0vl8q7DTTL2VsH5Ww27A "Open block.json diagram in excalidraw")
 
@@ -19,16 +19,16 @@ At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/ref
 
 ## Basic metadata of the block
 
-Through properties of the `block.json`, we can define how the block will be uniquely idenfified, how it can be found, and the info displayed for the block in the Block Editor. Some of these properties are:
+Through properties of the `block.json`, we can define how the block will be uniquely identified, how it can be found, and the info displayed for the block in the Block Editor. Some of these properties are:
 
-- `apiVersion`: the version of [the API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) used by the block (current version is 2)
-- `name`:  a unique identifier for a block including a namespace
-- `title`:  a display title for a block
-- `category`:  a block category for the block in the Inserter panel
-- `icon`:  a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon
-- `description`:  a short description visible in the block inspector
-- `keywords`: to locate the block in the inserter
-- `textdomain`: the plugin text-domain (important for things such as translations)
+- `apiVersion`: the version of [the API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) used by the block (current version is 2).
+- `name`:  a unique identifier for a block, including a namespace.
+- `title`:  a display title for a block.
+- `category`:  a block category for the block in the Inserter panel.
+- `icon`:  a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon.
+- `description`:  a short description visible in the block inspector.
+- `keywords`: to locate the block in the inserter.
+- `textdomain`: the plugin text-domain (important for things such as translations).
 
 ## Files for the block's behavior, output, or style 
 
@@ -44,7 +44,7 @@ The `render` property ([introduced on WordPress 6.1](https://make.wordpress.org/
 
 ## Data Storage in the Block with `attributes`
 
-The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) allows a block to declare variables that store data or content for the block.
+The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) allows a block to declare "variables" that store data or content for the block.
 
 _Example: Atributes as defined in block.json_
 ```json
@@ -60,8 +60,6 @@ _Example: Atributes as defined in block.json_
 	}
 },
 ```
-
-[![Open Attributes diagram in excalidraw](https://developer.wordpress.org/files/2023/11/attributes.png)](https://excalidraw.com/#json=pSgCZy8q9GbH7r0oz2fL1,MFCLd6ddQHqi_UqNp5ZSgg "Open Attributes diagram in excalidraw")
 
 <div class="callout callout-info">
 Check the <a href="https://developer.wordpress.org/redesign-test/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Attributes API. 
@@ -83,8 +81,11 @@ The `Edit` component receives exclusively the capability of updating the attribu
 _See how the attributes are passed to the [`Edit` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js), [the `Save` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) and [the `render.php`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php) in this [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3) of the  code above_
 
 <div class="callout callout-info">
-Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Supports API. 
+Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Attributes API. 
 </div>
+
+[![Open Attributes diagram in excalidraw](https://developer.wordpress.org/files/2023/11/attributes.png)](https://excalidraw.com/#json=pSgCZy8q9GbH7r0oz2fL1,MFCLd6ddQHqi_UqNp5ZSgg "Open Attributes diagram in excalidraw")
+
 
 ## Enable UI settings panels for the block with `supports`
 
@@ -110,12 +111,12 @@ The use of `supports` generates a set of properties that need to be manually add
 _Example: Supports custom settings stored in the Markup representation of the block_
 
 ```html
-<!-- wp:block-development-examples/block-supports-6aa4dd {"style":{"elements":{"link":{"color":{"text":"var:preset|color|contrast"}}}},"backgroundColor":"accent-3","textColor":"contrast"} -->
-<p class="wp-block-block-development-examples-block-supports-6aa4dd has-contrast-color has-accent-3-background-color has-text-color has-background has-link-color">Hello World!</p>
+<!-- wp:block-development-examples/block-supports-6aa4dd {"backgroundColor":"contrast","textColor":"accent-4"} -->
+<p class="wp-block-block-development-examples-block-supports-6aa4dd has-accent-4-color has-contrast-background-color has-text-color has-background">Hello World</p>
 <!-- /wp:block-development-examples/block-supports-6aa4dd -->
 ```
 
-_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json)_
+_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json)_
 
 <div class="callout callout-info">
 Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/"> <code>supports</code> </a> reference page for full info about the Supports API. 
