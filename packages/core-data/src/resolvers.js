@@ -244,7 +244,7 @@ export const getEntityRecords =
 
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
-			// that way we consider the query "fullfilled".
+			// that way we consider the query "fulfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
 					query._fields.split( ',' ).forEach( ( field ) => {
@@ -322,7 +322,7 @@ export const getCurrentTheme =
 export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
- * Requests a preview from the from the Embed API.
+ * Requests a preview from the Embed API.
  *
  * @param {string} url URL to get the preview for.
  */
@@ -717,4 +717,147 @@ export const getDefaultTemplateId =
 		if ( template ) {
 			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
+	};
+
+/**
+ * Requests an entity's revisions from the REST API.
+ *
+ * @param {string}           kind      Entity kind.
+ * @param {string}           name      Entity name.
+ * @param {number|string}    recordKey The key of the entity record whose revisions you want to fetch.
+ * @param {Object|undefined} query     Optional object of query parameters to
+ *                                     include with request. If requesting specific
+ *                                     fields, fields must always include the ID.
+ */
+export const getRevisions =
+	( kind, name, recordKey, query = {} ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if (
+			! entityConfig ||
+			entityConfig?.__experimentalNoFetch ||
+			! entityConfig?.supports?.revisions
+		) {
+			return;
+		}
+
+		if ( query._fields ) {
+			// If requesting specific fields, items and query association to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: [
+					...new Set( [
+						...( getNormalizedCommaSeparable( query._fields ) ||
+							[] ),
+						DEFAULT_ENTITY_KEY,
+					] ),
+				].join(),
+			};
+		}
+
+		const path = addQueryArgs(
+			entityConfig.getRevisionsUrl( recordKey ),
+			query
+		);
+
+		let records, meta;
+		if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
+			const response = await apiFetch( { path, parse: false } );
+			records = Object.values( await response.json() );
+			meta = {
+				totalItems: parseInt( response.headers.get( 'X-WP-Total' ) ),
+			};
+		} else {
+			records = Object.values( await apiFetch( { path } ) );
+		}
+
+		// If we request fields but the result doesn't contain the fields,
+		// explicitly set these fields as "undefined"
+		// that way we consider the query "fulfilled".
+		if ( query._fields ) {
+			records = records.map( ( record ) => {
+				query._fields.split( ',' ).forEach( ( field ) => {
+					if ( ! record.hasOwnProperty( field ) ) {
+						record[ field ] = undefined;
+					}
+				} );
+
+				return record;
+			} );
+		}
+
+		dispatch.receiveRevisions(
+			kind,
+			name,
+			recordKey,
+			records,
+			query,
+			false,
+			meta
+		);
+	};
+
+// Invalidate cache when a new revision is created.
+getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
+	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+	name === action.name &&
+	kind === action.kind &&
+	! action.error &&
+	recordKey === action.recordId;
+
+/**
+ * Requests a specific Entity revision from the REST API.
+ *
+ * @param {string}           kind        Entity kind.
+ * @param {string}           name        Entity name.
+ * @param {number|string}    recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param {number|string}    revisionKey The revision's key.
+ * @param {Object|undefined} query       Optional object of query parameters to
+ *                                       include with request. If requesting specific
+ *                                       fields, fields must always include the ID.
+ */
+export const getRevision =
+	( kind, name, recordKey, revisionKey, query = {} ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if (
+			! entityConfig ||
+			entityConfig?.__experimentalNoFetch ||
+			! entityConfig?.supports?.revisions
+		) {
+			return;
+		}
+
+		if ( query !== undefined && query._fields ) {
+			// If requesting specific fields, items and query association to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: [
+					...new Set( [
+						...( getNormalizedCommaSeparable( query._fields ) ||
+							[] ),
+						DEFAULT_ENTITY_KEY,
+					] ),
+				].join(),
+			};
+		}
+		const path = addQueryArgs(
+			entityConfig.getRevisionsUrl( recordKey, revisionKey ),
+			query
+		);
+
+		const record = await apiFetch( { path } );
+		dispatch.receiveRevisions( kind, name, recordKey, record, query );
 	};

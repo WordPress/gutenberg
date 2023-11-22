@@ -24,6 +24,7 @@ import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
+import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const {
 	CompositeV2: Composite,
@@ -76,7 +77,9 @@ function BlockPattern( {
 					} }
 				>
 					<WithToolTip
-						showTooltip={ showTooltip && ! pattern.id }
+						showTooltip={
+							showTooltip && ! pattern.type !== PATTERN_TYPES.user
+						}
 						title={ pattern.title }
 					>
 						<CompositeItem
@@ -93,7 +96,8 @@ function BlockPattern( {
 										'block-editor-block-patterns-list__item',
 										{
 											'block-editor-block-patterns-list__list-item-synced':
-												pattern.id &&
+												pattern.type ===
+													PATTERN_TYPES.user &&
 												! pattern.syncStatus,
 										}
 									) }
@@ -118,15 +122,17 @@ function BlockPattern( {
 							/>
 
 							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.id && ! pattern.syncStatus && (
-									<div className="block-editor-patterns__pattern-icon-wrapper">
-										<Icon
-											className="block-editor-patterns__pattern-icon"
-											icon={ symbol }
-										/>
-									</div>
-								) }
-								{ ( ! showTooltip || pattern.id ) && (
+								{ pattern.type === PATTERN_TYPES.user &&
+									! pattern.syncStatus && (
+										<div className="block-editor-patterns__pattern-icon-wrapper">
+											<Icon
+												className="block-editor-patterns__pattern-icon"
+												icon={ symbol }
+											/>
+										</div>
+									) }
+								{ ( ! showTooltip ||
+									pattern.type === PATTERN_TYPES.user ) && (
 									<div className="block-editor-block-patterns-list__item-title">
 										{ pattern.title }
 									</div>

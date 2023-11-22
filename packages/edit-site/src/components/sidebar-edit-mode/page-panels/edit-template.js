@@ -3,17 +3,12 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,6 +18,8 @@ import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../../lock-unlock';
 import { PAGE_CONTENT_BLOCK_TYPES } from '../../../utils/constants';
+
+const { PostPanelRow } = unlock( editorPrivateApis );
 
 const POPOVER_PROPS = {
 	className: 'edit-site-page-panels-edit-template__dropdown',
@@ -71,10 +68,7 @@ export default function EditTemplate() {
 	}
 
 	return (
-		<HStack className="edit-site-summary-field">
-			<Text className="edit-site-summary-field__label">
-				{ __( 'Template' ) }
-			</Text>
+		<PostPanelRow label={ __( 'Template' ) }>
 			<DropdownMenu
 				popoverProps={ POPOVER_PROPS }
 				focusOnMount
@@ -122,6 +116,6 @@ export default function EditTemplate() {
 					</>
 				) }
 			</DropdownMenu>
-		</HStack>
+		</PostPanelRow>
 	);
 }

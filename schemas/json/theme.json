@@ -364,7 +364,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
+							"minItems": 1
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
