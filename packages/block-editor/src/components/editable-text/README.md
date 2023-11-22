@@ -47,40 +47,6 @@ _Optional._ Called when the block can be removed. `forward` is true when the sel
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			source: 'html',
-			selector: 'div',
-		},
-	},
-
-	edit: function( props ) {
-		return React.createElement( wp.editor.EditableText, {
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return React.createElement( wp.editor.EditableText.Content, {
-			value: props.attributes.content
-		} );
-	}
-} );
-```
-
-{% ESNext %}
-
 ```js
 const { registerBlockType } = wp.blocks;
 const { EditableText } = wp.editor;
@@ -110,5 +76,3 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
-
-{% end %}

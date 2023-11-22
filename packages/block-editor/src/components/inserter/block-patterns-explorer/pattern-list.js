@@ -18,6 +18,7 @@ import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import {
+	PATTERN_TYPES,
 	allPatternsCategory,
 	myPatternsCategory,
 } from '../block-patterns-tab/utils';
@@ -70,7 +71,10 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			if ( selectedCategory === allPatternsCategory.name ) {
 				return true;
 			}
-			if ( selectedCategory === myPatternsCategory.name && pattern.id ) {
+			if (
+				selectedCategory === myPatternsCategory.name &&
+				pattern.type === PATTERN_TYPES.user
+			) {
 				return true;
 			}
 			if ( selectedCategory === 'uncategorized' ) {

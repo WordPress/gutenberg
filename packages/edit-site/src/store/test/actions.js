@@ -158,7 +158,7 @@ describe( 'actions', () => {
 				registry
 					.select( preferencesStore )
 					.get( 'core/edit-site', 'fixedToolbar' )
-			).toBe( false );
+			).toBe( true );
 			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
 				false
 			);

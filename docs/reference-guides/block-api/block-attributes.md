@@ -375,7 +375,7 @@ Attribute definition:
 
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
-{% codetabs %}
+
 {% JSX %}
 
 ```js
@@ -388,22 +388,6 @@ edit( { attributes, setAttributes } ) {
 },
 ```
 
-{% Plain %}
-
-```js
-edit: function( props ) {
-	function onChange( event ) {
-		props.setAttributes( { author: event.target.value } );
-	}
-
-	return el( 'input', {
-		value: props.attributes.author,
-		onChange: onChange,
-	} );
-},
-```
-
-{% end %}
 
 #### Considerations
 

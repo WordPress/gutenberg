@@ -20,33 +20,6 @@ _Optional._ The component forwards the `ref` property to the `TextareaAutosize` 
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			type: 'string',
-		},
-	},
-
-	edit: function( props ) {
-		return React.createElement( wp.blockEditor.PlainText, {
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			},
-		} );
-	},
-} );
-```
-
-{% ESNext %}
-
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { PlainText } from '@wordpress/block-editor';
@@ -72,4 +45,3 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% end %}
