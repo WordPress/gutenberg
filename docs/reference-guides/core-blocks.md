@@ -826,7 +826,7 @@ Display an image to represent this site. Update this block and the changes apply
 -	**Name:** core/site-logo
 -	**Category:** theme
 -	**Supports:** align, color (~~background~~, ~~text~~), spacing (margin, padding), ~~alignWide~~, ~~html~~
--	**Attributes:** isLink, linkTarget, shouldSyncIcon, width
+-	**Attributes:** alt, isLink, linkTarget, shouldSyncIcon, width
 
 ## Site Tagline
 

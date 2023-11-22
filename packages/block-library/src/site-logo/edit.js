@@ -29,6 +29,8 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	ExternalLink,
+	TextareaControl,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -104,7 +106,7 @@ const SiteLogo = ( {
 		if ( shouldSyncIcon && logoId !== iconId ) {
 			setAttributes( { shouldSyncIcon: false } );
 		}
-	}, [] );
+	}, [ iconId, logoId, setAttributes, shouldSyncIcon ] );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -120,11 +122,15 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
+	function updateAlt( newAlt ) {
+		setAttributes( { alt: newAlt } );
+	}
+
 	const img = (
 		<img
 			className="custom-logo"
 			src={ logoUrl }
-			alt={ alt }
+			alt={ alt || title }
 			onLoad={ ( event ) => {
 				setNaturalSize( {
 					naturalWidth: event.target.naturalWidth,
@@ -145,7 +151,6 @@ const SiteLogo = ( {
 				href={ siteUrl }
 				className={ classes }
 				rel="home"
-				title={ title }
 				onClick={ ( event ) => event.preventDefault() }
 			>
 				{ img }
@@ -341,6 +346,25 @@ const SiteLogo = ( {
 							/>
 						</>
 					) }
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						value={ alt }
+						onChange={ updateAlt }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __(
+									'If the alternative text is left empty, the site title is used.'
+								) }
+							</>
+						}
+						__nextHasNoMarginBottom
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls group="block">
@@ -371,9 +395,13 @@ function SiteLogoReplaceFlow( { onRemoveLogo, ...mediaReplaceProps } ) {
 	);
 }
 
-const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
+const InspectorLogoPreview = ( {
+	mediaItemData = {},
+	itemGroupProps,
+	alt,
+	title,
+} ) => {
 	const {
-		alt_text: alt,
 		source_url: logoUrl,
 		slug: logoSlug,
 		media_details: logoMediaDetails,
@@ -382,7 +410,7 @@ const InspectorLogoPreview = ( { mediaItemData = {}, itemGroupProps } ) => {
 	return (
 		<ItemGroup { ...itemGroupProps } as="span">
 			<HStack justify="flex-start" as="span">
-				<img src={ logoUrl } alt={ alt } />
+				<img src={ logoUrl } alt={ alt || title } />
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
@@ -402,7 +430,7 @@ export default function LogoEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const { width, shouldSyncIcon } = attributes;
+	const { width, shouldSyncIcon, alt } = attributes;
 	const ref = useRef();
 
 	const {
@@ -468,7 +496,7 @@ export default function LogoEdit( {
 			site_icon: newValue ?? null,
 		} );
 
-	const { alt_text: alt, source_url: logoUrl } = mediaItemData ?? {};
+	const { source_url: logoUrl } = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no

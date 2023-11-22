@@ -20,6 +20,10 @@
 		},
 		"shouldSyncIcon": {
 			"type": "boolean"
+		},
+		"alt": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"example": {

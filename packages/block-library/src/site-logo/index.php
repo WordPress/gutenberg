@@ -48,6 +48,13 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
+	//Update the alternative text. If it's empty, the site title is used.
+	$alt = ! empty($attributes['alt']) ? $attributes['alt'] : get_bloginfo( 'name' );
+	$alt_processor = new WP_HTML_Tag_Processor( $custom_logo );
+	$alt_processor->next_tag( 'img' );
+	$alt_processor->set_attribute( 'alt', $alt );
+	$custom_logo = $alt_processor->get_updated_html();
+
 	$classnames = array();
 	if ( empty( $attributes['width'] ) ) {
 		$classnames[] = 'is-default-size';
