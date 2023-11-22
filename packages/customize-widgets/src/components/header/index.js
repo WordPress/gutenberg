@@ -105,7 +105,11 @@ function Header( {
 			{ isFixedToolbarActive && isLargeViewport && (
 				<>
 					<div className="selected-block-tools-wrapper">
-						<BlockToolbar isFixed variant="unstyled" />
+						<BlockToolbar
+							isFixed
+							hideDragHandle
+							variant="unstyled"
+						/>
 					</div>
 					<Popover.Slot
 						ref={ blockToolbarRef }
