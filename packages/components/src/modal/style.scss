@@ -28,6 +28,7 @@
 	animation: components-modal__appear-animation 0.1s ease-out;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
+	@include reset;
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
@@ -90,7 +91,6 @@
 // if the content needs to be scrolled (for example, on the keyboard shortcuts
 // modal screen).
 .components-modal__header {
-	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
 	padding: $grid-unit-30 $grid-unit-40 $grid-unit-10;
 	display: flex;

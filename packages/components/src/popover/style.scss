@@ -8,6 +8,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 .components-popover {
 	z-index: z-index(".components-popover");
 	will-change: transform;
+	@include reset;
 
 	&.is-expanded {
 		position: fixed;
@@ -23,7 +24,6 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	background: $white;
 	box-shadow: $shadow-popover-border-default, $shadow-popover;
 	border-radius: $radius-block-ui;
-	box-sizing: border-box;
 	width: min-content;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast.
