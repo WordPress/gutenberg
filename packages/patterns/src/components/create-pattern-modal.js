@@ -198,6 +198,7 @@ export default function CreatePatternModal( {
 					/>
 					<HStack justify="right">
 						<Button
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => {
 								onClose();
@@ -208,6 +209,7 @@ export default function CreatePatternModal( {
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							aria-disabled={ ! title || isSaving }
