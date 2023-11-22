@@ -73,13 +73,7 @@ function HeaderMenu( { dataView, header } ) {
 	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
 		filter = {
 			field: header.column.columnDef.id,
-			elements: [
-				{
-					value: '',
-					label: __( 'All' ),
-				},
-				...( header.column.columnDef.elements || [] ),
-			],
+			elements: header.column.columnDef.elements || [],
 		};
 	}
 	const isFilterable = !! filter;
@@ -166,11 +160,6 @@ function HeaderMenu( { dataView, header } ) {
 										)[ 0 ] === filter.field
 								);
 
-								// Set the empty item as active if the filter is not set.
-								if ( ! columnFilter && element.value === '' ) {
-									isActive = true;
-								}
-
 								if ( columnFilter ) {
 									const value =
 										Object.values( columnFilter )[ 0 ];
@@ -205,19 +194,15 @@ function HeaderMenu( { dataView, header } ) {
 													}
 												);
 
-											if ( element.value === '' ) {
-												dataView.setColumnFilters(
-													otherFilters
-												);
-											} else {
-												dataView.setColumnFilters( [
-													...otherFilters,
-													{
-														[ filter.field +
-														':in' ]: element.value,
-													},
-												] );
-											}
+											dataView.setColumnFilters( [
+												...otherFilters,
+												{
+													[ filter.field + ':in' ]:
+														isActive
+															? undefined
+															: element.value,
+												},
+											] );
 										} }
 									>
 										{ element.label }

@@ -218,6 +218,8 @@ export function receiveThemeSupports() {
  * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
  * Ignored from documentation as it's internal to the data store.
  *
+ * @deprecated since WordPress 6.5.0. Callers should use `dispatch( 'core' ).receiveRevision` instead.
+ *
  * @ignore
  *
  * @param {number} currentId The post id.
@@ -226,6 +228,13 @@ export function receiveThemeSupports() {
  * @return {Object} Action object.
  */
 export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	deprecated(
+		"wp.data.dispatch( 'core' ).receiveThemeGlobalStyleRevisions()",
+		{
+			since: '6.5.0',
+			alternative: "wp.data.dispatch( 'core' ).receiveRevisions",
+		}
+	);
 	return {
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
 		currentId,
