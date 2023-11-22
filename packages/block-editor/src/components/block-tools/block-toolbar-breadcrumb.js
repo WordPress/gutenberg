@@ -19,7 +19,6 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 
 export default function BlockToolbarBreadcrumb( {
 	clientId,
-	showEmptyBlockSideInserter,
 	__unstableContentRef,
 } ) {
 	const {
@@ -46,10 +45,6 @@ export default function BlockToolbarBreadcrumb( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
 	} );
-
-	if ( showEmptyBlockSideInserter ) {
-		return null;
-	}
 
 	if ( shouldShowBreadcrumb ) {
 		return (
