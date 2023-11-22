@@ -27,17 +27,15 @@ const SettingsHeader = () => {
 	}, [] );
 
 	return (
-		<>
-			<Tabs.TabList>
-				<Tabs.Tab id={ sidebars.document }>
-					{ isTemplateMode ? __( 'Template' ) : documentLabel }
-				</Tabs.Tab>
-				<Tabs.Tab id={ sidebars.block }>
-					{ /* translators: Text label for the Block Settings Sidebar tab. */ }
-					{ __( 'Block' ) }
-				</Tabs.Tab>
-			</Tabs.TabList>
-		</>
+		<Tabs.TabList>
+			<Tabs.Tab id={ sidebars.document }>
+				{ isTemplateMode ? __( 'Template' ) : documentLabel }
+			</Tabs.Tab>
+			<Tabs.Tab id={ sidebars.block }>
+				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
+				{ __( 'Block' ) }
+			</Tabs.Tab>
+		</Tabs.TabList>
 	);
 };
 
