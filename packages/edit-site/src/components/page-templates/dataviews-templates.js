@@ -175,7 +175,7 @@ export default function DataviewsTemplates() {
 						) : (
 							<>
 							<Text variant="muted" aria-hidden="true">
-								{ __( '—' ) }
+								&#8212;
 							</Text>
 							<VisuallyHidden>
 								{ __( 'No description.' ) }
