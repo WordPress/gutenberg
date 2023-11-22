@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+import type {
+	KeyboardEvent,
+	MouseEvent,
+	TouchEvent,
+	FocusEvent as ReactFocusEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -162,7 +167,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur( event: FocusEvent ) {
+	function onBlur( event: ReactFocusEvent ) {
 		if (
 			inputHasValidValue() &&
 			__experimentalValidateInput( incompleteTokenValue )
