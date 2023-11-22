@@ -1,9 +1,4 @@
 /**
- * Browser dependencies
- */
-const { parseInt } = window;
-
-/**
  * Internal dependencies
  */
 import { deepFilterHTML } from './utils';
@@ -50,7 +45,9 @@ export default function msListConverter( node, doc ) {
 	listItem.innerHTML = deepFilterHTML( node.innerHTML, [ msListIgnore ] );
 
 	const matches = /mso-list\s*:[^;]+level([0-9]+)/i.exec( style );
-	let level = matches ? parseInt( matches[ 1 ], 10 ) - 1 || 0 : 0;
+	const { ownerDocument } = node;
+	const { defaultView } = ownerDocument;
+	let level = matches ? defaultView.parseInt( matches[ 1 ], 10 ) - 1 || 0 : 0;
 
 	// Change pointer depending on indentation level.
 	while ( level-- ) {

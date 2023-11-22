@@ -3,11 +3,6 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 
-/**
- * Browser dependencies
- */
-const { atob, File } = window;
-
 export default function imageCorrector( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;
@@ -28,10 +23,12 @@ export default function imageCorrector( node ) {
 		}
 
 		let decoded;
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
 
 		// Can throw DOMException!
 		try {
-			decoded = atob( data );
+			decoded = defaultView.atob( data );
 		} catch ( e ) {
 			node.src = '';
 			return;
@@ -44,7 +41,7 @@ export default function imageCorrector( node ) {
 		}
 
 		const name = type.replace( '/', '.' );
-		const file = new File( [ uint8Array ], name, { type } );
+		const file = new defaultView.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );
 	}
