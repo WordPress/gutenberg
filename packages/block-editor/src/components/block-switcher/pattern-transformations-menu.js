@@ -11,9 +11,7 @@ import {
 	MenuItem,
 	Popover,
 	VisuallyHidden,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 /**
@@ -21,6 +19,13 @@ import {
  */
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
+import { unlock } from '../../lock-unlock';
+
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 function PatternTransformationsMenu( {
 	blocks,
@@ -73,10 +78,10 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 }
 
 function BlockPatternsList( { patterns, onSelect } ) {
-	const composite = useCompositeState();
+	const composite = useCompositeStore();
 	return (
 		<Composite
-			{ ...composite }
+			store={ composite }
 			role="listbox"
 			className="block-editor-block-switcher__preview-patterns-container"
 			aria-label={ __( 'Patterns list' ) }
@@ -86,14 +91,13 @@ function BlockPatternsList( { patterns, onSelect } ) {
 					key={ pattern.name }
 					pattern={ pattern }
 					onSelect={ onSelect }
-					composite={ composite }
 				/>
 			) ) }
 		</Composite>
 	);
 }
 
-function BlockPattern( { pattern, onSelect, composite } ) {
+function BlockPattern( { pattern, onSelect } ) {
 	// TODO check pattern/preview width...
 	const baseClassName =
 		'block-editor-block-switcher__preview-patterns-container';
@@ -104,14 +108,16 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 	return (
 		<div className={ `${ baseClassName }-list__list-item` }>
 			<CompositeItem
-				role="option"
-				as="div"
-				{ ...composite }
-				aria-label={ pattern.title }
-				aria-describedby={
-					pattern.description ? descriptionId : undefined
+				render={
+					<div
+						role="option"
+						aria-label={ pattern.title }
+						aria-describedby={
+							pattern.description ? descriptionId : undefined
+						}
+						className={ `${ baseClassName }-list__item` }
+					/>
 				}
-				className={ `${ baseClassName }-list__item` }
 				onClick={ () => onSelect( pattern.transformedBlocks ) }
 			>
 				<BlockPreview

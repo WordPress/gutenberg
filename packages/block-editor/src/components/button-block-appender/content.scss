@@ -39,8 +39,8 @@
 	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
 	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,
 	// Legacy groups have an inner container so need to be targeted separately
-	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > &,
-	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > & {
+	.block-editor-block-list__block:not(.is-selected) > .is-layout-constrained.wp-block-group__inner-container > &,
+	.block-editor-block-list__block:not(.is-selected) > .is-layout-flow.wp-block-group__inner-container > & {
 		pointer-events: none;
 
 		&::after {

@@ -254,7 +254,7 @@ export function useSettings( ...paths ) {
  *
  * @param {string} path The path to the setting.
  * @return {any} Returns the value defined for the setting.
- * @deprecated 6.4.0 Use useSettings instead.
+ * @deprecated 6.5.0 Use useSettings instead.
  * @example
  * ```js
  * const isEnabled = useSetting( 'typography.dropCap' );
@@ -262,7 +262,7 @@ export function useSettings( ...paths ) {
  */
 export function useSetting( path ) {
 	deprecated( 'wp.blockEditor.useSetting', {
-		since: '6.4',
+		since: '6.5',
 		alternative: 'wp.blockEditor.useSettings',
 		note: 'The new useSettings function can retrieve multiple settings at once, with better performance.',
 	} );
