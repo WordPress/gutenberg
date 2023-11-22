@@ -574,12 +574,50 @@ class WP_Theme_JSON_Gutenberg {
 		'typography'           => 'typography',
 	);
 
-	protected static function schema_per_origin( $schema ) {
-		$schema_per_origin = $schema;
+	/**
+	 * Return the input schema at the root and per origin.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $schema The base schema.
+	 * @return array The schema at the root and per origin.
+	 *
+	 * Example:
+	 * schema_in_root_and_per_origin(
+	 *   array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *   )
+	 * )
+	 *
+	 * Returns:
+	 * array(
+	 *  'fontFamily' => null,
+	 *  'slug' => null,
+	 *  'default' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'blocks' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'theme' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 *  'custom' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 * )
+	 */
+	protected static function schema_in_root_and_per_origin( $schema ) {
+		$schema_in_root_and_per_origin = $schema;
 		foreach ( static::VALID_ORIGINS as $origin ) {
-			$schema_per_origin[ $origin ] = $schema;
+			$schema_in_root_and_per_origin[ $origin ] = $schema;
 		}
-		return $schema_per_origin;
+		return $schema_in_root_and_per_origin;
 	}
 
 	/**
@@ -828,7 +866,7 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
-		$schema['settings']['typography']['fontFamilies'] = static::schema_per_origin( static::FONT_FAMILY_SCHEMA );
+		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
