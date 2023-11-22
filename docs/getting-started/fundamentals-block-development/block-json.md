@@ -46,8 +46,6 @@ The `render` property ([introduced on WordPress 6.1](https://make.wordpress.org/
 
 The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) allows a block to declare variables that store data or content for the block.
 
-[![Open Attributes diagram in excalidraw](https://developer.wordpress.org/files/2023/11/attributes.png)](https://excalidraw.com/#json=pSgCZy8q9GbH7r0oz2fL1,MFCLd6ddQHqi_UqNp5ZSgg "Open Attributes diagram in excalidraw")
-
 _Example: Atributes as defined in block.json_
 ```json
 "attributes": {
@@ -62,6 +60,8 @@ _Example: Atributes as defined in block.json_
 	}
 },
 ```
+
+[![Open Attributes diagram in excalidraw](https://developer.wordpress.org/files/2023/11/attributes.png)](https://excalidraw.com/#json=pSgCZy8q9GbH7r0oz2fL1,MFCLd6ddQHqi_UqNp5ZSgg "Open Attributes diagram in excalidraw")
 
 <div class="callout callout-info">
 Check the <a href="https://developer.wordpress.org/redesign-test/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Attributes API. 
