@@ -47,20 +47,6 @@ export default function SidebarNavigationScreenMain() {
 					<ItemGroup>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
-							path="/navigation"
-							withChevron
-							icon={ navigation }
-						>
-							{ __( 'Navigation' ) }
-						</NavigatorButton>
-						<SidebarNavigationItemGlobalStyles
-							withChevron
-							icon={ styles }
-						>
-							{ __( 'Styles' ) }
-						</SidebarNavigationItemGlobalStyles>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
 							path="/page"
 							withChevron
 							icon={ page }
@@ -82,6 +68,20 @@ export default function SidebarNavigationScreenMain() {
 							icon={ symbol }
 						>
 							{ __( 'Patterns' ) }
+						</NavigatorButton>
+						<SidebarNavigationItemGlobalStyles
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</SidebarNavigationItemGlobalStyles>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					</ItemGroup>
 					<TemplatePartHint />
