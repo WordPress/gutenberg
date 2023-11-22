@@ -28,21 +28,46 @@ const postTypesWithoutParentTemplate = [
 ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
-	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
-		const { getSite, getUnstableBase } = select( coreDataStore );
-		const siteData = getSite();
-		const base = getUnstableBase();
+	const { isRequestingSite, homepageId, url, frontPageTemplateId } =
+		useSelect( ( select ) => {
+			const { getSite, getUnstableBase, getEntityRecords } =
+				select( coreDataStore );
+			const siteData = getSite();
+			const base = getUnstableBase();
+			const templates = getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
+			);
+			let _frontPateTemplateId;
+			if ( templates ) {
+				const frontPageTemplate = templates.find(
+					( t ) => t.slug === 'front-page'
+				);
+				_frontPateTemplateId = frontPageTemplate
+					? frontPageTemplate.id
+					: false;
+			}
 
-		return {
-			isRequestingSite: ! base,
-			homepageId:
-				siteData?.show_on_front === 'page'
-					? siteData.page_on_front
-					: null,
-			url: base?.home,
-		};
-	}, [] );
+			return {
+				isRequestingSite: ! base,
+				homepageId:
+					siteData?.show_on_front === 'page'
+						? siteData.page_on_front
+						: null,
+				url: base?.home,
+				frontPageTemplateId: _frontPateTemplateId,
+			};
+		}, [] );
 
+	/**
+	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
+	 * in order to match the frontend as closely as possible in the site editor.
+	 *
+	 * It is not possible to rely on the server logic because there maybe unsaved changes that impact the template resolution.
+	 */
 	const resolvedTemplateId = useSelect(
 		( select ) => {
 			// If we're rendering a post type that doesn't have a template
@@ -62,6 +87,22 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypeToResolve,
 				postIdToResolve
 			) {
+				// For the front page, we alwayse use the front page template if existing.
+				if (
+					postTypeToResolve === 'page' &&
+					homepageId === postIdToResolve
+				) {
+					// We're still checking whether the front page template exists.
+					// Don't resolve the template yet.
+					if ( frontPageTemplateId === undefined ) {
+						return undefined;
+					}
+
+					if ( !! frontPageTemplateId ) {
+						return frontPageTemplateId;
+					}
+				}
+
 				const editedEntity = getEditedEntityRecord(
 					'postType',
 					postTypeToResolve,
@@ -107,7 +148,14 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				return template?.id;
 			}
 		},
-		[ homepageId, isRequestingSite, url, postId, postType ]
+		[
+			homepageId,
+			isRequestingSite,
+			url,
+			postId,
+			postType,
+			frontPageTemplateId,
+		]
 	);
 
 	const context = useMemo( () => {
