@@ -45,18 +45,12 @@ test.describe( 'Block Renaming', () => {
 				name: 'Block navigation structure',
 			} );
 
-			// Create a two blocks on the page.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/group',
 				attributes: { content: 'First Paragraph' },
 			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Second Paragraph' },
-			} );
 
-			// Multiselect via keyboard.
-			await pageUtils.pressKeys( 'primary+a' );
+			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
 			// Convert to a Group block which supports renaming.
@@ -209,18 +203,11 @@ test.describe( 'Block Renaming', () => {
 			page,
 			pageUtils,
 		} ) => {
-			// Create a two blocks on the page.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'First Paragraph' },
-			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Second Paragraph' },
+				name: 'core/group',
 			} );
 
-			// Multiselect via keyboard.
-			await pageUtils.pressKeys( 'primary+a' );
+			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
 			// Convert to a Group block which supports renaming.
