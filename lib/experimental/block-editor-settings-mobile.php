@@ -23,6 +23,10 @@ if ( ! function_exists( 'keep_supported_block_editor_settings_mobile' ) ) {
 		$result = array();
 
 		foreach ( $allow_list_array as $key => $value ) {
+			if ( ! array_key_exists( $key, $initial_array ) ) {
+				continue;
+			}
+
 			$initial_value = $initial_array[ $key ];
 
 			if ( array_key_exists( $key, $initial_array ) ) {
