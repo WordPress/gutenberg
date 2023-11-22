@@ -1,0 +1,136 @@
+.compress-image_container {
+	margin-bottom: $grid-unit-30;
+}
+
+.compress-image__thumbnail {
+	width: 20px;
+	min-width: 20px !important;
+	aspect-ratio: 1;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+// Image compare slider styles.
+.block-editor-compare-images-slider__container {
+	height: 400px;
+	max-height: 50vh;
+	min-width: 550px;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	align-content: flex-end;
+
+	> div {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 50%;
+		overflow: hidden;
+		display: flex;
+		align-items: flex-end;
+	}
+
+	.block-editor-compare-images-slider_image {
+		display: block;
+		user-select: none;
+		box-sizing: border-box;
+		height: 100%;
+		width: 100%;
+		max-width: initial;
+		pointer-events: none;
+		object-fit: cover;
+		flex: none;
+	}
+
+	.block-editor-compare-images-slider__top-image {
+		z-index: 10;
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 5px;
+			height: 100%;
+			border-right: 5px solid $white;
+			z-index: 20;
+		}
+	}
+
+	// This will act as the controller for the slider.
+	.block-editor-compare-images-slider__handle {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		width: 0;
+		height: 0;
+		// width: 20px;
+		// height: 80px;
+		// border: 8px solid #FFF;
+		z-index: 30;
+		pointer-events: none;
+		margin-left: -2px;
+		overflow: visible;
+
+		&::before {
+			color: $white;
+			content: "";
+			position: absolute;
+			right: -20px;
+			height: 10px;
+			width: 10px;
+			border-bottom: solid 3px currentColor;
+			border-right: solid 3px currentColor;
+			transform: rotate(-45deg);
+			z-index: 99;
+		}
+
+		&::after {
+			color: $white;
+			content: "";
+			position: absolute;
+			left: -20px;
+			height: 10px;
+			width: 10px;
+			border-left: solid 3px currentColor;
+			border-top: solid 3px currentColor;
+			transform: rotate(-45deg);
+			z-index: 99;
+		}
+	}
+
+	input[type="range"] {
+		margin: 0;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		height: 100%;
+		width: 100%;
+		background: transparent;
+		padding: 0;
+		border: none;
+		z-index: 20;
+		-webkit-appearance: none;
+		appearance: none;
+		&:focus {
+			outline: none;
+		}
+	}
+	input[type="range"],
+	input[type="range"]::-webkit-slider-runnable-track,
+	input[type="range"]::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	input[type="range"]::-webkit-slider-thumb {
+		width: 20px;
+		height: 500px;
+		background-color: transparent;
+		cursor: ew-resize;
+		display: block;
+		border: none;
+	}
+}

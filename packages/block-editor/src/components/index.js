@@ -42,6 +42,7 @@ export {
 } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
+export { default as CompressMedia } from './compress-media';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalDateFormatPicker } from './date-format-picker';
 export { default as __experimentalDuotoneControl } from './duotone-control';

@@ -26,6 +26,7 @@ import {
 	store as blockEditorStore,
 	useSettings,
 	BlockAlignmentControl,
+	CompressMedia,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
@@ -223,6 +224,7 @@ export default function Image( {
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	const canUploadMedia = !! mediaUpload;
+	const isExternal = isExternalImage( id, url );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -614,6 +616,12 @@ export default function Image( {
 						</>
 					}
 				/>
+				{ ! isExternal && (
+					<CompressMedia
+						image={ image }
+						onUploadImage={ onSelectImage }
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);

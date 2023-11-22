@@ -326,6 +326,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### CompressMedia
+
+Undocumented declaration.
+
 ### ContrastChecker
 
 _Related_
