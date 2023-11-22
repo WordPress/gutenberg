@@ -1,5 +1,17 @@
 == Changelog ==
 
+= 17.0.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+
+- PostCSS style transformation: fail gracefully instead of throwing an error (https://github.com/WordPress/gutenberg/pull/56093)
+
+
+
 = 17.0.2 =
 
 
