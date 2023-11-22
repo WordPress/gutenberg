@@ -28,7 +28,7 @@
 	border-color: inherit;
 	border-collapse: collapse;
 	position: relative;
-	
+
 	a {
 		text-decoration: none;
 	}
@@ -47,12 +47,12 @@
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;
-		
+
 		&:last-child {
 			border-bottom: 0;
 		}
 	}
-	thead {		
+	thead {
 		tr {
 			border: 0;
 		}
