@@ -41,6 +41,7 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
@@ -86,6 +87,7 @@ export default function DataViews( {
 					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
+					getItemId={ getItemId }
 					isLoading={ isLoading }
 				/>
 				<Pagination

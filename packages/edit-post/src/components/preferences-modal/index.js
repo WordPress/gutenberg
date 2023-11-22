@@ -70,7 +70,7 @@ export default function EditPostPreferencesModal() {
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', false );
+		setPreference( 'core/edit-post', 'fixedToolbar', true );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
