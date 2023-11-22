@@ -15,6 +15,7 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -38,10 +39,7 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
 
 const BlockToolbar = ( {
 	hideDragHandle,
-	focusOnMount,
 	isFixed, // TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
-	__experimentalInitialIndex,
-	__experimentalOnIndexChange,
 	variant,
 } ) => {
 	const {
@@ -50,11 +48,13 @@ const BlockToolbar = ( {
 		blockEditingMode,
 		blockType,
 		hasParents,
+		isEmptyDefaultBlock,
 		isValid,
 		isVisual,
 		showParentSelector,
 	} = useSelect( ( select ) => {
 		const {
+			getBlock,
 			getBlockName,
 			getBlockMode,
 			getBlockParents,
@@ -79,6 +79,9 @@ const BlockToolbar = ( {
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 
 			hasParents: parents.length,
+			isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
+				getBlock( selectedBlockClientId ) || {}
+			),
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
 			),
@@ -116,6 +119,7 @@ const BlockToolbar = ( {
 	const hasAnyBlockControls = useHasAnyBlockControls();
 
 	if (
+		isEmptyDefaultBlock ||
 		! isToolbarEnabled ||
 		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
 	) {
@@ -139,7 +143,6 @@ const BlockToolbar = ( {
 
 	return (
 		<NavigableToolbar
-			focusOnMount={ focusOnMount }
 			focusEditorOnEscape
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
@@ -148,8 +151,6 @@ const BlockToolbar = ( {
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }
-			__experimentalInitialIndex={ __experimentalInitialIndex }
-			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
