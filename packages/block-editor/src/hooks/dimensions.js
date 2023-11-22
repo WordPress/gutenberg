@@ -133,6 +133,5 @@ export function DimensionsPanel( props ) {
 export function useCustomSides() {
 	deprecated( 'wp.blockEditor.__experimentalUseCustomSides', {
 		since: '6.3',
-		version: '6.4',
 	} );
 }

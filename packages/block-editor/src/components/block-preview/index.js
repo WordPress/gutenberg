@@ -33,7 +33,6 @@ export function BlockPreview( {
 		minHeight = __experimentalMinHeight;
 		deprecated( 'The __experimentalMinHeight prop', {
 			since: '6.2',
-			version: '6.4',
 			alternative: 'minHeight',
 		} );
 	}
@@ -44,7 +43,6 @@ export function BlockPreview( {
 		];
 		deprecated( 'The __experimentalPadding prop of BlockPreview', {
 			since: '6.2',
-			version: '6.4',
 			alternative: 'additionalStyles',
 		} );
 	}

@@ -31,7 +31,6 @@ import * as children from './children';
 function isNodeOfType( node, type ) {
 	deprecated( 'wp.blocks.node.isNodeOfType', {
 		since: '6.1',
-		version: '6.3',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
 
@@ -71,7 +70,6 @@ export function getNamedNodeMapAsObject( nodeMap ) {
 export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'wp.richText.create',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
@@ -106,7 +104,6 @@ export function fromDOM( domNode ) {
 export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'wp.richText.toHTMLString',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
@@ -125,7 +122,6 @@ export function toHTML( node ) {
 export function matcher( selector ) {
 	deprecated( 'wp.blocks.node.matcher', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'html source',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );

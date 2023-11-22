@@ -15,7 +15,6 @@ export const __unstableUseClipboardHandler = () => {
 	deprecated( '__unstableUseClipboardHandler', {
 		alternative: 'BlockCanvas or WritingFlow',
 		since: '6.4',
-		version: '6.7',
 	} );
 	return useClipboardHandler();
 };
@@ -28,7 +27,6 @@ export default function CopyHandler( props ) {
 	deprecated( 'CopyHandler', {
 		alternative: 'BlockCanvas or WritingFlow',
 		since: '6.4',
-		version: '6.7',
 	} );
 	return <div { ...props } ref={ useClipboardHandler() } />;
 }

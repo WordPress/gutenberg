@@ -1290,7 +1290,6 @@ export function stopDraggingBlocks() {
 export function enterFormattedText() {
 	deprecated( 'wp.data.dispatch( "core/block-editor" ).enterFormattedText', {
 		since: '6.1',
-		version: '6.3',
 	} );
 	return {
 		type: 'DO_NOTHING',
@@ -1307,7 +1306,6 @@ export function enterFormattedText() {
 export function exitFormattedText() {
 	deprecated( 'wp.data.dispatch( "core/block-editor" ).exitFormattedText', {
 		since: '6.1',
-		version: '6.3',
 	} );
 	return {
 		type: 'DO_NOTHING',

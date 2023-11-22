@@ -42,7 +42,6 @@ export function getSerializeCapableElement( children ) {
 function getChildrenArray( children ) {
 	deprecated( 'wp.blocks.children.getChildrenArray', {
 		since: '6.1',
-		version: '6.3',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
 
@@ -63,7 +62,6 @@ function getChildrenArray( children ) {
 export function concat( ...blockNodes ) {
 	deprecated( 'wp.blocks.children.concat', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'wp.richText.concat',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
@@ -101,7 +99,6 @@ export function concat( ...blockNodes ) {
 export function fromDOM( domNodes ) {
 	deprecated( 'wp.blocks.children.fromDOM', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'wp.richText.create',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
@@ -128,7 +125,6 @@ export function fromDOM( domNodes ) {
 export function toHTML( children ) {
 	deprecated( 'wp.blocks.children.toHTML', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'wp.richText.toHTMLString',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
@@ -149,7 +145,6 @@ export function toHTML( children ) {
 export function matcher( selector ) {
 	deprecated( 'wp.blocks.children.matcher', {
 		since: '6.1',
-		version: '6.3',
 		alternative: 'html source',
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );

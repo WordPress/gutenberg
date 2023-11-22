@@ -397,7 +397,6 @@ function RichTextSwitcher( props, ref ) {
 	if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
 			since: '6.1',
-			version: '6.3',
 			alternative: 'value prop as string',
 			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 		} );

@@ -85,7 +85,6 @@ export function __experimentalTearDownEditor() {
 export function resetPost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).resetPost", {
 		since: '6.0',
-		version: '6.3',
 		alternative: 'Initialize the editor with the setupEditorState action',
 	} );
 	return { type: 'DO_NOTHING' };
@@ -240,7 +239,6 @@ export const savePost =
 export function refreshPost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
 		since: '6.0',
-		version: '6.3',
 		alternative: 'Use the core entities store instead',
 	} );
 	return { type: 'DO_NOTHING' };
@@ -347,7 +345,6 @@ export const undo =
 export function createUndoLevel() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
 		since: '6.0',
-		version: '6.3',
 		alternative: 'Use the core entities store instead',
 	} );
 	return { type: 'DO_NOTHING' };
@@ -560,7 +557,6 @@ const getBlockEditorAction =
 			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
-			version: '6.2',
 		} );
 		registry.dispatch( blockEditorStore )[ name ]( ...args );
 	};

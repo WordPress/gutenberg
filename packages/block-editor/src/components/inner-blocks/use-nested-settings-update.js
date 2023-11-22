@@ -123,7 +123,6 @@ export default function useNestedSettingsUpdate(
 			deprecated( '__experimentalDefaultBlock', {
 				alternative: 'defaultBlock',
 				since: '6.3',
-				version: '6.4',
 			} );
 			newSettings.defaultBlock = __experimentalDefaultBlock;
 		}
@@ -136,7 +135,6 @@ export default function useNestedSettingsUpdate(
 			deprecated( '__experimentalDirectInsert', {
 				alternative: 'directInsert',
 				since: '6.3',
-				version: '6.4',
 			} );
 			newSettings.directInsert = __experimentalDirectInsert;
 		}
