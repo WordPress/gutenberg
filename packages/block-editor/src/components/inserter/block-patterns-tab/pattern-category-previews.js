@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import usePatternsState from '../hooks/use-patterns-state';
-import BlockPatternList from '../../block-patterns-list';
+import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
@@ -159,7 +159,7 @@ export function PatternCategoryPreviews( {
 			</VStack>
 
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternList
+				<BlockPatternsList
 					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }
