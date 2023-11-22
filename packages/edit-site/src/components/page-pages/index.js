@@ -125,7 +125,7 @@ export default function PagePages() {
 				filter.field === 'status' &&
 				filter.operator === OPERATOR_IN
 			) {
-				filters.status = filter.value;
+				filters.status = filter.value.join( ',' );
 			}
 			if (
 				filter.field === 'author' &&
