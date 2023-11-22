@@ -176,6 +176,9 @@ function BlockPatternsList(
 	const { setActiveId } = compositeStore;
 
 	useEffect( () => {
+		// We reset the active composite item whenever the
+		// available patterns change, to make sure that
+		// focus is put back to the start.
 		setActiveId( undefined );
 	}, [ setActiveId, shownPatterns, blockPatterns ] );
 
