@@ -34,6 +34,11 @@
 			height: 1px;
 		}
 
+		> svg {
+			width: $button-size-small;
+			height: $button-size-small;
+		}
+
 		&.is-active {
 			svg,
 			.dashicon {
