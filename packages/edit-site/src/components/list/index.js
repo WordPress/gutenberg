@@ -51,7 +51,7 @@ export default function List() {
 		[ templateType ]
 	);
 
-	useTitle( postType, postType );
+	useTitle( postType?.labels?.name );
 
 	// `postType` could load in asynchronously. Only provide the detailed region labels if
 	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.

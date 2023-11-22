@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function useTitle( title, accessibleTitle ) {
+export default function useTitle( title ) {
 	const location = useLocation();
 	const siteTitle = useSelect(
 		( select ) =>
@@ -39,7 +39,7 @@ export default function useTitle( title, accessibleTitle ) {
 			// @see https://github.com/WordPress/wordpress-develop/blob/94849898192d271d533e09756007e176feb80697/src/wp-admin/admin-header.php#L67-L68
 			const formattedTitle = sprintf(
 				/* translators: Admin screen title. 1: Admin screen name, 2: Network or site name. */
-				__( '%1$s ‹ %2$s — WordPress' ),
+				__( '%1$s ‹ %2$s ‹ Editor — WordPress' ),
 				decodeEntities( title ),
 				decodeEntities( siteTitle )
 			);
@@ -47,7 +47,7 @@ export default function useTitle( title, accessibleTitle ) {
 			document.title = formattedTitle;
 
 			// Announce title on route change for screen readers.
-			speak( accessibleTitle || formattedTitle, 'assertive' );
+			speak( title, 'assertive' );
 		}
-	}, [ title, accessibleTitle, siteTitle, location ] );
+	}, [ title, siteTitle, location ] );
 }

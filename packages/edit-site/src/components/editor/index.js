@@ -167,16 +167,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const postWithTemplate = !! context?.postId;
 
 	let title;
-	let accessibleTitle;
 	if ( hasLoadedPost ) {
 		title = sprintf(
-			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
-			__( '%1$s ‹ %2$s ‹ Editor' ),
-			getTitle(),
-			POST_TYPE_LABELS[ editedPostType ] ??
-				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
-		);
-		accessibleTitle = sprintf(
 			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s' ),
 			getTitle(),
@@ -187,7 +179,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URLQueryController> from double-announcing.
-	useTitle( hasLoadedPost && title, accessibleTitle );
+	useTitle( hasLoadedPost && title );
 
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
