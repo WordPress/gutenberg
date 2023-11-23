@@ -18,7 +18,7 @@ export function useEditedPostContext() {
 	);
 }
 
-export function useIsPostsPageOrFrontPage() {
+export function useAllowSwitchingTemplates() {
 	const { postId } = useEditedPostContext();
 	return useSelect(
 		( select ) => {
@@ -35,7 +35,7 @@ export function useIsPostsPageOrFrontPage() {
 			const isFrontPage =
 				+postId === siteSettings?.page_on_front &&
 				templates?.some( ( { slug } ) => slug === 'front-page' );
-			return isPostsPage || isFrontPage;
+			return ! isPostsPage && ! isFrontPage;
 		},
 		[ postId ]
 	);
@@ -58,19 +58,18 @@ function useTemplates() {
 
 export function useAvailableTemplates() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPageOrFrontPage = useIsPostsPageOrFrontPage();
+	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const templates = useTemplates();
 	return useMemo(
 		() =>
-			// The posts page template cannot be changed.
-			! isPostsPageOrFrontPage &&
+			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
 					template.is_custom &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),
-		[ templates, currentTemplateSlug, isPostsPageOrFrontPage ]
+		[ templates, currentTemplateSlug, allowSwitchingTemplate ]
 	);
 }
 

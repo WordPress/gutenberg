@@ -10,18 +10,18 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import {
+	useAllowSwitchingTemplates,
 	useCurrentTemplateSlug,
 	useEditedPostContext,
-	useIsPostsPageOrFrontPage,
 } from './hooks';
 
 export default function ResetDefaultTemplate( { onClick } ) {
 	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPageOrFrontPage = useIsPostsPageOrFrontPage();
+	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const { postType, postId } = useEditedPostContext();
 	const { editEntityRecord } = useDispatch( coreStore );
 	// The default template in a post is indicated by an empty string.
-	if ( ! currentTemplateSlug || isPostsPageOrFrontPage ) {
+	if ( ! currentTemplateSlug || ! allowSwitchingTemplate ) {
 		return null;
 	}
 	return (
