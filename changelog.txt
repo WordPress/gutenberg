@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 17.1.1 =
+
+# Changelog
+
+## Bug Fixes
+
+### Block Library
+
+Fix fatal error when calling undefined block library function. #56459
+
+
 = 17.1.0 =
 
 
