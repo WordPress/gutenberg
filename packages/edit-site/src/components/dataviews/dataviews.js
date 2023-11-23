@@ -4,6 +4,7 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	Popover,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
@@ -17,6 +18,7 @@ import Filters from './filters';
 import Search from './search';
 import { ViewGrid } from './view-grid';
 import { ViewSideBySide } from './view-side-by-side';
+import BulkActions from './bulk-actions';
 
 // To do: convert to view type registry.
 export const viewTypeSupportsMap = {
@@ -45,6 +47,9 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
+	selection,
+	setSelection,
+	bulkActions,
 } ) {
 	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
@@ -89,12 +94,23 @@ export default function DataViews( {
 					data={ data }
 					getItemId={ getItemId }
 					isLoading={ isLoading }
+					selection={ selection }
+					setSelection={ setSelection }
 				/>
+
+				<div>
 				<Pagination
 					view={ view }
 					onChangeView={ onChangeView }
 					paginationInfo={ paginationInfo }
 				/>
+					<BulkActions
+						data={ data }
+						bulkActions={ bulkActions }
+						selection={ selection }
+						setSelection={ setSelection }
+					/>
+				</div>
 			</VStack>
 		</div>
 	);
