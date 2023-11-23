@@ -26,6 +26,15 @@ import {
  */
 import Page from '../page';
 import Link from '../routes/link';
+import {
+	DataViews,
+	VIEW_LAYOUTS,
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+} from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,
@@ -139,6 +148,11 @@ export default function PagePages() {
 				filter.operator === OPERATOR_IN
 			) {
 				filters.author = filter.value;
+			} else if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_NOT_IN
+			) {
+				filters.author_exclude = filter.value;
 			}
 		} );
 		// We want to provide a different default item for the status filter
