@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 17.1.2 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+
+- PostCSS style transformation: fail gracefully instead of throwing an error (https://github.com/WordPress/gutenberg/pull/56093)
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@zaguiini
+
+
 = 17.1.1 =
 
 # Changelog
