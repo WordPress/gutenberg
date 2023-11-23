@@ -113,14 +113,14 @@ test.describe( 'Block Toolbar', () => {
 		} );
 	} );
 
-	test( 'should focus with Shift+Tab', async ( {
+	test( 'should focus with alt+F10', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block Tools' } )
@@ -183,8 +183,7 @@ test.describe( 'Block Toolbar', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Paragraph' );
 
-		// shift + tab
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		// check focus is within the block toolbar
 		const blockToolbarParagraphButton = page.getByRole( 'button', {
 			name: 'Paragraph',
@@ -199,7 +198,7 @@ test.describe( 'Block Toolbar', () => {
 		await pageUtils.setBrowserViewport( 'small' );
 
 		// TEST: Small screen toolbar without fixed toolbar setting should be the first tabstop before the editor
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		// check focus is within the block toolbar
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
@@ -229,7 +228,7 @@ test.describe( 'Block Toolbar', () => {
 
 		// TEST: Small screen toolbar with fixed toolbar setting should be the first tabstop before the editor. Even though the fixed toolbar setting is on, it should not render within the header since it's visually after it.
 		await pageUtils.setBrowserViewport( 'small' );
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		// check focus is within the block toolbar
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );

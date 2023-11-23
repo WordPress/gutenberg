@@ -33,7 +33,7 @@ test.describe( 'Site editor writing flow', () => {
 		await editor.selectBlocks( siteTitleBlock );
 
 		// Shift tab to the toolbar.
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		const blockToolbarButton = page.locator(
 			'role=toolbar[name="Block tools"i] >> role=button[name="Site Title"i]'
 		);
@@ -64,7 +64,8 @@ test.describe( 'Site editor writing flow', () => {
 		await editor.selectBlocks( siteTaglineBlock );
 
 		// Tab to the inspector, tabbing three times to go past the two resize handles.
-		await pageUtils.pressKeys( 'Tab', { times: 3 } );
+		await pageUtils.pressKeys( 'ctrl+`' );
+		await pageUtils.pressKeys( 'Tab', { times: 4 } );
 		const inspectorTemplateTab = page.locator(
 			'role=region[name="Editor settings"i] >> role=button[name="Template part"i]'
 		);

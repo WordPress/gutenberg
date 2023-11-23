@@ -232,11 +232,15 @@ class KeyboardNavigableBlocks {
 
 		await expect( activeElement ).toHaveText( paragraphText );
 
+		await this.pageUtils.pressKeys( 'ctrl+`' );
+		await this.expectLabelToHaveFocus( 'Editor settings' );
 		await this.page.keyboard.press( 'Tab' );
 		await this.expectLabelToHaveFocus( 'Post' );
 
-		// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
-		await this.pageUtils.pressKeys( 'shift+Tab' );
+		await this.pageUtils.pressKeys( 'shift+ctrl+`' );
+		await this.expectLabelToHaveFocus( 'Editor content' );
+		await this.page.keyboard.press( 'Tab' );
+		await this.page.keyboard.press( 'Tab' );
 		await this.expectLabelToHaveFocus( 'Block: Paragraph' );
 	}
 

@@ -148,7 +148,7 @@ test.describe( 'Image', () => {
 
 		// Add caption and navigate to inline toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
