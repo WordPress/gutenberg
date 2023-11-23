@@ -18,13 +18,19 @@ export function useEditedPostContext() {
 	);
 }
 
-export function useIsPostsPage() {
+export function useIsPostsPageOrFrontPage() {
 	const { postId } = useEditedPostContext();
 	return useSelect(
-		( select ) =>
-			+postId ===
-			select( coreStore ).getEntityRecord( 'root', 'site' )
-				?.page_for_posts,
+		( select ) => {
+			const siteSettings = select( coreStore ).getEntityRecord(
+				'root',
+				'site'
+			);
+			return [
+				siteSettings?.page_for_posts,
+				siteSettings?.page_on_front,
+			].includes( +postId );
+		},
 		[ postId ]
 	);
 }
@@ -46,19 +52,19 @@ function useTemplates() {
 
 export function useAvailableTemplates() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPage = useIsPostsPage();
+	const isPostsPageOrFrontPage = useIsPostsPageOrFrontPage();
 	const templates = useTemplates();
 	return useMemo(
 		() =>
 			// The posts page template cannot be changed.
-			! isPostsPage &&
+			! isPostsPageOrFrontPage &&
 			templates?.filter(
 				( template ) =>
 					template.is_custom &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),
-		[ templates, currentTemplateSlug, isPostsPage ]
+		[ templates, currentTemplateSlug, isPostsPageOrFrontPage ]
 	);
 }
 
