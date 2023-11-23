@@ -30,6 +30,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'allowedBlockTypes',
 	'allowRightClickOverrides',
 	'blockInspectorTabs',
+	'blockPreview',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
 	'canLockBlocks',
