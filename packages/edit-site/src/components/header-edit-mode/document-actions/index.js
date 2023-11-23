@@ -24,8 +24,8 @@ import {
 	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { useState, useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -56,19 +56,18 @@ export default function DocumentActions() {
 }
 
 function PageDocumentActions() {
-	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+	const { isEditingPage, hasResolved, isFound, title } = useSelect(
 		( select ) => {
-			const {
-				hasPageContentFocus: _hasPageContentFocus,
-				getEditedPostContext,
-			} = select( editSiteStore );
+			const { getEditedPostContext } = select( editSiteStore );
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
+			const { getRenderingMode } = select( editorStore );
 			const context = getEditedPostContext();
 			const queryArgs = [ 'postType', context.postType, context.postId ];
 			const page = getEditedEntityRecord( ...queryArgs );
 			return {
-				hasPageContentFocus: _hasPageContentFocus(),
+				isEditingPage:
+					!! context.postId && getRenderingMode() !== 'template-only',
 				hasResolved: hasFinishedResolution(
 					'getEditedEntityRecord',
 					queryArgs
@@ -80,16 +79,7 @@ function PageDocumentActions() {
 		[]
 	);
 
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
-
-	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
-	const prevHasPageContentFocus = useRef( false );
-	useEffect( () => {
-		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
-			setHasEditedTemplate( true );
-		}
-		prevHasPageContentFocus.current = hasPageContentFocus;
-	}, [ hasPageContentFocus ] );
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -103,19 +93,15 @@ function PageDocumentActions() {
 		);
 	}
 
-	return hasPageContentFocus ? (
-		<BaseDocumentActions
-			className={ classnames( 'is-page', {
-				'is-animated': hasEditedTemplate,
-			} ) }
-			icon={ pageIcon }
-		>
+	// Todo: check animation
+	return isEditingPage ? (
+		<BaseDocumentActions className="is-page" icon={ pageIcon }>
 			{ title }
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
 			className="is-animated"
-			onBack={ () => setHasPageContentFocus( true ) }
+			onBack={ () => setRenderingMode( 'template-locked' ) }
 		/>
 	);
 }

@@ -549,6 +549,20 @@ export function updateEditorSettings( settings ) {
 }
 
 /**
+ * Returns an action used to set the rendering mode of the post editor.
+ *
+ * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+ *
+ * @return {Object} Action object
+ */
+export function setRenderingMode( mode ) {
+	return {
+		type: 'SET_RENDERING_MODE',
+		mode,
+	};
+}
+
+/**
  * Backward compatibility
  */
 

@@ -501,6 +501,18 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
+### getRenderingMode
+
+Returns the post editor's rendering mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string?`: Rendering mode.
+
 ### getSelectedBlock
 
 _Related_
@@ -1240,6 +1252,18 @@ _Parameters_
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+### setRenderingMode
+
+Returns an action used to set the rendering mode of the post editor.
+
+_Parameters_
+
+-   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+
+_Returns_
+
+-   `Object`: Action object
 
 ### setTemplateValidity
 

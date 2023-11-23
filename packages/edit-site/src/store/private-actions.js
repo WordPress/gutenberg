@@ -3,6 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Action that switches the canvas mode.
@@ -11,7 +12,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 export const setCanvasMode =
 	( mode ) =>
-	( { registry, dispatch, select } ) => {
+	( { registry, dispatch } ) => {
 		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
@@ -29,10 +30,6 @@ export const setCanvasMode =
 				.get( 'core/edit-site', 'distractionFree' )
 		) {
 			dispatch.setIsListViewOpened( true );
-		}
-		// Switch focus away from editing the template when switching to view mode.
-		if ( mode === 'view' && select.isPage() ) {
-			dispatch.setHasPageContentFocus( true );
 		}
 	};
 
@@ -62,9 +59,13 @@ export const setEditorCanvasContainerView =
  */
 export const setPageContentFocusType =
 	( pageContentFocusType ) =>
-	( { dispatch } ) => {
-		dispatch( {
-			type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
-			pageContentFocusType,
-		} );
+	( { registry } ) => {
+		registry
+			.dispatch( editorStore )
+			.setRenderingMode(
+				! pageContentFocusType ||
+					pageContentFocusType === 'disableTemplate'
+					? 'template-locked'
+					: 'post-only'
+			);
 	};
