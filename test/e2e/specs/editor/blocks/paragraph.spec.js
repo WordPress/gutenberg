@@ -83,9 +83,7 @@ test.describe( 'Paragraph', () => {
 			await expect( draggingUtils.dropZone ).toBeVisible();
 			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
-			await drop(
-				editor.canvas.locator( '[data-type="core/paragraph"]' )
-			);
+			await drop();
 
 			const imageBlock = editor.canvas.locator(
 				'role=document[name="Block: Image"i]'

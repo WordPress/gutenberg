@@ -6,11 +6,61 @@ import {
 	MenuGroup,
 	MenuItem,
 	Button,
+	Modal,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+
+function PrimaryActionTrigger( { action, onClick } ) {
+	return (
+		<Button
+			label={ action.label }
+			icon={ action.icon }
+			isDestructive={ action.isDestructive }
+			size="compact"
+			onClick={ onClick }
+		/>
+	);
+}
+
+function SecondaryActionTrigger( { action, onClick } ) {
+	return (
+		<MenuItem onClick={ onClick } isDestructive={ action.isDestructive }>
+			{ action.label }
+		</MenuItem>
+	);
+}
+
+function ActionWithModal( { action, item, ActionTrigger } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const actionTriggerProps = {
+		action,
+		onClick: () => setIsModalOpen( true ),
+	};
+	const { RenderModal, hideModalHeader } = action;
+	return (
+		<>
+			<ActionTrigger { ...actionTriggerProps } />
+			{ isModalOpen && (
+				<Modal
+					title={ ! hideModalHeader && action.label }
+					__experimentalHideHeader={ !! hideModalHeader }
+					onRequestClose={ () => {
+						setIsModalOpen( false );
+					} }
+					overlayClassName="dataviews-action-modal"
+				>
+					<RenderModal
+						item={ item }
+						closeModal={ () => setIsModalOpen( false ) }
+					/>
+				</Modal>
+			) }
+		</>
+	);
+}
 
 export default function ItemActions( { item, actions } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
@@ -37,29 +87,54 @@ export default function ItemActions( { item, actions } ) {
 	return (
 		<HStack justify="flex-end">
 			{ !! primaryActions.length &&
-				primaryActions.map( ( action ) => (
-					<Button
-						label={ action.label }
-						key={ action.id }
-						icon={ action.icon }
-						onClick={ () => action.perform( item ) }
-						isDestructive={ action.isDestructive }
-						size="compact"
-					/>
-				) ) }
+				primaryActions.map( ( action ) => {
+					if ( !! action.RenderModal ) {
+						return (
+							<ActionWithModal
+								key={ action.id }
+								action={ action }
+								item={ item }
+								ActionTrigger={ PrimaryActionTrigger }
+							/>
+						);
+					}
+					return (
+						<PrimaryActionTrigger
+							key={ action.id }
+							action={ action }
+							item={ item }
+							onClick={ () => action.callback( item ) }
+						/>
+					);
+				} ) }
 			{ !! secondaryActions.length && (
 				<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
 					{ () => (
 						<MenuGroup>
-							{ secondaryActions.map( ( action ) => (
-								<MenuItem
-									key={ action.id }
-									onClick={ () => action.perform( item ) }
-									isDestructive={ action.isDestructive }
-								>
-									{ action.label }
-								</MenuItem>
-							) ) }
+							{ secondaryActions.map( ( action ) => {
+								if ( !! action.RenderModal ) {
+									return (
+										<ActionWithModal
+											key={ action.id }
+											action={ action }
+											item={ item }
+											ActionTrigger={
+												SecondaryActionTrigger
+											}
+										/>
+									);
+								}
+								return (
+									<SecondaryActionTrigger
+										key={ action.id }
+										action={ action }
+										item={ item }
+										onClick={ () =>
+											action.callback( item )
+										}
+									/>
+								);
+							} ) }
 						</MenuGroup>
 					) }
 				</DropdownMenu>
