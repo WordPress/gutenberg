@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,6 +22,25 @@ import type {
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
 
+function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
+	const isValueEmpty = Array.isArray( value )
+		? value.length === 0
+		: value === undefined || value === null;
+
+	if ( isValueEmpty ) {
+		return __( 'Select an item' );
+	}
+
+	if ( Array.isArray( value ) ) {
+		return value.length === 1
+			? value[ 0 ]
+			: // translators: %s: number of items selected (it will always be 2 or more items)
+			  sprintf( __( '%s items selected' ), value.length );
+	}
+
+	return value;
+}
+
 export function CustomSelect( props: CustomSelectProps ) {
 	const {
 		children,
@@ -30,7 +49,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 		onChange,
 		size = 'default',
 		value,
-		renderSelectedValue,
+		renderSelectedValue = defaultRenderSelectedValue,
 	} = props;
 
 	const store = Ariakit.useSelectStore( {
@@ -51,9 +70,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 				hasCustomRenderProp={ !! renderSelectedValue }
 				store={ store }
 			>
-				{ renderSelectedValue
-					? renderSelectedValue( currentValue )
-					: currentValue ?? __( 'Select an item' ) }
+				{ renderSelectedValue( currentValue ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
