@@ -135,7 +135,7 @@ describe( 'useSettings', () => {
 		const result = runHook( () => useSetting( 'layout.contentSize' ) );
 		expect( result ).toBe( '840px' );
 		expect( console ).toHaveWarnedWith(
-			'wp.blockEditor.useSetting is deprecated since version 6.4. Please use wp.blockEditor.useSettings instead.'
+			'wp.blockEditor.useSetting is deprecated since version 6.5. Please use wp.blockEditor.useSettings instead.'
 		);
 	} );
 } );

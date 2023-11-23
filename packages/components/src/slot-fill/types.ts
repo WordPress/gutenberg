@@ -36,15 +36,21 @@ export type SlotComponentProps =
 
 			/**
 			 * A function that returns nodes to be rendered.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Supported only when `bubblesVirtually` is `false`.
 			 */
 			children?: never;
 
 			/**
-			 * className.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			className?: string;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: React.CSSProperties;
 	  } )
 	| ( SlotPropBase & {
 			/**
@@ -56,15 +62,21 @@ export type SlotComponentProps =
 
 			/**
 			 * A function that returns nodes to be rendered.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Supported only when `bubblesVirtually` is `false`.
 			 */
 			children?: ( fills: ReactNode ) => ReactNode;
 
 			/**
-			 * className.
-			 * Not supported when `bubblesVirtually` is false.
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			className?: never;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: never;
 	  } );
 
 export type FillComponentProps = {
