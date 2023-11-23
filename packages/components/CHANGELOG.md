@@ -2,13 +2,14 @@
 
 ## Unreleased
 
-### Enhancements 
+### Enhancements
 
 -   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
 
 ### Experimental
 
 -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+-   `DropdownMenuV2`: Design tweaks ([#56041](https://github.com/WordPress/gutenberg/pull/56041))
 
 ### Internal
 
