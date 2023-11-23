@@ -185,6 +185,8 @@ export default function useEntityRecord< RecordType >(
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
+					isSaving: false,
+					isDeleting: false,
 				};
 			}
 
