@@ -52,6 +52,8 @@ describe( 'useEntityRecord', () => {
 			save: expect.any( Function ),
 			hasResolved: false,
 			isResolving: false,
+			isSaving: false,
+			isDeleting: false,
 			status: 'IDLE',
 		} );
 
@@ -71,6 +73,8 @@ describe( 'useEntityRecord', () => {
 			save: expect.any( Function ),
 			hasResolved: true,
 			isResolving: false,
+			isSaving: false,
+			isDeleting: false,
 			status: 'SUCCESS',
 		} );
 	} );
@@ -100,6 +104,8 @@ describe( 'useEntityRecord', () => {
 				save: expect.any( Function ),
 				hasResolved: true,
 				isResolving: false,
+				isSaving: false,
+				isDeleting: false,
 				status: 'SUCCESS',
 			} )
 		);
