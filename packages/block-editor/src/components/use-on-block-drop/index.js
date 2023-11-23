@@ -210,7 +210,7 @@ export default function useOnBlockDrop(
 	targetBlockIndex,
 	options = {}
 ) {
-	const { operation = 'insert' } = options;
+	const { operation = 'insert', moveBeforeOrAfter } = options;
 	const hasUploadPermissions = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -220,6 +220,7 @@ export default function useOnBlockDrop(
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		getBlockOrder,
+		getBlockParents,
 		getBlocksByClientId,
 	} = useSelect( blockEditorStore );
 	const {
@@ -280,6 +281,24 @@ export default function useOnBlockDrop(
 					);
 				} );
 			} else {
+				if ( moveBeforeOrAfter ) {
+					const parentBlock =
+						getBlockParents( targetRootClientId )[ 0 ];
+					// const targetBlockClientIds = getBlockOrder( parentBlock );
+					let blockIndex = getBlockIndex( targetRootClientId );
+					if ( moveBeforeOrAfter === 'after' ) {
+						++blockIndex;
+					}
+					// const targetBlockClientId =
+					// 	targetBlockClientIds[ blockIndex ];
+					moveBlocksToPosition(
+						sourceClientIds,
+						sourceRootClientId,
+						parentBlock,
+						blockIndex
+					);
+					return;
+				}
 				moveBlocksToPosition(
 					sourceClientIds,
 					sourceRootClientId,
@@ -293,6 +312,7 @@ export default function useOnBlockDrop(
 			getBlockOrder,
 			getBlocksByClientId,
 			insertBlocks,
+			moveBeforeOrAfter,
 			moveBlocksToPosition,
 			removeBlocks,
 			targetBlockIndex,

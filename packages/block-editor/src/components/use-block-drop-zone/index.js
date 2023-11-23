@@ -60,11 +60,33 @@ export function getDropTargetPosition(
 			? [ 'left', 'right' ]
 			: [ 'top', 'bottom' ];
 
-	const isRightToLeft = isRTL();
-
 	let nearestIndex = 0;
 	let insertPosition = 'before';
 	let minDistance = Infinity;
+
+	// TODO: Figure out a neater way to handle passing in the drop zone element.
+	const dropZoneElement = blocksData[ 0 ]?.dropZoneElement;
+
+	if ( dropZoneElement ) {
+		const rect = dropZoneElement.getBoundingClientRect();
+
+		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
+			'top',
+			'bottom',
+		] );
+
+		// TODO: Replace `30` with a constant.
+		if ( distance < 30 ) {
+			if ( edge === 'top' ) {
+				return [ 0, 'insert', 'before' ];
+			}
+			if ( edge === 'bottom' ) {
+				return [ 0, 'insert', 'after' ];
+			}
+		}
+	}
+
+	const isRightToLeft = isRTL();
 
 	blocksData.forEach(
 		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
@@ -173,6 +195,7 @@ export default function useBlockDropZone( {
 		useDispatch( blockEditorStore );
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
+		moveBeforeOrAfter: dropTarget.moveBeforeOrAfter,
 		operation: dropTarget.operation,
 	} );
 	const throttled = useThrottle(
@@ -198,6 +221,7 @@ export default function useBlockDropZone( {
 					const clientId = block.clientId;
 
 					return {
+						dropZoneElement,
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
 						getBoundingClientRect: () =>
@@ -208,23 +232,29 @@ export default function useBlockDropZone( {
 					};
 				} );
 
-				const [ targetIndex, operation ] = getDropTargetPosition(
-					blocksData,
-					{ x: event.clientX, y: event.clientY },
-					getBlockListSettings( targetRootClientId )?.orientation
-				);
+				const [ targetIndex, operation, moveBeforeOrAfter ] =
+					getDropTargetPosition(
+						blocksData,
+						{ x: event.clientX, y: event.clientY },
+						getBlockListSettings( targetRootClientId )?.orientation
+					);
 
 				registry.batch( () => {
 					setDropTarget( {
+						moveBeforeOrAfter,
 						index: targetIndex,
 						operation,
 					} );
+
+					// TODO: Fix display of insertion point, so that it matches onBlockDrop logic.
 					showInsertionPoint( targetRootClientId, targetIndex, {
+						moveBeforeOrAfter,
 						operation,
 					} );
 				} );
 			},
 			[
+				dropZoneElement,
 				getBlocks,
 				targetRootClientId,
 				getBlockListSettings,
