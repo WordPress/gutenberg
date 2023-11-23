@@ -191,8 +191,11 @@ class WP_Fonts_Resolver {
 
 		foreach ( $variations as $variation ) {
 
-			// Skip if settings.typography.fontFamilies are not defined in the variation.
-			if ( empty( $variation['settings']['typography']['fontFamilies'] ) ) {
+			// Skip if settings.typography.fontFamilies.theme is not defined or is not an array.
+			if (
+				! isset( $variation['settings']['typography']['fontFamilies']['theme'] ) ||
+				! is_array( $variation['settings']['typography']['fontFamilies']['theme'] )
+			) {
 				continue;
 			}
 
@@ -200,27 +203,25 @@ class WP_Fonts_Resolver {
 			if ( $set_theme_structure ) {
 				$set_theme_structure = false;
 				$settings            = static::set_tyopgraphy_settings_array_structure( $settings );
+
+				// Font families from settings must be an array.
+				if (
+					! isset( $settings['typography']['fontFamilies']['theme'] ) ||
+					! is_array( $settings['typography']['fontFamilies']['theme'] )
+				) {
+					$settings['typography']['fontFamilies']['theme'] = array();
+				}
 			}
 
-			// Initialize the font families from variation if set and is an array, otherwise default to an empty array.
-			$variation_font_families = ( isset( $variation['settings']['typography']['fontFamilies']['theme'] ) && is_array( $variation['settings']['typography']['fontFamilies']['theme'] ) )
-				? $variation['settings']['typography']['fontFamilies']['theme']
-				: array();
-
-			// Merge the variation settings with the global settings.
+			// Merge the variation settings with the global settings. Variations overwrite the globals.
 			$settings['typography']['fontFamilies']['theme'] = array_merge(
 				$settings['typography']['fontFamilies']['theme'],
-				$variation_font_families
+				$variation['settings']['typography']['fontFamilies']['theme']
 			);
-
-			// Make sure there are no duplicates.
-			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'], SORT_REGULAR );
-
-			// The font families from settings might become null after running the `array_unique`.
-			if ( ! isset( $settings['typography']['fontFamilies']['theme'] ) || ! is_array( $settings['typography']['fontFamilies']['theme'] ) ) {
-				$settings['typography']['fontFamilies']['theme'] = array();
-			}
 		}
+
+		// Make sure there are no duplicate values with different names (array keys).
+		$settings['typography']['fontFamilies']['theme'] = array_unique( $settings['typography']['fontFamilies']['theme'], SORT_REGULAR );
 
 		return $settings;
 	}
