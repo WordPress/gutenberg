@@ -198,7 +198,6 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
-				getValue: () => {},
 				render: ( { item, view: { type: viewType } } ) => {
 					return (
 						<TemplatePreview
@@ -238,7 +237,6 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				getValue: () => {},
 				render: ( { item } ) => <AuthorField item={ item } />,
 				enableHiding: false,
 				enableSorting: false,
