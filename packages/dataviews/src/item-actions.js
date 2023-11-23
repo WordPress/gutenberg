@@ -46,12 +46,18 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 	);
 }
 
-function ActionWithModal( { action, item, ActionTrigger } ) {
+export function ActionWithModal( { action, item, items, ActionTrigger } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
 	};
+	const additionalProps = {};
+	if ( action.isBulk ) {
+		additionalProps.items = items ? items : [ item ];
+	} else {
+		additionalProps.item = item;
+	}
 	const { RenderModal, hideModalHeader } = action;
 	return (
 		<>
@@ -66,7 +72,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					overlayClassName="dataviews-action-modal"
 				>
 					<RenderModal
-						item={ item }
+						{ ...additionalProps }
 						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				</Modal>
@@ -157,7 +163,11 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( item ) }
+							onClick={
+								action.isBulk
+									? () => action.callback( [ item ] )
+									: () => action.callback( item )
+							}
 						/>
 					);
 				} ) }

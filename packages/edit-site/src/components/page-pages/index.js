@@ -5,7 +5,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
@@ -170,6 +170,21 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
+	// Remove any selected pages that are no longer in the list of visible pages.
+	useEffect( () => {
+		if (
+			selection.some(
+				( id ) => ! pages?.some( ( page ) => page.id === id )
+			)
+		) {
+			setSelection(
+				selection.filter( ( id ) =>
+					pages?.some( ( page ) => page.id === id )
+				)
+			);
+		}
+	}, [ pages, selection ] );
+
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user' );
 
@@ -280,6 +295,7 @@ export default function PagePages() {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
+
 	const actions = useMemo(
 		() => [
 			viewPostAction,
@@ -291,6 +307,7 @@ export default function PagePages() {
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
+
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			let updatedView =
@@ -324,6 +341,24 @@ export default function PagePages() {
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
+					selection={ selection }
+					setSelection={ setSelection }
+					labels={ {
+						getSelectLabel: ( item ) => {
+							return sprintf(
+								// translators: %s: The title of the page.
+								__( 'Select page: %s' ),
+								item.title?.rendered || item.slug
+							);
+						},
+						getDeselectLabel: ( item ) => {
+							return sprintf(
+								// translators: %s: The title of the page.
+								__( 'Deselect page: %s' ),
+								item.title?.rendered || item.slug
+							);
+						},
+					} }
 				/>
 			</Page>
 			{ VIEW_LAYOUTS.find( ( v ) => v.type === view.type )?.supports

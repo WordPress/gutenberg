@@ -15,6 +15,7 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
+import BulkActions from './bulk-actions';
 
 export default function DataViews( {
 	view,
@@ -28,6 +29,9 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
+	selection,
+	setSelection,
+	labels,
 } ) {
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -72,12 +76,24 @@ export default function DataViews( {
 					data={ data }
 					getItemId={ getItemId }
 					isLoading={ isLoading }
+					selection={ selection }
+					setSelection={ setSelection }
+					labels={ labels }
 				/>
+
+				<div>
 				<Pagination
 					view={ view }
 					onChangeView={ onChangeView }
 					paginationInfo={ paginationInfo }
 				/>
+					<BulkActions
+						data={ data }
+						actions={ actions }
+						selection={ selection }
+						setSelection={ setSelection }
+					/>
+				</div>
 			</VStack>
 		</div>
 	);

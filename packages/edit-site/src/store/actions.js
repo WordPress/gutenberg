@@ -154,7 +154,7 @@ export const removeTemplate =
 
 			registry.dispatch( noticesStore ).createSuccessNotice(
 				sprintf(
-					/* translators: The template/part's name. */
+					/* translators: %s: The template or template part's name. */
 					__( '"%s" deleted.' ),
 					decodeEntities( templateTitle )
 				),

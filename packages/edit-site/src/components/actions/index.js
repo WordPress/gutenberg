@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -28,23 +28,34 @@ export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
+	isBulk: true,
 	icon: trash,
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item: post, closeModal } ) => {
+	RenderModal: ( { items: posts, closeModal } ) => {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ sprintf(
-						// translators: %s: The page's title.
-						__( 'Are you sure you want to delete "%s"?' ),
-						decodeEntities( post.title.rendered )
-					) }
+					{ posts.length > 1
+						? sprintf(
+								// translators: %s: The number of posts (always plural).
+								__(
+									'Are you sure you want to delete %s posts?'
+								),
+								decodeEntities( posts.length )
+						  )
+						: sprintf(
+								// translators: %s: The page's title.
+								__( 'Are you sure you want to delete "%s"?' ),
+								decodeEntities(
+									posts && posts[ 0 ]?.title?.rendered
+								)
+						  ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -54,19 +65,31 @@ export const trashPostAction = {
 						variant="primary"
 						onClick={ async () => {
 							try {
-								await deleteEntityRecord(
-									'postType',
-									post.type,
-									post.id,
-									{},
-									{ throwOnError: true }
+								await Promise.allSettled(
+									posts.map( async ( post ) => {
+										deleteEntityRecord(
+											'postType',
+											post.type,
+											post.id,
+											{},
+											{ throwOnError: true }
+										);
+									} )
 								);
 								createSuccessNotice(
-									sprintf(
-										/* translators: The page's title. */
-										__( '"%s" moved to the Trash.' ),
-										decodeEntities( post.title.rendered )
-									),
+									posts.length > 1
+										? __(
+												'The selected posts were moved to the trash.'
+										  )
+										: sprintf(
+												/* translators: The page's title. */
+												__(
+													'"%s" moved to the Trash.'
+												),
+												decodeEntities(
+													posts[ 0 ].title.rendered
+												)
+										  ),
 									{
 										type: 'snackbar',
 										id: 'edit-site-page-trashed',
@@ -77,8 +100,10 @@ export const trashPostAction = {
 									error.message &&
 									error.code !== 'unknown_error'
 										? error.message
-										: __(
-												'An error occurred while moving the page to the trash.'
+										: _n(
+												'An error occurred while moving the page to the trash.',
+												'An error occurred while moving the pages to the trash.',
+												posts.length
 										  );
 
 								createErrorNotice( errorMessage, {
