@@ -34,7 +34,11 @@ const defaultSideValues = {
 	left: '10px',
 };
 
-const Template: StoryFn< typeof BoxControl > = ( props ) => {
+const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
+	return <BoxControl { ...props } />;
+};
+
+const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 	const [ values, setValues ] =
 		useState< ( typeof props )[ 'values' ] >( defaultSideValues );
 
@@ -50,31 +54,35 @@ const Template: StoryFn< typeof BoxControl > = ( props ) => {
 	);
 };
 
-export const Default = Template.bind( {} );
+export const Default = TemplateUncontrolled.bind( {} );
 Default.args = {
-	values: undefined,
 	label: 'Label',
 };
 
-export const ArbitrarySides = Template.bind( {} );
+export const Controlled = TemplateControlled.bind( {} );
+Controlled.args = {
+	...Default.args,
+};
+
+export const ArbitrarySides = TemplateControlled.bind( {} );
 ArbitrarySides.args = {
 	...Default.args,
 	sides: [ 'top', 'bottom' ],
 };
 
-export const SingleSide = Template.bind( {} );
+export const SingleSide = TemplateControlled.bind( {} );
 SingleSide.args = {
 	...Default.args,
 	sides: [ 'bottom' ],
 };
 
-export const AxialControls = Template.bind( {} );
+export const AxialControls = TemplateControlled.bind( {} );
 AxialControls.args = {
 	...Default.args,
 	splitOnAxis: true,
 };
 
-export const AxialControlsWithSingleSide = Template.bind( {} );
+export const AxialControlsWithSingleSide = TemplateControlled.bind( {} );
 AxialControlsWithSingleSide.args = {
 	...Default.args,
 	sides: [ 'horizontal' ],
