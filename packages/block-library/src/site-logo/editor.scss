@@ -1,5 +1,6 @@
 .wp-block[data-align="center"] > .wp-block-site-logo,
-.wp-block-site-logo.aligncenter > div {
+.wp-block-site-logo.aligncenter > div,
+.wp-block-site-logo.aligncenter {
 	display: table;
 	margin-left: auto;
 	margin-right: auto;
