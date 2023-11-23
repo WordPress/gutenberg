@@ -103,7 +103,6 @@ if ( ! defined( 'BLOCK_EDITOR_SETTINGS_MOBILE_ALLOW_LIST' ) ) {
 			'__unstableIsBlockBasedTheme'      => true,
 			'localAutosaveInterval'            => true,
 			'__experimentalDiscussionSettings' => true,
-			'__experimentalDashboardLink'      => true,
 			'__experimentalEnableQuoteBlockV2' => true,
 			'__experimentalEnableListBlockV2'  => true,
 		)
