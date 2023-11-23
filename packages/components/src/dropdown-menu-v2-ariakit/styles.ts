@@ -21,7 +21,7 @@ const ANIMATION_PARAMS = {
 	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
 };
 
-const CONTENT_WRAPPER_PADDING = space( 2 );
+const CONTENT_WRAPPER_PADDING = space( 1 );
 const ITEM_PADDING_BLOCK = space( 2 );
 const ITEM_PADDING_INLINE = space( 3 );
 
@@ -86,7 +86,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	padding: ${ CONTENT_WRAPPER_PADDING };
 
 	background-color: ${ COLORS.ui.background };
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: 4px;
 	${ ( props ) => css`
 		box-shadow: ${ props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BOX_SHADOW
