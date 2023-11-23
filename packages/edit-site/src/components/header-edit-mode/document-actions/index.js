@@ -26,6 +26,7 @@ import {
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -80,6 +81,15 @@ function PageDocumentActions() {
 	);
 
 	const { setRenderingMode } = useDispatch( editorStore );
+	const [ isAnimated, setIsAnimated ] = useState( false );
+	const isLoading = useRef( true );
+
+	useEffect( () => {
+		if ( ! isLoading.current ) {
+			setIsAnimated( true );
+		}
+		isLoading.current = false;
+	}, [ isEditingPage ] );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -93,14 +103,20 @@ function PageDocumentActions() {
 		);
 	}
 
-	// Todo: check animation
 	return isEditingPage ? (
-		<BaseDocumentActions className="is-page" icon={ pageIcon }>
+		<BaseDocumentActions
+			className={ classnames( 'is-page', {
+				'is-animated': isAnimated,
+			} ) }
+			icon={ pageIcon }
+		>
 			{ title }
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
-			className="is-animated"
+			className={ classnames( {
+				'is-animated': isAnimated,
+			} ) }
 			onBack={ () => setRenderingMode( 'template-locked' ) }
 		/>
 	);
