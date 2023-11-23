@@ -1,6 +1,6 @@
 # Block Patterns List
 
-The `BlockPatternList` component makes a list of the different registered block patterns. It uses the `BlockPreview` component to display a preview for each block pattern.
+The `BlockPatternsList` component makes a list of the different registered block patterns. It uses the `BlockPreview` component to display a preview for each block pattern.
 
 For more infos about blocks patterns, read [this](https://make.wordpress.org/core/2020/07/16/block-patterns-in-wordpress-5-5/).
 
@@ -18,10 +18,10 @@ For more infos about blocks patterns, read [this](https://make.wordpress.org/cor
 Renders a block patterns list.
 
 ```jsx
-import { BlockPatternList } from '@wordpress/block-editor';
+import { BlockPatternsList } from '@wordpress/block-editor';
 
-const MyBlockPatternList = () => (
-	<BlockPatternList
+const MyBlockPatternsList = () => (
+	<BlockPatternsList
 		blockPatterns={ shownBlockPatterns }
 		shownPatterns={ shownBlockPatterns }
 		onClickPattern={ onSelectBlockPattern }

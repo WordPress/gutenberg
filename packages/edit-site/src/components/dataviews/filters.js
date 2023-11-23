@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import { default as InFilter } from './in-filter';
@@ -23,13 +18,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					elements: [
-						{
-							value: '',
-							label: __( 'All' ),
-						},
-						...( field.elements || [] ),
-					],
+					elements: field.elements || [],
 					isVisible: view.filters.some(
 						( f ) =>
 							f.field === field.id && f.operator === OPERATOR_IN

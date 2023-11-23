@@ -630,7 +630,7 @@ export const toggleDistractionFree =
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-post', 'fixedToolbar', false );
+					.set( 'core/edit-post', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
