@@ -26,11 +26,6 @@ import { SVG, Circle } from '@wordpress/primitives';
 import { useContextSystem, contextConnect } from '../context';
 import type { WordPressComponentProps } from '../context';
 import Icon from '../icon';
-import { useSlot } from '../slot-fill';
-import {
-	SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME,
-	slotNameContext,
-} from '../popover';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
 	DropdownMenuProps,
@@ -187,9 +182,6 @@ const UnconnectedDropdownMenu = (
 		shift,
 		modal = true,
 
-		// Other props
-		slotName: slotNameProp = POPOVER_DEFAULT_SLOT_NAME,
-
 		// From internal components context
 		variant,
 
@@ -278,11 +270,6 @@ const UnconnectedDropdownMenu = (
 		[ computedDirection ]
 	);
 
-	// Render the portal in the default slot used by the legacy Popover component.
-	const slotName = useContext( slotNameContext ) || slotNameProp;
-	const slot = useSlot( slotName );
-	const portalContainer = slot.ref?.current;
-
 	return (
 		<>
 			{ /* Menu trigger */ }
@@ -318,7 +305,6 @@ const UnconnectedDropdownMenu = (
 				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
-				portalElement={ portalContainer }
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
 					{ children }
