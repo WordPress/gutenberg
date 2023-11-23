@@ -52,7 +52,7 @@ export default function MoreMenu( { showIconLabels } ) {
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-site', 'fixedToolbar', false );
+			setPreference( 'core/edit-site', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();

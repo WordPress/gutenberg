@@ -52,8 +52,6 @@ Because `RichText` allows for nested nodes, you'll most often use it in conjunct
 
 Here is the complete block definition for Example 03.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -107,62 +105,3 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	},
 } );
 ```
-
-{% Plain %}
-
-```js
-( function ( blocks, blockEditor, React ) {
-	var el = React.createElement;
-	var RichText = blockEditor.RichText;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
-		apiVersion: 3,
-		title: 'Example: Editable',
-		icon: 'universal-access-alt',
-		category: 'design',
-
-		attributes: {
-			content: {
-				type: 'string',
-				source: 'html',
-				selector: 'p',
-			},
-		},
-		example: {
-			attributes: {
-				content: 'Hello World',
-			},
-		},
-		edit: function ( props ) {
-			var blockProps = useBlockProps();
-			var content = props.attributes.content;
-			function onChangeContent( newContent ) {
-				props.setAttributes( { content: newContent } );
-			}
-
-			return el(
-				RichText,
-				Object.assign( blockProps, {
-					tagName: 'p',
-					onChange: onChangeContent,
-					value: content,
-				} )
-			);
-		},
-
-		save: function ( props ) {
-			var blockProps = useBlockProps.save();
-			return el(
-				RichText.Content,
-				Object.assign( blockProps, {
-					tagName: 'p',
-					value: props.attributes.content,
-				} )
-			);
-		},
-	} );
-} )( window.wp.blocks, window.wp.blockEditor, window.React );
-```
-
-{% end %}

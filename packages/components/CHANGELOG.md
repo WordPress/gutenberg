@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enhancements 
+
+-   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
+
+### Experimental
+
+-   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+
+### Internal
+
+-   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
+
+## 25.12.0 (2023-11-16)
+
+### Bug Fix
+
+-   `Toolbar`: Remove CSS rule that prevented focus outline to be visible for toolbar buttons in the `:active` state. ([#56123](https://github.com/WordPress/gutenberg/pull/56123)).
+
 ### Internal
 
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
@@ -22,6 +40,7 @@
 
 ### Bug Fix
 
+-   `DropdownMenu`: remove extra vertical space around the toggle button ([#56136](https://github.com/WordPress/gutenberg/pull/56136)).
 -   Package should not depend on `@ariakit/test`, that package is only needed for testing ([#56091](https://github.com/WordPress/gutenberg/pull/56091)).
 
 ## 25.11.0 (2023-11-02)

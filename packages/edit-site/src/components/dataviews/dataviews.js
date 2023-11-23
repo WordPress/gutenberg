@@ -41,6 +41,7 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
@@ -70,7 +71,7 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end">
+					<HStack justify="end" expanded={ false }>
 						<ViewActions
 							fields={ fields }
 							view={ view }
@@ -86,6 +87,7 @@ export default function DataViews( {
 					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
+					getItemId={ getItemId }
 					isLoading={ isLoading }
 				/>
 				<Pagination

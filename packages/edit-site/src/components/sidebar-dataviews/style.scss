@@ -8,6 +8,8 @@
 }
 
 .edit-site-sidebar-dataviews-dataview-item {
+	border-radius: $radius-block-ui;
+
 	&:hover,
 	&:focus,
 	&[aria-current] {

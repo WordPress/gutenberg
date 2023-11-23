@@ -59,8 +59,7 @@ function SidebarScreens() {
 			{ window?.__experimentalAdminViews && (
 				<NavigatorScreen path="/pages">
 					<SidebarNavigationScreen
-						title={ __( 'All Pages' ) }
-						description={ __( 'Manage your pages.' ) }
+						title={ __( 'Pages' ) }
 						backPath="/page"
 						content={ <DataViewsSidebarContent /> }
 					/>

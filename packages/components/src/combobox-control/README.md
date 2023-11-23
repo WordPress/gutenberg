@@ -47,9 +47,7 @@ function MyComboboxControl() {
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
 					options.filter( ( option ) =>
-						option.label
-							.toLowerCase()
-							.startsWith( inputValue.toLowerCase() )
+						option.value === inputValue
 					)
 				)
 			}

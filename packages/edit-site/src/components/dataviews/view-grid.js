@@ -14,7 +14,7 @@ import {
  */
 import ItemActions from './item-actions';
 
-export function ViewGrid( { data, fields, view, actions } ) {
+export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -27,7 +27,7 @@ export function ViewGrid( { data, fields, view, actions } ) {
 		<Grid gap={ 8 } columns={ 2 } alignment="top">
 			{ data.map( ( item, index ) => {
 				return (
-					<VStack key={ index }>
+					<VStack key={ getItemId?.( item ) || index }>
 						<div className="dataviews-view-grid__media">
 							{ mediaField?.render( { item, view } ) || (
 								<Placeholder

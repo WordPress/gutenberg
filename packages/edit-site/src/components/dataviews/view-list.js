@@ -36,6 +36,7 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import ItemActions from './item-actions';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2,
@@ -52,6 +53,7 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
+
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
 		return null;
@@ -68,21 +70,10 @@ function HeaderMenu( { dataView, header } ) {
 	const sortedDirection = header.column.getIsSorted();
 
 	let filter;
-	if (
-		header.column.columnDef.filters?.length > 0 &&
-		header.column.columnDef.filters.some(
-			( f ) => 'string' === typeof f && f === 'in'
-		)
-	) {
+	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
 		filter = {
 			field: header.column.columnDef.id,
-			elements: [
-				{
-					value: '',
-					label: __( 'All' ),
-				},
-				...( header.column.columnDef.elements || [] ),
-			],
+			elements: header.column.columnDef.elements || [],
 		};
 	}
 	const isFilterable = !! filter;
@@ -169,11 +160,6 @@ function HeaderMenu( { dataView, header } ) {
 										)[ 0 ] === filter.field
 								);
 
-								// Set the empty item as active if the filter is not set.
-								if ( ! columnFilter && element.value === '' ) {
-									isActive = true;
-								}
-
 								if ( columnFilter ) {
 									const value =
 										Object.values( columnFilter )[ 0 ];
@@ -202,24 +188,21 @@ function HeaderMenu( { dataView, header } ) {
 														return (
 															field !==
 																filter.field ||
-															operator !== 'in'
+															operator !==
+																OPERATOR_IN
 														);
 													}
 												);
 
-											if ( element.value === '' ) {
-												dataView.setColumnFilters(
-													otherFilters
-												);
-											} else {
-												dataView.setColumnFilters( [
-													...otherFilters,
-													{
-														[ filter.field +
-														':in' ]: element.value,
-													},
-												] );
-											}
+											dataView.setColumnFilters( [
+												...otherFilters,
+												{
+													[ filter.field + ':in' ]:
+														isActive
+															? undefined
+															: element.value,
+												},
+											] );
 										} }
 									>
 										{ element.label }
@@ -251,6 +234,7 @@ function ViewList( {
 	fields,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
 } ) {
@@ -372,6 +356,7 @@ function ViewList( {
 			},
 			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
 		},
+		getRowId: getItemId,
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
 				const sort =
@@ -490,7 +475,7 @@ function ViewList( {
 							<tr key={ row.id }>
 								{ row.getVisibleCells().map( ( cell ) => (
 									<td
-										key={ cell.id }
+										key={ cell.column.id }
 										style={ {
 											width:
 												cell.column.columnDef.width ||

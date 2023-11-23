@@ -67,8 +67,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'postsPerPage',
 	'readOnly',
 	'styles',
-	'template',
-	'templateLock',
 	'titlePlaceholder',
 	'supportsLayout',
 	'widgetTypesToHideFromLegacyWidgetBlock',
@@ -237,6 +235,12 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageOnFront,
 			pageForPosts,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
+			templateLock:
+				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
+			template:
+				postType === 'wp_navigation'
+					? [ [ 'core/navigation', {}, [] ] ]
+					: settings.template,
 		} ),
 		[
 			settings,
