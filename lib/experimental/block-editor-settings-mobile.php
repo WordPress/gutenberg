@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'keep_supported_block_editor_settings_mobile' ) ) {
+if ( ! function_exists( 'filter_by_supported_block_editor_settings_mobile' ) ) {
 	/**
 	 * Keeps only supported settings for the mobile block editor.
 	 *
@@ -19,7 +19,7 @@ if ( ! function_exists( 'keep_supported_block_editor_settings_mobile' ) ) {
 	 *
 	 * @return array New block editor settings.
 	 */
-	function keep_supported_block_editor_settings_mobile( $initial_array, $allow_list_array ) {
+	function filter_by_supported_block_editor_settings_mobile( $initial_array, $allow_list_array ) {
 		$result = array();
 
 		foreach ( $allow_list_array as $key => $value ) {
@@ -31,7 +31,7 @@ if ( ! function_exists( 'keep_supported_block_editor_settings_mobile' ) ) {
 
 			if ( array_key_exists( $key, $initial_array ) ) {
 				if ( is_array( $value ) && is_array( $initial_value ) ) {
-					$result[ $key ] = keep_supported_block_editor_settings_mobile( $initial_value, $value );
+					$result[ $key ] = filter_by_supported_block_editor_settings_mobile( $initial_value, $value );
 				} else {
 					$result[ $key ] = $initial_value;
 				}
@@ -71,7 +71,7 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		$settings['__experimentalEnableListBlockV2'] = true;
 	}
 
-	return keep_supported_block_editor_settings_mobile(
+	return filter_by_supported_block_editor_settings_mobile(
 		$settings,
 		array(
 			'alignWide'                        => true,
