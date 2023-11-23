@@ -115,6 +115,19 @@ if ( ! function_exists( 'block_theme_activate_nonce' ) ) {
 	}
 }
 
+function gutenberg_render_block_block_theme_previews( $block_content, $parsed_block, $block_class ) {
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	$tags->next_tag( 'a' );
+	$href = $tags->get_attribute( 'href' );
+
+	if ( ! empty( $href ) ) {
+		$href = add_query_arg( 'gutenberg_theme_preview', $_GET['gutenberg_theme_preview'], $href ); // TODO - escape
+		$tags->set_attribute( 'href', $href );
+		$block_content = $tags->get_updated_html( $tags );
+	}
+	return $block_content;
+}
+
 /**
  * Attaches filters to enable theme previews in the Site Editor.
  */
@@ -122,6 +135,7 @@ if ( ! empty( $_GET['wp_theme_preview'] ) && ! function_exists( 'wp_get_theme_pr
 	add_filter( 'stylesheet', 'gutenberg_get_theme_preview_path' );
 	add_filter( 'template', 'gutenberg_get_theme_preview_path' );
 	add_filter( 'init', 'gutenberg_attach_theme_preview_middleware' );
+	add_filter( 'render_block', 'gutenberg_render_block_block_theme_previews', 10, 3 );
 }
 
 if ( ! function_exists( 'wp_get_theme_preview_path' ) ) {
