@@ -1,13 +1,14 @@
 <?php
 /**
  * Adds the wp-block-list class to the rendered list block.
+ *
  * @package WordPress
  */
 
 /**
  * Adds a wp-block-list class to the list block.
  * For example, <ol> would be transformed to <ol class="wp-block-list">.
- * 
+ *
  * @see https://github.com/WordPress/gutenberg/issues/12420
  *
  * @param array  $attributes Attributes of the block being rendered.

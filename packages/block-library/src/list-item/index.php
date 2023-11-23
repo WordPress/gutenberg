@@ -1,13 +1,14 @@
 <?php
 /**
  * Adds the wp-block-list-item class to the rendered list item block.
+ *
  * @package WordPress
  */
 
 /**
  * Adds a wp-block-list-item class to the list item block.
  * For example, <li> would be transformed to <li class="wp-block-list-item">.
- * 
+ *
  * @see https://github.com/WordPress/gutenberg/issues/12420
  *
  * @param array  $attributes Attributes of the block being rendered.
