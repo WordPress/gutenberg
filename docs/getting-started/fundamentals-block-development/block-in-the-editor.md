@@ -1,23 +1,50 @@
 # The block in the Editor
 
-The Block Editor is React Single Page Application (SPA)
+The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. 
+changes in blocks --- update store --- update blocks
 
-A block manages two main interfaces
-- The "Edit" interface - how the block is displayed and its behaviour in the Block Editor 
-- The "Save" interface - how the block is stored in the DB
+A block actually manages two main interfaces that are registered in the form of React components on the client through the `registerBlockType`:
+- The `edit` React component that defines how the block is displayed in the Block Editor and its behavior.
+- The `save` React component that defines how the block is stored in the DB
 
-Every block defined its "edit" interface via a React component when the block is registered in the client
+The `edit` React component of a block receives a `props` object which includes `attributes` and `setAttributes`
 
-The "edit" React component of a block receives a `props` object (including attributes and setAttributes)
-
-The block wrapper element needs to include props retrieved from useBlockProps in order to receive its classes and atributes
+The block wrapper element needs to include `props` from `useBlockProps` to include its classes and atributes properly:
 - any custom attributes (like extra classes) should be passed as an argument of `useBlockProps`
-- When you add support for any feature, they get added to the object returned by the `useBlockProps` hook.
+- When you add `support` for any feature, they get added to the object returned by the `useBlockProps` hook.
 
 
 This "edit" interface can also define custom setting controls for the block in the Editor:  `Block Toolbar` and `Settings Sidebar`
 
 Wordpress offers a lot of built-in components via NPM packages to define the interface of the block in the editor, like `@wordpress/components` or `@wordpress/block-editor`
+
+```js
+import { useBlockProps, RichText } from '@wordpress/block-editor';
+
+const Edit = ( props ) => {
+	const {
+		attributes: { content },
+		setAttributes,
+	} = props;
+
+	const blockProps = useBlockProps();
+
+	const onChangeContent = ( newContent ) => {
+		setAttributes( { content: newContent } );
+	};
+	return (
+		<RichText
+			{ ...blockProps }
+			tagName="p"
+			onChange={ onChangeContent }
+			value={ content }
+		/>
+	);
+};
+export default Edit;
+```
+
+_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/edit.js)_
 
 
 ## Built-in components
