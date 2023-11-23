@@ -1,0 +1,20 @@
+.edit-site-page-media {
+
+	.is-view-list img,
+	.is-view-list video {
+		width: 80px;
+	}
+	.is-view-media-grid {
+		text-align: center;
+		video,
+		img {
+			width: 300px;
+		}
+	}
+}
+
+.edit-site-dataview-view-media-item {
+	padding: 10px;
+	background-color: #f8f7f7;
+}
+

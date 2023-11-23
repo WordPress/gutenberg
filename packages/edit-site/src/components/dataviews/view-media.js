@@ -6,7 +6,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexBlock,
-	Placeholder,
 } from '@wordpress/components';
 
 /**
@@ -20,33 +19,25 @@ export function ViewMedia( { data, fields, view, actions } ) {
 			! view.hiddenFields.includes( field.id ) &&
 			field.id !== view.layout.mediaField
 	);
-	console.log( 'data, fields, view, actions', data, fields, view, actions );
 	return (
-		<Grid gap={ 8 } columns={ 2 } alignment="top">
+		<Grid gap={ 8 } columns={ 3 } alignment="top">
 			{ data.map( ( item, index ) => {
 				return (
-					<VStack key={ index }>
-						<div className="dataviews-view-grid__media">
-							{ /* featured image for files, images for image */ }
-						</div>
-
-						<HStack justify="space-between" alignment="top">
-							<FlexBlock>
-								<VStack>
-									{ visibleFields.map( ( field ) => (
-										<div key={ field.id }>
-											{ field.render( { item, view } ) }
-										</div>
-									) ) }
-								</VStack>
-							</FlexBlock>
-							<FlexBlock>
-								<ItemActions
-									item={ item }
-									actions={ actions }
-								/>
-							</FlexBlock>
-						</HStack>
+					<VStack
+						key={ index }
+						justify="space-between"
+						alignment="top"
+						className="edit-site-dataview-view-media-item"
+					>
+						{ visibleFields.map( ( field ) => (
+							<div key={ field.id }>
+								{ field.render( { item, view } ) }
+							</div>
+						) ) }
+						<ItemActions
+							item={ item }
+							actions={ actions }
+						/>
 					</VStack>
 				);
 			} ) }

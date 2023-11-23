@@ -5,6 +5,7 @@ import {
 	Icon,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	DropZone,
 	Tooltip,
 } from '@wordpress/components';
@@ -80,15 +81,7 @@ function MediaPreview( { item } ) {
 	}
 
 	if ( mediaType === 'image' ) {
-		return (
-			<img
-				src={ item.thumbnail }
-				alt={ item.alt }
-				style={ {
-					maxHeight: '80px',
-				} }
-			/>
-		);
+		return <img src={ item.thumbnail } alt={ item.alt } />;
 	}
 
 	if ( mediaType === 'audio' ) {
@@ -109,7 +102,6 @@ function MediaPreview( { item } ) {
 				poster={ item?.featuredImage?.url }
 				preload="true"
 				src={ item?.url }
-				height="80"
 				playsInline
 			/>
 		);
@@ -140,7 +132,7 @@ function AuthorField( { item } ) {
 }
 
 export default function PageMedia() {
-	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const [ currentView, setCurrentViewView ] = useState( DEFAULT_VIEW );
 	const [ hasDropped, setHasDropped ] = useState( false );
 	const { records: attachments, isResolving: isLoadingData } =
 		useEntityRecords( 'root', 'media', {
@@ -154,7 +146,7 @@ export default function PageMedia() {
 		}
 		return attachments.map( ( item ) => ( {
 			title: item.title?.rendered || item.slug || __( '(no title)' ),
-			type: item.media_type,
+			//type: item.media_type,
 			id: item.id,
 			alt: item.alt_text,
 			thumbnail: item?.media_details?.sizes?.thumbnail?.source_url,
@@ -163,6 +155,8 @@ export default function PageMedia() {
 			url: item?.source_url,
 			poster: item?.poster,
 			mimeType: item?.mime_type,
+			type: getMediaTypeFromMimeType( item?.mime_type ),
+			description: item?.description?.raw || '',
 			featuredImage: getFeaturedImageDetails( item ),
 		} ) );
 	}, [ attachments ] );
@@ -173,22 +167,29 @@ export default function PageMedia() {
 				id: 'title',
 				header: __( 'Media item' ),
 				getValue: ( { item } ) => item.title,
-				render: ( { item } ) => (
-					<HStack spacing={ 2 } justify="flex-start">
-						<MediaPreview item={ item } />
-						<Heading as="h3" level={ 5 }>
-							{ decodeEntities( item.title ) }
-						</Heading>
-					</HStack>
-				),
+				render: ( { item, view } ) => {
+					const Component = 'list' === view.type ? HStack : VStack;
+					return (
+						<Component
+							spacing={ 2 }
+							justify="flex-start"
+							className={ `is-view-${ view.type }` }
+						>
+							<MediaPreview item={ item } />
+							<Heading as="h3" level={ 5 }>
+								{ decodeEntities( item.title ) }
+							</Heading>
+						</Component>
+					);
+				},
 				maxWidth: 400,
 				enableHiding: false,
 			},
 			{
 				id: 'type',
 				header: __( 'Type' ),
-				getValue: ( { item } ) => item.mimeType,
-				render: ( { item } ) => item.mimeType,
+				getValue: ( { item } ) => item.type,
+				render: ( { item } ) => item.type,
 			},
 			{
 				id: 'filesize',
@@ -215,32 +216,32 @@ export default function PageMedia() {
 		}
 		let filteredAttachments = [ ...mediaItems ];
 		// Handle global search.
-		if ( view.search ) {
+		if ( currentView.search ) {
 			filteredAttachments = filteredAttachments.filter( ( item ) => {
 				return (
-					item.title.includes( view.search ) ||
-					item.description.includes( view.search )
+					item.title.includes( currentView.search ) ||
+					item.description.includes( currentView.search )
 				);
 			} );
 		}
 		// Handle sorting.
 		// TODO: Explore how this can be more dynamic..
-		if ( view.sort ) {
-			if ( view.sort.direction === 'asc' ) {
+		if ( currentView.sort ) {
+			if ( currentView.sort.direction === 'asc' ) {
 				filteredAttachments.sort( ( a, b ) =>
 					// eslint-disable-next-line no-nested-ternary
-					a[ view.sort.field ] > b[ view.sort.field ]
+					a[ currentView.sort.field ] > b[ currentView.sort.field ]
 						? 1
-						: a[ view.sort.field ] < b[ view.sort.field ]
+						: a[ currentView.sort.field ] < b[ currentView.sort.field ]
 						? -1
 						: 0
 				);
 			} else {
 				filteredAttachments.sort( ( a, b ) =>
 					// eslint-disable-next-line no-nested-ternary
-					a[ view.sort.field ] < b[ view.sort.field ]
+					a[ currentView.sort.field ] < b[ currentView.sort.field ]
 						? 1
-						: a[ view.sort.field ] > b[ view.sort.field ]
+						: a[ currentView.sort.field ] > b[ currentView.sort.field ]
 						? -1
 						: 0
 				);
@@ -248,34 +249,35 @@ export default function PageMedia() {
 		}
 
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
+		const start = ( currentView.page - 1 ) * currentView.perPage;
 		const totalItems = filteredAttachments?.length || 0;
 		filteredAttachments = filteredAttachments?.slice(
 			start,
-			start + view.perPage
+			start + currentView.perPage
 		);
 		return {
 			shownTemplates: filteredAttachments,
 			paginationInfo: {
 				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
+				totalPages: Math.ceil( totalItems / currentView.perPage ),
 			},
 		};
-	}, [ mediaItems, view ] );
+	}, [ mediaItems, currentView ] );
 
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			const updatedView =
 				typeof viewUpdater === 'function'
-					? viewUpdater( view )
+					? viewUpdater( currentView )
 					: viewUpdater;
-			setView( updatedView );
+			setCurrentViewView( updatedView );
 		},
-		[ view, setView ]
+		[ currentView, setCurrentViewView ]
 	);
 	return (
 		<Page
 			title={ __( 'Media' ) }
+			className="edit-site-page-media"
 			/*actions={} Upload flow */
 		>
 			<DataViews
@@ -289,7 +291,7 @@ export default function PageMedia() {
 				// fields: required
 				fields={ fields }
 				isLoading={ isLoadingData }
-				view={ view }
+				view={ currentView }
 				supportedLayouts={ [ 'list', 'media-grid' ] }
 			/>
 			<DropZone
