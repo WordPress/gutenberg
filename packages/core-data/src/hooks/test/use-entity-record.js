@@ -130,6 +130,8 @@ describe( 'useEntityRecord', () => {
 		);
 
 		const { rerender } = render( <UI enabled={ true } /> );
+
+		// A minimum delay for a fetch request. The same delay is used again as a control.
 		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
 		);
