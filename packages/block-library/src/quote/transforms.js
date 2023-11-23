@@ -2,6 +2,20 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+
+function ungroup( { citation }, innerBlocks ) {
+	return citation
+		? [
+				...innerBlocks,
+				createBlock( 'core/paragraph', {
+					content: citation,
+				} ),
+		  ]
+		: innerBlocks;
+}
+
+ungroup.__experimentalLabel = __( 'Unquote' );
 
 const transforms = {
 	from: [
@@ -140,15 +154,7 @@ const transforms = {
 				),
 		},
 	],
-	ungroup: ( { citation }, innerBlocks ) =>
-		citation
-			? [
-					...innerBlocks,
-					createBlock( 'core/paragraph', {
-						content: citation,
-					} ),
-			  ]
-			: innerBlocks,
+	ungroup,
 };
 
 export default transforms;
