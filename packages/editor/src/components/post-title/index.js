@@ -63,6 +63,11 @@ function PostTitle( _, forwardedRef ) {
 		[]
 	);
 
+	const timeout = useRef();
+	if ( timeout.current === undefined ) {
+		timeout.current = 0;
+	}
+
 	useImperativeHandle( forwardedRef, () => ( {
 		focus: () => {
 			ref?.current?.focus();
@@ -99,6 +104,17 @@ function PostTitle( _, forwardedRef ) {
 
 	function onUpdate( newTitle ) {
 		editPost( { title: newTitle } );
+	}
+
+	function onUpdate( newTitle ) {
+		/**
+		 * As a POC, we're saving after 5 characters typed
+		 */
+		if ( timeout.current++ % 5 === 0 ) {
+			editPost( { title: newTitle } );
+		} else {
+			editPost( { title: newTitle }, { isCached: true } );
+		}
 	}
 
 	const [ selection, setSelection ] = useState( {} );
