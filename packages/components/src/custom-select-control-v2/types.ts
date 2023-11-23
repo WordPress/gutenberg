@@ -26,7 +26,7 @@ export type CustomSelectProps = {
 	/**
 	 * Label for the control.
 	 */
-	label?: string;
+	label: string;
 	/**
 	 * A function that receives the new value of the input.
 	 */

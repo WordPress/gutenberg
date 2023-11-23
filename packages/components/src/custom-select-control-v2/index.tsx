@@ -43,11 +43,9 @@ export function CustomSelect( props: CustomSelectProps ) {
 
 	return (
 		<>
-			{ label && (
-				<Styled.CustomSelectLabel store={ store }>
-					{ label }
-				</Styled.CustomSelectLabel>
-			) }
+			<Styled.CustomSelectLabel store={ store }>
+				{ label }
+			</Styled.CustomSelectLabel>
 			<Styled.CustomSelectButton
 				size={ size }
 				hasCustomRenderProp={ !! renderSelectedValue }

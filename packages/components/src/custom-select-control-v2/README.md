@@ -26,7 +26,7 @@ An optional default value for the control. If left `undefined`, the first non-di
 
 Label for the control.
 
--   Required: no
+-   Required: yes
 
 ##### `onChange`: `( newValue: string ) => void`
 
