@@ -170,6 +170,13 @@ export default function EditPostPreferencesModal() {
 						) }
 					>
 						<EnableFeature
+							featureName="fixedToolbar"
+							help={ __(
+								'Access all block and document tools in a single place.'
+							) }
+							label={ __( 'Top toolbar' ) }
+						/>
+						<EnableFeature
 							featureName="distractionFree"
 							onToggle={ toggleDistractionFree }
 							help={ __(
