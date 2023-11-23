@@ -14,6 +14,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useAsyncList } from '@wordpress/compose';
 import {
 	chevronDown,
 	chevronUp,
@@ -332,8 +333,9 @@ function ViewList( {
 			return { field, operator, value };
 		} );
 
+	const shownData = useAsyncList( data );
 	const dataView = useReactTable( {
-		data,
+		data: shownData,
 		columns,
 		manualSorting: true,
 		manualFiltering: true,
@@ -455,6 +457,9 @@ function ViewList( {
 											width:
 												header.column.columnDef.width ||
 												undefined,
+											minWidth:
+												header.column.columnDef
+													.minWidth || undefined,
 											maxWidth:
 												header.column.columnDef
 													.maxWidth || undefined,
@@ -480,6 +485,9 @@ function ViewList( {
 											width:
 												cell.column.columnDef.width ||
 												undefined,
+											minWidth:
+												cell.column.columnDef
+													.minWidth || undefined,
 											maxWidth:
 												cell.column.columnDef
 													.maxWidth || undefined,
