@@ -729,7 +729,7 @@ test.describe( 'Image', () => {
 		await page
 			.getByRole( 'button', { name: 'Publish', exact: true } )
 			.click();
-		await page.getByRole( 'button', { name: 'Upload all' } ).click();
+		await page.getByRole( 'button', { name: 'Upload' } ).click();
 
 		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
 
