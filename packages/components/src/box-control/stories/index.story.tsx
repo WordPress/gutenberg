@@ -12,15 +12,15 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import BoxControl from '../';
-import type { BoxControlValue } from '../types';
 
 const meta: Meta< typeof BoxControl > = {
 	title: 'Components (Experimental)/BoxControl',
 	component: BoxControl,
 	argTypes: {
-		onChange: { action: 'onChange' },
+		values: { control: null },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -36,41 +36,47 @@ const defaultSideValues = {
 
 const Template: StoryFn< typeof BoxControl > = ( props ) => {
 	const [ values, setValues ] =
-		useState< BoxControlValue >( defaultSideValues );
+		useState< ( typeof props )[ 'values' ] >( defaultSideValues );
 
 	return (
 		<BoxControl
-			label="Padding"
 			values={ values }
 			{ ...props }
-			onChange={ ( nextValue ) => setValues( nextValue ) }
+			onChange={ ( nextValue ) => {
+				setValues( nextValue );
+				props.onChange?.( nextValue );
+			} }
 		/>
 	);
 };
 
 export const Default = Template.bind( {} );
 Default.args = {
-	label: 'Box Control',
 	values: undefined,
+	label: 'Label',
 };
 
 export const ArbitrarySides = Template.bind( {} );
 ArbitrarySides.args = {
+	...Default.args,
 	sides: [ 'top', 'bottom' ],
 };
 
 export const SingleSide = Template.bind( {} );
 SingleSide.args = {
+	...Default.args,
 	sides: [ 'bottom' ],
 };
 
 export const AxialControls = Template.bind( {} );
 AxialControls.args = {
+	...Default.args,
 	splitOnAxis: true,
 };
 
 export const AxialControlsWithSingleSide = Template.bind( {} );
 AxialControlsWithSingleSide.args = {
+	...Default.args,
 	sides: [ 'horizontal' ],
 	splitOnAxis: true,
 };
