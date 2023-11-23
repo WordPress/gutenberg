@@ -150,15 +150,18 @@ test.describe( 'Order of block keyboard navigation', () => {
 			'Multiple selected blocks'
 		);
 
+		await pageUtils.pressKeys( 'ctrl+`' );
 		await page.keyboard.press( 'Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
 
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+ctrl+`' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Multiple selected blocks'
 		);
 
-		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
 		await page.keyboard.press( 'ArrowRight' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Move up' );
 	} );
