@@ -19,6 +19,10 @@ export default function Filters( { fields, view, onChangeView } ) {
 					field: field.id,
 					name: field.header,
 					elements: field.elements || [],
+					operators: field.filterBy?.operators || [
+						OPERATOR_IN,
+						OPERATOR_NOT_IN,
+					],
 					isVisible: view.filters.some(
 						( f ) =>
 							f.field === field.id &&

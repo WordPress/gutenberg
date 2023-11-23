@@ -185,6 +185,8 @@ Example:
 -   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment.
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
+-   `filterBy`: configuration for the filters.
+    - `operators`: the list of operators supported by the field.
 
 ## Actions
 

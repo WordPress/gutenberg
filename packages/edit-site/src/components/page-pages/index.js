@@ -265,6 +265,9 @@ export default function PagePages() {
 				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
+				filterBy: {
+					operators: [ OPERATOR_IN ],
+				},
 			},
 			{
 				header: __( 'Date' ),
