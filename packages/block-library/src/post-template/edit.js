@@ -123,7 +123,7 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
 			const query = {
-				offset: perPage ? offset || 0 : 0,
+				offset: offset || 0,
 				order,
 				orderby: orderBy,
 			};
