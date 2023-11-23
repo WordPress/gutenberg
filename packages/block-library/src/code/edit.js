@@ -2,10 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useRefEffect } from '@wordpress/compose';
 import { TAB } from '@wordpress/keycodes';
+import { useSelect } from '@wordpress/data';
 
 export default function CodeEdit( {
 	attributes,
@@ -15,6 +20,7 @@ export default function CodeEdit( {
 	mergeBlocks,
 } ) {
 	const blockProps = useBlockProps();
+	const { getSettings } = useSelect( blockEditorStore );
 	const ref = useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -28,6 +34,10 @@ export default function CodeEdit( {
 				metaKey ||
 				ctrlKey
 			) {
+				return;
+			}
+
+			if ( getSettings().keepCaretInsideBlock ) {
 				return;
 			}
 

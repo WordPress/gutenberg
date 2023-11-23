@@ -3,6 +3,8 @@
  */
 import { useRefEffect } from '@wordpress/compose';
 import { TAB } from '@wordpress/keycodes';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -13,6 +15,7 @@ import useOutdentListItem from './use-outdent-list-item';
 export default function useTab( clientId ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	return useRefEffect(
 		( element ) => {
@@ -27,6 +30,10 @@ export default function useTab( clientId ) {
 					metaKey ||
 					ctrlKey
 				) {
+					return;
+				}
+
+				if ( getSettings().keepCaretInsideBlock ) {
 					return;
 				}
 
