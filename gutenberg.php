@@ -53,7 +53,7 @@ if ( ! defined( 'GUTENBERG_MAX_WP_VERSION' ) ) {
 	 * release will be synced/merged to WP 6.5 so this versions of the Gutenberg plugin
 	 * should not be used there.
 	 */
-	define( 'GUTENBERG_MAX_WP_VERSION', '6.4' );
+	define( 'GUTENBERG_MAX_WP_VERSION', '6.5' );
 }
 
 if ( defined( 'ABSPATH' ) ) {
@@ -65,7 +65,7 @@ if ( defined( 'ABSPATH' ) ) {
 /**
  * Retiurns the text for the "WordPress version is too old" notices.
  *
- * @since 17.0.0
+ * @since 17.2.0
  *
  * @return string Text for the notices, escaped.
  */
@@ -90,7 +90,7 @@ function gutenberg_wordpress_version_too_old_text() {
 /**
  * Retiurns the text for the "Gutenberg version is too old" notices.
  *
- * @since 17.0.0
+ * @since 17.2.0
  *
  * @return string Text for the notices, escaped.
  */
@@ -112,6 +112,7 @@ function gutenberg_version_too_old_text() {
 function gutenberg_wordpress_version_too_old_notice() {
 	$current_screen = get_current_screen();
 
+	// Show only on the Dashboard and the Plugins screen.
 	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
 		return;
 	}
@@ -124,11 +125,12 @@ function gutenberg_wordpress_version_too_old_notice() {
 /**
  * Display a "Gutenberg version is too old" notice.
  *
- * @since 17.0.0
+ * @since 17.2.0
  */
 function gutenberg_version_too_old_notice() {
 	$current_screen = get_current_screen();
 
+	// Show only on the Dashboard and the Plugins screen.
 	if ( ! $current_screen || ( 'dashboard' !== $current_screen->id && 'plugins' !== $current_screen->id ) ) {
 		return;
 	}
@@ -141,7 +143,7 @@ function gutenberg_version_too_old_notice() {
 /**
  * Add a "WordPress version is too old" plugins list table notice.
  *
- * @since 17.0.0
+ * @since 17.2.0
  *
  * @param string[] $plugin_meta Array of plugin row meta data.
  * @param string   $file        Path to the plugin file relative to the plugins directory.
@@ -153,7 +155,9 @@ function gutenberg_wordpress_version_too_old_plugin_row_meta( $plugin_meta, $fil
 	if ( $file === $plugin_basename ) {
 		// Prevent PHP warnings when a plugin uses this filter incorrectly.
 		$plugin_meta = (array) $plugin_meta;
-		$text        = gutenberg_wordpress_version_too_old_text();
+
+		// The text is already HTML escaped.
+		$text = gutenberg_wordpress_version_too_old_text();
 
 		$plugin_meta['gutenberg-plugin-notice'] = '<p style="color:red;margin:0.7em 0;">' . $text . '</p>';
 	}
@@ -164,7 +168,7 @@ function gutenberg_wordpress_version_too_old_plugin_row_meta( $plugin_meta, $fil
 /**
  * Add a "Gutenberg version is too old" plugins list table notice.
  *
- * @since 17.0.0
+ * @since 17.2.0
  *
  * @param string[] $plugin_meta Array of plugin row meta data.
  * @param string   $file        Path to the plugin file relative to the plugins directory.
@@ -176,7 +180,9 @@ function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 	if ( $file === $plugin_basename ) {
 		// Prevent PHP warnings when a plugin uses this filter incorrectly.
 		$plugin_meta = (array) $plugin_meta;
-		$text        = gutenberg_version_too_old_text();
+
+		// The text is already HTML escaped.
+		$text = gutenberg_version_too_old_text();
 
 		$plugin_meta['gutenberg-plugin-notice'] = '<p style="color:red;margin:0.7em 0;">' . $text . '</p>';
 	}
@@ -187,7 +193,7 @@ function gutenberg_version_too_old_plugin_row_meta( $plugin_meta, $file ) {
 /**
  * Add a "(disabled)" notice to the plugin's action links.
  *
- * @since 17.0.0
+ * @since 17.2.0
  *
  * @param string[] $links Array of plugin action links.
  * @param string   $file  Path to the plugin file relative to the plugins directory.
