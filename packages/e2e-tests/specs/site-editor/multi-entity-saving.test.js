@@ -235,5 +235,50 @@ describe( 'Multi-entity save flow', () => {
 
 			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
+
+		// Regression: https://github.com/WordPress/gutenberg/issues/36096
+		it( "Can publish even if some changes haven't been saved", async () => {
+			await createNewPost();
+			//await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			const editableSiteTitleSelector =
+				'.wp-block-site-title a[contenteditable="true"]';
+			await page.waitForSelector( editableSiteTitleSelector );
+			await page.focus( editableSiteTitleSelector );
+			await page.keyboard.type( '...' );
+
+			await clickButton( 'Publish' );
+			await page.waitForSelector( savePanelSelector );
+			const checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 2 );
+
+			await checkboxInputs[ 0 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await clickButton( 'Save' );
+			await page.waitForSelector( publishPanelSelector );
+
+			// Make sure we can publish.
+			page.on( 'pageerror', ( err ) => {
+				// eslint-disable-next-line no-console
+				console.log( 'Error when attempting to publish post:', err );
+			} );
+			await clickButton( 'Publish' );
+
+			// Reset site entity to default value to not affect other tests.
+			await page.evaluate( () => {
+				wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						title: 'gutenberg',
+					} );
+				wp.data
+					.dispatch( 'core' )
+					.saveEditedEntityRecord( 'root', 'site', undefined );
+			} );
+		} );
 	} );
 } );
