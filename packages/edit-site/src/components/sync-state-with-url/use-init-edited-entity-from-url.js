@@ -87,7 +87,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypeToResolve,
 				postIdToResolve
 			) {
-				// For the front page, we alwayse use the front page template if existing.
+				// For the front page, we always use the front page template if existing.
 				if (
 					postTypeToResolve === 'page' &&
 					homepageId === postIdToResolve
