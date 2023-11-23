@@ -285,7 +285,6 @@ export default function ViewActions( {
 } ) {
 	return (
 		<DropdownMenuV2
-			label={ __( 'View options' ) }
 			trigger={
 				<Button
 					variant="tertiary"
