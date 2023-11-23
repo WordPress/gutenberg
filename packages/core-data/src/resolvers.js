@@ -803,7 +803,7 @@ export const getRevisions =
 		);
 
 		// When requesting all fields, the list of results can be used to
-		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+		// resolve the `getRevision` selector in addition to `getRevisions`.
 		if ( ! query?._fields && ! query.context ) {
 			const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 			const resolutionsArgs = records
