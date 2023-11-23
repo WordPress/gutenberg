@@ -9,10 +9,21 @@ import {
 	__experimentalView as View,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
+
 function ScreenHeader( { title, description } ) {
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -27,6 +38,9 @@ function ScreenHeader( { title, description } ) {
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							isSmall
 							aria-label={ __( 'Navigate to the previous view' ) }
+							onClick={ () =>
+								setEditorCanvasContainerView( undefined )
+							}
 						/>
 						<Spacer>
 							<Heading

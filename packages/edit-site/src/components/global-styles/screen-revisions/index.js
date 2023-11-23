@@ -61,6 +61,7 @@ function ScreenRevisions() {
 
 	const onCloseRevisions = () => {
 		goTo( '/' ); // Return to global styles main panel.
+		setEditorCanvasContainerView( undefined );
 	};
 
 	const restoreRevision = ( revision ) => {
@@ -116,10 +117,18 @@ function ScreenRevisions() {
 		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
 
+	const revisionsCountBadge = () => {
+		if ( revisions.length ) {
+			return ' (' + revisions.length + ')';
+		}
+
+		return '';
+	};
+
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Revisions' ) }
+				title={ __( 'Revisions' ) + revisionsCountBadge() }
 				description={ __(
 					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }

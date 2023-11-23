@@ -1,8 +1,3 @@
-// /**
-//  * External dependencies
-//  */
-// import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
@@ -70,8 +65,14 @@ function GlobalStylesActionMenu() {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
 	const { goTo } = useNavigator();
-	const loadCustomCSS = () => goTo( '/css' );
+	const loadCustomCSS = () => {
+		setEditorCanvasContainerView( 'global-styles-css' );
+		goTo( '/css' );
+	};
 
 	return (
 		<GlobalStylesMenuFill>
@@ -114,19 +115,6 @@ function GlobalStylesActionMenu() {
 	);
 }
 
-// function RevisionsCountBadge( { className, children } ) {
-// 	return (
-// 		<span
-// 			className={ classnames(
-// 				className,
-// 				'edit-site-global-styles-sidebar__revisions-count-badge'
-// 			) }
-// 		>
-// 			{ children }
-// 		</span>
-// 	);
-// }
-
 function GlobalStylesRevisionsMenu() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 	const { revisionsCount } = useSelect( ( select ) => {
@@ -155,7 +143,7 @@ function GlobalStylesRevisionsMenu() {
 			setEditorCanvasContainerView( 'global-styles-revisions' );
 		} else {
 			goTo( '/' );
-			setEditorCanvasContainerView( '' );
+			setEditorCanvasContainerView( undefined );
 		}
 	};
 	const hasRevisions = revisionsCount > 0;
