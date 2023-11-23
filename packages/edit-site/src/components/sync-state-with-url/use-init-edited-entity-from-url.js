@@ -28,7 +28,7 @@ const postTypesWithoutParentTemplate = [
 ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
-	const { isRequestingSite, homepageId, url, frontPageTemplateId } =
+	const { hasLoadedAllDependencies, homepageId, url, frontPageTemplateId } =
 		useSelect( ( select ) => {
 			const { getSite, getUnstableBase, getEntityRecords } =
 				select( coreDataStore );
@@ -52,10 +52,10 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			}
 
 			return {
-				isRequestingSite: ! base,
+				hasLoadedAllDependencies: !! base && !! siteData,
 				homepageId:
 					siteData?.show_on_front === 'page'
-						? siteData.page_on_front
+						? siteData.page_on_front.toString()
 						: null,
 				url: base?.home,
 				frontPageTemplateId: _frontPateTemplateId,
@@ -132,6 +132,10 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				} );
 			}
 
+			if ( ! hasLoadedAllDependencies ) {
+				return undefined;
+			}
+
 			// If we're rendering a specific page, post... we need to resolve its template.
 			if ( postType && postId ) {
 				return resolveTemplateForPostTypeAndId( postType, postId );
@@ -143,14 +147,14 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			}
 
 			// If we're not rendering a specific page, use the front page template.
-			if ( ! isRequestingSite && url ) {
+			if ( url ) {
 				const template = __experimentalGetTemplateForLink( url );
 				return template?.id;
 			}
 		},
 		[
 			homepageId,
-			isRequestingSite,
+			hasLoadedAllDependencies,
 			url,
 			postId,
 			postType,
@@ -178,7 +182,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		return { isReady: true, postType, postId, context };
 	}
 
-	if ( ( postType && postId ) || homepageId || ! isRequestingSite ) {
+	if ( hasLoadedAllDependencies ) {
 		return {
 			isReady: resolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
