@@ -39,8 +39,6 @@ const availableViews = [
 		id: 'grid',
 		label: __( 'Grid' ),
 	},
-	// TODO: This(the whole layout) needs be redesigned because in order for it to
-	// work properly, needs extra code from the consumer of DataViews component.
 	{
 		id: 'side-by-side',
 		label: __( 'Side by side' ),

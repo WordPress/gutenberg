@@ -110,18 +110,33 @@ function AuthorField( { item } ) {
 	);
 }
 
-function TemplatePreview( { content } ) {
+function TemplatePreview( { content, viewType } ) {
+	const settings = usePatternSettings();
 	const blocks = useMemo( () => {
 		return parse( content );
 	}, [ content ] );
 	if ( ! blocks?.length ) {
 		return null;
 	}
-	return <BlockPreview blocks={ blocks } />;
+	// Wrap everything in a block editor provider to ensure 'styles' that are needed
+	// for the previews are synced between the site editor store and the block editor store.
+	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+	// render patterns inside the previews.
+	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
+	// the block editor settings are needed in context where we don't have the block editor.
+	// Explore how we can solve this in a better way.
+	return (
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<div
+				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+			>
+				<BlockPreview blocks={ blocks } />
+			</div>
+		</ExperimentalBlockEditorProvider>
+	);
 }
 
 export default function DataviewsTemplates() {
-	const settings = usePatternSettings();
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
@@ -184,8 +199,13 @@ export default function DataviewsTemplates() {
 				header: __( 'Preview' ),
 				id: 'preview',
 				getValue: () => {},
-				render: ( { item } ) => {
-					return <TemplatePreview content={ item.content.raw } />;
+				render: ( { item, view: { type: viewType } } ) => {
+					return (
+						<TemplatePreview
+							content={ item.content.raw }
+							viewType={ viewType }
+						/>
+					);
 				},
 				minWidth: 120,
 				maxWidth: 120,
@@ -254,29 +274,19 @@ export default function DataviewsTemplates() {
 		},
 		[ view, setView ]
 	);
-
-	// Wrap everything in a block editor provider to ensure 'styles' that are needed
-	// for the previews are synced between the site editor store and the block editor store.
-	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
-	// render patterns inside the previews.
-	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
-	// the block editor settings are needed in context where we don't have the block editor.
-	// Explore how we can solve this in a better way.
 	return (
-		<ExperimentalBlockEditorProvider settings={ settings }>
-			<Page title={ __( 'Templates' ) }>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ shownTemplates }
-					getItemId={ ( item ) => item.id }
-					isLoading={ isLoadingData }
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ [ 'list', 'grid' ] }
-				/>
-			</Page>
-		</ExperimentalBlockEditorProvider>
+		<Page title={ __( 'Templates' ) }>
+			<DataViews
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ shownTemplates }
+				getItemId={ ( item ) => item.id }
+				isLoading={ isLoadingData }
+				view={ view }
+				onChangeView={ onChangeView }
+				supportedLayouts={ [ 'list', 'grid' ] }
+			/>
+		</Page>
 	);
 }

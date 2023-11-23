@@ -36,11 +36,6 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 				return (
 					<VStack key={ getItemId?.( item ) || index }>
 						<div className="dataviews-view-grid__media">
-							{ /* TODO: This needs to be handled better because it could be not possible to
-								to return `null`, if the field needs to provide a component that uses hooks, etc..
-								In that case, the actual field could render nothing, but the `mediaField?.render`
-								call would return a React element.
-							*/ }
 							{ mediaField?.render( { item, view } ) || (
 								<Placeholder
 									withIllustration
@@ -62,10 +57,6 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 									) ) }
 								</VStack>
 							</FlexBlock>
-							{ /* TODO: ItemActions needs to be handled better in general.
-							In smaller viewports the actions could take too much space.
-							A solution could be to render the actions inside the media,
-							or in `grid` render all actions in the drop down menu. */ }
 							<FlexBlock style={ { maxWidth: 'min-content' } }>
 								<ItemActions
 									item={ item }
