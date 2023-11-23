@@ -116,21 +116,28 @@ describe( 'useEntityRecord', () => {
 	} );
 
 	it( 'does not resolve entity record when disabled via options', async () => {
-		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORD );
 
 		let data;
-		const TestComponent = () => {
-			data = useEntityRecord( 'root', 'widget', 2, {
-				options: { enabled: false },
-			} );
+		const TestComponent = ( { enabled } ) => {
+			data = useEntityRecord( 'root', 'widget', 1, { enabled } );
 			return <div />;
 		};
-		render(
+		const UI = ( { enabled } ) => (
 			<RegistryProvider value={ registry }>
-				<TestComponent />
+				<TestComponent enabled={ enabled } />
 			</RegistryProvider>
 		);
+
+		const { rerender } = render( <UI enabled={ true } /> );
+
+		// A minimum delay for a fetch request. The same delay is used again as a control.
+		await act(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
+		);
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		rerender( <UI enabled={ false } /> );
 
 		expect( data ).toEqual( {
 			edit: expect.any( Function ),
@@ -141,14 +148,10 @@ describe( 'useEntityRecord', () => {
 			save: expect.any( Function ),
 		} );
 
-		// Fetch request should have been issued.
-		await waitFor( () => {
-			expect( triggerFetch ).not.toHaveBeenCalled();
-		} );
-		await waitFor( () =>
-			expect( triggerFetch ).not.toHaveBeenCalledWith( {
-				path: '/wp/v2/widgets/2?context=edit',
-			} )
+		// The same delay.
+		await act(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
 		);
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
