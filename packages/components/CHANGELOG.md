@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   `DropdownMenuV2`: add support for rendering in legacy popover slot ([#56342](https://github.com/WordPress/gutenberg/pull/56342)).
 -   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
 
 ## 25.12.0 (2023-11-16)
