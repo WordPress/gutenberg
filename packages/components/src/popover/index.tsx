@@ -97,7 +97,7 @@ const ArrowTriangle = () => (
 	</SVG>
 );
 
-export const slotNameContext = createContext< string | undefined >( undefined );
+const slotNameContext = createContext< string | undefined >( undefined );
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {

@@ -79,13 +79,6 @@ export interface DropdownMenuProps {
 		| ( (
 				event: KeyboardEvent | React.KeyboardEvent< Element >
 		  ) => boolean );
-	/**
-	 * The name of the Slot in which the popover should be rendered. It should
-	 * be also passed to the corresponding `PopoverSlot` component.
-	 *
-	 * @default 'Popover'
-	 */
-	slotName?: string;
 }
 
 export interface DropdownMenuGroupProps {
