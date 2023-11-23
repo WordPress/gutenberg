@@ -82,3 +82,19 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_dimensions_support',
 	)
 );
+
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'dimensions',
+	array(
+		'minHeight' => array(
+			'property_keys' => array(
+				'default' => 'min-height',
+			),
+			'path'          => array( 'dimensions', 'minHeight' ),
+			'css_vars'      => array(
+				'spacing' => '--wp--preset--spacing--$slug',
+			),
+		),
+	)
+);

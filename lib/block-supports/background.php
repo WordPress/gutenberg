@@ -104,3 +104,22 @@ WP_Block_Supports::get_instance()->register(
 );
 
 add_filter( 'render_block', 'gutenberg_render_background_support', 10, 2 );
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'background',
+	array(
+		'backgroundImage' => array(
+			'property_keys' => array(
+				'default' => 'background-image',
+			),
+			'value_func'    => array( 'WP_Style_Engine_Gutenberg', 'get_url_or_value_css_declaration' ),
+			'path'          => array( 'background', 'backgroundImage' ),
+		),
+		'backgroundSize'  => array(
+			'property_keys' => array(
+				'default' => 'background-size',
+			),
+			'path'          => array( 'background', 'backgroundSize' ),
+		),
+	)
+);
