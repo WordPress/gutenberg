@@ -316,10 +316,12 @@ const UnconnectedDropdownMenu = (
 				{ ...otherProps }
 				modal={ modal }
 				store={ dropdownMenuStore }
-				// Nested menus overlap by 8px
+				// Root menu has an 8px distance from its trigger,
+				// otherwise 0 (which causes the submenu to slightly overlap)
 				gutter={ gutter ?? ( dropdownMenuStore.parent ? 0 : 8 ) }
-				// Nested menus have their items aligned horizontally
-				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
+				// Align nested menu by the same (but opposite) amount
+				// as the menu container's padding.
+				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				variant={ variant }
