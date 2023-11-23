@@ -16,7 +16,7 @@ import { speak } from '@wordpress/a11y';
  */
 import Icon from '../icon';
 import type { PlaceholderProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 const PlaceholderIllustration = (
 	<SVG

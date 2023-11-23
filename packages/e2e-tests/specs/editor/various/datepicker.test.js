@@ -56,14 +56,12 @@ function formatDatePickerValues(
 
 async function getPublishingDate() {
 	return page.$eval(
-		'.edit-post-post-schedule__toggle',
+		'.editor-post-schedule__dialog-toggle',
 		( dateLabel ) => dateLabel.textContent
 	);
 }
 
-// @todo: Change `UTC+1` back to `UTC` once the core regressions is resolved.
-// See: https://github.com/WordPress/gutenberg/pull/54806#issuecomment-1734840171.
-describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
+describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 	`Datepicker %s`,
 	( timezone ) => {
 		let oldTimezone;
@@ -85,7 +83,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 
 		it( 'should show the publishing date if the date is in the past', async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the past.
 			await page.click( '.components-datetime__time-field-year' );
@@ -93,7 +91,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 			const datePickerValues = await getDatePickerValues();
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			const publishingDate = await getPublishingDate();
 
@@ -104,7 +102,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 
 		it( 'should show the publishing date if the date is in the future', async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the future.
 			await page.click( '.components-datetime__time-field-year' );
@@ -112,7 +110,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 			const datePickerValues = await getDatePickerValues();
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			const publishingDate = await getPublishingDate();
 
@@ -125,17 +123,17 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
 
 		it( `should show the publishing date as "Immediately" if the date is cleared`, async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the future.
 			await page.click( '.components-datetime__time-field-year' );
 			await page.keyboard.press( 'ArrowUp' );
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Clear the date.
 			await page.click(

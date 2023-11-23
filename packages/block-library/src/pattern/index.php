@@ -7,8 +7,6 @@
 
 /**
  *  Registers the `core/pattern` block on the server.
- *
- * @return void
  */
 function register_block_core_pattern() {
 	register_block_type_from_metadata(
@@ -46,12 +44,16 @@ function render_block_core_pattern( $attributes ) {
 	// Backward compatibility for handling Block Hooks and injecting the theme attribute in the Gutenberg plugin.
 	// This can be removed when the minimum supported WordPress is >= 6.4.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && ! function_exists( 'traverse_and_serialize_blocks' ) ) {
-		$content = _inject_theme_attribute_in_block_template_content( $content );
 		$blocks  = parse_blocks( $content );
 		$content = gutenberg_serialize_blocks( $blocks );
 	}
 
-	return do_blocks( $content );
+	$content = do_blocks( $content );
+
+	global $wp_embed;
+	$content = $wp_embed->autoembed( $content );
+
+	return $content;
 }
 
 add_action( 'init', 'register_block_core_pattern' );

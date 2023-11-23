@@ -15,7 +15,7 @@ import { cloneElement, forwardRef } from '@wordpress/element';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { MenuItemProps } from './types';
 
 function UnforwardedMenuItem(

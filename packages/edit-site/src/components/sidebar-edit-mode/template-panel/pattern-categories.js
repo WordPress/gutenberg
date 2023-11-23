@@ -3,7 +3,7 @@
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { FormTokenField, PanelRow } from '@wordpress/components';
+import { FormTokenField, FlexBlock, PanelRow } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
@@ -257,21 +257,23 @@ export default function PatternCategories( { post } ) {
 
 	return (
 		<PanelRow initialOpen={ true } title={ __( 'Categories' ) }>
-			<FormTokenField
-				__next40pxDefaultSize
-				value={ values }
-				suggestions={ suggestions }
-				onChange={ onChange }
-				onInputChange={ debouncedSearch }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				label={ __( 'Pattern categories' ) }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-				tokenizeOnBlur
-			/>
+			<FlexBlock>
+				<FormTokenField
+					__next40pxDefaultSize
+					value={ values }
+					suggestions={ suggestions }
+					onChange={ onChange }
+					onInputChange={ debouncedSearch }
+					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+					label={ __( 'Pattern categories' ) }
+					messages={ {
+						added: termAddedLabel,
+						removed: termRemovedLabel,
+						remove: removeTermLabel,
+					} }
+					tokenizeOnBlur
+				/>
+			</FlexBlock>
 		</PanelRow>
 	);
 }

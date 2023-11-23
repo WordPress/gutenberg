@@ -5,13 +5,13 @@ import { store } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { browserSupportsPdfs } from './utils';
+import { browserSupportsPdfs as hasPdfPreview } from './utils';
 
 store( {
 	selectors: {
 		core: {
 			file: {
-				hasPdfPreview: browserSupportsPdfs() ? 'inherit' : 'none',
+				hasPdfPreview,
 			},
 		},
 	},

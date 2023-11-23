@@ -222,7 +222,6 @@ function PostTitle( _, forwardedRef ) {
 			} );
 		},
 		__unstableDisableFormats: true,
-		preserveWhiteSpace: true,
 	} );
 
 	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */

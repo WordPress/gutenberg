@@ -10,8 +10,9 @@ import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
+import BlockContextualToolbar from './components/block-tools/block-contextual-toolbar';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
-import { cleanEmptyObject } from './hooks/utils';
+import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -24,6 +25,7 @@ import {
 } from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
+import { getDuotoneFilter } from './components/duotone/utils';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -33,14 +35,17 @@ lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockCanvas,
 	ExperimentalBlockEditorProvider,
+	getDuotoneFilter,
 	getRichTextValues,
 	kebabCase,
 	PrivateInserter,
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
+	BlockContextualToolbar,
 	useShouldContextualToolbarShow,
 	cleanEmptyObject,
+	useStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,

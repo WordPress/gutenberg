@@ -101,6 +101,10 @@
 	background: $gray-900;
 	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
 	z-index: z-index(".edit-site-patterns__header");
+
+	.edit-site-patterns__button {
+		color: $gray-600;
+	}
 }
 
 .edit-site-patterns__section {
@@ -217,4 +221,8 @@
 
 .edit-site-patterns__no-results {
 	color: $gray-600;
+}
+
+.edit-site-patterns__delete-modal {
+	width: $modal-width-small;
 }

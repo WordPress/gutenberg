@@ -349,6 +349,7 @@ describe( 'Change detection', () => {
 		// Trash post.
 		await openDocumentSettingsSidebar();
 		await page.click( '.editor-post-trash.components-button' );
+		await page.click( '.components-confirm-dialog .is-primary' );
 
 		await Promise.all( [
 			// Wait for "Saved" to confirm save complete.

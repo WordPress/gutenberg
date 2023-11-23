@@ -129,6 +129,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		generateHapticFeedback: jest.fn(),
 		toggleUndoButton: jest.fn(),
 		toggleRedoButton: jest.fn(),
+		sendActionButtonPressedAction: jest.fn(),
+		actionButtons: {
+			missingBlockAlertActionButton: 'missing_block_alert_action_button',
+		},
 	};
 } );
 
@@ -147,6 +151,7 @@ jest.mock( 'react-native-svg', () => {
 		G: () => 'G',
 		Polygon: () => 'Polygon',
 		Rect: () => 'Rect',
+		SvgXml: jest.fn(),
 	};
 } );
 

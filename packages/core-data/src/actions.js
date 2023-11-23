@@ -80,6 +80,7 @@ export function addEntities( entities ) {
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
+ * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -88,7 +89,8 @@ export function receiveEntityRecords(
 	records,
 	query,
 	invalidateCache = false,
-	edits
+	edits,
+	meta
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -102,9 +104,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query, edits );
+		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
-		action = receiveItems( records, edits );
+		action = receiveItems( records, edits, meta );
 	}
 
 	return {
@@ -216,6 +218,8 @@ export function receiveThemeSupports() {
  * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
  * Ignored from documentation as it's internal to the data store.
  *
+ * @deprecated since WordPress 6.5.0. Callers should use `dispatch( 'core' ).receiveRevision` instead.
+ *
  * @ignore
  *
  * @param {number} currentId The post id.
@@ -224,6 +228,13 @@ export function receiveThemeSupports() {
  * @return {Object} Action object.
  */
 export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	deprecated(
+		"wp.data.dispatch( 'core' ).receiveThemeGlobalStyleRevisions()",
+		{
+			since: '6.5.0',
+			alternative: "wp.data.dispatch( 'core' ).receiveRevisions",
+		}
+	);
 	return {
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
 		currentId,
@@ -904,5 +915,54 @@ export function receiveNavigationFallbackId( fallbackId ) {
 	return {
 		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',
 		fallbackId,
+	};
+}
+
+/**
+ * Returns an action object used to set the template for a given query.
+ *
+ * @param {Object} query      The lookup query.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( query, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		query,
+		templateId,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that revisions have been received.
+ *
+ * @param {string}        kind            Kind of the received entity record revisions.
+ * @param {string}        name            Name of the received entity record revisions.
+ * @param {number|string} recordKey       The key of the entity record whose revisions you want to fetch.
+ * @param {Array|Object}  records         Revisions received.
+ * @param {?Object}       query           Query Object.
+ * @param {?boolean}      invalidateCache Should invalidate query caches.
+ * @param {?Object}       meta            Meta information about pagination.
+ * @return {Object} Action object.
+ */
+export function receiveRevisions(
+	kind,
+	name,
+	recordKey,
+	records,
+	query,
+	invalidateCache = false,
+	meta
+) {
+	return {
+		type: 'RECEIVE_ITEM_REVISIONS',
+		items: Array.isArray( records ) ? records : [ records ],
+		recordKey,
+		meta,
+		query,
+		kind,
+		name,
+		invalidateCache,
 	};
 }

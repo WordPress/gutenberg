@@ -109,7 +109,6 @@
 			overflow-y: hidden;
 		}
 
-		border: none;
 		border-bottom: $border-width solid $gray-200;
 		border-radius: 0;
 
@@ -117,16 +116,6 @@
 		.block-editor-block-toolbar .components-toolbar {
 			border-right-color: $gray-200;
 		}
-	}
-
-	// Add a scrim to the right of the collapsed button.
-	&.is-collapsed::after {
-		content: "";
-		position: absolute;
-		left: 100%;
-		width: $grid-unit-60;
-		height: 100%;
-		background: linear-gradient(to right, $white, transparent);
 	}
 
 	@include break-medium() {

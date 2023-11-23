@@ -23,9 +23,7 @@ describe( 'Scheduling', () => {
 		} );
 	};
 
-	// @todo: Change `UTC+1` back to `UTC` once the core regressions is resolved.
-	// See: https://github.com/WordPress/gutenberg/pull/54806#issuecomment-1734840171.
-	describe.each( [ [ 'UTC-10' ], [ 'UTC+1' ], [ 'UTC+10' ] ] )(
+	describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 		`Timezone %s`,
 		( timezone ) => {
 			let oldTimezone;
@@ -48,7 +46,7 @@ describe( 'Scheduling', () => {
 				await page.keyboard.press( 'ArrowUp' );
 
 				// Close the datepicker.
-				await page.click( '.edit-post-post-schedule__toggle' );
+				await page.click( '.editor-post-schedule__dialog-toggle' );
 
 				expect( await getPublishButtonText() ).toBe( 'Schedule…' );
 			} );

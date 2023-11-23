@@ -283,6 +283,16 @@
 							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, its attributes definition is extended to include two new attributes: textColor and style",
 							"default": true
 						},
+						"heading": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set heading colors in a block, heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"default": false
+						},
+						"button": {
+							"type": "boolean",
+							"description": "This property adds block controls which allow the user to set button colors in a block, button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"default": false
+						},
 						"enableContrastChecker": {
 							"type": "boolean",
 							"description": "Determines whether the contrast checker widget displays in the block editor UI.\n\nThe contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default.\n\nSet to `false` to explicitly disable.",

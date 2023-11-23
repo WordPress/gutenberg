@@ -61,6 +61,10 @@ $preview-image-height: 140px;
 .block-editor-link-control__field {
 	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 
+	.components-base-control__label {
+		color: $gray-900;
+	}
+
 	input[type="text"],
 	// Specificity overide of URLInput defaults.
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
@@ -92,12 +96,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-actions {
-	display: flex;
-	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
-	justify-content: flex-start;
-	gap: $grid-unit-10;
 	padding: $grid-unit-10 $grid-unit-20 $grid-unit-20;
-	order: 20;
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -297,9 +296,9 @@ $preview-image-height: 140px;
 
 		img {
 			display: block; // remove unwanted space below image
-			max-width: 100%;
-			height: $preview-image-height; // limit height
-			max-height: $preview-image-height; // limit height
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 	}
 }
@@ -419,6 +418,10 @@ $preview-image-height: 140px;
 
 	.components-base-control__field {
 		display: flex; // don't allow label to wrap under checkbox.
+
+		.components-checkbox-control__label {
+			color: $gray-900;
+		}
 	}
 
 	// Cancel left margin inherited from WP Admin Forms CSS.

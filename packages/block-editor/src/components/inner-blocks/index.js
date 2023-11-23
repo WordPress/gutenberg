@@ -29,7 +29,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const EMPTY_OBJECT = {};
 
@@ -98,7 +98,7 @@ function UncontrolledInnerBlocks( props ) {
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 
-	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
+	const [ defaultLayout ] = useSettings( 'layout' );
 
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
@@ -169,8 +169,11 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
-		options;
+	const {
+		__unstableDisableLayoutClassNames,
+		__unstableDisableDropZone,
+		dropZoneElement,
+	} = options;
 	const {
 		clientId,
 		layout = null,
@@ -211,6 +214,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {
+		dropZoneElement,
 		rootClientId: clientId,
 	} );
 

@@ -129,8 +129,11 @@
 			background: transparent;
 			transform: none;
 			opacity: 1;
-			box-shadow: none;
-			outline: none;
+
+			&:not(:focus) {
+				box-shadow: none;
+				outline: none;
+			}
 		}
 	}
 
@@ -145,7 +148,7 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled, [aria-disabled="true"]) {
 			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
 		}
 	}
