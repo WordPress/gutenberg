@@ -23,6 +23,7 @@ const meta: Meta< typeof CustomSelect > = {
 	argTypes: {
 		children: { control: { type: null } },
 		renderSelectedValue: { control: { type: null } },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -79,6 +80,11 @@ Default.args = {
 	),
 };
 
+/**
+ * Multiple selection can be enabled by using an array for the `value` and
+ * `defaultValue` props. The argument of the `onChange` function will also
+ * change accordingly.
+ */
 export const MultiSelect = Template.bind( {} );
 MultiSelect.args = {
 	defaultValue: [ 'lavender', 'tangerine' ],
@@ -89,7 +95,7 @@ MultiSelect.args = {
 		}
 		if ( currentValue.length === 0 ) return 'No colors selected';
 		if ( currentValue.length === 1 ) return currentValue[ 0 ];
-		return <div>{ currentValue.length } colors selected</div>;
+		return `${ currentValue.length } colors selected`;
 	},
 	children: (
 		<>
@@ -118,7 +124,7 @@ const renderControlledValue = ( gravatar: string | string[] ) => {
 				key={ avatar }
 				src={ avatar }
 				alt=""
-				aria-hidden
+				aria-hidden="true"
 			/>
 			<span>{ gravatar }</span>
 		</div>
