@@ -14,7 +14,7 @@ import type {
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -249,40 +249,39 @@ export function UnforwardedButton(
 			</button>
 		);
 
-	// Convert legacy `position` values to be used with the new `placement` prop
-	let computedPlacement;
-	// if `tooltipPosition` is defined, compute value to `placement`
-	if ( tooltipPosition !== undefined ) {
-		computedPlacement = positionToPlacement( tooltipPosition );
-	}
-
-	if ( ! shouldShowTooltip ) {
-		return (
-			<>
-				{ element }
-				{ describedBy && (
-					<VisuallyHidden>
-						<span id={ descriptionId }>{ describedBy }</span>
-					</VisuallyHidden>
-				) }
-			</>
-		);
-	}
+	// In order to avoid some React reconciliation issues, we are always rendering
+	// the `Tooltip` component even when `shouldShowTooltip` is `false`.
+	// In order to make sure that the tooltip doesn't show when it shouldn't,
+	// we don't pass the props to the `Tooltip` componet.
+	const tooltipProps = useMemo(
+		() =>
+			( shouldShowTooltip
+				? {
+						text:
+							( children as string | ReactElement[] )?.length &&
+							describedBy
+								? describedBy
+								: label,
+						shortcut,
+						placement:
+							tooltipPosition &&
+							// Convert legacy `position` values to be used with the new `placement` prop
+							positionToPlacement( tooltipPosition ),
+				  }
+				: {} ) as Partial< React.ComponentProps< typeof Tooltip > >,
+		[
+			shouldShowTooltip,
+			children,
+			describedBy,
+			label,
+			shortcut,
+			tooltipPosition,
+		]
+	);
 
 	return (
 		<>
-			<Tooltip
-				text={
-					( children as string | ReactElement[] )?.length &&
-					describedBy
-						? describedBy
-						: label
-				}
-				shortcut={ shortcut }
-				placement={ computedPlacement }
-			>
-				{ element }
-			</Tooltip>
+			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
 			{ describedBy && (
 				<VisuallyHidden>
 					<span id={ descriptionId }>{ describedBy }</span>
