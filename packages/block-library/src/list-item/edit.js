@@ -23,6 +23,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import {
 	useEnter,
 	useSpace,
+	useTab,
 	useIndentListItem,
 	useOutdentListItem,
 	useSplit,
@@ -77,7 +78,11 @@ export default function ListItemEdit( {
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
+					ref={ useMergeRefs( [
+						useEnterRef,
+						useSpaceRef,
+						useTab( clientId ),
+					] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
