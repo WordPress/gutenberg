@@ -27,15 +27,23 @@ import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
-	const hasMultiSelection = useSelect(
-		( select ) => select( blockEditorStore ).hasMultiSelection(),
+	const { hasMultiSelection, keepCaretInsideBlock } = useSelect(
+		( select ) => {
+			const { hasMultiSelection: _hasMultiSelection, getSettings } =
+				select( blockEditorStore );
+
+			return {
+				hasMultiSelection: _hasMultiSelection(),
+				keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
+			};
+		},
 		[]
 	);
 
 	return [
-		before,
+		keepCaretInsideBlock ? null : before,
 		useMergeRefs( [
-			ref,
+			keepCaretInsideBlock ? null : ref,
 			useClipboardHandler(),
 			useInput(),
 			useDragSelection(),
@@ -67,7 +75,7 @@ export function useWritingFlow() {
 				[ hasMultiSelection ]
 			),
 		] ),
-		after,
+		keepCaretInsideBlock ? null : after,
 	];
 }
 
