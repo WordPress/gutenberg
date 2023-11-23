@@ -151,6 +151,8 @@ describe( 'useEntityRecord', () => {
 			hasEdits: false,
 			edits: {},
 			record: null,
+			isSaving: false,
+			isDeleting: false,
 			save: expect.any( Function ),
 		} );
 
