@@ -557,15 +557,17 @@ export function updateEditorSettings( settings ) {
  * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
  *
  * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
- *
- * @return {Object} Action object
  */
-export function setRenderingMode( mode ) {
-	return {
-		type: 'SET_RENDERING_MODE',
-		mode,
+export const setRenderingMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( blockEditorStore ).clearSelectedBlock();
+
+		dispatch( {
+			type: 'SET_RENDERING_MODE',
+			mode,
+		} );
 	};
-}
 
 /**
  * Backward compatibility

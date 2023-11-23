@@ -1266,10 +1266,6 @@ _Parameters_
 
 -   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
 
-_Returns_
-
--   `Object`: Action object
-
 ### setTemplateValidity
 
 _Related_
