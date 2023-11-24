@@ -1,6 +1,10 @@
 $toggle-width: 36px;
 $toggle-height: 18px;
 $toggle-border-width: 1px;
+$thumb-size:  $toggle-height - ($toggle-border-width * 6);
+
+$transition-duration-color: 0.2s;
+$transition-duration-position: 0.1s;
 
 .components-form-toggle {
 	position: relative;
@@ -8,6 +12,7 @@ $toggle-border-width: 1px;
 
 	// Unchecked state.
 	.components-form-toggle__track {
+		position: relative;
 		content: "";
 		display: inline-block;
 		box-sizing: border-box;
@@ -17,8 +22,26 @@ $toggle-border-width: 1px;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: $toggle-height * 0.5;
-		transition: 0.2s background ease;
+		transition:
+			$transition-duration-color background-color ease,
+			$transition-duration-color border-color ease;
 		@include reduce-motion("transition");
+		overflow: hidden;
+
+		// Windows High Contrast Mode
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			box-sizing: border-box;
+			// Expand the border to fake a solid in Windows High Contrast Mode.
+			border-top: #{ $toggle-height } solid transparent;
+
+			transition: $transition-duration-color opacity ease;
+			@include reduce-motion("transition");
+
+			opacity: 0;
+		}
 	}
 
 	.components-form-toggle__thumb {
@@ -27,20 +50,28 @@ $toggle-border-width: 1px;
 		box-sizing: border-box;
 		top: $toggle-border-width * 3;
 		left: $toggle-border-width * 3;
-		width: $toggle-height - ($toggle-border-width * 6);
-		height: $toggle-height - ($toggle-border-width * 6);
+		width: $thumb-size;
+		height: $thumb-size;
 		border-radius: 50%;
-		transition: 0.1s transform ease;
+		transition:
+			$transition-duration-position transform ease,
+			$transition-duration-color background-color ease-out;
 		@include reduce-motion("transition");
 		background-color: $gray-900;
-		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
+
+		// Transparent border acts as a fill in Windows High Contrast Mode.
+		border: $thumb-size / 2 solid transparent;
 	}
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
 		background-color: $components-color-accent;
-		border: $toggle-border-width solid $components-color-accent;
-		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+		border-color: $components-color-accent;
+
+		// Windows High Contrast Mode
+		&::after {
+			opacity: 1;
+		}
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
