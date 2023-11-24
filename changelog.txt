@@ -1,7 +1,46 @@
 == Changelog ==
 
-= 17.1.0-rc.1 =
+= 17.1.2 =
 
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+
+- PostCSS style transformation: fail gracefully instead of throwing an error (https://github.com/WordPress/gutenberg/pull/56093)
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@zaguiini
+
+
+= 17.1.1 =
+
+# Changelog
+
+## Bug Fixes
+
+### Block Library
+
+Fix fatal error when calling undefined block library function. #56459
+
+
+= 17.0.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+
+- PostCSS style transformation: fail gracefully instead of throwing an error (https://github.com/WordPress/gutenberg/pull/56093)
+
+
+
+= 17.1.0 =
 
 
 ## Changelog
@@ -27,7 +66,7 @@
 #### Global Styles
 - Global Style Revisions: Ensure consistent back button behaviour. ([55881](https://github.com/WordPress/gutenberg/pull/55881))
 - Global Styles Revisions: More descriptive text timeline. ([55868](https://github.com/WordPress/gutenberg/pull/55868))
-- Global styles revisions: Add route for single styles revisions. ([55827](https://github.com/WordPress/gutenberg/pull/55827))
+- Global Styles Revisions: Add route for single styles revisions. ([55827](https://github.com/WordPress/gutenberg/pull/55827))
 
 #### Block Locking
 - Block Quick Navigation: Truncate text. ([56142](https://github.com/WordPress/gutenberg/pull/56142))
@@ -89,7 +128,7 @@
 - DataViews: Make items per page an even number. ([55906](https://github.com/WordPress/gutenberg/pull/55906))
 - DataViews: Make used taxonomy private. ([55918](https://github.com/WordPress/gutenberg/pull/55918))
 - DataViews: Reset pagination upon filter change. ([55797](https://github.com/WordPress/gutenberg/pull/55797))
-- Dataviews: Add a missing icon for the side by side view. ([55925](https://github.com/WordPress/gutenberg/pull/55925))
+- DataViews: Add a missing icon for the side by side view. ([55925](https://github.com/WordPress/gutenberg/pull/55925))
 
 #### Components
 - DropdownMenu: Remove extra vertical space around the toggle button. ([56136](https://github.com/WordPress/gutenberg/pull/56136))
@@ -326,6 +365,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @afercia @andrewhayward @andrewserong @anomiex @anton-vlasenko @aristath @artemiomorales @bph @brookewp @c4rl0sbr4v0 @chad1008 @ciampo @DAreRodz @dcalhoun @dsas @ellatrix @flootr @fluiddot @gaambo @glendaviesnz @gziolo @jameskoster @jeryj @jhnstn @joanrodas @jorgefilipecosta @JorgeVilchez95 @jsnajdr @juanmaguitar @kevin940726 @Mamaduka @masteradhoc @matiasbenedetto @ndiego @ntsekouras @oandregal @peterwilsoncc @pooja-muchandikar @priethor @ramonjd @renatho @richtabor @sacerro @scruffian @shimotmk @SiobhyB @Soean @swissspidy @t-hamano @talldan @tellthemachines @torounit @tyxla @WunderBart @youknowriad
+
+
 
 
 = 17.0.2 =
