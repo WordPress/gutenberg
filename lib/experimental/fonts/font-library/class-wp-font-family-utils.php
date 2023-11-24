@@ -92,24 +92,19 @@ class WP_Font_Family_Utils {
 	}
 
 	/**
-	 * Format font slug and family.
+	 * Format font family to make it CSS ready.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $font The font to format.
-	 * @return array The formatted font.
+	 * @param string $font_family Font family attribute.
+	 * @return string The formatted font family attribute.
 	 */
-	public static function format_slug_and_family( $font ) {
-		// Ensure slugs are kebab-cased and font families are wrapped in quotes.
-		if ( isset( $font['slug'] ) ) {
-			$font['slug'] = _wp_to_kebab_case( $font['slug'] );
-		}
-
-		if ( isset( $font['fontFamily'] ) ) {
-			$font_families         = explode( ',', $font['fontFamily'] );
+	public static function format_font_family( $font_family ) {
+		if ( $font_family ) {
+			$font_families         = explode( ',', $font_family );
 			$wrapped_font_families = array_map(
-				function ( $font_family ) {
-					$trimmed = trim( $font_family );
+				function ( $family ) {
+					$trimmed = trim( $family );
 					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
 							return "'" . $trimmed . "'";
 					}
@@ -119,12 +114,12 @@ class WP_Font_Family_Utils {
 			);
 
 			if ( count( $wrapped_font_families ) === 1 ) {
-				$font['fontFamily'] = $wrapped_font_families[0];
+				$font_family = $wrapped_font_families[0];
 			} else {
-				$font['fontFamily'] = implode( ', ', $wrapped_font_families );
+				$font_family = implode( ', ', $wrapped_font_families );
 			}
 		}
 
-		return $font;
+		return $font_family;
 	}
 }
