@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { default as FilterSummary } from './filter-summary';
+import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
