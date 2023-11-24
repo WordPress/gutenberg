@@ -48,6 +48,7 @@ function Pagination( {
 								onChangeView( { ...view, page: 1 } )
 							}
 							disabled={ view.page === 1 }
+							__experimentalIsFocusable
 							label={ __( 'First page' ) }
 							icon={ previous }
 							showTooltip
@@ -58,6 +59,7 @@ function Pagination( {
 								onChangeView( { ...view, page: view.page - 1 } )
 							}
 							disabled={ view.page === 1 }
+							__experimentalIsFocusable
 							label={ __( 'Previous page' ) }
 							icon={ chevronLeft }
 							showTooltip
@@ -115,6 +117,7 @@ function Pagination( {
 								onChangeView( { ...view, page: view.page + 1 } )
 							}
 							disabled={ view.page >= totalPages }
+							__experimentalIsFocusable
 							label={ __( 'Next page' ) }
 							icon={ chevronRight }
 							showTooltip
@@ -125,6 +128,7 @@ function Pagination( {
 								onChangeView( { ...view, page: totalPages } )
 							}
 							disabled={ view.page >= totalPages }
+							__experimentalIsFocusable
 							label={ __( 'Last page' ) }
 							icon={ next }
 							showTooltip
