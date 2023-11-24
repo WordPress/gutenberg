@@ -132,9 +132,9 @@ export default function PostSavedState( {
 	const buttonAccessibleLabel = text || label;
 
 	/**
-	 * The tooltip needs to be enabled only is the button is not disabled. When
+	 * The tooltip needs to be enabled only if the button is not disabled. When
 	 * relying on the internal Button tooltip functionality, this causes the
-	 * resulting `button` element to be always remove and re-added to the DOM,
+	 * resulting `button` element to be always removed and re-added to the DOM,
 	 * causing focus loss. An alternative approach to circumvent the issue
 	 * is not to use the `label` and `shortcut` props on `Button` (which would
 	 * trigger the tooltip), and instead manually wrap the `Button` in a separate
