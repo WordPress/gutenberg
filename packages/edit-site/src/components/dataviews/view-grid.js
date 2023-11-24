@@ -8,6 +8,7 @@ import {
 	FlexBlock,
 	Placeholder,
 } from '@wordpress/components';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,9 +24,15 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			! view.hiddenFields.includes( field.id ) &&
 			field.id !== view.layout.mediaField
 	);
+	const shownData = useAsyncList( data, { step: 3 } );
 	return (
-		<Grid gap={ 8 } columns={ 2 } alignment="top">
-			{ data.map( ( item, index ) => {
+		<Grid
+			gap={ 8 }
+			columns={ 2 }
+			alignment="top"
+			className="dataviews-grid-view"
+		>
+			{ shownData.map( ( item, index ) => {
 				return (
 					<VStack key={ getItemId?.( item ) || index }>
 						<div className="dataviews-view-grid__media">
@@ -50,7 +57,7 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 									) ) }
 								</VStack>
 							</FlexBlock>
-							<FlexBlock>
+							<FlexBlock style={ { maxWidth: 'min-content' } }>
 								<ItemActions
 									item={ item }
 									actions={ actions }

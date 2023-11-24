@@ -56,8 +56,8 @@ export default function DataViews( {
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 } justify="flex-start">
-				<HStack>
-					<HStack justify="start">
+				<HStack alignment="flex-start">
+					<HStack justify="start" wrap>
 						{ search && (
 							<Search
 								label={ searchLabel }

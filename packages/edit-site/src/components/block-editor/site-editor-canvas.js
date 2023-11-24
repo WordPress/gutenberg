@@ -27,7 +27,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import PageContentFocusManager from '../page-content-focus-manager';
+import PageContentFocusNotifications from '../page-content-focus-notifications';
 
 const LAYOUT = {
 	type: 'default',
@@ -149,7 +149,7 @@ export default function SiteEditorCanvas() {
 					)
 				}
 			</EditorCanvasContainer.Slot>
-			<PageContentFocusManager contentRef={ contentRef } />
+			<PageContentFocusNotifications contentRef={ contentRef } />
 		</>
 	);
 }

@@ -285,7 +285,6 @@ export default function ViewActions( {
 } ) {
 	return (
 		<DropdownMenuV2
-			label={ __( 'Actions' ) }
 			trigger={
 				<Button
 					variant="tertiary"
@@ -293,9 +292,8 @@ export default function ViewActions( {
 					icon={
 						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
 					}
-				>
-					{ __( 'View' ) }
-				</Button>
+					label={ __( 'View options' ) }
+				/>
 			}
 		>
 			<DropdownMenuGroupV2>
