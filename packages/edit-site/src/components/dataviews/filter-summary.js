@@ -12,13 +12,10 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN } from './constants';
 import { unlock } from '../../lock-unlock';
+import FilterEnumeration from './filter-enumeration';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 export default function FilterSummary( { filter, view, onChangeView } ) {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
@@ -43,37 +40,11 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 				</Button>
 			}
 		>
-			{ filter.elements.map( ( element ) => {
-				return (
-					<DropdownMenuCheckboxItem
-						key={ element.value }
-						value={ element.value }
-						checked={ activeElement?.value === element.value }
-						onSelect={ () =>
-							onChangeView( ( currentView ) => ( {
-								...currentView,
-								page: 1,
-								filters: [
-									...view.filters.filter(
-										( f ) => f.field !== filter.field
-									),
-									{
-										field: filter.field,
-										operator: OPERATOR_IN,
-										value:
-											activeElement?.value ===
-											element.value
-												? undefined
-												: element.value,
-									},
-								],
-							} ) )
-						}
-					>
-						{ element.label }
-					</DropdownMenuCheckboxItem>
-				);
-			} ) }
+			<FilterEnumeration
+				filter={ filter }
+				view={ view }
+				onChangeView={ onChangeView }
+			/>
 		</DropdownMenu>
 	);
 }

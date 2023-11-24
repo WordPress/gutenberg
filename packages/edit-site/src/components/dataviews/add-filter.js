@@ -14,12 +14,12 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from '../../lock-unlock';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import FilterEnumeration from './filter-enumeration';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownSubMenuV2: DropdownSubMenu,
 	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
-	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
 export default function AddFilter( { fields, view, onChangeView } ) {
@@ -78,28 +78,11 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 							</DropdownSubMenuTrigger>
 						}
 					>
-						{ filter.elements.map( ( element ) => (
-							<DropdownMenuItem
-								key={ element.value }
-								onSelect={ () => {
-									onChangeView( ( currentView ) => ( {
-										...currentView,
-										page: 1,
-										filters: [
-											...currentView.filters,
-											{
-												field: filter.field,
-												operator: OPERATOR_IN,
-												value: element.value,
-											},
-										],
-									} ) );
-								} }
-								role="menuitemcheckbox"
-							>
-								{ element.label }
-							</DropdownMenuItem>
-						) ) }
+						<FilterEnumeration
+							filter={ filter }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
 					</DropdownSubMenu>
 				);
 			} ) }
