@@ -10,7 +10,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -123,7 +123,13 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	if ( hasRecursionError ) {
 		return (
 			<div { ...props }>
-				<Warning>{ __( 'Recursion!' ) }</Warning>
+				<Warning>
+					{ sprintf(
+						// translators: A warning in which %s is the name of a pattern.
+						__( 'Pattern "%s" cannot be rendered inside itself.' ),
+						selectedPattern?.name
+					) }
+				</Warning>
 			</div>
 		);
 	}
