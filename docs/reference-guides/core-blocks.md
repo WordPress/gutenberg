@@ -44,6 +44,15 @@ Create and save content to reuse across your site. Update the pattern, and the c
 -	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** ref
 
+## Bug
+
+undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/bug))
+
+-	**Name:** core/bug
+-	**Category:** undefined
+-	**Supports:** 
+-	**Attributes:** testAttribute
+
 ## Button
 
 Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))

@@ -20,6 +20,7 @@ import {
 // production build to make the final bundle smaller.
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+import * as bug from './bug';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -129,6 +130,8 @@ import isBlockMetadataExperimental from './utils/is-block-metadata-experimental'
  */
 const getAllBlocks = () => {
 	const blocks = [
+		bug,
+
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
 		paragraph,

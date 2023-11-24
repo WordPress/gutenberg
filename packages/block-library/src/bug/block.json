@@ -1,0 +1,11 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/bug",
+	"title": "Bug",
+	"attributes": {
+		"testAttribute": {
+			"type": "string"
+		}
+	}
+}
