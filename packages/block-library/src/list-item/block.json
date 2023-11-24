@@ -20,7 +20,7 @@
 		}
 	},
 	"supports": {
-		"className": false,
+		"className": true,
 		"__experimentalSelector": "li",
 		"typography": {
 			"fontSize": true,

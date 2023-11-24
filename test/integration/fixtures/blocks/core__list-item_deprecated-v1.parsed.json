@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/list-item",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<li>Text</li>\n",
+		"innerContent": [
+			"\n<li>Text</li>\n"
+		]
+	}
+]

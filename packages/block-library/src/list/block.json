@@ -37,7 +37,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
+		"className": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
