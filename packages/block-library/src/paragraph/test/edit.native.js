@@ -21,7 +21,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 /**
  * WordPress dependencies
  */
-import { ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -684,5 +684,39 @@ describe( 'Paragraph block', () => {
 		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should focus on the previous Paragraph block when backspacing in an empty Paragraph block', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, 'A quick brown fox jumps' );
+
+		await addBlock( screen, 'Paragraph' );
+		const secondParagraphBlock = getBlock( screen, 'Paragraph', {
+			rowIndex: 2,
+		} );
+		fireEvent.press( secondParagraphBlock );
+
+		const secondParagraphTextInput =
+			within( secondParagraphBlock ).getByPlaceholderText(
+				'Start writing…'
+			);
+		fireEvent( secondParagraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		// Check for formatting options to make sure the RichText Input is focused
+		const boldFormattingButton = screen.getByLabelText( 'Bold' );
+		expect( boldFormattingButton ).toBeVisible();
 	} );
 } );
