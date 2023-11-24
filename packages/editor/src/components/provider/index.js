@@ -22,16 +22,13 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
+import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-export const PAGE_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
 
 /**
  * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
@@ -308,6 +305,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<PatternsMenuItems />
+							{ [ 'post-only', 'template-locked' ].includes(
+								mode
+							) && <DisableNonPageContentBlocks /> }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>
