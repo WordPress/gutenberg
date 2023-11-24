@@ -221,7 +221,13 @@ class WP_Fonts_Resolver {
 		}
 
 		// Make sure there are no duplicate values with different names (array keys).
-		$settings['typography']['fontFamilies']['theme'] = array_unique( $settings['typography']['fontFamilies']['theme'], SORT_REGULAR );
+		if ( ! empty( $settings['typography']['fontFamilies']['theme'] ) ) {
+			$settings['typography']['fontFamilies']['theme'] = array_unique(
+				$settings['typography']['fontFamilies']['theme'],
+				SORT_REGULAR
+			);
+		}
+
 
 		return $settings;
 	}
