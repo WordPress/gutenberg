@@ -24,6 +24,10 @@
 		height: auto;
 		max-width: 100%;
 	}
+
+	.wp-block-image__crop-area {
+		pointer-events: auto;
+	}
 }
 
 // Provide special styling for the placeholder.

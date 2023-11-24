@@ -177,7 +177,18 @@ const SiteLogo = ( {
 	}
 
 	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		return <div style={ { width, height } }>{ img }</div>;
+		return (
+			<div style={ { width, height } }>
+				<ImageWrapper
+					isLink={ isLink }
+					href={ siteUrl }
+					title={ title }
+					classes={ classes }
+				>
+					{ img }
+				</ImageWrapper>
+			</div>
+		);
 	}
 
 	// Set the default width to a responsible size.

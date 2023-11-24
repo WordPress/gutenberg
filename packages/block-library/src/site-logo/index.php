@@ -34,8 +34,6 @@ function render_block_core_site_logo( $attributes ) {
 	if ( ! $attributes['isLink'] ) {
 		// Remove the link.
 		$custom_logo = preg_replace( '#<a.*?>(.*?)</a>#i', '\1', $custom_logo );
-
-		preg_replace( '#<a.*?>(.*?)</a>#i', '\1', $custom_logo );
 	}
 
 	if ( $attributes['isLink'] && '_blank' === $attributes['linkTarget'] ) {
@@ -105,12 +103,12 @@ function block_core_site_logo_get_border_attributes( $attributes ) {
 
 	// Border color.
 	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null );
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
 	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
-		$border                 = _wp_array_get( $attributes, array( 'style', 'border', $side ), null );
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
 			'color' => isset( $border['color'] ) ? $border['color'] : null,
 			'style' => isset( $border['style'] ) ? $border['style'] : null,
