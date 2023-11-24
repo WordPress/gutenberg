@@ -20,6 +20,8 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
+const THRESHOLD_DISTANCE = 30;
+
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -48,12 +50,14 @@ import { store as blockEditorStore } from '../../store';
  * @param {WPBlockData[]}          blocksData  The block data list.
  * @param {WPPoint}                position    The position of the item being dragged.
  * @param {WPBlockListOrientation} orientation The orientation of the block list.
+ * @param {Object}                 options     Additional options.
  * @return {[number, WPDropOperation]} The drop target position.
  */
 export function getDropTargetPosition(
 	blocksData,
 	position,
-	orientation = 'vertical'
+	orientation = 'vertical',
+	options = {}
 ) {
 	const allowedEdges =
 		orientation === 'horizontal'
@@ -64,10 +68,9 @@ export function getDropTargetPosition(
 	let insertPosition = 'before';
 	let minDistance = Infinity;
 
-	// TODO: Figure out a neater way to handle passing in the drop zone element.
-	const dropZoneElement = blocksData[ 0 ]?.dropZoneElement;
+	const { dropZoneElement, parentBlock, rootBlockIndex = 0 } = options;
 
-	if ( dropZoneElement ) {
+	if ( dropZoneElement && parentBlock ) {
 		const rect = dropZoneElement.getBoundingClientRect();
 
 		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
@@ -75,13 +78,13 @@ export function getDropTargetPosition(
 			'bottom',
 		] );
 
-		// TODO: Replace `30` with a constant.
-		if ( distance < 30 ) {
+		// TODO: Check if the parent block is horizontal / vertical orientation.
+		if ( distance < THRESHOLD_DISTANCE ) {
 			if ( edge === 'top' ) {
-				return [ 0, 'insert', 'before' ];
+				return [ rootBlockIndex, 'insert', 'before' ];
 			}
 			if ( edge === 'bottom' ) {
-				return [ 0, 'insert', 'after' ];
+				return [ rootBlockIndex + 1, 'insert', 'after' ];
 			}
 		}
 	}
@@ -172,19 +175,26 @@ export default function useBlockDropZone( {
 		operation: 'insert',
 	} );
 
-	const isDisabled = useSelect(
+	const { isDisabled, parentBlock, rootBlockIndex } = useSelect(
 		( select ) => {
 			const {
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
+				getBlockIndex,
+				getBlockParents,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
-			return (
-				blockEditingMode !== 'default' ||
-				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
-				__unstableIsWithinBlockOverlay( targetRootClientId )
-			);
+			return {
+				parentBlock: getBlockParents( targetRootClientId, true )[ 0 ],
+				rootBlockIndex: getBlockIndex( targetRootClientId ),
+				isDisabled:
+					blockEditingMode !== 'default' ||
+					__unstableHasActiveBlockOverlayActive(
+						targetRootClientId
+					) ||
+					__unstableIsWithinBlockOverlay( targetRootClientId ),
+			};
 		},
 		[ targetRootClientId ]
 	);
@@ -221,7 +231,6 @@ export default function useBlockDropZone( {
 					const clientId = block.clientId;
 
 					return {
-						dropZoneElement,
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
 						getBoundingClientRect: () =>
@@ -236,7 +245,12 @@ export default function useBlockDropZone( {
 					getDropTargetPosition(
 						blocksData,
 						{ x: event.clientX, y: event.clientY },
-						getBlockListSettings( targetRootClientId )?.orientation
+						getBlockListSettings( targetRootClientId )?.orientation,
+						{
+							dropZoneElement,
+							parentBlock,
+							rootBlockIndex,
+						}
 					);
 
 				registry.batch( () => {
@@ -246,8 +260,12 @@ export default function useBlockDropZone( {
 						operation,
 					} );
 
+					const insertionPointClientId = moveBeforeOrAfter
+						? parentBlock
+						: targetRootClientId;
+
 					// TODO: Fix display of insertion point, so that it matches onBlockDrop logic.
-					showInsertionPoint( targetRootClientId, targetIndex, {
+					showInsertionPoint( insertionPointClientId, targetIndex, {
 						moveBeforeOrAfter,
 						operation,
 					} );
@@ -261,6 +279,8 @@ export default function useBlockDropZone( {
 				registry,
 				showInsertionPoint,
 				getBlockIndex,
+				parentBlock,
+				rootBlockIndex,
 			]
 		),
 		200

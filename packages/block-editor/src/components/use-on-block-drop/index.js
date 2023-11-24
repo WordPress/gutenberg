@@ -282,8 +282,10 @@ export default function useOnBlockDrop(
 				} );
 			} else {
 				if ( moveBeforeOrAfter ) {
-					const parentBlock =
-						getBlockParents( targetRootClientId )[ 0 ];
+					const parentBlock = getBlockParents(
+						targetRootClientId,
+						true
+					)[ 0 ];
 					// const targetBlockClientIds = getBlockOrder( parentBlock );
 					let blockIndex = getBlockIndex( targetRootClientId );
 					if ( moveBeforeOrAfter === 'after' ) {
