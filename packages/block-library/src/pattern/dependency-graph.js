@@ -1,8 +1,4 @@
-/**
- * Track any patterns that require subsequent patterns, so as to prevent single
- * or mutual recursion.
- */
-export class PatternsDependencyGraph {
+class PatternRecursionDetector {
 	constructor() {
 		/**
 		 * @type {Map<string, Set<string>>}
@@ -11,11 +7,15 @@ export class PatternsDependencyGraph {
 	}
 
 	/**
-	 * Foo.
+	 * Parse a given pattern and traverse its contents to detect any subsequent
+	 * patterns on which it may depend. Such occurrences will be added to an
+	 * internal dependency graph. If a circular dependency is detected, an
+	 * error will be thrown.
 	 *
 	 * @param {Object} pattern        Pattern.
 	 * @param {string} pattern.name   Pattern name.
 	 * @param {Array}  pattern.blocks Pattern's block list.
+	 *
 	 * @throws {Error} If a circular dependency is detected.
 	 */
 	parsePatternDependencies( { name, blocks } ) {
@@ -37,6 +37,7 @@ export class PatternsDependencyGraph {
 	 *
 	 * @param {string} a Slug for pattern A.
 	 * @param {string} b Slug for pattern B.
+	 *
 	 * @throws {Error} If a circular dependency is detected.
 	 */
 	dependsOn( a, b ) {
@@ -45,43 +46,43 @@ export class PatternsDependencyGraph {
 		}
 		this.deps.get( a ).add( b );
 
-		if ( hasCircularDependency( a, this.deps ) ) {
+		if ( this.#hasCircularDependency( a ) ) {
 			throw new Error(
 				`Pattern ${ a } has a circular dependency and cannot be rendered.`
 			);
 		}
 	}
-}
 
-function hasCircularDependency(
-	id,
-	dependencyGraph,
-	visitedNodes = new Set(),
-	currentPath = new Set()
-) {
-	visitedNodes.add( id );
-	currentPath.add( id );
+	#hasCircularDependency(
+		id,
+		visitedNodes = new Set(),
+		currentPath = new Set()
+	) {
+		visitedNodes.add( id );
+		currentPath.add( id );
 
-	const dependencies = dependencyGraph.get( id ) ?? new Set();
+		const dependencies = this.deps.get( id ) ?? new Set();
 
-	for ( const dependency of dependencies ) {
-		if ( ! visitedNodes.has( dependency ) ) {
-			if (
-				hasCircularDependency(
-					dependency,
-					dependencyGraph,
-					visitedNodes,
-					currentPath
-				)
-			) {
+		for ( const dependency of dependencies ) {
+			if ( ! visitedNodes.has( dependency ) ) {
+				if (
+					this.#hasCircularDependency(
+						dependency,
+						visitedNodes,
+						currentPath
+					)
+				) {
+					return true;
+				}
+			} else if ( currentPath.has( dependency ) ) {
 				return true;
 			}
-		} else if ( currentPath.has( dependency ) ) {
-			return true;
 		}
-	}
 
-	// Remove the current node from the current path when backtracking
-	currentPath.delete( id );
-	return false;
+		// Remove the current node from the current path when backtracking
+		currentPath.delete( id );
+		return false;
+	}
 }
+
+export const patternRecursionDetector = new PatternRecursionDetector();
