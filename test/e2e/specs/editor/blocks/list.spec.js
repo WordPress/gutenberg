@@ -23,12 +23,12 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'Another list item' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>A list item</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">A list item</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>Another list item</li>
+<li class="wp-block-list-item">Another list item</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -48,8 +48,8 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>test</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">test</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -67,8 +67,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
-<li>A list item</li>
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">A list item</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
@@ -234,8 +234,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>I’m a list</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">I’m a list</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -253,8 +253,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>test</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">test</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -279,12 +279,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -305,12 +305,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -338,12 +338,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one<br>...</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one<br>...</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -403,12 +403,12 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></blockquote>
 <!-- /wp:quote -->`
@@ -427,8 +427,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -443,12 +443,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -468,16 +468,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li></li>
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -486,8 +486,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -496,8 +496,8 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>two</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -511,16 +511,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li></li>
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>two</li>
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -607,8 +607,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
-<li>one</li>
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
@@ -617,8 +617,8 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
-<li>two</li>
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
@@ -635,14 +635,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>two</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">two</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>three</li>
+<li class="wp-block-list-item">three</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -661,10 +661,10 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>one<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li></li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">one<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -678,8 +678,8 @@ test.describe( 'List (@firefox)', () => {
 		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
-<li></li>
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
@@ -699,10 +699,10 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -724,8 +724,8 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>aaa</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">aaa</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -745,10 +745,10 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -759,12 +759,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>1</li>
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -782,12 +782,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>i</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -800,14 +800,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>i</li>
+<li class="wp-block-list-item">i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -821,16 +821,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<liclass="wp-block-list-item">1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>i</li>
+<li class="wp-block-list-item">i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -852,12 +852,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>b<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>c</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">b<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -871,14 +871,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>b<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>c</li>
+<li class="wp-block-list-item">b<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -897,8 +897,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<br></li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<br></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -920,16 +920,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>b<br></li>
+<li class="wp-block-list-item">b<br></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>c</li>
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -951,12 +951,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>i</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -970,14 +970,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li></li>
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -988,16 +988,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li></li>
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1006,10 +1006,10 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -1021,12 +1021,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li></li>
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1035,8 +1035,8 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1068,14 +1068,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>2<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<li class="wp-block-list-item">2<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -1098,12 +1098,12 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li> </li>
+<li class="wp-block-list-item"> </li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1152,14 +1152,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>2</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">2</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>3</li>
+<li class="wp-block-list-item">3</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -1178,14 +1178,14 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>2</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">2</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>3</li>
+<li class="wp-block-list-item">3</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
@@ -1213,8 +1213,8 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>2</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1238,15 +1238,15 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
 <ol><!-- wp:list-item -->
-<li>1</li>
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>2</li>
+<li class="wp-block-list-item">2</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>3</li>
+<li class="wp-block-list-item">3</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
 		);
@@ -1269,16 +1269,16 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>b</li>
+<li class="wp-block-list-item">b</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>c</li>
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
@@ -1295,8 +1295,8 @@ test.describe( 'List (@firefox)', () => {
 		// Add empty list block
 		await page.getByPlaceholder( 'Start writing with text or HTML' )
 			.fill( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li></li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 
@@ -1305,8 +1305,8 @@ test.describe( 'List (@firefox)', () => {
 
 		// Verify no WSOD and content is proper.
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li></li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 	} );
@@ -1326,18 +1326,18 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* c' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>b</li>
+<li class="wp-block-list-item">b</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>c</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 
@@ -1345,16 +1345,16 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>a</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>b</li>
+<li class="wp-block-list-item">b</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>c</li>
+<li class="wp-block-list-item">c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 	} );
@@ -1368,8 +1368,8 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '1' );
 
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li></li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item"></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
@@ -1409,12 +1409,12 @@ test.describe( 'List (@firefox)', () => {
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li class="wp-block-list-item">1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li>2</li>
+<li class="wp-block-list-item">2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
 	} );
