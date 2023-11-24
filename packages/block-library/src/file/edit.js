@@ -102,7 +102,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		}
 
 		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
+			setAttributes( {
+				downloadButtonText: removeAnchorTag(
+					_x( 'Download', 'button label' )
+				),
+			} );
 		}
 	}, [] );
 
@@ -148,11 +152,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( { showDownloadButton: newValue } );
 	}
 
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
+	// Remove anchor tags from file name and button text content.
+	function removeAnchorTag( value ) {
+		return value.replace( /<\/?a[^>]*>/g, '' );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -277,7 +279,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
@@ -301,7 +305,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>

@@ -166,9 +166,9 @@ function ButtonEdit( props ) {
 
 	const TagName = tagName || 'a';
 
-	function setButtonText( newText ) {
-		// Remove anchor tags from button text content.
-		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	// Remove anchor tags from button text content.
+	function removeAnchorTag( newValue ) {
+		return newValue.replace( /<\/?a[^>]*>/g, '' );
 	}
 
 	function onKeyDown( event ) {
@@ -245,7 +245,11 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setButtonText( value ) }
+					onChange={ ( value ) =>
+						setAttributes( {
+							text: removeAnchorTag( value ),
+						} )
+					}
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,
