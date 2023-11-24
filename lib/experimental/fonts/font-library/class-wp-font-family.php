@@ -318,9 +318,9 @@ class WP_Font_Family {
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
 
-		$sanitized_font['slug'] = _wp_to_kebab_case( $sanitized_font['slug'] );
+		$sanitized_font['slug']       = _wp_to_kebab_case( $sanitized_font['slug'] );
 		$sanitized_font['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized_font['fontFamily'] );
-		$this->data     = $sanitized_font;
+		$this->data                   = $sanitized_font;
 		return $this->data;
 	}
 
