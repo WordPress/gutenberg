@@ -8,7 +8,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useCallback,
+	useEffect,
+	forwardRef,
+} from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -41,6 +47,8 @@ const defaultConfigPerViewType = {
 		mediaField: 'featured-image',
 	},
 };
+
+const DefaultWidget = forwardRef( ( { render } ) => render );
 
 function useView( type ) {
 	const {
@@ -192,33 +200,39 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item, view: { type } } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-									onClick={ ( event ) => {
-										if (
-											viewTypeSupportsMap[ type ].preview
-										) {
-											event.preventDefault();
-											setSelection( [ item.id ] );
-										}
-									} }
-								>
-									{ decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' ) }
-								</Link>
-							</Heading>
-						</VStack>
-					);
-				},
+				render: (
+					{ item, view: { type } },
+					Widget = DefaultWidget
+				) => (
+					<VStack spacing={ 1 }>
+						<Heading as="h3" level={ 5 }>
+							<Widget
+								render={
+									<Link
+										params={ {
+											postId: item.id,
+											postType: item.type,
+											canvas: 'edit',
+										} }
+										onClick={ ( event ) => {
+											if (
+												viewTypeSupportsMap[ type ]
+													.preview
+											) {
+												event.preventDefault();
+												setSelection( [ item.id ] );
+											}
+										} }
+									>
+										{ decodeEntities(
+											item.title?.rendered || item.slug
+										) || __( '(no title)' ) }
+									</Link>
+								}
+							/>
+						</Heading>
+					</VStack>
+				),
 				maxWidth: 400,
 				enableHiding: false,
 			},
@@ -226,12 +240,18 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
+				render: ( { item }, Widget = DefaultWidget ) => {
 					const author = item._embedded?.author[ 0 ];
 					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
+						<Widget
+							render={
+								<a
+									href={ `user-edit.php?user_id=${ author.id }` }
+								>
+									{ author.name }
+								</a>
+							}
+						/>
 					);
 				},
 				type: ENUMERATION_TYPE,

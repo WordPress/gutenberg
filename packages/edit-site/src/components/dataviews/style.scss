@@ -34,6 +34,13 @@
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
+
+		&:focus,
+		&:focus-visible,
+		&:focus-within {
+			background-color: #f0f0f0;
+			outline: none;
+		}
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;

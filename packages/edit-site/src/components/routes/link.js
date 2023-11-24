@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { forwardRef } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -49,18 +50,17 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 	};
 }
 
-export default function Link( {
-	params = {},
-	state,
-	replace: shouldReplace = false,
-	children,
-	...props
-} ) {
+export function UnforwardedLink(
+	{ params = {}, state, replace: shouldReplace = false, children, ...props },
+	ref
+) {
 	const { href, onClick } = useLink( params, state, shouldReplace );
 
 	return (
-		<a href={ href } onClick={ onClick } { ...props }>
+		<a ref={ ref } href={ href } onClick={ onClick } { ...props }>
 			{ children }
 		</a>
 	);
 }
+
+export default forwardRef( UnforwardedLink );

@@ -10,34 +10,32 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 
-function PrimaryActionTrigger( { action, onClick } ) {
-	return (
-		<Button
-			label={ action.label }
-			icon={ action.icon }
-			isDestructive={ action.isDestructive }
-			size="compact"
-			onClick={ onClick }
-		/>
-	);
-}
+const PrimaryActionTrigger = forwardRef( ( { action, ...props }, ref ) => (
+	<Button
+		ref={ ref }
+		label={ action.label }
+		icon={ action.icon }
+		isDestructive={ action.isDestructive }
+		size="compact"
+		{ ...props }
+	/>
+) );
 
-function SecondaryActionTrigger( { action, onClick } ) {
-	return (
-		<MenuItem onClick={ onClick } isDestructive={ action.isDestructive }>
-			{ action.label }
-		</MenuItem>
-	);
-}
+const SecondaryActionTrigger = forwardRef( ( { action, ...props }, ref ) => (
+	<MenuItem ref={ ref } isDestructive={ action.isDestructive } { ...props }>
+		{ action.label }
+	</MenuItem>
+) );
 
-function ActionWithModal( { action, item, ActionTrigger } ) {
+function ActionWithModal( { action, item, ActionTrigger, ...props } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
+		...props,
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -62,7 +60,15 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-export default function ItemActions( { item, actions } ) {
+const WidgetTrigger = forwardRef( ( { Widget, Trigger, ...props }, ref ) => {
+	if ( Widget ) {
+		return <Widget ref={ ref } { ...props } render={ <Trigger /> } />;
+	}
+
+	return <Trigger ref={ ref } { ...props } />;
+} );
+
+export default function ItemActions( { item, actions, Widget } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
 			( accumulator, action ) => {
@@ -94,21 +100,35 @@ export default function ItemActions( { item, actions } ) {
 								key={ action.id }
 								action={ action }
 								item={ item }
-								ActionTrigger={ PrimaryActionTrigger }
+								ActionTrigger={ WidgetTrigger }
+								Widget={ Widget }
+								Trigger={ PrimaryActionTrigger }
 							/>
 						);
 					}
 					return (
-						<PrimaryActionTrigger
+						<WidgetTrigger
 							key={ action.id }
 							action={ action }
-							item={ item }
 							onClick={ () => action.callback( item ) }
+							Widget={ Widget }
+							Trigger={ PrimaryActionTrigger }
 						/>
 					);
 				} ) }
 			{ !! secondaryActions.length && (
-				<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
+				<DropdownMenu
+					toggleProps={ {
+						as: ( props ) =>
+							Widget ? (
+								<Widget { ...props } render={ <Button /> } />
+							) : (
+								<Button { ...props } />
+							),
+					} }
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+				>
 					{ () => (
 						<MenuGroup>
 							{ secondaryActions.map( ( action ) => {

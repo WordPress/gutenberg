@@ -29,7 +29,14 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useMemo, Children, Fragment } from '@wordpress/element';
+import {
+	useMemo,
+	Children,
+	Fragment,
+	forwardRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,12 +46,15 @@ import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
-	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
+	CompositeV2: Composite,
+	CompositeRowV2: CompositeRow,
+	useCompositeStoreV2: useCompositeStore,
+	CompositeItemV2: CompositeItem,
+
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -54,32 +64,79 @@ const sortingItemsInfo = {
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
 
-function HeaderMenu( { dataView, header } ) {
+function Header( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
-		return null;
+		return <CompositeItem render={ <td /> } focusable={ false } />;
 	}
+
 	const text = flexRender(
 		header.column.columnDef.header,
 		header.getContext()
 	);
+
+	const headerProps = {
+		colSpan: header.colSpan,
+		'data-field-id': header.id,
+		style: {
+			width: header.column.columnDef.width || undefined,
+			maxWidth: header.column.columnDef.maxWidth || undefined,
+		},
+		role: 'columnheader',
+		scope: 'col',
+	};
+
 	const isSortable = !! header.column.getCanSort();
 	const isHidable = !! header.column.getCanHide();
-	if ( ! isSortable && ! isHidable ) {
-		return text;
-	}
-	const sortedDirection = header.column.getIsSorted();
 
-	let filter;
-	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
-		filter = {
-			field: header.column.columnDef.id,
-			elements: header.column.columnDef.elements || [],
-		};
+	if ( ! isSortable && ! isHidable ) {
+		return (
+			<CompositeItem render={ <th { ...headerProps }>{ text }</th> } />
+		);
 	}
-	const isFilterable = !! filter;
+
+	const filter =
+		header.column.columnDef.type === ENUMERATION_TYPE
+			? {
+					field: header.column.columnDef.id,
+					elements: header.column.columnDef.elements || [],
+			  }
+			: undefined;
+
+	const menuProps = {
+		isSortable,
+		isHidable,
+		isFilterable: !! filter,
+		filter,
+		sortedDirection: header.column.getIsSorted(),
+		dataView,
+		header,
+		text,
+	};
 
 	return (
-		<DropdownMenuV2
+		<th { ...headerProps }>
+			<CompositeItem render={ <HeaderMenu { ...menuProps } /> } />
+		</th>
+	);
+}
+
+const HeaderMenu = forwardRef( function HeaderMenu(
+	{
+		isSortable,
+		isHidable,
+		isFilterable,
+		filter,
+		sortedDirection,
+		dataView,
+		header,
+		text,
+		...props
+	},
+	ref
+) {
+	return (
+		<DropdownMenu
+			ref={ ref }
 			align="start"
 			trigger={
 				<Button
@@ -87,15 +144,16 @@ function HeaderMenu( { dataView, header } ) {
 					iconPosition="right"
 					text={ text }
 					style={ { padding: 0 } }
+					{ ...props }
 				/>
 			}
 		>
 			<WithSeparators>
 				{ isSortable && (
-					<DropdownMenuGroupV2>
+					<DropdownMenuGroup>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => (
-								<DropdownMenuItemV2
+								<DropdownMenuItem
 									key={ direction }
 									prefix={ <Icon icon={ info.icon } /> }
 									suffix={
@@ -103,7 +161,7 @@ function HeaderMenu( { dataView, header } ) {
 											<Icon icon={ check } />
 										)
 									}
-									onSelect={ ( event ) => {
+									onClick={ ( event ) => {
 										event.preventDefault();
 										if ( sortedDirection === direction ) {
 											dataView.resetSorting();
@@ -118,35 +176,35 @@ function HeaderMenu( { dataView, header } ) {
 									} }
 								>
 									{ info.label }
-								</DropdownMenuItemV2>
+								</DropdownMenuItem>
 							)
 						) }
-					</DropdownMenuGroupV2>
+					</DropdownMenuGroup>
 				) }
 				{ isHidable && (
-					<DropdownMenuItemV2
+					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
-						onSelect={ ( event ) => {
+						onClick={ ( event ) => {
 							event.preventDefault();
 							header.column.getToggleVisibilityHandler()( event );
 						} }
 					>
 						{ __( 'Hide' ) }
-					</DropdownMenuItemV2>
+					</DropdownMenuItem>
 				) }
 				{ isFilterable && (
-					<DropdownMenuGroupV2>
-						<DropdownSubMenuV2
+					<DropdownMenuGroup>
+						<DropdownMenu
 							key={ filter.field }
 							trigger={
-								<DropdownSubMenuTriggerV2
+								<DropdownMenuItem
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
 										<Icon icon={ chevronRightSmall } />
 									}
 								>
 									{ __( 'Filter by' ) }
-								</DropdownSubMenuTriggerV2>
+								</DropdownMenuItem>
 							}
 						>
 							{ filter.elements.map( ( element ) => {
@@ -169,12 +227,12 @@ function HeaderMenu( { dataView, header } ) {
 								}
 
 								return (
-									<DropdownMenuItemV2
+									<DropdownMenuItem
 										key={ element.value }
 										suffix={
 											isActive && <Icon icon={ check } />
 										}
-										onSelect={ () => {
+										onClick={ () => {
 											const otherFilters =
 												columnFilters?.filter(
 													( f ) => {
@@ -206,27 +264,64 @@ function HeaderMenu( { dataView, header } ) {
 										} }
 									>
 										{ element.label }
-									</DropdownMenuItemV2>
+									</DropdownMenuItem>
 								);
 							} ) }
-						</DropdownSubMenuV2>
-					</DropdownMenuGroupV2>
+						</DropdownMenu>
+					</DropdownMenuGroup>
 				) }
 			</WithSeparators>
-		</DropdownMenuV2>
+		</DropdownMenu>
 	);
-}
+} );
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
 		.map( ( child, i ) => (
 			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparatorV2 /> }
+				{ i > 0 && <DropdownMenuSeparator /> }
 				{ child }
 			</Fragment>
 		) );
 }
+
+const Cell = forwardRef( function Cell( { cell, ...props }, ref ) {
+	const [ widgetUsed, setWidgetUsed ] = useState( false );
+
+	const Widget = forwardRef( ( widgetProps, innerRef ) => {
+		useEffect( () => setWidgetUsed( true ), [] );
+		return <CompositeItem ref={ innerRef } { ...widgetProps } />;
+	} );
+
+	const children = flexRender( cell.column.columnDef.cell, {
+		...props,
+		...cell.getContext(),
+		Widget,
+	} );
+
+	const cellProps = {
+		role: 'gridcell',
+	};
+
+	if ( widgetUsed ) {
+		return (
+			<td ref={ ref } { ...cellProps }>
+				{ children }
+			</td>
+		);
+	}
+
+	return (
+		<CompositeItem
+			ref={ ref }
+			{ ...props }
+			render={ <td { ...cellProps } /> }
+		>
+			{ children }
+		</CompositeItem>
+	);
+} );
 
 function ViewList( {
 	view,
@@ -238,11 +333,21 @@ function ViewList( {
 	isLoading = false,
 	paginationInfo,
 } ) {
+	const compositeStore = useCompositeStore( {
+		focusShift: true,
+	} );
+	const { setActiveId } = compositeStore;
+
+	useEffect( () => {
+		setActiveId( undefined );
+	}, [ setActiveId, isLoading ] );
+
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
 			const { render, getValue, ...column } = field;
-			column.cell = ( props ) =>
-				render( { item: props.row.original, view } );
+			column.cell = ( { Widget, ...props } ) => {
+				return render( { item: props.row.original, view }, Widget );
+			};
 			if ( getValue ) {
 				column.accessorFn = ( item ) => getValue( { item } );
 			}
@@ -252,10 +357,11 @@ function ViewList( {
 			_columns.push( {
 				header: __( 'Actions' ),
 				id: 'actions',
-				cell: ( props ) => {
+				cell: ( { row, Widget } ) => {
 					return (
 						<ItemActions
-							item={ props.row.original }
+							item={ row.original }
+							Widget={ Widget }
 							actions={ actions }
 						/>
 					);
@@ -441,41 +547,35 @@ function ViewList( {
 		return <h3>{ __( 'Loading' ) }</h3>;
 	}
 	return (
-		<div className="dataviews-list-view-wrapper">
+		<Composite
+			store={ compositeStore }
+			className="dataviews-list-view-wrapper"
+		>
 			{ hasRows && (
-				<table className="dataviews-list-view">
+				<table className="dataviews-list-view" role="grid">
 					<thead>
 						{ dataView.getHeaderGroups().map( ( headerGroup ) => (
-							<tr key={ headerGroup.id }>
+							<CompositeRow
+								render={ <tr /> }
+								key={ headerGroup.id }
+							>
 								{ headerGroup.headers.map( ( header ) => (
-									<th
+									<Header
 										key={ header.id }
-										colSpan={ header.colSpan }
-										style={ {
-											width:
-												header.column.columnDef.width ||
-												undefined,
-											maxWidth:
-												header.column.columnDef
-													.maxWidth || undefined,
-										} }
-										data-field-id={ header.id }
-									>
-										<HeaderMenu
-											dataView={ dataView }
-											header={ header }
-										/>
-									</th>
+										dataView={ dataView }
+										header={ header }
+									/>
 								) ) }
-							</tr>
+							</CompositeRow>
 						) ) }
 					</thead>
 					<tbody>
 						{ rows.map( ( row ) => (
-							<tr key={ row.id }>
+							<CompositeRow render={ <tr /> } key={ row.id }>
 								{ row.getVisibleCells().map( ( cell ) => (
-									<td
+									<Cell
 										key={ cell.column.id }
+										cell={ cell }
 										style={ {
 											width:
 												cell.column.columnDef.width ||
@@ -484,20 +584,15 @@ function ViewList( {
 												cell.column.columnDef
 													.maxWidth || undefined,
 										} }
-									>
-										{ flexRender(
-											cell.column.columnDef.cell,
-											cell.getContext()
-										) }
-									</td>
+									/>
 								) ) }
-							</tr>
+							</CompositeRow>
 						) ) }
 					</tbody>
 				</table>
 			) }
 			{ ! hasRows && <p>{ __( 'no results' ) }</p> }
-		</div>
+		</Composite>
 	);
 }
 
