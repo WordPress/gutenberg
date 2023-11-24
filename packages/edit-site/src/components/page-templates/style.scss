@@ -1,0 +1,18 @@
+.page-templates-preview-field {
+	.block-editor-block-preview__container {
+		border: 1px solid $gray-300;
+		border-radius: $radius-block-ui;
+	}
+
+	&.is-viewtype-list {
+		.block-editor-block-preview__container {
+			height: 120px;
+		}
+	}
+
+	&.is-viewtype-grid {
+		.block-editor-block-preview__container {
+			height: 320px;
+		}
+	}
+}

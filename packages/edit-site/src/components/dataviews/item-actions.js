@@ -102,7 +102,6 @@ export default function ItemActions( { item, actions } ) {
 						<PrimaryActionTrigger
 							key={ action.id }
 							action={ action }
-							item={ item }
 							onClick={ () => action.callback( item ) }
 						/>
 					);
@@ -128,7 +127,6 @@ export default function ItemActions( { item, actions } ) {
 									<SecondaryActionTrigger
 										key={ action.id }
 										action={ action }
-										item={ item }
 										onClick={ () =>
 											action.callback( item )
 										}

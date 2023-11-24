@@ -8,7 +8,10 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -31,9 +34,7 @@ export default function EditTemplate() {
 		useSelect( ( select ) => {
 			const { getEditedPostContext, getEditedPostType, getEditedPostId } =
 				select( editSiteStore );
-			const { getCanvasMode, getPageContentFocusType } = unlock(
-				select( editSiteStore )
-			);
+			const { getRenderingMode } = unlock( select( editorStore ) );
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const { __experimentalGetGlobalBlocksByName } =
@@ -51,17 +52,12 @@ export default function EditTemplate() {
 					queryArgs
 				),
 				template: getEditedEntityRecord( ...queryArgs ),
-				isTemplateHidden:
-					getCanvasMode() === 'edit' &&
-					getPageContentFocusType() === 'hideTemplate',
+				isTemplateHidden: getRenderingMode() === 'post-only',
 				postType: _postType,
 			};
 		}, [] );
 
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
-	// Disable reason: `useDispatch` can't be called conditionally.
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { setPageContentFocusType } = unlock( useDispatch( editSiteStore ) );
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -85,7 +81,7 @@ export default function EditTemplate() {
 						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
-									setHasPageContentFocus( false );
+									setRenderingMode( 'template-only' );
 									onClose();
 								} }
 							>
@@ -102,10 +98,10 @@ export default function EditTemplate() {
 									}
 									isPressed={ ! isTemplateHidden }
 									onClick={ () => {
-										setPageContentFocusType(
+										setRenderingMode(
 											isTemplateHidden
-												? 'disableTemplate'
-												: 'hideTemplate'
+												? 'template-locked'
+												: 'post-only'
 										);
 									} }
 								>

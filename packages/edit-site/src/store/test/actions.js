@@ -7,18 +7,19 @@ import { createRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
-import { setHasPageContentFocus } from '../actions';
 
 function createRegistryWithStores() {
 	// create a registry
 	const registry = createRegistry();
 
 	// register stores
+	registry.register( editorStore );
 	registry.register( blockEditorStore );
 	registry.register( coreStore );
 	registry.register( editSiteStore );
@@ -175,36 +176,6 @@ describe( 'actions', () => {
 					.select( preferencesStore )
 					.get( 'core/edit-site', 'distractionFree' )
 			).toBe( true );
-		} );
-	} );
-
-	describe( 'setHasPageContentFocus', () => {
-		it( 'toggles the page content lock on', () => {
-			const dispatch = jest.fn();
-			const clearSelectedBlock = jest.fn();
-			const registry = {
-				dispatch: () => ( { clearSelectedBlock } ),
-			};
-			setHasPageContentFocus( true )( { dispatch, registry } );
-			expect( clearSelectedBlock ).toHaveBeenCalled();
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
-				hasPageContentFocus: true,
-			} );
-		} );
-
-		it( 'toggles the page content lock off', () => {
-			const dispatch = jest.fn();
-			const clearSelectedBlock = jest.fn();
-			const registry = {
-				dispatch: () => ( { clearSelectedBlock } ),
-			};
-			setHasPageContentFocus( false )( { dispatch, registry } );
-			expect( clearSelectedBlock ).not.toHaveBeenCalled();
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'SET_HAS_PAGE_CONTENT_FOCUS',
-				hasPageContentFocus: false,
-			} );
 		} );
 	} );
 } );
