@@ -46,7 +46,7 @@ registerBlockType( 'gutenpride/gutenpride-block', {
 } );
 ```
 
-## TextControl Component
+## PlainText Component
 
 For our example block, the component we are going to use is the **PlainText** component, which allows the user to type some unformatted text. The **PlainText** component is imported from the `@wordpress/block-editor` package.
 
