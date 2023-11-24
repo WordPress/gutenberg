@@ -54,4 +54,8 @@ h3.edit-site-template-card__template-areas-title {
 	@include break-wide() {
 		column-count: 4;
 	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
 }
