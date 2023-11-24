@@ -40,7 +40,7 @@ export const FOCUSABLE_ENTITIES = [
 
 /**
  * Block types that are considered to be page content. These are the only blocks
- * editable when hasPageContentFocus() is true.
+ * editable when the page is focused.
  */
 export const PAGE_CONTENT_BLOCK_TYPES = {
 	'core/post-title': true,
