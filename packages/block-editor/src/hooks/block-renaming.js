@@ -3,6 +3,15 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { InspectorControls } from '../components';
+import { useBlockRename } from '../components/block-rename';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
@@ -37,6 +46,44 @@ export function addLabelCallback( settings ) {
 
 	return settings;
 }
+
+export const withBlockRenameControl = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const { name, attributes, setAttributes, isSelected } = props;
+
+		const { canRename } = useBlockRename( name );
+
+		return (
+			<>
+				{ isSelected && canRename && (
+					<InspectorControls group="advanced">
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'Block name' ) }
+							value={ attributes?.metadata?.name || '' }
+							onChange={ ( newName ) => {
+								setAttributes( {
+									metadata: {
+										...attributes?.metadata,
+										name: newName,
+									},
+								} );
+							} }
+						/>
+					</InspectorControls>
+				) }
+				<BlockEdit key="edit" { ...props } />
+			</>
+		);
+	},
+	'withToolbarControls'
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'core/block-rename-ui/with-block-rename-control',
+	withBlockRenameControl
+);
 
 addFilter(
 	'blocks.registerBlockType',
