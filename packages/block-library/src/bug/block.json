@@ -5,8 +5,8 @@
 	"title": "Bug",
 	"attributes": {
 		"testAttribute": {
-			"type": "string",
-			"default": "off"
+			"type": "boolean",
+			"default": false
 		}
 	}
 }

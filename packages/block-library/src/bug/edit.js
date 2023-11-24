@@ -3,6 +3,7 @@
  */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	PanelBody,
@@ -15,15 +16,20 @@ export default function Test( { attributes, setAttributes } ) {
 		<>
 			<InspectorControls group="list">
 				<PanelBody title={ null }>
+					<ToggleControl
+						checked={ testAttribute }
+						onChange={ ( value ) =>
+							setAttributes( { testAttribute: value } )
+						}
+					/>
 					<ToggleGroupControl
-						label="Bug"
 						value={ testAttribute }
 						onChange={ ( value ) =>
 							setAttributes( { testAttribute: value } )
 						}
 					>
-						<ToggleGroupControlOption value="off" label="OFF" />
-						<ToggleGroupControlOption value="on" label="ON" />
+						<ToggleGroupControlOption value={ false } label="OFF" />
+						<ToggleGroupControlOption value={ true } label="ON" />
 					</ToggleGroupControl>
 				</PanelBody>
 			</InspectorControls>
