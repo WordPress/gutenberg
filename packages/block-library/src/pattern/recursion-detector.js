@@ -1,7 +1,7 @@
 /**
  * @type {Map<string, Set<string>>}
  */
-const deps = new Map();
+const patternDependencies = new Map();
 
 /**
  * Parse a given pattern and traverse its contents to detect any subsequent
@@ -38,27 +38,27 @@ export function parsePatternDependencies( { name, blocks } ) {
  * @throws {Error} If a circular dependency is detected.
  */
 function dependsOn( a, b ) {
-	if ( ! deps.has( a ) ) {
-		deps.set( a, new Set() );
+	if ( ! patternDependencies.has( a ) ) {
+		patternDependencies.set( a, new Set() );
 	}
-	deps.get( a ).add( b );
+	patternDependencies.get( a ).add( b );
 
 	if ( hasCircularDependency( a ) ) {
-		throw new Error(
+		throw new TypeError(
 			`Pattern ${ a } has a circular dependency and cannot be rendered.`
 		);
 	}
 }
 
 function hasCircularDependency(
-	id,
+	slug,
 	visitedNodes = new Set(),
 	currentPath = new Set()
 ) {
-	visitedNodes.add( id );
-	currentPath.add( id );
+	visitedNodes.add( slug );
+	currentPath.add( slug );
 
-	const dependencies = deps.get( id ) ?? new Set();
+	const dependencies = patternDependencies.get( slug ) ?? new Set();
 
 	for ( const dependency of dependencies ) {
 		if ( ! visitedNodes.has( dependency ) ) {
@@ -73,6 +73,6 @@ function hasCircularDependency(
 	}
 
 	// Remove the current node from the current path when backtracking
-	currentPath.delete( id );
+	currentPath.delete( slug );
 	return false;
 }
