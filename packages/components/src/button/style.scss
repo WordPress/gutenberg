@@ -129,8 +129,11 @@
 			background: transparent;
 			transform: none;
 			opacity: 1;
-			box-shadow: none;
-			outline: none;
+
+			&:not(:focus) {
+				box-shadow: none;
+				outline: none;
+			}
 		}
 	}
 

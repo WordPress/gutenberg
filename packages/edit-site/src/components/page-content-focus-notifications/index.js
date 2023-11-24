@@ -7,27 +7,21 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import EditTemplateNotification from './edit-template-notification';
 import BackToPageNotification from './back-to-page-notification';
 import { unlock } from '../../lock-unlock';
 
-export default function PageContentFocusManager( { contentRef } ) {
-	const { hasPageContentFocus, pageContentFocusType, canvasMode } = useSelect(
-		( select ) => {
-			const { getPageContentFocusType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _canvasMode = getCanvasMode();
-			return {
-				canvasMode: _canvasMode,
-				pageContentFocusType: getPageContentFocusType(),
-				hasPageContentFocus:
-					select( editSiteStore ).hasPageContentFocus(),
-			};
-		},
-		[]
-	);
+export default function PageContentFocusNotifications( { contentRef } ) {
+	const { pageContentFocusType, canvasMode } = useSelect( ( select ) => {
+		const { getPageContentFocusType, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _canvasMode = getCanvasMode();
+		return {
+			canvasMode: _canvasMode,
+			pageContentFocusType: getPageContentFocusType(),
+		};
+	}, [] );
 	const { setPageContentFocusType } = unlock( useDispatch( editSiteStore ) );
 
 	/*
@@ -39,11 +33,10 @@ export default function PageContentFocusManager( { contentRef } ) {
 		if ( canvasMode !== 'edit' && !! pageContentFocusType ) {
 			setPageContentFocusType( null );
 		}
-	}, [ canvasMode, pageContentFocusType ] );
+	}, [ canvasMode, pageContentFocusType, setPageContentFocusType ] );
 
 	return (
 		<>
-			{ hasPageContentFocus && <DisableNonPageContentBlocks /> }
 			<EditTemplateNotification contentRef={ contentRef } />
 			<BackToPageNotification />
 		</>

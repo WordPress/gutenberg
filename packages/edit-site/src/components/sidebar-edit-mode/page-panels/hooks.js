@@ -18,13 +18,25 @@ export function useEditedPostContext() {
 	);
 }
 
-export function useIsPostsPage() {
+export function useAllowSwitchingTemplates() {
 	const { postId } = useEditedPostContext();
 	return useSelect(
-		( select ) =>
-			+postId ===
-			select( coreStore ).getEntityRecord( 'root', 'site' )
-				?.page_for_posts,
+		( select ) => {
+			const { getEntityRecord, getEntityRecords } = select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			const templates = getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{ per_page: -1 }
+			);
+			const isPostsPage = +postId === siteSettings?.page_for_posts;
+			// If current page is set front page or posts page, we also need
+			// to check if the current theme has a template for it. If not
+			const isFrontPage =
+				+postId === siteSettings?.page_on_front &&
+				templates?.some( ( { slug } ) => slug === 'front-page' );
+			return ! isPostsPage && ! isFrontPage;
+		},
 		[ postId ]
 	);
 }
@@ -46,19 +58,18 @@ function useTemplates() {
 
 export function useAvailableTemplates() {
 	const currentTemplateSlug = useCurrentTemplateSlug();
-	const isPostsPage = useIsPostsPage();
+	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const templates = useTemplates();
 	return useMemo(
 		() =>
-			// The posts page template cannot be changed.
-			! isPostsPage &&
+			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
 					template.is_custom &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),
-		[ templates, currentTemplateSlug, isPostsPage ]
+		[ templates, currentTemplateSlug, allowSwitchingTemplate ]
 	);
 }
 

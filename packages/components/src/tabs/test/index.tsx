@@ -524,6 +524,15 @@ describe( 'Tabs', () => {
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
 
+			// This assertion ensures the component has had time to fully
+			// render, preventing flakiness.
+			// see https://github.com/WordPress/gutenberg/pull/55950
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tab', { name: 'Beta' } )
+				).toHaveAttribute( 'tabindex', '-1' )
+			);
+
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
 			// Instead, focus should go to the currently selected tabpanel (alpha).
@@ -847,6 +856,16 @@ describe( 'Tabs', () => {
 				// onSelect should not be called since the disabled tab is
 				// highlighted, but not selected.
 				await user.keyboard( '[Tab]' );
+
+				// This assertion ensures focus has time to move to the first
+				// tab before the test proceeds, preventing flakiness.
+				// see https://github.com/WordPress/gutenberg/pull/55950
+				await waitFor( () =>
+					expect(
+						screen.getByRole( 'tab', { name: 'Alpha' } )
+					).toHaveFocus()
+				);
+
 				await user.keyboard( '[ArrowLeft]' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
