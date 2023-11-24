@@ -1193,7 +1193,7 @@ export function getEditorSettings( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string?} Rendering mode.
+ * @return {string} Rendering mode.
  */
 export function getRenderingMode( state ) {
 	return state.renderingMode;

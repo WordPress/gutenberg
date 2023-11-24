@@ -511,7 +511,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Rendering mode.
+-   `string`: Rendering mode.
 
 ### getSelectedBlock
 

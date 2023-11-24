@@ -3,7 +3,6 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Action that switches the canvas mode.
@@ -45,27 +44,4 @@ export const setEditorCanvasContainerView =
 			type: 'SET_EDITOR_CANVAS_CONTAINER_VIEW',
 			view,
 		} );
-	};
-
-/**
- * Sets the type of page content focus. Can be one of:
- *
- * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
- * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
- *
- * @param {'disableTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
- *
- * @return {Object} Action object.
- */
-export const setPageContentFocusType =
-	( pageContentFocusType ) =>
-	( { registry } ) => {
-		registry
-			.dispatch( editorStore )
-			.setRenderingMode(
-				! pageContentFocusType ||
-					pageContentFocusType === 'disableTemplate'
-					? 'template-locked'
-					: 'post-only'
-			);
 	};
