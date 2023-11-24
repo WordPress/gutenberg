@@ -103,9 +103,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 		if ( downloadButtonText === undefined ) {
 			setAttributes( {
-				downloadButtonText: removeAnchorTag(
-					_x( 'Download', 'button label' )
-				),
+				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
 		}
 	}, [] );
