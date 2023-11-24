@@ -17,10 +17,11 @@ import { moreVertical, Icon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
 const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function ButtonTrigger( { action, onClick } ) {
@@ -43,7 +44,7 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 				action.isPrimary && action.icon && <Icon icon={ action.icon } />
 			}
 		>
-			{ action.label }
+			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -166,7 +167,7 @@ export default function ItemActions( { item, actions, viewType } ) {
 							label={ __( 'Actions' ) }
 						/>
 					}
-					align="start"
+					placement="bottom-end"
 				>
 					<ActionsDropdownMenuGroup
 						actions={ secondaryActions }
@@ -200,7 +201,7 @@ function GridItemActions( { item, primaryActions, secondaryActions } ) {
 					label={ __( 'Actions' ) }
 				/>
 			}
-			align="start"
+			placement="bottom-end"
 		>
 			<WithSeparators>
 				{ !! primaryActions.length && (
