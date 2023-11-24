@@ -107,7 +107,7 @@ export default function EditPostPreferencesModal() {
 								<EnableFeature
 									featureName="showBlockBreadcrumbs"
 									help={ __(
-										'Shows block breadcrumbs at the bottom of the editor.'
+										'Display the block hierarchy trail at the bottom of the editor.'
 									) }
 									label={ __( 'Show block breadcrumbs' ) }
 								/>
