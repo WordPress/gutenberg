@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { patternRecursionDetector } from './dependency-graph';
+import { parsePatternDependencies } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect(
@@ -75,9 +75,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	useEffect( () => {
 		if ( ! hasRecursionError && selectedPattern?.blocks ) {
 			try {
-				patternRecursionDetector.parsePatternDependencies(
-					selectedPattern
-				);
+				parsePatternDependencies( selectedPattern );
 			} catch ( error ) {
 				setHasRecursionError( true );
 				return;
