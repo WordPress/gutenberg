@@ -650,6 +650,31 @@ export class RichText extends Component {
 		return shouldDrop;
 	}
 
+	shouldFocusTextInputAfterUpdate( prevProps ) {
+		const {
+			__unstableIsSelected: isSelected,
+			blockIsSelected,
+			selectionStart,
+			selectionEnd,
+			__unstableMobileNoFocusOnMount,
+		} = this.props;
+
+		const {
+			__unstableIsSelected: prevIsSelected,
+			blockIsSelected: prevBlockIsSelected,
+		} = prevProps;
+
+		return (
+			! __unstableMobileNoFocusOnMount &&
+			selectionStart === undefined &&
+			selectionEnd === undefined &&
+			! prevIsSelected &&
+			! isSelected &&
+			! prevBlockIsSelected &&
+			blockIsSelected
+		);
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
 		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
 			return;
@@ -843,9 +868,8 @@ export class RichText extends Component {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
-		const { __unstableIsSelected: isSelected } = this.props;
-
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
+		const { __unstableIsSelected: isSelected } = this.props;
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
@@ -854,6 +878,13 @@ export class RichText extends Component {
 			this.onSelectionChange(
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
+			);
+		} else if ( this.shouldFocusTextInputAfterUpdate( prevProps ) ) {
+			// When merging blocks it restores the focus in some cases
+			this._editor.focus();
+			this.props.onSelectionChange(
+				this.selectionStart,
+				this.selectionEnd
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
