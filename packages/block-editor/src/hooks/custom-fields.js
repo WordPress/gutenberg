@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -47,71 +47,45 @@ function CustomFieldsControl( props ) {
 	if ( props.name === 'core/paragraph' ) attributeName = 'content';
 	if ( props.name === 'core/image' ) attributeName = 'url';
 
-	const connectionSource =
-		props.attributes?.connections?.attributes?.[ attributeName ]?.source ||
-		'';
-	const connectionValue =
-		props.attributes?.connections?.attributes?.[ attributeName ]?.value ||
-		'';
-
-	function updateConnections( source, value ) {
-		if ( value === '' ) {
-			props.setAttributes( {
-				connections: undefined,
-				placeholder: undefined,
-			} );
-		} else {
-			props.setAttributes( {
-				connections: {
-					attributes: {
-						// The attributeName will be either `content` or `url`.
-						[ attributeName ]: {
-							// Source will be variable, could be post_meta, user_meta, term_meta, etc.
-							// Could even be a custom source like a social media attribute.
-							source,
-							value,
-						},
-					},
-				},
-				placeholder: sprintf(
-					'This content will be replaced on the frontend by the value of "%s" custom field.',
-					value
-				),
-			} );
-		}
-	}
-
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Connections' ) } initialOpen={ true }>
-				<SelectControl
-					label={ __( 'Source' ) }
-					value={ connectionSource }
-					options={ [
-						{
-							label: __( 'None' ),
-							value: '',
-						},
-						{
-							label: __( 'Meta fields' ),
-							value: 'meta_fields',
-						},
-						{
-							label: __( 'Pattern attributes' ),
-							value: 'pattern_attributes',
-						},
-					] }
-					onChange={ ( nextSource ) => {
-						updateConnections( nextSource, connectionValue );
-					} }
-				/>
 				<TextControl
 					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Custom field meta_key' ) }
-					value={ connectionValue }
+					value={
+						props.attributes?.connections?.attributes?.[
+							attributeName
+						]?.value || ''
+					}
 					onChange={ ( nextValue ) => {
-						updateConnections( connectionSource, nextValue );
+						if ( nextValue === '' ) {
+							props.setAttributes( {
+								connections: undefined,
+								[ attributeName ]: undefined,
+								placeholder: undefined,
+							} );
+						} else {
+							props.setAttributes( {
+								connections: {
+									attributes: {
+										// The attributeName will be either `content` or `url`.
+										[ attributeName ]: {
+											// Source will be variable, could be post_meta, user_meta, term_meta, etc.
+											// Could even be a custom source like a social media attribute.
+											source: 'meta_fields',
+											value: nextValue,
+										},
+									},
+								},
+								[ attributeName ]: undefined,
+								placeholder: sprintf(
+									'This content will be replaced on the frontend by the value of "%s" custom field.',
+									nextValue
+								),
+							} );
+						}
 					} }
 				/>
 			</PanelBody>

@@ -142,16 +142,24 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the attribute does not specify the name of the custom field, skip it.
-			if ( ! isset( $attribute_value['value'] ) ) {
-				continue;
-			}
+			if ( 'pattern_attributes' === $attribute_value['source'] ) {
+				if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
+					continue;
+				}
 
-			// Get the content from the connection source.
-			$custom_value = $connection_sources[ $attribute_value['source'] ](
-				$block_instance,
-				$attribute_value['value']
-			);
+				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance );
+			} else {
+				// If the attribute does not specify the name of the custom field, skip it.
+				if ( ! isset( $attribute_value['value'] ) ) {
+					continue;
+				}
+
+				// Get the content from the connection source.
+				$custom_value = $connection_sources[ $attribute_value['source'] ](
+					$block_instance,
+					$attribute_value['value']
+				);
+			}
 
 			if ( false === $custom_value ) {
 				continue;

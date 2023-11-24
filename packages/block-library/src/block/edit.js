@@ -46,14 +46,11 @@ function isPartiallySynced( block ) {
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	const attributes = {};
-	for ( const [ attribute, connection ] of Object.entries(
-		block.attributes.connections.attributes
-	) ) {
-		if ( connection.source !== 'pattern_attributes' ) continue;
-		attributes[ attribute ] = connection.value;
-	}
-	return attributes;
+	return Object.entries( block.attributes.connections.attributes )
+		.filter(
+			( [ , connection ] ) => connection.source === 'pattern_attributes'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
 }
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
@@ -94,13 +91,15 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			overrides,
 			defaultValues
 		);
-		if ( ! isPartiallySynced( block ) ) return { ...block, innerBlocks };
+		const blockId = block.attributes.metadata?.id;
+		if ( ! isPartiallySynced( block ) || ! blockId )
+			return { ...block, innerBlocks };
 		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
-		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
-			defaultValues[ id ] = block.attributes[ attributeKey ];
-			if ( overrides[ id ] ) {
-				newAttributes[ attributeKey ] = overrides[ id ];
+		for ( const attributeKey of attributes ) {
+			defaultValues[ blockId ] = block.attributes[ attributeKey ];
+			if ( overrides[ blockId ] ) {
+				newAttributes[ attributeKey ] = overrides[ blockId ];
 			}
 		}
 		return {
@@ -119,11 +118,14 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 			overrides,
 			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
-		if ( ! isPartiallySynced( block ) ) continue;
+		const blockId = block.attributes.metadata?.id;
+		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
-		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
-			if ( block.attributes[ attributeKey ] !== defaultValues[ id ] ) {
-				overrides[ id ] = block.attributes[ attributeKey ];
+		for ( const attributeKey of attributes ) {
+			if (
+				block.attributes[ attributeKey ] !== defaultValues[ blockId ]
+			) {
+				overrides[ blockId ] = block.attributes[ attributeKey ];
 			}
 		}
 	}

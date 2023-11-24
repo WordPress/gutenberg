@@ -7,6 +7,7 @@ import DuplicatePatternModal from './components/duplicate-pattern-modal';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
+import PartialSyncingControls from './components/partial-syncing-controls';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
@@ -22,6 +23,7 @@ lock( privateApis, {
 	RenamePatternModal,
 	PatternsMenuItems,
 	RenamePatternCategoryModal,
+	PartialSyncingControls,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
