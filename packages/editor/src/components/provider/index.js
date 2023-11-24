@@ -125,6 +125,10 @@ function useBlockEditorProps( post, template, mode ) {
 		}
 
 		if ( mode === 'post-only' ) {
+			const postContentBlocks =
+				extractPageContentBlockTypesFromTemplateBlocks(
+					templateBlocks
+				);
 			return [
 				createBlock(
 					'core/group',
@@ -138,9 +142,12 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					extractPageContentBlockTypesFromTemplateBlocks(
-						templateBlocks
-					)
+					postContentBlocks.length
+						? postContentBlocks
+						: [
+								createBlock( 'core/post-title' ),
+								createBlock( 'core/post-content' ),
+						  ]
 				),
 			];
 		}
