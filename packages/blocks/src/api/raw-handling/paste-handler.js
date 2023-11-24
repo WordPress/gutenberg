@@ -33,7 +33,7 @@ import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
 
-const log = ( ...args ) => window?.console?.warn?.( ...args );
+const log = ( ...args ) => window?.console?.log?.( ...args );
 
 /**
  * Filters HTML to only contain phrasing content.

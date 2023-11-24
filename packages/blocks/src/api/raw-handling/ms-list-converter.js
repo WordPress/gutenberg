@@ -45,9 +45,7 @@ export default function msListConverter( node, doc ) {
 	listItem.innerHTML = deepFilterHTML( node.innerHTML, [ msListIgnore ] );
 
 	const matches = /mso-list\s*:[^;]+level([0-9]+)/i.exec( style );
-	const { ownerDocument } = node;
-	const { defaultView } = ownerDocument;
-	let level = matches ? defaultView.parseInt( matches[ 1 ], 10 ) - 1 || 0 : 0;
+	let level = matches ? parseInt( matches[ 1 ], 10 ) - 1 || 0 : 0;
 
 	// Change pointer depending on indentation level.
 	while ( level-- ) {

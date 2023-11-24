@@ -23,12 +23,10 @@ export default function imageCorrector( node ) {
 		}
 
 		let decoded;
-		const { ownerDocument } = node;
-		const { defaultView } = ownerDocument;
 
 		// Can throw DOMException!
 		try {
-			decoded = defaultView.atob( data );
+			decoded = atob( data );
 		} catch ( e ) {
 			node.src = '';
 			return;
@@ -41,7 +39,7 @@ export default function imageCorrector( node ) {
 		}
 
 		const name = type.replace( '/', '.' );
-		const file = new defaultView.File( [ uint8Array ], name, { type } );
+		const file = new window.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );
 	}
