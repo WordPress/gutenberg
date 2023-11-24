@@ -167,10 +167,6 @@ export default function PostSavedState( {
 						: undefined
 				}
 				onClick={ isDisabled ? undefined : () => savePost() }
-				/*
-				 * We want the tooltip to show the keyboard shortcut only when the
-				 * button does something, i.e. when it's not disabled.
-				 */
 				variant="tertiary"
 				icon={ isLargeViewport ? undefined : cloudUpload }
 				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
