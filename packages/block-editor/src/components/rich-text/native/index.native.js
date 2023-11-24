@@ -650,6 +650,13 @@ export class RichText extends Component {
 		return shouldDrop;
 	}
 
+	/**
+	 * Determines whether the text input should receive focus after an update.
+	 * For cases where a RichText with a value is merged with an empty one.
+	 *
+	 * @param {Object} prevProps - The previous props of the component.
+	 * @return {boolean} True if the text input should receive focus, false otherwise.
+	 */
 	shouldFocusTextInputAfterUpdate( prevProps ) {
 		const {
 			__unstableIsSelected: isSelected,
@@ -664,12 +671,14 @@ export class RichText extends Component {
 			blockIsSelected: prevBlockIsSelected,
 		} = prevProps;
 
+		const noSelectionValues =
+			selectionStart === undefined && selectionEnd === undefined;
+		const textInputWasNotFocused = ! prevIsSelected && ! isSelected;
+
 		return (
 			! __unstableMobileNoFocusOnMount &&
-			selectionStart === undefined &&
-			selectionEnd === undefined &&
-			! prevIsSelected &&
-			! isSelected &&
+			noSelectionValues &&
+			textInputWasNotFocused &&
 			! prevBlockIsSelected &&
 			blockIsSelected
 		);
@@ -880,11 +889,14 @@ export class RichText extends Component {
 				this.props.selectionEnd || 0
 			);
 		} else if ( this.shouldFocusTextInputAfterUpdate( prevProps ) ) {
-			// When merging blocks it restores the focus in some cases
+			// Since this is happening when merging blocks, the selection should be at the last character position.
+			// As a fallback the internal selectionEnd value is used.
+			const lastCharacterPosition =
+				this.value?.length ?? this.selectionEnd;
 			this._editor.focus();
 			this.props.onSelectionChange(
-				this.selectionStart,
-				this.selectionEnd
+				lastCharacterPosition,
+				lastCharacterPosition
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
