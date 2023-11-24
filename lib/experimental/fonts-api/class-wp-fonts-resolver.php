@@ -228,7 +228,6 @@ class WP_Fonts_Resolver {
 			);
 		}
 
-
 		return $settings;
 	}
 
