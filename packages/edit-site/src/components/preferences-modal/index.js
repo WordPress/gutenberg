@@ -46,32 +46,7 @@ export default function EditSitePreferencesModal() {
 			name: 'general',
 			tabLabel: __( 'General' ),
 			content: (
-				<PreferencesModalSection
-					title={ __( 'Appearance' ) }
-					description={ __(
-						'Customize options related to the block editor interface and editing flow.'
-					) }
-				>
-					<EnableFeature
-						featureName="distractionFree"
-						onToggle={ toggleDistractionFree }
-						help={ __(
-							'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
-						) }
-						label={ __( 'Distraction free' ) }
-					/>
-					<EnableFeature
-						featureName="focusMode"
-						help={ __(
-							'Highlights the current block and fades other content.'
-						) }
-						label={ __( 'Spotlight mode' ) }
-					/>
-					<EnableFeature
-						featureName="showIconLabels"
-						label={ __( 'Show button text labels' ) }
-						help={ __( 'Show text instead of icons on buttons.' ) }
-					/>
+				<PreferencesModalSection title={ __( 'Interface' ) }>
 					<EnableFeature
 						featureName="showListViewByDefault"
 						help={ __(
@@ -90,23 +65,76 @@ export default function EditSitePreferencesModal() {
 			),
 		},
 		{
-			name: 'blocks',
-			tabLabel: __( 'Blocks' ),
+			name: 'appearance',
+			tabLabel: __( 'Appearance' ),
 			content: (
 				<PreferencesModalSection
-					title={ __( 'Block interactions' ) }
+					title={ __( 'Appearance' ) }
 					description={ __(
-						'Customize how you interact with blocks in the block library and editing canvas.'
+						'Customize the editor interface to suit your needs.'
 					) }
 				>
 					<EnableFeature
-						featureName="keepCaretInsideBlock"
+						featureName="fixedToolbar"
 						help={ __(
-							'Aids screen readers by stopping text caret from leaving blocks.'
+							'Access all block and document tools in a single place.'
 						) }
-						label={ __( 'Contain text cursor inside block' ) }
+						label={ __( 'Top toolbar' ) }
+					/>
+					<EnableFeature
+						featureName="distractionFree"
+						onToggle={ toggleDistractionFree }
+						help={ __(
+							'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+						) }
+						label={ __( 'Distraction free' ) }
+					/>
+					<EnableFeature
+						featureName="focusMode"
+						help={ __(
+							'Highlights the current block and fades other content.'
+						) }
+						label={ __( 'Spotlight mode' ) }
+					/>
+					<EnableFeature
+						featureName="showBlockBreadcrumbs"
+						help={ __(
+							'Shows block breadcrumbs at the bottom of the editor.'
+						) }
+						label={ __( 'Display block breadcrumbs' ) }
 					/>
 				</PreferencesModalSection>
+			),
+		},
+		{
+			name: 'accessibility',
+			tabLabel: __( 'Accessibility' ),
+			content: (
+				<>
+					<PreferencesModalSection
+						title={ __( 'Navigation' ) }
+						description={ __(
+							'Optimize the editing experience for enhanced control.'
+						) }
+					>
+						<EnableFeature
+							featureName="keepCaretInsideBlock"
+							help={ __(
+								'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+							) }
+							label={ __( 'Contain text cursor inside block' ) }
+						/>
+					</PreferencesModalSection>
+					<PreferencesModalSection title={ __( 'Interface' ) }>
+						<EnableFeature
+							featureName="showIconLabels"
+							label={ __( 'Show button text labels' ) }
+							help={ __(
+								'Show text instead of icons on buttons across the interface.'
+							) }
+						/>
+					</PreferencesModalSection>
+				</>
 			),
 		},
 	] );
