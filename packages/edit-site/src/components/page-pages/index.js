@@ -226,14 +226,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
-					const author = item._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
-					);
-				},
 				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
