@@ -7,7 +7,6 @@ import { paramCase as kebabCase } from 'change-case';
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { formatFontFamily } from './preview-styles';
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -90,14 +89,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	// eslint-disable-next-line no-undef
-	const newFont = new FontFace(
-		formatFontFamily( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: fontFace.fontWeight,
-		}
-	);
+	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
+		style: fontFace.fontStyle,
+		weight: fontFace.fontWeight,
+	} );
 
 	const loadedFace = await newFont.load();
 
