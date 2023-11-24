@@ -69,8 +69,8 @@ const STYLE_BOOK_IFRAME_STYLES = `
 		padding: 16px;
 		width: 100%;
 		box-sizing: border-box;
-		scroll-margin-top: var(--wp--style--root--padding-top);
-		scroll-margin-bottom: var(--wp--style--root--padding-bottom);
+		scroll-margin-top: 32px;
+		scroll-margin-bottom: 32px;
 	}
 
 	.edit-site-style-book__example.is-selected {
