@@ -5,6 +5,7 @@ This file documents the DataViews UI component, which provides an API to render 
 ```js
 <DataViews
 	data={ pages }
+	getItemId={ ( item ) => item.id }
 	isLoading={ isLoadingPages }
 	view={ view }
 	onChangeView={ onChangeView }

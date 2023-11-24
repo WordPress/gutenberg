@@ -31,7 +31,7 @@ function WritingMenu() {
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', false );
+			setPreference( 'core/edit-post', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();

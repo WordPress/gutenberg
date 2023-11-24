@@ -14,6 +14,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	PATTERN_TYPES,
 } from './utils';
 
 export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
@@ -69,7 +70,11 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				label: _x( 'Uncategorized' ),
 			} );
 		}
-		if ( filteredPatterns.some( ( pattern ) => pattern.id ) ) {
+		if (
+			filteredPatterns.some(
+				( pattern ) => pattern.type === PATTERN_TYPES.user
+			)
+		) {
 			categories.unshift( myPatternsCategory );
 		}
 		if ( filteredPatterns.length > 0 ) {
