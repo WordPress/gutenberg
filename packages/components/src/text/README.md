@@ -132,6 +132,8 @@ function Example() {
 
 Sets `Text` to have `display: block`.
 
+Note: text truncation only works when `isBlock` is `false`.
+
 ### isDestructive
 
 **Type**: `boolean`
@@ -197,6 +199,8 @@ function Example() {
 **Type**: `boolean`
 
 Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
+
+Note: text truncation won't work if the `isBlock` property is set to `true`
 
 ```jsx
 import { __experimentalText as Text } from '@wordpress/components';
