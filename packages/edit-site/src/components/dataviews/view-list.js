@@ -37,7 +37,9 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import { ENUMERATION_TYPE } from './constants';
+
+import FilterEnumeration from './filter-enumeration';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -55,7 +57,7 @@ const sortingItemsInfo = {
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
 
-function HeaderMenu( { dataView, header } ) {
+function HeaderMenu( { dataView, header, view, onChangeView } ) {
 	if ( header.isPlaceholder ) {
 		return null;
 	}
@@ -150,66 +152,11 @@ function HeaderMenu( { dataView, header } ) {
 								</DropdownSubMenuTrigger>
 							}
 						>
-							{ filter.elements.map( ( element ) => {
-								let isActive = false;
-								const columnFilters =
-									dataView.getState().columnFilters;
-								const columnFilter = columnFilters.find(
-									( f ) =>
-										Object.keys( f )[ 0 ].split(
-											':'
-										)[ 0 ] === filter.field
-								);
-
-								if ( columnFilter ) {
-									const value =
-										Object.values( columnFilter )[ 0 ];
-									// Intentionally use loose comparison, so it does type conversion.
-									// This covers the case where a top-level filter for the same field converts a number into a string.
-									isActive = element.value == value; // eslint-disable-line eqeqeq
-								}
-
-								return (
-									<DropdownMenuItem
-										key={ element.value }
-										suffix={
-											isActive && <Icon icon={ check } />
-										}
-										onSelect={ () => {
-											const otherFilters =
-												columnFilters?.filter(
-													( f ) => {
-														const [
-															field,
-															operator,
-														] =
-															Object.keys(
-																f
-															)[ 0 ].split( ':' );
-														return (
-															field !==
-																filter.field ||
-															operator !==
-																OPERATOR_IN
-														);
-													}
-												);
-
-											dataView.setColumnFilters( [
-												...otherFilters,
-												{
-													[ filter.field + ':in' ]:
-														isActive
-															? undefined
-															: element.value,
-												},
-											] );
-										} }
-									>
-										{ element.label }
-									</DropdownMenuItem>
-								);
-							} ) }
+							<FilterEnumeration
+								filter={ filter }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
 						</DropdownSubMenu>
 					</DropdownMenuGroup>
 				) }
@@ -281,58 +228,6 @@ function ViewList( {
 		);
 	}, [ view.hiddenFields ] );
 
-	/**
-	 * Transform the filters from the view format into the tanstack columns filter format.
-	 *
-	 * Input:
-	 *
-	 * view.filters = [
-	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
-	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
-	 * ]
-	 *
-	 * Output:
-	 *
-	 * columnFilters = [
-	 *   { "date:before": '2020-01-01' },
-	 *   { "date:after": '2020-01-01' }
-	 * ]
-	 *
-	 * @param {Array} filters The view filters to transform.
-	 * @return {Array} The transformed TanStack column filters.
-	 */
-	const toTanStackColumnFilters = ( filters ) =>
-		filters?.map( ( filter ) => ( {
-			[ filter.field + ':' + filter.operator ]: filter.value,
-		} ) );
-
-	/**
-	 * Transform the filters from the view format into the tanstack columns filter format.
-	 *
-	 * Input:
-	 *
-	 * columnFilters = [
-	 *   { "date:before": '2020-01-01'},
-	 *   { "date:after": '2020-01-01' }
-	 * ]
-	 *
-	 * Output:
-	 *
-	 * view.filters = [
-	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
-	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
-	 * ]
-	 *
-	 * @param {Array} filters The TanStack column filters to transform.
-	 * @return {Array} The transformed view filters.
-	 */
-	const fromTanStackColumnFilters = ( filters ) =>
-		filters.map( ( filter ) => {
-			const [ key, value ] = Object.entries( filter )[ 0 ];
-			const [ field, operator ] = key.split( ':' );
-			return { field, operator, value };
-		} );
-
 	const shownData = useAsyncList( data );
 	const dataView = useReactTable( {
 		data: shownData,
@@ -351,7 +246,6 @@ function ViewList( {
 				  ]
 				: [],
 			globalFilter: view.search,
-			columnFilters: toTanStackColumnFilters( view.filters ),
 			pagination: {
 				pageIndex: view.page,
 				pageSize: view.perPage,
@@ -413,13 +307,6 @@ function ViewList( {
 		onGlobalFilterChange: ( value ) => {
 			onChangeView( { ...view, search: value, page: 1 } );
 		},
-		onColumnFiltersChange: ( columnFiltersUpdater ) => {
-			onChangeView( {
-				...view,
-				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
-				page: 1,
-			} );
-		},
 		onPaginationChange: ( paginationUpdater ) => {
 			onChangeView( ( currentView ) => {
 				const { pageIndex, pageSize } = paginationUpdater( {
@@ -469,6 +356,8 @@ function ViewList( {
 										<HeaderMenu
 											dataView={ dataView }
 											header={ header }
+											view={ view }
+											onChangeView={ onChangeView }
 										/>
 									</th>
 								) ) }
