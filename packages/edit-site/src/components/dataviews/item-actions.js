@@ -2,18 +2,28 @@
  * WordPress dependencies
  */
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 	Button,
 	Modal,
 	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
-import { moreVertical } from '@wordpress/icons';
+import { useMemo, useState, Fragment, Children } from '@wordpress/element';
+import { moreVertical, Icon } from '@wordpress/icons';
 
-function PrimaryActionTrigger( { action, onClick } ) {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+} = unlock( componentsPrivateApis );
+
+function ButtonTrigger( { action, onClick } ) {
 	return (
 		<Button
 			label={ action.label }
@@ -25,11 +35,16 @@ function PrimaryActionTrigger( { action, onClick } ) {
 	);
 }
 
-function SecondaryActionTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( { action, onClick } ) {
 	return (
-		<MenuItem onClick={ onClick } isDestructive={ action.isDestructive }>
+		<DropdownMenuItem
+			onClick={ onClick }
+			prefix={
+				action.isPrimary && action.icon && <Icon icon={ action.icon } />
+			}
+		>
 			{ action.label }
-		</MenuItem>
+		</DropdownMenuItem>
 	);
 }
 
@@ -62,7 +77,33 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-export default function ItemActions( { item, actions } ) {
+function ActionsDropdownMenuGroup( { actions, item } ) {
+	return (
+		<DropdownMenuGroup>
+			{ actions.map( ( action ) => {
+				if ( !! action.RenderModal ) {
+					return (
+						<ActionWithModal
+							key={ action.id }
+							action={ action }
+							item={ item }
+							ActionTrigger={ DropdownMenuItemTrigger }
+						/>
+					);
+				}
+				return (
+					<DropdownMenuItemTrigger
+						key={ action.id }
+						action={ action }
+						onClick={ () => action.callback( item ) }
+					/>
+				);
+			} ) }
+		</DropdownMenuGroup>
+	);
+}
+
+export default function ItemActions( { item, actions, viewType } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
 			( accumulator, action ) => {
@@ -84,6 +125,15 @@ export default function ItemActions( { item, actions } ) {
 	if ( ! primaryActions.length && ! secondaryActions.length ) {
 		return null;
 	}
+	if ( viewType === 'grid' ) {
+		return (
+			<GridItemActions
+				item={ item }
+				primaryActions={ primaryActions }
+				secondaryActions={ secondaryActions }
+			/>
+		);
+	}
 	return (
 		<HStack justify="flex-end">
 			{ !! primaryActions.length &&
@@ -94,12 +144,12 @@ export default function ItemActions( { item, actions } ) {
 								key={ action.id }
 								action={ action }
 								item={ item }
-								ActionTrigger={ PrimaryActionTrigger }
+								ActionTrigger={ ButtonTrigger }
 							/>
 						);
 					}
 					return (
-						<PrimaryActionTrigger
+						<ButtonTrigger
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( item ) }
@@ -107,36 +157,65 @@ export default function ItemActions( { item, actions } ) {
 					);
 				} ) }
 			{ !! secondaryActions.length && (
-				<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
-					{ () => (
-						<MenuGroup>
-							{ secondaryActions.map( ( action ) => {
-								if ( !! action.RenderModal ) {
-									return (
-										<ActionWithModal
-											key={ action.id }
-											action={ action }
-											item={ item }
-											ActionTrigger={
-												SecondaryActionTrigger
-											}
-										/>
-									);
-								}
-								return (
-									<SecondaryActionTrigger
-										key={ action.id }
-										action={ action }
-										onClick={ () =>
-											action.callback( item )
-										}
-									/>
-								);
-							} ) }
-						</MenuGroup>
-					) }
+				<DropdownMenu
+					trigger={
+						<Button
+							variant="tertiary"
+							size="compact"
+							icon={ moreVertical }
+							label={ __( 'Actions' ) }
+						/>
+					}
+					align="start"
+				>
+					<ActionsDropdownMenuGroup
+						actions={ secondaryActions }
+						item={ item }
+					/>
 				</DropdownMenu>
 			) }
 		</HStack>
+	);
+}
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
+
+function GridItemActions( { item, primaryActions, secondaryActions } ) {
+	return (
+		<DropdownMenu
+			trigger={
+				<Button
+					variant="tertiary"
+					size="compact"
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+				/>
+			}
+			align="start"
+		>
+			<WithSeparators>
+				{ !! primaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ primaryActions }
+						item={ item }
+					/>
+				) }
+				{ !! secondaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ secondaryActions }
+						item={ item }
+					/>
+				) }
+			</WithSeparators>
+		</DropdownMenu>
 	);
 }
