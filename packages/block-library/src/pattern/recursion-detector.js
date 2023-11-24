@@ -23,7 +23,7 @@ export function parsePatternDependencies( { name, blocks } ) {
 			queue.unshift( innerBlock );
 		}
 		if ( block.name === 'core/pattern' ) {
-			dependsOn( name, block.attributes.slug );
+			registerDependency( name, block.attributes.slug );
 		}
 	}
 }
@@ -37,7 +37,7 @@ export function parsePatternDependencies( { name, blocks } ) {
  *
  * @throws {Error} If a circular dependency is detected.
  */
-function dependsOn( a, b ) {
+function registerDependency( a, b ) {
 	if ( ! patternDependencies.has( a ) ) {
 		patternDependencies.set( a, new Set() );
 	}
