@@ -15,7 +15,8 @@ import {
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { BottomSheet, Gradient, InserterButton } from '@wordpress/components';
+import { BottomSheet, Gradient } from '@wordpress/components';
+import { InserterButton } from '@wordpress/block-editor';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,

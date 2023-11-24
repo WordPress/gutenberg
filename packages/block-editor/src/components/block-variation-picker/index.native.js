@@ -20,8 +20,8 @@ import {
 	PanelBody,
 	BottomSheet,
 	FooterMessageControl,
-	InserterButton,
 } from '@wordpress/components';
+import { InserterButton } from '@wordpress/block-editor';
 import { Icon, close } from '@wordpress/icons';
 
 /**
