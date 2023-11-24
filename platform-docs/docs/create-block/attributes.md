@@ -48,7 +48,7 @@ registerBlockType( 'gutenpride/gutenpride-block', {
 
 ## TextControl Component
 
-For our example block, the component we are going to use is the **PlainText** component, which allows the user to type some non formatted text. The **PlainText** component is imported from the `@wordpress/block-editor` package.
+For our example block, the component we are going to use is the **PlainText** component, which allows the user to type some unformatted text. The **PlainText** component is imported from the `@wordpress/block-editor` package.
 
 The component is added similar to an HTML tag, the `value` is set to the `attributes.message` and the `onChange` function uses the `setAttributes` to update the message attribute value.
 

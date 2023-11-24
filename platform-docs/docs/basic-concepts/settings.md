@@ -8,7 +8,7 @@ You can customize the block editor by providing a `settings` prop to the `BlockE
 
 ## __experimentalFeatures
 
-The experimental features setting is an object that allows you to enable/disable common block editor features. For instance, the following settings enables support for text, background colors and allow users to pick a custom color or one of the defined theme palette colors. Core block types and third-party block typess using the block supports feature will automatically take these settings into account.
+The experimental features setting is an object that allows you to enable/disable common block editor features. For instance, the following settings enables support for text, background colors and allow users to pick a custom color or one of the defined theme palette colors. Core block types and third-party block types using the block supports feature will automatically take these settings into account.
 
 ```js
 import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
