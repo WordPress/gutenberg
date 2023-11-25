@@ -17,7 +17,7 @@ const meta: Meta< typeof BoxControl > = {
 	title: 'Components (Experimental)/BoxControl',
 	component: BoxControl,
 	argTypes: {
-		values: { control: null },
+		values: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -27,20 +27,12 @@ const meta: Meta< typeof BoxControl > = {
 };
 export default meta;
 
-const defaultSideValues = {
-	top: '10px',
-	right: '10px',
-	bottom: '10px',
-	left: '10px',
-};
-
 const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
 	return <BoxControl { ...props } />;
 };
 
 const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
-	const [ values, setValues ] =
-		useState< ( typeof props )[ 'values' ] >( defaultSideValues );
+	const [ values, setValues ] = useState< ( typeof props )[ 'values' ] >();
 
 	return (
 		<BoxControl
