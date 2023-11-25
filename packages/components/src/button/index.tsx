@@ -9,12 +9,13 @@ import type {
 	MouseEvent,
 	ReactElement,
 } from 'react';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useId, Fragment, Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -85,6 +86,74 @@ function useDeprecatedProps( {
 		variant: computedVariant,
 	};
 }
+
+const ButtonElement = forwardRef(
+	(
+		{
+			icon,
+			iconPosition,
+			iconSize,
+			text,
+			children,
+			tag: Tag,
+			anchorProps,
+			buttonProps,
+			commonProps,
+			additionalProps,
+		}: Record< string, any >,
+		ref: React.ForwardedRef< any >
+	) => {
+		const elementChildren = (
+			<>
+				{ icon && iconPosition === 'left' && (
+					<Icon icon={ icon } size={ iconSize } />
+				) }
+				{ text && <>{ text }</> }
+				{ icon && iconPosition === 'right' && (
+					<Icon icon={ icon } size={ iconSize } />
+				) }
+				{ children }
+			</>
+		);
+
+		return Tag === 'a' ? (
+			<a
+				{ ...anchorProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
+				{ ...commonProps }
+				ref={ ref }
+			>
+				{ elementChildren }
+			</a>
+		) : (
+			<button
+				{ ...buttonProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
+				{ ...commonProps }
+				ref={ ref }
+			>
+				{ elementChildren }
+			</button>
+		);
+	}
+);
+
+const FakeTooltip = ( { children }: { children: React.ReactElement } ) => {
+	const store = Ariakit.useTooltipStore();
+	return <Ariakit.TooltipAnchor render={ children } store={ store } />;
+};
+FakeTooltip.type = Tooltip;
+
+const MaybeTooltip = ( {
+	shouldShowTooltip,
+	children,
+	...restProps
+}: Record< string, any > & { children: React.ReactElement } ) =>
+	shouldShowTooltip ? (
+		<Tooltip { ...restProps }>{ children }</Tooltip>
+	) : (
+		<FakeTooltip>{ children }</FakeTooltip>
+	);
 
 export function UnforwardedButton(
 	props: ButtonProps,
@@ -195,9 +264,9 @@ export function UnforwardedButton(
 	const shouldShowTooltip =
 		! trulyDisabled &&
 		// An explicit tooltip is passed or...
-		( ( showTooltip && label ) ||
+		( ( showTooltip && !! label ) ||
 			// There's a shortcut or...
-			shortcut ||
+			!! shortcut ||
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
@@ -210,44 +279,13 @@ export function UnforwardedButton(
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
+	const uniqueKey = useId();
+
 	const commonProps = {
 		className: classes,
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
-		ref,
 	};
-
-	const elementChildren = (
-		<>
-			{ icon && iconPosition === 'left' && (
-				<Icon icon={ icon } size={ iconSize } />
-			) }
-			{ text && <>{ text }</> }
-			{ icon && iconPosition === 'right' && (
-				<Icon icon={ icon } size={ iconSize } />
-			) }
-			{ children }
-		</>
-	);
-
-	const element =
-		Tag === 'a' ? (
-			<a
-				{ ...anchorProps }
-				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
-				{ ...commonProps }
-			>
-				{ elementChildren }
-			</a>
-		) : (
-			<button
-				{ ...buttonProps }
-				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
-				{ ...commonProps }
-			>
-				{ elementChildren }
-			</button>
-		);
 
 	// Convert legacy `position` values to be used with the new `placement` prop
 	let computedPlacement;
@@ -256,22 +294,9 @@ export function UnforwardedButton(
 		computedPlacement = positionToPlacement( tooltipPosition );
 	}
 
-	if ( ! shouldShowTooltip ) {
-		return (
-			<>
-				{ element }
-				{ describedBy && (
-					<VisuallyHidden>
-						<span id={ descriptionId }>{ describedBy }</span>
-					</VisuallyHidden>
-				) }
-			</>
-		);
-	}
-
 	return (
 		<>
-			<Tooltip
+			<MaybeTooltip
 				text={
 					( children as string | ReactElement[] )?.length &&
 					describedBy
@@ -280,9 +305,24 @@ export function UnforwardedButton(
 				}
 				shortcut={ shortcut }
 				placement={ computedPlacement }
+				shouldShowTooltip={ shouldShowTooltip }
 			>
-				{ element }
-			</Tooltip>
+				<ButtonElement
+					key={ uniqueKey }
+					icon={ icon }
+					iconPosition={ iconPosition }
+					iconSize={ iconSize }
+					text={ text }
+					tag={ Tag }
+					anchorProps={ anchorProps }
+					buttonProps={ buttonProps }
+					commonProps={ commonProps }
+					additionalProps={ additionalProps }
+					ref={ ref }
+				>
+					{ children }
+				</ButtonElement>
+			</MaybeTooltip>
 			{ describedBy && (
 				<VisuallyHidden>
 					<span id={ descriptionId }>{ describedBy }</span>
