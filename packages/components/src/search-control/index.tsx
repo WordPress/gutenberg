@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+// import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,8 @@ import { forwardRef, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import BaseControl from '../base-control';
+import InputControl from '../input-control';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
@@ -73,36 +74,65 @@ function UnforwardedSearchControl(
 		return <Icon icon={ search } />;
 	};
 
+	// TODO:
+	// - add margin if __nextHasNoMarginBottom if false
+	// - check label
+	// - compact size
+	// - classnames
+	// - onChange type signature changed
+	// - value no fallback to empty string
+
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		// @ts-expect-error
+		<InputControl
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 			label={ label }
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
-			className={ classnames( className, 'components-search-control', {
-				'is-next-40px-default-size': __next40pxDefaultSize,
-				'is-size-compact': size === 'compact',
-			} ) }
-		>
-			<div className="components-search-control__input-wrapper">
-				<input
-					{ ...restProps }
-					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
-					className="components-search-control__input"
-					id={ id }
-					type="search"
-					placeholder={ placeholder }
-					onChange={ ( event ) => onChange( event.target.value ) }
-					onKeyDown={ onKeyDown }
-					autoComplete="off"
-					value={ value || '' }
-				/>
-				<div className="components-search-control__icon">
+			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+			type="search"
+			onChange={ ( newValue ) => onChange( newValue ) }
+			onKeyDown={ onKeyDown }
+			autoComplete="off"
+			value={ value }
+			prefix={
+				<InputControlPrefixWrapper>
 					{ renderRightButton() }
-				</div>
-			</div>
-		</BaseControl>
+				</InputControlPrefixWrapper>
+			}
+			{ ...restProps }
+		/>
+
+		// <BaseControl
+		// 	__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		// 	label={ label }
+		// 	id={ id }
+		// 	hideLabelFromVision={ hideLabelFromVision }
+		// 	help={ help }
+		// 	className={ classnames( className, 'components-search-control', {
+		// 		'is-next-40px-default-size': __next40pxDefaultSize,
+		// 		'is-size-compact': size === 'compact',
+		// 	} ) }
+		// >
+		// 	<div className="components-search-control__input-wrapper">
+		// 		<input
+		// 			{ ...restProps }
+		// 			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+		// 			className="components-search-control__input"
+		// 			id={ id }
+		// 			type="search"
+		// 			placeholder={ placeholder }
+		// 			onChange={ ( event ) => onChange( event.target.value ) }
+		// 			onKeyDown={ onKeyDown }
+		// 			autoComplete="off"
+		// 			value={ value || '' }
+		// 		/>
+		// 		<div className="components-search-control__icon">
+		// 			{ renderRightButton() }
+		// 		</div>
+		// 	</div>
+		// </BaseControl>
 	);
 }
 

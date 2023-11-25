@@ -21,7 +21,7 @@ export type SearchControlProps = Pick<
 	/**
 	 * A function that receives the value of the input when the value is changed.
 	 */
-	onChange: ( value: string ) => void;
+	onChange: ( value?: string ) => void;
 	/**
 	 * When an `onClose` callback is provided, the search control will render a close button
 	 * that will trigger the given callback.

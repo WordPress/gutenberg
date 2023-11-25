@@ -85,7 +85,7 @@ function MenuTitleSearch( {
 				autoComplete="off"
 				className="components-navigation__menu-search-input"
 				id={ inputId }
-				onChange={ ( value ) => onSearch?.( value ) }
+				onChange={ ( value ) => onSearch?.( value ?? '' ) }
 				onKeyDown={ onKeyDown }
 				placeholder={ placeholder }
 				onClose={ onClose }
