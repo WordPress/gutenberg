@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,24 +21,28 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
 export function useComputeControlledOrUncontrolledValue(
 	valueProp: ValueProp
 ): { value: ValueProp; defaultValue: ValueProp } {
-	const hasEverBeenUsedInControlledMode = useRef( false );
+	const [
+		hasEverBeenUsedInControlledMode,
+		setHasEverBeenUsedInControlledMode,
+	] = useState( false );
 	const previousValueProp = usePrevious( valueProp );
 
 	useEffect( () => {
-		if ( ! hasEverBeenUsedInControlledMode.current ) {
+		if ( ! hasEverBeenUsedInControlledMode ) {
 			// Assume the component is being used in controlled mode if:
 			// - the `value` prop is not `undefined`
 			// - the `value` prop was not previously `undefined` and was given a new value
-			hasEverBeenUsedInControlledMode.current =
+			setHasEverBeenUsedInControlledMode(
 				valueProp !== undefined &&
-				previousValueProp !== undefined &&
-				valueProp !== previousValueProp;
+					previousValueProp !== undefined &&
+					valueProp !== previousValueProp
+			);
 		}
-	}, [ valueProp, previousValueProp ] );
+	}, [ valueProp, previousValueProp, hasEverBeenUsedInControlledMode ] );
 
 	let value, defaultValue;
 
-	if ( hasEverBeenUsedInControlledMode.current ) {
+	if ( hasEverBeenUsedInControlledMode ) {
 		// When in controlled mode, use `''` instead of `undefined`
 		value = valueProp ?? '';
 	} else {
