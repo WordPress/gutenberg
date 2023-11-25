@@ -7,8 +7,8 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { createRef } from '@wordpress/element';
-import { plusCircle } from '@wordpress/icons';
+import { createRef, useRef } from '@wordpress/element';
+import { button, plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -389,6 +389,27 @@ describe( 'Button', () => {
 				expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 					'is-pressed'
 				);
+			} );
+
+			it( 'should not re-render a new button HTML element when toggling the internal tooltip logic', () => {
+				const buttonCallbackRef = jest.fn();
+
+				const buttonProps = {
+					label: 'tooltip text',
+					ref: buttonCallbackRef,
+					children: 'Button text',
+				};
+
+				const { rerender } = render( <Button { ...buttonProps } /> );
+
+				expect( buttonCallbackRef ).toHaveBeenCalledTimes( 1 );
+
+				rerender( <Button { ...buttonProps } showTooltip /> );
+
+				// If the callback hasn't been called more than once, it means that
+				// flipping from hiding to showing the tooltip didn't cause the HTML
+				// button element to be removed and re-added to the DOM.
+				expect( buttonCallbackRef ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
 	} );
