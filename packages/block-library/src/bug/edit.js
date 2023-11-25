@@ -23,13 +23,13 @@ export default function Test( { attributes, setAttributes } ) {
 						}
 					/>
 					<ToggleGroupControl
-						value={ testAttribute }
+						value={ testAttribute ? 'on' : 'off' }
 						onChange={ ( value ) =>
-							setAttributes( { testAttribute: value } )
+							setAttributes( { testAttribute: value === 'on' } )
 						}
 					>
-						<ToggleGroupControlOption value={ false } label="OFF" />
-						<ToggleGroupControlOption value={ true } label="ON" />
+						<ToggleGroupControlOption value="off" label="OFF" />
+						<ToggleGroupControlOption value="on" label="ON" />
 					</ToggleGroupControl>
 				</PanelBody>
 			</InspectorControls>
