@@ -4,7 +4,7 @@ A block is usually registered through a plugin on both the server and client-sid
 
 Although technically, blocks could be registered only in the client, **registering blocks on both the server and in the client is a strong recommendation**. Some server-side features like Dynamic Rendering, Block Supports, Block Hooks, or Block style variations require the block to "exist" on the server, and they won't work properly without server registration of the block.
 
-For example, to enable the [capability of blocks to be styled via `theme.json`](https://developer.wordpress.org/themes/global-settings-and-styles/settings/blocks/), they need to be registered in the server, otherwise, any styles assigned to them in `theme.json` will be ignored. 
+For example, to allow a block [to be styled via `theme.json`](https://developer.wordpress.org/themes/global-settings-and-styles/settings/blocks/), it needs to be registered on the server, otherwise, any styles assigned to it in `theme.json` will be ignored. 
 
 [![Open Block Registration diagram in excalidraw](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://excalidraw.com/#json=PUQu7jpvbKsUHYfpHWn7s,61QnhpZtjykp3s44lbUN_g "Open Block Registration diagram in excalidraw")
 
