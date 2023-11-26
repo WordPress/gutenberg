@@ -21,11 +21,11 @@ import { renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { store as noticeStore } from '@wordpress/notices';
+import { tableOfContents as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
 import { useObserveHeadings } from './hooks';
