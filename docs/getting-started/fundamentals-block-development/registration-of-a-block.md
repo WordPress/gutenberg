@@ -1,6 +1,6 @@
 # Registration of a block
 
-A block is usually registered through a plugin in both the server and the client using its `block.json` metadata. 
+A block is usually registered through a plugin on both the server and client-side using its `block.json` metadata. 
 
 Although technically, blocks could be registered only on the client, **registering blocks in both the server and the client is a strong recommendation**, as some server-side features like Dynamic Rendering, Block Supports, Block Hooks, or Block style variations require the block to "exist" in the server and they won't work properly without a server registration of the block.
 
