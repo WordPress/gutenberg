@@ -10,7 +10,7 @@ For example, to allow a block [to be styled via `theme.json`](https://developer.
 
 ### Registration of the block with PHP (server-side)
 
-A block registration in the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the `init` action.
+Block registration on the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the [init hook](https://developer.wordpress.org/reference/hooks/init/).
 
 The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function, that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
 
