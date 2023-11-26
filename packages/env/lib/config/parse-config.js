@@ -35,6 +35,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {number|null}                          testsMysqlPort                The port to use in the tests MySQL environment.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -50,6 +51,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
+ * @property {number}                    mysqlPort     The port to use for MySQL. Random if empty.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
@@ -85,6 +87,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	testsMysqlPort: null,
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -281,6 +284,11 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.port = overrides.testsPort;
 	}
 
+	if ( overrides.testsMysqlPort ) {
+		overrideConfig.testsMysqlPort = overrides.testsMysqlPort;
+		overrideConfig.env.tests.mysqlPort = overrides.testsMysqlPort;
+	}
+
 	if ( overrides.coreSource ) {
 		overrideConfig.coreSource = overrides.coreSource;
 		overrideConfig.env.development.coreSource = overrides.coreSource;
@@ -339,6 +347,9 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.testsMysqlPort !== undefined ) {
+		parsedConfig.testsMysqlPort = rawConfig.testsMysqlPort;
 	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
@@ -412,6 +423,7 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
+			case 'testsMysqlPort':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
