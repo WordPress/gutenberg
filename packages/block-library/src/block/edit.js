@@ -10,12 +10,16 @@ import {
 	useEntityBlockEditor,
 	useEntityProp,
 	useEntityRecord,
+	store as coreStore,
 } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import {
 	Placeholder,
 	Spinner,
 	TextControl,
 	PanelBody,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -28,8 +32,12 @@ import {
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
+	BlockControls,
+	store as editorStore,
 } from '@wordpress/block-editor';
+
 import { useRef, useMemo } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -73,6 +81,30 @@ export default function ReusableBlockEdit( {
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
 } ) {
+	const editUrl = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const { getSettings } = select( editorStore );
+
+			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
+			const defaultUrl = addQueryArgs( 'post.php', {
+				action: 'edit',
+				post: ref,
+			} );
+			const siteEditorUrl = addQueryArgs( 'site-editor.php', {
+				postType: 'wp_block',
+				postId: ref,
+				categoryType: 'pattern',
+				canvas: 'edit',
+			} );
+
+			// For editing link to the site editor if the theme and user permissions support it
+			return canUser( 'read', 'templates' ) && isBlockTheme
+				? siteEditorUrl
+				: defaultUrl;
+		},
+		[ ref ]
+	);
 	useBlockEditingMode( 'syncedPattern' );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
@@ -143,6 +175,13 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton href={ editUrl }>
+						{ __( 'Edit' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
