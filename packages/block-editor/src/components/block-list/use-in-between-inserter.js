@@ -75,7 +75,8 @@ export function useInBetweenInserter() {
 
 				if (
 					getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled'
+					getBlockEditingMode( rootClientId ) === 'disabled' ||
+					getBlockEditingMode( rootClientId ) === 'syncedPattern'
 				) {
 					return;
 				}

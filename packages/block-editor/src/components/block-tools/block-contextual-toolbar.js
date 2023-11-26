@@ -70,7 +70,9 @@ export default function BlockContextualToolbar( {
 	const hasAnyBlockControls = useHasAnyBlockControls();
 	if (
 		! isToolbarEnabled ||
-		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
+		( blockEditingMode !== 'syncedPattern' &&
+			blockEditingMode !== 'default' &&
+			! hasAnyBlockControls )
 	) {
 		return null;
 	}

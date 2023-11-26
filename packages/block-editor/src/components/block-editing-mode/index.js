@@ -11,7 +11,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockListBlockContext } from '../block-list/block-list-block-context';
 
 /**
- * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
+ * @typedef {'disabled'|'contentOnly'|'default'|'syncedPattern'} BlockEditingMode
  */
 
 /**
@@ -26,13 +26,14 @@ import { BlockListBlockContext } from '../block-list/block-list-block-context';
  * }
  * ```
  *
- * `mode` can be one of three options:
+ * `mode` can be one of four options:
  *
  * - `'disabled'`: Prevents editing the block entirely, i.e. it cannot be
  *   selected.
  * - `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the
  *   toolbar, the block movers, block settings.
  * - `'default'`: Allows editing the block as normal.
+ * - `'syncedPattern'`: Restricts editing of pattern block entities to only child blocks that have attribute connections set.
  *
  * The mode is inherited by all of the block's inner blocks, unless they have
  * their own mode.

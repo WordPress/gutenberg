@@ -27,6 +27,7 @@ import {
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
 
@@ -72,6 +73,7 @@ export default function ReusableBlockEdit( {
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
 } ) {
+	useBlockEditingMode( 'syncedPattern' );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',

@@ -113,6 +113,8 @@ function BlockListBlock( {
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const isSyncedPatternChild =
+		name !== 'core/block' && blockEditingMode === 'syncedPattern';
 
 	const parentLayout = useLayout() || {};
 
@@ -142,7 +144,7 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( blockEditingMode === 'disabled' ) {
+	if ( blockEditingMode === 'disabled' || isSyncedPatternChild ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -216,7 +218,8 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-editing-disabled': blockEditingMode === 'disabled',
+				'is-editing-disabled':
+					blockEditingMode === 'disabled' || isSyncedPatternChild,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

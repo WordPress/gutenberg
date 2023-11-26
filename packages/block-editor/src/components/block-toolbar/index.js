@@ -91,6 +91,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
+	const isSyncedPattern = isReusableBlock( blockType );
 	const classes = classnames( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 	} );
@@ -101,7 +102,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				isLargeViewport &&
 				blockEditingMode === 'default' && <BlockParentSelector /> }
 			{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-				blockEditingMode === 'default' && (
+				( blockEditingMode === 'default' ||
+					blockEditingMode === 'syncedPattern' ) && (
 					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockSwitcher clientIds={ blockClientIds } />
@@ -148,7 +150,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				</>
 			) }
 			<BlockEditVisuallyButton clientIds={ blockClientIds } />
-			{ blockEditingMode === 'default' && (
+			{ ( blockEditingMode === 'default' || isSyncedPattern ) && (
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			) }
 		</div>
