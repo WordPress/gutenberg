@@ -1,6 +1,8 @@
 # The Block wrapper
 
-The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. 
+The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. Besides this "edit" interface, every block decides how it's going to be rendered for the fromnted. s 
+
+
 changes in blocks --- update store --- update blocks
 
 To render the block element wrapper for the block’s edit implementation, the block author must use the `useBlockProps()` hook.
@@ -20,7 +22,7 @@ The use of `supports` generates a set of properties that need to be manually add
 - in any server-side render definition for the block via the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
 
 
-…but in order for the Gutenberg editor to know how to manipulate the block, add any extra classNames that are needed for the block… the block wrapper element should apply props retrieved from the useBlockProps react hook call. The block wrapper element should be a native DOM element, like <div> and <table>, or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
+…but in order for the Gutenberg editor to know how to manipulate the block, add any extra classNames that are needed for the block… the block wrapper element should apply props retrieved from the `useBlockProps` react hook call. The block wrapper element should be a native DOM element, like <div> and <table>, or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
 
 If the element wrapper needs any extra custom HTML attributes, these need to be passed as an argument to the useBlockProps hook.
 
@@ -36,3 +38,23 @@ If the element wrapper needs any extra custom HTML attributes, these need to be 
 
 Related resources:
 - https://franky-arkon-digital.medium.com/gutenberg-tips-generate-your-blocks-class-name-using-useblockprops-aa77a98f4fd
+
+
+```html
+<p 
+    tabindex="0" 
+    class="
+        block-editor-block-list__block 
+        wp-block 
+        is-selected wp-block-block-development-examples-copyright-date-block-09aac3
+    " 
+    id="block-f68d05d7-71a3-4b8c-93f0-b673b62ed255" 
+    role="document" aria-label="Block: Copyright Date Block 09aac3" data-block="f68d05d7-71a3-4b8c-93f0-b673b62ed255" data-type="block-development-examples/copyright-date-block-09aac3" data-title="Copyright Date Block 09aac3"
+>
+© 2020–2023
+</p>
+```
+
+```html
+<p class="wp-block-block-development-examples-copyright-date-block-09aac3">© 2020–2023</p>
+```
