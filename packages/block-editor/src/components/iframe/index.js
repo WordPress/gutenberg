@@ -218,6 +218,7 @@ function Iframe( {
 <html>
 	<head>
 		<meta charset="utf-8">
+  		<base href="${ window.location.origin }">
 		<script>window.frameElement._load()</script>
 		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
 		${ styles }
