@@ -98,7 +98,7 @@ export default function ReusableBlockEdit( {
 				canvas: 'edit',
 			} );
 
-			// For editing link to the site editor if the theme and user permissions support it
+			// For editing link to the site editor if the theme and user permissions support it.
 			return canUser( 'read', 'templates' ) && isBlockTheme
 				? siteEditorUrl
 				: defaultUrl;
