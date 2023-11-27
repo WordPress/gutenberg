@@ -60,7 +60,7 @@ describe( 'List block', () => {
 
 	it( 'adds one item to the list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li></li><!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
@@ -88,17 +88,17 @@ describe( 'List block', () => {
 
 	it( 'shows different indentation levels', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>List item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>List item 2<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>List item nested 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>List item nested 2<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Extra item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -140,7 +140,7 @@ describe( 'List block', () => {
 
 	it( 'changes the indentation level', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -183,9 +183,9 @@ describe( 'List block', () => {
 
 	it( 'removes the indentation level', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 2</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list --></li>
@@ -230,7 +230,7 @@ describe( 'List block', () => {
 
 	it( 'changes to ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -258,7 +258,7 @@ describe( 'List block', () => {
 
 	it( 'changes to reverse ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -299,7 +299,7 @@ describe( 'List block', () => {
 
 	it( 'sets a start value to an ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -342,7 +342,7 @@ describe( 'List block', () => {
 	it( 'splits empty list items into paragraphs', async () => {
 		// Arrange
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li><!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Two</li><!-- /wp:list-item --></ul>
@@ -370,7 +370,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->
@@ -380,7 +380,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
@@ -389,7 +389,7 @@ describe( 'List block', () => {
 
 	it( 'merges paragraphs into list items', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->
@@ -399,7 +399,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -417,7 +417,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -435,7 +435,7 @@ describe( 'List block', () => {
 	it( 'merges lists into lists', async () => {
 		// Arrange
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -445,7 +445,7 @@ describe( 'List block', () => {
 		<!-- /wp:list -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -466,7 +466,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -486,7 +486,7 @@ describe( 'List block', () => {
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li><!-- /wp:list-item --><!-- wp:list-item -->
 		<li>Two</li><!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -527,7 +527,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
@@ -539,9 +539,9 @@ describe( 'List block', () => {
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -591,7 +591,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item -->
 
