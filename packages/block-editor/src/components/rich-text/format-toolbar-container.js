@@ -42,6 +42,8 @@ function InlineToolbar( { popoverAnchor } ) {
 			anchor={ popoverAnchor }
 			className="block-editor-rich-text__inline-format-toolbar"
 			__unstableSlotName="block-toolbar"
+			role="region"
+			tabIndex="-1"
 		>
 			<NavigableToolbar
 				className="block-editor-rich-text__inline-format-toolbar-group"
