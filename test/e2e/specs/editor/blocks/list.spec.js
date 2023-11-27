@@ -1237,7 +1237,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
