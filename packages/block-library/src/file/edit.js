@@ -35,6 +35,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -148,11 +149,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	// Remove anchor tags from file name and button text content.
-	function removeAnchorTag( value ) {
-		return value.replace( /<\/?a[^>]*>/g, '' );
 	}
 
 	function changeDisplayPreview( newValue ) {
