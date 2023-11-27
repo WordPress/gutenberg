@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { PostURLPanel, PostSchedulePanel } from '@wordpress/editor';
+import {
+	PostAuthorPanel,
+	PostURLPanel,
+	PostSchedulePanel,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,7 +22,7 @@ export default function PageSummary( {
 	postType,
 } ) {
 	return (
-		<VStack>
+		<VStack spacing={ 0 }>
 			<PageStatus
 				status={ status }
 				date={ date }
@@ -29,6 +33,7 @@ export default function PageSummary( {
 			<PostSchedulePanel />
 			<EditTemplate />
 			<PostURLPanel />
+			<PostAuthorPanel />
 		</VStack>
 	);
 }

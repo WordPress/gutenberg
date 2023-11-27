@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -181,7 +182,10 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
 			return { rootClientId, insertionIndex, filterValue };
 		}
 
-		if ( hasPageContentFocus( state ) ) {
+		if (
+			isPage( state ) &&
+			select( editorStore ).getRenderingMode() !== 'template-only'
+		) {
 			const [ postContentClientId ] =
 				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
 					'core/post-content'
@@ -310,10 +314,14 @@ export function isPage( state ) {
 /**
  * Whether or not the editor allows only page content to be edited.
  *
- * @param {Object} state Global application state.
+ * @deprecated
  *
  * @return {boolean} Whether or not focus is on editing page content.
  */
-export function hasPageContentFocus( state ) {
-	return isPage( state ) ? state.hasPageContentFocus : false;
+export function hasPageContentFocus() {
+	deprecated( `select( 'core/edit-site' ).hasPageContentFocus`, {
+		since: '6.5',
+	} );
+
+	return false;
 }

@@ -31,6 +31,7 @@ import {
 import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -120,10 +121,16 @@ export default function PagePages() {
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
-			if ( filter.field === 'status' && filter.operator === 'in' ) {
+			if (
+				filter.field === 'status' &&
+				filter.operator === OPERATOR_IN
+			) {
 				filters.status = filter.value;
 			}
-			if ( filter.field === 'author' && filter.operator === 'in' ) {
+			if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_IN
+			) {
 				filters.author = filter.value;
 			}
 		} );
@@ -219,15 +226,7 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
-					const author = item._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
-					);
-				},
-				type: 'enumeration',
+				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -240,7 +239,7 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
-				type: 'enumeration',
+				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
 			},
@@ -309,6 +308,7 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
+					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }

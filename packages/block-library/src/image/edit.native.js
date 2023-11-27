@@ -44,7 +44,6 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockStyles,
 	store as blockEditorStore,
 	blockSettingsScreens,
@@ -212,7 +211,6 @@ export class ImageEdit extends Component {
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator =
 			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
@@ -305,6 +303,20 @@ export class ImageEdit extends Component {
 			this.replacedFeaturedImage = false;
 			setFeaturedImage( id );
 		}
+
+		const { align } = attributes;
+		const { __unstableMarkNextChangeAsNotPersistent } = this.props;
+
+		// Update the attributes if the align is wide or full
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+				aspectRatio: undefined,
+				scale: undefined,
+			} );
+		}
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -388,18 +400,6 @@ export class ImageEdit extends Component {
 			url,
 			width: undefined,
 			height: undefined,
-		} );
-	}
-
-	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = Object.values(
-			WIDE_ALIGNMENTS.alignments
-		).includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		this.props.setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
 		} );
 	}
 
@@ -711,10 +711,6 @@ export class ImageEdit extends Component {
 						onClick={ open }
 					/>
 				</ToolbarGroup>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
 			</BlockControls>
 		);
 
@@ -941,8 +937,11 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { createErrorNotice } = dispatch( noticesStore );
+		const { __unstableMarkNextChangeAsNotPersistent } =
+			dispatch( blockEditorStore );
 
 		return {
+			__unstableMarkNextChangeAsNotPersistent,
 			createErrorNotice,
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
