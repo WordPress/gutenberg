@@ -8,8 +8,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, Fragment, Children } from '@wordpress/element';
-import { moreVertical, Icon } from '@wordpress/icons';
+import { useMemo, useState } from '@wordpress/element';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +20,6 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
@@ -38,12 +37,7 @@ function ButtonTrigger( { action, onClick } ) {
 
 function DropdownMenuItemTrigger( { action, onClick } ) {
 	return (
-		<DropdownMenuItem
-			onClick={ onClick }
-			prefix={
-				action.isPrimary && action.icon && <Icon icon={ action.icon } />
-			}
-		>
+		<DropdownMenuItem onClick={ onClick }>
 			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
@@ -161,7 +155,6 @@ export default function ItemActions( { item, actions, viewType } ) {
 				<DropdownMenu
 					trigger={
 						<Button
-							variant="tertiary"
 							size="compact"
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
@@ -179,23 +172,11 @@ export default function ItemActions( { item, actions, viewType } ) {
 	);
 }
 
-function WithSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
-
 function GridItemActions( { item, primaryActions, secondaryActions } ) {
 	return (
 		<DropdownMenu
 			trigger={
 				<Button
-					variant="tertiary"
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
@@ -203,20 +184,18 @@ function GridItemActions( { item, primaryActions, secondaryActions } ) {
 			}
 			placement="bottom-end"
 		>
-			<WithSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithSeparators>
+			{ !! primaryActions.length && (
+				<ActionsDropdownMenuGroup
+					actions={ primaryActions }
+					item={ item }
+				/>
+			) }
+			{ !! secondaryActions.length && (
+				<ActionsDropdownMenuGroup
+					actions={ secondaryActions }
+					item={ item }
+				/>
+			) }
 		</DropdownMenu>
 	);
 }
