@@ -16,7 +16,7 @@ Let's discover how to use the **Gutenberg Block Editor** to build your own block
 
 First bootstrap a vite project using `npm create vite@latest` and pick `Vanilla` variant and `JavaScript` as a language.
 
-Once done, you can navigate to your application folder and run it locally using `npm run dev`. Open the displayed local URL in a browser.
+Once done, you can navigate to your application folder and install its dependencies with `npm install` to finally run it locally using `npm run dev`. Open the displayed local URL in a browser.
 
 ## Installing dependencies
 
