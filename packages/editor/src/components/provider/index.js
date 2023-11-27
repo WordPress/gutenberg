@@ -188,7 +188,23 @@ function useBlockEditorProps( post, template, mode ) {
 					[ block ]
 				);
 			} );
-			return innerBlocksWithLayout;
+
+			// This group block is only here to leave some space at the top of the canvas.
+			return [
+				createBlock(
+					'core/group',
+					{
+						style: {
+							spacing: {
+								margin: {
+									top: '4em',
+								},
+							},
+						},
+					},
+					innerBlocksWithLayout
+				),
+			];
 		}
 
 		if ( rootLevelPost === 'template' ) {
