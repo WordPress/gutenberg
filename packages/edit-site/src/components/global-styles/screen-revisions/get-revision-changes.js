@@ -1,17 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 const translationMap = {
-	blocks: __( 'Block styles' ),
 	border: __( 'Border' ),
 	color: __( 'Colors' ),
-	elements: __( 'Elements' ),
-	link: __( 'Links' ),
-	layout: __( 'Layout' ),
 	spacing: __( 'Spacing' ),
 	typography: __( 'Typography' ),
+	'settings.color.palette': __( 'color palette' ),
+	'settings.color.gradients': __( 'gradients' ),
+	'settings.color.duotone': __( 'duotone colors' ),
+	'settings.typography.fontFamilies': __( 'font family settings' ),
+	'settings.typography.fontSizes': __( 'font size settings' ),
+	'color.text': __( 'text color' ),
+	'color.background': __( 'background color' ),
+	'spacing.margin.top': __( 'margin top' ),
+	'spacing.margin.bottom': __( 'margin bottom' ),
+	'spacing.margin.left': __( 'margin left' ),
+	'spacing.margin.right': __( 'margin right' ),
+	'spacing.padding.top': __( 'padding top' ),
+	'spacing.padding.bottom': __( 'padding bottom' ),
+	'spacing.padding.left': __( 'padding left' ),
+	'spacing.padding.right': __( 'padding right' ),
+	'spacing.blockGap': __( 'block gap' ),
+	'settings.layout.contentSize': __( 'content size' ),
+	'settings.layout.wideSize': __( 'wide size' ),
+	'typography.fontStyle': __( 'font style' ),
+	'typography.fontSize': __( 'font size' ),
+	'typography.lineHeight': __( 'line height' ),
+	'typography.fontFamily': __( 'font family' ),
+	'typography.fontWeight': __( 'font weight' ),
 };
 
 /**
@@ -36,102 +55,130 @@ export function getGlobalStylesChanges( { settings = {}, styles = {} } ) {
 	return changes;
 }
 
-const shuffle = ( array ) => {
+function getTranslation( key ) {
+	console.log( 'key', key );
+
+	if ( translationMap[ key ] ) {
+		return translationMap[ key ];
+	}
+	const keyArray = key.split( '.' );
+
+	if ( keyArray?.[ 0 ] === 'blocks' ) {
+		let blockName = keyArray[ 1 ].split( '/' )?.[ 1 ];
+		blockName = blockName.charAt( 0 ).toUpperCase() + blockName.slice( 1 );
+		// @todo maybe getBlockTypes() and find the block name from the block type.
+		return sprintf(
+			// translators: %1$s: block name, %2$s: changed property.
+			__( '%1$s block %2$s' ),
+			blockName.replace( /-/g, ' ' ),
+			keyArray?.[ 2 ]
+		);
+	}
+
+	if ( keyArray?.[ 0 ] === 'elements' ) {
+		return sprintf(
+			// translators: %1$s: block name, %2$s: changed property.
+			__( '%1$s element %2$s' ),
+			keyArray?.[ 1 ],
+			keyArray?.[ 2 ]
+		);
+	}
+}
+
+function shuffle( array ) {
 	for ( let i = array.length - 1; i > 0; i-- ) {
 		// eslint-disable-next-line no-restricted-syntax
 		const j = Math.floor( Math.random() * ( i + 1 ) );
 		[ array[ i ], array[ j ] ] = [ array[ j ], array[ i ] ];
 	}
 	return array;
-};
+}
 
-const cache = {}; // Should be a Set?
+const cache = new Map();
 
 export function getRevisionChanges(
 	revision,
 	previousRevision,
-	maxResults = 10
+	maxResults = 4
 ) {
-	if ( cache[ revision.id ] ) {
-		return cache[ revision.id ];
+	if ( cache.has( revision.id ) ) {
+		return cache.get( revision.id );
 	}
-console.log( 'revision, previousRevision', revision, previousRevision );
+
 	const changedValueTree = deepCompare(
 		{
 			blocks: revision?.styles?.blocks,
-			elements: revision?.styles?.elements,
 			color: revision?.styles?.color,
 			typography: revision?.styles?.typography,
-			dimensions: revision?.styles?.dimensions,
 			spacing: revision?.styles?.spacing,
-			border: revision?.styles?.border,
-			settingsColor: revision?.settings?.color,
+			elements: revision?.styles?.elements,
+			settings: revision?.settings,
 		},
 		{
 			blocks: previousRevision?.styles?.blocks,
-			elements: previousRevision?.styles?.elements,
 			color: previousRevision?.styles?.color,
 			typography: previousRevision?.styles?.typography,
-			dimensions: previousRevision?.styles?.dimensions,
 			spacing: previousRevision?.styles?.spacing,
-			border: previousRevision?.styles?.border,
-			settingsColor: previousRevision?.settings?.color,
+			elements: previousRevision?.styles?.elements,
+			settings: previousRevision?.settings,
 		}
 	);
-
-
-	console.log( 'flattenedChanges', changedValueTree);
-	const shuffled = shuffle(
-		changedValueTree.filter( ( { hasChanged, path } ) => hasChanged )
-	);
-	console.log( 'shuffled', shuffled );
-	/*	cache[ revision.id ] = shuffled
+	const hasMore = changedValueTree.length > maxResults;
+	// Remove dupes and shuffle results.
+	let result = shuffle( [ ...new Set( changedValueTree ) ] )
+		// Limit to max results.
 		.slice( 0, maxResults )
-		.map( ( { path } ) => path )
+		// Translate the keys.
+		.map( ( key ) => getTranslation( key ) )
+		.filter( ( str ) => !! str )
 		.join( ', ' );
 
-	return cache[ revision.id ];*/
+	if ( hasMore ) {
+		result += '…';
+	}
+
+	cache.set( revision.id, result );
+
+	return result;
 }
 
 function isObject( obj ) {
 	return obj !== null && typeof obj === 'object';
 }
 
-function deepCompare( revisionValue, configValue, depth = 0, parentPath = '' ) {
-	if ( ! isObject( revisionValue ) && ! isObject( configValue ) ) {
-		return [
-			{
-				path: parentPath,
-				revisionValue,
-				configValue,
-				hasChanged: revisionValue !== configValue,
-			},
-		];
+function deepCompare(
+	changedObject,
+	originalObject,
+	depth = 0,
+	parentPath = ''
+) {
+	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
+		// Only return a path if the value has changed.
+		// And then only the path name up to 3 levels deep.
+		return changedObject !== originalObject
+			? parentPath.split( '.' ).slice( 0, 3 ).join( '.' )
+			: undefined;
 	}
 
-	revisionValue = isObject( revisionValue ) ? revisionValue : {};
-	configValue = isObject( configValue ) ? configValue : {};
+	changedObject = isObject( changedObject ) ? changedObject : {};
+	originalObject = isObject( originalObject ) ? originalObject : {};
 
-	const keys1 = Object.keys( revisionValue );
-	const keys2 = Object.keys( configValue );
-	const allKeys = new Set( [ ...keys1, ...keys2 ] );
+	const changedKeys = Object.keys( changedObject );
+	const originalKeys = Object.keys( originalObject );
+	const allKeys = new Set( [ ...changedKeys, ...originalKeys ] );
 
 	let diffs = [];
 	for ( const key of allKeys ) {
 		const path = parentPath ? parentPath + '.' + key : key;
-		const subDiffs = deepCompare(
-			revisionValue[ key ],
-			configValue[ key ],
+		const changedPath = deepCompare(
+			changedObject[ key ],
+			originalObject[ key ],
 			depth + 1,
 			path
 		);
-		diffs = diffs.concat( subDiffs );
+		if ( changedPath ) {
+			diffs = diffs.concat( changedPath );
+		}
 	}
-/*	diffs = diffs.filter(
-		( diff ) =>
-			diff.path.includes( 'behaviors' ) ||
-			diff.path.includes( 'settings' ) ||
-			diff.path.includes( 'styles' )
-	);*/
 	return diffs;
 }

@@ -129,3 +129,19 @@
 .edit-site-global-styles-screen-revisions__loading {
 	margin: $grid-unit-30 auto !important;
 }
+
+.edit-site-global-styles-screen-revision__matches,
+.edit-site-global-styles-screen-revision__changes {
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+	color: $gray-900;
+	display: block;
+	&:first-letter {
+		text-transform: uppercase;
+	}
+}
+
+.edit-site-global-styles-screen-revision__matches {
+	font-style: italic;
+	font-size: 12px;
+	color: $gray-600;
+}

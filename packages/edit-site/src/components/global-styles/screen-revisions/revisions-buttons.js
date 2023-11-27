@@ -19,6 +19,20 @@ import { getRevisionChanges } from './get-revision-changes';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
+function ChangedSummary( { revision, previousRevision } ) {
+	const summary = getRevisionChanges( revision, previousRevision );
+
+	if ( ! summary ) {
+		return null;
+	}
+
+	return (
+		<span className="edit-site-global-styles-screen-revision__changes">
+			{ summary }
+		</span>
+	);
+}
+
 /**
  * Returns a button label for the revision.
  *
@@ -104,9 +118,10 @@ function RevisionsButtons( {
 				const revisionAuthor = isUnsaved ? currentUser : author;
 				const authorDisplayName = revisionAuthor?.name || __( 'User' );
 				const authorAvatar = revisionAuthor?.avatar_urls?.[ '48' ];
+				const isFirstItem = index === 0;
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === id
-					: index === 0;
+					: isFirstItem;
 				const isReset = 'parent' === id;
 				const modifiedDate = getDate( modified );
 				const displayDate =
@@ -173,14 +188,15 @@ function RevisionsButtons( {
 						</Button>
 						{ isSelected && (
 							<>
-								<p>
-									{ getRevisionChanges(
-										revision,
+								<ChangedSummary
+									revision={ revision }
+									previousRevision={
 										index < userRevisions.length
 											? userRevisions[ index + 1 ]
 											: {}
-									) }
-								</p>
+									}
+								/>
+								{ /* eslint-disable-next-line no-nested-ternary */ }
 								{ canApplyRevision ? (
 									<Button
 										variant="primary"
@@ -192,10 +208,11 @@ function RevisionsButtons( {
 											: __( 'Apply' ) }
 									</Button>
 								) : (
-									<p>
-										The revision is the same as the saved
-										state.
-									</p>
+									<span className="edit-site-global-styles-screen-revision__matches">
+										{ __(
+											'Revision matches current editor styles.'
+										) }
+									</span>
 								) }
 							</>
 						) }
