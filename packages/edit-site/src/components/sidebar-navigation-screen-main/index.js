@@ -45,6 +45,20 @@ export default function SidebarNavigationScreenMain() {
 			content={
 				<>
 					<ItemGroup>
+						<SidebarNavigationItemGlobalStyles
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</SidebarNavigationItemGlobalStyles>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/wp_template"
+							withChevron
+							icon={ layout }
+						>
+							{ __( 'Templates' ) }
+						</NavigatorButton>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/page"
@@ -63,26 +77,12 @@ export default function SidebarNavigationScreenMain() {
 						</NavigatorButton>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
-							path="/wp_template"
-							withChevron
-							icon={ layout }
-						>
-							{ __( 'Templates' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
 							path="/navigation"
 							withChevron
 							icon={ navigation }
 						>
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
-						<SidebarNavigationItemGlobalStyles
-							withChevron
-							icon={ styles }
-						>
-							{ __( 'Styles' ) }
-						</SidebarNavigationItemGlobalStyles>
 					</ItemGroup>
 					<TemplatePartHint />
 				</>
