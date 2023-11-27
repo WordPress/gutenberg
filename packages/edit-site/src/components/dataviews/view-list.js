@@ -244,7 +244,7 @@ function ViewList( {
 } ) {
 	const areAllSelected = selection && selection.length === data.length;
 	const columns = useMemo( () => {
-		const fieldsColumns = fields.map( ( field ) => {
+		const _columns = fields.map( ( field ) => {
 			const { render, getValue, ...column } = field;
 			column.cell = ( props ) =>
 				render( { item: props.row.original, view } );
@@ -253,61 +253,53 @@ function ViewList( {
 			}
 			return column;
 		} );
-		const _columns =
-			selection !== undefined
-				? [
-						{
-							header: (
-								<CheckboxControl
-									__nextHasNoMarginBottom
-									checked={ areAllSelected }
-									onChange={ () => {
-										if ( areAllSelected ) {
-											setSelection( [] );
-										} else {
-											setSelection(
-												data.map( ( { id } ) => id )
-											);
-										}
-									} }
-								/>
-							),
-							id: 'selection',
-							cell: ( props ) => {
-								//console.log({ props });
-								const item = props.row.original;
-								const isSelected = selection.includes(
-									item.id
-								);
-								//console.log({ item, isSelected });
-								return (
-									<CheckboxControl
-										__nextHasNoMarginBottom
-										checked={ isSelected }
-										onChange={ () => {
-											if ( ! isSelected ) {
-												const newSelection = [
-													...selection,
-													item.id,
-												];
-												setSelection( newSelection );
-											} else {
-												setSelection(
-													selection.filter(
-														( id ) => id !== item.id
-													)
-												);
-											}
-										} }
-									/>
-								);
-							},
-							enableHiding: false,
-							width: 40,
-						},
-						...fieldsColumns,
-				  ]
-				: fieldsColumns;
+		if ( selection !== undefined ) {
+			_columns.unshift( {
+				header: (
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						checked={ areAllSelected }
+						onChange={ () => {
+							if ( areAllSelected ) {
+								setSelection( [] );
+							} else {
+								setSelection( data.map( ( { id } ) => id ) );
+							}
+						} }
+					/>
+				),
+				id: 'selection',
+				cell: ( props ) => {
+					//console.log({ props });
+					const item = props.row.original;
+					const isSelected = selection.includes( item.id );
+					//console.log({ item, isSelected });
+					return (
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							checked={ isSelected }
+							onChange={ () => {
+								if ( ! isSelected ) {
+									const newSelection = [
+										...selection,
+										item.id,
+									];
+									setSelection( newSelection );
+								} else {
+									setSelection(
+										selection.filter(
+											( id ) => id !== item.id
+										)
+									);
+								}
+							} }
+						/>
+					);
+				},
+				enableHiding: false,
+				width: 40,
+			} );
+		}
 		if ( actions?.length ) {
 			_columns.push( {
 				header: __( 'Actions' ),

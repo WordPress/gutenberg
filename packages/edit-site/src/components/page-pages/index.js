@@ -158,6 +158,7 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
+	// Remove any selected pages that are no longer in the list of visible pages.
 	useEffect( () => {
 		if (
 			selection.some(
