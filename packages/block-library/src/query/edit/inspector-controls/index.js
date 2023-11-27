@@ -37,6 +37,7 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
@@ -226,12 +227,7 @@ export default function QueryInspectorControls( props ) {
 							} );
 							setQuerySearch( '' );
 						} }
-						dropdownMenuProps={ {
-							popoverProps: {
-								placement: 'left-start',
-								offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
-							},
-						} }
+						dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 					>
 						{ showTaxControl && (
 							<ToolsPanelItem
