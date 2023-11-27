@@ -151,7 +151,7 @@ function ScreenRevisions() {
 				description={ __(
 					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }
-				onClick={ onCloseRevisions }
+				onBack={ onCloseRevisions }
 			/>
 			{ isLoading && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
