@@ -258,7 +258,6 @@ function ViewList( {
 						<ItemActions
 							item={ props.row.original }
 							actions={ actions }
-							viewType={ view.type }
 						/>
 					);
 				},

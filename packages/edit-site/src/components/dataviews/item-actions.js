@@ -98,7 +98,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
-export default function ItemActions( { item, actions, viewType } ) {
+export default function ItemActions( { item, actions, isCompact } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
 			( accumulator, action ) => {
@@ -120,9 +120,9 @@ export default function ItemActions( { item, actions, viewType } ) {
 	if ( ! primaryActions.length && ! secondaryActions.length ) {
 		return null;
 	}
-	if ( viewType === 'grid' ) {
+	if ( isCompact ) {
 		return (
-			<GridItemActions
+			<CompactItemActions
 				item={ item }
 				primaryActions={ primaryActions }
 				secondaryActions={ secondaryActions }
@@ -172,7 +172,7 @@ export default function ItemActions( { item, actions, viewType } ) {
 	);
 }
 
-function GridItemActions( { item, primaryActions, secondaryActions } ) {
+function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 	return (
 		<DropdownMenu
 			trigger={
