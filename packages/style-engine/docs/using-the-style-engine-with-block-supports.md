@@ -204,7 +204,7 @@ array(
 
 If you don't want the Style Engine to output the CSS custom vars in the generated CSS string as well, which you might not if you're applying both the CSS rules and classnames to the block element, you can pass `'convert_vars_to_classnames' => true` in the options array.
 
-This flag means "covert the vars to classnames and don't output the vars to the CSS". The Style Engine will therefore **only** generate the required classnames and omit the CSS custom vars in the CSS.
+This flag means "convert the vars to classnames and don't output the vars to the CSS". The Style Engine will therefore **only** generate the required classnames and omit the CSS custom vars in the CSS.
 
 Using the above example code, observe the different output when we pass the option:
 
