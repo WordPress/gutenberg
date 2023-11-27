@@ -24,6 +24,7 @@ export const InsertionPointOpenRef = createContext();
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -138,9 +139,14 @@ function InbetweenInsertionPointPopover( {
 		return null;
 	}
 
+	const orientationClassname =
+		orientation === 'horizontal' || operation === 'group'
+			? 'is-horizontal'
+			: 'is-vertical';
+
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation
+		orientationClassname
 	);
 
 	return (
@@ -149,6 +155,7 @@ function InbetweenInsertionPointPopover( {
 			nextClientId={ nextClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			operation={ operation }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -229,14 +236,16 @@ export default function InsertionPoint( props ) {
 	 * Render a popover that overlays the block when the desired operation is to replace it.
 	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
 	 */
-	return insertionPoint.operation === 'replace' ||
-		insertionPoint.operation === 'group' ? (
+	return insertionPoint.operation === 'replace' ? (
 		<BlockDropZonePopover
 			// Force remount to trigger the animation.
 			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
 			{ ...props }
 		/>
 	) : (
-		<InbetweenInsertionPointPopover { ...props } />
+		<InbetweenInsertionPointPopover
+			operation={ insertionPoint.operation }
+			{ ...props }
+		/>
 	);
 }

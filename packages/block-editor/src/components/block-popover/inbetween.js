@@ -33,6 +33,7 @@ function BlockPopoverInbetween( {
 	children,
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -67,7 +68,7 @@ function BlockPopoverInbetween( {
 	);
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
-	const isVertical = orientation === 'vertical';
+	const isVertical = operation !== 'group' && orientation === 'vertical';
 
 	const popoverAnchor = useMemo( () => {
 		if (
