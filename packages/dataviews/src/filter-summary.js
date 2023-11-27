@@ -72,7 +72,7 @@ function WithSeparators( { children } ) {
 		) );
 }
 
-export function FilterSummary( { filter, view, onChangeView } ) {
+export default function FilterSummary( { filter, view, onChangeView } ) {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
