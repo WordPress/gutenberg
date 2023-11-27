@@ -2,12 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type {
-	KeyboardEvent,
-	MouseEvent,
-	TouchEvent,
-	FocusEvent as ReactFocusEvent,
-} from 'react';
+import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -148,7 +143,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		return input.current === input.current?.ownerDocument.activeElement;
 	}
 
-	function onFocusHandler( event: ReactFocusEvent ) {
+	function onFocusHandler( event: FocusEvent ) {
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( hasFocus() || event.target === tokensAndInput.current ) {
 			setIsActive( true );
@@ -167,7 +162,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur( event: ReactFocusEvent ) {
+	function onBlur( event: FocusEvent ) {
 		if (
 			inputHasValidValue() &&
 			__experimentalValidateInput( incompleteTokenValue )

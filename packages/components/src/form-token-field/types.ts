@@ -5,7 +5,7 @@ import type {
 	ComponentPropsWithRef,
 	MouseEventHandler,
 	ReactNode,
-	FocusEvent as ReactFocusEvent,
+	FocusEvent,
 } from 'react';
 
 type Messages = {
@@ -106,7 +106,7 @@ export interface FormTokenFieldProps
 	 * Function to call when the TokenField has been focused on. The event is passed to the callback. Useful for analytics.
 	 *
 	 */
-	onFocus?: ( event: ReactFocusEvent ) => void;
+	onFocus?: ( event: FocusEvent ) => void;
 	/**
 	 *  When true, renders tokens as without a background.
 	 */
