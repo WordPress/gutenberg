@@ -18,7 +18,7 @@ For more on creating a WordPress plugin see <a href="https://developer.wordpress
 
 ### `package.json`
 
-[`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) is a configuration file for a NodeJs project. In this file you define the NPM dependencies of the block and the scripts used for local work.
+[`package.json`](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) is a configuration file for a Node.js project. In this file you define the NPM dependencies of the block and the scripts used for local work.
 
 ### `src` folder
 
