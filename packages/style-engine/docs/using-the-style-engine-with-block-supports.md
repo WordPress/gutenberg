@@ -30,11 +30,11 @@ The global function `wp_style_engine_get_styles` accepts a style object as its f
 
 ```php
 $block_styles =  array(
-     'spacing' => array( 'padding' => '10px', 'margin' => array( 'top' => '1em') ),
-     'typography' => array( 'fontSize' => '2.2rem' ),
+	'spacing' => array( 'padding' => '10px', 'margin' => array( 'top' => '1em') ),
+	'typography' => array( 'fontSize' => '2.2rem' ),
 );
 $styles = wp_style_engine_get_styles(
-    $block_styles
+	$block_styles
 );
 print_r( $styles );
 
@@ -190,7 +190,7 @@ print_r( $styles );
 
 /*
 array(
-    'css'          => 'background-color:var(--wp--preset--color--blue);padding:10px;margin-top:1em;font-size:var(--wp--preset--font-size--small);',
+	'css'          => 'background-color:var(--wp--preset--color--blue);padding:10px;margin-top:1em;font-size:var(--wp--preset--font-size--small);',
 	'declarations' => array(
 		'background-color' => 'var(--wp--preset--color--blue)',
 		'padding' => '10px',
@@ -214,19 +214,19 @@ $options = array(
 );
 
 $styles = wp_style_engine_get_styles(
-    $block_styles,
-    $options
+	$block_styles,
+	$options
 );
 print_r( $styles );
 
 /*
 array(
-    'css'          => 'padding:10px;margin-top:1em;',
+	'css'          => 'padding:10px;margin-top:1em;',
 	'declarations' => array(
 		'padding' => '10px',
 		'margin-top' => '1em',
 	),
-    'classnames'   => 'has-background has-blue-background-color has-small-font-size',
+	'classnames'   => 'has-background has-blue-background-color has-small-font-size',
 )
 */
 ```
