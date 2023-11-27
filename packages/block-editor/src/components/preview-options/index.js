@@ -19,6 +19,7 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 	label,
+	showIconLabels,
 } ) {
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
@@ -35,6 +36,7 @@ export default function PreviewOptions( {
 		disabled: ! isEnabled,
 		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
+		showTooltip: ! showIconLabels,
 	};
 	const menuProps = {
 		'aria-label': __( 'View options' ),

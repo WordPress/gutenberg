@@ -159,7 +159,7 @@ const selectPatterns = createSelector(
 			// User patterns can have their sync statuses checked directly
 			// Non-user patterns are all unsynced for the time being.
 			patterns = patterns.filter( ( pattern ) => {
-				return pattern.id
+				return pattern.type === PATTERN_TYPES.user
 					? pattern.syncStatus === syncStatus
 					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
 			} );

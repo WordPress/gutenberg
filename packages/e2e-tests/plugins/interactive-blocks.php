@@ -40,7 +40,7 @@ add_action(
 		if ( 'true' === $_GET['disable_directives_ssr'] ) {
 			remove_filter(
 				'render_block_data',
-				'gutenberg_interactivity_process_directives'
+				'gutenberg_interactivity_mark_root_blocks'
 			);
 		}
 	}
