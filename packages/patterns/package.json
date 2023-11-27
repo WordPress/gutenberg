@@ -45,7 +45,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
-		"nanoid": "^4.0.2"
+		"nanoid": "^3.3.4"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
