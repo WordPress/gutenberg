@@ -44,7 +44,10 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item, view } ) }
 					</div>
-					<HStack className="dataviews-view-grid__title" justify="space-between">
+					<HStack
+						className="dataviews-view-grid__title"
+						justify="space-between"
+					>
 						{ primaryField?.render( { item, view } ) }
 						<ItemActions
 							item={ item }
@@ -52,7 +55,10 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 							isCompact
 						/>
 					</HStack>
-					<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+					<VStack
+						className="dataviews-view-grid__fields"
+						spacing={ 3 }
+					>
 						{ visibleFields.map( ( field ) => {
 							const renderedValue = field.render( {
 								item,
