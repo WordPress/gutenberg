@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	store as blocksStore,
+	isReusableBlock,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -68,9 +72,13 @@ export default function BlockContextualToolbar( {
 		blockType &&
 		hasBlockSupport( blockType, '__experimentalToolbar', true );
 	const hasAnyBlockControls = useHasAnyBlockControls();
+
+	const isSyncedUserPattern = isReusableBlock( blockType );
 	if (
 		! isToolbarEnabled ||
-		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
+		( blockEditingMode !== 'default' &&
+			! isSyncedUserPattern &&
+			! hasAnyBlockControls )
 	) {
 		return null;
 	}
