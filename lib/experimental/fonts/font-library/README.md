@@ -11,17 +11,15 @@ The Font Library is available globally, independently of the theme activated, si
 - **Install font family**: Is to make a font family available to the user in the Font Library. The user will be able to activate and use the installed font families.
 - **Activate font family**: Is to make it ready to use in the site or post editor. All the active fonts will appear in the font pickers so the user can use them in the site elements.
 - **Deactivate font family**: Is to make a font family unusable. If a font family is not active, it won't appear in the font pickers.
-- **Uninstall font family**: Is to remove the font family from the Font Library permanently. 
+- **Uninstall font family**: Is to remove the font family from the Font Library permanently.
 
 ### Different types of installations
 
 The library allows extenders to define how WordPress will install fonts. When users install a font family, its definition will always be saved to the database. What can vary is where are the font face file assets stored.
 
-Let's see the different types of installations:
-
+Review the following different types of installations to find what works best for your use case:
 #### Install a font with no font file assets (system fonts)
-Let's say you want to install a font family that doesn't need any font assets to work; these fonts are usually called system fonts. You could define these font families like this:
-
+In a situation where you want to install a font family that doesn't need any font assets to work, these fonts are usually called system fonts. You can define these font families like this:
 ```json
 {
     "name": "Humanist",
@@ -69,7 +67,7 @@ Let's say you want to install a font family that uses assets located outside of 
 ```
 
 #### Install a font providing the font asset
-Let's say you want to install a font family using the font files you are providing in an HTTP request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. As the previous way, this can be useful if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your HTTP request and add a reference for it in the font face definition. 
+Let's say you want to install a font family using the font files you are providing in an HTTP request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. As the previous way, this can be useful if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your HTTP request and add a reference for it in the font face definition.
 
 
 ```json
@@ -109,7 +107,7 @@ if ( function_exists( 'wp_register_font_collection' ) ) {
 }
 ```
 
-The Data JSON file for the collection created should look like this. 
+The Data JSON file for the collection created should look like this:
 ```json
 {
     "fontFamilies": [
@@ -121,7 +119,7 @@ The Data JSON file for the collection created should look like this.
 }
 ```
 
-Example of a data JSON file providing 2 font families with 2 font faces each and 2 categories:
+Example of a data JSON file providing 2 font families, with 2 font faces each and 2 categories:
 
 ```json
 {
@@ -174,10 +172,9 @@ Example of a data JSON file providing 2 font families with 2 font faces each and
 }
 ```
 
-### Create a plugin to provide my font collection
+### Create a plugin to provide a font collection
 
-Creating a plugin to provide a font collection can be as simple as this:
-
+Here's an example of a plugin that provides a font collection:
 ```php
 
 <?php
@@ -221,7 +218,7 @@ POST /wp-json/wp/v2/fonts
 Example:
 
 #### Uninstall font families
-Uninstall a font family is to remove the font definition from WordPress and make it unavailable for users to activate and save.
+Uninstalling a font family removes the font definition from WordPress and makes it unavailable for users to activate and save.
 
 If the font family being uninstalled is using local font file assets, those files will be removed from the `/wp-content/fonts` folder.
 
