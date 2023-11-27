@@ -30,7 +30,7 @@ In a situation where you want to install a font family that doesn't need any fon
 ```
 
 #### Install a font with external assets
-Let's say you want to install a font family that needs to add font faces using external font file assets. In this way, your font face assets will always be served from the external URL you indicated in the `src` property of the font faces. Your font families should look like this:
+In a situation where you want to install a font family that needs to add font faces using external font file assets, you can define font families like this:
 ```json
 {
     "name": "Piazzolla",
@@ -47,8 +47,10 @@ Let's say you want to install a font family that needs to add font faces using e
 }
 ```
 
+Font Face assets will be served from the external URL provided in the `src` attribute.
+
 ####  Install a font from external sources and serve it from your site
-Let's say you want to install a font family that uses assets located outside of your site and download it while installing to serve them always from your WordPress `/wp-content/fonts` folder. This can be useful if you want to avoid depending on external sites for technical or legal reasons. In that case, you need to set the `downloadFromUrl` property on each font face.
+In order to install a font family that uses assets located outside of your site and download it while installing, to serve them from your WordPress `/wp-content/fonts` folder. Useful, for example, if you want to avoid depending on external sites for technical or legal reasons. It can be achieved by settings the `downloadFromUrl` property on each font face to the URL of the font.
 
 ```json
 {
@@ -67,8 +69,7 @@ Let's say you want to install a font family that uses assets located outside of 
 ```
 
 #### Install a font providing the font asset
-Let's say you want to install a font family using the font files you are providing in an HTTP request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. As the previous way, this can be useful if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your HTTP request and add a reference for it in the font face definition.
-
+In a situation where you want to install a font family using the font files you are providing in an HTTP request. These font file assets will be stored in your WordPress `/wp-content/fonts` folder and they will always be served from your site. This can be useful, for example, if you want to avoid depending on external sites for technical or legal reasons. You need to add the file to your HTTP request and add a reference for it in the font face definition.
 
 ```json
 {
@@ -91,7 +92,7 @@ Font Library is able to manage different font collections. A font collection is 
 
 #### Provide a font collection
 
-To provide a font collection you need to call  `wp_register_font_collection ()` function with your configuration as a parameter. Any font collection you provide will be available as a new tab in the Font Library modal.
+To provide a font collection you need to call `wp_register_font_collection()` function with your configuration as a parameter. Any font collection you provide will be available as a new tab in the Font Library modal.
 
 Adding a font collection example:
 
