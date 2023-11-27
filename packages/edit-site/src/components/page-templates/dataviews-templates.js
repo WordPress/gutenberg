@@ -174,7 +174,10 @@ export default function DataviewsTemplates() {
 				header: __( 'Description' ),
 				id: 'description',
 				getValue: ( { item } ) => item.description,
-				render: ( { item } ) => {
+				render: ( { item, view: _view } ) => {
+					if ( _view.type === 'grid' && ! item.description ) {
+						return null;
+					}
 					return item.description ? (
 						decodeEntities( item.description )
 					) : (
