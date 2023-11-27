@@ -97,7 +97,7 @@ function TemplateTitle( { item } ) {
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	return (
-		<HStack alignment="left">
+		<HStack alignment="left" spacing={ 1 }>
 			{ imageUrl ? (
 				<AvatarImage imageUrl={ imageUrl } />
 			) : (
