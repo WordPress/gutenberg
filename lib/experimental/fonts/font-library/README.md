@@ -90,7 +90,8 @@ Let's say you want to install a font family using the font files you are providi
 Font Library is able to manage different font collections. A font collection is simply a list of font families ready to be installed by the user. Extenders can provide multiple typographic collections.
 
 #### Provide a font collection
-To provide a font collection you need to call  `wp_register_font_collection ()` function with your configuration as a parameter.
+
+To provide a font collection you need to call  `wp_register_font_collection ()` function with your configuration as a parameter. Any font collection you provide will be available as a new tab in the Font Library modal.
 
 Adding a font collection example:
 
