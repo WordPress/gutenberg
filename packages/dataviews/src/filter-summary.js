@@ -113,7 +113,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 											),
 											{
 												field: filter.field,
-												operator: OPERATOR_IN,
+												operator:
+													filterInView?.operator ||
+													filter.operators[ 0 ],
 												value:
 													activeElement?.value ===
 													element.value
