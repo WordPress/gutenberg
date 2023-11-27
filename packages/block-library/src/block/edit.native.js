@@ -78,7 +78,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing, innerBlockCount } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -176,20 +176,12 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ innerBlockCount > 1
-							? __(
-									'Alternatively, you can detach and edit these blocks separately by tapping “Detach patterns”.'
-							  )
-							: __(
-									'Alternatively, you can detach and edit this block separately by tapping “Detach pattern”.'
-							  ) }
+						{ __(
+							'Alternatively, you can detach and edit this block separately by tapping “Detach”.'
+						) }
 					</Text>
 					<TextControl
-						label={
-							innerBlockCount > 1
-								? __( 'Detach patterns' )
-								: __( 'Detach pattern' )
-						}
+						label={ __( 'Detach' ) }
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }

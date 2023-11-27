@@ -16,7 +16,7 @@ Next, use the [`@wordpress/create-block`](https://developer.wordpress.org/block-
 Choose the folder where you want to create the plugin, and then execute the following command in the terminal from within that folder:
 
 ```sh
-npx @wordpress/create-block copyright-date-block --template create-block-tutorial-template
+npx @wordpress/create-block copyright-date-block --template @wordpress/create-block-tutorial-template
 ```
 
 The `slug` provided (`copyright-date-block`) defines the folder name for the scaffolded plugin and the internal block name.

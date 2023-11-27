@@ -123,7 +123,7 @@
 	h4,
 	h5,
 	h6 {
-		&:not(.has-text-color) {
+		&:where(:not(.has-text-color)) {
 			color: inherit;
 		}
 	}

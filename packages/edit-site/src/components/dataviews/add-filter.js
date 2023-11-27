@@ -13,17 +13,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { OPERATOR_IN } from './in-filter';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
-	DropdownMenuV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
-	DropdownMenuItemV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownSubMenuV2: DropdownSubMenu,
+	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
-
-// TODO: find a place where these constants can be shared across components.
-const ENUMERATION_TYPE = 'enumeration';
 
 export default function AddFilter( { fields, view, onChangeView } ) {
 	const filters = [];
@@ -51,16 +48,16 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 	}
 
 	return (
-		<DropdownMenuV2
+		<DropdownMenu
 			label={ __( 'Add filter' ) }
 			trigger={
 				<Button
 					disabled={ filters.length === view.filters?.length }
 					__experimentalIsFocusable
-					icon={ plus }
 					variant="tertiary"
 					size="compact"
 				>
+					<Icon icon={ plus } style={ { flexShrink: 0 } } />
 					{ __( 'Add filter' ) }
 				</Button>
 			}
@@ -71,18 +68,18 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 				}
 
 				return (
-					<DropdownSubMenuV2
+					<DropdownSubMenu
 						key={ filter.field }
 						trigger={
-							<DropdownSubMenuTriggerV2
+							<DropdownSubMenuTrigger
 								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
 								{ filter.name }
-							</DropdownSubMenuTriggerV2>
+							</DropdownSubMenuTrigger>
 						}
 					>
 						{ filter.elements.map( ( element ) => (
-							<DropdownMenuItemV2
+							<DropdownMenuItem
 								key={ element.value }
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
@@ -101,11 +98,11 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 								role="menuitemcheckbox"
 							>
 								{ element.label }
-							</DropdownMenuItemV2>
+							</DropdownMenuItem>
 						) ) }
-					</DropdownSubMenuV2>
+					</DropdownSubMenu>
 				);
 			} ) }
-		</DropdownMenuV2>
+		</DropdownMenu>
 	);
 }
