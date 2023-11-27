@@ -21,13 +21,13 @@ function gutenberg_register_global_styles_revisions_endpoints() {
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
 
 /**
- * Registers additional fields for wp_template rest api.
+ * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private
  * @internal
  *
  * @param  array $template_object Template object.
- * @return string                  Original source of the template one of theme, plugin, site, or user.
+ * @return string                 Original source of the template one of theme, plugin, site, or user.
  */
 function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
 	if ( 'wp_template' === $template_object['type'] || 'wp_template_part' === $template_object['type'] ) {
@@ -70,13 +70,13 @@ function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
 }
 
 /**
- * Registers additional fields for wp_template rest api.
+ * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private
  * @internal
  *
  * @param  array $template_object Template object.
- * @return string                  Human readable text for the author.
+ * @return string                 Human readable text for the author.
  */
 function _gutenberg_get_wp_templates_author_text_field( $template_object ) {
 	$original_source = _gutenberg_get_wp_templates_original_source_field( $template_object );
@@ -96,14 +96,14 @@ function _gutenberg_get_wp_templates_author_text_field( $template_object ) {
 }
 
 /**
- * Registers additional fields for wp_template rest api.
+ * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private
  * @internal
  */
 function _gutenberg_register_wp_templates_additional_fields() {
 	register_rest_field(
-		'wp_template',
+		array( 'wp_template', 'wp_template_part' ),
 		'author_text',
 		array(
 			'get_callback'    => '_gutenberg_get_wp_templates_author_text_field',
@@ -118,7 +118,7 @@ function _gutenberg_register_wp_templates_additional_fields() {
 	);
 
 	register_rest_field(
-		'wp_template',
+		array( 'wp_template', 'wp_template_part' ),
 		'original_source',
 		array(
 			'get_callback'    => '_gutenberg_get_wp_templates_original_source_field',
