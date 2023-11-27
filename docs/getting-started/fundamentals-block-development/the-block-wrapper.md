@@ -1,17 +1,16 @@
 # The Block wrapper
 
-Each block's markup has its own markup wrapper that needs to be properly identified to fully work in the Block Editor and include any custom style settings when the block is rendered in the front end.
+Each block's markup is wrapped by a container HTML tag that needs the proper attributes to fully work in the Block Editor and reflect the proper block's style settings when rendered in the Block Editor and the front end.
 
-There are three main markups involved in the lifecyle of a block:
+Three markups can be defined for a block:
 
-- Every block in the Block Editor (React SPA) is displayed through a React component (`edit` property passed to `registerBlockType`). 
-- Another React component can be defined for the Block to set the markup saved to the DB (`save` property passed to `registerBlockType`). ). 
-- The markup stored in the DB will be returned to the front end on request unless a specific server-side render way (`render_callback` on `register_block_type` or `render` in `block.json`) has been defined to return the markup of the block to the fron end.
+- The one for the Block Editor, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
+- The one used to save the block in the DB, defined through a `save` React component passed to `registerBlockType` when registering the block in the client. 
+    - This markup will be returned to the front end on request if no dynamic render has been defined for the block.
+- The one used to dynamically render the markup of the block returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
+    - -----  If defined, this markup definition will take priority over the markup stored in DB ------
 
---- idea edit markup is defined separatedly than markup returned to the frontend - but the recommendation is that the edit markup should reflect the front end one -----
-
-
-When defined, these markups need to include the proper block's attributes in their wrappers.
+These markups are defined separately, but the recommendation is that they match each other so the block in the editor looks like as close as possible as how it will be rendered on the front end.
 
 ## The Edit component 
 
