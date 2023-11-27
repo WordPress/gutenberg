@@ -92,7 +92,7 @@ class WP_Font_Family_Utils {
 	}
 
 	/**
-	 * Format font family to make it CSS ready.
+	 * Format font family to make it valid CSS.
 	 *
 	 * @since 6.5.0
 	 *
