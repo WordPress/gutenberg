@@ -30,6 +30,8 @@ const colorsAndGradientKeys = [
 	'disableCustomGradients',
 ];
 
+const TAB_IDS = { color: 'color', gradient: 'gradient' };
+
 function ColorGradientControlInner( {
 	colors,
 	gradients,
@@ -131,20 +133,20 @@ function ColorGradientControlInner( {
 							<Tabs
 								initialTabId={
 									gradientValue
-										? 'gradient'
-										: !! canChooseAColor && 'color'
+										? TAB_IDS.gradient
+										: !! canChooseAColor && TAB_IDS.color
 								}
 							>
 								<Tabs.TabList>
-									<Tabs.Tab id={ 'color' }>
+									<Tabs.Tab id={ TAB_IDS.color }>
 										{ __( 'Solid' ) }
 									</Tabs.Tab>
-									<Tabs.Tab id={ 'gradient' }>
+									<Tabs.Tab id={ TAB_IDS.gradient }>
 										{ __( 'Gradient' ) }
 									</Tabs.Tab>
 								</Tabs.TabList>
 								<Tabs.TabPanel
-									id={ 'color' }
+									id={ TAB_IDS.color }
 									className={
 										'block-editor-color-gradient-control__panel'
 									}
@@ -153,7 +155,7 @@ function ColorGradientControlInner( {
 									{ tabPanels.color }
 								</Tabs.TabPanel>
 								<Tabs.TabPanel
-									id={ 'gradient' }
+									id={ TAB_IDS.gradient }
 									className={
 										'block-editor-color-gradient-control__panel'
 									}
@@ -165,8 +167,8 @@ function ColorGradientControlInner( {
 						</div>
 					) }
 
-					{ ! canChooseAGradient && renderPanelType( 'color' ) }
-					{ ! canChooseAColor && renderPanelType( 'gradient' ) }
+					{ ! canChooseAGradient && renderPanelType( TAB_IDS.color ) }
+					{ ! canChooseAColor && renderPanelType( TAB_IDS.gradient ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>
