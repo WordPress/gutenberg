@@ -68,7 +68,6 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSelector": "ol,ul",
 		"__experimentalOnMerge": true,
 		"__experimentalSlashInserter": true
 	},
