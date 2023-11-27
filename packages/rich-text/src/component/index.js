@@ -69,6 +69,14 @@ export function useRichText( {
 	const record = useRef();
 
 	function setRecordFromProps() {
+		// `value` needs to be a string, but there are times when `null` seems to be explicitely passed
+		// for some reason, after https://github.com/WordPress/gutenberg/pull/55999 was introduced in 17.1.
+		// This needs further investigation, but for now, we add a safe-guard here to make sure it's always
+		// a string.
+		if ( typeof value !== 'string' ) {
+			value = '';
+		}
+
 		_value.current = value;
 		record.current = create( {
 			html: preserveWhiteSpace ? value : collapseWhiteSpace( value ),
