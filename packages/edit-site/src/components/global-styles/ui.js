@@ -135,6 +135,12 @@ function GlobalStylesRevisionsMenu() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const isRevisionsOpened = useSelect(
+		( select ) =>
+			'global-styles-revisions' ===
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	const loadRevisions = () => {
 		setIsListViewOpened( false );
 
@@ -147,12 +153,6 @@ function GlobalStylesRevisionsMenu() {
 		}
 	};
 	const hasRevisions = revisionsCount > 0;
-	const isRevisionsOpened = useSelect(
-		( select ) =>
-			'global-styles-revisions' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
 
 	return (
 		<GlobalStylesMenuFill>
