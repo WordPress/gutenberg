@@ -12,23 +12,27 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
-function ScreenHeader( { title, description, onBack } ) {
+function ScreenHeader( { title, description, onBack, showBack = true } ) {
 	return (
 		<VStack spacing={ 0 }>
 			<View>
 				<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 					<HStack spacing={ 2 }>
-						<NavigatorToParentButton
-							style={
-								// TODO: This style override is also used in ToolsPanelHeader.
-								// It should be supported out-of-the-box by Button.
-								{ minWidth: 24, padding: 0 }
-							}
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							isSmall
-							aria-label={ __( 'Navigate to the previous view' ) }
-							onClick={ onBack }
-						/>
+						{ showBack && (
+							<NavigatorToParentButton
+								style={
+									// TODO: This style override is also used in ToolsPanelHeader.
+									// It should be supported out-of-the-box by Button.
+									{ minWidth: 24, padding: 0 }
+								}
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								isSmall
+								aria-label={ __(
+									'Navigate to the previous view'
+								) }
+								onClick={ onBack }
+							/>
+						) }
 						<Spacer>
 							<Heading
 								className="edit-site-global-styles-header"

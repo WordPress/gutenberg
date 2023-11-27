@@ -2,16 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	edit,
-	seen,
-	typography,
-	color,
-	layout,
-	media,
-	styles,
-	widget,
-} from '@wordpress/icons';
+import { typography, color, layout } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as coreStore } from '@wordpress/core-data';
@@ -20,8 +11,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
-import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
@@ -30,16 +19,13 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { useLink } from '../routes/link';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import StyleVariationsContainer from '../global-styles/style-variations-container';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 const { useLocation } = unlock( routerPrivateApis );
-const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -79,9 +65,29 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		params: { path },
 	} = useLocation();
 
-	const linkInfo = useLink( {
+	const variationsLink = useLink( {
 		path,
-		activeView: 'test',
+		activeView: '/variations',
+	} );
+
+	const typographyLink = useLink( {
+		path,
+		activeView: '/typography',
+	} );
+
+	const colorsLink = useLink( {
+		path,
+		activeView: '/colors',
+	} );
+
+	const layoutLink = useLink( {
+		path,
+		activeView: '/layout',
+	} );
+
+	const blocksLink = useLink( {
+		path,
+		activeView: '/blocks',
 	} );
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
@@ -96,104 +102,46 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			</div>
 			<ItemGroup>
 				<SidebarNavigationItem
-					{ ...linkInfo }
+					{ ...variationsLink }
 					aria-current={ false ? 'true' : undefined }
 				>
 					Moonlight
 				</SidebarNavigationItem>
 			</ItemGroup>
 			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-				<Heading level={ 2 }>{ __( 'Presets' ) }</Heading>
+				<Heading level={ 2 }>{ __( 'Customize' ) }</Heading>
 			</div>
 			<ItemGroup>
 				<SidebarNavigationItem
-					{ ...linkInfo }
+					{ ...typographyLink }
 					icon={ typography }
 					aria-current={ false ? 'true' : undefined }
 				>
 					Typography
 				</SidebarNavigationItem>
 				<SidebarNavigationItem
-					{ ...linkInfo }
+					{ ...colorsLink }
 					icon={ color }
 					aria-current={ false ? 'true' : undefined }
 				>
 					Colors
 				</SidebarNavigationItem>
 				<SidebarNavigationItem
-					{ ...linkInfo }
+					{ ...layoutLink }
 					icon={ layout }
 					aria-current={ false ? 'true' : undefined }
 				>
 					Layout
 				</SidebarNavigationItem>
-			</ItemGroup>
-			<div className="edit-site-sidebar-navigation-screen-patterns__group-header">
-				<Heading level={ 2 }>{ __( 'Blocks' ) }</Heading>
-			</div>
-			<ItemGroup>
 				<SidebarNavigationItem
-					{ ...linkInfo }
-					icon={ typography }
-					aria-current={ false ? 'true' : undefined }
-				>
-					Text
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...linkInfo }
-					icon={ media }
-					aria-current={ false ? 'true' : undefined }
-				>
-					Media
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...linkInfo }
-					icon={ styles }
-					aria-current={ false ? 'true' : undefined }
-				>
-					Design
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...linkInfo }
-					icon={ widget }
-					aria-current={ false ? 'true' : undefined }
-				>
-					Widgets
-				</SidebarNavigationItem>
-				<SidebarNavigationItem
-					{ ...linkInfo }
+					{ ...blocksLink }
 					icon={ layout }
 					aria-current={ false ? 'true' : undefined }
 				>
-					Theme
+					Blocks
 				</SidebarNavigationItem>
 			</ItemGroup>
 		</>
-	);
-}
-
-function SidebarNavigationScreenStyleVariations() {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
-
-	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
-	// loaded. This is necessary because the Iframe component waits until
-	// the block editor store's `__internalIsInitialized` is true before
-	// rendering the iframe. Without this, the iframe previews will not render
-	// in mobile viewport sizes, where the editor canvas is hidden.
-	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<StyleVariationsContainer />
-		</BlockEditorProvider>
 	);
 }
 
@@ -201,33 +149,21 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setIsListViewOpened } = useDispatch( editorStore );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { isViewMode, isStyleBookOpened, revisionsCount } = useSelect(
-		( select ) => {
-			const { getCanvasMode, getEditorCanvasContainerView } = unlock(
-				select( editSiteStore )
-			);
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
-			return {
-				isViewMode: 'view' === getCanvasMode(),
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				revisionsCount:
-					globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
-					0,
-			};
-		},
-		[]
-	);
+	const { revisionsCount } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return {
+			revisionsCount:
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
+		};
+	}, [] );
 
 	const openGlobalStyles = useCallback( async () => {
 		return Promise.all( [
@@ -235,19 +171,6 @@ export default function SidebarNavigationScreenGlobalStyles() {
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
 	}, [ setCanvasMode, openGeneralSidebar ] );
-
-	const openStyleBook = useCallback( async () => {
-		await openGlobalStyles();
-		// Open the Style Book once the canvas mode is set to edit,
-		// and the global styles sidebar is open. This ensures that
-		// the Style Book is not prematurely closed.
-		setEditorCanvasContainerView( 'style-book' );
-		setIsListViewOpened( false );
-	}, [
-		openGlobalStyles,
-		setEditorCanvasContainerView,
-		setIsListViewOpened,
-	] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();
@@ -280,40 +203,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 						/>
 					)
 				}
-				actions={
-					<>
-						{ ! isMobileViewport && (
-							<SidebarButton
-								icon={ seen }
-								label={ __( 'Style Book' ) }
-								onClick={ () =>
-									setEditorCanvasContainerView(
-										! isStyleBookOpened
-											? 'style-book'
-											: undefined
-									)
-								}
-								isPressed={ isStyleBookOpened }
-							/>
-						) }
-						<SidebarButton
-							icon={ edit }
-							label={ __( 'Edit styles' ) }
-							onClick={ async () => await openGlobalStyles() }
-						/>
-					</>
-				}
 			/>
-			{ /* { isStyleBookOpened && ! isMobileViewport && isViewMode && (
-				<StyleBook
-					enableResizing={ false }
-					isSelected={ () => false }
-					onClick={ openStyleBook }
-					onSelect={ openStyleBook }
-					showCloseButton={ false }
-					showTabs={ false }
-				/>
-			) } */ }
 		</>
 	);
 }

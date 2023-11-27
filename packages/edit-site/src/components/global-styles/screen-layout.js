@@ -14,13 +14,13 @@ import { unlock } from '../../lock-unlock';
 const { useHasDimensionsPanel, useGlobalSetting, useSettingsForBlockElement } =
 	unlock( blockEditorPrivateApis );
 
-function ScreenLayout() {
+function ScreenLayout( { showBack = true } ) {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	return (
 		<>
-			<ScreenHeader title={ __( 'Layout' ) } />
+			<ScreenHeader showBack={ showBack } title={ __( 'Layout' ) } />
 			{ hasDimensionsPanel && <DimensionsPanel /> }
 		</>
 	);
