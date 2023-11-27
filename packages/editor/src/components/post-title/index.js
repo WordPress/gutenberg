@@ -131,7 +131,13 @@ function PostTitle( _, forwardedRef ) {
 				( firstBlock.name === 'core/heading' ||
 					firstBlock.name === 'core/paragraph' )
 			) {
-				onUpdate( stripHTML( firstBlock.attributes.content ) );
+				// Strip HTML to avoid unwanted HTML being added to the title.
+				// In the majority of cases it is assumed that HTML in the title
+				// is undesirable.
+				const contentNoHTML = stripHTML(
+					firstBlock.attributes.content
+				);
+				onUpdate( contentNoHTML );
 				onInsertBlockAfter( content.slice( 1 ) );
 			} else {
 				onInsertBlockAfter( content );
@@ -141,10 +147,13 @@ function PostTitle( _, forwardedRef ) {
 				...create( { html: title } ),
 				...selection,
 			};
-			const newValue = insert(
-				value,
-				create( { html: stripHTML( content ) } )
-			);
+
+			// Strip HTML to avoid unwanted HTML being added to the title.
+			// In the majority of cases it is assumed that HTML in the title
+			// is undesirable.
+			const contentNoHTML = stripHTML( content );
+
+			const newValue = insert( value, create( { html: contentNoHTML } ) );
 			onUpdate( toHTMLString( { value: newValue } ) );
 			setSelection( {
 				start: newValue.start,
