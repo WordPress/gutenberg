@@ -21,7 +21,7 @@
 
 <div data-testid="non-existent-directives">
 	<!-- WARNING: the `div` with `data-wp-non-existent-directive` should remain
-	     inline (i.e., without new line or blank characters in between) to
-		 ensure it is the only child node. Otherwise, tests could fail. -->
+		inline (i.e., without new line or blank characters in between) to
+		ensure it is the only child node. Otherwise, tests could fail. -->
 	<div data-wp-interactive='{ "namespace": "directive-priorities" }'><div data-wp-non-existent-directive></div></div>
 </div>
