@@ -77,6 +77,10 @@ Development is improved by using a defined schema definition file. Supported edi
 "$schema": "https://schemas.wp.org/trunk/block.json"
 ```
 
+<div class="callout callout-info">
+Check <a href="/docs/getting-started/fundamentals-block-development/registration-of-a-block.md">Registration of a block</a> to learn more about how to register a block using its metadata.
+</div>
+
 ## Block API
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.

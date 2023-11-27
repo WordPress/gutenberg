@@ -61,13 +61,12 @@ Although registering the block also on the server with PHP is still recommended 
 
 The function takes two params:
 
--   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
+-   `$blockNameOrMetadata` (`string`|`Object`) – block type name (if previously registered on the server) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
 -   `$settings` (`Object`) – client-side block settings.
 
 The client-side block settings object passed as a second parameter include two properties that are especially relevant:
 - `edit`: The React component that gets used in the editor for our block.
 - `save`: The React component that generates the static HTML markup that gets saved to the Database. 
-
 
 `registerBlockType` returns the registered block type (`WPBlock`) on success or `undefined` on failure.
 
