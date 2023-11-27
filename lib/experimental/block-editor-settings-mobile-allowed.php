@@ -65,8 +65,6 @@ if ( ! function_exists( 'gutenberg_get_allowed_block_editor_settings_mobile' ) )
 		} else {
 			return $settings;
 		}
-
-
 	}
 }
 
