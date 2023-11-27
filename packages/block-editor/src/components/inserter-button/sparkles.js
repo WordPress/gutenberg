@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { SVG, Path } from '@wordpress/primitives';
 
 const sparkles = (
