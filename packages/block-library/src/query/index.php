@@ -28,12 +28,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 				'data-wp-context',
 				wp_json_encode(
 					array(
-						'core' => array(
-							'query' => array(
-								'loadingText' => __( 'Loading page, please wait.' ),
-								'loadedText'  => __( 'Page Loaded.' ),
-							),
-						),
+						'loadingText' => __( 'Loading page, please wait.' ),
+						'loadedText'  => __( 'Page Loaded.' ),
 					),
 					JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 				)
