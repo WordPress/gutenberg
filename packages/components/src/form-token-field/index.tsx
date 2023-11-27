@@ -148,7 +148,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		return input.current === input.current?.ownerDocument.activeElement;
 	}
 
-	function onFocusHandler( event: FocusEvent ) {
+	function onFocusHandler( event: ReactFocusEvent ) {
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( hasFocus() || event.target === tokensAndInput.current ) {
 			setIsActive( true );
