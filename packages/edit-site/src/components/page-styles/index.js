@@ -150,9 +150,14 @@ export default function PageStyles() {
 	return (
 		<>
 			<EntityProvider kind="root" type="site">
-				<Page small>
-					<GlobalStylesUI initialPath={ activeView } root={ false } />
-				</Page>
+				{ activeView && (
+					<Page small>
+						<GlobalStylesUI
+							initialPath={ activeView }
+							root={ false }
+						/>
+					</Page>
+				) }
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						<StyleBookPanel />
