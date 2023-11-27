@@ -22,16 +22,13 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
+import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-export const PAGE_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
 
 /**
  * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
@@ -128,6 +125,10 @@ function useBlockEditorProps( post, template, mode ) {
 		}
 
 		if ( mode === 'post-only' ) {
+			const postContentBlocks =
+				extractPageContentBlockTypesFromTemplateBlocks(
+					templateBlocks
+				);
 			return [
 				createBlock(
 					'core/group',
@@ -141,9 +142,12 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					extractPageContentBlockTypesFromTemplateBlocks(
-						templateBlocks
-					)
+					postContentBlocks.length
+						? postContentBlocks
+						: [
+								createBlock( 'core/post-title' ),
+								createBlock( 'core/post-content' ),
+						  ]
 				),
 			];
 		}
@@ -181,7 +185,6 @@ function useBlockEditorProps( post, template, mode ) {
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
-		mode = 'all',
 		post,
 		settings,
 		recovery,
@@ -190,6 +193,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const mode = useSelect(
+			( select ) => select( editorStore ).getRenderingMode(),
+			[]
+		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
@@ -308,6 +315,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<PatternsMenuItems />
+							{ [ 'post-only', 'template-locked' ].includes(
+								mode
+							) && <DisableNonPageContentBlocks /> }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

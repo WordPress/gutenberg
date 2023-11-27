@@ -13,7 +13,6 @@ import {
 	isInserterOpened,
 	isListViewOpened,
 	isPage,
-	hasPageContentFocus,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -86,40 +85,6 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( isPage( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasPageContentFocus', () => {
-		it( 'returns true if locked and the edited post type is a page', () => {
-			const state = {
-				editedPost: {
-					postType: 'wp_template',
-					context: { postType: 'page', postId: 123 },
-				},
-				hasPageContentFocus: true,
-			};
-			expect( hasPageContentFocus( state ) ).toBe( true );
-		} );
-
-		it( 'returns false if not locked and the edited post type is a page', () => {
-			const state = {
-				editedPost: {
-					postType: 'wp_template',
-					context: { postType: 'page', postId: 123 },
-				},
-				hasPageContentFocus: false,
-			};
-			expect( hasPageContentFocus( state ) ).toBe( false );
-		} );
-
-		it( 'returns false if locked and the edited post type is a template', () => {
-			const state = {
-				editedPost: {
-					postType: 'wp_template',
-				},
-				hasPageContentFocus: true,
-			};
-			expect( hasPageContentFocus( state ) ).toBe( false );
 		} );
 	} );
 } );
