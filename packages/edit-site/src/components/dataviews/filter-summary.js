@@ -20,7 +20,7 @@ const {
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 } = unlock( componentsPrivateApis );
 
-export default ( { filter, view, onChangeView } ) => {
+export default function FilterSummary( { filter, view, onChangeView } ) {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
@@ -76,4 +76,4 @@ export default ( { filter, view, onChangeView } ) => {
 			} ) }
 		</DropdownMenu>
 	);
-};
+}

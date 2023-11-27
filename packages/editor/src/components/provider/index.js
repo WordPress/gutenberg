@@ -125,6 +125,10 @@ function useBlockEditorProps( post, template, mode ) {
 		}
 
 		if ( mode === 'post-only' ) {
+			const postContentBlocks =
+				extractPageContentBlockTypesFromTemplateBlocks(
+					templateBlocks
+				);
 			return [
 				createBlock(
 					'core/group',
@@ -138,9 +142,12 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					extractPageContentBlockTypesFromTemplateBlocks(
-						templateBlocks
-					)
+					postContentBlocks.length
+						? postContentBlocks
+						: [
+								createBlock( 'core/post-title' ),
+								createBlock( 'core/post-content' ),
+						  ]
 				),
 			];
 		}
@@ -178,7 +185,6 @@ function useBlockEditorProps( post, template, mode ) {
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
-		mode = 'all',
 		post,
 		settings,
 		recovery,
@@ -187,6 +193,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const mode = useSelect(
+			( select ) => select( editorStore ).getRenderingMode(),
+			[]
+		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
