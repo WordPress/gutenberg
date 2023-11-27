@@ -2,28 +2,28 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
-import { wordpress } from '@wordpress/icons';
+import { customLink, formatCapitalize } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { COLORS, useCx } from '../../utils';
+import { useCx } from '../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuCheckboxItem,
 	DropdownMenuGroup,
-	DropdownMenuGroupLabel,
 	DropdownMenuSeparator,
 	DropdownMenuContext,
 	DropdownMenuRadioItem,
+	DropdownMenuItemLabel,
+	DropdownMenuItemHelpText,
 } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -37,6 +37,20 @@ const meta: Meta< typeof DropdownMenu > = {
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		DropdownMenuItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuCheckboxItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuSeparator,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuContext,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuRadioItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuItemLabel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		DropdownMenuItemHelpText,
 	},
 	argTypes: {
 		children: { control: { type: null } },
@@ -65,54 +79,48 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const ItemHelpText = styled.span`
-	font-size: 12px;
-	color: ${ COLORS.gray[ '700' ] };
-
-	/* when the immediate parent item is hovered / focused */
-	[data-active-item] > * > &,
-	/* when the parent item is a submenu trigger and the submenu is open */
-	[aria-expanded='true'] > &,
-	/* when the parent item is disabled */
-	[aria-disabled='true'] > & {
-		color: inherit;
-	}
-`;
-
 export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
-		<DropdownMenuItem>Default item</DropdownMenuItem>
+		<DropdownMenuItem>
+			<DropdownMenuItemLabel>Label</DropdownMenuItemLabel>
+		</DropdownMenuItem>
+		<DropdownMenuItem>
+			<DropdownMenuItemLabel>Label</DropdownMenuItemLabel>
+			<DropdownMenuItemHelpText>Help text</DropdownMenuItemHelpText>
+		</DropdownMenuItem>
+		<DropdownMenuItem>
+			<DropdownMenuItemLabel>Label</DropdownMenuItemLabel>
+			<DropdownMenuItemHelpText>
+				The menu item help text is automatically truncated when there
+				are more than two lines of text
+			</DropdownMenuItemHelpText>
+		</DropdownMenuItem>
 		<DropdownMenuItem hideOnClick={ false }>
-			<div
-				style={ {
-					display: 'inline-flex',
-					flexDirection: 'column',
-				} }
-			>
-				Other item
-				<ItemHelpText>
-					Won&apos;t close the menu when clicked
-				</ItemHelpText>
-			</div>
+			<DropdownMenuItemLabel>Label</DropdownMenuItemLabel>
+			<DropdownMenuItemHelpText>
+				This item doesn&apos;t close the menu on click
+			</DropdownMenuItemHelpText>
 		</DropdownMenuItem>
 		<DropdownMenuItem disabled>Disabled item</DropdownMenuItem>
 		<DropdownMenuSeparator />
 		<DropdownMenuGroup>
-			<DropdownMenuGroupLabel>Prefix and suffix</DropdownMenuGroupLabel>
 			<DropdownMenuItem
-				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
+				prefix={ <Icon icon={ customLink } size={ 24 } /> }
 			>
-				With prefix
+				<DropdownMenuItemLabel>With prefix</DropdownMenuItemLabel>
 			</DropdownMenuItem>
-			<DropdownMenuItem suffix={ <span>⌘S</span> }>
-				With suffix
-			</DropdownMenuItem>
+			<DropdownMenuItem suffix={ '⌘S' }>With suffix</DropdownMenuItem>
 			<DropdownMenuItem
 				disabled
-				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
-				suffix={ <span>⌥⌘T</span> }
+				prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
+				suffix="⌥⌘T"
 			>
-				Disabled with prefix and suffix
+				<DropdownMenuItemLabel>
+					Disabled with prefix and suffix
+				</DropdownMenuItemLabel>
+				<DropdownMenuItemHelpText>
+					And help text
+				</DropdownMenuItemHelpText>
 			</DropdownMenuItem>
 		</DropdownMenuGroup>
 	</DropdownMenu>
@@ -129,15 +137,35 @@ export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
 	<DropdownMenu { ...props }>
 		<DropdownMenuItem>Level 1 item</DropdownMenuItem>
 		<DropdownMenu
-			trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+			trigger={
+				<DropdownMenuItem suffix="Suffix">
+					<DropdownMenuItemLabel>
+						Submenu trigger item with a long label
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
+			}
 		>
-			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
-			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+			<DropdownMenuItem>
+				<DropdownMenuItemLabel>Level 2 item</DropdownMenuItemLabel>
+			</DropdownMenuItem>
+			<DropdownMenuItem>
+				<DropdownMenuItemLabel>Level 2 item</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			<DropdownMenu
-				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+				trigger={
+					<DropdownMenuItem>
+						<DropdownMenuItemLabel>
+							Submenu trigger
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+				}
 			>
-				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
-				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>Level 3 item</DropdownMenuItemLabel>
+				</DropdownMenuItem>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>Level 3 item</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			</DropdownMenu>
 		</DropdownMenu>
 	</DropdownMenu>
@@ -167,35 +195,45 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<DropdownMenu { ...props }>
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Individual, uncontrolled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-uncontrolled-a"
 					value="a"
+					suffix="⌥⌘T"
 				>
-					Checkbox item A (initially unchecked)
+					<DropdownMenuItemLabel>
+						Checkbox item A
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-uncontrolled-b"
 					value="b"
 					defaultChecked
 				>
-					Checkbox item B (initially checked)
+					<DropdownMenuItemLabel>
+						Checkbox item B
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Individual, controlled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-controlled-a"
 					value="a"
 					checked={ isAChecked }
 					onChange={ ( e ) => setAChecked( e.target.checked ) }
 				>
-					Checkbox item A
+					<DropdownMenuItemLabel>
+						Checkbox item A
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-individual-controlled-b"
@@ -203,40 +241,54 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ isBChecked }
 					onChange={ ( e ) => setBChecked( e.target.checked ) }
 				>
-					Checkbox item B (initially checked)
+					<DropdownMenuItemLabel>
+						Checkbox item B
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Multiple, uncontrolled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="a"
 				>
-					Checkbox item A (initially unchecked)
+					<DropdownMenuItemLabel>
+						Checkbox item A
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled, multiple selection
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="b"
 					defaultChecked
 				>
-					Checkbox item B (initially checked)
+					<DropdownMenuItemLabel>
+						Checkbox item B
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled, multiple selection, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Multiple, controlled checkboxes
-				</DropdownMenuGroupLabel>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-controlled"
 					value="a"
 					checked={ multipleCheckboxesValue.includes( 'a' ) }
 					onChange={ onMultipleCheckboxesCheckedChange }
 				>
-					Checkbox item A (initially unchecked)
+					<DropdownMenuItemLabel>
+						Checkbox item A
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled, multiple selection
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 				<DropdownMenuCheckboxItem
 					name="checkbox-multiple-controlled"
@@ -244,7 +296,12 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ multipleCheckboxesValue.includes( 'b' ) }
 					onChange={ onMultipleCheckboxesCheckedChange }
 				>
-					Checkbox item B (initially checked)
+					<DropdownMenuItemLabel>
+						Checkbox item B
+					</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled, multiple selection, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuCheckboxItem>
 			</DropdownMenuGroup>
 		</DropdownMenu>
@@ -263,32 +320,35 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<DropdownMenu { ...props }>
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Uncontrolled radios
-				</DropdownMenuGroupLabel>
 				<DropdownMenuRadioItem name="radio-uncontrolled" value="one">
-					Radio item 1
+					<DropdownMenuItemLabel>Radio item 1</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 				<DropdownMenuRadioItem
 					name="radio-uncontrolled"
 					value="two"
 					defaultChecked
 				>
-					Radio item 2 (initially checked)
+					<DropdownMenuItemLabel>Radio item 2</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Uncontrolled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>
-					Controlled radios
-				</DropdownMenuGroupLabel>
 				<DropdownMenuRadioItem
 					name="radio-controlled"
 					value="one"
 					checked={ radioValue === 'one' }
 					onChange={ onRadioChange }
 				>
-					Radio item 1
+					<DropdownMenuItemLabel>Radio item 1</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 				<DropdownMenuRadioItem
 					name="radio-controlled"
@@ -296,7 +356,10 @@ export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
 					checked={ radioValue === 'two' }
 					onChange={ onRadioChange }
 				>
-					Radio item 2 (initially checked)
+					<DropdownMenuItemLabel>Radio item 2</DropdownMenuItemLabel>
+					<DropdownMenuItemHelpText>
+						Controlled, initially checked
+					</DropdownMenuItemHelpText>
 				</DropdownMenuRadioItem>
 			</DropdownMenuGroup>
 		</DropdownMenu>
@@ -327,13 +390,17 @@ export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
 					onClick={ () => setOuterModalOpen( true ) }
 					hideOnClick={ false }
 				>
-					Open outer modal
+					<DropdownMenuItemLabel>
+						Open outer modal
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={ () => setInnerModalOpen( true ) }
 					hideOnClick={ false }
 				>
-					Open inner modal
+					<DropdownMenuItemLabel>
+						Open inner modal
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 				{ isInnerModalOpen && (
 					<Modal
@@ -383,7 +450,13 @@ const Slot = () => {
 		[ dropdownMenuContext ]
 	);
 
-	return <ExampleSlotFill.Slot fillProps={ fillProps } bubblesVirtually />;
+	return (
+		<ExampleSlotFill.Slot
+			fillProps={ fillProps }
+			bubblesVirtually
+			style={ { display: 'contents' } }
+		/>
+	);
 };
 
 type ForwardedContextTuple< P = {} > = [
@@ -414,18 +487,32 @@ export const WithSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<DropdownMenu { ...props }>
-				<DropdownMenuItem>Item</DropdownMenuItem>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>Item</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 				<Slot />
 			</DropdownMenu>
 
 			<Fill>
-				<DropdownMenuItem>Item from fill</DropdownMenuItem>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>
+						Item from fill
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 				<DropdownMenu
 					trigger={
-						<DropdownMenuItem>Submenu from fill</DropdownMenuItem>
+						<DropdownMenuItem>
+							<DropdownMenuItemLabel>
+								Submenu from fill
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
 					}
 				>
-					<DropdownMenuItem>Submenu item from fill</DropdownMenuItem>
+					<DropdownMenuItem>
+						<DropdownMenuItemLabel>
+							Submenu item from fill
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
 				</DropdownMenu>
 			</Fill>
 		</SlotFillProvider>
@@ -441,15 +528,28 @@ const toolbarVariantContextValue = {
 	},
 };
 export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
+	// TODO: add toolbar
 	<ContextSystemProvider value={ toolbarVariantContextValue }>
 		<DropdownMenu { ...props }>
-			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
-			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+			<DropdownMenuItem>
+				<DropdownMenuItemLabel>Level 1 item</DropdownMenuItemLabel>
+			</DropdownMenuItem>
+			<DropdownMenuItem>
+				<DropdownMenuItemLabel>Level 1 item</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 			<DropdownMenu
-				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
+				trigger={
+					<DropdownMenuItem>
+						<DropdownMenuItemLabel>
+							Submenu trigger
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+				}
 			>
-				<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>Level 2 item</DropdownMenuItemLabel>
+				</DropdownMenuItem>
 			</DropdownMenu>
 		</DropdownMenu>
 	</ContextSystemProvider>
@@ -472,17 +572,31 @@ export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
 			{ isModalOpen && (
 				<Modal onRequestClose={ () => setModalOpen( false ) }>
 					<DropdownMenu { ...props }>
-						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
-						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
+						<DropdownMenuItem>
+							<DropdownMenuItemLabel>
+								Level 1 item
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<DropdownMenuItemLabel>
+								Level 1 item
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenu
 							trigger={
 								<DropdownMenuItem>
-									Submenu trigger
+									<DropdownMenuItemLabel>
+										Submenu trigger
+									</DropdownMenuItemLabel>
 								</DropdownMenuItem>
 							}
 						>
-							<DropdownMenuItem>Level 2 item</DropdownMenuItem>
+							<DropdownMenuItem>
+								<DropdownMenuItemLabel>
+									Level 2 item
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
 						</DropdownMenu>
 					</DropdownMenu>
 					<Button onClick={ () => setModalOpen( false ) }>

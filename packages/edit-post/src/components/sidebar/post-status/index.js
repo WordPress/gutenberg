@@ -8,6 +8,8 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	PostAuthorPanel,
+	PostSchedulePanel,
 	PostSwitchToDraftButton,
 	PostSyncStatus,
 	PostURLPanel,
@@ -18,9 +20,7 @@ import {
  */
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
-import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
-import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
@@ -61,15 +61,15 @@ export default function PostStatus() {
 				{ ( fills ) => (
 					<>
 						<PostVisibility />
-						<PostSchedule />
+						<PostSchedulePanel />
 						<PostTemplate />
 						<PostURLPanel />
+						<PostSyncStatus />
 						<PostSticky />
 						<PostPendingStatus />
 						<PostFormat />
 						<PostSlug />
-						<PostAuthor />
-						<PostSyncStatus />
+						<PostAuthorPanel />
 						{ fills }
 						<HStack
 							style={ {

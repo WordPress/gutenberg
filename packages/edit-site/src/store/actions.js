@@ -575,6 +575,10 @@ export const switchEditorMode =
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
 	( { dispatch, registry } ) => {
+		deprecated( `dispatch( 'core/edit-site' ).setHasPageContentFocus`, {
+			since: '6.5',
+		} );
+
 		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
@@ -599,7 +603,7 @@ export const toggleDistractionFree =
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-site', 'fixedToolbar', false );
+					.set( 'core/edit-site', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
