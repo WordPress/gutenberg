@@ -13,7 +13,7 @@ export default function save( { attributes } ) {
 		<pre { ...useBlockProps.save() }>
 			<RichText.Content
 				tagName="code"
-				value={ escape( attributes.content ) }
+				value={ escape( attributes.content.toString() ) }
 			/>
 		</pre>
 	);

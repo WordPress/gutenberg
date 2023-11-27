@@ -226,7 +226,10 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'rich-text':
-			return richText( sourceConfig.selector );
+			return richText(
+				sourceConfig.selector,
+				sourceConfig.__unstablePreserveWhiteSpace
+			);
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':

@@ -46,8 +46,8 @@
 					"attribute": "data-id"
 				},
 				"caption": {
-					"type": "string",
-					"source": "html",
+					"type": "rich-text",
+					"source": "rich-text",
 					"selector": ".blocks-gallery-item__caption"
 				}
 			}
@@ -72,8 +72,8 @@
 			"maximum": 8
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": ".blocks-gallery-caption"
 		},
 		"imageCrop": {

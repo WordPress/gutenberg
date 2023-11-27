@@ -25,7 +25,9 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const pdfEmbedLabel = RichText.isEmpty( fileName ) ? 'PDF embed' : fileName;
+	const pdfEmbedLabel = RichText.isEmpty( fileName )
+		? 'PDF embed'
+		: fileName.toString();
 
 	const hasFilename = ! RichText.isEmpty( fileName );
 
