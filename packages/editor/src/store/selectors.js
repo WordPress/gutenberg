@@ -1188,6 +1188,17 @@ export function getEditorSettings( state ) {
 	return state.editorSettings;
 }
 
+/**
+ * Returns the post editor's rendering mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} Rendering mode.
+ */
+export function getRenderingMode( state ) {
+	return state.renderingMode;
+}
+
 /*
  * Backward compatibility
  */

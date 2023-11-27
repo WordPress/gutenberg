@@ -24,8 +24,9 @@ import {
 	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { useState, useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+import { useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,19 +57,18 @@ export default function DocumentActions() {
 }
 
 function PageDocumentActions() {
-	const { hasPageContentFocus, hasResolved, isFound, title } = useSelect(
+	const { isEditingPage, hasResolved, isFound, title } = useSelect(
 		( select ) => {
-			const {
-				hasPageContentFocus: _hasPageContentFocus,
-				getEditedPostContext,
-			} = select( editSiteStore );
+			const { getEditedPostContext } = select( editSiteStore );
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
+			const { getRenderingMode } = select( editorStore );
 			const context = getEditedPostContext();
 			const queryArgs = [ 'postType', context.postType, context.postId ];
 			const page = getEditedEntityRecord( ...queryArgs );
 			return {
-				hasPageContentFocus: _hasPageContentFocus(),
+				isEditingPage:
+					!! context.postId && getRenderingMode() !== 'template-only',
 				hasResolved: hasFinishedResolution(
 					'getEditedEntityRecord',
 					queryArgs
@@ -80,16 +80,16 @@ function PageDocumentActions() {
 		[]
 	);
 
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	const { setRenderingMode } = useDispatch( editorStore );
+	const [ isAnimated, setIsAnimated ] = useState( false );
+	const isLoading = useRef( true );
 
-	const [ hasEditedTemplate, setHasEditedTemplate ] = useState( false );
-	const prevHasPageContentFocus = useRef( false );
 	useEffect( () => {
-		if ( prevHasPageContentFocus.current && ! hasPageContentFocus ) {
-			setHasEditedTemplate( true );
+		if ( ! isLoading.current ) {
+			setIsAnimated( true );
 		}
-		prevHasPageContentFocus.current = hasPageContentFocus;
-	}, [ hasPageContentFocus ] );
+		isLoading.current = false;
+	}, [ isEditingPage ] );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -103,10 +103,10 @@ function PageDocumentActions() {
 		);
 	}
 
-	return hasPageContentFocus ? (
+	return isEditingPage ? (
 		<BaseDocumentActions
 			className={ classnames( 'is-page', {
-				'is-animated': hasEditedTemplate,
+				'is-animated': isAnimated,
 			} ) }
 			icon={ pageIcon }
 		>
@@ -114,8 +114,10 @@ function PageDocumentActions() {
 		</BaseDocumentActions>
 	) : (
 		<TemplateDocumentActions
-			className="is-animated"
-			onBack={ () => setHasPageContentFocus( true ) }
+			className={ classnames( {
+				'is-animated': isAnimated,
+			} ) }
+			onBack={ () => setRenderingMode( 'template-locked' ) }
 		/>
 	);
 }

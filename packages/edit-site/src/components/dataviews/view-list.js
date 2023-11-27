@@ -40,12 +40,12 @@ import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
-	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownSubMenuV2: DropdownSubMenu,
+	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -80,7 +80,7 @@ function HeaderMenu( { dataView, header } ) {
 	const isFilterable = !! filter;
 
 	return (
-		<DropdownMenuV2
+		<DropdownMenu
 			align="start"
 			trigger={
 				<Button
@@ -93,10 +93,10 @@ function HeaderMenu( { dataView, header } ) {
 		>
 			<WithSeparators>
 				{ isSortable && (
-					<DropdownMenuGroupV2>
+					<DropdownMenuGroup>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => (
-								<DropdownMenuItemV2
+								<DropdownMenuItem
 									key={ direction }
 									prefix={ <Icon icon={ info.icon } /> }
 									suffix={
@@ -119,13 +119,13 @@ function HeaderMenu( { dataView, header } ) {
 									} }
 								>
 									{ info.label }
-								</DropdownMenuItemV2>
+								</DropdownMenuItem>
 							)
 						) }
-					</DropdownMenuGroupV2>
+					</DropdownMenuGroup>
 				) }
 				{ isHidable && (
-					<DropdownMenuItemV2
+					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
 						onSelect={ ( event ) => {
 							event.preventDefault();
@@ -133,21 +133,21 @@ function HeaderMenu( { dataView, header } ) {
 						} }
 					>
 						{ __( 'Hide' ) }
-					</DropdownMenuItemV2>
+					</DropdownMenuItem>
 				) }
 				{ isFilterable && (
-					<DropdownMenuGroupV2>
-						<DropdownSubMenuV2
+					<DropdownMenuGroup>
+						<DropdownSubMenu
 							key={ filter.field }
 							trigger={
-								<DropdownSubMenuTriggerV2
+								<DropdownSubMenuTrigger
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
 										<Icon icon={ chevronRightSmall } />
 									}
 								>
 									{ __( 'Filter by' ) }
-								</DropdownSubMenuTriggerV2>
+								</DropdownSubMenuTrigger>
 							}
 						>
 							{ filter.elements.map( ( element ) => {
@@ -170,7 +170,7 @@ function HeaderMenu( { dataView, header } ) {
 								}
 
 								return (
-									<DropdownMenuItemV2
+									<DropdownMenuItem
 										key={ element.value }
 										suffix={
 											isActive && <Icon icon={ check } />
@@ -207,14 +207,14 @@ function HeaderMenu( { dataView, header } ) {
 										} }
 									>
 										{ element.label }
-									</DropdownMenuItemV2>
+									</DropdownMenuItem>
 								);
 							} ) }
-						</DropdownSubMenuV2>
-					</DropdownMenuGroupV2>
+						</DropdownSubMenu>
+					</DropdownMenuGroup>
 				) }
 			</WithSeparators>
-		</DropdownMenuV2>
+		</DropdownMenu>
 	);
 }
 
@@ -223,7 +223,7 @@ function WithSeparators( { children } ) {
 		.filter( Boolean )
 		.map( ( child, i ) => (
 			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparatorV2 /> }
+				{ i > 0 && <DropdownMenuSeparator /> }
 				{ child }
 			</Fragment>
 		) );

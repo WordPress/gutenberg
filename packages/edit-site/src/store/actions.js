@@ -575,6 +575,10 @@ export const switchEditorMode =
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
 	( { dispatch, registry } ) => {
+		deprecated( `dispatch( 'core/edit-site' ).setHasPageContentFocus`, {
+			since: '6.5',
+		} );
+
 		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
