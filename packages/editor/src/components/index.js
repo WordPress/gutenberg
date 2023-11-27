@@ -67,6 +67,7 @@ export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } fr
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
+export { default as PostTitleRaw } from './post-title/post-title-raw';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
