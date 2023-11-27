@@ -24,6 +24,7 @@ import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+import { usePostEditorLayout } from './use-post-editor-layout';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -58,6 +59,41 @@ function useForceFocusModeForNavigation( navigationBlockClientId ) {
 		unsetBlockEditingMode,
 		setBlockEditingMode,
 	] );
+}
+
+/**
+ * Helper method to extract the post content block from a template.
+ *
+ * @param {Array} blocks Template blocks.
+ *
+ * @return {Object?} Post content block.
+ */
+function extractPostContentBlockFromTemplateBlocks( blocks ) {
+	if ( ! blocks ) {
+		return undefined;
+	}
+	for ( let i = 0; i < blocks.length; i++ ) {
+		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
+		// we skip it because we only want to render stand-alone page content blocks in the block list.
+		if ( blocks[ i ].name === 'core/query' ) {
+			continue;
+		}
+		if ( blocks[ i ].name === 'core/post-content' ) {
+			return blocks[ i ];
+		}
+
+		if ( blocks[ i ].innerBlocks.length ) {
+			const postContentBlock = extractPostContentBlockFromTemplateBlocks(
+				blocks[ i ].innerBlocks
+			);
+
+			if ( postContentBlock ) {
+				return postContentBlock;
+			}
+		}
+	}
+
+	return undefined;
 }
 
 /**
@@ -111,6 +147,9 @@ function useBlockEditorProps( post, template, mode ) {
 		useEntityBlockEditor( 'postType', template?.type, {
 			id: template?.id,
 		} );
+	const postContentBlock =
+		extractPostContentBlockFromTemplateBlocks( templateBlocks );
+	const postContentLayout = usePostEditorLayout( postContentBlock );
 	const blocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
@@ -129,27 +168,27 @@ function useBlockEditorProps( post, template, mode ) {
 				extractPageContentBlockTypesFromTemplateBlocks(
 					templateBlocks
 				);
-			return [
-				createBlock(
+			const innerBlocks = postContentBlocks.length
+				? postContentBlocks
+				: [
+						createBlock( 'core/post-title' ),
+						createBlock( 'core/post-content' ),
+				  ];
+			const innerBlocksWithLayout = innerBlocks.map( ( block ) => {
+				if ( block.name === 'core/post-content' ) {
+					return createBlock( 'core/post-content', {
+						layout: postContentLayout,
+					} );
+				}
+				return createBlock(
 					'core/group',
 					{
-						layout: { type: 'constrained' },
-						style: {
-							spacing: {
-								margin: {
-									top: '4em', // Mimics the post editor.
-								},
-							},
-						},
+						layout: postContentLayout,
 					},
-					postContentBlocks.length
-						? postContentBlocks
-						: [
-								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content' ),
-						  ]
-				),
-			];
+					[ block ]
+				);
+			} );
+			return innerBlocksWithLayout;
 		}
 
 		if ( rootLevelPost === 'template' ) {
@@ -158,6 +197,7 @@ function useBlockEditorProps( post, template, mode ) {
 
 		return postBlocks;
 	}, [
+		postContentLayout,
 		templateBlocks,
 		postBlocks,
 		rootLevelPost,
