@@ -80,6 +80,7 @@ export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
+	context: { postId },
 } ) {
 	const editUrl = useSelect(
 		( select ) => {
@@ -96,6 +97,7 @@ export default function ReusableBlockEdit( {
 				postId: ref,
 				categoryType: 'pattern',
 				canvas: 'edit',
+				refererId: postId,
 			} );
 
 			// For editing link to the site editor if the theme and user permissions support it.
@@ -103,7 +105,7 @@ export default function ReusableBlockEdit( {
 				? siteEditorUrl
 				: defaultUrl;
 		},
-		[ ref ]
+		[ postId, ref ]
 	);
 	useBlockEditingMode( 'syncedPattern' );
 	const hasAlreadyRendered = useHasRecursion( ref );

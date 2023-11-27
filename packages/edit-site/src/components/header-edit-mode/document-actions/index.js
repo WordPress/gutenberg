@@ -27,6 +27,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useRef, useState, useEffect } from '@wordpress/element';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -142,6 +143,13 @@ function TemplateDocumentActions( { className, onBack } ) {
 		typeIcon = navigationIcon;
 	} else if ( record.type === PATTERN_TYPES.user ) {
 		typeIcon = symbol;
+	}
+
+	const { refererId } = getQueryArgs( window.location.href );
+
+	if ( ! onBack && refererId ) {
+		onBack = () =>
+			( document.location = `post.php?post=${ refererId }&action=edit` );
 	}
 
 	return (
