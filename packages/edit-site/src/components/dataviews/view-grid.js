@@ -5,8 +5,6 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -39,13 +37,14 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 		>
 			{ shownData.map( ( item, index ) => (
 				<VStack
+					spacing={ 3 }
 					key={ getItemId?.( item ) || index }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item, view } ) }
 					</div>
-					<HStack justify="space-between">
+					<HStack className="dataviews-view-grid__title" justify="space-between">
 						{ primaryField?.render( { item, view } ) }
 						<ItemActions
 							item={ item }
@@ -53,28 +52,31 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 							isCompact
 						/>
 					</HStack>
-					<div className="dataviews-view-grid__fields">
-						{ visibleFields.map( ( field ) => (
-							<div
-								className="dataviews-view-grid__field"
-								key={ field.id }
-							>
-								<VisuallyHidden>
-									{ field.header }
-								</VisuallyHidden>
-								<span className="dataviews-view-grid__field-value">
-									<Tooltip
-										text={ field.header }
-										placement="top"
-									>
-										<span>
-											{ field.render( { item, view } ) }
-										</span>
-									</Tooltip>
-								</span>
-							</div>
-						) ) }
-					</div>
+					<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+						{ visibleFields.map( ( field ) => {
+							const renderedValue = field.render( {
+								item,
+								view,
+							} );
+							if ( ! renderedValue ) {
+								return null;
+							}
+							return (
+								<VStack
+									className="dataviews-view-grid__field"
+									key={ field.id }
+									spacing={ 1 }
+								>
+									<div className="dataviews-view-grid__field-header">
+										{ field.header }
+									</div>
+									<div className="dataviews-view-grid__field-value">
+										{ field.render( { item, view } ) }
+									</div>
+								</VStack>
+							);
+						} ) }
+					</VStack>
 				</VStack>
 			) ) }
 		</Grid>

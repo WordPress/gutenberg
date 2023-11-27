@@ -41,13 +41,14 @@
 }
 
 .dataviews-grid-view {
+	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 
-	@include break-wide() {
+	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
 	}
 
-	@include break-xhuge() {
+	@include break-huge() {
 		grid-template-columns: repeat(4, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
 	}
 
@@ -74,27 +75,27 @@
 		}
 	}
 
+	.dataviews-view-grid__title {
+		min-height: $grid-unit-30;
+		
+		a {
+			color: $gray-900;
+			text-decoration: none;
+			font-weight: 500;
+		}
+	}
+
 	.dataviews-view-grid__fields {
 		position: relative;
+		font-size: 12px;
+		line-height: 16px;
 
 		.dataviews-view-grid__field {
-			display: inline-flex;
-
-			&::after {
-				content: "•";
-				display: inline-block;
-				margin: 0 $grid-unit-05;
-			}
-
-			&:last-child {
-				&::after {
-					display: none;
-				}
-			}
-
-			.dataviews-view-grid__field-value {
+			.dataviews-view-grid__field-header {
 				color: $gray-700;
-				cursor: default;
+			}
+			.dataviews-view-grid__field-value {
+				color: $gray-900;
 			}
 		}
 	}
