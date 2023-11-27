@@ -61,8 +61,12 @@ Although registering the block also on the server with PHP is still recommended 
 
 The function takes two params:
 
--   `$blockNameOrMetadata` (`string`|`Object`) – block type name (if previously registered on the server) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
+-   `$blockNameOrMetadata` (`string`|`Object`) – block type name or the metadata object loaded from the `block.json`
 -   `$settings` (`Object`) – client-side block settings.
+
+<div class="callout callout-tip">
+The content of <code>block.json</code> (or any other <code>.json</code> file) can be imported directly in Javascript files when using <a href="/docs/getting-started/devenv/get-started-with-wp-scripts/#the-build-process-with-wp-scripts">a build process like the one available with <code>wp-scripts</code></a>
+</div>
 
 The client-side block settings object passed as a second parameter include two properties that are especially relevant:
 - `edit`: The React component that gets used in the editor for our block.
