@@ -28,11 +28,11 @@ function MyEditorPreferencesModal() {
 									'Review settings, such as visibility and tags.'
 								) }
 								label={ __(
-									'Include pre-publish checklist'
+									'Enable pre-publish flow'
 								) }
 							/>
 						</PreferencesModalSection>
-					) 
+					)
 
 		}
 		{
@@ -47,7 +47,7 @@ function MyEditorPreferencesModal() {
 						>
 							// Section content here
 						</PreferencesModalSection>
-					) 
+					)
 
 		}
 	]

@@ -32,9 +32,7 @@ describe( 'EditPostPreferencesModal', () => {
 			} );
 
 			expect(
-				within( tabPanel ).getByLabelText(
-					'Include pre-publish checklist'
-				)
+				within( tabPanel ).getByLabelText( 'Enable pre-publish flow' )
 			).toBeInTheDocument();
 		} );
 		it( 'small viewports', async () => {
@@ -55,9 +53,7 @@ describe( 'EditPostPreferencesModal', () => {
 
 			// Checkbox toggle controls are not rendered in small viewports.
 			expect(
-				within( dialog ).queryByLabelText(
-					'Include pre-publish checklist'
-				)
+				within( dialog ).queryByLabelText( 'Enable pre-publish flow' )
 			).not.toBeInTheDocument();
 
 			// Individual preference nav buttons are rendered in small viewports.
