@@ -66,7 +66,7 @@ add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2
  */
 function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
 	$store = array_merge(
-		WP_Interactivity_Initial_State::get_state(),
+		WP_Interactivity_Store::get_data(),
 		array( 'context' => $context )
 	);
 
