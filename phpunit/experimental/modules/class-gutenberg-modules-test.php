@@ -10,7 +10,6 @@
  */
 class Gutenberg_Modules_Test extends WP_UnitTestCase {
 	public function test_register() {
-		// Prepare data for the test.
 		$module_identifier = 'test_module';
 		$src               = 'test_src';
 		$dependencies      = array(
@@ -19,7 +18,6 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 		);
 		$version           = '1.0.0';
 
-		// Call the function with test data.
 		Gutenberg_Modules::register( $module_identifier, $src, $dependencies, $version );
 
 		// Use reflection to access the private static property $registered.
@@ -36,10 +34,7 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 	}
 
 	public function test_enqueue() {
-		// Prepare data for the test.
 		$module_identifier = 'test_module_enqueued';
-
-		// Call the function with test data.
 		Gutenberg_Modules::enqueue( $module_identifier );
 
 		// Use reflection to access the private static property $enqueued.
@@ -53,43 +48,31 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_dependencies() {
-		// Prepare data for the test.
-		$module_identifier  = 'test_module';
-		$dependency         = 'dependency_module';
-		$registered_modules = array(
-			$module_identifier => array(
-				'dependencies' => array(
-					'static'  => array( $dependency ),
-					'dynamic' => array(
-						'test_dynamic',
-					),
-				),
-			),
-			$dependency        => array(
-				'dependencies' => array(
-					'static'  => array( 'test_static' ),
-					'dynamic' => array( 'test_dynamic' ),
-				),
-			),
+		$parent_module         = 'module_1';
+		$parent_module_src     = 'module_1_src';
+		$dependant_module      = 'module_2';
+		$dependant_module_src  = 'module_2_src';
+		$dependant_module_deps = array(
+			$parent_module,
 		);
+		$version               = '1.0.0';
+		$empty_deps            = array();
 
-		// Use reflection to modify the private static property $registered.
-		$reflection = new ReflectionClass( 'Gutenberg_Modules' );
-		$property   = $reflection->getProperty( 'registered' );
-		$property->setAccessible( true );
-		$property->setValue( $registered_modules );
+		Gutenberg_Modules::register( $parent_module, $parent_module_src, $empty_deps, $version );
+		Gutenberg_Modules::register( $dependant_module, $dependant_module_src, $dependant_module_deps, $version );
 
 		// Use reflection to call the private method get_dependencies.
-		$method = $reflection->getMethod( 'get_dependencies' );
+		$reflection = new ReflectionClass( 'Gutenberg_Modules' );
+		$method     = $reflection->getMethod( 'get_dependencies' );
 		$method->setAccessible( true );
-		$dependencies = $method->invokeArgs( null, array( array( $module_identifier ) ) );
-		// Assert that the dependencies are correct.
-		$this->assertArrayHasKey( $dependency, $dependencies );
-		$this->assertSame( $registered_modules[ $dependency ]['dependencies'], $dependencies['dependency_module']['dependencies'] );
+		$dependencies = $method->invokeArgs( null, array( array( $dependant_module ) ) );
+		$this->assertArrayHasKey( $parent_module, $dependencies );
+		$this->assertArrayHasKey( 'src', $dependencies[ $parent_module ] );
+		$this->assertArrayHasKey( 'version', $dependencies[ $parent_module ] );
+		$this->assertArrayHasKey( 'dependencies', $dependencies[ $parent_module ] );
 	}
 
 	public function test_get_version_query_string() {
-		// Prepare data for the test.
 		$version = '1.0.0';
 		// Use reflection to call the private method get_version_query_string.
 		$reflection = new ReflectionClass( 'Gutenberg_Modules' );
@@ -106,5 +89,29 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 		// Default.
 		$version_query_string = $method->invokeArgs( null, array( null ) );
 		$this->assertSame( '', $version_query_string );
+	}
+
+	public function test_get_import_map() {
+		$parent_module         = 'module_1';
+		$parent_module_src     = 'module_1_src';
+		$dependant_module      = 'module_2';
+		$dependant_module_src  = 'module_2_src';
+		$dependant_module_deps = array(
+			$parent_module,
+		);
+		$version               = '1.0.0';
+		$empty_deps            = array();
+
+		Gutenberg_Modules::register( $parent_module, $parent_module_src, $empty_deps, $version );
+		Gutenberg_Modules::register( $dependant_module, $dependant_module_src, $dependant_module_deps, $version );
+		Gutenberg_Modules::enqueue( $parent_module );
+		Gutenberg_Modules::enqueue( $dependant_module );
+
+		$import_map = Gutenberg_Modules::get_import_map();
+
+		// Assert that the import map is correct.
+		$this->assertArrayHasKey( 'imports', $import_map );
+		$this->assertArrayHasKey( $parent_module, $import_map['imports'] );
+		$this->assertSame( $parent_module_src . '?ver=' . $version, $import_map['imports'][ $parent_module ] );
 	}
 }
