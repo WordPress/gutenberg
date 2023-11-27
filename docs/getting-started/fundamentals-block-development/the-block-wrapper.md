@@ -1,6 +1,21 @@
 # The Block wrapper
 
-The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. Besides this "edit" interface, every block decides how it's going to be rendered for the fromnted. s 
+Each block's markup has its own markup wrapper that needs to be properly identified to fully work in the Block Editor and include any custom style settings when the block is rendered in the front end.
+
+There are three main markups involved in the lifecyle of a block:
+
+- Every block in the Block Editor (React SPA) is displayed through a React component (`edit` property passed to `registerBlockType`). 
+- Another React component can be defined for the Block to set the markup saved to the DB (`save` property passed to `registerBlockType`). ). 
+- The markup stored in the DB will be returned to the front end on request unless a specific server-side render way (`render_callback` on `register_block_type` or `render` in `block.json`) has been defined to return the markup of the block to the fron end.
+
+--- idea edit markup is defined separatedly than markup returned to the frontend - but the recommendation is that the edit markup should reflect the front end one -----
+
+
+When defined, these markups need to include the proper block's attributes in their wrappers.
+
+## The Edit component 
+
+The markup of the `Edit` React component ` function is wrapped in a few other elements. The outer wrapper of each block has the wp-block class and a data-block attribute that contains the name of the block with its namespace – core/group for the group block, for example.
 
 
 changes in blocks --- update store --- update blocks
