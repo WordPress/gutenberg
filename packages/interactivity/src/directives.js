@@ -400,48 +400,4 @@ export default () => {
 		),
 		{ priority: 4 }
 	);
-
-	// data-wp-each
-	directive(
-		'each',
-		( {
-			directives: { each, 'each-key': key },
-			context: inheritedContext,
-			element,
-			evaluate,
-		} ) => {
-			const { Provider } = inheritedContext;
-			const inheritedValue = useContext( inheritedContext );
-
-			const entry = each
-				.filter( ( n ) => n !== 'default' )
-				.find( ( n ) => n );
-
-			const list = evaluate( entry );
-
-			if ( ! list.length ) return null;
-
-			element.props.children = list.map( ( item ) => {
-				const currentValue = useRef( deepSignal( {} ) );
-
-				currentValue.current = useMemo( () => {
-					const newValue = deepSignal( {
-						[ entry.namespace ]: { [ entry.suffix ]: item },
-					} );
-					mergeDeepSignals( newValue, inheritedValue );
-					mergeDeepSignals( currentValue.current, newValue, true );
-					return currentValue.current;
-				}, [ inheritedValue, entry ] );
-
-				return (
-					<Provider
-						value={ currentValue.current }
-						key={ item[ key[ 0 ].value ] }
-					>
-						{ element.props.children[ 1 ] }
-					</Provider>
-				);
-			} );
-		}
-	);
 };
