@@ -1,4 +1,16 @@
 /**
+ * THIS MODULE IS INTENTIONALLY KEPT WITHIN THE PATTERN BLOCK'S SOURCE.
+ *
+ * This is because this approach for preventing infinite loops due to
+ * recursively rendering blocks is specific to the way that the `core/pattern`
+ * block behaves in the editor. Any other block types that deal with recursion
+ * SHOULD USE THE STANDARD METHOD for avoiding loops:
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/31455
+ * @see packages/block-editor/src/components/recursion-provider/README.md
+ */
+
+/**
  * @type {Map<string, Set<string>>}
  */
 const patternDependencies = new Map();
