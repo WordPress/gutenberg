@@ -47,7 +47,11 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 					</div>
 					<HStack justify="space-between">
 						{ primaryField?.render( { item, view } ) }
-						<ItemActions item={ item } actions={ actions } />
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
 					</HStack>
 					<div className="dataviews-view-grid__fields">
 						{ visibleFields.map( ( field ) => (
