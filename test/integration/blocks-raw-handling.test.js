@@ -178,15 +178,15 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toMatchInlineSnapshot( `
 		"<ul class="wp-block-list"><!-- wp:list-item -->
-		<li class="wp-block-list-item">one</li>
+		<li>one</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">two</li>
+		<li>two</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">three</li>
+		<li>three</li>
 		<!-- /wp:list-item --></ul>"
 	` );
 		expect( console ).toHaveLogged();
@@ -203,15 +203,15 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toMatchInlineSnapshot( `
 		"<ul class="wp-block-list"><!-- wp:list-item -->
-		<li class="wp-block-list-item">one</li>
+		<li>one</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">two</li>
+		<li>two</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">three</li>
+		<li>three</li>
 		<!-- /wp:list-item --></ul>"
 	` );
 		expect( console ).toHaveLogged();
@@ -319,15 +319,15 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toMatchInlineSnapshot( `
 		"<ul class="wp-block-list"><!-- wp:list-item -->
-		<li class="wp-block-list-item">One</li>
+		<li>One</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">Two</li>
+		<li>Two</li>
 		<!-- /wp:list-item -->
 
 		<!-- wp:list-item -->
-		<li class="wp-block-list-item">Three</li>
+		<li>Three</li>
 		<!-- /wp:list-item --></ul>"
 	` );
 		expect( console ).toHaveLogged();

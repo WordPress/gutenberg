@@ -62,12 +62,12 @@
 
 <!-- wp:list -->
 <ul class="wp-block-list">
-	<li class="wp-block-list-item"><?php _e( 'Text &amp; Headings', 'gutenberg' ); ?></li>
-	<li class="wp-block-list-item"><?php _e( 'Images &amp; Videos', 'gutenberg' ); ?></li>
-	<li class="wp-block-list-item"><?php _e( 'Galleries', 'gutenberg' ); ?></li>
-	<li class="wp-block-list-item"><?php _e( 'Embeds, like YouTube, Tweets, or other WordPress posts.', 'gutenberg' ); ?></li>
-	<li class="wp-block-list-item"><?php _e( 'Layout blocks, like Buttons, Hero Images, Separators, etc.', 'gutenberg' ); ?></li>
-	<li class="wp-block-list-item"><?php _e( 'And <em>Lists</em> like this one of course :)', 'gutenberg' ); ?></li>
+	<li><?php _e( 'Text &amp; Headings', 'gutenberg' ); ?></li>
+	<li><?php _e( 'Images &amp; Videos', 'gutenberg' ); ?></li>
+	<li><?php _e( 'Galleries', 'gutenberg' ); ?></li>
+	<li><?php _e( 'Embeds, like YouTube, Tweets, or other WordPress posts.', 'gutenberg' ); ?></li>
+	<li><?php _e( 'Layout blocks, like Buttons, Hero Images, Separators, etc.', 'gutenberg' ); ?></li>
+	<li><?php _e( 'And <em>Lists</em> like this one of course :)', 'gutenberg' ); ?></li>
 </ul>
 <!-- /wp:list -->
 

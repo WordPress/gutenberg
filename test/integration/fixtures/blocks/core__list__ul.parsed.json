@@ -7,54 +7,48 @@
 				"blockName": "core/list-item",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">Text &amp; Headings</li>\n",
+				"innerHTML": "\n<li>Text &amp; Headings</li>\n",
+				"innerContent": [ "\n<li>Text &amp; Headings</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Images &amp; Videos</li>\n",
+				"innerContent": [ "\n<li>Images &amp; Videos</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Galleries</li>\n",
+				"innerContent": [ "\n<li>Galleries</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n",
 				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">Text &amp; Headings</li>\n"
+					"\n<li>Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n"
 				]
 			},
 			{
 				"blockName": "core/list-item",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">Images &amp; Videos</li>\n",
+				"innerHTML": "\n<li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n",
 				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">Images &amp; Videos</li>\n"
+					"\n<li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n"
 				]
 			},
 			{
 				"blockName": "core/list-item",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">Galleries</li>\n",
+				"innerHTML": "\n<li>And <em>Lists</em> like this one of course :)</li>\n",
 				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">Galleries</li>\n"
-				]
-			},
-			{
-				"blockName": "core/list-item",
-				"attrs": {},
-				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n",
-				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n"
-				]
-			},
-			{
-				"blockName": "core/list-item",
-				"attrs": {},
-				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n",
-				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n"
-				]
-			},
-			{
-				"blockName": "core/list-item",
-				"attrs": {},
-				"innerBlocks": [],
-				"innerHTML": "\n<li class=\"wp-block-list-item\">And <em>Lists</em> like this one of course :)</li>\n",
-				"innerContent": [
-					"\n<li class=\"wp-block-list-item\">And <em>Lists</em> like this one of course :)</li>\n"
+					"\n<li>And <em>Lists</em> like this one of course :)</li>\n"
 				]
 			}
 		],
