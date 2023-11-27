@@ -130,7 +130,14 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		);
 	}
 	return (
-		<HStack justify="flex-end">
+		<HStack
+			spacing={ 1 }
+			justify="flex-end"
+			style={ {
+				flexShrink: '0',
+				width: 'auto',
+			} }
+		>
 			{ !! primaryActions.length &&
 				primaryActions.map( ( action ) => {
 					if ( !! action.RenderModal ) {
