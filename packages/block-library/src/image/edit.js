@@ -10,8 +10,6 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentControl,
-	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
@@ -106,13 +104,13 @@ export function ImageEdit( {
 		url = '',
 		alt,
 		caption,
-		align,
 		id,
 		width,
 		height,
 		sizeSlug,
 		aspectRatio,
 		scale,
+		align,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -125,6 +123,21 @@ export function ImageEdit( {
 	useEffect( () => {
 		captionRef.current = caption;
 	}, [ caption ] );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+				aspectRatio: undefined,
+				scale: undefined,
+			} );
+		}
+	}, [ align ] );
 
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
@@ -255,16 +268,6 @@ export function ImageEdit( {
 		}
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
-	}
-
 	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
@@ -375,14 +378,6 @@ export function ImageEdit( {
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
 			/>
-			{ ! url && blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			) }
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }

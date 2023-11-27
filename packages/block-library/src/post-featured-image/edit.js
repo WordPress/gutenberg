@@ -44,6 +44,11 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 	);
 }
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
@@ -70,9 +75,10 @@ export default function PostFeaturedImageEdit( {
 		postId
 	);
 
-	const { media, postType } = useSelect(
+	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType } = select( coreStore );
+			const { getMedia, getPostType, getEditedEntityRecord } =
+				select( coreStore );
 			return {
 				media:
 					featuredImage &&
@@ -80,10 +86,16 @@ export default function PostFeaturedImageEdit( {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
+				postPermalink: getEditedEntityRecord(
+					'postType',
+					postTypeSlug,
+					postId
+				)?.link,
 			};
 		},
-		[ featuredImage, postTypeSlug ]
+		[ featuredImage, postTypeSlug, postId ]
 	);
+
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 	const imageSizes = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
@@ -224,7 +236,17 @@ export default function PostFeaturedImageEdit( {
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ placeholder() }
+					{ !! isLink ? (
+						<a
+							href={ postPermalink }
+							target={ linkTarget }
+							{ ...disabledClickProps }
+						>
+							{ placeholder() }
+						</a>
+					) : (
+						placeholder()
+					) }
 					<Overlay
 						attributes={ attributes }
 						setAttributes={ setAttributes }
@@ -323,7 +345,18 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ image }
+				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
+				{ !! isLink ? (
+					<a
+						href={ postPermalink }
+						target={ linkTarget }
+						{ ...disabledClickProps }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
 				<Overlay
 					attributes={ attributes }
 					setAttributes={ setAttributes }

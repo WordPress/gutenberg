@@ -14,6 +14,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useAsyncList } from '@wordpress/compose';
 import {
 	chevronDown,
 	chevronUp,
@@ -21,29 +22,30 @@ import {
 	check,
 	arrowUp,
 	arrowDown,
-	moreVertical,
+	chevronRightSmall,
+	funnel,
 } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
-	VisuallyHidden,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import ItemActions from './item-actions';
+import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
-	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuSeparatorV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownSubMenuV2: DropdownSubMenu,
+	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -52,6 +54,7 @@ const sortingItemsInfo = {
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
 const sortIcons = { asc: chevronUp, desc: chevronDown };
+
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
 		return null;
@@ -66,8 +69,18 @@ function HeaderMenu( { dataView, header } ) {
 		return text;
 	}
 	const sortedDirection = header.column.getIsSorted();
+
+	let filter;
+	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
+		filter = {
+			field: header.column.columnDef.id,
+			elements: header.column.columnDef.elements || [],
+		};
+	}
+	const isFilterable = !! filter;
+
 	return (
-		<DropdownMenuV2
+		<DropdownMenu
 			align="start"
 			trigger={
 				<Button
@@ -78,94 +91,174 @@ function HeaderMenu( { dataView, header } ) {
 				/>
 			}
 		>
-			{ isSortable && (
-				<DropdownMenuGroupV2>
-					{ Object.entries( sortingItemsInfo ).map(
-						( [ direction, info ] ) => (
-							<DropdownMenuItemV2
-								key={ direction }
-								prefix={ <Icon icon={ info.icon } /> }
-								suffix={
-									sortedDirection === direction && (
-										<Icon icon={ check } />
-									)
-								}
-								onSelect={ ( event ) => {
-									event.preventDefault();
-									if ( sortedDirection === direction ) {
-										dataView.resetSorting();
-									} else {
-										dataView.setSorting( [
-											{
-												id: header.column.id,
-												desc: direction === 'desc',
-											},
-										] );
+			<WithSeparators>
+				{ isSortable && (
+					<DropdownMenuGroup>
+						{ Object.entries( sortingItemsInfo ).map(
+							( [ direction, info ] ) => (
+								<DropdownMenuItem
+									key={ direction }
+									prefix={ <Icon icon={ info.icon } /> }
+									suffix={
+										sortedDirection === direction && (
+											<Icon icon={ check } />
+										)
 									}
-								} }
-							>
-								{ info.label }
-							</DropdownMenuItemV2>
-						)
-					) }
-				</DropdownMenuGroupV2>
-			) }
-			{ isSortable && isHidable && <DropdownMenuSeparatorV2 /> }
-			{ isHidable && (
-				<DropdownMenuItemV2
-					prefix={ <Icon icon={ unseen } /> }
-					onSelect={ ( event ) => {
-						event.preventDefault();
-						header.column.getToggleVisibilityHandler()( event );
-					} }
-				>
-					{ __( 'Hide' ) }
-				</DropdownMenuItemV2>
-			) }
-		</DropdownMenuV2>
+									onSelect={ ( event ) => {
+										event.preventDefault();
+										if ( sortedDirection === direction ) {
+											dataView.resetSorting();
+										} else {
+											dataView.setSorting( [
+												{
+													id: header.column.id,
+													desc: direction === 'desc',
+												},
+											] );
+										}
+									} }
+								>
+									{ info.label }
+								</DropdownMenuItem>
+							)
+						) }
+					</DropdownMenuGroup>
+				) }
+				{ isHidable && (
+					<DropdownMenuItem
+						prefix={ <Icon icon={ unseen } /> }
+						onSelect={ ( event ) => {
+							event.preventDefault();
+							header.column.getToggleVisibilityHandler()( event );
+						} }
+					>
+						{ __( 'Hide' ) }
+					</DropdownMenuItem>
+				) }
+				{ isFilterable && (
+					<DropdownMenuGroup>
+						<DropdownSubMenu
+							key={ filter.field }
+							trigger={
+								<DropdownSubMenuTrigger
+									prefix={ <Icon icon={ funnel } /> }
+									suffix={
+										<Icon icon={ chevronRightSmall } />
+									}
+								>
+									{ __( 'Filter by' ) }
+								</DropdownSubMenuTrigger>
+							}
+						>
+							{ filter.elements.map( ( element ) => {
+								let isActive = false;
+								const columnFilters =
+									dataView.getState().columnFilters;
+								const columnFilter = columnFilters.find(
+									( f ) =>
+										Object.keys( f )[ 0 ].split(
+											':'
+										)[ 0 ] === filter.field
+								);
+
+								if ( columnFilter ) {
+									const value =
+										Object.values( columnFilter )[ 0 ];
+									// Intentionally use loose comparison, so it does type conversion.
+									// This covers the case where a top-level filter for the same field converts a number into a string.
+									isActive = element.value == value; // eslint-disable-line eqeqeq
+								}
+
+								return (
+									<DropdownMenuItem
+										key={ element.value }
+										suffix={
+											isActive && <Icon icon={ check } />
+										}
+										onSelect={ () => {
+											const otherFilters =
+												columnFilters?.filter(
+													( f ) => {
+														const [
+															field,
+															operator,
+														] =
+															Object.keys(
+																f
+															)[ 0 ].split( ':' );
+														return (
+															field !==
+																filter.field ||
+															operator !==
+																OPERATOR_IN
+														);
+													}
+												);
+
+											dataView.setColumnFilters( [
+												...otherFilters,
+												{
+													[ filter.field + ':in' ]:
+														isActive
+															? undefined
+															: element.value,
+												},
+											] );
+										} }
+									>
+										{ element.label }
+									</DropdownMenuItem>
+								);
+							} ) }
+						</DropdownSubMenu>
+					</DropdownMenuGroup>
+				) }
+			</WithSeparators>
+		</DropdownMenu>
 	);
 }
+
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
+
 function ViewList( {
 	view,
 	onChangeView,
 	fields,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
 } ) {
 	const columns = useMemo( () => {
-		const _columns = [ ...fields ];
+		const _columns = fields.map( ( field ) => {
+			const { render, getValue, ...column } = field;
+			column.cell = ( props ) =>
+				render( { item: props.row.original, view } );
+			if ( getValue ) {
+				column.accessorFn = ( item ) => getValue( { item } );
+			}
+			return column;
+		} );
 		if ( actions?.length ) {
 			_columns.push( {
-				header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
+				header: __( 'Actions' ),
 				id: 'actions',
 				cell: ( props ) => {
 					return (
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						>
-							{ () => (
-								<MenuGroup>
-									{ actions.map( ( action ) => (
-										<MenuItem
-											key={ action.id }
-											onClick={ () =>
-												action.perform(
-													props.row.original
-												)
-											}
-											isDestructive={
-												action.isDesctructive
-											}
-										>
-											{ action.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-						</DropdownMenu>
+						<ItemActions
+							item={ props.row.original }
+							actions={ actions }
+						/>
 					);
 				},
 				enableHiding: false,
@@ -173,7 +266,7 @@ function ViewList( {
 		}
 
 		return _columns;
-	}, [ fields, actions ] );
+	}, [ fields, actions, view ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {
@@ -188,8 +281,61 @@ function ViewList( {
 		);
 	}, [ view.hiddenFields ] );
 
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01' },
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * @param {Array} filters The view filters to transform.
+	 * @return {Array} The transformed TanStack column filters.
+	 */
+	const toTanStackColumnFilters = ( filters ) =>
+		filters?.map( ( filter ) => ( {
+			[ filter.field + ':' + filter.operator ]: filter.value,
+		} ) );
+
+	/**
+	 * Transform the filters from the view format into the tanstack columns filter format.
+	 *
+	 * Input:
+	 *
+	 * columnFilters = [
+	 *   { "date:before": '2020-01-01'},
+	 *   { "date:after": '2020-01-01' }
+	 * ]
+	 *
+	 * Output:
+	 *
+	 * view.filters = [
+	 *   { field: 'date', operator: 'before', value: '2020-01-01' },
+	 *   { field: 'date', operator: 'after', value: '2020-01-01' },
+	 * ]
+	 *
+	 * @param {Array} filters The TanStack column filters to transform.
+	 * @return {Array} The transformed view filters.
+	 */
+	const fromTanStackColumnFilters = ( filters ) =>
+		filters.map( ( filter ) => {
+			const [ key, value ] = Object.entries( filter )[ 0 ];
+			const [ field, operator ] = key.split( ':' );
+			return { field, operator, value };
+		} );
+
+	const shownData = useAsyncList( data );
 	const dataView = useReactTable( {
-		data,
+		data: shownData,
 		columns,
 		manualSorting: true,
 		manualFiltering: true,
@@ -205,12 +351,14 @@ function ViewList( {
 				  ]
 				: [],
 			globalFilter: view.search,
+			columnFilters: toTanStackColumnFilters( view.filters ),
 			pagination: {
 				pageIndex: view.page,
 				pageSize: view.perPage,
 			},
 			columnVisibility: columnVisibility ?? EMPTY_OBJECT,
 		},
+		getRowId: getItemId,
 		onSortingChange: ( sortingUpdater ) => {
 			onChangeView( ( currentView ) => {
 				const sort =
@@ -263,7 +411,14 @@ function ViewList( {
 			} );
 		},
 		onGlobalFilterChange: ( value ) => {
-			onChangeView( { ...view, search: value, page: 0 } );
+			onChangeView( { ...view, search: value, page: 1 } );
+		},
+		onColumnFiltersChange: ( columnFiltersUpdater ) => {
+			onChangeView( {
+				...view,
+				filters: fromTanStackColumnFilters( columnFiltersUpdater() ),
+				page: 1,
+			} );
 		},
 		onPaginationChange: ( paginationUpdater ) => {
 			onChangeView( ( currentView ) => {
@@ -302,10 +457,14 @@ function ViewList( {
 											width:
 												header.column.columnDef.width ||
 												undefined,
+											minWidth:
+												header.column.columnDef
+													.minWidth || undefined,
 											maxWidth:
 												header.column.columnDef
 													.maxWidth || undefined,
 										} }
+										data-field-id={ header.id }
 									>
 										<HeaderMenu
 											dataView={ dataView }
@@ -321,11 +480,14 @@ function ViewList( {
 							<tr key={ row.id }>
 								{ row.getVisibleCells().map( ( cell ) => (
 									<td
-										key={ cell.id }
+										key={ cell.column.id }
 										style={ {
 											width:
 												cell.column.columnDef.width ||
 												undefined,
+											minWidth:
+												cell.column.columnDef
+													.minWidth || undefined,
 											maxWidth:
 												cell.column.columnDef
 													.maxWidth || undefined,

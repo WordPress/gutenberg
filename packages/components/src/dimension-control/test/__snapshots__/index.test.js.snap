@@ -119,8 +119,8 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
-  height: 30px;
-  min-height: 30px;
+  height: 32px;
+  min-height: 32px;
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 8px;
@@ -390,8 +390,8 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
-  height: 30px;
-  min-height: 30px;
+  height: 32px;
+  min-height: 32px;
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 8px;
@@ -671,8 +671,8 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
-  height: 30px;
-  min-height: 30px;
+  height: 32px;
+  min-height: 32px;
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 8px;
@@ -964,8 +964,8 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
-  height: 30px;
-  min-height: 30px;
+  height: 32px;
+  min-height: 32px;
   padding-top: 0;
   padding-bottom: 0;
   padding-left: 8px;

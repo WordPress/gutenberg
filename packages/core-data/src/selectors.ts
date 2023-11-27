@@ -20,6 +20,7 @@ import {
 	getNormalizedCommaSeparable,
 	isRawAttribute,
 	setNestedValue,
+	isNumericID,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -45,6 +46,7 @@ export interface State {
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
+	defaultTemplates: Record< string, string >;
 }
 
 type EntityRecordKey = string | number;
@@ -60,6 +62,16 @@ interface QueriedData {
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
 
+type RevisionRecord =
+	| Record< ET.Context, Record< number, ET.PostRevision > >
+	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+
+interface RevisionsQueriedData {
+	items: RevisionRecord;
+	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
+	queries: Record< ET.Context, Record< string, Array< number > > >;
+}
+
 interface EntityState< EntityRecord extends ET.EntityRecord > {
 	edits: Record< string, Partial< EntityRecord > >;
 	saving: Record<
@@ -68,6 +80,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
+	revisions?: RevisionsQueriedData;
 }
 
 interface EntityConfig {
@@ -79,6 +92,12 @@ interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
+
+type TemplateQuery = {
+	slug?: string;
+	is_custom?: boolean;
+	ignore_empty?: boolean;
+};
 
 export interface UserPatternCategory {
 	id: number;
@@ -94,6 +113,13 @@ type Optional< T > = T | undefined;
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
 type GetRecordsHttpQuery = Record< string, any >;
+
+/**
+ * Arguments for EntityRecord selectors.
+ */
+type EntityRecordArgs =
+	| [ string, string, EntityRecordKey ]
+	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -292,6 +318,7 @@ export interface GetEntityRecord {
 		key: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
+	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -364,6 +391,24 @@ export const getEntityRecord = createSelector(
 		];
 	}
 ) as GetEntityRecord;
+
+/**
+ * Normalizes `recordKey`s that look like numeric IDs to numbers.
+ *
+ * @param args EntityRecordArgs the selector arguments.
+ * @return EntityRecordArgs the normalized arguments.
+ */
+getEntityRecord.__unstableNormalizeArgs = (
+	args: EntityRecordArgs
+): EntityRecordArgs => {
+	const newArgs = [ ...args ] as EntityRecordArgs;
+	const recordKey = newArgs?.[ 2 ];
+
+	// If recordKey looks to be a numeric ID then coerce to number.
+	newArgs[ 2 ] = isNumericID( recordKey ) ? Number( recordKey ) : recordKey;
+
+	return newArgs;
+};
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
@@ -1308,13 +1353,20 @@ export function getUserPatternCategories(
 /**
  * Returns the revisions of the current global styles theme.
  *
- * @param state Data state.
+ * @deprecated since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+ *
+ * @param      state Data state.
  *
  * @return The current global styles.
  */
 export function getCurrentThemeGlobalStylesRevisions(
 	state: State
 ): Array< object > | null {
+	deprecated( "select( 'core' ).getCurrentThemeGlobalStylesRevisions()", {
+		since: '6.5.0',
+		alternative:
+			"select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )",
+	} );
 	const currentGlobalStylesId =
 		__experimentalGetCurrentGlobalStylesId( state );
 
@@ -1324,3 +1376,118 @@ export function getCurrentThemeGlobalStylesRevisions(
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }
+
+/**
+ * Returns the default template use to render a given query.
+ *
+ * @param state Data state.
+ * @param query Query.
+ *
+ * @return The default template id for the given query.
+ */
+export function getDefaultTemplateId(
+	state: State,
+	query: TemplateQuery
+): string {
+	return state.defaultTemplates[ JSON.stringify( query ) ];
+}
+
+/**
+ * Returns an entity's revisions.
+ *
+ * @param state     State tree
+ * @param kind      Entity kind.
+ * @param name      Entity name.
+ * @param recordKey The key of the entity record whose revisions you want to fetch.
+ * @param query     Optional query. If requesting specific
+ *                  fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ *
+ * @return Record.
+ */
+export const getRevisions = (
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): RevisionRecord[] | null => {
+	const queriedStateRevisions =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedStateRevisions ) {
+		return null;
+	}
+
+	return getQueriedItems( queriedStateRevisions, query );
+};
+
+/**
+ * Returns a single, specific revision of a parent entity.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query. If requesting specific
+ *                    fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+ *
+ * @return Record.
+ */
+export const getRevision = createSelector(
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordKey: EntityRecordKey,
+		revisionKey: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	): RevisionRecord | Record< PropertyKey, never > | undefined => {
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
+				recordKey
+			];
+
+		if ( ! queriedState ) {
+			return undefined;
+		}
+
+		const context = query?.context ?? 'default';
+
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
+				return undefined;
+			}
+
+			return queriedState.items[ context ][ revisionKey ];
+		}
+
+		const item = queriedState.items[ context ]?.[ revisionKey ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value?.[ fieldName ];
+				} );
+				setNestedValue( filteredItem, field, value );
+			}
+
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state: State, kind, name, recordKey, revisionKey, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.items?.[ context ]?.[ revisionKey ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.itemIsComplete?.[ context ]?.[ revisionKey ],
+		];
+	}
+);

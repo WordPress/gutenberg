@@ -20,7 +20,7 @@ import { settings } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import useSetting from '../../use-setting';
+import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import {
 	ALL_SIDES,
@@ -102,8 +102,9 @@ export default function SpacingInputControl( {
 		setShowCustomValueControl( true );
 	}
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 	} );
 
 	let currentValue = null;
@@ -138,7 +139,7 @@ export default function SpacingInputControl( {
 		useMemo(
 			() => parseQuantityAndUnitFromRawValue( currentValue ),
 			[ currentValue ]
-		)[ 1 ] || units[ 0 ].value;
+		)[ 1 ] || units[ 0 ]?.value;
 
 	const setInitialValue = () => {
 		if ( value === undefined ) {

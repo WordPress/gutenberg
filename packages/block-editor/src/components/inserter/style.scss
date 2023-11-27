@@ -292,6 +292,11 @@ $block-inserter-tabs-height: 44px;
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
+
+	.block-editor-inserter__patterns-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+	}
 }
 
 .block-editor-inserter__patterns-category-dialog {
@@ -533,7 +538,10 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	&__media-category {
+	.block-editor-inserter__media-tabs__media-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+
 		&.is-selected {
 			color: var(--wp-admin-theme-color);
 			position: relative;

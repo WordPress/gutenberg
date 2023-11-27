@@ -17,7 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { filterOutDuplicatesByName } from './utils';
 import {
-	PATTERN_CORE_SOURCES,
+	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
@@ -123,7 +123,8 @@ const selectThemePatterns = createSelector(
 			...( restBlockPatterns || [] ),
 		]
 			.filter(
-				( pattern ) => ! PATTERN_CORE_SOURCES.includes( pattern.source )
+				( pattern ) =>
+					! EXCLUDED_PATTERN_SOURCES.includes( pattern.source )
 			)
 			.filter( filterOutDuplicatesByName )
 			.filter( ( pattern ) => pattern.inserter !== false )
@@ -158,7 +159,7 @@ const selectPatterns = createSelector(
 			// User patterns can have their sync statuses checked directly
 			// Non-user patterns are all unsynced for the time being.
 			patterns = patterns.filter( ( pattern ) => {
-				return pattern.id
+				return pattern.type === PATTERN_TYPES.user
 					? pattern.syncStatus === syncStatus
 					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
 			} );

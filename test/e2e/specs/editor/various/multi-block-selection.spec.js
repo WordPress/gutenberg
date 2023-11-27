@@ -247,15 +247,14 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
-		// To do: run with iframe.
-		await editor.switchToLegacyCanvas();
-
-		await page.getByRole( 'button', { name: 'Add default block' } ).click();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 
-		await page
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click( { modifiers: [ 'Shift' ] } );
@@ -272,11 +271,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Group' } )
 			.click();
-		await page
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click();
-		await page
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '2' } )
 			.click( { modifiers: [ 'Shift' ] } );
@@ -301,13 +300,7 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: 'test' },
 		} );
 
-		await page.getByRole( 'button', { name: 'Save draft' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Draft saved' } )
-		).toBeVisible();
-
+		await editor.saveDraft();
 		await page.reload();
 		// To do: run with iframe.
 		await editor.switchToLegacyCanvas();

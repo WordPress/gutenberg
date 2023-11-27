@@ -47,7 +47,9 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
@@ -69,7 +71,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -98,7 +102,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -129,7 +135,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -182,7 +190,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const tmpInput = await page.evaluateHandle( () => {
 			const input = document.createElement( 'input' );
@@ -226,7 +236,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -292,7 +304,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -349,7 +363,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -385,7 +401,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -572,7 +590,9 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		const imageInEditor = imageBlock.locator( 'role=img' );
+		const imageInEditor = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( imageInEditor ).toBeVisible();
 		await expect( imageInEditor ).toHaveAttribute(
 			'src',

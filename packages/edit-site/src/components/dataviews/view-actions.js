@@ -10,9 +10,10 @@ import {
 	chevronRightSmall,
 	check,
 	blockTable,
-	chevronDown,
 	arrowUp,
 	arrowDown,
+	grid,
+	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -22,11 +23,11 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 
 const {
-	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownSubMenuV2: DropdownSubMenu,
+	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const availableViews = [
@@ -38,14 +39,27 @@ const availableViews = [
 		id: 'grid',
 		label: __( 'Grid' ),
 	},
+	{
+		id: 'side-by-side',
+		label: __( 'Side by side' ),
+	},
 ];
 
-function ViewTypeMenu( { view, onChangeView } ) {
-	const activeView = availableViews.find( ( v ) => view.type === v.id );
+function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
+	let _availableViews = availableViews;
+	if ( supportedLayouts ) {
+		_availableViews = _availableViews.filter( ( _view ) =>
+			supportedLayouts.includes( _view.id )
+		);
+	}
+	if ( _availableViews.length === 1 ) {
+		return null;
+	}
+	const activeView = _availableViews.find( ( v ) => view.type === v.id );
 	return (
-		<DropdownSubMenuV2
+		<DropdownSubMenu
 			trigger={
-				<DropdownSubMenuTriggerV2
+				<DropdownSubMenuTrigger
 					suffix={
 						<>
 							{ activeView.label }
@@ -54,12 +68,12 @@ function ViewTypeMenu( { view, onChangeView } ) {
 					}
 				>
 					{ __( 'Layout' ) }
-				</DropdownSubMenuTriggerV2>
+				</DropdownSubMenuTrigger>
 			}
 		>
-			{ availableViews.map( ( availableView ) => {
+			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuItemV2
+					<DropdownMenuItem
 						key={ availableView.id }
 						prefix={
 							availableView.id === view.type && (
@@ -75,19 +89,19 @@ function ViewTypeMenu( { view, onChangeView } ) {
 						role="menuitemcheckbox"
 					>
 						{ availableView.label }
-					</DropdownMenuItemV2>
+					</DropdownMenuItem>
 				);
 			} ) }
-		</DropdownSubMenuV2>
+		</DropdownSubMenu>
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 5, 20, 50 ];
+const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function PageSizeMenu( { view, onChangeView } ) {
 	return (
-		<DropdownSubMenuV2
+		<DropdownSubMenu
 			trigger={
-				<DropdownSubMenuTriggerV2
+				<DropdownSubMenuTrigger
 					suffix={
 						<>
 							{ view.perPage }
@@ -97,12 +111,12 @@ function PageSizeMenu( { view, onChangeView } ) {
 				>
 					{ /* TODO: probably label per view type. */ }
 					{ __( 'Rows per page' ) }
-				</DropdownSubMenuTriggerV2>
+				</DropdownSubMenuTrigger>
 			}
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuItemV2
+					<DropdownMenuItem
 						key={ size }
 						prefix={
 							view.perPage === size && <Icon icon={ check } />
@@ -110,16 +124,16 @@ function PageSizeMenu( { view, onChangeView } ) {
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							onChangeView( { ...view, perPage: size, page: 0 } );
+							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 						// TODO: check about role and a11y.
 						role="menuitemcheckbox"
 					>
 						{ size }
-					</DropdownMenuItemV2>
+					</DropdownMenuItem>
 				);
 			} ) }
-		</DropdownSubMenuV2>
+		</DropdownSubMenu>
 	);
 }
 
@@ -131,18 +145,18 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 		return null;
 	}
 	return (
-		<DropdownSubMenuV2
+		<DropdownSubMenu
 			trigger={
-				<DropdownSubMenuTriggerV2
+				<DropdownSubMenuTrigger
 					suffix={ <Icon icon={ chevronRightSmall } /> }
 				>
 					{ __( 'Fields' ) }
-				</DropdownSubMenuTriggerV2>
+				</DropdownSubMenuTrigger>
 			}
 		>
 			{ hidableFields?.map( ( field ) => {
 				return (
-					<DropdownMenuItemV2
+					<DropdownMenuItem
 						key={ field.id }
 						prefix={
 							! view.hiddenFields?.includes( field.id ) && (
@@ -165,10 +179,10 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 						role="menuitemcheckbox"
 					>
 						{ field.header }
-					</DropdownMenuItemV2>
+					</DropdownMenuItem>
 				);
 			} ) }
-		</DropdownSubMenuV2>
+		</DropdownSubMenu>
 	);
 }
 
@@ -188,9 +202,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 		( field ) => field.id === view.sort?.field
 	);
 	return (
-		<DropdownSubMenuV2
+		<DropdownSubMenu
 			trigger={
-				<DropdownSubMenuTriggerV2
+				<DropdownSubMenuTrigger
 					suffix={
 						<>
 							{ currentSortedField?.header }
@@ -199,20 +213,20 @@ function SortMenu( { fields, view, onChangeView } ) {
 					}
 				>
 					{ __( 'Sort by' ) }
-				</DropdownSubMenuTriggerV2>
+				</DropdownSubMenuTrigger>
 			}
 		>
 			{ sortableFields?.map( ( field ) => {
 				const sortedDirection = view.sort?.direction;
 				return (
-					<DropdownSubMenuV2
+					<DropdownSubMenu
 						key={ field.id }
 						trigger={
-							<DropdownSubMenuTriggerV2
+							<DropdownSubMenuTrigger
 								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
 								{ field.header }
-							</DropdownSubMenuTriggerV2>
+							</DropdownSubMenuTrigger>
 						}
 						side="left"
 					>
@@ -223,7 +237,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
 								return (
-									<DropdownMenuItemV2
+									<DropdownMenuItem
 										key={ direction }
 										prefix={ <Icon icon={ info.icon } /> }
 										suffix={
@@ -250,30 +264,44 @@ function SortMenu( { fields, view, onChangeView } ) {
 										} }
 									>
 										{ info.label }
-									</DropdownMenuItemV2>
+									</DropdownMenuItem>
 								);
 							}
 						) }
-					</DropdownSubMenuV2>
+					</DropdownSubMenu>
 				);
 			} ) }
-		</DropdownSubMenuV2>
+		</DropdownSubMenu>
 	);
 }
 
-export default function ViewActions( { fields, view, onChangeView } ) {
+const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
+
+export default function ViewActions( {
+	fields,
+	view,
+	onChangeView,
+	supportedLayouts,
+} ) {
 	return (
-		<DropdownMenuV2
-			label={ __( 'Actions' ) }
+		<DropdownMenu
 			trigger={
-				<Button variant="tertiary" icon={ blockTable }>
-					{ __( 'View' ) }
-					<Icon icon={ chevronDown } />
-				</Button>
+				<Button
+					variant="tertiary"
+					size="compact"
+					icon={
+						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+					}
+					label={ __( 'View options' ) }
+				/>
 			}
 		>
-			<DropdownMenuGroupV2>
-				<ViewTypeMenu view={ view } onChangeView={ onChangeView } />
+			<DropdownMenuGroup>
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }
@@ -285,7 +313,7 @@ export default function ViewActions( { fields, view, onChangeView } ) {
 					onChangeView={ onChangeView }
 				/>
 				<PageSizeMenu view={ view } onChangeView={ onChangeView } />
-			</DropdownMenuGroupV2>
-		</DropdownMenuV2>
+			</DropdownMenuGroup>
+		</DropdownMenu>
 	);
 }
