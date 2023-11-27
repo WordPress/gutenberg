@@ -6,5 +6,5 @@
  * @return {string} The value with anchor tags removed.
  */
 export default function removeAnchorTag( value ) {
-	return value.replace( /<\/?a[^>]*>/g, '' );
+	return value.toString().replace( /<\/?a[^>]*>/g, '' );
 }
