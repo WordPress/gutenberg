@@ -11,7 +11,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { PAGE_CONTENT_BLOCK_TYPES } from '../../utils/constants';
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 function DisableBlock( { clientId } ) {
 	const isDescendentOfQueryLoop = useSelect(
@@ -46,9 +46,7 @@ export default function DisableNonPageContentBlocks() {
 	const clientIds = useSelect( ( select ) => {
 		const { __experimentalGetGlobalBlocksByName } =
 			select( blockEditorStore );
-		return __experimentalGetGlobalBlocksByName(
-			Object.keys( PAGE_CONTENT_BLOCK_TYPES )
-		);
+		return __experimentalGetGlobalBlocksByName( PAGE_CONTENT_BLOCK_TYPES );
 	}, [] );
 
 	return clientIds.map( ( clientId ) => {
