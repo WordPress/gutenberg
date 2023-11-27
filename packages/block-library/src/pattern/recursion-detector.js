@@ -32,29 +32,37 @@ export function parsePatternDependencies( { name, blocks } ) {
  * Declare that pattern `a` depends on pattern `b`. If a circular
  * dependency is detected, an error will be thrown.
  *
+ * Exported for testing purposes only.
+ *
  * @param {string} a Slug for pattern A.
  * @param {string} b Slug for pattern B.
  *
  * @throws {Error} If a circular dependency is detected.
  */
-function registerDependency( a, b ) {
+export function registerDependency( a, b ) {
 	if ( ! patternDependencies.has( a ) ) {
 		patternDependencies.set( a, new Set() );
 	}
 	patternDependencies.get( a ).add( b );
 
-	if ( hasCircularDependency( a ) ) {
+	if ( hasCycle( a ) ) {
 		throw new TypeError(
 			`Pattern ${ a } has a circular dependency and cannot be rendered.`
 		);
 	}
 }
 
-function hasCircularDependency(
-	slug,
-	visitedNodes = new Set(),
-	currentPath = new Set()
-) {
+/**
+ * Determine if a given pattern has circular dependencies on other patterns.
+ * This will be determined by running a depth-first search on the current state
+ * of the graph represented by `patternDependencies`.
+ *
+ * @param {string}      slug           Pattern slug.
+ * @param {Set<string>} [visitedNodes] Set to track visited nodes in the graph.
+ * @param {Set<string>} [currentPath]  Set to track and backtrack graph paths.
+ * @return {boolean}                   Whether any cycle was found.
+ */
+function hasCycle( slug, visitedNodes = new Set(), currentPath = new Set() ) {
 	visitedNodes.add( slug );
 	currentPath.add( slug );
 
@@ -62,9 +70,7 @@ function hasCircularDependency(
 
 	for ( const dependency of dependencies ) {
 		if ( ! visitedNodes.has( dependency ) ) {
-			if (
-				hasCircularDependency( dependency, visitedNodes, currentPath )
-			) {
+			if ( hasCycle( dependency, visitedNodes, currentPath ) ) {
 				return true;
 			}
 		} else if ( currentPath.has( dependency ) ) {
@@ -75,4 +81,11 @@ function hasCircularDependency(
 	// Remove the current node from the current path when backtracking
 	currentPath.delete( slug );
 	return false;
+}
+
+/**
+ * Exported for testing purposes only.
+ */
+export function clearPatternDependencies() {
+	patternDependencies.clear();
 }
