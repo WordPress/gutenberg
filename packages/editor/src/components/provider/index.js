@@ -150,61 +150,76 @@ function useBlockEditorProps( post, template, mode ) {
 	const postContentBlock =
 		extractPostContentBlockFromTemplateBlocks( templateBlocks );
 	const postContentLayout = usePostEditorLayout( postContentBlock );
-	const blocks = useMemo( () => {
-		if ( post.type === 'wp_navigation' ) {
-			return [
-				createBlock( 'core/navigation', {
-					ref: post.id,
-					// As the parent editor is locked with `templateLock`, the template locking
-					// must be explicitly "unset" on the block itself to allow the user to modify
-					// the block's content.
-					templateLock: false,
-				} ),
-			];
+
+	const maybeNavigationBlock = useMemo( () => {
+		if ( post.type !== 'wp_navigation' ) {
+			return undefined;
 		}
+		return [
+			createBlock( 'core/navigation', {
+				ref: post.id,
+				// As the parent editor is locked with `templateLock`, the template locking
+				// must be explicitly "unset" on the block itself to allow the user to modify
+				// the block's content.
+				templateLock: false,
+			} ),
+		];
+	}, [ post.type, post.id ] );
 
-		if ( mode === 'post-only' ) {
-			const postContentBlocks =
-				extractPageContentBlockTypesFromTemplateBlocks(
-					templateBlocks
-				);
-			const innerBlocks = postContentBlocks.length
-				? postContentBlocks
-				: [
-						createBlock( 'core/post-title' ),
-						createBlock( 'core/post-content' ),
-				  ];
-			const innerBlocksWithLayout = innerBlocks.map( ( block ) => {
-				if ( block.name === 'core/post-content' ) {
-					return createBlock( 'core/post-content', {
-						layout: postContentLayout,
-					} );
-				}
-				return createBlock(
-					'core/group',
-					{
-						layout: postContentLayout,
-					},
-					[ block ]
-				);
-			} );
+	const maybePostOnlyModeBlocks = useMemo( () => {
+		if ( mode !== 'post-only' ) {
+			return undefined;
+		}
+		const postContentBlocks =
+			extractPageContentBlockTypesFromTemplateBlocks( templateBlocks );
+		const innerBlocks = postContentBlocks.length
+			? postContentBlocks
+			: [
+					createBlock( 'core/post-title' ),
+					createBlock( 'core/post-content' ),
+			  ];
+		const innerBlocksWithLayout = innerBlocks.map( ( block ) => {
+			if ( block.name === 'core/post-content' ) {
+				return createBlock( 'core/post-content', {
+					layout: postContentLayout,
+				} );
+			}
+			return createBlock(
+				'core/group',
+				{
+					layout: postContentLayout,
+				},
+				[ block ]
+			);
+		} );
 
-			// This group block is only here to leave some space at the top of the canvas.
-			return [
-				createBlock(
-					'core/group',
-					{
-						style: {
-							spacing: {
-								margin: {
-									top: '4em',
-								},
+		// This group block is only here to leave some space at the top of the canvas.
+		return [
+			createBlock(
+				'core/group',
+				{
+					style: {
+						spacing: {
+							margin: {
+								top: '4em',
 							},
 						},
 					},
-					innerBlocksWithLayout
-				),
-			];
+				},
+				innerBlocksWithLayout
+			),
+		];
+	}, [ mode, templateBlocks, postContentLayout ] );
+
+	// It is important that we don't create a new instance of blocks on every change
+	// We should only create a new instance if the blocks them selves change, not a dependency of them.
+	const blocks = useMemo( () => {
+		if ( maybeNavigationBlock ) {
+			return maybeNavigationBlock;
+		}
+
+		if ( maybePostOnlyModeBlocks ) {
+			return maybePostOnlyModeBlocks;
 		}
 
 		if ( rootLevelPost === 'template' ) {
@@ -213,14 +228,13 @@ function useBlockEditorProps( post, template, mode ) {
 
 		return postBlocks;
 	}, [
-		postContentLayout,
-		templateBlocks,
-		postBlocks,
+		maybeNavigationBlock,
+		maybePostOnlyModeBlocks,
 		rootLevelPost,
-		post.type,
-		post.id,
-		mode,
+		postBlocks,
+		templateBlocks,
 	] );
+
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation' ||
