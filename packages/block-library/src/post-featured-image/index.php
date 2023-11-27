@@ -54,9 +54,26 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+
+	// Get the first image from the post.
+	if ( $attributes['useFirstImageFromPost'] && ! $featured_image ) {
+		$content_post = get_post( $post_ID );
+		$content = $content_post->post_content;
+		$processor = new WP_HTML_Tag_Processor( $content );
+		if ( $processor->next_tag( 'img' ) ) {
+			$tag_html = new WP_HTML_Tag_Processor( '<img>' );
+			$tag_html->next_tag();
+			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
+			}
+			$featured_image = $tag_html->get_updated_html();
+		}
+	}
+
 	if ( ! $featured_image ) {
 		return '';
 	}
+
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
