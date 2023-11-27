@@ -236,6 +236,7 @@ class Tests_Fonts_WPRESTFontLibraryController_InstallFonts extends WP_REST_Font_
 						'fontFamily' => 'Montserrat',
 						'slug'       => 'montserrat',
 						'name'       => 'Montserrat',
+						'badKey'     => 'badValue',
 						'fontFace'   => array(
 							array(
 								'fontFamily'   => 'Montserrat',

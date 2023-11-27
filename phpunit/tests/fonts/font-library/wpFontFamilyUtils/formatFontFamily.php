@@ -16,7 +16,7 @@ class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
 	 * @dataProvider data_should_format_font_family
 	 *
 	 * @param string $font_family   Font family.
-	 * @param string $expected  	Expected family.
+	 * @param string $expected      Expected family.
 	 */
 	public function test_should_format_font_family( $font_family, $expected ) {
 		$this->assertSame(
@@ -35,8 +35,8 @@ class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
 	public function data_should_format_font_family() {
 		return array(
 			'data' => array(
-				'font_family' => "Rock 3D , Open Sans, ,serif",
-				'expected' => "'Rock 3D', 'Open Sans', , serif",
+				'font_family' => 'Rock 3D , Open Sans, ,serif',
+				'expected'    => "'Rock 3D', 'Open Sans', , serif",
 			),
 		);
 	}
