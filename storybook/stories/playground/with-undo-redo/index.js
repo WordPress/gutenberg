@@ -41,9 +41,6 @@ export default function EditorWithUndoRedo() {
 				onChange={ ( blocks, { selection } ) =>
 					setValue( { blocks, selection }, false )
 				}
-				settings={ {
-					hasFixedToolbar: true,
-				} }
 			>
 				<div className="editor-with-undo-redo__toolbar">
 					<Button
@@ -58,9 +55,10 @@ export default function EditorWithUndoRedo() {
 						icon={ redoIcon }
 						label="Redo"
 					/>
-					<BlockTools />
 				</div>
-				<BlockCanvas height="100%" styles={ editorStyles } />
+				<BlockTools>
+					<BlockCanvas height="100%" styles={ editorStyles } />
+				</BlockTools>
 			</BlockEditorProvider>
 		</div>
 	);
