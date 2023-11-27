@@ -38,7 +38,7 @@ export default function useTitle( title ) {
 		if ( title && siteTitle ) {
 			// @see https://github.com/WordPress/wordpress-develop/blob/94849898192d271d533e09756007e176feb80697/src/wp-admin/admin-header.php#L67-L68
 			const formattedTitle = sprintf(
-				/* translators: Admin screen title. 1: Admin screen name, 2: Network or site name. */
+				/* translators: Admin document title. 1: Admin screen name, 2: Network or site name. */
 				__( '%1$s ‹ %2$s ‹ Editor — WordPress' ),
 				decodeEntities( title ),
 				decodeEntities( siteTitle )
