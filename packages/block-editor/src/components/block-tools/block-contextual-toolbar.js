@@ -92,6 +92,8 @@ export default function BlockContextualToolbar( {
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ selectedBlockClientId }
+			role="region"
+			tabIndex="-1"
 			{ ...props }
 		>
 			<BlockToolbar hideDragHandle={ isFixed } />
