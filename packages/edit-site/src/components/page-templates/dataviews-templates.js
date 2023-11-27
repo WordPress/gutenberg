@@ -192,7 +192,6 @@ export default function DataviewsTemplates() {
 					return <AuthorField item={ item } />;
 				},
 				enableHiding: false,
-				enableSorting: true,
 			},
 		],
 		[]

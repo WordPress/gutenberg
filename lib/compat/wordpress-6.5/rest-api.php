@@ -25,8 +25,8 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoin
  *
  * @access private
  * @internal
- * 
- * @param  array  $template_object Template object.
+ *
+ * @param  array $template_object Template object.
  * @return string                  Original source of the template one of theme, plugin, site, or user.
  */
 function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
@@ -38,17 +38,21 @@ function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
 		// or 'custom' source.
 		if ( $template_object['has_theme_file'] &&
 			( 'theme' === $template_object['origin'] || (
-				empty( $template_object['origin'] ) && in_array( $template_object['source'], array(
-					'theme',
-					'custom',
-				), true ) )
+				empty( $template_object['origin'] ) && in_array(
+					$template_object['source'],
+					array(
+						'theme',
+						'custom',
+					),
+					true
+				) )
 			)
 		) {
 			return 'theme';
 		}
 
 		// Added by plugin.
-		if ( $template_object['has_theme_file'] && $template_object['origin'] === 'plugin' ) {
+		if ( $template_object['has_theme_file'] && 'plugin' === $template_object['origin'] ) {
 			return 'plugin';
 		}
 
@@ -56,7 +60,7 @@ function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
 		// Template was created from scratch, but has no author. Author support
 		// was only added to templates in WordPress 5.9. Fallback to showing the
 		// site logo and title.
-		if ( empty( $template_object['has_theme_file'] ) && $template_object['source'] === 'custom' && empty( $template_object['author'] ) ) {
+		if ( empty( $template_object['has_theme_file'] ) && 'custom' === $template_object['source'] && empty( $template_object['author'] ) ) {
 			return 'site';
 		}
 	}
@@ -70,24 +74,24 @@ function _gutenberg_get_wp_templates_original_source_field( $template_object ) {
  *
  * @access private
  * @internal
- * 
- * @param  array  $template_object Template object.
+ *
+ * @param  array $template_object Template object.
  * @return string                  Human readable text for the author.
  */
 function _gutenberg_get_wp_templates_author_text_field( $template_object ) {
 	$original_source = _gutenberg_get_wp_templates_original_source_field( $template_object );
-	switch( $original_source ) {
+	switch ( $original_source ) {
 		case 'theme':
 			$theme_name = wp_get_theme( $template_object['theme'] )->get( 'Name' );
 			return empty( $theme_name ) ? $template_object['theme'] : $theme_name;
 		case 'plugin':
 			$plugins = get_plugins();
-			$plugin = $plugins[ plugin_basename( sanitize_text_field( $template_object['theme'] . '.php' ) ) ];
+			$plugin  = $plugins[ plugin_basename( sanitize_text_field( $template_object['theme'] . '.php' ) ) ];
 			return empty( $plugin['Name'] ) ? $template_object['theme'] : $plugin['Name'];
 		case 'site':
 			return get_bloginfo( 'name' );
 		case 'user':
-			get_user_by( 'id', $template_object['author'] )->get( 'display_name' );
+			return get_user_by( 'id', $template_object['author'] )->get( 'display_name' );
 	}
 }
 
@@ -104,7 +108,12 @@ function _gutenberg_register_wp_templates_additional_fields() {
 		array(
 			'get_callback'    => '_gutenberg_get_wp_templates_author_text_field',
 			'update_callback' => null,
-			'schema'          => null,
+			'schema'          => array(
+				'type'        => 'string',
+				'description' => __( 'Human readable text for the author.', 'gutenberg' ),
+				'readonly'    => true,
+				'context'     => array( 'view', 'edit', 'embed' ),
+			),
 		)
 	);
 
@@ -114,7 +123,18 @@ function _gutenberg_register_wp_templates_additional_fields() {
 		array(
 			'get_callback'    => '_gutenberg_get_wp_templates_original_source_field',
 			'update_callback' => null,
-			'schema'          => null,
+			'schema'          => array(
+				'description' => __( 'Where the template originally comes from e.g. \'theme\'', 'gutenberg' ),
+				'type'        => 'string',
+				'readonly'    => true,
+				'context'     => array( 'view', 'edit', 'embed' ),
+				'enum'        => array(
+					'theme',
+					'plugin',
+					'site',
+					'user',
+				),
+			),
 		)
 	);
 }
