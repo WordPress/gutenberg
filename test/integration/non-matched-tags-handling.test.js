@@ -30,7 +30,7 @@ describe( 'Handling of non matched tags in block transforms', () => {
 
 		expect( codeResult ).toHaveLength( 1 );
 		expect( codeResult[ 0 ].name ).toBe( 'core/code' );
-		expect( codeResult[ 0 ].attributes.content ).toBe( 'code' );
+		expect( codeResult[ 0 ].attributes.content.valueOf() ).toBe( 'code' );
 		expect( console ).toHaveLogged();
 	} );
 } );

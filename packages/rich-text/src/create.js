@@ -187,9 +187,15 @@ export class RichTextData {
 		// instance doesn't have any enumerable properties, it will be
 		// visualised as a string.
 		Object.defineProperty( this, RichTextInternalData, { value: init } );
+		Object.defineProperty( this, 'originalHTML', {
+			value: options.originalHTML,
+		} );
 	}
 	valueOf() {
-		return toHTMLString( { value: this[ RichTextInternalData ] } );
+		return (
+			this.originalHTML ||
+			toHTMLString( { value: this[ RichTextInternalData ] } )
+		);
 	}
 	toString() {
 		return this.valueOf();

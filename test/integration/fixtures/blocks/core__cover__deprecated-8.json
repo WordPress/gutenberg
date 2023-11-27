@@ -18,7 +18,7 @@
 				"isValid": true,
 				"attributes": {
 					"align": "center",
-					"content": "Guten Berg!",
+					"content": "\n                Guten Berg!\n        ",
 					"dropCap": false,
 					"placeholder": "Write title…",
 					"fontSize": "large"
