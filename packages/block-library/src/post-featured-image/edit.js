@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -64,13 +65,32 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		useFirstImageFromPost,
 	} = attributes;
-	const [ featuredImage, setFeaturedImage ] = useEntityProp(
+	let [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
+
+	// Fallback to post content if no featured image is set.
+	// This is needed for the "Use first image from post" option.
+	const [ postContent ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'content',
+		postId
+	);
+	const blocks = parse( postContent );
+	const imageBlock = blocks.find( ( block ) => block.name === 'core/image' );
+	if (
+		! featuredImage &&
+		useFirstImageFromPost &&
+		imageBlock?.attributes?.id
+	) {
+		featuredImage = imageBlock.attributes.id;
+	}
 
 	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
@@ -189,6 +209,16 @@ export default function PostFeaturedImageEdit( {
 							/>
 						</>
 					) }
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Use first image from post' ) }
+						onChange={ ( value ) =>
+							setAttributes( {
+								useFirstImageFromPost: value,
+							} )
+						}
+						checked={ useFirstImageFromPost }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
