@@ -171,7 +171,7 @@ function RevisionsButtons( {
 								</span>
 							) }
 						</Button>
-						{ isSelected && canApplyRevision && (
+						{ isSelected && (
 							<>
 								<p>
 									{ getRevisionChanges(
@@ -181,15 +181,22 @@ function RevisionsButtons( {
 											: {}
 									) }
 								</p>
-								<Button
-									variant="primary"
-									className="edit-site-global-styles-screen-revision__button"
-									onClick={ onSelect }
-								>
-									{ isReset
-										? __( 'Reset to defaults' )
-										: __( 'Apply' ) }
-								</Button>
+								{ canApplyRevision ? (
+									<Button
+										variant="primary"
+										className="edit-site-global-styles-screen-revision__button"
+										onClick={ onSelect }
+									>
+										{ isReset
+											? __( 'Reset to defaults' )
+											: __( 'Apply' ) }
+									</Button>
+								) : (
+									<p>
+										The revision is the same as the saved
+										state.
+									</p>
+								) }
 							</>
 						) }
 					</li>
