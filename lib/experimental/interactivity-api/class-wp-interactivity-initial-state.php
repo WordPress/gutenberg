@@ -2,15 +2,6 @@
 /**
  * WP_Interactivity_Initial_State class
  *
- * @package Gutenberg
- * @subpackage Interactivity API
- */
-
-if ( class_exists( 'WP_Interactivity_Initial_State' ) ) {
-	return;
-}
-
-/**
  * Manages the initial state of the Interactivity API store in the server and
  * its serialization so it can be restored in the browser upon hydration.
  *
@@ -28,28 +19,28 @@ class WP_Interactivity_Initial_State {
 	/**
 	 * Get state from a given namespace.
 	 *
-	 * @param string $store_ns Namespace.
+	 * @param string $namespace Namespace.
 	 *
 	 * @return array The requested state.
 	 */
-	public static function get_state( $store_ns = null ) {
-		if ( ! $store_ns ) {
+	public static function get_state( $namespace = null ) {
+		if ( ! $namespace ) {
 			return self::$initial_state;
 		}
-		return self::$initial_state[ $store_ns ] ?? array();
+		return self::$initial_state[ $namespace ] ?? array();
 	}
 
 	/**
 	 * Merge data into the state with the given namespace.
 	 *
-	 * @param string $store_ns Namespace.
+	 * @param string $namespace Namespace.
 	 * @param array  $data      State to merge.
 	 *
 	 * @return void
 	 */
-	public static function merge_state( $store_ns, $data ) {
-		self::$initial_state[ $store_ns ] = array_replace_recursive(
-			self::get_state( $store_ns ),
+	public static function merge_state( $namespace, $data ) {
+		self::$initial_state[ $namespace ] = array_replace_recursive(
+			self::get_state( $namespace ),
 			$data
 		);
 	}
