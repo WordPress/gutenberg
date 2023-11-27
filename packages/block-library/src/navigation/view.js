@@ -32,7 +32,7 @@ const { state, actions } = store( 'core/navigation', {
 					focusableElements[ focusableElements.length - 1 ];
 			}
 		},
-		focusFirstElementinitMenu() {
+		focusFirstElement() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
 				ref.querySelector(
