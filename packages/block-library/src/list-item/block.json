@@ -21,7 +21,7 @@
 	},
 	"supports": {
 		"className": false,
-		"__experimentalSelector": "li",
+		"__experimentalSelector": ".wp-block-list > li",
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
