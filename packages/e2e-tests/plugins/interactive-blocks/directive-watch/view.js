@@ -39,7 +39,7 @@
 				state.counter = state.counter + 1;
 			},
 		},
-		effects: {
+		callbacks: {
 			elementAddedToTheDOM: () => {
 				state.isElementInTheDOM = true;
 

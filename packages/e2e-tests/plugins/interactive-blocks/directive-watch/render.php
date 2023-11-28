@@ -10,7 +10,7 @@
 	<div data-wp-show-mock="state.isOpen">
 		<input
 			data-testid="input"
-			data-wp-watch="effects.elementAddedToTheDOM"
+			data-wp-watch="callbacks.elementAddedToTheDOM"
 		/>
 	</div>
 
@@ -19,11 +19,11 @@
 		data-testid="element in the DOM"
 	></div>
 
-	<div data-wp-watch="effects.changeFocus"></div>
+	<div data-wp-watch="callbacks.changeFocus"></div>
 
 	<div
 		data-testid="short-circuit infinite loops"
-		data-wp-watch="effects.infiniteLoop"
+		data-wp-watch="callbacks.infiniteLoop"
 		data-wp-text="state.counter"
 	>
 		0
