@@ -476,6 +476,7 @@ export default function useListViewDropZone( {
 			previousRootClientId !== target?.rootClientId
 		) {
 			throttledMaybeExpandBlock.cancel();
+			return;
 		}
 		throttledMaybeExpandBlock( expandedState, target );
 	}, [
