@@ -25,7 +25,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 // Entity based blocks which allow edit locking
-const ALLOWS_EDIT_LOCKING = [ 'core/block', 'core/navigation' ];
+const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
 
 function getTemplateLockValue( lock ) {
 	// Prevents all operations.
