@@ -347,7 +347,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     }
 
     func gutenbergDidRequestConnectionStatus() -> Bool {
-        return true;
+        return true
     }
 }
 
