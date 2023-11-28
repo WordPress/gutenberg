@@ -8,7 +8,7 @@ Ensuring proper attributes to the block wrapper is especially important when usi
 The use of <code>supports</code> generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data
 </div>
 
-A block can have three markups defined, each one of them with a specific target and purpose:
+A block can have three sets of markup defined, each one of them with a specific target and purpose:
 
 - The one for the **Block Editor**, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
 - The one used to **save the block in the DB**, defined through a `save` React component passed to `registerBlockType` when registering the block in the client. 
