@@ -238,19 +238,26 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 			'elements_with_css_var_value'                  => array(
 				'block_styles'    => array(
-					'color' => array(
+					'color'      => array(
 						'text' => 'var:preset|color|my-little-pony',
+					),
+					'typography' => array(
+						'fontSize'   => 'var:preset|font-size|cabbage-patch',
+						'fontFamily' => 'var:preset|font-family|transformers',
 					),
 				),
 				'options'         => array(
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'          => '.wp-selector{color:var(--wp--preset--color--my-little-pony);}',
+					'css'          => '.wp-selector{color:var(--wp--preset--color--my-little-pony);font-size:var(--wp--preset--font-size--cabbage-patch);font-family:var(--wp--preset--font-family--transformers);}',
 					'declarations' => array(
-						'color' => 'var(--wp--preset--color--my-little-pony)',
+						'color'       => 'var(--wp--preset--color--my-little-pony)',
+						'font-size'   => 'var(--wp--preset--font-size--cabbage-patch)',
+						'font-family' => 'var(--wp--preset--font-family--transformers)',
+
 					),
-					'classnames'   => 'has-text-color has-my-little-pony-color',
+					'classnames'   => 'has-text-color has-my-little-pony-color has-cabbage-patch-font-size has-transformers-font-family',
 				),
 			),
 

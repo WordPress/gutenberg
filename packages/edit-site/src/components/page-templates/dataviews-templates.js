@@ -97,7 +97,7 @@ function TemplateTitle( { item } ) {
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	return (
-		<HStack alignment="left">
+		<HStack alignment="left" spacing={ 1 }>
 			{ imageUrl ? (
 				<AvatarImage imageUrl={ imageUrl } />
 			) : (
@@ -142,57 +142,7 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
-	const { shownTemplates, paginationInfo } = useMemo( () => {
-		if ( ! allTemplates ) {
-			return {
-				shownTemplates: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredTemplates = [ ...allTemplates ];
-		// Handle global search.
-		if ( view.search ) {
-			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredTemplates = filteredTemplates.filter( ( item ) => {
-				const title = item.title?.rendered || item.slug;
-				return (
-					normalizeSearchInput( title ).includes(
-						normalizedSearch
-					) ||
-					normalizeSearchInput( item.description ).includes(
-						normalizedSearch
-					)
-				);
-			} );
-		}
-		// Handle sorting.
-		// TODO: Explore how this can be more dynamic..
-		if ( view.sort ) {
-			if ( view.sort.field === 'title' ) {
-				filteredTemplates.sort( ( a, b ) => {
-					const titleA = a.title?.rendered || a.slug;
-					const titleB = b.title?.rendered || b.slug;
-					return view.sort.direction === 'asc'
-						? titleA.localeCompare( titleB )
-						: titleB.localeCompare( titleA );
-				} );
-			}
-		}
-		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
-		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
-	}, [ allTemplates, view ] );
+
 	const fields = useMemo(
 		() => [
 			{
@@ -237,13 +187,74 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				render: ( { item } ) => <AuthorField item={ item } />,
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField item={ item } />;
+				},
 				enableHiding: false,
-				enableSorting: false,
 			},
 		],
 		[]
 	);
+
+	const { shownTemplates, paginationInfo } = useMemo( () => {
+		if ( ! allTemplates ) {
+			return {
+				shownTemplates: EMPTY_ARRAY,
+				paginationInfo: { totalItems: 0, totalPages: 0 },
+			};
+		}
+		let filteredTemplates = [ ...allTemplates ];
+		// Handle global search.
+		if ( view.search ) {
+			const normalizedSearch = normalizeSearchInput( view.search );
+			filteredTemplates = filteredTemplates.filter( ( item ) => {
+				const title = item.title?.rendered || item.slug;
+				return (
+					normalizeSearchInput( title ).includes(
+						normalizedSearch
+					) ||
+					normalizeSearchInput( item.description ).includes(
+						normalizedSearch
+					)
+				);
+			} );
+		}
+
+		// Handle sorting.
+		if ( view.sort ) {
+			const stringSortingFields = [ 'title', 'author' ];
+			const fieldId = view.sort.field;
+			if ( stringSortingFields.includes( fieldId ) ) {
+				const fieldToSort = fields.find( ( field ) => {
+					return field.id === fieldId;
+				} );
+				filteredTemplates.sort( ( a, b ) => {
+					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
+					return view.sort.direction === 'asc'
+						? valueA.localeCompare( valueB )
+						: valueB.localeCompare( valueA );
+				} );
+			}
+		}
+
+		// Handle pagination.
+		const start = ( view.page - 1 ) * view.perPage;
+		const totalItems = filteredTemplates?.length || 0;
+		filteredTemplates = filteredTemplates?.slice(
+			start,
+			start + view.perPage
+		);
+		return {
+			shownTemplates: filteredTemplates,
+			paginationInfo: {
+				totalItems,
+				totalPages: Math.ceil( totalItems / view.perPage ),
+			},
+		};
+	}, [ allTemplates, view, fields ] );
+
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
 		() => [

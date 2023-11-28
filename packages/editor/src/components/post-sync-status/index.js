@@ -113,7 +113,7 @@ export function PostSyncStatusModal() {
 									'Option that makes an individual pattern synchronized'
 								) }
 								help={ __(
-									'Editing the pattern will update it anywhere it is used.'
+									'Sync this pattern across multiple locations.'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {

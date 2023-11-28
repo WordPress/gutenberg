@@ -11,8 +11,6 @@ import {
 	editedPost,
 	blockInserterPanel,
 	listViewPanel,
-	hasPageContentFocus,
-	pageContentFocusType,
 } from '../reducer';
 
 import { setIsInserterOpened } from '../actions';
@@ -147,66 +145,6 @@ describe( 'state', () => {
 			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
 				true
 			);
-		} );
-	} );
-
-	describe( 'hasPageContentFocus()', () => {
-		it( 'defaults to false', () => {
-			expect( hasPageContentFocus( undefined, {} ) ).toBe( false );
-		} );
-
-		it( 'becomes false when editing a template', () => {
-			expect(
-				hasPageContentFocus( true, {
-					type: 'SET_EDITED_POST',
-					postType: 'wp_template',
-				} )
-			).toBe( false );
-		} );
-
-		it( 'becomes true when editing a page', () => {
-			expect(
-				hasPageContentFocus( false, {
-					type: 'SET_EDITED_POST',
-					postType: 'wp_template',
-					context: {
-						postType: 'page',
-						postId: 123,
-					},
-				} )
-			).toBe( true );
-		} );
-
-		it( 'can be set', () => {
-			expect(
-				hasPageContentFocus( false, {
-					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
-					hasPageContentFocus: true,
-				} )
-			).toBe( true );
-			expect(
-				hasPageContentFocus( true, {
-					type: 'SET_HAS_PAGE_CONTENT_FOCUS',
-					hasPageContentFocus: false,
-				} )
-			).toBe( false );
-		} );
-	} );
-
-	describe( 'pageContentFocusType', () => {
-		it( 'defaults to disableTemplate', () => {
-			expect( pageContentFocusType( undefined, {} ) ).toBe(
-				'disableTemplate'
-			);
-		} );
-
-		it( 'can be set', () => {
-			expect(
-				pageContentFocusType( 'disableTemplate', {
-					type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
-					pageContentFocusType: 'enableTemplate',
-				} )
-			).toBe( 'enableTemplate' );
 		} );
 	} );
 } );

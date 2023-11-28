@@ -801,6 +801,26 @@ export const getRevisions =
 			false,
 			meta
 		);
+
+		// When requesting all fields, the list of results can be used to
+		// resolve the `getRevision` selector in addition to `getRevisions`.
+		if ( ! query?._fields && ! query.context ) {
+			const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+			const resolutionsArgs = records
+				.filter( ( record ) => record[ key ] )
+				.map( ( record ) => [ kind, name, recordKey, record[ key ] ] );
+
+			dispatch( {
+				type: 'START_RESOLUTIONS',
+				selectorName: 'getRevision',
+				args: resolutionsArgs,
+			} );
+			dispatch( {
+				type: 'FINISH_RESOLUTIONS',
+				selectorName: 'getRevision',
+				args: resolutionsArgs,
+			} );
+		}
 	};
 
 // Invalidate cache when a new revision is created.
@@ -823,7 +843,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
  *                                       fields, fields must always include the ID.
  */
 export const getRevision =
-	( kind, name, recordKey, revisionKey, query = {} ) =>
+	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
 		const entityConfig = configs.find(
