@@ -79,16 +79,6 @@ export default () => {
 		} );
 	} );
 
-	// data-wp-layout-init--[name]
-	directive(
-		'layout-init',
-		( { directives: { 'layout-init': layoutInit }, evaluate } ) => {
-			layoutInit.forEach( ( entry ) => {
-				useLayoutEffect( () => evaluate( entry ), [] );
-			} );
-		}
-	);
-
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
