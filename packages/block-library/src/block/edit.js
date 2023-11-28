@@ -30,7 +30,6 @@ import {
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
-	useBlockEditingMode,
 	BlockControls,
 	store as editorStore,
 } from '@wordpress/block-editor';
@@ -106,7 +105,6 @@ export default function ReusableBlockEdit( {
 		},
 		[ postId, ref ]
 	);
-	useBlockEditingMode( 'disabled' );
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',

@@ -141,9 +141,8 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
-	const isSyncedUserPattern = blockType?.name === 'core/block';
 
-	if ( blockEditingMode === 'disabled' && ! isSyncedUserPattern ) {
+	if ( blockEditingMode === 'disabled' ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -217,8 +216,7 @@ function BlockListBlock( {
 		clientId,
 		className: classnames(
 			{
-				'is-editing-disabled':
-					blockEditingMode === 'disabled' && ! isSyncedUserPattern,
+				'is-editing-disabled': blockEditingMode === 'disabled',
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

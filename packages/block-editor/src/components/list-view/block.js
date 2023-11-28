@@ -89,7 +89,7 @@ function ListViewBlock( {
 		// List View respects this by also hiding the block settings menu.
 		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
 		// Don't show the settings menu if block is disabled or content only.
-		( blockEditingMode === 'default' || blockName === 'core/block' );
+		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(

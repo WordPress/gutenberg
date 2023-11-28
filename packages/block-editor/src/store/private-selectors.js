@@ -10,7 +10,6 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
-	getBlockName,
 } from './selectors';
 
 /**
@@ -78,10 +77,7 @@ export const isBlockSubtreeDisabled = createSelector(
 export const getEnabledClientIdsTree = createSelector(
 	( state, rootClientId = '' ) => {
 		return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
-			if (
-				getBlockEditingMode( state, clientId ) !== 'disabled' ||
-				getBlockName( state, clientId ) === 'core/block'
-			) {
+			if ( getBlockEditingMode( state, clientId ) !== 'disabled' ) {
 				return [
 					{
 						clientId,
