@@ -33,8 +33,8 @@ import {
 	BlockControls,
 	store as editorStore,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -44,6 +44,15 @@ import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
+
+function isPartiallySynced( block ) {
+	return (
+		!! block.attributes.connections?.attributes &&
+		Object.values( block.attributes.connections.attributes ).some(
+			( connection ) => connection.source === 'pattern_attributes'
+		)
+	);
+}
 
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
@@ -79,12 +88,14 @@ export default function ReusableBlockEdit( {
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
 	context: { postId },
+	clientId: patternClientId,
 } ) {
-	const editUrl = useSelect(
+	const { setBlockEditingMode } = useDispatch( editorStore );
+	const { editUrl, innerBlocks } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getSettings } = select( editorStore );
-
+			const { getSettings, getBlocks } = select( editorStore );
+			const blocks = getBlocks( patternClientId );
 			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
 			const defaultUrl = addQueryArgs( 'post.php', {
 				action: 'edit',
@@ -99,12 +110,26 @@ export default function ReusableBlockEdit( {
 			} );
 
 			// For editing link to the site editor if the theme and user permissions support it.
-			return canUser( 'read', 'templates' ) && isBlockTheme
-				? siteEditorUrl
-				: defaultUrl;
+			return {
+				innerBlocks: blocks,
+				editUrl:
+					canUser( 'read', 'templates' ) && isBlockTheme
+						? siteEditorUrl
+						: defaultUrl,
+			};
 		},
-		[ postId, ref ]
+		[ patternClientId, postId, ref ]
 	);
+
+	useEffect( () => {
+		innerBlocks.forEach( ( block ) => {
+			const editMode = isPartiallySynced( block )
+				? 'contentOnly'
+				: 'disabled';
+			setBlockEditingMode( block.clientId, editMode );
+		} );
+	}, [ innerBlocks, setBlockEditingMode ] );
+
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
