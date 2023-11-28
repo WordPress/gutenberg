@@ -85,9 +85,31 @@ function render_block_core_search( $attributes, $content, $block ) {
 			// Adding these attributes manually is needed until the Interactivity API SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
+		}
 
-			// Load the module.
-			gutenberg_enqueue_module( '@wordpress/block-library/search-block' );
+		$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+		$script_handles      = $block->block_type->view_script_handles;
+		$view_js_file        = 'wp-block-search-view';
+
+		if ( $is_gutenberg_plugin ) {
+			if ( $is_expandable_searchfield ) {
+				gutenberg_enqueue_module( '@wordpress/block-library/search-block' );
+			}
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		} else {
+			// If the script already exists, there is no point in removing it from viewScript.
+			if ( ! wp_script_is( $view_js_file ) ) {
+
+				// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+				if ( ! $is_expandable_searchfield && in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+				}
+				// If the script is needed, but it was previously removed, add it again.
+				if ( $is_expandable_searchfield && ! in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+				}
+			}
 		}
 	}
 
