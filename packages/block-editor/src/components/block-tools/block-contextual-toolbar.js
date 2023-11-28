@@ -68,7 +68,6 @@ export default function BlockContextualToolbar( {
 		blockType &&
 		hasBlockSupport( blockType, '__experimentalToolbar', true );
 	const hasAnyBlockControls = useHasAnyBlockControls();
-
 	if (
 		! isToolbarEnabled ||
 		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
