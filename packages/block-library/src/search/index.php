@@ -194,7 +194,7 @@ function register_block_core_search() {
 
 	gutenberg_register_module(
 		'@wordpress/block-library/search-block',
-		'/wp-content/plugins/gutenberg/build/interactivity/search.min.js',
+		gutenberg_url( '/build/interactivity/search.min.js' ),
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
