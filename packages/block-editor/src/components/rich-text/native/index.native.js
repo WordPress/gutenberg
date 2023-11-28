@@ -657,7 +657,7 @@ export class RichText extends Component {
 	 * @param {Object} prevProps - The previous props of the component.
 	 * @return {boolean} True if the text input should receive focus, false otherwise.
 	 */
-	shouldFocusTextInputAfterUpdate( prevProps ) {
+	shouldFocusTextInputAfterMerge( prevProps ) {
 		const {
 			__unstableIsSelected: isSelected,
 			blockIsSelected,
@@ -888,7 +888,7 @@ export class RichText extends Component {
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
 			);
-		} else if ( this.shouldFocusTextInputAfterUpdate( prevProps ) ) {
+		} else if ( this.shouldFocusTextInputAfterMerge( prevProps ) ) {
 			// Since this is happening when merging blocks, the selection should be at the last character position.
 			// As a fallback the internal selectionEnd value is used.
 			const lastCharacterPosition =
