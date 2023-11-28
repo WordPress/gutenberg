@@ -40,7 +40,9 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+	blockEditorPrivateApis
+);
 
 const EMPTY_ARRAY = [];
 
@@ -114,6 +116,7 @@ function AuthorField( { item } ) {
 
 function TemplatePreview( { content, viewType } ) {
 	const settings = usePatternSettings();
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
 		return parse( content );
 	}, [ content ] );
@@ -131,6 +134,7 @@ function TemplatePreview( { content, viewType } ) {
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+				style={ { backgroundColor } }
 			>
 				<BlockPreview blocks={ blocks } />
 			</div>
@@ -174,10 +178,7 @@ export default function DataviewsTemplates() {
 				header: __( 'Description' ),
 				id: 'description',
 				getValue: ( { item } ) => item.description,
-				render: ( { item, view: _view } ) => {
-					if ( _view.type === 'grid' && ! item.description ) {
-						return null;
-					}
+				render: ( { item } ) => {
 					return item.description ? (
 						decodeEntities( item.description )
 					) : (
