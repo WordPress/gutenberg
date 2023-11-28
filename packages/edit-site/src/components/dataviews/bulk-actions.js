@@ -5,11 +5,14 @@ import {
 	ToolbarButton,
 	Toolbar,
 	ToolbarGroup,
-	ToolbarItem,
 	Popover,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import { ActionWithModal } from './item-actions';
 
 function PrimaryActionTrigger( { action, onClick } ) {
 	return (
@@ -28,22 +31,34 @@ const EMPTY_ARRAY = [];
 export default function BulkActions( {
 	data,
 	selection,
-	bulkActions = EMPTY_ARRAY,
+	actions = EMPTY_ARRAY,
 	setSelection,
 } ) {
+	const items = useMemo(
+		() =>
+			data?.filter( ( item ) => selection?.includes( item.id ) ) ??
+			EMPTY_ARRAY,
+		[ data, selection ]
+	);
 	const primaryActions = useMemo(
 		() =>
-			bulkActions.filter( ( action ) => {
-				return action.isPrimary && action.isEligible( data, selection );
+			actions.filter( ( action ) => {
+				return (
+					action.isBulk &&
+					action.isPrimary &&
+					items.every( ( item ) => action.isEligible( item ) )
+				);
 			} ),
-		[ bulkActions, data, selection ]
+		[ actions, items ]
 	);
+
 	if (
 		( selection && selection.length === 0 ) ||
 		primaryActions.length === 0
 	) {
 		return null;
 	}
+
 	return (
 		<Popover
 			placement="top-middle"
@@ -76,13 +91,21 @@ export default function BulkActions( {
 					</ToolbarGroup>
 					<ToolbarGroup>
 						{ primaryActions.map( ( action ) => {
+							if ( !! action.RenderModal ) {
+								return (
+									<ActionWithModal
+										key={ action.id }
+										action={ action }
+										items={ items }
+										ActionTrigger={ PrimaryActionTrigger }
+									/>
+								);
+							}
 							return (
 								<PrimaryActionTrigger
 									key={ action.id }
 									action={ action }
-									onClick={ () =>
-										action.callback( data, selection )
-									}
+									onClick={ () => action.callback( items ) }
 								/>
 							);
 						} ) }

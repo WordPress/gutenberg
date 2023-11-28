@@ -2,28 +2,18 @@
  * WordPress dependencies
  */
 import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 	Button,
 	Modal,
 	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
-
-function ButtonTrigger( { action, onClick } ) {
+export function PrimaryActionTrigger( { action, onClick } ) {
 	return (
 		<Button
 			label={ action.label }
@@ -35,20 +25,26 @@ function ButtonTrigger( { action, onClick } ) {
 	);
 }
 
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function SecondaryActionTrigger( { action, onClick } ) {
 	return (
-		<DropdownMenuItem onClick={ onClick }>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
-		</DropdownMenuItem>
+		<MenuItem onClick={ onClick } isDestructive={ action.isDestructive }>
+			{ action.label }
+		</MenuItem>
 	);
 }
 
-function ActionWithModal( { action, item, ActionTrigger } ) {
+export function ActionWithModal( { action, item, items, ActionTrigger } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
 	};
+	const additionalProps = {};
+	if ( action.isBulk ) {
+		additionalProps.items = items ? items : [ item ];
+	} else {
+		additionalProps.item = item;
+	}
 	const { RenderModal, hideModalHeader } = action;
 	return (
 		<>
@@ -63,7 +59,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					overlayClassName="dataviews-action-modal"
 				>
 					<RenderModal
-						item={ item }
+						{ ...additionalProps }
 						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				</Modal>
@@ -72,33 +68,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-function ActionsDropdownMenuGroup( { actions, item } ) {
-	return (
-		<DropdownMenuGroup>
-			{ actions.map( ( action ) => {
-				if ( !! action.RenderModal ) {
-					return (
-						<ActionWithModal
-							key={ action.id }
-							action={ action }
-							item={ item }
-							ActionTrigger={ DropdownMenuItemTrigger }
-						/>
-					);
-				}
-				return (
-					<DropdownMenuItemTrigger
-						key={ action.id }
-						action={ action }
-						onClick={ () => action.callback( item ) }
-					/>
-				);
-			} ) }
-		</DropdownMenuGroup>
-	);
-}
-
-export default function ItemActions( { item, actions, isCompact } ) {
+export default function ItemActions( { item, actions } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
 			( accumulator, action ) => {
@@ -120,15 +90,6 @@ export default function ItemActions( { item, actions, isCompact } ) {
 	if ( ! primaryActions.length && ! secondaryActions.length ) {
 		return null;
 	}
-	if ( isCompact ) {
-		return (
-			<CompactItemActions
-				item={ item }
-				primaryActions={ primaryActions }
-				secondaryActions={ secondaryActions }
-			/>
-		);
-	}
 	return (
 		<HStack justify="flex-end">
 			{ !! primaryActions.length &&
@@ -139,63 +100,55 @@ export default function ItemActions( { item, actions, isCompact } ) {
 								key={ action.id }
 								action={ action }
 								item={ item }
-								ActionTrigger={ ButtonTrigger }
+								ActionTrigger={ PrimaryActionTrigger }
 							/>
 						);
 					}
 					return (
-						<ButtonTrigger
+						<PrimaryActionTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( item ) }
+							item={ item }
+							onClick={
+								action.isBulk
+									? () => action.callback( [ item ] )
+									: () => action.callback( item )
+							}
 						/>
 					);
 				} ) }
 			{ !! secondaryActions.length && (
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						/>
-					}
-					placement="bottom-end"
-				>
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
+				<DropdownMenu icon={ moreVertical } label={ __( 'Actions' ) }>
+					{ () => (
+						<MenuGroup>
+							{ secondaryActions.map( ( action ) => {
+								if ( !! action.RenderModal ) {
+									return (
+										<ActionWithModal
+											key={ action.id }
+											action={ action }
+											item={ item }
+											ActionTrigger={
+												SecondaryActionTrigger
+											}
+										/>
+									);
+								}
+								return (
+									<SecondaryActionTrigger
+										key={ action.id }
+										action={ action }
+										item={ item }
+										onClick={ () =>
+											action.callback( item )
+										}
+									/>
+								);
+							} ) }
+						</MenuGroup>
+					) }
 				</DropdownMenu>
 			) }
 		</HStack>
-	);
-}
-
-function CompactItemActions( { item, primaryActions, secondaryActions } ) {
-	return (
-		<DropdownMenu
-			trigger={
-				<Button
-					size="compact"
-					icon={ moreVertical }
-					label={ __( 'Actions' ) }
-				/>
-			}
-			placement="bottom-end"
-		>
-			{ !! primaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ primaryActions }
-					item={ item }
-				/>
-			) }
-			{ !! secondaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ secondaryActions }
-					item={ item }
-				/>
-			) }
-		</DropdownMenu>
 	);
 }

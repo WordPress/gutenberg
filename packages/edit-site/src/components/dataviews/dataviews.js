@@ -4,7 +4,6 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	Popover,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
@@ -49,7 +48,6 @@ export default function DataViews( {
 	supportedLayouts,
 	selection,
 	setSelection,
-	bulkActions,
 } ) {
 	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
@@ -99,14 +97,14 @@ export default function DataViews( {
 				/>
 
 				<div>
-				<Pagination
-					view={ view }
-					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
-				/>
+					<Pagination
+						view={ view }
+						onChangeView={ onChangeView }
+						paginationInfo={ paginationInfo }
+					/>
 					<BulkActions
 						data={ data }
-						bulkActions={ bulkActions }
+						actions={ actions }
 						selection={ selection }
 						setSelection={ setSelection }
 					/>

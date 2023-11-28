@@ -28,7 +28,6 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import { useBulkTrashPostAction } from '../bulk-actions';
 import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
@@ -279,8 +278,6 @@ export default function PagePages() {
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
 
-	const bulkTrashPostAction = useBulkTrashPostAction();
-
 	const actions = useMemo(
 		() => [
 			viewPostAction,
@@ -293,10 +290,6 @@ export default function PagePages() {
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 
-	const bulkActions = useMemo(
-		() => [ bulkTrashPostAction ],
-		[ bulkTrashPostAction ]
-	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			let updatedView =
@@ -325,7 +318,6 @@ export default function PagePages() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					bulkActions={ bulkActions }
 					data={ pages || EMPTY_ARRAY }
 					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
