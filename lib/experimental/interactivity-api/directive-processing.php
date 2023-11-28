@@ -7,8 +7,6 @@
  * @subpackage Interactivity API
  */
 
-global $children_of_interactive_block;
-$children_of_interactive_block = array();
 /**
  * Mark if the block is a root block. Checks that there is already a root block
  * in order not to mark template-parts or synced patterns as root blocks, where
@@ -88,36 +86,32 @@ add_filter( 'render_block_data', 'gutenberg_mark_interactive_block_children', 10
  */
 function gutenberg_mark_block_interactivity( $block_content, $block, $block_instance ) {
 	if (
-			isset( $block_instance->block_type->supports['interactivity'] ) &&
-			$block_instance->block_type->supports['interactivity']
-		) {
+		isset( $block_instance->block_type->supports['interactivity'] ) &&
+		$block_instance->block_type->supports['interactivity']
+	) {
 		// Mark interactive blocks so we can process them later.
-		/**
-		 * Debugging purposes only. Nested comments are not allowed.
-		 * We wrap a hidden textarea to save the block content delimited
-		 * by comments so we can later process it.
-		 */
-		return sprintf(
-			'<div data-wp-delimiter="interactivity-wrapper-start" style="display:none"></div>%s<div data-wp-delimiter="interactivity-wrapper-end" style="display:none"></div>',
+		return get_comment_delimited_block_content(
+			'core/interactivity-wrapper',
+			array(
+				'blockName' => $block['blockName'],
+			// We can put extra information about the block here.
+			),
 			$block_content
 		);
 	} elseif ( WP_Directive_Processor::is_marked_as_children_of_interactive_block( $block ) ) {
+		WP_Directive_Processor::unmark_children_of_interactive_block( $block );
 		// Mark children of interactive blocks that are not interactive themselves
 		// to so we can skip them later.
-		WP_Directive_Processor::unmark_children_of_interactive_block();
-
-		/**
-		 * Debugging purposes only. Nested comments are not allowed.
-		 * We wrap a hidden textarea to save the block content delimited
-		 * by comments so we can later process it.
-		 */
-		return sprintf(
-			'<div data-wp-delimiter="non-interactivity-wrapper-start" style="display:none"></div>%s<div data-wp-delimiter="non-interactivity-wrapper-end" style="display:none"></div>',
+		return get_comment_delimited_block_content(
+			'core/non-interactivity-wrapper',
+			array(
+				'blockName' => $block['blockName'],
+				// We can put extra information about the block here.
+			),
 			$block_content
 		);
 	}
-
-		return $block_content;
+	return $block_content;
 }
 
 add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
@@ -141,10 +135,9 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	 * passed context) using the subsequent path should be negated.
 	 */
 	$should_negate_value = '!' === $path[0];
-
-	$path          = $should_negate_value ? substr( $path, 1 ) : $path;
-	$path_segments = explode( '.', $path );
-	$current       = $store;
+	$path                = $should_negate_value ? substr( $path, 1 ) : $path;
+	$path_segments       = explode( '.', $path );
+	$current             = $store;
 	foreach ( $path_segments as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
