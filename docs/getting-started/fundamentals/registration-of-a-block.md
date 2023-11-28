@@ -78,15 +78,15 @@ The client-side block settings object passed as a second parameter include two p
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
 import metadata from './block.json';
 
+const Edit = () => <p { ...useBlockProps() }>Hello World - Block Editor</p>;
+const save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
+
 registerBlockType( metadata.name, {
-	edit() {
-		return <p>Hello World - Block Editor</p>;
-	},
-	save() {
-		return <p>Hello World - Frontend</p>;
-	},
+	edit: Edit,
+	save,
 } );
 ```
 _See the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)_
