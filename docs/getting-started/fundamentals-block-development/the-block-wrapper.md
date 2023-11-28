@@ -105,7 +105,15 @@ _(check the [example](https://github.com/WordPress/block-development-examples/tr
 
 ## The server-side render markup
 
-Any server-side render definition for the block via the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
+Any server-side render definition for the block can use the the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
+
+```php
+<p <?php echo get_block_wrapper_attributes(); ?>>
+	<?php esc_html_e( 'Block with Dynamic Rendering – hello!!!', '01-block-dynamic' ); ?>
+</p>
+```
+
+The `render.php` file (or any other file defined in the `render` property of `block.json`) defines the server side process that returns the markup for the block when there is a request from the frontend. If this file is defined, it will take precedence over any other ways to render the block's markup for the frontend.
 
 in the same way that `useBlockProps.save()` adds to the markup stored in the DB (and that potentially can also be returned to the front end )
 
