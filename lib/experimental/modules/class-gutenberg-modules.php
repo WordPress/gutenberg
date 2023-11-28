@@ -66,7 +66,7 @@ class Gutenberg_Modules {
 	/**
 	 * Returns the import map array.
 	 *
-	 * @return string The import map.
+	 * @return array Associative array with 'imports' key mapping to an array of module identifiers and their respective source strings.
 	 */
 	public static function get_import_map() {
 		$imports = array();
