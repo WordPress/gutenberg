@@ -103,10 +103,7 @@ _Example: Supports as defined in block.json_
 }
 ```
 
-The use of `supports` generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data:
-- in the `Edit` component via the `useBlockProps()` hook (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js#L106))
-- in the `Save` component via the `useBlockProps.save()` hook (see [example](https://github.com/WordPress/block-development-examples/blob/e804d8416775de94fccae27be6f26ae0ae75b3d9/plugins/copyright-date-block-09aac3/src/save.js#L40)) 
-- in any server-side render definition for the block via the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
+The use of `supports` generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data.
 
 _Example: Supports custom settings stored in the Markup representation of the block_
 
