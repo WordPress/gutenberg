@@ -99,12 +99,13 @@ export default function ReusableBlockEdit( {
 	clientId: patternClientId,
 } ) {
 	const { setBlockEditingMode } = useDispatch( editorStore );
-	const { editUrl, innerBlocks } = useSelect(
+	const { editUrl, innerBlocks, userCanEdit } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
 			const { getSettings, getBlocks } = select( editorStore );
 			const blocks = getBlocks( patternClientId );
 			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
+			const canEdit = canUser( 'update', 'blocks', ref );
 			const defaultUrl = addQueryArgs( 'post.php', {
 				action: 'edit',
 				post: ref,
@@ -124,6 +125,7 @@ export default function ReusableBlockEdit( {
 					canUser( 'read', 'templates' ) && isBlockTheme
 						? siteEditorUrl
 						: defaultUrl,
+				userCanEdit: canEdit,
 			};
 		},
 		[ patternClientId, postId, ref ]
@@ -141,6 +143,7 @@ export default function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
+
 	const isMissing = hasResolved && ! record;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -204,13 +207,15 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton href={ editUrl }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
+			{ userCanEdit && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton href={ editUrl }>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
