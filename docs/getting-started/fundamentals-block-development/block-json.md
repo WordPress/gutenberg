@@ -46,7 +46,7 @@ The `render` property ([introduced on WordPress 6.1](https://make.wordpress.org/
 
 The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) allows a block to declare "variables" that store data or content for the block.
 
-_Example: Atributes as defined in block.json_
+_Example: Attributes as defined in block.json_
 ```json
 "attributes": {
 	"fallbackCurrentYear": {
