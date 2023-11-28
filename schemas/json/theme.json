@@ -301,7 +301,7 @@
 							"type": "boolean",
 							"default": true
 						},
-						"allowCustomContentSize": {
+						"allowCustomContentAndWideSize": {
 							"description": "Enable or disable the custom content and wide size controls.",
 							"type": "boolean",
 							"default": true

@@ -36,8 +36,10 @@ export default {
 		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
-		const { allowJustification = true, allowCustomContentSize = true } =
-			layoutBlockSupport;
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -67,7 +69,7 @@ export default {
 		} );
 		return (
 			<>
-				{ allowCustomContentSize && (
+				{ allowCustomContentAndWideSize && (
 					<>
 						<div className="block-editor-hooks__layout-controls">
 							<div className="block-editor-hooks__layout-controls-unit">
