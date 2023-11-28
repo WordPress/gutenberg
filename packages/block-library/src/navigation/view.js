@@ -19,28 +19,6 @@ const focusableSelectors = [
 document.addEventListener( 'click', () => {} );
 
 const { state, actions } = store( 'core/navigation', {
-	callbacks: {
-		initMenu() {
-			const ctx = getContext();
-			const { ref } = getElement();
-			if ( state.isMenuOpen ) {
-				const focusableElements =
-					ref.querySelectorAll( focusableSelectors );
-				ctx.modal = ref;
-				ctx.firstFocusableElement = focusableElements[ 0 ];
-				ctx.lastFocusableElement =
-					focusableElements[ focusableElements.length - 1 ];
-			}
-		},
-		focusFirstElement() {
-			const { ref } = getElement();
-			if ( state.isMenuOpen ) {
-				ref.querySelector(
-					'.wp-block-navigation-item > *:first-child'
-				).focus();
-			}
-		},
-	},
 	state: {
 		get roleAttribute() {
 			const ctx = getContext();
@@ -183,6 +161,28 @@ const { state, actions } = store( 'core/navigation', {
 						'has-modal-open'
 					);
 				}
+			}
+		},
+	},
+	callbacks: {
+		initMenu() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			if ( state.isMenuOpen ) {
+				const focusableElements =
+					ref.querySelectorAll( focusableSelectors );
+				ctx.modal = ref;
+				ctx.firstFocusableElement = focusableElements[ 0 ];
+				ctx.lastFocusableElement =
+					focusableElements[ focusableElements.length - 1 ];
+			}
+		},
+		focusFirstElement() {
+			const { ref } = getElement();
+			if ( state.isMenuOpen ) {
+				ref.querySelector(
+					'.wp-block-navigation-item > *:first-child'
+				).focus();
 			}
 		},
 	},
