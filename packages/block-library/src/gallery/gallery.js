@@ -55,7 +55,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				showToolbarButton={ ! isContentLocked }
-				className="blocks-gallery-item__caption"
+				className="blocks-gallery-caption"
 			/>
 		</figure>
 	);
