@@ -55,7 +55,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 			gutenberg_enqueue_module( '@wordpress/block-library/image' );
 			// Remove the view script because we are using the module.
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
-		} elseif ( ! $is_gutenberg_plugin && ! in_array( $view_js_file_handle, $script_handles, true ) ) {
+		} elseif ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
 		}
 
