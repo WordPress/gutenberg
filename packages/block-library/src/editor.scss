@@ -65,7 +65,7 @@
 
 // This CSS Custom Properties aren't used anymore as defaults,
 // but we still need to keep them for backward compatibility.
-.editor-styles-wrapper {
+:where(.editor-styles-wrapper) {
 	--wp--preset--font-size--normal: 16px;
 	--wp--preset--font-size--huge: 42px;
 }
@@ -74,19 +74,19 @@
 //
 // The reason we add the editor class wrapper here is
 // to avoid enqueing the classes twice: here and in ./editor.scss
-.editor-styles-wrapper .has-regular-font-size {
+:where(.editor-styles-wrapper) .has-regular-font-size {
 	font-size: 16px;
 }
 
-.editor-styles-wrapper .has-larger-font-size {
+:where(.editor-styles-wrapper) .has-larger-font-size {
 	font-size: 42px;
 }
 
-.editor-styles-wrapper .has-normal-font-size {
+:where(.editor-styles-wrapper) .has-normal-font-size {
 	font-size: var(--wp--preset--font-size--normal);
 }
 
-.editor-styles-wrapper .has-huge-font-size {
+:where(.editor-styles-wrapper) .has-huge-font-size {
 	font-size: var(--wp--preset--font-size--huge);
 }
 
@@ -98,6 +98,6 @@
  */
 
 // Remove the browser default border for iframe in Custom HTML block, Embed block, etc.
-.editor-styles-wrapper iframe:not([frameborder]) {
+:where(.editor-styles-wrapper) iframe:not([frameborder]) {
 	border: 0;
 }

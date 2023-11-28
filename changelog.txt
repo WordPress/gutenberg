@@ -1,5 +1,17 @@
 == Changelog ==
 
+= 17.1.3 =
+
+
+## Changelog
+
+### Bug fixes
+
+#### Components
+- https://github.com/WordPress/gutenberg/pull/56570
+
+
+
 = 17.1.2 =
 
 ## Changelog

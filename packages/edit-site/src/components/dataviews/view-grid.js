@@ -61,6 +61,7 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 								<ItemActions
 									item={ item }
 									actions={ actions }
+									isCompact
 								/>
 							</FlexBlock>
 						</HStack>
