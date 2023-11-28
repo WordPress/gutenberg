@@ -4,17 +4,19 @@
 	 */
 	const { store } = wp.interactivity;
 
-	store( {
+	const { state } = store( 'store-tag', {
 		state: {
 			counter: {
 				// `value` is defined in the server.
-				double: ( { state } ) => state.counter.value * 2,
+				get double() {
+					return state.counter.value * 2
+				},
 				clicks: 0,
 			},
 		},
 		actions: {
 			counter: {
-				increment: ( { state } ) => {
+				increment() {
 					state.counter.value += 1;
 					state.counter.clicks += 1;
 				},
