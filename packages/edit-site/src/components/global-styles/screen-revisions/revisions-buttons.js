@@ -11,6 +11,8 @@ import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,7 +22,18 @@ import { getRevisionChanges } from './get-revision-changes';
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
 function ChangedSummary( { revision, previousRevision } ) {
-	const summary = getRevisionChanges( revision, previousRevision );
+	const blockNames = useMemo( () => {
+		const blockTypes = getBlockTypes();
+		return blockTypes.reduce( ( accumulator, { name, title } ) => {
+			accumulator[ name ] = title;
+			return accumulator;
+		}, {} );
+	}, [] );
+	const summary = getRevisionChanges(
+		revision,
+		previousRevision,
+		blockNames
+	);
 
 	if ( ! summary ) {
 		return null;
@@ -199,7 +212,7 @@ function RevisionsButtons( {
 								{ /* eslint-disable-next-line no-nested-ternary */ }
 								{ canApplyRevision ? (
 									<Button
-										variant="primary"
+										variant="secondary"
 										className="edit-site-global-styles-screen-revision__button"
 										onClick={ onSelect }
 									>

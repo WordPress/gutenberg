@@ -4,10 +4,19 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 const translationMap = {
-	border: __( 'Border' ),
-	color: __( 'Colors' ),
-	spacing: __( 'Spacing' ),
-	typography: __( 'Typography' ),
+	elements: __( 'elements' ),
+	variations: __( 'variations' ),
+	css: __( 'CSS' ),
+	filter: __( 'filter' ),
+	border: __( 'border' ),
+	color: __( 'color' ),
+	spacing: __( 'spacing' ),
+	typography: __( 'typography' ),
+	caption: __( 'caption' ),
+	link: __( 'link' ),
+	button: __( 'button' ),
+	heading: __( 'heading' ),
+	':hover': __( 'hover' ),
 	'settings.color.palette': __( 'color palette' ),
 	'settings.color.gradients': __( 'gradients' ),
 	'settings.color.duotone': __( 'duotone colors' ),
@@ -55,23 +64,19 @@ export function getGlobalStylesChanges( { settings = {}, styles = {} } ) {
 	return changes;
 }
 
-function getTranslation( key ) {
-	console.log( 'key', key );
-
+function getTranslation( key, blockNames ) {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
 	const keyArray = key.split( '.' );
 
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
-		let blockName = keyArray[ 1 ].split( '/' )?.[ 1 ];
-		blockName = blockName.charAt( 0 ).toUpperCase() + blockName.slice( 1 );
-		// @todo maybe getBlockTypes() and find the block name from the block type.
+		const blockName = blockNames[ keyArray[ 1 ] ];
 		return sprintf(
 			// translators: %1$s: block name, %2$s: changed property.
 			__( '%1$s block %2$s' ),
-			blockName.replace( /-/g, ' ' ),
-			keyArray?.[ 2 ]
+			blockName,
+			translationMap[ keyArray[ 2 ] ]
 		);
 	}
 
@@ -79,8 +84,8 @@ function getTranslation( key ) {
 		return sprintf(
 			// translators: %1$s: block name, %2$s: changed property.
 			__( '%1$s element %2$s' ),
-			keyArray?.[ 1 ],
-			keyArray?.[ 2 ]
+			translationMap[ keyArray[ 1 ] ],
+			translationMap[ keyArray[ 2 ] ]
 		);
 	}
 }
@@ -99,6 +104,7 @@ const cache = new Map();
 export function getRevisionChanges(
 	revision,
 	previousRevision,
+	blockNames,
 	maxResults = 4
 ) {
 	if ( cache.has( revision.id ) ) {
@@ -129,7 +135,7 @@ export function getRevisionChanges(
 		// Limit to max results.
 		.slice( 0, maxResults )
 		// Translate the keys.
-		.map( ( key ) => getTranslation( key ) )
+		.map( ( key ) => getTranslation( key, blockNames ) )
 		.filter( ( str ) => !! str )
 		.join( ', ' );
 

@@ -96,6 +96,9 @@
 	justify-content: center;
 	width: 90%;
 	margin: 0 0 $grid-unit-10 $grid-unit-20;
+	&:hover {
+		background: $white;
+	}
 }
 
 .edit-site-global-styles-screen-revisions__description {
@@ -135,7 +138,7 @@
 	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
 	color: $gray-900;
 	display: block;
-	&:first-letter {
+	&::first-letter {
 		text-transform: uppercase;
 	}
 }
