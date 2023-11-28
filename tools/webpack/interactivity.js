@@ -2,11 +2,12 @@
  * External dependencies
  */
 const { join } = require( 'path' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 /**
  * Internal dependencies
  */
-const { baseConfig } = require( './shared' );
+const { baseConfig, plugins } = require( './shared' );
 
 module.exports = {
 	...baseConfig,
@@ -63,6 +64,18 @@ module.exports = {
 			},
 		],
 	},
+	plugins: [
+		...plugins,
+		// TODO: Move it to a different Webpack file.
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: './node_modules/es-module-shims/dist/es-module-shims.wasm.js',
+					to: './build/importmap-polyfill.min.js',
+				},
+			],
+		} ),
+	],
 	watchOptions: {
 		ignored: [ '**/node_modules' ],
 		aggregateTimeout: 500,

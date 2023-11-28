@@ -17,11 +17,11 @@ function gutenberg_register_interactivity_module() {
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
 
-	// TODO: Move this to a local file and replace with a simpler version that
-	// only provides support for import maps.
+	// TODO: Replace with a simpler version that only provides support for import maps.
+	// TODO: Load only if the browser doesn't support import maps (https://github.com/guybedford/es-module-shims/issues/371).
 	wp_enqueue_script(
 		'es-module-shims',
-		'https://ga.jspm.io/npm:es-module-shims@1.8.2/dist/es-module-shims.js',
+		gutenberg_url( '/build/importmap-polyfill.min.js' ),
 		array(),
 		null,
 		array(
