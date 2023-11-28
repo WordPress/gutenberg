@@ -47,7 +47,7 @@ The `edit.js` commonly gets used to contain the React component that gets used i
 
 ### `save.js`
 
-The `save.js` is similar to the `edit.js` file in that it exports a single React component. This component generates the static HTML markup that gets saved to the Database. 
+The `save.js` exports the function that returns the static HTML markup that gets saved to the Database. 
 
 ### `style.(css|scss|sass)`
 
