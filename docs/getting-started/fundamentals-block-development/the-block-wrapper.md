@@ -11,7 +11,7 @@ The use of <code>supports</code> generates a set of properties that need to be m
 A block can have three sets of markup defined, each one of them with a specific target and purpose:
 
 - The one for the **Block Editor**, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
-- The one used to **save the block in the DB**, defined through a `save` React component passed to `registerBlockType` when registering the block in the client. 
+- The one used to **save the block in the DB**, defined through a `save` function passed to `registerBlockType` when registering the block in the client. 
     - This markup will be returned to the front end on request if no dynamic render has been defined for the block.
 - The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
     - If defined, this server-side generated markup will be returned to the front end, ignoring the markup stored in DB.
@@ -70,6 +70,7 @@ When saving the markup in the DB, it’s important to add the block props return
 For example, for the following piece of code of a block's registration in the client that defines the markup desired for the DB (and returned to the front end by default)...
 
 ```js
+const Edit = () => <p { ...useBlockProps() }>Hello World - Block Editor</p>;
 const save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
 
 registerBlockType( ..., {
