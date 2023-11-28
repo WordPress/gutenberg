@@ -70,7 +70,7 @@ When saving the markup in the DB, it’s important to add the block props return
 For example, for the following piece of code of a block's registration in the client that defines the markup desired for the DB (and returned to the front end by default)...
 
 ```js
-const Save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
+const save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
 
 registerBlockType( ..., {
 	edit: Edit,
