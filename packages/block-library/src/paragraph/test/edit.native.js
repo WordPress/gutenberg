@@ -17,6 +17,7 @@ import {
 	waitForElementToBeRemoved,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
@@ -704,6 +705,9 @@ describe( 'Paragraph block', () => {
 		} );
 		fireEvent.press( secondParagraphBlock );
 
+		// Clear mock history
+		TextInputState.focusTextInput.mockClear();
+
 		const secondParagraphTextInput =
 			within( secondParagraphBlock ).getByPlaceholderText(
 				'Start writing…'
@@ -715,8 +719,6 @@ describe( 'Paragraph block', () => {
 		} );
 
 		// Assert
-		// Check for formatting options to make sure the RichText Input is focused
-		const boldFormattingButton = screen.getByLabelText( 'Bold' );
-		expect( boldFormattingButton ).toBeVisible();
+		expect( TextInputState.focusTextInput ).toHaveBeenCalled();
 	} );
 } );
