@@ -205,7 +205,6 @@ module.exports = function cli() {
 				default: '.',
 				describe:
 					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
-				coerce: ( value ) => value.trim().replace( /^'|'$/g, '' ),
 			} );
 			args.positional( 'container', {
 				type: 'string',

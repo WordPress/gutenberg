@@ -46,7 +46,15 @@ module.exports = async function run( {
 	const joinedCommand = command.join( ' ' );
 	showCommandTips( joinedCommand, container, spinner );
 
-	await spawnCommandDirectly( config, container, command, envCwd, spinner );
+	const trimmedEnvCwd = envCwd.trim().replace( /^'|'$/g, '' );
+
+	await spawnCommandDirectly(
+		config,
+		container,
+		command,
+		trimmedEnvCwd,
+		spinner
+	);
 
 	spinner.text = `Ran \`${ joinedCommand }\` in '${ container }'.`;
 };
