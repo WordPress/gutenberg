@@ -299,6 +299,7 @@ async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
+	console.log( 'postTypes', postTypes );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
