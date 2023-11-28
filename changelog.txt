@@ -2,14 +2,16 @@
 
 = 17.1.3 =
 
-
 ## Changelog
 
 ### Bug fixes
 
 #### Components
-- https://github.com/WordPress/gutenberg/pull/56570
+- (RichText)(Workaround)(17.1.x) Fallback to a string arg in collapseWhiteSpace() if value is not a string (https://github.com/WordPress/gutenberg/pull/56570)
 
+## Contributors
+
+@fullofcaffeine
 
 
 = 17.1.2 =
