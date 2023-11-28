@@ -1,24 +1,27 @@
 ( ( { wp } ) => {
-	const { store, directive, createElement } = wp.interactivity;
+	const { store, directive, createElement: h } = wp.interactivity;
 
 	// Fake `data-wp-show-mock` directive to test when things are removed from the
 	// DOM.  Replace with `data-wp-show` when it's ready.
-	directive(
+directive(
 		'show-mock',
 		( {
-			directives: {
-				"show-mock": { default: showMock },
-			},
+			directives: { 'show-mock': showMock },
 			element,
 			evaluate,
 		} ) => {
-			if ( ! evaluate( showMock ) )
+			const entry = showMock.find(
+				( { suffix} ) => suffix === 'default'
+			);
+
+			if ( ! evaluate( entry ) ) {
 				element.props.children =
-					createElement( "template", null, element.props.children );
+					h( "template", null, element.props.children );
+			}
 		}
 	);
 
-	store( {
+	store( 'tovdom-islands', {
 		state: {
 			falseValue: false,
 		},
