@@ -141,12 +141,14 @@ function register_block_core_query() {
 		)
 	);
 
-	gutenberg_register_module(
-		'@wordpress/block-library/query',
-		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
-		array( '@wordpress/interactivity' ),
-		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-	);
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/query',
+			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_query' );
 
