@@ -17,6 +17,11 @@ import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { parse } from '@wordpress/blocks';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -31,8 +36,19 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './template-actions';
+import usePatternSettings from '../page-patterns/use-pattern-settings';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const EMPTY_ARRAY = [];
+
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'preview',
+	},
+};
 
 const DEFAULT_VIEW = {
 	type: 'list',
@@ -41,7 +57,7 @@ const DEFAULT_VIEW = {
 	perPage: 20,
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [],
+	hiddenFields: [ 'preview' ],
 	layout: {},
 };
 
@@ -81,7 +97,7 @@ function TemplateTitle( { item } ) {
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	return (
-		<HStack alignment="left">
+		<HStack alignment="left" spacing={ 1 }>
 			{ imageUrl ? (
 				<AvatarImage imageUrl={ imageUrl } />
 			) : (
@@ -94,65 +110,56 @@ function AuthorField( { item } ) {
 	);
 }
 
+function TemplatePreview( { content, viewType } ) {
+	const settings = usePatternSettings();
+	const blocks = useMemo( () => {
+		return parse( content );
+	}, [ content ] );
+	if ( ! blocks?.length ) {
+		return null;
+	}
+	// Wrap everything in a block editor provider to ensure 'styles' that are needed
+	// for the previews are synced between the site editor store and the block editor store.
+	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+	// render patterns inside the previews.
+	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
+	// the block editor settings are needed in context where we don't have the block editor.
+	// Explore how we can solve this in a better way.
+	return (
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<div
+				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+			>
+				<BlockPreview blocks={ blocks } />
+			</div>
+		</ExperimentalBlockEditorProvider>
+	);
+}
+
 export default function DataviewsTemplates() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
-	const { shownTemplates, paginationInfo } = useMemo( () => {
-		if ( ! allTemplates ) {
-			return {
-				shownTemplates: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredTemplates = [ ...allTemplates ];
-		// Handle global search.
-		if ( view.search ) {
-			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredTemplates = filteredTemplates.filter( ( item ) => {
-				const title = item.title?.rendered || item.slug;
-				return (
-					normalizeSearchInput( title ).includes(
-						normalizedSearch
-					) ||
-					normalizeSearchInput( item.description ).includes(
-						normalizedSearch
-					)
-				);
-			} );
-		}
-		// Handle sorting.
-		// TODO: Explore how this can be more dynamic..
-		if ( view.sort ) {
-			if ( view.sort.field === 'title' ) {
-				filteredTemplates.sort( ( a, b ) => {
-					const titleA = a.title?.rendered || a.slug;
-					const titleB = b.title?.rendered || b.slug;
-					return view.sort.direction === 'asc'
-						? titleA.localeCompare( titleB )
-						: titleB.localeCompare( titleA );
-				} );
-			}
-		}
-		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
-		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
-	}, [ allTemplates, view ] );
+
 	const fields = useMemo(
 		() => [
+			{
+				header: __( 'Preview' ),
+				id: 'preview',
+				render: ( { item, view: { type: viewType } } ) => {
+					return (
+						<TemplatePreview
+							content={ item.content.raw }
+							viewType={ viewType }
+						/>
+					);
+				},
+				minWidth: 120,
+				maxWidth: 120,
+				enableSorting: false,
+			},
 			{
 				header: __( 'Template' ),
 				id: 'title',
@@ -180,14 +187,74 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				getValue: () => {},
-				render: ( { item } ) => <AuthorField item={ item } />,
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField item={ item } />;
+				},
 				enableHiding: false,
-				enableSorting: false,
 			},
 		],
 		[]
 	);
+
+	const { shownTemplates, paginationInfo } = useMemo( () => {
+		if ( ! allTemplates ) {
+			return {
+				shownTemplates: EMPTY_ARRAY,
+				paginationInfo: { totalItems: 0, totalPages: 0 },
+			};
+		}
+		let filteredTemplates = [ ...allTemplates ];
+		// Handle global search.
+		if ( view.search ) {
+			const normalizedSearch = normalizeSearchInput( view.search );
+			filteredTemplates = filteredTemplates.filter( ( item ) => {
+				const title = item.title?.rendered || item.slug;
+				return (
+					normalizeSearchInput( title ).includes(
+						normalizedSearch
+					) ||
+					normalizeSearchInput( item.description ).includes(
+						normalizedSearch
+					)
+				);
+			} );
+		}
+
+		// Handle sorting.
+		if ( view.sort ) {
+			const stringSortingFields = [ 'title', 'author' ];
+			const fieldId = view.sort.field;
+			if ( stringSortingFields.includes( fieldId ) ) {
+				const fieldToSort = fields.find( ( field ) => {
+					return field.id === fieldId;
+				} );
+				filteredTemplates.sort( ( a, b ) => {
+					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
+					return view.sort.direction === 'asc'
+						? valueA.localeCompare( valueB )
+						: valueB.localeCompare( valueA );
+				} );
+			}
+		}
+
+		// Handle pagination.
+		const start = ( view.page - 1 ) * view.perPage;
+		const totalItems = filteredTemplates?.length || 0;
+		filteredTemplates = filteredTemplates?.slice(
+			start,
+			start + view.perPage
+		);
+		return {
+			shownTemplates: filteredTemplates,
+			paginationInfo: {
+				totalItems,
+				totalPages: Math.ceil( totalItems / view.perPage ),
+			},
+		};
+	}, [ allTemplates, view, fields ] );
+
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
 		() => [
@@ -199,10 +266,19 @@ export default function DataviewsTemplates() {
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
-			const updatedView =
+			let updatedView =
 				typeof viewUpdater === 'function'
 					? viewUpdater( view )
 					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
 			setView( updatedView );
 		},
 		[ view, setView ]
@@ -214,10 +290,11 @@ export default function DataviewsTemplates() {
 				fields={ fields }
 				actions={ actions }
 				data={ shownTemplates }
+				getItemId={ ( item ) => item.id }
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list' ] }
+				supportedLayouts={ [ 'list', 'grid' ] }
 			/>
 		</Page>
 	);

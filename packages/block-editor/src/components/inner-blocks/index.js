@@ -172,7 +172,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const {
 		__unstableDisableLayoutClassNames,
 		__unstableDisableDropZone,
-		__unstableDropZoneElement,
+		dropZoneElement,
 	} = options;
 	const {
 		clientId,
@@ -214,7 +214,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {
-		dropZoneElement: __unstableDropZoneElement,
+		dropZoneElement,
 		rootClientId: clientId,
 	} );
 

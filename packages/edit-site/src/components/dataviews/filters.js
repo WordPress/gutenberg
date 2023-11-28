@@ -1,12 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
-import { default as InFilter } from './in-filter';
+import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
@@ -23,13 +18,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					elements: [
-						{
-							value: '',
-							label: __( 'All' ),
-						},
-						...( field.elements || [] ),
-					],
+					elements: field.elements || [],
 					isVisible: view.filters.some(
 						( f ) =>
 							f.field === field.id && f.operator === OPERATOR_IN
@@ -44,7 +33,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		}
 
 		return (
-			<InFilter
+			<FilterSummary
 				key={ filter.field + '.' + filter.operator }
 				filter={ filter }
 				view={ view }
