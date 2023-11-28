@@ -11,7 +11,7 @@ Block Transforms is the API that allows a block to be transformed _from_ and _to
 A block declares which transformations it supports via the optional `transforms` key of the block configuration object passed to the `registerBlockType` function call, whose subkeys `to` and `from` hold an array of available transforms for every direction. Example:
 
 ```jsx
-registerBlockType( 'gutenpride/gutenpride-block', {
+registerBlockType( 'create-block/gutenpride', {
 	// ...
 	transforms: {
 		from: [
