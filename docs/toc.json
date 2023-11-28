@@ -47,15 +47,15 @@
 				]
 			},
 			{
-				"docs/getting-started/fundamentals-block-development/README.md": [
+				"docs/getting-started/fundamentals/README.md": [
 					{
-						"docs/getting-started/fundamentals-block-development/file-structure-of-a-block.md": []
+						"docs/getting-started/fundamentals/file-structure-of-a-block.md": []
 					},
 					{
-						"docs/getting-started/fundamentals-block-development/registration-of-a-block.md": []
+						"docs/getting-started/fundamentals/registration-of-a-block.md": []
 					},
 					{
-						"docs/getting-started/fundamentals-block-development/javascript-in-the-block-editor.md": []
+						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
 					}
 				]
 			},

@@ -97,27 +97,27 @@
 	},
 	{
 		"title": "Fundamentals of Block Development",
-		"slug": "fundamentals-block-development",
-		"markdown_source": "../docs/getting-started/fundamentals-block-development/README.md",
+		"slug": "fundamentals",
+		"markdown_source": "../docs/getting-started/fundamentals/README.md",
 		"parent": "getting-started"
 	},
 	{
 		"title": "File structure of a block",
 		"slug": "file-structure-of-a-block",
-		"markdown_source": "../docs/getting-started/fundamentals-block-development/file-structure-of-a-block.md",
-		"parent": "fundamentals-block-development"
+		"markdown_source": "../docs/getting-started/fundamentals/file-structure-of-a-block.md",
+		"parent": "fundamentals"
 	},
 	{
 		"title": "Registration of a block",
 		"slug": "registration-of-a-block",
-		"markdown_source": "../docs/getting-started/fundamentals-block-development/registration-of-a-block.md",
-		"parent": "fundamentals-block-development"
+		"markdown_source": "../docs/getting-started/fundamentals/registration-of-a-block.md",
+		"parent": "fundamentals"
 	},
 	{
 		"title": "Working with Javascript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
-		"markdown_source": "../docs/getting-started/fundamentals-block-development/javascript-in-the-block-editor.md",
-		"parent": "fundamentals-block-development"
+		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
+		"parent": "fundamentals"
 	},
 	{
 		"title": "Glossary",
