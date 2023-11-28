@@ -26,19 +26,25 @@ const {
 	getArgsFromCLI,
 } = require( '../utils' );
 
-const result = spawn(
-	'node',
-	[
-		path.resolve( require.resolve( 'playwright-core' ), '..', 'cli.js' ),
-		'install',
-	],
-	{
-		stdio: 'inherit',
-	}
-);
+if ( ! process.env.CI ) {
+	const result = spawn(
+		'node',
+		[
+			path.resolve(
+				require.resolve( 'playwright-core' ),
+				'..',
+				'cli.js'
+			),
+			'install',
+		],
+		{
+			stdio: 'inherit',
+		}
+	);
 
-if ( result.status > 0 ) {
-	process.exit( result.status );
+	if ( result.status > 0 ) {
+		process.exit( result.status );
+	}
 }
 
 const config =
