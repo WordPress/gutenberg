@@ -41,7 +41,7 @@ A transformation of type `block` is an object that takes the following parameter
 
 **Example: Let's declare a transform from our Gutenpride block to Heading block**
 
-To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the `@wordpress/blocks` package to create a new block:
+To declare this transformation we add the following code into our Gutenpride block configuration, which uses the `createBlock` function from the `@wordpress/blocks` package to create a new block:
 
 ```js
 transforms: {
