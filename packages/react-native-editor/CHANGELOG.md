@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
 
 ## 1.109.0
 -   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
