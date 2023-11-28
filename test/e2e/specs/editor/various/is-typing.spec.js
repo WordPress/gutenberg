@@ -1,101 +1,63 @@
 /**
  * WordPress dependencies
  */
-import {
-	clickBlockAppender,
-	createNewPost,
-	showBlockToolbar,
-} from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-describe( 'isTyping', () => {
-	beforeEach( async () => {
-		await createNewPost();
+test.describe( 'isTyping', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	it( 'should hide the toolbar when typing', async () => {
-		const blockToolbarSelector = '.block-editor-block-toolbar';
-
-		await clickBlockAppender();
-
-		// Type in a paragraph.
+	test( 'should hide the toolbar when typing', async ( { editor, page } ) => {
+		// Enter to reach paragraph block.
+		await page.keyboard.press( 'Enter' );
+		// Insert paragraph
 		await page.keyboard.type( 'Type' );
 
-		// Toolbar is hidden
-		let blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).toBe( null );
+		const blockToolbar = page.locator(
+			'role=toolbar[name="Block tools"i]'
+		);
+
+		// Toolbar should not be showing
+		await expect( blockToolbar ).toBeHidden();
 
 		// Moving the mouse shows the toolbar.
-		await showBlockToolbar();
+		await editor.showBlockToolbar();
 
 		// Toolbar is visible.
-		blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).not.toBe( null );
+		await expect( blockToolbar ).toBeVisible();
 
 		// Typing again hides the toolbar
 		await page.keyboard.type( ' and continue' );
 
 		// Toolbar is hidden again
-		blockToolbar = await page.$( blockToolbarSelector );
-		expect( blockToolbar ).toBe( null );
+		await expect( blockToolbar ).toBeHidden();
 	} );
 
-	it( 'should not close the dropdown when typing in it', async () => {
-		// Adds a Dropdown with an input to all blocks.
-		await page.evaluate( () => {
-			const { Dropdown, ToolbarButton, Fill } = wp.components;
-			const { createElement: el, Fragment } = wp.element;
-			function AddDropdown( BlockListBlock ) {
-				return ( props ) => {
-					return el(
-						Fragment,
-						{},
-						el(
-							Fill,
-							{ name: 'BlockControls' },
-							el( Dropdown, {
-								renderToggle: ( { onToggle } ) =>
-									el(
-										ToolbarButton,
-										{
-											onClick: onToggle,
-											className: 'dropdown-open',
-										},
-										'Open Dropdown'
-									),
-								renderContent: () =>
-									el( 'input', {
-										className: 'dropdown-input',
-									} ),
-							} )
-						),
-						el( BlockListBlock, props )
-					);
-				};
-			}
+	test( 'should not close the dropdown when typing in it', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add a block with a dropdown in the toolbar that contains an input.
+		await editor.insertBlock( { name: 'core/query' } );
 
-			wp.hooks.addFilter(
-				'editor.BlockListBlock',
-				'e2e-test/add-dropdown',
-				AddDropdown
-			);
-		} );
-
-		await clickBlockAppender();
-
-		// Type in a paragraph.
-		await page.keyboard.type( 'Type' );
-
-		// Show Toolbar.
-		await showBlockToolbar();
-
+		// Tab to Start Blank Button
+		await page.keyboard.press( 'Tab' );
+		// Select the Start Blank Button
+		await page.keyboard.press( 'Enter' );
+		// Select the First variation
+		await page.keyboard.press( 'Enter' );
+		// Moving the mouse shows the toolbar.
+		await editor.showBlockToolbar();
 		// Open the dropdown.
-		await page.click( '.dropdown-open' );
+		await page.getByLabel( 'Display settings' ).click();
 
+		const itemsPerPageInput = page.getByLabel( 'Items per Page' );
+		// Make sure we're where we think we are
+		await expect( itemsPerPageInput ).toBeFocused();
 		// Type inside the dropdown's input
-		await page.type( '.dropdown-input', 'Random' );
-
+		await page.keyboard.type( '00' );
 		// The input should still be visible.
-		const input = await page.$( '.dropdown-input' );
-		expect( input ).not.toBe( null );
+		await expect( itemsPerPageInput ).toBeVisible();
 	} );
 } );
