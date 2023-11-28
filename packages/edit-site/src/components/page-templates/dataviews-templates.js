@@ -14,7 +14,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -140,6 +140,7 @@ function TemplatePreview( { content, viewType } ) {
 
 export default function DataviewsTemplates() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const [ selection, setSelection ] = useState( [] );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
@@ -288,6 +289,22 @@ export default function DataviewsTemplates() {
 		};
 	}, [ allTemplates, view, fields ] );
 
+	// Remove any selected pages that are no longer in the list of visible pages.
+	useEffect( () => {
+		if (
+			selection.some(
+				( id ) =>
+					! shownTemplates?.some( ( template ) => template.id === id )
+			)
+		) {
+			setSelection(
+				selection.filter( ( id ) =>
+					shownTemplates?.some( ( template ) => template.id === id )
+				)
+			);
+		}
+	}, [ shownTemplates, selection ] );
+
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
 		() => [
@@ -328,6 +345,8 @@ export default function DataviewsTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				supportedLayouts={ [ 'list', 'grid' ] }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);
