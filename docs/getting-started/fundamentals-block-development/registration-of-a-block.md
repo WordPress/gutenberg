@@ -70,7 +70,7 @@ The content of <code>block.json</code> (or any other <code>.json</code> file) ca
 
 The client-side block settings object passed as a second parameter include two properties that are especially relevant:
 - `edit`: The React component that gets used in the editor for our block.
-- `save`: The React component that generates the static HTML markup that gets saved to the Database. 
+- `save`: The function that returns the static HTML markup that gets saved to the Database. 
 
 `registerBlockType` returns the registered block type (`WPBlock`) on success or `undefined` on failure.
 
