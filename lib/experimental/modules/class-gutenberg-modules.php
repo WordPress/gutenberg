@@ -80,7 +80,10 @@ class Gutenberg_Modules {
 	 * Prints the import map.
 	 */
 	public static function print_import_map() {
-		echo '<script type="importmap">' . wp_json_encode( self::get_import_map(), JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>';
+		$import_map = self::get_import_map();
+		if ( ! empty( $import_map['imports'] ) ) {
+			echo '<script type="importmap">' . wp_json_encode( self::get_import_map(), JSON_HEX_TAG | JSON_HEX_AMP ) . '</script>';
+		}
 	}
 
 	/**
