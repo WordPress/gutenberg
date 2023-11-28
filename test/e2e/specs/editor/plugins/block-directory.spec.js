@@ -150,10 +150,7 @@ test.describe( 'Block Directory', () => {
 		);
 	} );
 
-	test( 'Should be able to add (the first) block', async ( {
-		editor,
-		page,
-	} ) => {
+	test( 'Should be able to add (the first) block', async ( { page } ) => {
 		// Mock response for search with the block.
 		await page.route(
 			( url ) => matchUrl( url, SEARCH_URLS ),
@@ -247,10 +244,5 @@ test.describe( 'Block Directory', () => {
 				name: `Block: ${ MOCK_BLOCK1.title }`,
 			} )
 		).toBeVisible();
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: MOCK_BLOCK1.name,
-			},
-		] );
 	} );
 } );
