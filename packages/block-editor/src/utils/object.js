@@ -5,27 +5,6 @@ import { paramCase } from 'change-case';
 import memoize from 'memize';
 
 /**
- * Converts a path to an array of its fragments.
- * Supports strings, numbers and arrays:
- *
- * 'foo' => [ 'foo' ]
- * 2 => [ '2' ]
- * [ 'foo', 'bar' ] => [ 'foo', 'bar' ]
- *
- * @param {string|number|Array} path Path
- * @return {Array} Normalized path.
- */
-function normalizePath( path ) {
-	if ( Array.isArray( path ) ) {
-		return path;
-	} else if ( typeof path === 'number' ) {
-		return [ path.toString() ];
-	}
-
-	return [ path ];
-}
-
-/**
  * Converts any string to kebab case.
  * Backwards compatible with Lodash's `_.kebabCase()`.
  * Backwards compatible with `_wp_to_kebab_case()`.
@@ -66,10 +45,10 @@ export function kebabCase( str ) {
  * @return {Object} Cloned object with the new value set.
  */
 export function setImmutably( object, path, value ) {
-	path = normalizePath( path );
+	path = Array.isArray( path ) ? path : [ path ];
 
 	if ( path.length === 0 ) {
-		throw new Error( 'Path cannot be empty' );
+		return value;
 	}
 
 	const shallowClone = Array.isArray( object )
@@ -77,9 +56,7 @@ export function setImmutably( object, path, value ) {
 		: { ...object };
 	const [ first, ...rest ] = path;
 
-	shallowClone[ first ] = rest.length
-		? setImmutably( shallowClone[ first ], rest, value )
-		: value;
+	shallowClone[ first ] = setImmutably( shallowClone[ first ], rest, value );
 
 	return shallowClone;
 }
