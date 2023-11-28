@@ -24,7 +24,7 @@ Gets an offset, given an event.
 
 -   Required: No
 
-### `onKeydown`: `( event: KeyboardEvent ) => void`
+### `onKeyDown`: `( event: KeyboardEvent ) => void`
 
 A callback invoked on the keydown event.
 

@@ -7,21 +7,28 @@ import removeAccents from 'remove-accents';
  * WordPress dependencies
  */
 import {
+	Icon,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { parse } from '@wordpress/blocks';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import AddedBy from '../list/added-by';
+import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
 import {
@@ -29,8 +36,19 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './template-actions';
+import usePatternSettings from '../page-patterns/use-pattern-settings';
+import { unlock } from '../../lock-unlock';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const EMPTY_ARRAY = [];
+
+const defaultConfigPerViewType = {
+	list: {},
+	grid: {
+		mediaField: 'preview',
+	},
+};
 
 const DEFAULT_VIEW = {
 	type: 'list',
@@ -39,12 +57,83 @@ const DEFAULT_VIEW = {
 	perPage: 20,
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [],
+	hiddenFields: [ 'preview' ],
 	layout: {},
 };
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
+}
+
+// TODO: these are going to be reused in the template part list.
+// That's the reason for leaving the template parts code for now.
+function TemplateTitle( { item } ) {
+	const { isCustomized } = useAddedBy( item.type, item.id );
+	return (
+		<VStack spacing={ 1 }>
+			<Heading as="h3" level={ 5 }>
+				<Link
+					params={ {
+						postId: item.id,
+						postType: item.type,
+						canvas: 'edit',
+					} }
+				>
+					{ decodeEntities( item.title?.rendered || item.slug ) ||
+						__( '(no title)' ) }
+				</Link>
+			</Heading>
+			{ isCustomized && (
+				<span className="edit-site-list-added-by__customized-info">
+					{ item.type === TEMPLATE_POST_TYPE
+						? _x( 'Customized', 'template' )
+						: _x( 'Customized', 'template part' ) }
+				</span>
+			) }
+		</VStack>
+	);
+}
+
+function AuthorField( { item } ) {
+	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ imageUrl ? (
+				<AvatarImage imageUrl={ imageUrl } />
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>{ text }</span>
+		</HStack>
+	);
+}
+
+function TemplatePreview( { content, viewType } ) {
+	const settings = usePatternSettings();
+	const blocks = useMemo( () => {
+		return parse( content );
+	}, [ content ] );
+	if ( ! blocks?.length ) {
+		return null;
+	}
+	// Wrap everything in a block editor provider to ensure 'styles' that are needed
+	// for the previews are synced between the site editor store and the block editor store.
+	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+	// render patterns inside the previews.
+	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
+	// the block editor settings are needed in context where we don't have the block editor.
+	// Explore how we can solve this in a better way.
+	return (
+		<ExperimentalBlockEditorProvider settings={ settings }>
+			<div
+				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+			>
+				<BlockPreview blocks={ blocks } />
+			</div>
+		</ExperimentalBlockEditorProvider>
+	);
 }
 
 export default function DataviewsTemplates() {
@@ -53,6 +142,61 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+
+	const fields = useMemo(
+		() => [
+			{
+				header: __( 'Preview' ),
+				id: 'preview',
+				render: ( { item, view: { type: viewType } } ) => {
+					return (
+						<TemplatePreview
+							content={ item.content.raw }
+							viewType={ viewType }
+						/>
+					);
+				},
+				minWidth: 120,
+				maxWidth: 120,
+				enableSorting: false,
+			},
+			{
+				header: __( 'Template' ),
+				id: 'title',
+				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				render: ( { item } ) => <TemplateTitle item={ item } />,
+				maxWidth: 400,
+				enableHiding: false,
+			},
+			{
+				header: __( 'Description' ),
+				id: 'description',
+				getValue: ( { item } ) => item.description,
+				render: ( { item } ) => {
+					return (
+						item.description && (
+							<Text variant="muted">
+								{ decodeEntities( item.description ) }
+							</Text>
+						)
+					);
+				},
+				maxWidth: 200,
+				enableSorting: false,
+			},
+			{
+				header: __( 'Author' ),
+				id: 'author',
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField item={ item } />;
+				},
+				enableHiding: false,
+			},
+		],
+		[]
+	);
+
 	const { shownTemplates, paginationInfo } = useMemo( () => {
 		if ( ! allTemplates ) {
 			return {
@@ -76,19 +220,25 @@ export default function DataviewsTemplates() {
 				);
 			} );
 		}
+
 		// Handle sorting.
-		// TODO: Explore how this can be more dynamic..
 		if ( view.sort ) {
-			if ( view.sort.field === 'title' ) {
+			const stringSortingFields = [ 'title', 'author' ];
+			const fieldId = view.sort.field;
+			if ( stringSortingFields.includes( fieldId ) ) {
+				const fieldToSort = fields.find( ( field ) => {
+					return field.id === fieldId;
+				} );
 				filteredTemplates.sort( ( a, b ) => {
-					const titleA = a.title?.rendered || a.slug;
-					const titleB = b.title?.rendered || b.slug;
+					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
 					return view.sort.direction === 'asc'
-						? titleA.localeCompare( titleB )
-						: titleB.localeCompare( titleA );
+						? valueA.localeCompare( valueB )
+						: valueB.localeCompare( valueA );
 				} );
 			}
 		}
+
 		// Handle pagination.
 		const start = ( view.page - 1 ) * view.perPage;
 		const totalItems = filteredTemplates?.length || 0;
@@ -103,65 +253,8 @@ export default function DataviewsTemplates() {
 				totalPages: Math.ceil( totalItems / view.perPage ),
 			},
 		};
-	}, [ allTemplates, view ] );
-	const fields = useMemo(
-		() => [
-			{
-				header: __( 'Template' ),
-				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' ) }
-								</Link>
-							</Heading>
-						</VStack>
-					);
-				},
-				maxWidth: 400,
-				enableHiding: false,
-			},
-			{
-				header: __( 'Description' ),
-				id: 'description',
-				getValue: ( { item } ) => item.description,
-				render: ( { item } ) => {
-					return (
-						item.description && (
-							<Text variant="muted">
-								{ decodeEntities( item.description ) }
-							</Text>
-						)
-					);
-				},
-				enableSorting: false,
-			},
-			{
-				header: __( 'Author' ),
-				id: 'author',
-				getValue: () => {},
-				render: ( { item } ) => {
-					return (
-						<AddedBy postType={ item.type } postId={ item.id } />
-					);
-				},
-				enableHiding: false,
-				enableSorting: false,
-			},
-		],
-		[]
-	);
+	}, [ allTemplates, view, fields ] );
+
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
 		() => [
@@ -173,10 +266,19 @@ export default function DataviewsTemplates() {
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
-			const updatedView =
+			let updatedView =
 				typeof viewUpdater === 'function'
 					? viewUpdater( view )
 					: viewUpdater;
+			if ( updatedView.type !== view.type ) {
+				updatedView = {
+					...updatedView,
+					layout: {
+						...defaultConfigPerViewType[ updatedView.type ],
+					},
+				};
+			}
+
 			setView( updatedView );
 		},
 		[ view, setView ]
@@ -188,10 +290,11 @@ export default function DataviewsTemplates() {
 				fields={ fields }
 				actions={ actions }
 				data={ shownTemplates }
+				getItemId={ ( item ) => item.id }
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list' ] }
+				supportedLayouts={ [ 'list', 'grid' ] }
 			/>
 		</Page>
 	);

@@ -5,6 +5,7 @@ This file documents the DataViews UI component, which provides an API to render 
 ```js
 <DataViews
 	data={ pages }
+	getItemId={ ( item ) => item.id }
 	isLoading={ isLoadingPages }
 	view={ view }
 	onChangeView={ onChangeView }
@@ -44,8 +45,8 @@ Example:
 	},
 	search: '',
 	filters: [
-		{ field: 'author', operator: 'in', value: 2 },
-		{ field: 'status', operator: 'in', value: 'publish,draft' }
+		{ field: 'author', operator: OPERATOR_IN, value: 2 },
+		{ field: 'status', operator: OPERATOR_IN, value: 'publish,draft' }
 	],
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {},
@@ -83,8 +84,8 @@ function MyCustomPageList() {
 		},
 		search: '',
 		filters: [
-			{ field: 'author', operator: 'in', value: 2 },
-			{ field: 'status', operator: 'in', value: 'publish,draft' }
+			{ field: 'author', operator: OPERATOR_IN, value: 2 },
+			{ field: 'status', operator: OPERATOR_IN, value: 'publish,draft' }
 		],
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
@@ -93,10 +94,10 @@ function MyCustomPageList() {
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
-			if ( filter.field === 'status' && filter.operator === 'in' ) {
+			if ( filter.field === 'status' && filter.operator === OPERATOR_IN ) {
 				filters.status = filter.value;
 			}
-			if ( filter.field === 'author' && filter.operator === 'in' ) {
+			if ( filter.field === 'author' && filter.operator === OPERATOR_IN ) {
 				filters.author = filter.value;
 			}
 		} );
@@ -154,11 +155,11 @@ Example:
 				<a href="...">{ item.author }</a>
 			);
 		},
+		type: ENUMERATION_TYPE,
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
 		]
-		filters: [ 'in' ],
 		enableSorting: false
 	}
 ]
@@ -169,7 +170,7 @@ Example:
 -   `getValue`: function that returns the value of the field.
 -   `render`: function that renders the field.
 -   `elements`: the set of valid values for the field's value.
--   `filters`: what filter operators are available for the user to use over this field. Only `in` available at the moment.
+-   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment.
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 

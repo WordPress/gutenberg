@@ -127,7 +127,8 @@ export function getDropTargetPosition(
 
 /**
  * @typedef  {Object} WPBlockDropZoneConfig
- * @property {string} rootClientId The root client id for the block list.
+ * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
+ * @property {string}       rootClientId    The root client id for the block list.
  */
 
 /**
@@ -136,6 +137,7 @@ export function getDropTargetPosition(
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  */
 export default function useBlockDropZone( {
+	dropZoneElement,
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
 	// values returned by the `getRootBlockClientId` selector, which also uses
@@ -235,6 +237,7 @@ export default function useBlockDropZone( {
 	);
 
 	return useDropZone( {
+		dropZoneElement,
 		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {

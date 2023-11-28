@@ -103,9 +103,9 @@ body {
 }
 ```
 
-{% end %}
-
 -   **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
+
+{% end %}
 
 {% codetabs %}
 {% Input %}
@@ -309,7 +309,6 @@ The settings section has the following structure:
 	}
 }
 ```
-
 {% end %}
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
@@ -375,6 +374,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 - Custom Properties: `--wp--preset--{preset-category}--{preset-slug}` such as `--wp--preset--color--black`
 - Classes: `.has-{preset-slug}-{preset-category}` such as `.has-black-color`.
+
 
 {% codetabs %}
 {% Input %}
@@ -539,7 +539,6 @@ body {
 .wp-block-group.has-white-border-color { border-color: #444 !important; }
 
 ```
-
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
@@ -703,7 +702,6 @@ The tabs below show WordPress 5.8 supported styles and the ones supported by the
 Each block declares which style properties it exposes via the [block supports mechanism](/docs/reference-guides/block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 {% codetabs %}
-
 {% WordPress %}
 
 ```json
@@ -783,7 +781,6 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
-
 {% Gutenberg %}
 
 ```json
@@ -872,9 +869,7 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
-
 {% end %}
-
 ### Top-level styles
 
 Styles found at the top-level will be enqueued using the `body` selector.
@@ -902,7 +897,6 @@ body {
 ```
 
 {% end %}
-
 ### Block styles
 
 Styles found within a block will be enqueued using the block selector.
@@ -948,7 +942,6 @@ p { /* The core/paragraph opts out from the default behaviour and uses p as a se
 	color: var( --wp--preset--color--tertiary );
 }
 ```
-
 {% end %}
 
 #### Referencing a style
@@ -995,6 +988,7 @@ Supported by WordPress:
 - `link`: maps to the `a` CSS selector.
 
 If they're found in the top-level the element selector will be used. If they're found within a block, the selector to be used will be the element's appended to the corresponding block.
+
 
 {% codetabs %}
 {% Input %}
@@ -1065,9 +1059,7 @@ h3 {
 	font-size: var( --wp--preset--font-size--smaller );
 }
 ```
-
 {% end %}
-
 ##### Element pseudo selectors
 
 Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
@@ -1261,7 +1253,6 @@ body {
 	--wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif";
 }
 ```
-
 {% end %}
 
 A few notes about this process:
