@@ -4,8 +4,8 @@ This section provides an introduction to the most important concepts in Block De
 
 In this section you will learn:
 
+1. [**File structure of a block**](/docs/getting-started/fundamentals-block-development/file-structure-of-a-block.md) - The purpose of each one of the types of files available for a block, the relationships between them and their role in the output of the block
 <!--
-1. [**File structure of a block**](#) - The purpose of each one of the types of files available for a block, the relationships between them and their role in the output of the block
 2. [**`block.json`**](#) - How a block is defined using its `block.json` metadata and learn about some relevant properties of this file.
 -->
 1. [**Registration of a block**](/docs/getting-started/fundamentals-block-development/registration-of-a-block.md) - How a block is registered in both the server and client
