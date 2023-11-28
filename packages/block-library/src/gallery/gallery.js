@@ -7,14 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Caption } from '../utils/caption';
 
-export const Gallery = ( props ) => {
+export default function Gallery( props ) {
 	const {
 		attributes,
 		isSelected,
@@ -59,6 +58,4 @@ export const Gallery = ( props ) => {
 			/>
 		</figure>
 	);
-};
-
-export default forwardRef( Gallery );
+}
