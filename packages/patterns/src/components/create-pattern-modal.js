@@ -9,7 +9,7 @@ import {
 	__experimentalVStack as VStack,
 	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -166,12 +166,13 @@ export default function CreatePatternModal( {
 			>
 				<VStack spacing="5">
 					<TextControl
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
 						className="patterns-create-modal__name-input"
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 					/>
 					<CategorySelector
 						categoryTerms={ categoryTerms }
@@ -179,9 +180,12 @@ export default function CreatePatternModal( {
 						categoryMap={ categoryMap }
 					/>
 					<ToggleControl
-						label={ __( 'Synced' ) }
+						label={ _x(
+							'Synced',
+							'Option that makes an individual pattern synchronized'
+						) }
 						help={ __(
-							'Editing the pattern will update it anywhere it is used.'
+							'Sync this pattern across multiple locations.'
 						) }
 						checked={ syncType === PATTERN_SYNC_TYPES.full }
 						onChange={ () => {
@@ -194,6 +198,7 @@ export default function CreatePatternModal( {
 					/>
 					<HStack justify="right">
 						<Button
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => {
 								onClose();
@@ -204,6 +209,7 @@ export default function CreatePatternModal( {
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							aria-disabled={ ! title || isSaving }

@@ -120,12 +120,11 @@ _Returns_
 
 ### getSettings
 
-Returns the settings, taking into account active features and permissions.
+Returns the site editor settings.
 
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _setIsInserterOpen_ `Function`: Setter for the open state of the global inserter.
 
 _Returns_
 
@@ -133,11 +132,9 @@ _Returns_
 
 ### hasPageContentFocus
 
+> **Deprecated**
+
 Whether or not the editor allows only page content to be edited.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 

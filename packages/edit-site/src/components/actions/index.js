@@ -10,6 +10,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import {
+	Button,
+	__experimentalText as Text,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
@@ -17,55 +24,76 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export function useTrashPostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { deleteEntityRecord } = useDispatch( coreStore );
+export const trashPostAction = {
+	id: 'move-to-trash',
+	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
+	isEligible( { status } ) {
+		return status !== 'trash';
+	},
+	hideModalHeader: true,
+	RenderModal: ( { item: post, closeModal } ) => {
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+		const { deleteEntityRecord } = useDispatch( coreStore );
+		return (
+			<VStack spacing="5">
+				<Text>
+					{ sprintf(
+						// translators: %s: The page's title.
+						__( 'Are you sure you want to delete "%s"?' ),
+						decodeEntities( post.title.rendered )
+					) }
+				</Text>
+				<HStack justify="right">
+					<Button variant="tertiary" onClick={ closeModal }>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							try {
+								await deleteEntityRecord(
+									'postType',
+									post.type,
+									post.id,
+									{},
+									{ throwOnError: true }
+								);
+								createSuccessNotice(
+									sprintf(
+										/* translators: The page's title. */
+										__( '"%s" moved to the Trash.' ),
+										decodeEntities( post.title.rendered )
+									),
+									{
+										type: 'snackbar',
+										id: 'edit-site-page-trashed',
+									}
+								);
+							} catch ( error ) {
+								const errorMessage =
+									error.message &&
+									error.code !== 'unknown_error'
+										? error.message
+										: __(
+												'An error occurred while moving the page to the trash.'
+										  );
 
-	return useMemo(
-		() => ( {
-			id: 'move-to-trash',
-			label: __( 'Move to Trash' ),
-			isPrimary: true,
-			icon: trash,
-			isEligible( { status } ) {
-				return status !== 'trash';
-			},
-			async perform( post ) {
-				try {
-					await deleteEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{},
-						{ throwOnError: true }
-					);
-					createSuccessNotice(
-						sprintf(
-							/* translators: The page's title. */
-							__( '"%s" moved to the Trash.' ),
-							decodeEntities( post.title.rendered )
-						),
-						{
-							type: 'snackbar',
-							id: 'edit-site-page-trashed',
-						}
-					);
-				} catch ( error ) {
-					const errorMessage =
-						error.message && error.code !== 'unknown_error'
-							? error.message
-							: __(
-									'An error occurred while moving the page to the trash.'
-							  );
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
-				}
-			},
-		} ),
-		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
-	);
-}
+								createErrorNotice( errorMessage, {
+									type: 'snackbar',
+								} );
+							}
+						} }
+					>
+						{ __( 'Delete' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
 
 export function usePermanentlyDeletePostAction() {
 	const { createSuccessNotice, createErrorNotice } =
@@ -81,7 +109,7 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				try {
 					await deleteEntityRecord(
 						'postType',
@@ -132,7 +160,7 @@ export function useRestorePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async perform( post ) {
+			async callback( post ) {
 				await editEntityRecord( 'postType', post.type, post.id, {
 					status: 'draft',
 				} );
@@ -183,7 +211,7 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	perform( post ) {
+	callback( post ) {
 		document.location.href = post.link;
 	},
 };
@@ -197,7 +225,7 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			perform( post ) {
+			callback( post ) {
 				history.push( {
 					postId: post.id,
 					postType: post.type,
@@ -222,7 +250,7 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	perform( post ) {
+	callback( post ) {
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );

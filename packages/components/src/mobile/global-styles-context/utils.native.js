@@ -3,6 +3,7 @@
  */
 import { camelCase } from 'change-case';
 import { Dimensions } from 'react-native';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -13,6 +14,12 @@ import {
 	useMultipleOriginColorsAndGradients,
 	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { useGlobalStyles } from './index.native';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -441,3 +448,40 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
+
+/**
+ * Determine and apply appropriate color scheme based on global styles or device's light/dark mode.
+ *
+ * The function first attempts to retrieve the editor's background color from global styles.
+ * If the detected background color is light, light styles are applied, and dark styles otherwise.
+ * If no custom background color is defined, styles are applied using the device's dark/light setting.
+ *
+ * @param {Object} baseStyle - An object representing the base (light theme) styles for the editor.
+ * @param {Object} darkStyle - An object representing the additional styles to apply when the editor is in dark mode.
+ *
+ * @return {Object} - The combined style object that should be applied to the editor.
+ */
+export const useEditorColorScheme = ( baseStyle, darkStyle ) => {
+	const globalStyles = useGlobalStyles();
+
+	const deviceColorScheme = usePreferredColorSchemeStyle(
+		baseStyle,
+		darkStyle
+	);
+
+	const editorColors = globalStyles?.baseColors?.color;
+	const editorBackgroundColor = editorColors?.background;
+
+	const isBackgroundColorDefined =
+		typeof editorBackgroundColor !== 'undefined' &&
+		editorBackgroundColor !== 'undefined';
+
+	if ( isBackgroundColorDefined ) {
+		const isEditorBackgroundDark = colord( editorBackgroundColor ).isDark();
+		return isEditorBackgroundDark
+			? { ...baseStyle, ...darkStyle }
+			: baseStyle;
+	}
+
+	return deviceColorScheme;
+};

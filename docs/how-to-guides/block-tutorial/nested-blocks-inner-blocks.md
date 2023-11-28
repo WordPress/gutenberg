@@ -6,8 +6,6 @@ Note: A single block can only contain one `InnerBlocks` component.
 
 Here is the basic InnerBlocks usage.
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -37,35 +35,6 @@ registerBlockType( 'gutenberg-examples/example-06', {
 	},
 } );
 ```
-
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-	var InnerBlocks = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-06', {
-		title: 'Example: Inner Blocks',
-		category: 'design',
-
-		edit: function () {
-			var blockProps = useBlockProps();
-
-			return el( 'div', blockProps, el( InnerBlocks ) );
-		},
-
-		save: function () {
-			var blockProps = useBlockProps.save();
-
-			return el( 'div', blockProps, el( InnerBlocks.Content ) );
-		},
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
 
 ## Allowed Blocks
 
@@ -101,8 +70,6 @@ By default this behavior is disabled until the `directInsert` prop is set to `tr
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const MY_TEMPLATE = [
@@ -123,29 +90,6 @@ const MY_TEMPLATE = [
 	},
 ```
 
-{% Plain %}
-
-```js
-const MY_TEMPLATE = [
-	[ 'core/image', {} ],
-	[ 'core/heading', { placeholder: 'Book Title' } ],
-	[ 'core/paragraph', { placeholder: 'Summary' } ],
-];
-
-//...
-
-	edit: function( props ) {
-		return el(
-			InnerBlocks,
-			{
-				template: MY_TEMPLATE,
-				templateLock: "all",
-			}
-		);
-	},
-```
-
-{% end %}
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
@@ -167,7 +111,7 @@ add_action( 'init', function() {
 
 ## Using Parent and Ancestor Relationships in Blocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are: 
+A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are:
 
 - If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a __direct descendant of the parent__.
 - If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a __descendent of the parent__.
@@ -214,8 +158,7 @@ The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package
 
 Here is the basic `useInnerBlocksProps` hook usage.
 
-{% codetabs %}
-{% JSX %}
+
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -248,42 +191,9 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-	var InnerBlocks = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-06', {
-		title: 'Example: Inner Blocks',
-		category: 'design',
-
-		edit: function () {
-			var blockProps = useBlockProps();
-			var innerBlocksProps = useInnerBlocksProps();
-
-			return el( 'div', blockProps, el( 'div', innerBlocksProps ) );
-		},
-
-		save: function () {
-			var blockProps = useBlockProps.save();
-			var innerBlocksProps = useInnerBlocksProps.save();
-
-			return el( 'div', blockProps, el( 'div', innerBlocksProps ) );
-		},
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
-
 This hook can also pass objects returned from the `useBlockProps` hook to the `useInnerBlocksProps` hook. This reduces the number of elements we need to create.
 
-{% codetabs %}
-{% JSX %}
+
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -312,36 +222,6 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-	var InnerBlocks = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-06', {
-		// ...
-
-		edit: function () {
-			var blockProps = useBlockProps();
-			var innerBlocksProps = useInnerBlocksProps();
-
-			return el( 'div', innerBlocksProps );
-		},
-
-		save: function () {
-			var blockProps = useBlockProps.save();
-			var innerBlocksProps = useInnerBlocksProps.save();
-
-			return el( 'div', innerBlocksProps );
-		},
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
 
 The above code will render to the following markup in the editor:
 
@@ -353,8 +233,6 @@ The above code will render to the following markup in the editor:
 
 Another benefit to using the hook approach is using the returned value, which is just an object, and deconstruct to get the react children from the object. This property contains the actual child inner blocks thus we can place elements on the same level as our inner blocks.
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -379,39 +257,6 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-	var InnerBlocks = blockEditor.InnerBlocks;
-	var useBlockProps = blockEditor.useBlockProps;
-	var useInnerBlocksProps = blockEditor.useInnerBlocksProps;
-
-    blocks.registerBlockType( 'gutenberg-examples/example-06', {
-		// ...
-
-		edit: function () {
-			var blockProps = useBlockProps();
-			var { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps );
-
-			return el(
-                'div',
-                innerBlocksProps,
-                children,
-                el(
-            	    'div',
-                    {},
-    	            '<!-- Insert any arbitrary html here at the same level as the children -->',
-	            )
-            );
-		},
-		// ...
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
 
 ```html
 <div>

@@ -42,6 +42,12 @@
 		"parent": "devenv"
 	},
 	{
+		"title": "Quick Start Guide",
+		"slug": "quick-start-guide",
+		"markdown_source": "../docs/getting-started/quick-start-guide.md",
+		"parent": "getting-started"
+	},
+	{
 		"title": "Create a Block Tutorial",
 		"slug": "create-block",
 		"markdown_source": "../docs/getting-started/create-block/README.md",
@@ -777,6 +783,12 @@
 		"title": "ConfirmDialog",
 		"slug": "confirm-dialog",
 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControlV2",
+		"slug": "custom-select-control-v2",
+		"markdown_source": "../packages/components/src/custom-select-control-v2/README.md",
 		"parent": "components"
 	},
 	{

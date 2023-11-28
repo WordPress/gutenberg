@@ -31,11 +31,14 @@ import {
  */
 export function toggleFeature( featureName ) {
 	return function ( { registry } ) {
-		deprecated( "select( 'core/edit-site' ).toggleFeature( featureName )", {
-			since: '6.0',
-			alternative:
-				"select( 'core/preferences').toggle( 'core/edit-site', featureName )",
-		} );
+		deprecated(
+			"dispatch( 'core/edit-site' ).toggleFeature( featureName )",
+			{
+				since: '6.0',
+				alternative:
+					"dispatch( 'core/preferences').toggle( 'core/edit-site', featureName )",
+			}
+		);
 
 		registry
 			.dispatch( preferencesStore )
@@ -572,6 +575,10 @@ export const switchEditorMode =
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
 	( { dispatch, registry } ) => {
+		deprecated( `dispatch( 'core/edit-site' ).setHasPageContentFocus`, {
+			since: '6.5',
+		} );
+
 		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
@@ -596,7 +603,7 @@ export const toggleDistractionFree =
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-site', 'fixedToolbar', false );
+					.set( 'core/edit-site', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();

@@ -72,7 +72,7 @@ export interface DropdownMenuProps {
 	 * Determines whether the menu popover will be hidden when the user presses
 	 * the Escape key.
 	 *
-	 * @default true
+	 * @default `( event ) => { event.preventDefault(); return true; }`
 	 */
 	hideOnEscape?:
 		| boolean
@@ -84,13 +84,6 @@ export interface DropdownMenuProps {
 export interface DropdownMenuGroupProps {
 	/**
 	 * The contents of the dropdown menu group.
-	 */
-	children: React.ReactNode;
-}
-
-export interface DropdownMenuGroupLabelProps {
-	/**
-	 * The contents of the dropdown menu group label.
 	 */
 	children: React.ReactNode;
 }

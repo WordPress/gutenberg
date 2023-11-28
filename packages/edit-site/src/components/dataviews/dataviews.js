@@ -41,8 +41,10 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
+	getItemId,
 	isLoading = false,
 	paginationInfo,
+	supportedLayouts,
 } ) {
 	const ViewComponent = viewTypeMap[ view.type ];
 	const _fields = useMemo( () => {
@@ -54,8 +56,8 @@ export default function DataViews( {
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 } justify="flex-start">
-				<HStack>
-					<HStack justify="start">
+				<HStack alignment="flex-start">
+					<HStack justify="start" wrap>
 						{ search && (
 							<Search
 								label={ searchLabel }
@@ -69,11 +71,12 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end">
+					<HStack justify="end" expanded={ false }>
 						<ViewActions
 							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
+							supportedLayouts={ supportedLayouts }
 						/>
 					</HStack>
 				</HStack>
@@ -84,6 +87,7 @@ export default function DataViews( {
 					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
+					getItemId={ getItemId }
 					isLoading={ isLoading }
 				/>
 				<Pagination

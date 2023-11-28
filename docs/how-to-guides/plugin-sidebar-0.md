@@ -379,7 +379,7 @@ Functions used in this guide:
 
 You now have a custom sidebar that you can use to update `post_meta` content.
 
-A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/plugin-sidebar) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/plugin-sidebar-9ee4a6) from the [block-development-examples](https://github.com/WordPress/block-development-examples) repository.
 
 ### Note
 

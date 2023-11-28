@@ -14,22 +14,16 @@ import {
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
+import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
@@ -368,7 +362,6 @@ export const withPositionStyles = createHigherOrderComponent(
 			hasPositionBlockSupport && ! isPositionDisabled;
 
 		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
 
 		// Higher specificity to override defaults in editor UI.
 		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
@@ -392,15 +385,9 @@ export const withPositionStyles = createHigherOrderComponent(
 				!! attributes?.style?.position?.type,
 		} );
 
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+		useStyleOverride( { css } );
+
+		return <BlockListBlock { ...props } className={ className } />;
 	},
 	'withPositionStyles'
 );

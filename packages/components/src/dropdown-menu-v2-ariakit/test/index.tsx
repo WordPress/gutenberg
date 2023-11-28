@@ -16,7 +16,6 @@ import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuItem,
-	DropdownMenuGroupLabel,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuGroup,
@@ -134,8 +133,9 @@ describe( 'DropdownMenu', () => {
 			await press.ArrowDown();
 
 			// DropdownMenu open, focus is on the first focusable item
+			// (disabled items are still focusable and accessible)
 			expect(
-				screen.getByRole( 'menuitem', { name: 'Second item' } )
+				screen.getByRole( 'menuitem', { name: 'First item' } )
 			).toHaveFocus();
 		} );
 
@@ -163,8 +163,9 @@ describe( 'DropdownMenu', () => {
 			await press.Space();
 
 			// DropdownMenu open, focus is on the first focusable item
+			// (disabled items are still focusable and accessible
 			expect(
-				screen.getByRole( 'menuitem', { name: 'Second item' } )
+				screen.getByRole( 'menuitem', { name: 'First item' } )
 			).toHaveFocus();
 		} );
 
@@ -195,32 +196,6 @@ describe( 'DropdownMenu', () => {
 					screen.getByRole( 'button', { name: 'Open dropdown' } )
 				).toHaveFocus()
 			);
-		} );
-
-		it( 'should not close when pressing the escape key if the `hideOnEscape` prop is set to `false`', async () => {
-			render(
-				<DropdownMenu
-					trigger={ <button>Open dropdown</button> }
-					hideOnEscape={ false }
-				>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
-			);
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			await click( trigger );
-
-			// Focuses menu on mouse click, focuses first item on keyboard press
-			// Can be changed with a custom useEffect
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
-
-			// Pressing esc will close the menu and move focus to the toggle
-			await press.Escape();
-
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 		} );
 
 		it( 'should close when clicking outside of the content', async () => {
@@ -478,9 +453,6 @@ describe( 'DropdownMenu', () => {
 				return (
 					<DropdownMenu trigger={ <button>Open dropdown</button> }>
 						<DropdownMenuGroup>
-							<DropdownMenuGroupLabel>
-								Radio group label
-							</DropdownMenuGroupLabel>
 							<DropdownMenuRadioItem
 								name="radio-test"
 								value="radio-one"
@@ -558,9 +530,6 @@ describe( 'DropdownMenu', () => {
 			render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuGroup>
-						<DropdownMenuGroupLabel>
-							Radio group label
-						</DropdownMenuGroupLabel>
 						<DropdownMenuRadioItem
 							name="radio-test"
 							value="radio-one"
@@ -1017,7 +986,7 @@ describe( 'DropdownMenu', () => {
 			// The contents of the suffix are rendered after the item's children
 			expect(
 				screen.getByRole( 'menuitemradio', {
-					name: 'Radio item oneRadio suffix',
+					name: 'Radio item one Radio suffix',
 				} )
 			).toBeInTheDocument();
 		} );

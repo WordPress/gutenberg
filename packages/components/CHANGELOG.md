@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
+
+### Bug Fix
+
+-   `ToolsPanelItem`: Use useLayoutEffect to prevent rendering glitch for last panel item styling. ([#56536](https://github.com/WordPress/gutenberg/pull/56536)).
+-   `FormTokenField`: Fix broken suggestions scrollbar when the `__experimentalExpandOnFocus` prop is defined ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
+-   `FormTokenField`: `onFocus` prop is now typed as a React `FocusEvent` ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
+
+### Experimental
+
+-   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+-   `DropdownMenuV2`: Design tweaks ([#56041](https://github.com/WordPress/gutenberg/pull/56041))
+
+### Internal
+
+-   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
+
+### Internal
+
+-   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
+
+## 25.12.0 (2023-11-16)
+
+### Bug Fix
+
+-   `Toolbar`: Remove CSS rule that prevented focus outline to be visible for toolbar buttons in the `:active` state. ([#56123](https://github.com/WordPress/gutenberg/pull/56123)).
+
 ### Internal
 
 -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
@@ -12,11 +41,18 @@
 
 -   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
 -   `Tabs`: Update sub-components to accept relevant HTML element props ([#55860](https://github.com/WordPress/gutenberg/pull/55860))
+-   `DropdownMenuV2`: Fix radio menu item check icon not rendering correctly in some browsers ([#55964](https://github.com/WordPress/gutenberg/pull/55964))
+-   `DropdownMenuV2`: prevent default when pressing Escape key to close menu ([#55962](https://github.com/WordPress/gutenberg/pull/55962))
 
 ### Enhancements
 
 -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
 -   `TextControl`: Add opt-in prop for 40px default size ([#55471](https://github.com/WordPress/gutenberg/pull/55471)).
+
+### Bug Fix
+
+-   `DropdownMenu`: remove extra vertical space around the toggle button ([#56136](https://github.com/WordPress/gutenberg/pull/56136)).
+-   Package should not depend on `@ariakit/test`, that package is only needed for testing ([#56091](https://github.com/WordPress/gutenberg/pull/56091)).
 
 ## 25.11.0 (2023-11-02)
 
@@ -27,6 +63,7 @@
 ### Bug Fix
 
 -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
+-   Improve Button saving state accessibility. ([#55547](https://github.com/WordPress/gutenberg/pull/55547))
 
 ### Internal
 
