@@ -7,7 +7,7 @@
 
 ?>
 
-<div data-wp-interactive>
+<div data-wp-interactive='{ "namespace": "directive-style" }'>
 	<button
 		data-wp-on--click="actions.toggleColor"
 		data-testid="toggle color"

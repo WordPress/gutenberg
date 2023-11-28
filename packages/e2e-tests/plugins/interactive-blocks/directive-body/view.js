@@ -1,9 +1,10 @@
 ( ( { wp } ) => {
-	const { store } = wp.interactivity;
+	const { store, getContext } = wp.interactivity;
 
-	store( {
+	store( 'directive-body', {
 		actions: {
-			toggleText: ( { context } ) => {
+			toggleText: () => {
+				const context = getContext();
 				context.text = context.text === 'text-1' ? 'text-2' : 'text-1';
 			},
 		},

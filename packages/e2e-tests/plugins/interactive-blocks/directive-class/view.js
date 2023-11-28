@@ -1,19 +1,20 @@
 ( ( { wp } ) => {
-	const { store } = wp.interactivity;
+	const { store, getContext } = wp.interactivity;
 
-	store( {
+	const { state } = store( "directive-class", {
 		state: {
 			trueValue: true,
 			falseValue: false,
 		},
 		actions: {
-			toggleTrueValue: ( { state } ) => {
+			toggleTrueValue: () => {
 				state.trueValue = ! state.trueValue;
 			},
-			toggleFalseValue: ( { state } ) => {
+			toggleFalseValue: () => {
 				state.falseValue = ! state.falseValue;
 			},
-			toggleContextFalseValue: ( { context } ) => {
+			toggleContextFalseValue: () => {
+				const context = getContext();
 				context.falseValue = ! context.falseValue;
 			},
 		},

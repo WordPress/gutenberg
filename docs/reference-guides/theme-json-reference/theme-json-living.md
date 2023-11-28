@@ -95,6 +95,8 @@ Settings related to colors.
 | link | boolean | false |  |
 | palette | array |  | color, name, slug |
 | text | boolean | true |  |
+| heading | boolean | true |  |
+| button | boolean | true |  |
 
 ---
 
@@ -127,6 +129,7 @@ Settings related to layout.
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
+| allowCustomContentAndWideSize | boolean | true |  |
 
 ---
 

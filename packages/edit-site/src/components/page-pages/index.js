@@ -21,7 +21,7 @@ import Link from '../routes/link';
 import { DataViews, viewTypeSupportsMap } from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
-	useTrashPostAction,
+	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
 	postRevisionsAction,
@@ -226,14 +226,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				render: ( { item } ) => {
-					const author = item._embedded?.author[ 0 ];
-					return (
-						<a href={ `user-edit.php?user_id=${ author.id }` }>
-							{ author.name }
-						</a>
-					);
-				},
 				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
@@ -267,7 +259,6 @@ export default function PagePages() {
 		[ authors ]
 	);
 
-	const trashPostAction = useTrashPostAction();
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
@@ -280,12 +271,7 @@ export default function PagePages() {
 			editPostAction,
 			postRevisionsAction,
 		],
-		[
-			trashPostAction,
-			permanentlyDeletePostAction,
-			restorePostAction,
-			editPostAction,
-		]
+		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
@@ -316,6 +302,7 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
+					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
