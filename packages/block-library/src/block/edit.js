@@ -54,6 +54,14 @@ function isPartiallySynced( block ) {
 	);
 }
 
+function setBlockEditMode( setEditMode, block ) {
+	const editMode = isPartiallySynced( block ) ? 'contentOnly' : 'disabled';
+	setEditMode( block.clientId, editMode );
+	block.innerBlocks.forEach( ( innerBlock ) =>
+		setBlockEditMode( setEditMode, innerBlock )
+	);
+}
+
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
 
@@ -122,12 +130,9 @@ export default function ReusableBlockEdit( {
 	);
 
 	useEffect( () => {
-		innerBlocks.forEach( ( block ) => {
-			const editMode = isPartiallySynced( block )
-				? 'contentOnly'
-				: 'disabled';
-			setBlockEditingMode( block.clientId, editMode );
-		} );
+		innerBlocks.forEach( ( block ) =>
+			setBlockEditMode( setBlockEditingMode, block )
+		);
 	}, [ innerBlocks, setBlockEditingMode ] );
 
 	const hasAlreadyRendered = useHasRecursion( ref );
