@@ -74,7 +74,7 @@ const save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
 
 registerBlockType( ..., {
 	edit: Edit,
-	save: Save,
+	save,
 } );
 ```
 
