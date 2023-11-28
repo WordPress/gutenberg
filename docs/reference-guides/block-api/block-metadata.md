@@ -78,7 +78,7 @@ Development is improved by using a defined schema definition file. Supported edi
 ```
 
 <div class="callout callout-info">
-Check <a href="/docs/getting-started/fundamentals-block-development/registration-of-a-block.md">Registration of a block</a> to learn more about how to register a block using its metadata.
+Check <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals-block-development/registration-of-a-block">Registration of a block</a> to learn more about how to register a block using its metadata.
 </div>
 
 ## Block API
