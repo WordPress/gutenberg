@@ -77,7 +77,7 @@ function handleScroll( ctx ) {
 	}
 }
 
-const { state, actions, effects } = store( 'core/image', {
+const { state, actions, callbacks } = store( 'core/image', {
 	state: {
 		windowWidth: window.innerWidth,
 		windowHeight: window.innerHeight,
@@ -200,7 +200,7 @@ const { state, actions, effects } = store( 'core/image', {
 			const { ref } = getElement();
 			ctx.imageLoaded = true;
 			ctx.imageCurrentSrc = ref.currentSrc;
-			effects.setButtonStyles();
+			callbacks.setButtonStyles();
 		},
 		handleTouchStart() {
 			isTouching = true;
@@ -225,7 +225,7 @@ const { state, actions, effects } = store( 'core/image', {
 			isTouching = false;
 		},
 	},
-	effects: {
+	callbacks: {
 		initOriginImage() {
 			const ctx = getContext();
 			const { ref } = getElement();

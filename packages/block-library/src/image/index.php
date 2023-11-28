@@ -214,14 +214,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.initOriginImage' );
+	$w->set_attribute( 'data-wp-init', 'callbacks.initOriginImage' );
 	$w->set_attribute( 'data-wp-on--load', 'actions.handleLoad' );
-	$w->set_attribute( 'data-wp-watch', 'effects.setButtonStyles' );
+	$w->set_attribute( 'data-wp-watch', 'callbacks.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
 	$w->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
-	$w->set_attribute( 'data-wp-watch--setStylesOnResize', 'effects.setStylesOnResize' );
+	$w->set_attribute( 'data-wp-watch--setStylesOnResize', 'callbacks.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
 	// Add a button alongside image in the body content.
@@ -309,7 +309,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
             data-wp-class--active="context.lightboxEnabled"
             data-wp-class--hideAnimationEnabled="context.hideAnimationEnabled"
             data-wp-bind--aria-modal="state.ariaModal"
-            data-wp-watch="effects.initLightbox"
+            data-wp-watch="callbacks.initLightbox"
             data-wp-on--keydown="actions.handleKeydown"
             data-wp-on--touchstart="actions.handleTouchStart"
             data-wp-on--touchmove="actions.handleTouchMove"

@@ -19,7 +19,7 @@ const focusableSelectors = [
 document.addEventListener( 'click', () => {} );
 
 const { state, actions } = store( 'core/navigation', {
-	effects: {
+	callbacks: {
 		initMenu() {
 			const ctx = getContext();
 			const { ref } = getElement();

@@ -435,7 +435,7 @@ class WP_Navigation_Block_Renderer {
 			$responsive_container_directives = '
 				data-wp-class--has-modal-open="state.isMenuOpen"
 				data-wp-class--is-menu-open="state.isMenuOpen"
-				data-wp-watch="effects.initMenu"
+				data-wp-watch="callbacks.initMenu"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 				data-wp-on--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
@@ -444,7 +444,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-bind--aria-modal="state.ariaModal"
 				data-wp-bind--aria-label="state.ariaLabel"
 				data-wp-bind--role="state.roleAttribute"
-				data-wp-watch="effects.focusFirstElement"
+				data-wp-watch="callbacks.focusFirstElement"
 			';
 			$close_button_directives         = '
 				data-wp-on--click="actions.closeMenuOnClick"

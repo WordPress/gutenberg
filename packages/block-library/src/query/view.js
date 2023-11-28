@@ -81,7 +81,7 @@ store( 'core/query', {
 			}
 		},
 	},
-	effects: {
+	callbacks: {
 		*prefetch() {
 			const { url } = getContext();
 			const { ref } = getElement();
