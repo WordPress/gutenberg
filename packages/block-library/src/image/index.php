@@ -37,6 +37,10 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
+	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$view_js_file_handle = 'wp-block-image-view';
+	$script_handles      = $block->block_type->view_script_handles;
+
 	/*
 	 * If the lightbox is enabled and the image is not linked, add the filter
 	 * and the JavaScript view file.
@@ -47,7 +51,13 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		gutenberg_enqueue_module( '@wordpress/block-library/image' );
+		if ( $is_gutenberg_plugin ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/image' );
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
+		} elseif ( ! $is_gutenberg_plugin && ! in_array( $view_js_file_handle, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
+		}
 
 		/*
 		 * This render needs to happen in a filter with priority 15 to ensure
@@ -64,6 +74,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 * other Image blocks.
 		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
+		}
 	}
 
 	return $processor->get_updated_html();
