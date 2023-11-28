@@ -18,8 +18,6 @@
  */
 function render_block_core_query( $attributes, $content, $block ) {
 	if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) ) {
-		gutenberg_enqueue_module( '@wordpress/block-library/query' );
-
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
@@ -66,6 +64,31 @@ function render_block_core_query( $attributes, $content, $block ) {
 				$last_tag_position,
 				0
 			);
+		}
+	}
+
+	$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$should_load_view_script = $attributes['enhancedPagination'] && isset( $attributes['queryId'] );
+	$view_asset              = 'wp-block-query-view';
+	$script_handles          = $block->block_type->view_script_handles;
+
+	if ( $is_gutenberg_plugin ) {
+		if ( $should_load_view_script ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/query' );
+		}
+		// Remove the view script because we are using the module.
+		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	} else {
+		if ( ! wp_script_is( $view_asset ) ) {
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $should_load_view_script && in_array( $view_asset, $script_handles, true )
+			) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $should_load_view_script && ! in_array( $view_asset, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+			}
 		}
 	}
 
@@ -120,7 +143,7 @@ function register_block_core_query() {
 
 	gutenberg_register_module(
 		'@wordpress/block-library/query',
-		gutenberg_url( '/build/interactivity/query.min.js' ),
+		'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
 		array( '@wordpress/interactivity' ),
 		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 	);
