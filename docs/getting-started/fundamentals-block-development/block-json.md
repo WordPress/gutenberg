@@ -74,11 +74,11 @@ _Example: Atributes stored in the Markup representation of the block_
 <!-- /wp:block-development-examples/copyright-date-block-09aac3 -->x
 ```
 
-These attributes are passed to the React components `Edit`(to display in the Block Editor) and `Save` (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
+These attributes are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
 
 The `Edit` component receives exclusively the capability of updating the attributes via the `setAttributes` function.
 
-_See how the attributes are passed to the [`Edit` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js), [the `Save` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) and [the `render.php`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php) in this [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3) of the  code above_
+_See how the attributes are passed to the [`Edit` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js), [the `save` function](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) and [the `render.php`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php) in this [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3) of the  code above_
 
 <div class="callout callout-info">
 Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Attributes API. 
