@@ -2928,6 +2928,19 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( ! clientId ) {
 				return 'default';
 			}
+			const syncedPatternParent = getBlockParentsByBlockName(
+				state,
+				clientId,
+				'core/block'
+			);
+
+			if ( syncedPatternParent?.length > 0 ) {
+				const attributes = getBlockAttributes( state, clientId );
+				return attributes.connections?.attributes?.content?.source ===
+					'pattern_attributes'
+					? 'contentOnly'
+					: 'disabled';
+			}
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
 			if ( templateLock === 'contentOnly' ) {
