@@ -36,13 +36,12 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		keepCaretInsideBlock,
-		isTemplateMode,
+		hasTemplate,
 		template,
 	} = useSelect(
 		( select ) => {
 			const {
 				isFeatureActive,
-				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
@@ -68,6 +67,8 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
+			const _hasTemplate =
+				supportsTemplateMode && isViewable && canEditTemplate;
 
 			return {
 				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
@@ -81,11 +82,8 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-				isTemplateMode: isEditingTemplate(),
-				template:
-					supportsTemplateMode && isViewable && canEditTemplate
-						? getEditedPostTemplate()
-						: null,
+				hasTemplate: _hasTemplate,
+				template: _hasTemplate ? getEditedPostTemplate() : null,
 				post: postObject,
 			};
 		},
@@ -145,7 +143,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 	] );
 
-	if ( ! post ) {
+	if ( ! post || ( hasTemplate && ! template ) ) {
 		return null;
 	}
 
@@ -156,7 +154,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post={ post }
 				initialEdits={ initialEdits }
 				useSubRegistry={ false }
-				__unstableTemplate={ isTemplateMode ? template : undefined }
+				__unstableTemplate={ template }
 				{ ...props }
 			>
 				<ErrorBoundary>

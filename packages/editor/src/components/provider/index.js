@@ -105,6 +105,9 @@ function extractPostContentBlockFromTemplateBlocks( blocks ) {
  */
 function extractPageContentBlockTypesFromTemplateBlocks( blocks ) {
 	const result = [];
+	if ( ! blocks ) {
+		return result;
+	}
 	for ( let i = 0; i < blocks.length; i++ ) {
 		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
 		// we skip it because we only want to render stand-alone page content blocks in the block list.
@@ -178,37 +181,35 @@ function useBlockEditorProps( post, template, mode ) {
 					createBlock( 'core/post-title' ),
 					createBlock( 'core/post-content' ),
 			  ];
-		const innerBlocksWithLayout = innerBlocks.map( ( block ) => {
+		const innerBlocksWithLayout = innerBlocks.map( ( block, index ) => {
+			// Leave some space at the top of the canvas.
+			const style =
+				index === 0
+					? {
+							spacing: {
+								margin: {
+									top: '4em',
+								},
+							},
+					  }
+					: undefined;
 			if ( block.name === 'core/post-content' ) {
 				return createBlock( 'core/post-content', {
 					layout: postContentLayout,
+					style,
 				} );
 			}
 			return createBlock(
 				'core/group',
 				{
 					layout: postContentLayout,
+					style,
 				},
 				[ block ]
 			);
 		} );
 
-		// This group block is only here to leave some space at the top of the canvas.
-		return [
-			createBlock(
-				'core/group',
-				{
-					style: {
-						spacing: {
-							margin: {
-								top: '4em',
-							},
-						},
-					},
-				},
-				innerBlocksWithLayout
-			),
-		];
+		return innerBlocksWithLayout;
 	}, [ mode, templateBlocks, postContentLayout ] );
 
 	// It is important that we don't create a new instance of blocks on every change
@@ -242,10 +243,10 @@ function useBlockEditorProps( post, template, mode ) {
 	const navigationBlockClientId =
 		post.type === 'wp_navigation' && blocks && blocks[ 0 ]?.clientId;
 	useForceFocusModeForNavigation( navigationBlockClientId );
+
 	if ( disableRootLevelChanges ) {
 		return [ blocks, noop, noop ];
 	}
-
 	return [
 		blocks,
 		rootLevelPost === 'post' ? onInput : onInputTemplate,
