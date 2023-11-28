@@ -307,7 +307,6 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 			rootClientId: candidateBlockData.clientId,
 			blockIndex: newBlockIndex,
 			dropPosition: 'inside',
-			cursorPosition: position,
 		};
 	}
 
