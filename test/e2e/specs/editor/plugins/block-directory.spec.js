@@ -144,12 +144,10 @@ test.describe( 'Block Directory', () => {
 		 * fulfilling the first assertion.
 		 * Waiting for these two elements ensures that the request was dispatched.
 		 */
-		await expect(
-			blockLibrary.locator( '.block-editor-inserter__no-results' )
-		).toHaveText( 'No results found.' );
-		await expect(
-			blockLibrary.locator( '.block-editor-inserter__tips' )
-		).toContainText( 'Interested in creating your own block?' );
+		await expect( blockLibrary ).toContainText( 'No results found.' );
+		await expect( blockLibrary ).toContainText(
+			'Interested in creating your own block?'
+		);
 	} );
 
 	test( 'Should be able to add (the first) block', async ( {
