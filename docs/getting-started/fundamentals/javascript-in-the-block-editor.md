@@ -42,10 +42,10 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 
 ## Additional resources
 
+- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
+- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
+- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
 - [Javascript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
-- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) | Block Editor Handbook
-- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) | Block Editor Handbook
-- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) | Block Editor Handbook
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
