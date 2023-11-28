@@ -16,7 +16,6 @@ import {
  */
 import { useState, useEffect } from '@wordpress/element';
 import { BottomSheet, Gradient } from '@wordpress/components';
-import { InserterButton } from '@wordpress/block-editor';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -26,6 +25,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
+import InserterButton from '../inserter-button';
 
 const MIN_COL_NUM = 3;
 
