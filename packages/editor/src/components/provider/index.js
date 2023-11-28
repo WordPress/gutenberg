@@ -74,14 +74,14 @@ function extractPostContentBlockFromTemplateBlocks( blocks ) {
 	}
 	for ( let i = 0; i < blocks.length; i++ ) {
 		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
-		// we skip it because we only want to render stand-alone page content blocks in the block list.
+		// we skip it because we're only looking for post content blocks outside queries
+		// that render the actual post content of the current post/page.
 		if ( blocks[ i ].name === 'core/query' ) {
 			continue;
 		}
 		if ( blocks[ i ].name === 'core/post-content' ) {
 			return blocks[ i ];
 		}
-
 		if ( blocks[ i ].innerBlocks.length ) {
 			const postContentBlock = extractPostContentBlockFromTemplateBlocks(
 				blocks[ i ].innerBlocks
