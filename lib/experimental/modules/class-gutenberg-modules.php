@@ -89,8 +89,14 @@ class Gutenberg_Modules {
 	public static function print_enqueued_modules() {
 		foreach ( self::$enqueued as $module_identifier ) {
 			if ( isset( self::$registered[ $module_identifier ] ) ) {
-					$module = self::$registered[ $module_identifier ];
-					echo '<script type="module" src="' . $module['src'] . self::get_version_query_string( $module['version'] ) . '" id="' . $module_identifier . '"></script>';
+				$module = self::$registered[ $module_identifier ];
+				wp_print_script_tag(
+					array(
+						'type' => 'module',
+						'src'  => $module['src'] . self::get_version_query_string( $module['version'] ),
+						'id'   => $module_identifier,
+					)
+				);
 			}
 		}
 	}
