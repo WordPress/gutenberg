@@ -137,7 +137,7 @@ const { state, actions } = store( 'core/navigation', {
 			}
 		},
 
-		openMenu( menuOpenedOn ) {
+		openMenu( menuOpenedOn = 'click' ) {
 			const { type } = getContext();
 			state.menuOpenedBy[ menuOpenedOn ] = true;
 			if ( type === 'overlay' ) {
@@ -146,7 +146,7 @@ const { state, actions } = store( 'core/navigation', {
 			}
 		},
 
-		closeMenu( menuClosedOn ) {
+		closeMenu( menuClosedOn = 'click' ) {
 			const ctx = getContext();
 			state.menuOpenedBy[ menuClosedOn ] = false;
 			// Check if the menu is still open or not.
