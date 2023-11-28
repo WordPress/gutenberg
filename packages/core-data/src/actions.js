@@ -945,7 +945,6 @@ export function receiveDefaultTemplateId( query, templateId ) {
  * @param {?boolean}      invalidateCache Should invalidate query caches.
  * @param {?Object}       meta            Meta information about pagination.
  */
-
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch } ) => {
