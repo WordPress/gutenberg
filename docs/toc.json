@@ -46,6 +46,16 @@
 					}
 				]
 			},
+			{
+				"docs/getting-started/fundamentals-block-development/README.md": [
+					{
+						"docs/getting-started/fundamentals-block-development/registration-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals-block-development/javascript-in-the-block-editor.md": []
+					}
+				]
+			},
 			{ "docs/getting-started/glossary.md": [] },
 			{ "docs/getting-started/faq.md": [] }
 		]
@@ -117,26 +127,6 @@
 			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
-			{
-				"docs/how-to-guides/javascript/README.md": [
-					{
-						"docs/how-to-guides/javascript/plugins-background.md": []
-					},
-					{
-						"docs/how-to-guides/javascript/loading-javascript.md": []
-					},
-					{
-						"docs/how-to-guides/javascript/extending-the-block-editor.md": []
-					},
-					{ "docs/how-to-guides/javascript/troubleshooting.md": [] },
-					{
-						"docs/how-to-guides/javascript/versions-and-building.md": []
-					},
-					{ "docs/how-to-guides/javascript/scope-your-code.md": [] },
-					{ "docs/how-to-guides/javascript/js-build-setup.md": [] },
-					{ "docs/how-to-guides/javascript/esnext-js.md": [] }
-				]
-			},
 			{ "docs/how-to-guides/internationalization.md": [] },
 			{
 				"docs/how-to-guides/metabox.md": []
