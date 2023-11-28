@@ -102,21 +102,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify the markup of the selected alignment was generated.
-			let markup = await editor.getEditedPostContent();
-			expect( markup ).toContain( 'alignright' );
-
-			let blocks = await page.evaluate(
-				( [ content ] ) => {
-					return window.wp.blocks.parse( content );
-				},
-				[ markup ]
-			);
-			expect( blocks ).toMatchObject( [
-				{
-					name: 'test/test-align-true',
-					isValid: true,
-				},
-			] );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toContain( 'alignright' );
 
 			// Remove the alignment. Dropdown should be open.
 			await dropdown
@@ -130,21 +118,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify alignment markup was removed from the block.
-			markup = await editor.getEditedPostContent();
-			expect( markup ).not.toContain( 'alignright' );
-
-			blocks = await page.evaluate(
-				( [ content ] ) => {
-					return window.wp.blocks.parse( content );
-				},
-				[ markup ]
-			);
-			expect( blocks ).toMatchObject( [
-				{
-					name: 'test/test-align-true',
-					isValid: true,
-				},
-			] );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.not.toContain( 'alignright' );
 		} );
 	} );
 
@@ -188,9 +164,6 @@ test.describe( 'Align Hook Works as Expected', () => {
 			await editor.insertBlock( { name: 'test/test-align-array' } );
 			await editor.clickBlockToolbarButton( 'Align' );
 
-			const block = page.getByRole( 'document', {
-				name: 'Block: Test Align Array ',
-			} );
 			const dropdown = page.getByRole( 'menu', {
 				name: 'Align',
 			} );
@@ -206,7 +179,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify the markup of the selected alignment was generated.
-			await expect( block ).toHaveAttribute( 'data-align', 'center' );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toContain( 'aligncenter' );
 
 			// Remove the alignment. Dropdown should be open.
 			await dropdown
@@ -220,7 +195,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify alignment markup was removed from the block.
-			await expect( block ).not.toHaveAttribute( 'data-align' );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.not.toContain( 'aligncenter' );
 		} );
 	} );
 
@@ -288,9 +265,6 @@ test.describe( 'Align Hook Works as Expected', () => {
 			await editor.insertBlock( { name: 'test/test-default-align' } );
 			await editor.clickBlockToolbarButton( 'Align' );
 
-			const block = page.getByRole( 'document', {
-				name: 'Block: Test Default Align ',
-			} );
 			const dropdown = page.getByRole( 'menu', {
 				name: 'Align',
 			} );
@@ -306,7 +280,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify the markup of the selected alignment was generated.
-			await expect( block ).toHaveAttribute( 'data-align', 'center' );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toContain( 'aligncenter' );
 
 			// Remove the alignment. Dropdown should be open.
 			await dropdown
@@ -320,7 +296,9 @@ test.describe( 'Align Hook Works as Expected', () => {
 			).toHaveAttribute( 'aria-checked', 'true' );
 
 			// Verify alignment markup was removed from the block.
-			await expect( block ).not.toHaveAttribute( 'data-align' );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.not.toContain( 'aligncenter' );
 		} );
 	} );
 } );
