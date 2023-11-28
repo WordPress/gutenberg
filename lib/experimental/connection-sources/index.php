@@ -13,6 +13,7 @@ return array(
 		return get_post_meta( $block_instance->context['postId'], $meta_field, true );
 	},
 	'pattern_attributes' => function ( $block_instance ) {
-		return _wp_array_get( $block_instance->context, array( 'overrides', $block_instance->attributes['metadata']['id'] ), false );
+		$block_id = $block_instance->attributes['metadata']['id'];
+		return _wp_array_get( $block_instance->context, array( 'overrides', $block_id ), false );
 	},
 );

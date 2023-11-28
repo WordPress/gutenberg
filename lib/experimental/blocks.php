@@ -97,9 +97,11 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		// Allowlist of blocks that support block connections.
 		// Currently, we only allow the following blocks and attributes:
 		// - Paragraph: content.
+		// - Button: text.
 		// - Image: url.
 		$blocks_attributes_allowlist = array(
 			'core/paragraph' => array( 'content' ),
+			'core/button'    => array( 'text' ),
 			'core/image'     => array( 'url' ),
 		);
 

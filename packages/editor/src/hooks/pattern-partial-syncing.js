@@ -11,10 +11,14 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../store';
+import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-const { PartialSyncingControls, PATTERN_TYPES } = unlock( privateApis );
+const {
+	PartialSyncingControls,
+	PATTERN_TYPES,
+	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
+} = unlock( privateApis );
 
 /**
  * Override the default edit UI to include a new block inspector control for
@@ -35,19 +39,19 @@ const withPartialSyncingControls = createHigherOrderComponent(
 		);
 		const isEditingPattern = useSelect(
 			( select ) =>
-				select( editSiteStore ).getEditedPostType() ===
+				select( editorStore ).getCurrentPostType() ===
 				PATTERN_TYPES.user,
 			[]
 		);
 
-		// Check if editing a pattern and the current block is a paragraph block.
-		// Currently, only the paragraph block is supported.
 		const shouldShowPartialSyncingControls =
 			hasCustomFieldsSupport &&
 			props.isSelected &&
 			isEditingPattern &&
 			blockEditingMode === 'default' &&
-			[ 'core/paragraph' ].includes( props.name );
+			Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+				props.name
+			);
 
 		return (
 			<>
@@ -63,7 +67,7 @@ const withPartialSyncingControls = createHigherOrderComponent(
 if ( window.__experimentalConnections ) {
 	addFilter(
 		'editor.BlockEdit',
-		'core/edit-site/with-partial-syncing-controls',
+		'core/editor/with-partial-syncing-controls',
 		withPartialSyncingControls
 	);
 }

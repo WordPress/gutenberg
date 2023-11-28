@@ -6,45 +6,60 @@ import { nanoid } from 'nanoid';
 /**
  * WordPress dependencies
  */
+import { InspectorControls } from '@wordpress/block-editor';
 import { BaseControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
 
-function PartialSyncingControls( { attributes, setAttributes } ) {
-	// Only the `content` attribute of the paragraph block is currently supported.
-	const attributeName = 'content';
+/**
+ * Internal dependencies
+ */
+import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 
-	const isPartiallySynced =
-		attributes.connections?.attributes?.[ attributeName ]?.source ===
-		'pattern_attributes';
+function PartialSyncingControls( { name, attributes, setAttributes } ) {
+	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 
-	function updateConnections( isChecked ) {
+	function updateConnections( attributeName, isChecked ) {
 		if ( ! isChecked ) {
+			let updatedConnections = {
+				...attributes.connections,
+				attributes: {
+					...attributes.connections?.attributes,
+					[ attributeName ]: undefined,
+				},
+			};
+			if ( Object.keys( updatedConnections.attributes ).length === 1 ) {
+				updatedConnections.attributes = undefined;
+			}
+			if (
+				Object.keys( updatedConnections ).length === 1 &&
+				updateConnections.attributes === undefined
+			) {
+				updatedConnections = undefined;
+			}
 			setAttributes( {
-				connections: undefined,
+				connections: updatedConnections,
 			} );
 			return;
 		}
-		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( {
-				connections: {
-					attributes: {
-						[ attributeName ]: {
-							source: 'pattern_attributes',
-						},
-					},
+
+		const updatedConnections = {
+			...attributes.connections,
+			attributes: {
+				...attributes.connections?.attributes,
+				[ attributeName ]: {
+					source: 'pattern_attributes',
 				},
-			} );
+			},
+		};
+
+		if ( typeof attributes.metadata?.id === 'string' ) {
+			setAttributes( { connections: updatedConnections } );
 			return;
 		}
 
 		const id = nanoid( 6 );
 		setAttributes( {
-			connections: {
-				attributes: {
-					[ attributeName ]: { source: 'pattern_attributes' },
-				},
-			},
+			connections: updatedConnections,
 			metadata: {
 				...attributes.metadata,
 				id,
@@ -58,14 +73,23 @@ function PartialSyncingControls( { attributes, setAttributes } ) {
 				<BaseControl.VisualLabel>
 					{ __( 'Synced attributes' ) }
 				</BaseControl.VisualLabel>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Content' ) }
-					checked={ isPartiallySynced }
-					onChange={ ( isChecked ) => {
-						updateConnections( isChecked );
-					} }
-				/>
+				{ Object.entries( syncedAttributes ).map(
+					( [ attributeName, label ] ) => (
+						<CheckboxControl
+							key={ attributeName }
+							__nextHasNoMarginBottom
+							label={ label }
+							checked={
+								attributes.connections?.attributes?.[
+									attributeName
+								]?.source === 'pattern_attributes'
+							}
+							onChange={ ( isChecked ) => {
+								updateConnections( attributeName, isChecked );
+							} }
+						/>
+					)
+				) }
 			</BaseControl>
 		</InspectorControls>
 	);
