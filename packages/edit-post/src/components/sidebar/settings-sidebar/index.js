@@ -62,6 +62,10 @@ const SidebarContent = ( {
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
+			// This classname is added so we can apply a corrective negative
+			// margin to the panel.
+			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
+			className="edit-post-sidebar__panel"
 			headerClassName="edit-post-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
