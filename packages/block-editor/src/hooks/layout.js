@@ -135,10 +135,9 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const settings = useBlockSettings( blockName );
-	const {
-		layout: { allowEditing: allowEditingSetting },
-	} = settings;
-
+	// Block settings come from theme.json under settings.[blockName].
+	const { layout: layoutSettings } = settings;
+	// Layout comes from block attributes.
 	const { layout } = attributes;
 	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
@@ -153,17 +152,22 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
+	// Layout block support comes from the block's block.json.
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
 		layoutBlockSupportKey,
 		{}
 	);
+	const blockSupportAndThemeSettings = {
+		...layoutSettings,
+		...layoutBlockSupport,
+	};
 	const {
 		allowSwitching,
-		allowEditing = allowEditingSetting ?? true,
+		allowEditing = true,
 		allowInheriting = true,
 		default: defaultBlockLayout,
-	} = layoutBlockSupport;
+	} = blockSupportAndThemeSettings;
 
 	if ( ! allowEditing ) {
 		return null;
@@ -260,14 +264,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						<layoutType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
+							layoutBlockSupport={ blockSupportAndThemeSettings }
 						/>
 					) }
 					{ constrainedType && displayControlsForLegacyLayouts && (
 						<constrainedType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
+							layoutBlockSupport={ blockSupportAndThemeSettings }
 						/>
 					) }
 				</PanelBody>

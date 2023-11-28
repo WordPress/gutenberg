@@ -18,6 +18,13 @@
 
 .block-editor-block-patterns-list__item {
 	height: 100%;
+	// This is derived from the top padding set on
+	// `.block-editor-block-patterns-explorer__list`
+	scroll-margin-top: $grid-unit-30;
+	// This is derived from the bottom padding set on
+	// `.block-editor-block-patterns-explorer__list` and
+	// the bottom margin set on `...__list-item` above
+	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
 	.block-editor-block-preview__container {
 		display: flex;
