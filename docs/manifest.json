@@ -282,6 +282,60 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "How to use JavaScript with the Block Editor",
+		"slug": "javascript",
+		"markdown_source": "../docs/how-to-guides/javascript/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Plugins Background",
+		"slug": "plugins-background",
+		"markdown_source": "../docs/how-to-guides/javascript/plugins-background.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Loading JavaScript",
+		"slug": "loading-javascript",
+		"markdown_source": "../docs/how-to-guides/javascript/loading-javascript.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Extending the Block Editor",
+		"slug": "extending-the-block-editor",
+		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Troubleshooting",
+		"slug": "troubleshooting",
+		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Versions and Build Step",
+		"slug": "versions-and-building",
+		"markdown_source": "../docs/how-to-guides/javascript/versions-and-building.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Scope Your Code",
+		"slug": "scope-your-code",
+		"markdown_source": "../docs/how-to-guides/javascript/scope-your-code.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript Build Setup",
+		"slug": "js-build-setup",
+		"markdown_source": "../docs/how-to-guides/javascript/js-build-setup.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "ESNext Syntax",
+		"slug": "esnext-js",
+		"markdown_source": "../docs/how-to-guides/javascript/esnext-js.md",
+		"parent": "javascript"
+	},
+	{
 		"title": "Internationalization",
 		"slug": "internationalization",
 		"markdown_source": "../docs/how-to-guides/internationalization.md",
