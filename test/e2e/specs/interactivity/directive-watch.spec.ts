@@ -3,14 +3,14 @@
  */
 import { test, expect } from './fixtures';
 
-test.describe( 'data-wp-effect', () => {
+test.describe( 'data-wp-watch', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
-		await utils.addPostWithBlock( 'test/directive-effect' );
+		await utils.addPostWithBlock( 'test/directive-watch' );
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		await page.goto( utils.getLink( 'test/directive-effect' ) );
+		await page.goto( utils.getLink( 'test/directive-watch' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -18,12 +18,12 @@ test.describe( 'data-wp-effect', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'check that effect runs when it is added', async ( { page } ) => {
+	test( 'check that watch runs when it is added', async ( { page } ) => {
 		const el = page.getByTestId( 'element in the DOM' );
 		await expect( el ).toContainText( 'element is in the DOM' );
 	} );
 
-	test( 'check that effect runs when it is removed', async ( { page } ) => {
+	test( 'check that watch runs when it is removed', async ( { page } ) => {
 		await page.getByTestId( 'toggle' ).click();
 		const el = page.getByTestId( 'element in the DOM' );
 		await expect( el ).toContainText( 'element is not in the DOM' );

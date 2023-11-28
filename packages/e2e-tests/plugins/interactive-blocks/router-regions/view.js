@@ -2,9 +2,9 @@
 	/**
 	 * WordPress dependencies
 	 */
-	const { store, navigate } = wp.interactivity;
+	const { store, navigate, getContext } = wp.interactivity;
 
-	store( {
+	const { state } = store( 'router-regions', {
 		state: {
 			region1: {
 				text: 'hydrated'
@@ -18,21 +18,25 @@
 		},
 		actions: {
 			router: {
-				navigate: async ( { event: e } ) => {
+				* navigate( e ) {
 					e.preventDefault();
-					await navigate( e.target.href );
+					yield navigate( e.target.href );
 				},
-				back: () => history.back(),
+				back() {
+					history.back();
+				},
 			},
 			counter: {
-				increment: ( { state, context } ) => {
-					if ( context.counter ) {
+				increment() {
+					const context = getContext();
+					if ( context?.counter ) {
 						context.counter.value += 1;
 					} else {
 						state.counter.value += 1;
 					}
 				},
-				init: ( { context } ) => {
+				init() {
+					const context = getContext();
 					if ( context.counter ) {
 						context.counter.value = context.counter.initialValue;
 					}
