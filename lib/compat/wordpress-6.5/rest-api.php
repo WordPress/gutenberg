@@ -21,7 +21,6 @@ function gutenberg_register_global_styles_revisions_endpoints() {
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
 
 /**
-<<<<<<< HEAD
  * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private

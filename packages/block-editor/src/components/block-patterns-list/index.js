@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-<<<<<<< HEAD
 import { useEffect, useState, forwardRef } from '@wordpress/element';
-=======
-import { useState, forwardRef } from '@wordpress/element';
->>>>>>> 8bc5711934 (not functional commit - refactor the implementation)
 import {
 	VisuallyHidden,
 	Tooltip,
