@@ -22,7 +22,11 @@ export function usePostEditorLayout( templatePostContentBlock ) {
 					...templateLayoutDefinition,
 					type: 'constrained',
 			  }
-			: { ...globalStylesLayout, ...layout, type: 'default' };
+			: {
+					...globalStylesLayout,
+					...templateLayoutDefinition,
+					type: 'default',
+			  };
 	}, [ templateLayoutDefinition, globalStylesLayout ] );
 
 	return layout;
