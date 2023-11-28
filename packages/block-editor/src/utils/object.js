@@ -72,14 +72,16 @@ export function setImmutably( object, path, value ) {
 		throw new Error( 'Path cannot be empty' );
 	}
 
-	const clonedObj = Array.isArray( object ) ? [ ...object ] : { ...object };
+	const shallowClone = Array.isArray( object )
+		? [ ...object ]
+		: { ...object };
 	const [ first, ...rest ] = path;
 
-	clonedObj[ first ] = rest.length
-		? setImmutably( clonedObj[ first ], rest, value )
+	shallowClone[ first ] = rest.length
+		? setImmutably( shallowClone[ first ], rest, value )
 		: value;
 
-	return clonedObj;
+	return shallowClone;
 }
 
 const stringToPath = memoize( ( path ) => path.split( '.' ) );
