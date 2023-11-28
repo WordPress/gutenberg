@@ -9,10 +9,10 @@ import {
 import {
 	chevronRightSmall,
 	check,
-	blockTable,
+	list,
 	arrowUp,
 	arrowDown,
-	grid,
+	category,
 	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -275,7 +275,11 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
+const VIEW_TYPE_ICONS = {
+	list,
+	grid: category,
+	'side-by-side': columns,
+};
 
 export default function ViewActions( {
 	fields,
