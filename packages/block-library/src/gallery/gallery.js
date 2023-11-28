@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
 
 /**
@@ -55,6 +56,8 @@ export default function Gallery( props ) {
 				insertBlocksAfter={ insertBlocksAfter }
 				showToolbarButton={ ! isContentLocked }
 				className="blocks-gallery-caption"
+				label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Add gallery caption' ) }
 			/>
 		</figure>
 	);

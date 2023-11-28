@@ -24,6 +24,7 @@ export function Caption( {
 	setAttributes,
 	isSelected,
 	insertBlocksAfter,
+	placeholder = __( 'Add caption' ),
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
 	className,
@@ -89,7 +90,7 @@ export function Caption( {
 						) }
 						ref={ ref }
 						aria-label={ label }
-						placeholder={ __( 'Add caption' ) }
+						placeholder={ placeholder }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

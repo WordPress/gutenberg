@@ -741,7 +741,7 @@ export default function Image( {
 				setAttributes={ setAttributes }
 				isSelected={ isSelected }
 				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption' ) }
+				label={ __( 'Image caption text' ) }
 				showToolbarButton={ hasNonContentControls }
 			/>
 		</>
