@@ -72,6 +72,7 @@ const setupInitHooks = () => {
 				rawFeatures,
 				galleryWithImageBlocks,
 				locale,
+				isNetworkConnected,
 			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
@@ -96,6 +97,7 @@ const setupInitHooks = () => {
 				rawFeatures,
 				galleryWithImageBlocks,
 				locale,
+				isNetworkConnected,
 			};
 		}
 	);
