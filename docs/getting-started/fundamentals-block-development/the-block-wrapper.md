@@ -1,46 +1,113 @@
-# The Block wrapper's attributes
+# The Block markup's wrapper
 
-Each block's markup is wrapped by a container HTML tag that needs to have the proper attributes to fully work in the Block Editor and reflect the proper block's style settings when rendered in the Block Editor and the front end.
+Each block's markup is wrapped by a container HTML tag that needs to have the proper attributes to fully work in the Block Editor and to reflect the proper block's style settings when rendered in the Block Editor and the front end.
 
 Ensuring proper attributes to the block wrapper is especially important when using custom styling or features like `supports`. 
 
-<div >
-The use of `supports` generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data
+<div class="callout callout-info">
+The use of <code>supports</code> generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data
+</div>
 
+**Three markups can be defined for a block**:
 
-Three markups can be defined for a block:
-
-- The one for the Block Editor, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
-- The one used to save the block in the DB, defined through a `save` React component passed to `registerBlockType` when registering the block in the client. 
+- The one for the **Block Editor**, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
+- The one used to **save the block in the DB**, defined through a `save` React component passed to `registerBlockType` when registering the block in the client. 
     - This markup will be returned to the front end on request if no dynamic render has been defined for the block.
-- The one used to dynamically render the markup of the block returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
+- The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
     - If defined, this server-side generated markup will be returned to the front end, ignoring the markup stored in DB.
 
+<div class="callout callout-tip">
 These markups are defined separately, but the recommendation is to match each other so the block in the editor looks as close as possible to how it looks on the front end.
+</div>
+
+## The Edit component's markup
+
+The `useBlockProps()` hook available on the `@wordpress/block-editor` allows passing the required attributes for the Block Editor to the `edit` block's outer wrapper. 
+
+Among other things, the `useBlockProps()` hook takes care of including in this wrapper:
+- An `id` for the block's markup 
+- Some accesibility and `data-` attributes
+- Classes and inline styles reflecting custom settings, which include by default:
+    - The `wp-block` class 
+    - A class that contains the name of the block with its namespace
+
+For example, for the following piece of code of a block's registration in the client:
+
+```js
+const Edit = () => <p { ...useBlockProps() }>Hello World - Block Editor</p>;
+
+registerBlockType( ..., {
+	edit: Edit
+} );
+```
+_(see the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))_
+
+The markup of the block in the Block Editor could look like this:
+```html
+<p 
+    tabindex="0" 
+    id="block-4462939a-b918-44bb-9b7c-35a0db5ab8fe" 
+    role="document" 
+    aria-label="Block: Minimal Gutenberg Block ca6eda" 
+    data-block="4462939a-b918-44bb-9b7c-35a0db5ab8fe" 
+    data-type="block-development-examples/minimal-block-ca6eda" 
+    data-title="Minimal Gutenberg Block ca6eda" 
+    class="
+        block-editor-block-list__block 
+        wp-block 
+        is-selected 
+        wp-block-block-development-examples-minimal-block-ca6eda
+    "
+>Hello World - Block Editor</p>
+```
+
+Any additional classes and attributes for the `Edit` component of the block should be passed as an argument of `useBlockProps` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/edit.js)). When you add `support` for any feature, they get added to the object returned by the `useBlockProps` hook.
 
 
-## The Edit component 
+## The Save component's markup
 
-The markup of the `Edit` React component ` function is wrapped in a few other elements. The outer wrapper of each block has the wp-block class and a data-block attribute that contains the name of the block with its namespace – core/group for the group block, for example.
+When saving the markup in the DB, it’s important to add the block props returned by `useBlockProps.save()` to the wrapper element of your block. `useBlockProps.save()` ensures that the block class name is rendered properly in addition to any HTML attribute injected by the block supports API.
+
+For example, for the following piece of code of a block's registration in the client, defining the markup desired for the DB (and returned to the front end by default):
+
+```js
+const Save = () => <p { ...useBlockProps.save() }>Hello World - Frontend</p>;
+
+registerBlockType( ..., {
+	edit: Edit,
+	save: Save,
+} );
+```
+
+_(see the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/src/index.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))_
 
 
-changes in blocks --- update store --- update blocks
+The markup of the block in the front end could look like this:
+```html
+<p class="wp-block-block-development-examples-minimal-block-ca6eda">Hello World – Frontend</p>
+```
 
-To render the block element wrapper for the block’s edit implementation, the block author must use the `useBlockProps()` hook.
+Any additional classes and attributes for the `Save` component of the block should be passed as an argument of `useBlockProps.save()` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js)). 
 
-The block wrapper element needs to include `props` from `useBlockProps` to include its classes and atributes properly:
-- any custom attributes (like extra classes) should be passed as an argument of `useBlockProps`
-- When you add `support` for any feature, they get added to the object returned by the `useBlockProps` hook.
+When you add `support` for any feature, they get added to the object returned by the `useBlockProps.save()` hook.
 
+```html
+<p class="
+    wp-block-block-development-examples-block-supports-6aa4dd 
+    has-accent-4-color 
+    has-contrast-background-color 
+    has-text-color 
+    has-background
+">Hello World</p>
+```
 
+_(check the [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) that generated the HTML above in the front end)_
 
-## The Save component 
+## The server-side render markup
 
-When saving the markup in the DB, it’s important to add the block props returned by `useBlockProps.save()` to the wrapper element of your block. This ensures that the block class name is rendered properly in addition to any HTML attribute injected by the block supports API.
+Any server-side render definition for the block via the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
 
-## The Render
-
-- in any server-side render definition for the block via the `get_block_wrapper_attributes()` function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
+in the same way that `useBlockProps.save()` adds to the markup stored in the DB (and that potentially can also be returned to the front end )
 
 
 --------
@@ -48,8 +115,8 @@ When saving the markup in the DB, it’s important to add the block props return
 
 
 The use of `supports` generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data:
-- in the `Edit` component via the `useBlockProps()` hook (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js#L106))
-- in the `Save` component via the `useBlockProps.save()` hook (see [example](https://github.com/WordPress/block-development-examples/blob/e804d8416775de94fccae27be6f26ae0ae75b3d9/plugins/copyright-date-block-09aac3/src/save.js#L40)) 
+- in the `Edit` component via the `useBlockProps()` hook 
+- in the `Save` component via the `useBlockProps.save()` hook  
 
 
 …but in order for the Gutenberg editor to know how to manipulate the block, add any extra classNames that are needed for the block… the block wrapper element should apply props retrieved from the `useBlockProps` react hook call. The block wrapper element should be a native DOM element, like <div> and <table>, or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
