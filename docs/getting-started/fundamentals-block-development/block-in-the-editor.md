@@ -1,18 +1,8 @@
 # The block in the Editor
 
-The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. 
-changes in blocks --- update store --- update blocks
+The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. Every update in the Block Editor triggers an action that updates a store that ultimately updates the blocks in the Block Editor to reflect its updated state.
 
-A block actually manages two main interfaces that are registered in the form of React components on the client through the `registerBlockType`:
-- The `edit` React component that defines how the block is displayed in the Block Editor and its behavior.
-- The `save` React component that defines how the block is stored in the DB
-
-The `edit` React component of a block receives a `props` object which includes `attributes` and `setAttributes`
-
-The block wrapper element needs to include `props` from `useBlockProps` to include its classes and atributes properly:
-- any custom attributes (like extra classes) should be passed as an argument of `useBlockProps`
-- When you add `support` for any feature, they get added to the object returned by the `useBlockProps` hook.
-
+Every block sets an `Edit` React component that defines how the block is displayed in the Block Editor and its behavior. This `Edit` React component of a block receives a `props` object, which includes `attributes` and `setAttributes` 
 
 This "edit" interface can also define custom setting controls for the block in the Editor:  `Block Toolbar` and `Settings Sidebar`
 
