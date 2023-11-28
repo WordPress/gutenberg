@@ -2806,8 +2806,9 @@ export const __unstableGetContentLockingParent = createSelector(
 		while ( state.blocks.parents.has( current ) ) {
 			current = state.blocks.parents.get( current );
 			if (
-				current &&
-				getTemplateLock( state, current ) === 'contentOnly'
+				getBlockName( state, current ) === 'core/block' ||
+				( current &&
+					getTemplateLock( state, current ) === 'contentOnly' )
 			) {
 				result = current;
 			}
