@@ -41,6 +41,10 @@ export default function EditSitePreferencesModal() {
 		} );
 	};
 
+	const turnOffDistractionFree = () => {
+		setPreference( 'core/edit-site', 'distractionFree', false );
+	};
+
 	const sections = useMemo( () => [
 		{
 			name: 'general',
@@ -76,6 +80,7 @@ export default function EditSitePreferencesModal() {
 				>
 					<EnableFeature
 						featureName="fixedToolbar"
+						onToggle={ turnOffDistractionFree }
 						help={ __(
 							'Access all block and document tools in a single place.'
 						) }
@@ -95,13 +100,6 @@ export default function EditSitePreferencesModal() {
 							'Highlights the current block and fades other content.'
 						) }
 						label={ __( 'Spotlight mode' ) }
-					/>
-					<EnableFeature
-						featureName="showBlockBreadcrumbs"
-						help={ __(
-							'Shows block breadcrumbs at the bottom of the editor.'
-						) }
-						label={ __( 'Display block breadcrumbs' ) }
 					/>
 				</PreferencesModalSection>
 			),

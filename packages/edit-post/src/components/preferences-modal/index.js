@@ -76,6 +76,10 @@ export default function EditPostPreferencesModal() {
 		closeGeneralSidebar();
 	};
 
+	const turnOffDistractionFree = () => {
+		setPreference( 'core/edit-post', 'distractionFree', false );
+	};
+
 	const sections = useMemo(
 		() => [
 			{
@@ -171,6 +175,7 @@ export default function EditPostPreferencesModal() {
 					>
 						<EnableFeature
 							featureName="fixedToolbar"
+							onToggle={ turnOffDistractionFree }
 							help={ __(
 								'Access all block and document tools in a single place.'
 							) }
