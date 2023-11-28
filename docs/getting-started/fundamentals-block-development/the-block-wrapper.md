@@ -1,6 +1,6 @@
 # The block wrapper
 
-Each block's markup is wrapped by a container HTML tag that needs to have the proper attributes to fully work in the Block Editor and to reflect the proper block's style settings when rendered in the Block Editor and the front end. As developers, when creating a custom block, we need to manually add these attributes to the markup using some of the tools provided by WordPress.
+Each block's markup is wrapped by a container HTML tag that needs to have the proper attributes to fully work in the Block Editor and to reflect the proper block's style settings when rendered in the Block Editor and the front end. As developers, we have full control over the block's markup, and WordPress provides the tools to add the attributes that need to exist on the wrapper to our block's markup.
 
 Ensuring proper attributes to the block wrapper is especially important when using custom styling or features like `supports`. 
 
