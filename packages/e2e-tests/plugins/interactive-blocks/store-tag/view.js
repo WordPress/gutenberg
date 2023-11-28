@@ -8,8 +8,8 @@
 		state: {
 			counter: {
 				// `value` is defined in the server.
-				double() {
 				get double() {
+					return state.counter.value * 2
 				},
 				clicks: 0,
 			},
