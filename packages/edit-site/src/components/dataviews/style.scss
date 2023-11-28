@@ -2,7 +2,7 @@
 	width: 100%;
 	height: calc(100% - #{$grid-unit-40} * 2);
 	overflow: auto;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-40 $grid-unit-40 0;
 
 	> div {
 		min-height: 100%;
@@ -58,7 +58,7 @@
 		}
 		th {
 			position: sticky;
-			top: 0;
+			top: - #{$grid-unit-40}; // Offset the container padding
 			background-color: $white;
 			box-shadow: inset 0 -#{$border-width} 0 $gray-200;
 		}
