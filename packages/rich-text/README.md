@@ -359,7 +359,14 @@ _Returns_
 
 The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
 
-Create an emtpy instance: `new RichTextData()`. Create one from an html string: `new RichTextData( '<em>hello</em>' )`. Create one from a DOM wrapper element: `new RichTextData( document.createElement( 'p' ) )`. Create Create one from a rich text value: `new RichTextData( { text: '...', formats: [ ... ] } )`.
+-   Create an emtpy instance: `new RichTextData()`.
+-   Create one from an html string: `RichTextData.fromHTMLString(
+'<em>hello</em>' )`.
+-   Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+document.querySelector( 'p' ) )`.
+-   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+-   Create one from a rich text value: `new RichTextData( { text: '...',
+formats: [ ... ] } )`.
 
 ### RichTextValue
 

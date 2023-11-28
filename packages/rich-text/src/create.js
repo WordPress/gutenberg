@@ -133,75 +133,58 @@ const RichTextInternalData = Symbol( 'RichTextInternalData' );
  * The RichTextData class is used to instantiate a wrapper around rich text
  * values, with methods that can be used to transform or manipulate the data.
  *
- * Create an emtpy instance: `new RichTextData()`.
- * Create one from an html string: `new RichTextData( '<em>hello</em>' )`.
- * Create one from a DOM wrapper element:
- * `new RichTextData( document.createElement( 'p' ) )`.
- * Create
- * Create one from a rich text value:
- * `new RichTextData( { text: '...', formats: [ ... ] } )`.
+ * - Create an emtpy instance: `new RichTextData()`.
+ * - Create one from an html string: `RichTextData.fromHTMLString(
+ *   '<em>hello</em>' )`.
+ * - Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+ *   document.querySelector( 'p' ) )`.
+ * - Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+ * - Create one from a rich text value: `new RichTextData( { text: '...',
+ *   formats: [ ... ] } )`.
  *
- * @todo Add methods to manipulate the data, such as slice etc.
+ * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
-	constructor( init, options = {} ) {
-		if ( ! init ) {
-			init = createEmptyValue();
-		} else if ( typeof init === 'string' ) {
-			init = create( { html: init } );
-		} else if ( init.nodeType && init.nodeType === init.ELEMENT_NODE ) {
-			init.normalize();
-			const { preserveWhiteSpace = false } = options;
-			if ( preserveWhiteSpace === false ) {
-				collapseWhiteSpaceElement( init );
-			}
-			init = create( { element: init } );
-		} else if ( init.text ) {
-			init = {
-				text: init.text,
-				formats: init.formats,
-				replacements: init.replacements,
-			};
-
-			if ( ! init.formats ) {
-				init.formats = Array( init.text.length );
-			} else if ( init.formats.length !== init.text.length ) {
-				throw new Error(
-					'RichTextData: `formats` and `text` must be of the same length.'
-				);
-			}
-
-			if ( ! init.replacements ) {
-				init.replacements = Array( init.text.length );
-			} else if ( init.replacements.length !== init.text.length ) {
-				throw new Error(
-					'RichTextData: `replacements` and `text` must be of the same length.'
-				);
-			}
-		} else {
-			init = createEmptyValue();
+	static fromHTMLString( html ) {
+		return new RichTextData( create( { html } ) );
+	}
+	static fromHTMLElement( htmlElement, options = {} ) {
+		const element = htmlElement.cloneNode( true );
+		element.normalize();
+		const { preserveWhiteSpace = false } = options;
+		if ( preserveWhiteSpace === false ) {
+			collapseWhiteSpaceElement( element );
 		}
-
+		const richTextData = new RichTextData( create( { element } ) );
+		Object.defineProperty( richTextData, 'originalHTML', {
+			value: htmlElement.innerHTML,
+		} );
+		return richTextData;
+	}
+	static fromPlainText( text ) {
+		return new RichTextData( create( { text } ) );
+	}
+	constructor( init = createEmptyValue() ) {
 		// Setting text, formats, and replacements as enumerable properties
 		// unfortunately visualises these in the e2e tests. As long as the class
 		// instance doesn't have any enumerable properties, it will be
 		// visualised as a string.
 		Object.defineProperty( this, RichTextInternalData, { value: init } );
-		Object.defineProperty( this, 'originalHTML', {
-			value: options.originalHTML,
-		} );
 	}
-	valueOf() {
+	toHTMLString() {
 		return (
 			this.originalHTML ||
 			toHTMLString( { value: this[ RichTextInternalData ] } )
 		);
 	}
+	valueOf() {
+		return this.toHTMLString();
+	}
 	toString() {
-		return this.valueOf();
+		return this.toHTMLString();
 	}
 	toJSON() {
-		return this.valueOf();
+		return this.toHTMLString();
 	}
 	get length() {
 		return this.text.length;

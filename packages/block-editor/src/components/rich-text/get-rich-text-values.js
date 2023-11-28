@@ -96,5 +96,9 @@ export function getRichTextValues( blocks = [] ) {
 	const values = [];
 	addValuesForBlocks( values, blocks );
 	getBlockProps.skipFilters = false;
-	return values.map( ( value ) => new RichTextData( value ) );
+	return values.map( ( value ) =>
+		value instanceof RichTextData
+			? value
+			: RichTextData.fromHTMLString( value )
+	);
 }

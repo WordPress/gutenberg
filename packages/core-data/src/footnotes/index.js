@@ -53,7 +53,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			// To do, remove support for string values.
+			// To do, remove support for string values?
 			if (
 				typeof value !== 'string' &&
 				! ( value instanceof RichTextData )
@@ -61,7 +61,10 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			const richTextValue = new RichTextData( value );
+			const richTextValue =
+				typeof value === 'string'
+					? RichTextData.fromHTMLElement( value )
+					: value;
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
@@ -78,11 +81,10 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				}
 			} );
 
-			if ( typeof value === 'string' ) {
-				attributes[ key ] = richTextValue.toString();
-			} else {
-				attributes[ key ] = richTextValue;
-			}
+			attributes[ key ] =
+				typeof value === 'string'
+					? richTextValue.toHTMLString()
+					: richTextValue;
 		}
 
 		return attributes;

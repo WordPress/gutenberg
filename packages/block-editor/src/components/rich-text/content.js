@@ -29,7 +29,7 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 		value = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ value?.valueOf() }</RawHTML>;
+	const content = <RawHTML>{ value?.toString() }</RawHTML>;
 
 	if ( Tag ) {
 		const { format, ...restProps } = props;

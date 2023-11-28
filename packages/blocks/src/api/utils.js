@@ -283,13 +283,14 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 					if ( value instanceof RichTextData ) {
 						accumulator[ key ] = value;
 					} else if ( typeof value === 'string' ) {
-						accumulator[ key ] = new RichTextData( value );
+						accumulator[ key ] =
+							RichTextData.fromHTMLString( value );
 					}
 				} else if (
 					schema.type === 'string' &&
 					value instanceof RichTextData
 				) {
-					accumulator[ key ] = value.toString();
+					accumulator[ key ] = value.toHTMLString();
 				} else {
 					accumulator[ key ] = value;
 				}
