@@ -16,7 +16,7 @@ A block can have three sets of markup defined, each one of them with a specific 
 - The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
     - If defined, this server-side generated markup will be returned to the front end, ignoring the markup stored in DB.
 
-For the React components `edit` and `save`, the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
+For the React component `edit` and the `save` function, the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
 
 
 ## The Edit component's markup
