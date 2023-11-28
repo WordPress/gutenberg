@@ -49,6 +49,9 @@
 			{
 				"docs/getting-started/fundamentals-block-development/README.md": [
 					{
+						"docs/getting-started/fundamentals-block-development/file-structure-of-a-block.md": []
+					},
+					{
 						"docs/getting-started/fundamentals-block-development/registration-of-a-block.md": []
 					},
 					{

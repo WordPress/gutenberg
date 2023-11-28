@@ -102,6 +102,12 @@
 		"parent": "getting-started"
 	},
 	{
+		"title": "File structure of a block",
+		"slug": "file-structure-of-a-block",
+		"markdown_source": "../docs/getting-started/fundamentals-block-development/file-structure-of-a-block.md",
+		"parent": "fundamentals-block-development"
+	},
+	{
 		"title": "Registration of a block",
 		"slug": "registration-of-a-block",
 		"markdown_source": "../docs/getting-started/fundamentals-block-development/registration-of-a-block.md",
