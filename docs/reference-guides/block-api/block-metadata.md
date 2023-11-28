@@ -77,65 +77,9 @@ Development is improved by using a defined schema definition file. Supported edi
 "$schema": "https://schemas.wp.org/trunk/block.json"
 ```
 
-## Block registration
-
-### PHP (server-side)
-
-The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
-
-This function takes two params relevant in this context (`$block_type` accepts more types and variants):
-
--   `$block_type` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
--   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
-    -   `$render_callback` (`callable`) – callback used to render blocks of this block type, it's an alternative to the `render` field in `block.json`.
-
-It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
-
-**Example:**
-
-```php
-register_block_type(
-	__DIR__ . '/notice',
-	array(
-		'render_callback' => 'render_block_core_notice',
-	)
-);
-```
-
-### JavaScript (client-side)
-
-When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
-
-**Example:**
-
-```js
-registerBlockType( 'my-plugin/notice', {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
-
-Although registering the block also on the server with PHP is still recommended for the reasons above, if you want to register it only client-side you can now use `registerBlockType` method from `@wordpress/blocks` package to register a block type using the metadata loaded from `block.json` file.
-
-The function takes two params:
-
--   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
--   `$settings` (`Object`) – client-side block settings.
-
-It returns the registered block type (`WPBlock`) on success or `undefined` on failure.
-
-**Example:**
-
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import Edit from './edit';
-import metadata from './block.json';
-
-registerBlockType( metadata, {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
+<div class="callout callout-info">
+Check <a href="/docs/getting-started/fundamentals-block-development/registration-of-a-block.md">Registration of a block</a> to learn more about how to register a block using its metadata.
+</div>
 
 ## Block API
 
