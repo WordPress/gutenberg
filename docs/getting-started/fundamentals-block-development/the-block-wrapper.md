@@ -86,7 +86,7 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 <p class="wp-block-block-development-examples-minimal-block-ca6eda">Hello World – Frontend</p>
 ```
 
-Any additional classes and attributes for the `Save` component of the block should be passed as an argument of `useBlockProps.save()` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js)). 
+Any additional classes and attributes for the `save` function of the block should be passed as an argument of `useBlockProps.save()` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js)). 
 
 When you add `support` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook.
 
