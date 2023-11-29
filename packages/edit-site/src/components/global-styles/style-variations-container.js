@@ -45,7 +45,7 @@ function Variation( { variation, preserveAdditionalCSS } ) {
 
 	const selectVariation = () => {
 		const blockStyles = variation?.styles?.blocks || {};
-		if ( user?.styles?.blocks ) {
+		if ( user?.styles?.blocks && preserveAdditionalCSS ) {
 			Object.keys( user.styles.blocks ).forEach( ( blockName ) => {
 				if ( user.styles.blocks[ blockName ].css ) {
 					blockStyles[ blockName ] = {
