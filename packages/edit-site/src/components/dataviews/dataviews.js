@@ -20,7 +20,7 @@ import ViewSideBySide from './view-side-by-side';
 
 // To do: convert to view type registry.
 export const viewTypeSupportsMap = {
-	list: {},
+	table: {},
 	grid: {},
 	'side-by-side': {
 		preview: true,
@@ -28,7 +28,7 @@ export const viewTypeSupportsMap = {
 };
 
 const viewTypeMap = {
-	list: ViewList,
+	table: ViewList,
 	grid: ViewGrid,
 	'side-by-side': ViewSideBySide,
 };
