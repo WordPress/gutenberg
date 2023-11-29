@@ -64,7 +64,10 @@ Example:
     -   `operator`: which type of filter it is. Only `in` available at the moment.
     -   `value`: the actual value selected by the user.
 -   `hiddenFields`: the `id` of the fields that are hidden in the UI.
--   `layout`: ...
+-   `layout`: config that is specific to a particular layout type.
+    -   `grid`: config for the `grid` layout
+        -   `mediaField`: the field name to be used for rendering each card's media.
+        -   `primaryField`: the field name to be used for rendering each card's title.
 
 ### View <=> data
 
