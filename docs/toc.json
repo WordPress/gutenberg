@@ -58,6 +58,9 @@
 						"docs/getting-started/fundamentals/registration-of-a-block.md": []
 					},
 					{
+						"docs/getting-started/fundamentals/block-wrapper.md": []
+					},
+					{
 						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
 					}
 				]

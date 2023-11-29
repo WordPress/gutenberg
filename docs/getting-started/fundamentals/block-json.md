@@ -1,4 +1,4 @@
-# `block.json`
+# block.json
 
 The `block.json` file simplifies the processs of defining and registering a block by using the same block's definition in JSON format to register the block in both the server and the client.
 
@@ -10,7 +10,7 @@ Click <a href="https://github.com/WordPress/block-development-examples/tree/trun
 
 Besides simplifying a block's registration, using a `block.json` has [several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), including improved performance and development.
 
-At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties you can define things such as:
+At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties you can define things such as:
 
 - Basic metadata of the block
 - Files for the block's behavior, style, or output
@@ -60,11 +60,6 @@ _Example: Attributes as defined in block.json_
 	}
 },
 ```
-
-<div class="callout callout-info">
-Check the <a href="https://developer.wordpress.org/redesign-test/block-editor/reference-guides/block-api/block-attributes/"> <code>attributes</code> </a> reference page for full info about the Attributes API. 
-</div>
-
 By default `attributes` are serialized and stored in the block's delimiter but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
 
 _Example: Atributes stored in the Markup representation of the block_
