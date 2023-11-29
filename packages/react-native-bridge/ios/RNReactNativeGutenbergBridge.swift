@@ -423,7 +423,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
 	@objc
-	func getConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
+	func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
 		callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
 	}
 }
